@@ -1,15 +1,639 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Luxury Private Transfers & Chauffeur Service in Barcelona. Airport transfers, cruise port transfers, executive chauffeur, VIP transportation across Barcelona and Spain." />
-    <meta name="keywords" content="Barcelona airport transfer, luxury chauffeur Barcelona, private transfer Barcelona, Barcelona to Sitges, Barcelona to Andorra, executive transfer Barcelona" />
-    <title>Élite BCN — Luxury Private Transfers Barcelona</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Luxury Private Transfers & Chauffeur Service in Barcelona. Airport transfers, cruise port transfers, executive chauffeur and VIP transportation across Barcelona and Spain."/>
+<meta name="keywords" content="Barcelona airport transfer, luxury chauffeur Barcelona, private transfer Barcelona, Barcelona to Sitges, Barcelona to Andorra, executive transfer Barcelona"/>
+<title>Élite BCN — Luxury Private Transfers Barcelona</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --gold:#c8a96e;--gold-l:#e2c898;--gold-d:#a07840;
+  --black:#080808;--dark:#0e0e0e;--d2:#141414;--d3:#1a1a1a;--d5:#2a2a2a;
+  --white:#fff;--off:#f5f0e8;--grey:#888;--gl:#ccc;
+  --glass:rgba(255,255,255,.04);--gb:rgba(200,169,110,.15);
+  --tr:.3s cubic-bezier(.4,0,.2,1);
+  --fd:'Cormorant Garamond',serif;--fb:'Montserrat',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:var(--fb);font-weight:300;line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}img{display:block;width:100%;object-fit:cover}ul{list-style:none}button{border:none;background:none;cursor:pointer;font-family:inherit}
+.container{max-width:1280px;margin:0 auto;padding:0 2rem}
+.section{padding:110px 0}
+::selection{background:var(--gold);color:var(--black)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--black)}::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:3px}
+
+/* SECTION HEADERS */
+.sh{text-align:center;margin-bottom:3.5rem}
+.stag{display:inline-block;font-size:.6rem;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:.9rem;padding:5px 14px;border:1px solid var(--gb);background:rgba(200,169,110,.07)}
+.stitle{font-family:var(--fd);font-size:clamp(2rem,4vw,3.2rem);font-weight:300;color:var(--off);letter-spacing:-.01em;line-height:1.15;margin-bottom:.75rem}
+.ssub{font-size:.82rem;color:var(--grey);max-width:580px;margin:0 auto;line-height:1.9}
+
+/* BUTTONS */
+.bg{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--gold),var(--gold-d));color:var(--black);font-family:var(--fb);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:13px 26px;transition:var(--tr);white-space:nowrap;cursor:pointer;border:none}
+.bg:hover{background:linear-gradient(135deg,var(--gold-l),var(--gold));transform:translateY(-1px);box-shadow:0 8px 28px rgba(200,169,110,.3)}
+.bg-lg{padding:17px 38px;font-size:.72rem}
+.bg-sm{padding:7px 14px;font-size:.62rem}
+.bo{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--gb);color:var(--gold-l);font-family:var(--fb);font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:13px 26px;transition:var(--tr);white-space:nowrap;background:var(--glass);backdrop-filter:blur(8px)}
+.bo:hover{border-color:var(--gold);background:rgba(200,169,110,.1);color:var(--gold)}
+.bwa{display:inline-flex;align-items:center;gap:7px;background:#25D366;color:#fff;font-family:var(--fb);font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:13px 26px;transition:var(--tr)}
+.bwa:hover{background:#1ebe5d;transform:translateY(-1px)}
+
+/* NAVBAR */
+.nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.4rem 2rem;transition:var(--tr)}
+.nav.scrolled{background:rgba(8,8,8,.96);backdrop-filter:blur(20px);padding:.9rem 2rem;border-bottom:1px solid var(--gb)}
+.nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1.5rem}
+.logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.logo-gem{color:var(--gold);font-size:.9rem}
+.logo-t{font-family:var(--fb);font-size:1.05rem;font-weight:700;letter-spacing:.15em;color:var(--white)}
+.logo-a{color:var(--gold)}
+.nav-links{display:flex;align-items:center;gap:1.8rem;flex-wrap:wrap}
+.nav-links a{font-size:.65rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gl);transition:color var(--tr)}
+.nav-links a:hover{color:var(--gold)}
+.nav-phone{color:var(--gold)!important}
+.burger{display:none;flex-direction:column;gap:5px;padding:4px;z-index:1001;background:none;border:none;cursor:pointer}
+.burger span{display:block;width:23px;height:1.5px;background:var(--gold);transition:var(--tr)}
+
+/* HERO */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 20% 50%,rgba(200,169,110,.07) 0%,transparent 55%),
+    radial-gradient(ellipse at 80% 15%,rgba(200,169,110,.04) 0%,transparent 50%),
+    linear-gradient(135deg,#060606 0%,#0e0e0e 60%,#060606 100%)}
+.hero-grid{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(200,169,110,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(200,169,110,.025) 1px,transparent 1px);
+  background-size:80px 80px}
+.particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.p{position:absolute;width:2px;height:2px;background:var(--gold);border-radius:50%;opacity:0;animation:pfloat 6s infinite ease-in-out}
+@keyframes pfloat{0%,100%{opacity:0;transform:translateY(0)}50%{opacity:.5;transform:translateY(-40px)}}
+.hero-content{position:relative;z-index:2;width:100%;max-width:1280px;margin:0 auto;padding:150px 2rem 80px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:.6rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:2rem;padding:7px 18px;border:1px solid var(--gb);background:rgba(200,169,110,.06);backdrop-filter:blur(8px)}
+.bdot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite;display:inline-block}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+.hero-title{font-family:var(--fd);font-size:clamp(2.8rem,7vw,5.8rem);font-weight:300;line-height:1.05;color:var(--off);letter-spacing:-.02em;margin-bottom:1.4rem;max-width:780px}
+.hero-title em{display:block;color:var(--gold);font-style:italic}
+.hero-sub{font-size:.85rem;color:var(--grey);max-width:540px;line-height:2;margin-bottom:1.8rem;font-weight:300}
+.hero-trust{display:flex;flex-wrap:wrap;gap:1.4rem;margin-bottom:2.5rem;font-size:.6rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-l)}
+
+/* BOOKING FORM */
+.bform{background:rgba(16,16,16,.93);border:1px solid var(--gb);backdrop-filter:blur(24px);padding:2.2rem;max-width:920px;margin-bottom:2.8rem}
+.bform-grid{display:grid;grid-template-columns:1fr 1fr 130px 150px 120px;gap:.9rem;margin-bottom:1.2rem}
+.bf{display:flex;flex-direction:column;gap:5px}
+.bf label{font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.bf input,.bf select{background:rgba(255,255,255,.04);border:1px solid rgba(200,169,110,.2);color:var(--white);font-family:var(--fb);font-size:.78rem;font-weight:300;padding:11px 13px;outline:none;transition:border-color var(--tr);-webkit-appearance:none;border-radius:0}
+.bf input::placeholder{color:rgba(255,255,255,.3)}
+.bf input:focus,.bf select:focus{border-color:var(--gold)}
+.bf input[type=date]::-webkit-calendar-picker-indicator,.bf input[type=time]::-webkit-calendar-picker-indicator{filter:invert(.7) sepia(1) saturate(3) hue-rotate(5deg);cursor:pointer}
+.bf select option{background:var(--d3);color:var(--white)}
+.bsuggest{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-bottom:1.2rem;padding:10px 14px;background:rgba(200,169,110,.05);border:1px solid var(--gb)}
+.bsl{font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+.btag{font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);padding:3px 9px;border:1px solid var(--gold);background:rgba(200,169,110,.08)}
+.bactions{display:flex;flex-wrap:wrap;gap:.9rem;align-items:center}
+.hero-stats{display:flex;flex-wrap:wrap;gap:2.5rem;padding-top:2.2rem;border-top:1px solid var(--gb);max-width:920px}
+.stat-n{display:block;font-family:var(--fd);font-size:1.9rem;font-weight:400;color:var(--gold);line-height:1.1}
+.stat-l{display:block;font-size:.6rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);margin-top:3px}
+
+/* SERVICES */
+.services{background:var(--d2);border-top:1px solid var(--gb);border-bottom:1px solid var(--gb)}
+.srv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5px;background:var(--gb);border:1.5px solid var(--gb);margin-bottom:3.5rem}
+.srv-card{background:var(--d2);padding:2.2rem 1.8rem;transition:background var(--tr);cursor:pointer}
+.srv-card:hover{background:var(--d3)}
+.srv-icon{display:block;font-size:1.4rem;margin-bottom:1rem}
+.srv-title{font-family:var(--fd);font-size:1.2rem;font-weight:400;color:var(--off);margin-bottom:.6rem;line-height:1.2}
+.srv-desc{font-size:.74rem;color:var(--grey);line-height:1.85;margin-bottom:1.2rem}
+.srv-link{font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.feat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4rem}
+.feat-pill{display:flex;align-items:flex-start;gap:.9rem;padding:1.4rem;border:1px solid var(--gb);background:var(--glass)}
+.fpi{font-size:1.4rem;flex-shrink:0}
+.feat-pill strong{display:block;font-size:.76rem;font-weight:600;color:var(--off);margin-bottom:3px}
+.feat-pill p{font-size:.68rem;color:var(--grey)}
+
+/* FLEET */
+.fleet{background:var(--black)}
+.fleet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:var(--gb);border:1.5px solid var(--gb);margin-bottom:2rem}
+.fc{background:var(--d2);transition:var(--tr);position:relative;overflow:hidden}
+.fc:hover{background:var(--d3)}
+.fc:hover .fc-img{transform:scale(1.04)}
+.fc-badge{position:absolute;top:.9rem;right:.9rem;z-index:10;background:var(--gold);color:var(--black);font-size:.55rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:4px 10px}
+.fc-imgw{position:relative;height:210px;overflow:hidden}
+.fc-img{height:100%;transition:transform .5s ease;object-fit:cover}
+.fc-ov{position:absolute;inset:0;background:linear-gradient(to top,var(--d2) 0%,transparent 60%)}
+.fc-body{padding:1.6rem}
+.fc-cat{display:block;font-size:.57rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.fc-model{font-family:var(--fd);font-size:1.3rem;font-weight:400;color:var(--off);margin-bottom:.9rem;line-height:1.2}
+.fc-specs{display:flex;gap:1.4rem;margin-bottom:.9rem}
+.fc-specs span{font-size:.7rem;color:var(--grey)}
+.fc-feats{margin-bottom:1.3rem}
+.fc-feats li{display:flex;align-items:center;gap:7px;font-size:.72rem;color:var(--gl);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.fc-check{color:var(--gold);font-size:.58rem}
+.fc-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.9rem;padding-top:.9rem;border-top:1px solid var(--gb)}
+.fc-price{font-family:var(--fd);font-size:1.4rem;color:var(--gold)}
+.fc-btns{display:flex;gap:7px;flex-wrap:wrap}
+.fleet-note{display:flex;align-items:flex-start;gap:.9rem;padding:1.4rem 1.8rem;border:1px solid var(--gb);background:rgba(200,169,110,.04);font-size:.78rem;color:var(--grey);line-height:1.8}
+.fleet-note strong{color:var(--gold-l)}
+
+/* PRICING */
+.pricing{background:var(--d2);border-top:1px solid var(--gb)}
+.p-guar{display:flex;flex-wrap:wrap;justify-content:center;gap:1.8rem;margin-bottom:2.8rem;font-size:.6rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold)}
+.p-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.4rem;margin-bottom:1.8rem}
+.p-tabs{display:flex;gap:2px;background:var(--d3);padding:3px;flex-wrap:wrap}
+.ptab{padding:9px 18px;font-family:var(--fb);font-size:.67rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);transition:var(--tr);cursor:pointer;border:none;background:none}
+.ptab.active{background:var(--gold);color:var(--black);font-weight:700}
+.ptab:not(.active):hover{color:var(--gold-l)}
+.p-search{background:var(--d3);border:1px solid var(--gb);color:var(--white);font-family:var(--fb);font-size:.78rem;padding:9px 16px;outline:none;width:240px;transition:border-color var(--tr)}
+.p-search:focus{border-color:var(--gold)}
+.p-search::placeholder{color:var(--grey)}
+.p-wrap{overflow-x:auto;border:1px solid var(--gb);background:var(--d3);margin-bottom:1.8rem;min-height:120px}
+.ptable{width:100%;border-collapse:collapse;font-size:.8rem}
+.ptable thead tr{background:rgba(200,169,110,.07);border-bottom:1px solid var(--gb)}
+.ptable th{padding:13px 18px;text-align:left;font-size:.58rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold)}
+.ptable td{padding:11px 18px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--gl);vertical-align:middle}
+.ptable tr:hover td{background:rgba(255,255,255,.02)}
+.pt-r{font-weight:500;color:var(--off)!important}
+.pt-v{color:var(--gold)!important;font-weight:600;font-size:.86rem}
+.pt-empty{text-align:center;padding:2.5rem!important;color:var(--grey)!important}
+.hourly-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:var(--gb)}
+.hcard{background:var(--d3);padding:2.8rem 2.2rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.9rem}
+.hcard h3{font-family:var(--fd);font-size:1.25rem;font-weight:400;color:var(--off)}
+.hcard-p{font-family:var(--fd);font-size:2.3rem;color:var(--gold);font-weight:300}
+.hcard-m{font-size:.67rem;color:var(--grey);letter-spacing:.08em}
+.p-note{font-size:.72rem;color:var(--grey);text-align:center;line-height:1.9;padding:1.4rem;border:1px solid var(--gb);background:var(--glass)}
+
+/* TESTIMONIALS */
+.testimonials{background:var(--black)}
+.t-bar{display:flex;align-items:center;justify-content:center;gap:.9rem;margin-top:.9rem}
+.tstars{font-size:1rem;color:var(--gold);letter-spacing:3px}
+.t-rt{font-size:.7rem;color:var(--grey);letter-spacing:.08em}
+.t-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:var(--gb);border:1.5px solid var(--gb);margin-bottom:2.8rem;transition:opacity .3s}
+.t-grid.fade{opacity:0}
+.rcard{background:var(--d2);padding:2.3rem}
+.rcard-h{display:flex;align-items:flex-start;gap:.9rem;margin-bottom:1.3rem;flex-wrap:wrap}
+.rcard-av{width:42px;height:42px;background:linear-gradient(135deg,var(--gold),var(--gold-d));color:var(--black);display:flex;align-items:center;justify-content:center;font-size:.67rem;font-weight:700;flex-shrink:0;border-radius:50%}
+.rcard-h>div strong{display:block;font-size:.78rem;font-weight:600;color:var(--off);margin-bottom:2px}
+.rcard-loc{font-size:.67rem;color:var(--grey)}
+.rcard-stars{margin-left:auto;color:var(--gold);letter-spacing:2px;font-size:.78rem}
+.rcard-txt{font-family:var(--fd);font-size:.97rem;font-weight:300;color:var(--gl);line-height:1.95;font-style:italic;margin-bottom:1.3rem}
+.rcard-g{display:flex;align-items:center;gap:5px;font-size:.62rem;color:var(--grey);letter-spacing:.07em}
+.t-nav{display:flex;align-items:center;justify-content:center;gap:1.8rem}
+.navarr{width:42px;height:42px;border:1px solid var(--gb);background:var(--glass);color:var(--gold);font-size:1rem;display:flex;align-items:center;justify-content:center;transition:var(--tr);cursor:pointer}
+.navarr:hover{border-color:var(--gold);background:rgba(200,169,110,.1)}
+.t-dots{display:flex;gap:7px}
+.dot{width:6px;height:6px;background:var(--d5);border:1px solid var(--gb);border-radius:50%;cursor:pointer;transition:var(--tr)}
+.dot.on{background:var(--gold);border-color:var(--gold)}
+
+/* FAQ */
+.faq{background:var(--d2)}
+.faq-list{max-width:780px;margin:0 auto 3.5rem;border:1px solid var(--gb)}
+.fi{border-bottom:1px solid var(--gb)}
+.fi:last-child{border-bottom:none}
+.fi-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.4rem 1.8rem;font-size:.82rem;font-weight:500;color:var(--off);text-align:left;cursor:pointer;transition:background var(--tr);background:none;border:none;font-family:var(--fb)}
+.fi-q:hover,.fi.open .fi-q{background:rgba(200,169,110,.04)}
+.fi-icon{color:var(--gold);font-size:1.4rem;line-height:1;flex-shrink:0;font-weight:300}
+.fi-a{padding:0 1.8rem 1.4rem;font-size:.77rem;color:var(--grey);line-height:1.95;display:none}
+.fi.open .fi-a{display:block}
+.faq-cta{text-align:center}
+.faq-cta>p{font-family:var(--fd);font-size:1.5rem;color:var(--off);margin-bottom:1.3rem;font-style:italic}
+.faq-btns{display:flex;flex-wrap:wrap;gap:.9rem;justify-content:center}
+
+/* FOOTER */
+footer{background:var(--dark);border-top:1px solid var(--gb);padding:4.5rem 0 1.8rem}
+.ft-top{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:2.8rem}
+.ft-tag{font-size:.72rem;color:var(--grey);margin-bottom:1.3rem;max-width:230px;line-height:1.85}
+.ft-con{display:flex;flex-direction:column;gap:7px;font-size:.75rem;color:var(--gold)}
+.ft-con a:hover{color:var(--gold-l)}
+.ft-col h4{font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.3rem}
+.ft-col ul{display:flex;flex-direction:column;gap:7px}
+.ft-col ul a{font-size:.75rem;color:var(--grey);transition:color var(--tr)}
+.ft-col ul a:hover{color:var(--gold-l)}
+.ft-div{height:1px;background:var(--gb);margin-bottom:1.8rem}
+.ft-bot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.9rem;margin-bottom:1.8rem}
+.ft-bot p{font-size:.68rem;color:var(--grey)}
+.ft-legal{display:flex;gap:1.3rem}
+.ft-legal a{font-size:.6rem;color:var(--grey);letter-spacing:.08em;text-transform:uppercase;transition:color var(--tr)}
+.ft-legal a:hover{color:var(--gold)}
+.ft-seo{padding-top:1.3rem;border-top:1px solid var(--gb);font-size:.67rem;color:rgba(255,255,255,.14);line-height:2}
+.ft-seo a{color:rgba(200,169,110,.22)}
+.ft-seo a:hover{color:var(--gold)}
+
+/* WHATSAPP FLOAT */
+.wa-float{position:fixed;bottom:1.8rem;right:1.8rem;z-index:999;display:flex;align-items:center;gap:9px;background:#25D366;color:#fff;padding:13px 18px 13px 15px;border-radius:50px;box-shadow:0 8px 28px rgba(37,211,102,.28);transition:var(--tr);font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.wa-float:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(37,211,102,.38)}
+
+/* RESPONSIVE */
+@media(max-width:1100px){.srv-grid{grid-template-columns:repeat(3,1fr)}.feat-row{grid-template-columns:repeat(2,1fr)}.fleet-grid{grid-template-columns:repeat(2,1fr)}.ft-top{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.bform-grid{grid-template-columns:1fr 1fr}.t-grid{grid-template-columns:1fr}.hourly-grid{grid-template-columns:1fr}.nav-links{display:none;position:fixed;inset:0;background:rgba(8,8,8,.97);flex-direction:column;align-items:center;justify-content:center;gap:2rem;z-index:1000}.nav-links.open{display:flex}.nav-links a{font-size:.9rem}.burger{display:flex}}
+@media(max-width:700px){.section{padding:75px 0}.srv-grid{grid-template-columns:1fr 1fr}.fleet-grid{grid-template-columns:1fr}.feat-row{grid-template-columns:1fr}.ft-top{grid-template-columns:1fr}.hero-title{font-size:2.5rem}.bform-grid{grid-template-columns:1fr}.bform{padding:1.4rem}.p-controls{flex-direction:column;align-items:flex-start}.p-search{width:100%}.wa-float span:last-child{display:none}.wa-float{padding:13px;border-radius:50%}}
+@media(max-width:480px){.srv-grid{grid-template-columns:1fr}.container{padding:0 1.2rem}.t-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav" id="navbar">
+  <div class="nav-inner">
+    <a href="#home" class="logo"><span class="logo-gem">◆</span><span class="logo-t">ÉLITE<span class="logo-a">BCN</span></span></a>
+    <ul class="nav-links" id="navlinks">
+      <li><a href="#services" onclick="closeNav()">Services</a></li>
+      <li><a href="#fleet" onclick="closeNav()">Fleet</a></li>
+      <li><a href="#pricing" onclick="closeNav()">Pricing</a></li>
+      <li><a href="#testimonials" onclick="closeNav()">Reviews</a></li>
+      <li><a href="#faq" onclick="closeNav()">FAQ</a></li>
+      <li><a href="tel:+34600000000" class="nav-phone">+34 600 000 000</a></li>
+      <li><a href="#booking" class="bg" onclick="closeNav()">Book Now</a></li>
+    </ul>
+    <button class="burger" id="burger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="particles" id="particles"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="bdot"></span>Barcelona's #1 Luxury Chauffeur Service</div>
+    <h1 class="hero-title">Luxury Private Transfers<em>in Barcelona</em></h1>
+    <p class="hero-sub">Premium chauffeur service with professional drivers, luxury vehicles, airport transfers, and executive transportation across Barcelona and Spain.</p>
+    <div class="hero-trust">
+      <span>✦ Meet &amp; Greet</span><span>✦ Flight Monitoring</span><span>✦ Free Waiting Time</span><span>✦ 24/7 Concierge</span>
+    </div>
+    <div class="bform" id="booking">
+      <div class="bform-grid">
+        <div class="bf"><label>Pick-up Location</label><input type="text" id="from" placeholder="Airport, hotel or address…"/></div>
+        <div class="bf"><label>Drop-off Location</label><input type="text" id="to" placeholder="Destination…"/></div>
+        <div class="bf"><label>Passengers</label>
+          <select id="pax" onchange="updateVeh()">
+            <option value="1">1 pax</option><option value="2" selected>2 pax</option><option value="3">3 pax</option>
+            <option value="4">4 pax</option><option value="5">5 pax</option><option value="6">6 pax</option>
+            <option value="7">7 pax</option><option value="8">8 pax</option><option value="9">9+ pax</option>
+          </select>
+        </div>
+        <div class="bf"><label>Date</label><input type="date" id="bdate"/></div>
+        <div class="bf"><label>Time</label><input type="time" id="btime"/></div>
+      </div>
+      <div class="bsuggest" id="bsug" style="display:none">
+        <span class="bsl">Recommended:</span><span id="bsug-tags"></span>
+      </div>
+      <div class="bactions">
+        <button class="bg bg-lg" onclick="doBook()">Book Your Transfer &nbsp;→</button>
+        <a href="#fleet" class="bo">View Luxury Fleet</a>
+        <a href="https://wa.me/34600000000" target="_blank" rel="noopener" class="bwa">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div><span class="stat-n">5,000+</span><span class="stat-l">Happy Clients</span></div>
+      <div><span class="stat-n">4.9 ★</span><span class="stat-l">Google Rating</span></div>
+      <div><span class="stat-n">24/7</span><span class="stat-l">Availability</span></div>
+      <div><span class="stat-n">100%</span><span class="stat-l">On-Time Rate</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services section" id="services">
+  <div class="container">
+    <div class="sh"><span class="stag">Our Services</span><h2 class="stitle">Premium Chauffeur Services</h2><p class="ssub">Every journey crafted to perfection — from airport arrivals to private tours across Catalonia.</p></div>
+    <div class="srv-grid" id="srv-grid"></div>
+    <div class="feat-row">
+      <div class="feat-pill"><span class="fpi">🛫</span><div><strong>Flight Monitoring</strong><p>We track your flight in real-time</p></div></div>
+      <div class="feat-pill"><span class="fpi">⏳</span><div><strong>Free Waiting Time</strong><p>60 min airport · 15 min elsewhere</p></div></div>
+      <div class="feat-pill"><span class="fpi">🪧</span><div><strong>Meet &amp; Greet</strong><p>Name board in arrivals hall</p></div></div>
+      <div class="feat-pill"><span class="fpi">💳</span><div><strong>Fixed Prices</strong><p>No surge pricing, ever</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FLEET -->
+<section class="fleet section" id="fleet">
+  <div class="container">
+    <div class="sh"><span class="stag">Our Fleet</span><h2 class="stitle">Luxury Vehicle Collection</h2><p class="ssub">Every vehicle meticulously maintained, professionally presented, and driven by certified chauffeurs.</p></div>
+    <div class="fleet-grid" id="fleet-grid"></div>
+    <div class="fleet-note"><span style="font-size:1.1rem;flex-shrink:0">⚡</span><p>Travelling with <strong>9+ passengers?</strong> We automatically suggest a minibus or two luxury minivans — just enter your passenger count in the booking form above.</p></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing section" id="pricing">
+  <div class="container">
+    <div class="sh"><span class="stag">Fixed Pricing</span><h2 class="stitle">Transparent Luxury Pricing</h2><p class="ssub">All prices are fixed, all-inclusive. No hidden fees. No surge pricing. Ever.</p></div>
+    <div class="p-guar"><span>✦ No surge pricing</span><span>✦ Fixed fare guaranteed</span><span>✦ Free cancellation 24h</span><span>✦ Instant confirmation</span></div>
+    <div class="p-controls">
+      <div class="p-tabs">
+        <button class="ptab active" onclick="switchTab(0)">Airport &amp; City</button>
+        <button class="ptab" onclick="switchTab(1)">Costa Dorada</button>
+        <button class="ptab" onclick="switchTab(2)">Costa Brava</button>
+        <button class="ptab" onclick="switchTab(3)">Hourly</button>
+      </div>
+      <input class="p-search" type="text" id="psearch" placeholder="Search destination…" oninput="renderPricing()"/>
+    </div>
+    <div class="p-wrap" id="p-wrap"></div>
+    <p class="p-note">All prices include professional chauffeur, luxury vehicle, toll fees, and meet &amp; greet. Child seats available on request at no extra charge.</p>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials section" id="testimonials">
+  <div class="container">
+    <div class="sh"><span class="stag">Client Reviews</span><h2 class="stitle">What Our Clients Say</h2>
+      <div class="t-bar"><span class="tstars">★★★★★</span><span class="t-rt">4.9 / 5 — Based on 200+ Google reviews</span></div>
+    </div>
+    <div class="t-grid" id="tgrid"></div>
+    <div class="t-nav">
+      <button class="navarr" onclick="tNav(-1)">←</button>
+      <div class="t-dots" id="tdots"></div>
+      <button class="navarr" onclick="tNav(1)">→</button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq section" id="faq">
+  <div class="container">
+    <div class="sh"><span class="stag">FAQ</span><h2 class="stitle">Frequently Asked Questions</h2><p class="ssub">Everything you need to know about our luxury transfer service.</p></div>
+    <div class="faq-list" id="faq-list"></div>
+    <div class="faq-cta">
+      <p>Still have questions?</p>
+      <div class="faq-btns">
+        <a href="tel:+34600000000" class="bg">Call Us Now</a>
+        <a href="https://wa.me/34600000000" target="_blank" rel="noopener" class="bo">WhatsApp Us</a>
+        <a href="mailto:info@elitebcn.com" class="bo">Send Email</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="ft-top">
+      <div>
+        <div class="logo" style="margin-bottom:1rem"><span class="logo-gem">◆</span><span class="logo-t">ÉLITE<span class="logo-a">BCN</span></span></div>
+        <p class="ft-tag">Luxury Private Transfers &amp; Chauffeur Service in Barcelona</p>
+        <div class="ft-con">
+          <a href="tel:+34600000000">+34 600 000 000</a>
+          <a href="mailto:info@elitebcn.com">info@elitebcn.com</a>
+          <a href="https://wa.me/34600000000" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+      </div>
+      <div class="ft-col"><h4>Services</h4><ul>
+        <li><a href="#services">Airport Transfers</a></li><li><a href="#services">Cruise Port</a></li>
+        <li><a href="#services">Executive Chauffeur</a></li><li><a href="#services">Corporate Travel</a></li>
+        <li><a href="#services">Hourly Hire</a></li><li><a href="#services">VIP Transportation</a></li>
+      </ul></div>
+      <div class="ft-col"><h4>Destinations</h4><ul>
+        <li><a href="#pricing">Barcelona Airport</a></li><li><a href="#pricing">Sitges</a></li>
+        <li><a href="#pricing">Lloret de Mar</a></li><li><a href="#pricing">Salou &amp; PortAventura</a></li>
+        <li><a href="#pricing">Andorra</a></li><li><a href="#pricing">Cadaqués</a></li>
+      </ul></div>
+      <div class="ft-col"><h4>Fleet</h4><ul>
+        <li><a href="#fleet">Standard Sedan</a></li><li><a href="#fleet">Toyota Camry</a></li>
+        <li><a href="#fleet">Mercedes E-Class</a></li><li><a href="#fleet">Minivan 8-Seater</a></li>
+        <li><a href="#fleet">Mercedes V-Class</a></li><li><a href="#fleet">Minibus</a></li>
+      </ul></div>
+    </div>
+    <div class="ft-div"></div>
+    <div class="ft-bot">
+      <p>© 2025 Élite BCN. All rights reserved. Luxury Private Transfers in Barcelona.</p>
+      <div class="ft-legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
+    </div>
+    <div class="ft-seo">
+      <a href="#">Barcelona Airport Transfer</a> · <a href="#">Barcelona Chauffeur Service</a> · <a href="#">Luxury Transfer Barcelona</a> ·
+      <a href="#">Private Driver Barcelona</a> · <a href="#">Barcelona to Sitges</a> · <a href="#">Barcelona to Andorra</a>
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp Float -->
+<a href="https://wa.me/34600000000?text=Hello%2C%20I%20would%20like%20to%20book%20a%20luxury%20transfer%20in%20Barcelona." target="_blank" rel="noopener" class="wa-float">
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  <span>Book via WhatsApp</span>
+</a>
+
+<script>
+// ── NAVBAR ──
+window.addEventListener('scroll',()=>document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>40));
+function toggleNav(){document.getElementById('navlinks').classList.toggle('open')}
+function closeNav(){document.getElementById('navlinks').classList.remove('open')}
+
+// ── PARTICLES ──
+(function(){
+  const c=document.getElementById('particles');
+  for(let i=0;i<22;i++){
+    const p=document.createElement('span');
+    p.className='p';
+    p.style.cssText='left:'+(4+i*4.2)+'%;top:'+(10+(i*37)%80)+'%;animation-delay:'+(i*0.28)+'s;animation-duration:'+(4+i%4)+'s';
+    c.appendChild(p);
+  }
+})();
+
+// ── VEHICLE SUGGESTION ──
+const vmap={
+  '1':['Standard Sedan','Economy Sedan','Luxury – Mercedes E-Class'],
+  '2':['Standard Sedan','Economy Sedan','Luxury – Mercedes E-Class'],
+  '3':['Standard Sedan','Economy Sedan','Luxury – Mercedes E-Class'],
+  '4':['Minivan 8-Seater','Mercedes V-Class'],
+  '5':['Minivan 8-Seater','Mercedes V-Class'],
+  '6':['Minivan 8-Seater','Mercedes V-Class'],
+  '7':['8-Seater Van','Mercedes V-Class'],
+  '8':['8-Seater Van','Mercedes V-Class'],
+  '9':['Minibus','Two Luxury Minivans']
+};
+function updateVeh(){
+  const n=document.getElementById('pax').value;
+  const s=vmap[n]||['Minibus','Two Luxury Minivans'];
+  document.getElementById('bsug-tags').innerHTML=s.map(v=>'<span class="btag">'+v+'</span>').join(' ');
+  document.getElementById('bsug').style.display='flex';
+}
+updateVeh();
+
+function doBook(){
+  const from=document.getElementById('from').value.trim();
+  const to=document.getElementById('to').value.trim();
+  const pax=document.getElementById('pax').value;
+  const date=document.getElementById('bdate').value;
+  const time=document.getElementById('btime').value;
+  if(!from||!to){alert('Please enter pick-up and drop-off locations.');return;}
+  const msg=encodeURIComponent('Hello, I would like to book a luxury transfer.\n\nFrom: '+from+'\nTo: '+to+'\nPassengers: '+pax+'\nDate: '+(date||'TBD')+'\nTime: '+(time||'TBD'));
+  window.open('https://wa.me/34600000000?text='+msg,'_blank');
+}
+
+// ── SERVICES ──
+const services=[
+  {icon:'✈',title:'Airport Transfers',desc:'Meet & greet with real-time flight monitoring. Free waiting up to 60 minutes.'},
+  {icon:'⚓',title:'Cruise Port Transfers',desc:'Seamless transfers to and from Barcelona Cruise Terminal in total comfort.'},
+  {icon:'💼',title:'Executive Chauffeur',desc:'Dedicated chauffeur for business meetings, corporate events, and executive travel.'},
+  {icon:'🏢',title:'Corporate Transfers',desc:'Premium corporate accounts with invoicing, dedicated fleet, and priority service.'},
+  {icon:'🎭',title:'Event Transportation',desc:'VIP transportation for weddings, galas, private events and special occasions.'},
+  {icon:'⏱',title:'Hourly Chauffeur Hire',desc:'Flexible hourly hire from 4 hours minimum. Your private chauffeur at disposal.'},
+  {icon:'🏖',title:'Costa Brava Transfers',desc:'Luxury transfers to Lloret de Mar, Platja d\'Aro, Tossa de Mar, Cadaqués.'},
+  {icon:'🌅',title:'Costa Dorada Transfers',desc:'Private transfers to Sitges, Salou, PortAventura, Tarragona and more.'},
+  {icon:'🏔',title:'Andorra Transfers',desc:'Premium private transfer Barcelona–Andorra in total luxury and comfort.'},
+  {icon:'🛎',title:'Hotel Transfers',desc:'Door-to-door luxury transfers to all Barcelona hotels and resorts.'},
+  {icon:'👑',title:'VIP Transportation',desc:'Discreet, exclusive transfers for high-profile clients requiring privacy.'},
+  {icon:'🗺',title:'Private Day Tours',desc:'Montserrat, La Roca Village, Girona, wine regions and beyond.'},
+];
+document.getElementById('srv-grid').innerHTML=services.map(s=>
+  '<div class="srv-card"><span class="srv-icon">'+s.icon+'</span><h3 class="srv-title">'+s.title+'</h3><p class="srv-desc">'+s.desc+'</p><a href="#booking" class="srv-link">Book Now →</a></div>'
+).join('');
+
+// ── FLEET ──
+const fleet=[
+  {cat:'Standard Sedan',model:'Toyota Corolla or similar',badge:'Best Value',pax:'1–3',bags:'2',feats:['Air Conditioning','USB Charging','Wi-Fi','Water Bottle'],price:'From €50',img:'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=600&q=80'},
+  {cat:'Economy Executive',model:'Toyota Camry',badge:null,pax:'1–3',bags:'3',feats:['Leather Seats','Climate Control','USB / Lightning','Privacy Glass'],price:'From €55',img:'https://images.unsplash.com/photo-1550355291-bbee04a92027?w=600&q=80'},
+  {cat:'Luxury Sedan',model:'Mercedes E-Class / Lexus ES',badge:'Most Popular',pax:'1–3',bags:'3',feats:['Premium Leather','Massage Seats','Ambient Lighting','Champagne Service'],price:'From €65',img:'https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=600&q=80'},
+  {cat:'Minivan 8-Seater',model:'Volkswagen Caravelle',badge:null,pax:'4–8',bags:'6',feats:['Individual Seats','Panoramic Roof','USB Charging','Extra Luggage Space'],price:'From €65',img:'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=600&q=80'},
+  {cat:'Mercedes V-Class',model:'Mercedes-Benz V-Class VIP',badge:'VIP Choice',pax:'6–7',bags:'7',feats:['Business Lounge Interior','Full Leather','Wi-Fi Onboard','Drinks Cabinet'],price:'From €80',img:'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=600&q=80'},
+  {cat:'Minibus',model:'Mercedes Sprinter 16–19 pax',badge:'Groups',pax:'9–19',bags:'12',feats:['Reclining Seats','Air Conditioning','Large Luggage Hold','USB Charging'],price:'From €120',img:'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=600&q=80'},
+];
+document.getElementById('fleet-grid').innerHTML=fleet.map(v=>{
+  const wa=encodeURIComponent('I\'d like to book the '+v.cat+' - '+v.model);
+  return '<div class="fc">'+(v.badge?'<span class="fc-badge">'+v.badge+'</span>':'')+
+    '<div class="fc-imgw"><img class="fc-img" src="'+v.img+'" alt="'+v.model+'" loading="lazy"/><div class="fc-ov"></div></div>'+
+    '<div class="fc-body"><span class="fc-cat">'+v.cat+'</span><h3 class="fc-model">'+v.model+'</h3>'+
+    '<div class="fc-specs"><span>👤 '+v.pax+' pax</span><span>🧳 '+v.bags+' bags</span></div>'+
+    '<ul class="fc-feats">'+v.feats.map(f=>'<li><span class="fc-check">✦</span>'+f+'</li>').join('')+'</ul>'+
+    '<div class="fc-footer"><span class="fc-price">'+v.price+'</span>'+
+    '<div class="fc-btns"><a href="#booking" class="bg bg-sm">Book Now</a>'+
+    '<a href="https://wa.me/34600000000?text='+wa+'" target="_blank" rel="noopener" class="bwa" style="padding:7px 12px;font-size:.6rem">WhatsApp</a></div></div></div></div>';
+}).join('');
+
+// ── PRICING DATA ──
+const airport=[
+  {r:'El Prat Airport ⇄ Barcelona City',p1:50,p2:65,p3:70},
+  {r:'El Prat Airport ⇄ Cruise Terminal',p1:50,p2:65,p3:70},
+  {r:'Cruise Terminal ⇄ Barcelona City',p1:50,p2:65,p3:70},
+  {r:'El Prat Airport ⇄ Sants Station',p1:55,p2:65,p3:75},
+  {r:'Barcelona ⇄ La Roca Village',p1:80,p2:100,p3:120},
+  {r:'Barcelona ⇄ Montserrat',p1:120,p2:140,p3:160},
+  {r:'Barcelona ⇄ Girona Airport',p1:140,p2:155,p3:175},
+  {r:'Barcelona ⇄ Andorra',p1:260,p2:285,p3:300},
+];
+const dorada=[
+  {r:'Barcelona ⇄ Castelldefels',p1:50,p2:60,p3:70},
+  {r:'Barcelona ⇄ Sitges',p1:80,p2:100,p3:120},
+  {r:'Barcelona ⇄ Cubelles',p1:90,p2:110,p3:130},
+  {r:'Barcelona ⇄ Calafell',p1:100,p2:120,p3:140},
+  {r:'Barcelona ⇄ Vendrell',p1:110,p2:130,p3:150},
+  {r:'Barcelona ⇄ Tarragona',p1:150,p2:170,p3:190},
+  {r:'Barcelona ⇄ La Pineda',p1:155,p2:175,p3:195},
+  {r:'Barcelona ⇄ Salou',p1:155,p2:175,p3:195},
+  {r:'Barcelona ⇄ PortAventura',p1:155,p2:175,p3:195},
+  {r:'Barcelona ⇄ Cambrils',p1:160,p2:180,p3:200},
+];
+const brava=[
+  {r:'Barcelona ⇄ Mataró',p1:90,p2:110,p3:130},
+  {r:'Barcelona ⇄ Calella',p1:110,p2:130,p3:150},
+  {r:'Barcelona ⇄ Pineda de Mar',p1:115,p2:135,p3:155},
+  {r:'Barcelona ⇄ Santa Susanna',p1:120,p2:140,p3:160},
+  {r:'Barcelona ⇄ Malgrat de Mar',p1:125,p2:145,p3:165},
+  {r:'Barcelona ⇄ Blanes',p1:135,p2:155,p3:175},
+  {r:'Barcelona ⇄ Lloret de Mar',p1:145,p2:165,p3:185},
+  {r:'Barcelona ⇄ Girona Airport',p1:140,p2:160,p3:180},
+  {r:'Barcelona ⇄ Tossa de Mar',p1:155,p2:175,p3:195},
+  {r:"Barcelona ⇄ S'Agaró",p1:155,p2:175,p3:195},
+  {r:"Barcelona ⇄ Platja d'Aro",p1:160,p2:180,p3:200},
+  {r:'Barcelona ⇄ Palamós',p1:185,p2:205,p3:225},
+  {r:'Barcelona ⇄ Roses',p1:205,p2:225,p3:245},
+  {r:'Barcelona ⇄ Empuriabrava',p1:210,p2:230,p3:250},
+  {r:'Barcelona ⇄ Figueres',p1:200,p2:220,p3:240},
+  {r:'Barcelona ⇄ Cadaqués',p1:240,p2:260,p3:280},
+];
+const hourly=[
+  {label:'Sedan (1–3 pax)',price:'€40 / hour',min:'Minimum 4 hours'},
+  {label:'Minivan (4–6 pax)',price:'€50 / hour',min:'Minimum 4 hours'},
+  {label:'Van / V-Class (7–8 pax)',price:'€60 / hour',min:'Minimum 4 hours'},
+];
+const datasets=[airport,dorada,brava];
+let curTab=0;
+
+function switchTab(i){
+  curTab=i;
+  document.querySelectorAll('.ptab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  const ps=document.getElementById('psearch');
+  ps.style.display=i===3?'none':'block';
+  if(i!==3)ps.value='';
+  renderPricing();
+}
+function renderPricing(){
+  const wrap=document.getElementById('p-wrap');
+  const search=(document.getElementById('psearch').value||'').toLowerCase();
+  if(curTab===3){
+    wrap.innerHTML='<div class="hourly-grid">'+hourly.map(h=>
+      '<div class="hcard"><h3>'+h.label+'</h3><span class="hcard-p">'+h.price+'</span><span class="hcard-m">'+h.min+'</span><a href="#booking" class="bg">Book Hourly</a></div>'
+    ).join('')+'</div>';return;
+  }
+  const data=datasets[curTab].filter(r=>!search||r.r.toLowerCase().includes(search));
+  const rows=data.map(r=>{
+    const wa=encodeURIComponent('Hi, I\'d like to book: '+r.r);
+    return '<tr><td class="pt-r">'+r.r+'</td><td class="pt-v">€'+r.p1+'</td><td class="pt-v">€'+r.p2+'</td><td class="pt-v">€'+r.p3+'</td><td><a href="https://wa.me/34600000000?text='+wa+'" target="_blank" rel="noopener" class="bg bg-sm">Book</a></td></tr>';
+  }).join('');
+  wrap.innerHTML='<table class="ptable"><thead><tr><th>Route</th><th>1–3 pax</th><th>4–6 pax</th><th>7–8 pax</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="5" class="pt-empty">No routes found.</td></tr>')+'</tbody></table>';
+}
+renderPricing();
+
+// ── TESTIMONIALS ──
+const reviews=[
+  {name:'James Thornton',loc:'London, UK',av:'JT',txt:'Absolutely impeccable service. The driver was waiting in arrivals with a name board, the Mercedes was spotless, and the journey was smooth and relaxed. Will always use Élite BCN.'},
+  {name:'Margot Dubois',loc:'Paris, France',av:'MD',txt:'We had a group of 7 for a conference. The V-Class was perfect — luxurious, spacious, professional and punctual. Corporate invoicing was handled effortlessly.'},
+  {name:'Alexander Müller',loc:'Munich, Germany',av:'AM',txt:'Booked hourly chauffeur for a full day — Montserrat, La Roca Village, then back to the hotel. Outstanding. This is exactly how luxury transfers should feel.'},
+  {name:'Sofia Reyes',loc:'Miami, USA',av:'SR',txt:'Used Élite BCN for our cruise port transfer. They tracked our ship arrival and adjusted accordingly. No waiting, no stress — pure comfort from ship to hotel.'},
+  {name:'David Chen',loc:'Singapore',av:'DC',txt:'Booking was instant via WhatsApp, price totally transparent, driver early and immaculately dressed. The Lexus was gorgeous. Highly recommend for business travel.'},
+  {name:'Isabella Romano',loc:'Milan, Italy',av:'IR',txt:'Transfer from Barcelona to Sitges for our wedding anniversary. The driver brought flowers and champagne. An unforgettable start to a perfect weekend.'},
+];
+let tCur=0;
+function renderT(){
+  const g=document.getElementById('tgrid');
+  const vis=[0,1,2].map(i=>reviews[(tCur+i)%reviews.length]);
+  g.innerHTML=vis.map(r=>
+    '<div class="rcard"><div class="rcard-h"><div class="rcard-av">'+r.av+'</div>'+
+    '<div><strong>'+r.name+'</strong><span class="rcard-loc">'+r.loc+'</span></div>'+
+    '<div class="rcard-stars">★★★★★</div></div>'+
+    '<p class="rcard-txt">"'+r.txt+'"</p>'+
+    '<div class="rcard-g"><svg width="13" height="13" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Verified Google Review</div></div>'
+  ).join('');
+  document.getElementById('tdots').innerHTML=reviews.map((_,i)=>'<span class="dot'+(i===tCur?' on':'')+'" onclick="tGo('+i+')"></span>').join('');
+}
+function tNav(d){
+  const g=document.getElementById('tgrid');g.classList.add('fade');
+  setTimeout(()=>{tCur=(tCur+d+reviews.length)%reviews.length;renderT();g.classList.remove('fade');},300);
+}
+function tGo(i){tCur=i;renderT();}
+renderT();
+setInterval(()=>tNav(1),5500);
+
+// ── FAQ ──
+const faqs=[
+  {q:'How do I book a transfer?',a:'Instantly via our booking form above, WhatsApp (+34 600 000 000), or email. We confirm within 15 minutes with full itinerary and driver details.'},
+  {q:'Do you track my flight?',a:'Yes. We monitor all flight arrivals in real-time. If your flight is delayed, we automatically adjust your pickup time at no extra charge.'},
+  {q:'How long do you wait at the airport?',a:'We provide 60 minutes of free waiting time from your flight\'s actual landing — enough to collect luggage, clear customs, and find your driver.'},
+  {q:'Will my driver have a name board?',a:'Absolutely. Your chauffeur waits in arrivals with a personalized name board in smart attire. Included in every airport transfer.'},
+  {q:'What if I need to cancel?',a:'Free cancellation up to 24 hours before pickup. Cancellations within 24 hours may be subject to a fee. Contact us directly for changes.'},
+  {q:'Are prices fixed or do they surge?',a:'All prices are 100% fixed. You see the exact price before booking. We never apply surge pricing, regardless of time of day or demand.'},
+  {q:'Do you offer child seats?',a:'Yes. Baby, toddler, and booster seats available at no extra charge. Just mention your requirement when booking.'},
+  {q:'Can I book for 9+ passengers?',a:'Yes. For 9–19 passengers we offer luxury minibus service. For larger groups we arrange multiple vehicles. Contact us for a custom quote.'},
+  {q:'Do you serve the Cruise Terminal?',a:'Yes. We specialize in cruise port transfers and monitor vessel arrivals, coordinating pickups directly dockside.'},
+  {q:'Can I book a driver for the full day?',a:'Yes. Hourly chauffeur from 4 hours minimum. Your dedicated driver is at your disposal for meetings, shopping, or sightseeing.'},
+];
+const fl=document.getElementById('faq-list');
+faqs.forEach((f,i)=>{
+  const el=document.createElement('div');
+  el.className='fi';
+  el.innerHTML='<button class="fi-q" onclick="toggleFaq('+i+',this)"><span>'+f.q+'</span><span class="fi-icon">+</span></button><div class="fi-a">'+f.a+'</div>';
+  fl.appendChild(el);
+});
+function toggleFaq(i,btn){
+  const fi=btn.closest('.fi');
+  const isOpen=fi.classList.contains('open');
+  document.querySelectorAll('.fi').forEach(el=>{el.classList.remove('open');el.querySelector('.fi-icon').textContent='+'});
+  if(!isOpen){fi.classList.add('open');fi.querySelector('.fi-icon').textContent='−';}
+}
+</script>
+</body>
 </html>
