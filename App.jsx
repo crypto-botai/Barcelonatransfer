@@ -1,4 +1,3 @@
-import { useState, useEffect, useRef } from "react";
 import Hero from "./components/Hero";
 import Fleet from "./components/Fleet";
 import Pricing from "./components/Pricing";
