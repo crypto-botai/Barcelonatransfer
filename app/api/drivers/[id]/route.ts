@@ -6,8 +6,9 @@ import { type DriverStatus } from "@/types";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   const user = session?.user as { role?: string } | undefined;
   if (!session || user?.role !== "ADMIN") {
@@ -16,7 +17,7 @@ export async function PATCH(
 
   const { status } = await req.json() as { status: DriverStatus };
   const driver = await prisma.driver.update({
-    where: { id: params.id },
+    where: { id },
     data: { status },
   });
 

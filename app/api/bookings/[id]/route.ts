@@ -6,11 +6,12 @@ import { type BookingStatus } from "@/types";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const booking = await prisma.booking.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         confirmationCode: true,
         pickupAddress: true,
@@ -32,8 +33,9 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   const user = session?.user as { role?: string } | undefined;
   if (!session || user?.role !== "ADMIN") {
@@ -43,7 +45,7 @@ export async function PATCH(
   try {
     const body = await req.json();
     const booking = await prisma.booking.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(body.status    ? { status: body.status as BookingStatus } : {}),
         ...(body.driverId  ? { driverId: body.driverId, status: "DRIVER_ASSIGNED", driverAssignedAt: new Date() } : {}),
