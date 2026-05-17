@@ -23,7 +23,7 @@ export default function AddressAutocomplete({ value, onChange, placeholder, icon
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { setQuery(value); }, [value]);
 
