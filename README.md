@@ -1,88 +1,65 @@
-# Élite BCN — Luxury Private Transfers Barcelona
+# Élite BCN — Luxury Transfer Platform
 
-A premium luxury chauffeur & airport transfer website for Barcelona.
-
-## Tech Stack
-- React 18 + Vite
-- Pure CSS (dark gold luxury theme)
-- No external UI libraries needed
-- Zero backend required (WhatsApp-based bookings)
+A full-stack luxury private transfer booking platform built with Next.js 15, TypeScript, Tailwind CSS, Framer Motion, Stripe, Supabase, and Google Maps.
 
 ## Features
-- ✅ Full luxury dark/gold design
-- ✅ Smart vehicle recommendation by passenger count
-- ✅ Complete pricing tables (Airport, Costa Dorada, Costa Brava, Hourly)
-- ✅ Fleet showcase (6 vehicle categories)
-- ✅ 12 service categories
-- ✅ Testimonials carousel
-- ✅ FAQ accordion
-- ✅ WhatsApp floating button
-- ✅ Fully responsive
-- ✅ SEO meta tags
 
----
+- **Live price calculator** — Google Maps Distance Matrix + real-time fare engine
+- **10 vehicle classes** — Economy to Minibus, all with accurate descriptions
+- **4-step booking flow** — Route → Vehicle → Details → Stripe Checkout
+- **Apple Pay & Google Pay** — via Stripe Payment Element
+- **Booking confirmation emails** — Resend with luxury HTML templates
+- **Admin dashboard** — Bookings, drivers, fleet, pricing rules
+- **Driver portal** — Ride management, status toggle, location tracking
+- **Customer dashboard** — Booking history
+- **Real-time tracking** — GPS polling API
+- **SEO optimized** — Sitemap, robots.txt, Schema.org, Open Graph
+- **Mobile-first** — Luxury app-grade mobile UX
 
-## Deploy FREE to Vercel (5 minutes)
+## Quick Start
 
-### Option A — GitHub + Vercel (Recommended)
-
-1. **Create a GitHub repository**
-   - Go to https://github.com/new
-   - Create a new repo (e.g. `elite-bcn-transfers`)
-   - Upload all these files to the repo
-
-2. **Deploy on Vercel**
-   - Go to https://vercel.com and sign up free
-   - Click "Add New Project"
-   - Import your GitHub repository
-   - Vercel auto-detects Vite → no settings needed
-   - Click **Deploy** → live in ~60 seconds ✅
-
-### Option B — Vercel CLI
-
-```bash
-npm install -g vercel
-cd elite-bcn-transfers
+### 1. Install dependencies
+\`\`\`bash
 npm install
-vercel
-```
+\`\`\`
 
-Follow the prompts → live instantly.
+### 2. Set up environment variables
+\`\`\`bash
+cp .env.example .env.local
+# Fill in all values
+\`\`\`
 
----
+### 3. Set up database
+\`\`\`bash
+npx prisma db push
+\`\`\`
 
-## Local Development
-
-```bash
-npm install
+### 4. Run development server
+\`\`\`bash
 npm run dev
-```
+\`\`\`
 
-Open http://localhost:5173
+## Environment Variables
 
-## Build for Production
+See `.env.example` for a complete list. Key services required:
 
-```bash
-npm run build
-```
+| Service | Purpose |
+|---------|---------|
+| **Supabase** | PostgreSQL database |
+| **Google Maps** | Places autocomplete + Distance Matrix |
+| **Stripe** | Payments (card, Apple Pay, Google Pay) |
+| **Resend** | Transactional emails |
+| **Google OAuth** | Social sign-in (optional) |
 
----
+## Deploy to Vercel
 
-## Customization Checklist
+1. Push to GitHub (already done)
+2. Connect repo in Vercel dashboard
+3. Add all environment variables in Vercel settings
+4. Deploy — auto-deploys on every push to main
 
-Before going live, update these:
+## Contact
 
-- [ ] Phone number: Replace `+34 600 000 000` with your real number (search: `34600000000`)
-- [ ] WhatsApp: Same number in all `wa.me` links
-- [ ] Email: Replace `info@elitebcn.com`
-- [ ] Brand name: Replace `ÉLITE BCN` if desired
-- [ ] Google Analytics: Add your GA4 tag to `index.html`
-- [ ] Favicon: Replace `/favicon.svg`
-- [ ] Vehicle images: Replace Unsplash URLs with your real vehicle photos
-
-## Custom Domain on Vercel (Free)
-
-1. In Vercel dashboard → your project → Settings → Domains
-2. Add your domain (e.g. `elitebcn.com`)
-3. Update your domain's DNS to point to Vercel
-4. SSL certificate is automatic and free ✅
+- **WhatsApp**: +34 635 383 712
+- **Email**: vtcbcn2025@gmail.com
+- **Location**: Barcelona, Spain

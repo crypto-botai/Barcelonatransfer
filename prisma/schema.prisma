@@ -1,0 +1,276 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  CUSTOMER
+  DRIVER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  DRIVER_ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum DriverStatus {
+  PENDING_APPROVAL
+  APPROVED
+  SUSPENDED
+  OFFLINE
+  ONLINE
+  ON_RIDE
+}
+
+enum VehicleClass {
+  ECONOMY
+  BUSINESS
+  LUXURY
+  FIRST_CLASS
+  ELECTRIC_VIP
+  SUV
+  LUXURY_SUV
+  MINIVAN
+  LUXURY_MINIVAN
+  MINIBUS
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  phone         String?
+  image         String?
+  passwordHash  String?
+  role          Role      @default(CUSTOMER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts  Account[]
+  sessions  Session[]
+  bookings  Booking[]
+  driver    Driver?
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Driver {
+  id              String       @id @default(cuid())
+  userId          String       @unique
+  status          DriverStatus @default(PENDING_APPROVAL)
+  licenseNumber   String?
+  licenseExpiry   DateTime?
+  taxiLicense     String?
+  taxiLicenseExp  DateTime?
+  nationalId      String?
+  bio             String?      @db.Text
+  rating          Float        @default(0)
+  totalRides      Int          @default(0)
+  currentLat      Float?
+  currentLng      Float?
+  lastLocationAt  DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicles Vehicle[]
+  bookings Booking[]
+
+  @@map("drivers")
+}
+
+model Vehicle {
+  id           String       @id @default(cuid())
+  driverId     String?
+  class        VehicleClass
+  make         String
+  model        String
+  year         Int
+  color        String
+  licensePlate String
+  maxPassengers Int
+  maxLuggage   Int
+  features     String[]
+  imageUrl     String?
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  driver   Driver?   @relation(fields: [driverId], references: [id])
+  bookings Booking[]
+
+  @@map("vehicles")
+}
+
+model PricingRule {
+  id              String       @id @default(cuid())
+  vehicleClass    VehicleClass
+  baseFare        Float
+  pricePerKm      Float
+  pricePerMinute  Float
+  minimumFare     Float
+  airportSurcharge Float       @default(10)
+  nightSurcharge  Float        @default(0.25)
+  nightStartHour  Int          @default(22)
+  nightEndHour    Int          @default(6)
+  isActive        Boolean      @default(true)
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([vehicleClass])
+  @@map("pricing_rules")
+}
+
+model Booking {
+  id              String        @id @default(cuid())
+  userId          String?
+  driverId        String?
+  vehicleId       String?
+  guestName       String?
+  guestEmail      String?
+  guestPhone      String?
+  pickupAddress   String
+  pickupLat       Float
+  pickupLng       Float
+  dropoffAddress  String
+  dropoffLat      Float
+  dropoffLng      Float
+  pickupDatetime  DateTime
+  passengers      Int           @default(1)
+  luggage         Int           @default(0)
+  vehicleClass    VehicleClass
+  flightNumber    String?
+  specialRequests String?       @db.Text
+  distanceKm      Float
+  durationMin     Int
+  baseFare        Float
+  distanceFare    Float
+  airportSurcharge Float        @default(0)
+  nightSurcharge  Float         @default(0)
+  totalAmount     Float
+  currency        String        @default("EUR")
+  status          BookingStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  stripeSessionId String?
+  stripePaymentId String?
+  confirmationCode String       @unique @default(cuid())
+  driverAssignedAt DateTime?
+  rideStartedAt   DateTime?
+  rideEndedAt     DateTime?
+  rating          Int?
+  review          String?       @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user     User?      @relation(fields: [userId], references: [id])
+  driver   Driver?    @relation(fields: [driverId], references: [id])
+  vehicle  Vehicle?   @relation(fields: [vehicleId], references: [id])
+  tracking RideTracking[]
+  payment  Payment?
+
+  @@map("bookings")
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  bookingId       String        @unique
+  stripePaymentId String?
+  stripeSessionId String?
+  amount          Float
+  currency        String        @default("EUR")
+  status          PaymentStatus @default(PENDING)
+  receiptUrl      String?
+  refundId        String?
+  refundAmount    Float?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model RideTracking {
+  id        String   @id @default(cuid())
+  bookingId String
+  lat       Float
+  lng       Float
+  speed     Float?
+  heading   Float?
+  createdAt DateTime @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("ride_tracking")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String   @db.Text
+  type      String
+  read      Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
