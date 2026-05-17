@@ -344,20 +344,20 @@ function BookingPageInner() {
                   <div className="glass-card rounded-2xl p-6">
                     <h2 className="font-display text-2xl text-white mb-5">Booking Summary</h2>
                     <div className="space-y-3 text-sm">
-                      {[
+                      {([
                         ["Pick-up",    data.pickupAddress],
                         ["Drop-off",   data.dropoffAddress],
                         ["Date",       `${data.date} at ${data.time}`],
-                        ["Vehicle",    VEHICLE_CATALOG.find((v) => v.class === data.vehicleClass)?.label],
-                        ["Passengers", data.passengers],
+                        ["Vehicle",    VEHICLE_CATALOG.find((v) => v.class === data.vehicleClass)?.label ?? ""],
+                        ["Passengers", String(data.passengers)],
                         ["Name",       data.guestName],
                         ["Email",      data.guestEmail],
                         ["Phone",      data.guestPhone],
-                        data.flightNumber ? ["Flight", data.flightNumber] : null,
-                      ].filter(Boolean).map(([label, value]) => (
-                        <div key={String(label)} className="flex justify-between border-b border-white/[0.04] pb-3">
+                        ...(data.flightNumber ? [["Flight", data.flightNumber]] : []),
+                      ] as [string, string][]).map(([label, value]) => (
+                        <div key={label} className="flex justify-between border-b border-white/[0.04] pb-3">
                           <span className="text-dark-400">{label}</span>
-                          <span className="text-white text-right max-w-xs">{String(value)}</span>
+                          <span className="text-white text-right max-w-xs">{value}</span>
                         </div>
                       ))}
                     </div>
