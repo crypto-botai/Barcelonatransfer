@@ -7,20 +7,20 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
   pricePerMinute: number;
   minimumFare: number;
 }> = {
-  ECONOMY:       { baseFare: 30,  pricePerKm: 1.50, pricePerMinute: 0.25, minimumFare: 30  },
-  BUSINESS:      { baseFare: 40,  pricePerKm: 1.80, pricePerMinute: 0.30, minimumFare: 40  },
-  LUXURY:        { baseFare: 55,  pricePerKm: 2.20, pricePerMinute: 0.40, minimumFare: 55  },
-  FIRST_CLASS:   { baseFare: 80,  pricePerKm: 3.00, pricePerMinute: 0.55, minimumFare: 80  },
-  ELECTRIC_VIP:  { baseFare: 70,  pricePerKm: 2.60, pricePerMinute: 0.50, minimumFare: 70  },
-  SUV:           { baseFare: 65,  pricePerKm: 2.40, pricePerMinute: 0.45, minimumFare: 65  },
-  LUXURY_SUV:    { baseFare: 100, pricePerKm: 3.50, pricePerMinute: 0.65, minimumFare: 100 },
-  MINIVAN:       { baseFare: 55,  pricePerKm: 2.00, pricePerMinute: 0.35, minimumFare: 55  },
-  LUXURY_MINIVAN:{ baseFare: 90,  pricePerKm: 2.80, pricePerMinute: 0.55, minimumFare: 90  },
-  MINIBUS:       { baseFare: 120, pricePerKm: 3.20, pricePerMinute: 0.60, minimumFare: 120 },
+  ECONOMY:       { baseFare: 15,  pricePerKm: 1.10, pricePerMinute: 0.18, minimumFare: 20  },
+  BUSINESS:      { baseFare: 20,  pricePerKm: 1.30, pricePerMinute: 0.22, minimumFare: 28  },
+  LUXURY:        { baseFare: 28,  pricePerKm: 1.60, pricePerMinute: 0.28, minimumFare: 38  },
+  FIRST_CLASS:   { baseFare: 40,  pricePerKm: 2.00, pricePerMinute: 0.38, minimumFare: 55  },
+  ELECTRIC_VIP:  { baseFare: 35,  pricePerKm: 1.80, pricePerMinute: 0.32, minimumFare: 48  },
+  SUV:           { baseFare: 32,  pricePerKm: 1.70, pricePerMinute: 0.30, minimumFare: 45  },
+  LUXURY_SUV:    { baseFare: 55,  pricePerKm: 2.20, pricePerMinute: 0.42, minimumFare: 70  },
+  MINIVAN:       { baseFare: 30,  pricePerKm: 1.50, pricePerMinute: 0.26, minimumFare: 42  },
+  LUXURY_MINIVAN:{ baseFare: 50,  pricePerKm: 2.00, pricePerMinute: 0.38, minimumFare: 65  },
+  MINIBUS:       { baseFare: 70,  pricePerKm: 2.20, pricePerMinute: 0.42, minimumFare: 90  },
 };
 
-export const AIRPORT_SURCHARGE = 10;
-export const NIGHT_SURCHARGE_RATE = 0.25;
+export const AIRPORT_SURCHARGE = 8;
+export const NIGHT_SURCHARGE_RATE = 0.20;
 
 export function calculateQuote(
   vehicleClass: VehicleClass,

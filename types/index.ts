@@ -128,7 +128,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     maxPassengers: 3,
     maxLuggage: 3,
     features: ["Air Conditioning", "USB Charging", "WiFi"],
-    image: "/images/fleet/economy-sedan.jpg",
+    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80",
     description: "Comfortable and reliable for everyday transfers.",
   },
   {
@@ -138,7 +138,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     maxPassengers: 3,
     maxLuggage: 3,
     features: ["Premium Sound", "WiFi", "Water & Mints", "USB-C Charging"],
-    image: "/images/fleet/business-sedan.jpg",
+    image: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=800&q=80",
     description: "The smart choice for business travel and airport transfers.",
   },
   {
@@ -148,7 +148,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     maxPassengers: 3,
     maxLuggage: 3,
     features: ["Leather Seats", "Privacy Glass", "Premium Sound", "WiFi", "Refreshments"],
-    image: "/images/fleet/luxury-sedan.jpg",
+    image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&q=80",
     description: "Arrive in style with our flagship luxury sedans.",
   },
   {
@@ -158,7 +158,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     maxPassengers: 3,
     maxLuggage: 3,
     features: ["Massaging Seats", "Ambient Lighting", "Champagne", "Privacy Screen", "4G WiFi"],
-    image: "/images/fleet/first-class.jpg",
+    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80",
     description: "The pinnacle of automotive luxury for VIP clients.",
   },
   {
@@ -168,7 +168,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     maxPassengers: 3,
     maxLuggage: 3,
     features: ["Zero Emissions", "Autopilot", "Glass Roof", "Premium Sound", "Fast Charging"],
-    image: "/images/fleet/electric-vip.jpg",
+    image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&q=80",
     description: "Cutting-edge electric luxury for the eco-conscious traveller.",
   },
   {
@@ -178,7 +178,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     maxPassengers: 5,
     maxLuggage: 5,
     features: ["Elevated Seating", "Large Boot", "4WD", "Premium Sound", "WiFi"],
-    image: "/images/fleet/suv.jpg",
+    image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&q=80",
     description: "Commanding presence with executive-level comfort.",
   },
   {
@@ -188,7 +188,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     maxPassengers: 6,
     maxLuggage: 6,
     features: ["VIP Rear Suite", "Refrigerator", "Ambient Lighting", "Privacy Glass", "Champagne"],
-    image: "/images/fleet/luxury-suv.jpg",
+    image: "https://images.unsplash.com/photo-1612825173281-9a193378527e?w=800&q=80",
     description: "Ultimate SUV luxury for groups demanding the very best.",
   },
   {
@@ -198,7 +198,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     maxPassengers: 7,
     maxLuggage: 7,
     features: ["Spacious Cabin", "Climate Control", "WiFi", "USB Charging"],
-    image: "/images/fleet/minivan.jpg",
+    image: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&q=80",
     description: "Ideal for families and groups up to 7 passengers.",
   },
   {
@@ -208,7 +208,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     maxPassengers: 7,
     maxLuggage: 7,
     features: ["Captain Seats", "Conference Layout", "Champagne Bar", "4K Screen", "Privacy Glass"],
-    image: "/images/fleet/luxury-minivan.jpg",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
     description: "A mobile lounge — the ultimate group luxury experience.",
   },
   {
@@ -218,7 +218,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     maxPassengers: 16,
     maxLuggage: 16,
     features: ["Large Group", "Air Conditioning", "PA System", "Luggage Hold"],
-    image: "/images/fleet/minibus.jpg",
+    image: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&q=80",
     description: "Premium group transfers for up to 16 passengers.",
   },
 ];
