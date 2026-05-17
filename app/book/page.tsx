@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Suspense } from "react";
 import Navbar from "@/components/layout/Navbar";
+import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
 import {
   ArrowRight, ArrowLeft, MapPin, Calendar, Clock, Users,
-  User, Mail, Phone, MessageSquare, Plane, ChevronDown,
+  User, Mail, Phone, MessageSquare, Plane,
   Zap, Loader2, CheckCircle2, Briefcase
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
@@ -21,81 +21,37 @@ const STEPS = [
   { id: 4, label: "Payment" },
 ];
 
-declare global { interface Window { google: typeof google; } }
-
 function BookingPageInner() {
   const router = useRouter();
   const params = useSearchParams();
   const [step, setStep] = useState(1);
 
-  const pickupRef  = useRef<HTMLInputElement>(null);
-  const dropoffRef = useRef<HTMLInputElement>(null);
-  const [mapsReady, setMapsReady] = useState(false);
-
   const [data, setData] = useState<Partial<BookingFormData>>({
-    pickupAddress:  params.get("pickup")  ?? "",
-    pickupLat:      parseFloat(params.get("pLat") ?? "0"),
-    pickupLng:      parseFloat(params.get("pLng") ?? "0"),
-    dropoffAddress: params.get("dropoff") ?? "",
-    dropoffLat:     parseFloat(params.get("dLat") ?? "0"),
-    dropoffLng:     parseFloat(params.get("dLng") ?? "0"),
-    date:           params.get("date")    ?? "",
-    time:           params.get("time")    ?? "",
-    passengers:     parseInt(params.get("pax") ?? "2"),
-    luggage:        0,
-    vehicleClass:   (params.get("vehicle") as VehicleClass) ?? "BUSINESS",
-    guestName:      "",
-    guestEmail:     "",
-    guestPhone:     "",
-    flightNumber:   "",
+    pickupAddress:   params.get("pickup")  ?? "",
+    pickupLat:       parseFloat(params.get("pLat") ?? "0"),
+    pickupLng:       parseFloat(params.get("pLng") ?? "0"),
+    dropoffAddress:  params.get("dropoff") ?? "",
+    dropoffLat:      parseFloat(params.get("dLat") ?? "0"),
+    dropoffLng:      parseFloat(params.get("dLng") ?? "0"),
+    date:            params.get("date")    ?? "",
+    time:            params.get("time")    ?? "",
+    passengers:      parseInt(params.get("pax") ?? "2"),
+    luggage:         0,
+    vehicleClass:    (params.get("vehicle") as VehicleClass) ?? "BUSINESS",
+    guestName:       "",
+    guestEmail:      "",
+    guestPhone:      "",
+    flightNumber:    "",
     specialRequests: "",
   });
 
-  const [quote, setQuote] = useState<QuoteResponse | null>(null);
-  const [loadingQuote, setLoadingQuote] = useState(false);
+  const [quote,      setQuote]      = useState<QuoteResponse | null>(null);
+  const [loadingQ,   setLoadingQ]   = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
-  // Load Google Maps
-  useEffect(() => {
-    if (window.google?.maps?.places) { setMapsReady(true); return; }
-    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
-    if (!key) return;
-    const s = document.createElement("script");
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
-    s.async = true;
-    s.onload = () => setMapsReady(true);
-    document.head.appendChild(s);
-  }, []);
-
-  const attachAC = useCallback((
-    input: HTMLInputElement,
-    field: "pickup" | "dropoff"
-  ) => {
-    if (!mapsReady || !window.google) return;
-    const ac = new window.google.maps.places.Autocomplete(input, {
-      componentRestrictions: { country: ["es", "fr", "pt", "ad"] },
-      fields: ["formatted_address", "geometry"],
-    });
-    ac.addListener("place_changed", () => {
-      const place = ac.getPlace();
-      if (!place.geometry?.location) return;
-      const address = place.formatted_address ?? input.value;
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      if (field === "pickup")  setData((d) => ({ ...d, pickupAddress: address,  pickupLat: lat,  pickupLng: lng  }));
-      if (field === "dropoff") setData((d) => ({ ...d, dropoffAddress: address, dropoffLat: lat, dropoffLng: lng }));
-    });
-  }, [mapsReady]);
-
-  useEffect(() => {
-    if (!mapsReady) return;
-    if (pickupRef.current)  attachAC(pickupRef.current,  "pickup");
-    if (dropoffRef.current) attachAC(dropoffRef.current, "dropoff");
-  }, [mapsReady, attachAC, step]);
 
   const fetchQuote = useCallback(async (vehicleClass: VehicleClass) => {
     if (!data.pickupLat || !data.dropoffLat || !data.date || !data.time) return;
-    setLoadingQuote(true);
+    setLoadingQ(true);
     try {
       const res = await fetch("/api/quote", {
         method: "POST",
@@ -109,13 +65,14 @@ function BookingPageInner() {
       });
       if (res.ok) setQuote(await res.json());
     } catch { /* silent */ } finally {
-      setLoadingQuote(false);
+      setLoadingQ(false);
     }
   }, [data.pickupLat, data.pickupLng, data.dropoffLat, data.dropoffLng, data.date, data.time, data.passengers]);
 
-  useEffect(() => {
-    if (step === 2 && data.vehicleClass) fetchQuote(data.vehicleClass);
-  }, [step, data.vehicleClass, fetchQuote]);
+  const goToStep2 = () => {
+    setStep(2);
+    if (data.vehicleClass) fetchQuote(data.vehicleClass);
+  };
 
   const handlePay = async () => {
     setSubmitting(true);
@@ -144,30 +101,22 @@ function BookingPageInner() {
       <main className="min-h-screen pt-20 bg-[#050505]">
         <div className="container mx-auto px-4 py-10 max-w-3xl">
           {/* Step indicator */}
-          <div className="flex items-center justify-center mb-10 steps-line">
+          <div className="flex items-center justify-center mb-10">
             {STEPS.map((s, i) => (
               <div key={s.id} className="flex items-center relative z-10">
-                <button
-                  onClick={() => step > s.id && setStep(s.id)}
-                  className="flex flex-col items-center gap-1"
-                >
+                <button onClick={() => step > s.id && setStep(s.id)} className="flex flex-col items-center gap-1">
                   <div className={cn(
                     "w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300",
-                    step === s.id  ? "step-active"   :
-                    step >  s.id  ? "step-complete"  : "step-pending"
+                    step === s.id ? "step-active" : step > s.id ? "step-complete" : "step-pending"
                   )}>
                     {step > s.id ? <CheckCircle2 size={16} /> : s.id}
                   </div>
-                  <span className={cn(
-                    "text-xs transition-colors hidden sm:block",
-                    step === s.id ? "text-gold-400" : "text-dark-500"
-                  )}>{s.label}</span>
+                  <span className={cn("text-xs transition-colors hidden sm:block", step === s.id ? "text-gold-400" : "text-dark-500")}>
+                    {s.label}
+                  </span>
                 </button>
                 {i < STEPS.length - 1 && (
-                  <div className={cn(
-                    "w-16 sm:w-24 h-px mx-2 transition-colors duration-500",
-                    step > s.id ? "bg-gold-500/40" : "bg-white/[0.06]"
-                  )} />
+                  <div className={cn("w-16 sm:w-24 h-px mx-2 transition-colors duration-500", step > s.id ? "bg-gold-500/40" : "bg-white/[0.06]")} />
                 )}
               </div>
             ))}
@@ -182,26 +131,21 @@ function BookingPageInner() {
                   <div className="space-y-4">
                     <div>
                       <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Pick-up Location</label>
-                      <div className="relative">
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-gold-500 flex items-center justify-center">
-                          <div className="w-2 h-2 rounded-full bg-black" />
-                        </div>
-                        <input ref={pickupRef} type="text" defaultValue={data.pickupAddress}
-                          onChange={(e) => setData((d) => ({ ...d, pickupAddress: e.target.value }))}
-                          placeholder="Airport, hotel, address…"
-                          className="input-luxury w-full pl-10 pr-4 py-4 rounded-xl" />
-                      </div>
+                      <AddressAutocomplete
+                        value={data.pickupAddress ?? ""}
+                        onChange={(v) => setData((d) => ({ ...d, pickupAddress: v.address, pickupLat: v.lat, pickupLng: v.lng }))}
+                        placeholder="Airport, hotel, address…"
+                        icon={<div className="w-5 h-5 rounded-full bg-gold-500 flex items-center justify-center"><div className="w-2 h-2 rounded-full bg-black" /></div>}
+                      />
                     </div>
                     <div className="h-px bg-gold-500/10 mx-3" />
                     <div>
                       <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Drop-off Location</label>
-                      <div className="relative">
-                        <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gold-500" />
-                        <input ref={dropoffRef} type="text" defaultValue={data.dropoffAddress}
-                          onChange={(e) => setData((d) => ({ ...d, dropoffAddress: e.target.value }))}
-                          placeholder="Destination…"
-                          className="input-luxury w-full pl-10 pr-4 py-4 rounded-xl" />
-                      </div>
+                      <AddressAutocomplete
+                        value={data.dropoffAddress ?? ""}
+                        onChange={(v) => setData((d) => ({ ...d, dropoffAddress: v.address, dropoffLat: v.lat, dropoffLng: v.lng }))}
+                        placeholder="Destination…"
+                      />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
@@ -249,7 +193,7 @@ function BookingPageInner() {
                         </div>
                       </div>
                     </div>
-                    <button onClick={() => setStep(2)} disabled={!step1Valid}
+                    <button onClick={goToStep2} disabled={!step1Valid}
                       className="btn-gold w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
                       Select Vehicle <ArrowRight size={16} />
                     </button>
@@ -267,28 +211,26 @@ function BookingPageInner() {
                       <p className="text-dark-400 text-xs uppercase tracking-wider">Route</p>
                       <p className="text-white text-sm mt-1">{data.pickupAddress} → {data.dropoffAddress}</p>
                     </div>
-                    {loadingQuote && <Loader2 size={16} className="text-gold-500 animate-spin" />}
+                    {loadingQ && <Loader2 size={16} className="text-gold-500 animate-spin" />}
                   </div>
 
                   {VEHICLE_CATALOG.filter((v) => v.maxPassengers >= (data.passengers ?? 1)).map((v) => {
                     const sel = data.vehicleClass === v.class;
                     const pricing = quote && sel ? quote : null;
                     return (
-                      <motion.button key={v.class} onClick={() => { setData((d) => ({ ...d, vehicleClass: v.class })); fetchQuote(v.class); }}
+                      <motion.button key={v.class}
+                        onClick={() => { setData((d) => ({ ...d, vehicleClass: v.class })); fetchQuote(v.class); }}
                         className={cn(
                           "w-full text-left rounded-xl border p-5 transition-all duration-200",
                           sel ? "border-gold-500/50 bg-gold-500/5" : "border-white/[0.06] bg-white/[0.02] hover:border-gold-500/20"
                         )}>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className={cn("w-4 h-4 rounded-full border-2 transition-colors flex items-center justify-center",
-                              sel ? "border-gold-500 bg-gold-500" : "border-white/20")}>
+                            <div className={cn("w-4 h-4 rounded-full border-2 transition-colors flex items-center justify-center", sel ? "border-gold-500 bg-gold-500" : "border-white/20")}>
                               {sel && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
                             </div>
                             <div>
-                              <p className={cn("font-medium transition-colors", sel ? "text-gold-400" : "text-white")}>
-                                {v.label}
-                              </p>
+                              <p className={cn("font-medium transition-colors", sel ? "text-gold-400" : "text-white")}>{v.label}</p>
                               <p className="text-dark-500 text-xs mt-0.5">{v.models.join(" / ")} · {v.maxPassengers} pax</p>
                             </div>
                           </div>
@@ -419,37 +361,25 @@ function BookingPageInner() {
                         </div>
                       ))}
                     </div>
-
-                    {/* Price breakdown */}
                     <div className="mt-5 bg-black/30 rounded-xl p-4 space-y-2 text-sm">
-                      <div className="flex justify-between text-dark-400">
-                        <span>Base fare</span><span>{formatCurrency(quote.baseFare)}</span>
-                      </div>
-                      <div className="flex justify-between text-dark-400">
-                        <span>Distance ({quote.distanceKm} km)</span><span>{formatCurrency(quote.distanceFare)}</span>
-                      </div>
+                      <div className="flex justify-between text-dark-400"><span>Base fare</span><span>{formatCurrency(quote.baseFare)}</span></div>
+                      <div className="flex justify-between text-dark-400"><span>Distance ({quote.distanceKm} km)</span><span>{formatCurrency(quote.distanceFare)}</span></div>
                       {quote.airportSurcharge > 0 && (
-                        <div className="flex justify-between text-dark-400">
-                          <span>Airport surcharge</span><span>{formatCurrency(quote.airportSurcharge)}</span>
-                        </div>
+                        <div className="flex justify-between text-dark-400"><span>Airport surcharge</span><span>{formatCurrency(quote.airportSurcharge)}</span></div>
                       )}
                       {quote.nightSurcharge > 0 && (
-                        <div className="flex justify-between text-dark-400">
-                          <span>Night surcharge</span><span>{formatCurrency(quote.nightSurcharge)}</span>
-                        </div>
+                        <div className="flex justify-between text-dark-400"><span>Night surcharge</span><span>{formatCurrency(quote.nightSurcharge)}</span></div>
                       )}
                       <div className="border-t border-white/10 pt-3 flex justify-between">
                         <span className="text-white font-semibold">Total</span>
                         <span className="font-display text-xl text-gold-400">{formatCurrency(quote.totalAmount)}</span>
                       </div>
                     </div>
-
                     <div className="flex items-center gap-2 mt-4 text-xs text-dark-500">
                       <Zap size={12} className="text-gold-500" />
                       Fixed price. No surge pricing. Free cancellation 24h before pickup.
                     </div>
                   </div>
-
                   <div className="flex gap-3">
                     <button onClick={() => setStep(3)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
                       <ArrowLeft size={16} /> Back
@@ -460,9 +390,7 @@ function BookingPageInner() {
                       {submitting ? "Processing…" : `Pay ${formatCurrency(quote.totalAmount)}`}
                     </button>
                   </div>
-                  <p className="text-center text-xs text-dark-500">
-                    Secured by Stripe · 256-bit SSL · Apple Pay & Google Pay accepted
-                  </p>
+                  <p className="text-center text-xs text-dark-500">Secured by Stripe · 256-bit SSL · Apple Pay & Google Pay accepted</p>
                 </div>
               </motion.div>
             )}

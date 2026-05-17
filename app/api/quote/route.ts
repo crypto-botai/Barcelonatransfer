@@ -13,21 +13,19 @@ const schema = z.object({
   passengers:      z.number().int().min(1).max(20).optional(),
 });
 
-async function getGoogleDistance(
+async function getOsrmDistance(
   originLat: number, originLng: number,
   destLat: number, destLng: number
 ): Promise<{ distanceKm: number; durationMin: number } | null> {
-  const key = process.env.GOOGLE_MAPS_SERVER_KEY;
-  if (!key) return null;
   try {
-    const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${originLat},${originLng}&destinations=${destLat},${destLng}&mode=driving&key=${key}`;
-    const res = await fetch(url);
+    const url = `https://router.project-osrm.org/route/v1/driving/${originLng},${originLat};${destLng},${destLat}?overview=false`;
+    const res = await fetch(url, { next: { revalidate: 0 } });
     const data = await res.json();
-    const el = data.rows?.[0]?.elements?.[0];
-    if (el?.status === "OK") {
+    const route = data.routes?.[0];
+    if (route) {
       return {
-        distanceKm:  el.distance.value / 1000,
-        durationMin: Math.ceil(el.duration.value / 60),
+        distanceKm:  Math.round(route.distance / 100) / 10,
+        durationMin: Math.ceil(route.duration / 60),
       };
     }
   } catch { /* fallback */ }
@@ -49,14 +47,14 @@ export async function POST(req: NextRequest) {
     const body = schema.parse(await req.json());
     const { pickupLat, pickupLng, dropoffLat, dropoffLng, vehicleClass, pickupDatetime } = body;
 
-    // Try Google Distance Matrix first; fall back to haversine * 1.35 (road factor)
+    // Try OSRM routing first; fall back to haversine * 1.35 (road factor)
     let distanceKm: number;
     let durationMin: number;
 
-    const google = await getGoogleDistance(pickupLat, pickupLng, dropoffLat, dropoffLng);
-    if (google) {
-      distanceKm  = google.distanceKm;
-      durationMin = google.durationMin;
+    const osrm = await getOsrmDistance(pickupLat, pickupLng, dropoffLat, dropoffLng);
+    if (osrm) {
+      distanceKm  = osrm.distanceKm;
+      durationMin = osrm.durationMin;
     } else {
       distanceKm  = Math.round(haversineKm(pickupLat, pickupLng, dropoffLat, dropoffLng) * 1.35 * 10) / 10;
       durationMin = Math.ceil((distanceKm / 50) * 60);
