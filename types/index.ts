@@ -79,6 +79,8 @@ export interface BookingFormData {
   dropoffLat: number;
   dropoffLng: number;
   pickupDatetime: string;
+  date: string;
+  time: string;
   passengers: number;
   luggage: number;
   vehicleClass: VehicleClass;
