@@ -49,7 +49,7 @@ export default function AddressAutocomplete({ value, onChange, placeholder, icon
     const q = e.target.value;
     setQuery(q);
     onChange({ address: q, lat: 0, lng: 0 });
-    clearTimeout(timer.current);
+    if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => search(q), 400);
   };
 
