@@ -8,7 +8,6 @@ import FleetSection from "@/components/sections/FleetSection";
 import StatsSection from "@/components/sections/StatsSection";
 import PricingSection from "@/components/sections/PricingSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
-import FAQSection from "@/components/sections/FAQSection";
 
 export const metadata: Metadata = {
   title: "Élite BCN | Luxury Private Transfers Barcelona",
@@ -27,7 +26,6 @@ export default function HomePage() {
         <FleetSection />
         <PricingSection />
         <TestimonialsSection />
-        <FAQSection />
       </main>
       <Footer />
       <WhatsAppButton />

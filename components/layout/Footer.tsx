@@ -145,6 +145,17 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+              <li className="pt-3 border-t border-white/[0.06] mt-1">
+                <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-3 font-medium">Staff Access</h4>
+                <div className="flex flex-col gap-2">
+                  <Link href="/auth/login" className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
+                    Driver Login
+                  </Link>
+                  <Link href="/auth/login" className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
+                    Admin Login
+                  </Link>
+                </div>
+              </li>
             </ul>
           </div>
         </div>
@@ -158,11 +169,9 @@ export default function Footer() {
           </p>
           <div className="flex gap-5">
             <Link href="/faq" className="text-xs text-dark-500 hover:text-gold-400 transition-colors">FAQ</Link>
-            {["Privacy Policy", "Terms & Conditions", "Cookie Policy"].map((t) => (
-              <Link key={t} href="#" className="text-xs text-dark-500 hover:text-dark-300 transition-colors">
-                {t}
-              </Link>
-            ))}
+            <Link href="/privacy" className="text-xs text-dark-500 hover:text-dark-300 transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="text-xs text-dark-500 hover:text-dark-300 transition-colors">Terms & Conditions</Link>
+            <Link href="/cookies" className="text-xs text-dark-500 hover:text-dark-300 transition-colors">Cookie Policy</Link>
           </div>
         </div>
       </div>
