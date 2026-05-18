@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, Clock, Calendar, MapPin, MessageCircle, Download } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, Calendar, MapPin, MessageCircle } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 
 type BookingData = {
@@ -30,11 +30,11 @@ function SuccessInner() {
 
     const verify = async () => {
       try {
-        const res = await fetch(`/api/payments/verify?booking_id=${bookingId}`);
+        const res  = await fetch(`/api/payments/verify?booking_id=${bookingId}`);
         const json = await res.json();
         setData(json);
 
-        if (json.status === "PENDING" && attempts < 6) {
+        if (json.status === "PENDING" && attempts < 5) {
           setTimeout(() => setAttempts((a) => a + 1), 3000);
         } else {
           setLoading(false);
@@ -52,7 +52,7 @@ function SuccessInner() {
       <main className="min-h-screen bg-[#050505] flex items-center justify-center p-4">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
           <div className="w-20 h-20 rounded-full border-2 border-gold-500/30 border-t-gold-500 animate-spin mx-auto mb-6" />
-          <p className="text-dark-400">Confirming your payment…</p>
+          <p className="text-dark-400">Confirming your booking…</p>
         </motion.div>
       </main>
     );
@@ -60,6 +60,8 @@ function SuccessInner() {
 
   const isPaid   = data?.status === "PAID";
   const isFailed = data?.status === "FAILED";
+  // PENDING after retries = booking saved, payment pending (SumUp not set up or pending webhook)
+  const isPending = !isPaid && !isFailed;
 
   return (
     <main className="min-h-screen bg-[#050505] flex items-center justify-center p-4 pt-24">
@@ -134,7 +136,7 @@ function SuccessInner() {
             </div>
             <h1 className="font-display text-3xl text-white mb-2">Payment Failed</h1>
             <p className="text-dark-400 mb-8">
-              Your payment could not be processed. No charge was made. Please try again.
+              Your payment could not be processed. No charge was made. Please try again or contact us.
             </p>
             <div className="flex flex-col gap-3">
               <Link href="/book" className="btn-gold w-full py-3.5 rounded-xl font-semibold">
@@ -147,27 +149,51 @@ function SuccessInner() {
             </div>
           </>
         ) : (
+          /* PENDING — booking saved, payment not yet processed */
           <>
-            <div className="w-20 h-20 rounded-full bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center mx-auto mb-6">
-              <Clock size={36} className="text-yellow-400" />
-            </div>
-            <h1 className="font-display text-3xl text-white mb-2">Payment Pending</h1>
-            <p className="text-dark-400 mb-8">
-              Your payment is being processed. You will receive a confirmation email shortly.
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", delay: 0.2 }}
+              className="w-20 h-20 rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center mx-auto mb-6"
+            >
+              <Clock size={36} className="text-gold-400" />
+            </motion.div>
+            <h1 className="font-display text-3xl text-white mb-2">Booking Received!</h1>
+            <p className="text-dark-400 mb-2">
+              Your booking request has been saved and our team has been notified.
             </p>
+            <p className="text-dark-400 text-sm mb-6">
+              Please complete your payment via WhatsApp or wait for our team to send you a payment link.
+            </p>
+
+            {data?.confirmationCode && (
+              <div className="bg-black/30 rounded-xl p-5 mb-6 text-sm">
+                <p className="text-dark-400 text-xs tracking-[0.2em] uppercase mb-2">Your Reference</p>
+                <p className="font-display text-2xl text-gold-400 tracking-widest">{data.confirmationCode}</p>
+              </div>
+            )}
+
             <div className="flex flex-col gap-3">
-              <Link href="/" className="btn-gold w-full py-3.5 rounded-xl font-semibold">
+              <a
+                href={`https://wa.me/34635383712?text=${encodeURIComponent(
+                  `Hi! I have a booking reference ${data?.confirmationCode ?? ""} and need to complete payment of €${data?.totalAmount?.toFixed(2) ?? ""}.`
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-gold w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2"
+              >
+                <MessageCircle size={16} />
+                Complete Payment via WhatsApp
+              </a>
+              <Link href="/" className="btn-outline-gold w-full py-3.5 rounded-xl font-semibold">
                 Back to Home
               </Link>
-              <a href="https://wa.me/34635383712" target="_blank" rel="noreferrer"
-                className="btn-outline-gold w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2">
-                <MessageCircle size={16} /> Contact Support
-              </a>
             </div>
           </>
         )}
         <p className="text-dark-500 text-xs mt-6">
-          Secured by SumUp · PCI DSS Level 1 Certified
+          Élite BCN Transfers · +34 635 383 712 · vtcbcn2025@gmail.com
         </p>
       </motion.div>
     </main>

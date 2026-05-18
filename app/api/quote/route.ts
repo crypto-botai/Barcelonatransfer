@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { calculateQuote, HOURLY_RATES, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE } from "@/lib/pricing";
+import { calculateQuote, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE } from "@/lib/pricing";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
 import { type VehicleClass } from "@/types";
 
@@ -53,7 +53,8 @@ export async function POST(req: NextRequest) {
     const vc = vehicleClass as VehicleClass;
 
     if (bookingType === "HOURLY" || bookingType === "DAY_HIRE") {
-      const hours = bookingType === "DAY_HIRE" ? 8 : (body.durationHours ?? 3);
+      const minH  = MIN_HOURLY_HOURS[vc] ?? 4;
+      const hours = bookingType === "DAY_HIRE" ? 8 : Math.max(body.durationHours ?? 4, minH);
       const hourlyRate = HOURLY_RATES[vc] ?? 50;
       const subtotal = hourlyRate * hours;
       const isNight = isNightTime(pickupDate);

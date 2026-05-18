@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     const extrasCost     = (body.extras ?? []).reduce((sum, e) => sum + e.price * e.quantity, 0);
     const totalWithExtras = Math.round((body.quote.totalAmount + extrasCost) * 100) / 100;
 
-    // Encode booking metadata into specialRequests as a JSON header line
+    // Encode booking metadata into specialRequests
     const metaObj = {
       bookingType:  body.bookingType,
       durationHours: body.durationHours ?? null,
@@ -67,6 +67,7 @@ export async function POST(req: NextRequest) {
       ? `${metaPrefix}${body.specialRequests}`
       : metaPrefix.trimEnd();
 
+    // Step 1: Always create the booking record first
     const booking = await prisma.booking.create({
       data: {
         userId:           user?.id ?? null,
@@ -97,33 +98,54 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const checkout = await createSumUpCheckout({
-      bookingId:     booking.id,
-      amount:        totalWithExtras,
-      description:   `Élite BCN: ${body.pickupAddress} → ${body.dropoffAddress || body.bookingType}`,
-      customerEmail: body.guestEmail,
-    });
-
-    await prisma.booking.update({
-      where: { id: booking.id },
-      data:  { stripeSessionId: checkout.id },
-    });
-
+    // Step 2: Notify admin (fire-and-forget — never blocks)
     sendAdminNewBookingAlert({
       confirmationCode: booking.confirmationCode,
       guestName:        body.guestName,
       guestEmail:       body.guestEmail,
       pickupAddress:    body.pickupAddress,
-      dropoffAddress:   body.dropoffAddress || `${body.bookingType} – ${body.durationHours}h`,
+      dropoffAddress:   body.dropoffAddress || `${body.bookingType} – ${body.durationHours ?? ""}h`,
       pickupDatetime:   pickupDatetime.toLocaleString("en-GB"),
       vehicleClass:     body.vehicleClass,
       totalAmount:      totalWithExtras,
     }).catch(() => {});
 
+    // Step 3: Try to create SumUp checkout — if not configured, use WhatsApp fallback
+    const sumupConfigured =
+      !!process.env.SUMUP_API_KEY && process.env.SUMUP_API_KEY !== "your_sumup_api_key" &&
+      !!process.env.SUMUP_MERCHANT_CODE && process.env.SUMUP_MERCHANT_CODE !== "your_merchant_code";
+
+    if (sumupConfigured) {
+      try {
+        const checkout = await createSumUpCheckout({
+          bookingId:     booking.id,
+          amount:        totalWithExtras,
+          description:   `Élite BCN: ${body.pickupAddress} → ${body.dropoffAddress || body.bookingType}`,
+          customerEmail: body.guestEmail,
+        });
+
+        await prisma.booking.update({
+          where: { id: booking.id },
+          data:  { stripeSessionId: checkout.id },
+        });
+
+        return NextResponse.json({
+          bookingId:   booking.id,
+          checkoutUrl: getSumUpCheckoutUrl(checkout.id),
+        });
+      } catch (sumupErr) {
+        console.error("[bookings] SumUp checkout failed:", sumupErr);
+        // Fall through to WhatsApp fallback below
+      }
+    }
+
+    // Fallback: booking is saved — redirect to success/pending page
+    // Admin is already notified; customer can pay via WhatsApp
     return NextResponse.json({
       bookingId:   booking.id,
-      checkoutUrl: getSumUpCheckoutUrl(checkout.id),
+      checkoutUrl: `/booking/success?booking_id=${booking.id}`,
     });
+
   } catch (err) {
     if (err instanceof z.ZodError)
       return NextResponse.json({ error: err.errors[0].message }, { status: 422 });

@@ -18,7 +18,7 @@ import {
   type VehicleClass, type BookingFormData, type QuoteResponse,
   type BookingType, type BookingExtra,
 } from "@/types";
-import { DEFAULT_PRICING, HOURLY_RATES } from "@/lib/pricing";
+import { DEFAULT_PRICING, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import toast from "react-hot-toast";
 
 // ─── Constants ──────────────────────────────────────────────
@@ -42,7 +42,7 @@ const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
   return `${h}:${m}`;
 });
 
-const HOURS_OPTIONS = [2, 3, 4, 5, 6, 8, 10, 12];
+const HOURS_OPTIONS = [4, 5, 6, 8, 10, 12];
 
 function todayStr()    { return new Date().toISOString().split("T")[0]; }
 function tomorrowStr() { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split("T")[0]; }
@@ -73,7 +73,7 @@ function BookingPageInner() {
     time:            params.get("time")     ?? "",
     passengers:      parseInt(params.get("pax") ?? "2"),
     luggage:         0,
-    durationHours:   3,
+    durationHours:   4,
     vehicleClass:    (params.get("vehicle") as VehicleClass) ?? "BUSINESS",
     guestName:       "",
     guestEmail:      "",
@@ -284,7 +284,9 @@ function BookingPageInner() {
                     {/* Duration (Hourly only) */}
                     {bookingType === "HOURLY" && (
                       <div>
-                        <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Duration</label>
+                        <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">
+                          Duration <span className="text-dark-600 normal-case tracking-normal">(minimum 4 hours)</span>
+                        </label>
                         <div className="flex flex-wrap gap-2">
                           {HOURS_OPTIONS.map((h) => (
                             <button
@@ -432,8 +434,10 @@ function BookingPageInner() {
                       const sel = data.vehicleClass === v.class;
                       const pricing = quote && sel ? quote : null;
                       const minFare = DEFAULT_PRICING[v.class].minimumFare;
+                      const minHours = MIN_HOURLY_HOURS[v.class] ?? 4;
+                      const selectedHours = bookingType === "DAY_HIRE" ? 8 : Math.max(data.durationHours ?? 4, minHours);
                       const hourlyRate = bookingType === "HOURLY" || bookingType === "DAY_HIRE"
-                        ? HOURLY_RATES[v.class] * (bookingType === "DAY_HIRE" ? 8 : (data.durationHours ?? 3))
+                        ? HOURLY_RATES[v.class] * selectedHours
                         : null;
 
                       return (
@@ -497,7 +501,7 @@ function BookingPageInner() {
                                   ) : hourlyRate !== null ? (
                                     <>
                                       <p className="font-display text-lg text-gold-400">{formatCurrency(hourlyRate)}</p>
-                                      <p className="text-dark-500 text-[10px]">estimated</p>
+                                      <p className="text-dark-500 text-[10px]">{formatCurrency(HOURLY_RATES[v.class])}/h · {selectedHours}h</p>
                                     </>
                                   ) : (
                                     <p className="text-dark-500 text-xs">from {formatCurrency(minFare)}</p>
