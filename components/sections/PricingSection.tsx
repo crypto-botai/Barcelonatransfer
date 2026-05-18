@@ -42,10 +42,13 @@ const BRAVA = [
 ];
 
 const HOURLY = [
-  { label: "Economy / Business",        price: 40, unit: "/ hour", min: "Min. 4 hours" },
-  { label: "Luxury / First Class",      price: 55, unit: "/ hour", min: "Min. 4 hours" },
-  { label: "SUV / Luxury SUV",          price: 65, unit: "/ hour", min: "Min. 4 hours" },
-  { label: "Minivan / V-Class",         price: 70, unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Economy / Business",       price: 45,  unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Luxury Sedan",             price: 65,  unit: "/ hour", min: "Min. 4 hours" },
+  { label: "First Class",              price: 110, unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Executive SUV",            price: 75,  unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Minivan (Vito)",           price: 55,  unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Luxury Minivan (V-Class)", price: 65,  unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Minibus",                  price: 160, unit: "/ hour", min: "Min. 4 hours" },
 ];
 
 type Row = { route: string; p1: number; p2: number; p3: number; p4: number };
@@ -181,7 +184,7 @@ export default function PricingSection() {
             {tab === 1 && <PriceTable data={DORADA}  search={search} />}
             {tab === 2 && <PriceTable data={BRAVA}   search={search} />}
             {tab === 3 && (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
                 {HOURLY.map((h) => (
                   <div key={h.label} className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 text-center">
                     <h3 className="text-white text-sm font-medium mb-3">{h.label}</h3>

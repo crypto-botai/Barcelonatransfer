@@ -14,10 +14,20 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    toast.success("Message sent! We'll reply within 2 hours.");
-    setForm({ name: "", email: "", phone: "", message: "" });
-    setLoading(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("failed");
+      toast.success("Message sent! We'll reply within 2 hours.");
+      setForm({ name: "", email: "", phone: "", message: "" });
+    } catch {
+      toast.error("Could not send message. Please try WhatsApp or email directly.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
