@@ -22,14 +22,12 @@ const DESTINATIONS = [
 ];
 
 const FLEET_LINKS = [
-  { label: "Economy Sedan",       href: "/fleet#economy" },
-  { label: "Business Class",      href: "/fleet#business" },
-  { label: "Luxury Sedan",        href: "/fleet#luxury" },
-  { label: "First Class",         href: "/fleet#first-class" },
-  { label: "Electric VIP",        href: "/fleet#electric" },
-  { label: "Luxury SUV",          href: "/fleet#suv" },
-  { label: "Luxury Minivan",      href: "/fleet#minivan" },
-  { label: "Group Minibus",       href: "/fleet#minibus" },
+  { label: "Standard Sedan",    href: "/fleet#economy" },
+  { label: "Luxury Sedan",      href: "/fleet#luxury" },
+  { label: "Executive Minivan", href: "/fleet#minivan" },
+  { label: "Luxury Minivan",    href: "/fleet#luxury-minivan" },
+  { label: "Group Minibus",     href: "/fleet#minibus" },
+  { label: "Electric Vehicle",  href: "/fleet#electric" },
 ];
 
 export default function Footer() {
@@ -159,6 +157,7 @@ export default function Footer() {
             © {new Date().getFullYear()} Élite BCN Transfers. All rights reserved. Licensed VTC Operator — Barcelona, Spain.
           </p>
           <div className="flex gap-5">
+            <Link href="/faq" className="text-xs text-dark-500 hover:text-gold-400 transition-colors">FAQ</Link>
             {["Privacy Policy", "Terms & Conditions", "Cookie Policy"].map((t) => (
               <Link key={t} href="#" className="text-xs text-dark-500 hover:text-dark-300 transition-colors">
                 {t}

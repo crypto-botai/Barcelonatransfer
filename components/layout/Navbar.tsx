@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Phone, ChevronDown } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -29,6 +30,9 @@ export default function Navbar() {
   const [mobileOpen, setMobile]   = useState(false);
   const [dropdown, setDropdown]   = useState<string | null>(null);
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const role = (session?.user as { role?: string } | undefined)?.role;
+  const dashboardHref = role === "ADMIN" ? "/admin" : role === "DRIVER" ? "/driver" : null;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -136,12 +140,22 @@ export default function Navbar() {
               >
                 Book Now
               </Link>
-              <Link
-                href="/auth/login"
-                className="text-sm text-dark-400 hover:text-white transition-colors tracking-wide"
-              >
-                Sign In
-              </Link>
+              {dashboardHref ? (
+                <Link
+                  href={dashboardHref}
+                  className="flex items-center gap-1.5 text-sm text-gold-400 hover:text-gold-300 transition-colors tracking-wide"
+                >
+                  <LayoutDashboard size={14} />
+                  Dashboard
+                </Link>
+              ) : (
+                <Link
+                  href="/auth/login"
+                  className="text-sm text-dark-400 hover:text-white transition-colors tracking-wide"
+                >
+                  Sign In
+                </Link>
+              )}
             </div>
 
             {/* Mobile burger */}
@@ -211,6 +225,16 @@ export default function Navbar() {
               >
                 Book Your Transfer
               </Link>
+              {dashboardHref && (
+                <Link
+                  href={dashboardHref}
+                  className="flex items-center justify-center gap-2 py-4 rounded-xl border border-gold-500/30 text-gold-400 hover:text-gold-300 transition-colors"
+                  onClick={() => setMobile(false)}
+                >
+                  <LayoutDashboard size={16} />
+                  <span>Dashboard</span>
+                </Link>
+              )}
               <a
                 href="tel:+34635383712"
                 className="flex items-center justify-center gap-2 py-4 rounded-xl border border-white/10 text-dark-300 hover:text-gold-400 transition-colors"
