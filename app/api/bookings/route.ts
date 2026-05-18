@@ -55,11 +55,21 @@ export async function POST(req: NextRequest) {
     const extrasCost     = (body.extras ?? []).reduce((sum, e) => sum + e.price * e.quantity, 0);
     const totalWithExtras = Math.round((body.quote.totalAmount + extrasCost) * 100) / 100;
 
+    // Encode booking metadata into specialRequests as a JSON header line
+    const metaObj = {
+      bookingType:  body.bookingType,
+      durationHours: body.durationHours ?? null,
+      extras:       body.extras ?? [],
+      extrasCost,
+    };
+    const metaPrefix = `[META]${JSON.stringify(metaObj)}[/META]\n`;
+    const specialRequests = body.specialRequests
+      ? `${metaPrefix}${body.specialRequests}`
+      : metaPrefix.trimEnd();
+
     const booking = await prisma.booking.create({
       data: {
         userId:           user?.id ?? null,
-        bookingType:      body.bookingType,
-        durationHours:    body.durationHours ?? null,
         guestName:        body.guestName,
         guestEmail:       body.guestEmail,
         guestPhone:       body.guestPhone,
@@ -74,9 +84,7 @@ export async function POST(req: NextRequest) {
         luggage:          body.luggage,
         vehicleClass:     body.vehicleClass as VehicleClass,
         flightNumber:     body.flightNumber ?? null,
-        specialRequests:  body.specialRequests ?? null,
-        extras:           body.extras ?? undefined,
-        extrasCost,
+        specialRequests,
         distanceKm:       body.quote.distanceKm,
         durationMin:      body.quote.durationMin,
         baseFare:         body.quote.baseFare,
