@@ -41,6 +41,7 @@ const schema = z.object({
     distanceFare:     z.number(),
     airportSurcharge: z.number(),
     nightSurcharge:   z.number(),
+    vatAmount:        z.number().default(0),
     totalAmount:      z.number(),
   }),
 });

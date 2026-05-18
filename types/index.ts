@@ -79,6 +79,7 @@ export interface QuoteResponse {
   distanceFare:     number;
   airportSurcharge: number;
   nightSurcharge:   number;
+  vatAmount:        number;
   totalAmount:      number;
   currency:         string;
   hourlyRate?:      number;

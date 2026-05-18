@@ -171,18 +171,18 @@ export function calculateQuote(
   // Check for a fixed route price first
   const fixedPrice = lookupFixedPrice(pickupLat, pickupLng, dropoffLat, dropoffLng, vehicleClass);
   if (fixedPrice !== null) {
-    // Apply night surcharge on top of fixed price
-    const isNight = isNightTime(pickupDatetime);
-    const nightSurcharge = isNight ? Math.round(fixedPrice * NIGHT_SURCHARGE_RATE * 100) / 100 : 0;
+    // Fixed routes: price + 10% VAT only — no surcharges
+    const vatAmount = Math.round(fixedPrice * 0.10 * 100) / 100;
     return {
-      distanceKm:      Math.round(distanceKm * 10) / 10,
+      distanceKm:       Math.round(distanceKm * 10) / 10,
       durationMin,
-      baseFare:        fixedPrice,
-      distanceFare:    0,
+      baseFare:         fixedPrice,
+      distanceFare:     0,
       airportSurcharge: 0,
-      nightSurcharge,
-      totalAmount:     Math.round((fixedPrice + nightSurcharge) * 100) / 100,
-      currency:        "EUR",
+      nightSurcharge:   0,
+      vatAmount,
+      totalAmount:      Math.round((fixedPrice + vatAmount) * 100) / 100,
+      currency:         "EUR",
     };
   }
 
@@ -205,6 +205,7 @@ export function calculateQuote(
     distanceFare:    Math.round(distanceFare * 100) / 100,
     airportSurcharge,
     nightSurcharge:  Math.round(nightSurcharge * 100) / 100,
+    vatAmount:       0,
     totalAmount:     Math.round(total * 100) / 100,
     currency:        "EUR",
   };

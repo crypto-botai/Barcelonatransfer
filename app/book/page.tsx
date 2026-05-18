@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useCallback, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
@@ -57,9 +57,14 @@ function roundUpToNext30(): string {
 
 // ─── Main Inner Component ───────────────────────────────────
 function BookingPageInner() {
-  const router = useRouter();
   const params = useSearchParams();
-  const [step, setStep] = useState(1);
+
+  const hasPrefilledJourney = !!(
+    params.get("pLat") && params.get("date") && params.get("time") &&
+    (params.get("dLat") || params.get("bookingType") === "HOURLY" || params.get("bookingType") === "DAY_HIRE")
+  );
+
+  const [step, setStep] = useState(hasPrefilledJourney ? 2 : 1);
 
   const [data, setData] = useState<Partial<BookingFormData>>({
     bookingType:     "TRANSFER",
@@ -121,6 +126,14 @@ function BookingPageInner() {
       setLoadingQ(false);
     }
   }, [data.pickupLat, data.pickupLng, data.dropoffLat, data.dropoffLng, data.date, data.time, data.passengers, data.durationHours, bookingType]);
+
+  // Auto-fetch quote when arriving with pre-filled journey from instant quote
+  useEffect(() => {
+    if (hasPrefilledJourney && data.vehicleClass && data.pickupLat && data.date && data.time) {
+      fetchQuote(data.vehicleClass as VehicleClass);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Extras helpers ─────────────────────────────────────────
   const extrasTotal = (data.extras ?? []).reduce((s, e) => s + e.price * e.quantity, 0);
@@ -184,7 +197,7 @@ function BookingPageInner() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Booking failed");
-      router.push(json.checkoutUrl);
+      window.location.href = json.checkoutUrl;
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Booking failed. Please try again.");
     } finally {
@@ -456,13 +469,13 @@ function BookingPageInner() {
                         >
                           <div className="flex">
                             {/* Vehicle image */}
-                            <div className="relative w-28 sm:w-36 flex-shrink-0 aspect-[4/3]">
+                            <div className="relative w-28 sm:w-36 flex-shrink-0 aspect-[4/3] bg-[#e8e8e8]">
                               <Image
                                 src={v.image}
                                 alt={v.label}
                                 fill
                                 sizes="144px"
-                                className="object-cover"
+                                className="object-contain p-2"
                               />
                               {v.badge && (
                                 <div className="absolute top-2 left-2 z-10">
@@ -745,27 +758,44 @@ function BookingPageInner() {
 
                     {/* Pricing breakdown */}
                     <div className="mt-5 bg-black/30 rounded-xl p-4 space-y-2 text-sm">
-                      <div className="flex justify-between text-dark-400">
-                        <span>Base fare</span>
-                        <span>{formatCurrency(quote.baseFare)}</span>
-                      </div>
-                      {quote.distanceFare > 0 && (
-                        <div className="flex justify-between text-dark-400">
-                          <span>Distance ({quote.distanceKm} km)</span>
-                          <span>{formatCurrency(quote.distanceFare)}</span>
-                        </div>
-                      )}
-                      {quote.airportSurcharge > 0 && (
-                        <div className="flex justify-between text-dark-400">
-                          <span>Airport surcharge</span>
-                          <span>{formatCurrency(quote.airportSurcharge)}</span>
-                        </div>
-                      )}
-                      {quote.nightSurcharge > 0 && (
-                        <div className="flex justify-between text-dark-400">
-                          <span>Night surcharge</span>
-                          <span>{formatCurrency(quote.nightSurcharge)}</span>
-                        </div>
+                      {quote.vatAmount > 0 ? (
+                        /* Fixed-route pricing: transfer price + VAT only */
+                        <>
+                          <div className="flex justify-between text-dark-400">
+                            <span>Transfer price</span>
+                            <span>{formatCurrency(quote.baseFare)}</span>
+                          </div>
+                          <div className="flex justify-between text-dark-400">
+                            <span>VAT (10%)</span>
+                            <span>{formatCurrency(quote.vatAmount)}</span>
+                          </div>
+                        </>
+                      ) : (
+                        /* Dynamic pricing breakdown */
+                        <>
+                          <div className="flex justify-between text-dark-400">
+                            <span>Base fare</span>
+                            <span>{formatCurrency(quote.baseFare)}</span>
+                          </div>
+                          {quote.distanceFare > 0 && (
+                            <div className="flex justify-between text-dark-400">
+                              <span>Distance ({quote.distanceKm} km)</span>
+                              <span>{formatCurrency(quote.distanceFare)}</span>
+                            </div>
+                          )}
+                          {quote.airportSurcharge > 0 && (
+                            <div className="flex justify-between text-dark-400">
+                              <span>Airport surcharge</span>
+                              <span>{formatCurrency(quote.airportSurcharge)}</span>
+                            </div>
+                          )}
+                          {quote.nightSurcharge > 0 && (
+                            <div className="flex justify-between text-dark-400">
+                              <span>Night surcharge</span>
+                              <span>{formatCurrency(quote.nightSurcharge)}</span>
+                            </div>
+                          )}
+                        </>
                       )}
 
                       {/* Extras */}

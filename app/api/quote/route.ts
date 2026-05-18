@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
         distanceFare: 0,
         airportSurcharge,
         nightSurcharge,
+        vatAmount:    0,
         totalAmount,
         currency:     "EUR",
         hourlyRate,
