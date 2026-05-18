@@ -225,6 +225,27 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     description: "Eco-conscious premium travel. Zero-emission Tesla for those who demand technology and sustainability.",
     badge: "Eco",
   },
+  {
+    class: "BUSINESS",
+    label: "Business Sedan",
+    models: ["Toyota Camry", "Toyota Prius"],
+    maxPassengers: 4,
+    maxLuggage: 3,
+    features: ["Air Conditioning", "USB Charging", "WiFi", "Professional Driver", "Comfortable Seating"],
+    image: "/fleet/sedan-camry.png",
+    description: "A step above standard — the Camry offers a smooth, quiet ride perfect for business and leisure travel.",
+  },
+  {
+    class: "FIRST_CLASS",
+    label: "Private Coach",
+    models: ["Mercedes Sprinter VIP", "Mercedes Sprinter Executive"],
+    maxPassengers: 19,
+    maxLuggage: 20,
+    features: ["Extra Large Group", "Air Conditioning", "PA System", "Panoramic Windows", "Reclining Seats"],
+    image: "/fleet/bus.png",
+    description: "Our largest vehicle — the full-size Mercedes Sprinter coach for major group transfers and corporate events.",
+    badge: "Large Group",
+  },
 ];
 
 export const STATUS_COLORS: Record<BookingStatus, string> = {
