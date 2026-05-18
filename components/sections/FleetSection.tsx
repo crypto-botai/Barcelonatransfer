@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { Users, Briefcase, Zap, ChevronRight } from "lucide-react";
 import { VEHICLE_CATALOG } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { DEFAULT_PRICING } from "@/lib/pricing";
-import Image from "next/image";
 
 export default function FleetSection() {
   const [active, setActive] = useState(0);
+  const vehicle = VEHICLE_CATALOG[active];
 
   return (
     <section className="py-24 bg-[#070707]" id="fleet">
@@ -69,73 +70,90 @@ export default function FleetSection() {
             transition={{ duration: 0.3 }}
             className="grid lg:grid-cols-2 gap-8 items-center"
           >
-            {/* Image */}
-            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-dark-800 vehicle-card">
-              <div className="absolute inset-0 bg-gradient-to-br from-gold-500/5 to-transparent" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <p className="font-display text-6xl text-gold-500/10 font-bold">
-                    {VEHICLE_CATALOG[active].label}
-                  </p>
-                  <p className="text-dark-500 text-sm mt-2">{VEHICLE_CATALOG[active].models.join(" · ")}</p>
-                </div>
-              </div>
+            {/* Image panel */}
+            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-dark-800 vehicle-card group">
+              <Image
+                src={vehicle.image}
+                alt={vehicle.label}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                priority={active === 0}
+              />
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none z-10" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent pointer-events-none z-10" />
+
               {/* Vehicle class badge */}
               <div className="absolute top-4 left-4 z-20">
-                <span className="px-3 py-1 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-400 text-xs tracking-wider uppercase font-medium">
-                  {VEHICLE_CATALOG[active].class.replace(/_/g, " ")}
+                <span className="px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm border border-gold-500/30 text-gold-400 text-xs tracking-wider uppercase font-medium">
+                  {vehicle.class.replace(/_/g, " ")}
                 </span>
               </div>
-              {/* Price badge */}
-              <div className="absolute top-4 right-4 z-20">
-                <span className="px-3 py-1 rounded-full bg-black/60 border border-white/10 text-white text-xs">
-                  From {formatCurrency(DEFAULT_PRICING[VEHICLE_CATALOG[active].class].minimumFare)}
-                </span>
+
+              {/* Badge (VIP / Popular / Eco) */}
+              {vehicle.badge && (
+                <div className="absolute top-4 right-4 z-20">
+                  <span className={`px-3 py-1.5 rounded-full text-xs font-semibold tracking-wider ${
+                    vehicle.badge === "VIP"     ? "bg-gold-500 text-black" :
+                    vehicle.badge === "Popular" ? "bg-blue-500/80 text-white" :
+                    "bg-green-500/80 text-white"
+                  }`}>
+                    {vehicle.badge}
+                  </span>
+                </div>
+              )}
+
+              {/* Bottom overlay: price */}
+              <div className="absolute bottom-0 left-0 right-0 z-20 p-5">
+                <div className="flex items-end justify-between">
+                  <div>
+                    <p className="text-dark-400 text-xs tracking-wider uppercase mb-1">From</p>
+                    <p className="font-display text-3xl text-gold-400">
+                      {formatCurrency(DEFAULT_PRICING[vehicle.class].minimumFare)}
+                    </p>
+                  </div>
+                  <p className="text-dark-300 text-sm">{vehicle.models[0]}</p>
+                </div>
               </div>
             </div>
 
             {/* Details */}
             <div className="space-y-6">
               <div>
-                <h3 className="font-display text-3xl text-white mb-2">
-                  {VEHICLE_CATALOG[active].label}
-                </h3>
-                <p className="text-dark-400">
-                  {VEHICLE_CATALOG[active].models.join(", ")}
-                </p>
+                <h3 className="font-display text-3xl text-white mb-1">{vehicle.label}</h3>
+                <p className="text-dark-400 text-sm">{vehicle.models.join(" · ")}</p>
               </div>
 
-              <p className="text-dark-300 leading-relaxed">
-                {VEHICLE_CATALOG[active].description}
-              </p>
+              <p className="text-dark-300 leading-relaxed">{vehicle.description}</p>
 
               {/* Capacity */}
               <div className="flex gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-lg bg-gold-500/10 flex items-center justify-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center">
                     <Users size={16} className="text-gold-500" />
                   </div>
                   <div>
-                    <p className="text-white text-sm font-medium">{VEHICLE_CATALOG[active].maxPassengers} passengers</p>
-                    <p className="text-dark-400 text-xs">Maximum capacity</p>
+                    <p className="text-white text-sm font-medium">Up to {vehicle.maxPassengers}</p>
+                    <p className="text-dark-400 text-xs">Passengers</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-lg bg-gold-500/10 flex items-center justify-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center">
                     <Briefcase size={16} className="text-gold-500" />
                   </div>
                   <div>
-                    <p className="text-white text-sm font-medium">{VEHICLE_CATALOG[active].maxLuggage} bags</p>
-                    <p className="text-dark-400 text-xs">Luggage capacity</p>
+                    <p className="text-white text-sm font-medium">Up to {vehicle.maxLuggage}</p>
+                    <p className="text-dark-400 text-xs">Luggage bags</p>
                   </div>
                 </div>
               </div>
 
               {/* Features */}
               <div>
-                <p className="text-dark-400 text-xs tracking-wider uppercase mb-3">Included Features</p>
+                <p className="text-dark-400 text-xs tracking-wider uppercase mb-3">Included</p>
                 <div className="flex flex-wrap gap-2">
-                  {VEHICLE_CATALOG[active].features.map((f) => (
+                  {vehicle.features.map((f) => (
                     <span
                       key={f}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-dark-200 text-xs"
@@ -147,19 +165,19 @@ export default function FleetSection() {
                 </div>
               </div>
 
-              {/* Pricing preview */}
-              <div className="glass-card rounded-xl p-4 flex items-center justify-between">
+              {/* Pricing + CTA */}
+              <div className="glass-card rounded-xl p-5 flex items-center justify-between">
                 <div>
                   <p className="text-dark-400 text-xs tracking-wider uppercase">Starting from</p>
                   <p className="font-display text-3xl text-gold-400 mt-1">
-                    {formatCurrency(DEFAULT_PRICING[VEHICLE_CATALOG[active].class].minimumFare)}
+                    {formatCurrency(DEFAULT_PRICING[vehicle.class].minimumFare)}
                   </p>
                 </div>
                 <Link
-                  href={`/book?vehicle=${VEHICLE_CATALOG[active].class}`}
+                  href={`/book?vehicle=${vehicle.class}`}
                   className="btn-gold flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold"
                 >
-                  Book This Vehicle
+                  Book Now
                   <ChevronRight size={16} />
                 </Link>
               </div>
@@ -167,26 +185,38 @@ export default function FleetSection() {
           </motion.div>
         </AnimatePresence>
 
-        {/* All fleet grid below */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        {/* All fleet thumbnail grid */}
+        <div className="mt-16 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {VEHICLE_CATALOG.map((v, i) => (
             <motion.button
               key={v.class}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
+              transition={{ delay: i * 0.04 }}
               onClick={() => setActive(i)}
-              className={`group relative p-4 rounded-xl border transition-all duration-200 text-left ${
+              className={`group relative rounded-xl overflow-hidden border transition-all duration-200 aspect-[4/3] ${
                 active === i
-                  ? "border-gold-500/40 bg-gold-500/8"
-                  : "border-white/[0.06] bg-white/[0.02] hover:border-gold-500/20"
+                  ? "border-gold-500/60 ring-1 ring-gold-500/30"
+                  : "border-white/[0.06] hover:border-gold-500/30"
               }`}
             >
-              <p className={`text-sm font-medium mb-1 transition-colors ${active === i ? "text-gold-400" : "text-dark-200 group-hover:text-gold-400"}`}>
-                {v.label}
-              </p>
-              <p className="text-dark-500 text-xs">up to {v.maxPassengers} pax</p>
+              <Image
+                src={v.image}
+                alt={v.label}
+                fill
+                sizes="200px"
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/10" />
+              <div className="absolute bottom-0 left-0 right-0 p-2.5">
+                <p className={`text-xs font-medium leading-tight transition-colors ${
+                  active === i ? "text-gold-400" : "text-white group-hover:text-gold-400"
+                }`}>
+                  {v.label}
+                </p>
+                <p className="text-dark-500 text-[10px] mt-0.5">up to {v.maxPassengers} pax</p>
+              </div>
             </motion.button>
           ))}
         </div>

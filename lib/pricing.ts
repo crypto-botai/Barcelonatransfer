@@ -1,4 +1,4 @@
-import { VehicleClass, QuoteRequest, QuoteResponse } from "@/types";
+import { VehicleClass, QuoteResponse } from "@/types";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
 
 export const DEFAULT_PRICING: Record<VehicleClass, {
@@ -21,6 +21,19 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
 
 export const AIRPORT_SURCHARGE = 8;
 export const NIGHT_SURCHARGE_RATE = 0.20;
+
+export const HOURLY_RATES: Record<VehicleClass, number> = {
+  ECONOMY:        35,
+  BUSINESS:       48,
+  LUXURY:         65,
+  FIRST_CLASS:    95,
+  ELECTRIC_VIP:   78,
+  SUV:            72,
+  LUXURY_SUV:     125,
+  MINIVAN:        68,
+  LUXURY_MINIVAN: 115,
+  MINIBUS:        155,
+};
 
 export function calculateQuote(
   vehicleClass: VehicleClass,

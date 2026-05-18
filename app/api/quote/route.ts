@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { calculateQuote } from "@/lib/pricing";
+import { calculateQuote, HOURLY_RATES, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE } from "@/lib/pricing";
+import { isAirportLocation, isNightTime } from "@/lib/utils";
 import { type VehicleClass } from "@/types";
 
 const schema = z.object({
-  pickupLat:       z.number(),
-  pickupLng:       z.number(),
-  dropoffLat:      z.number(),
-  dropoffLng:      z.number(),
-  vehicleClass:    z.string(),
-  pickupDatetime:  z.string(),
-  passengers:      z.number().int().min(1).max(20).optional(),
+  bookingType:    z.enum(["TRANSFER", "HOURLY", "DAY_HIRE", "CORPORATE"]).default("TRANSFER"),
+  pickupLat:      z.number(),
+  pickupLng:      z.number(),
+  dropoffLat:     z.number().optional(),
+  dropoffLng:     z.number().optional(),
+  vehicleClass:   z.string(),
+  pickupDatetime: z.string(),
+  passengers:     z.number().int().min(1).max(20).optional(),
+  durationHours:  z.number().min(1).max(24).optional(),
 });
 
 async function getOsrmDistance(
@@ -19,7 +22,7 @@ async function getOsrmDistance(
 ): Promise<{ distanceKm: number; durationMin: number } | null> {
   try {
     const url = `https://router.project-osrm.org/route/v1/driving/${originLng},${originLat};${destLng},${destLat}?overview=false`;
-    const res = await fetch(url, { next: { revalidate: 0 } });
+    const res  = await fetch(url, { next: { revalidate: 0 } });
     const data = await res.json();
     const route = data.routes?.[0];
     if (route) {
@@ -45,33 +48,67 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): nu
 export async function POST(req: NextRequest) {
   try {
     const body = schema.parse(await req.json());
-    const { pickupLat, pickupLng, dropoffLat, dropoffLng, vehicleClass, pickupDatetime } = body;
+    const { pickupLat, pickupLng, vehicleClass, pickupDatetime, bookingType } = body;
+    const pickupDate = new Date(pickupDatetime);
+    const vc = vehicleClass as VehicleClass;
 
-    // Try OSRM routing first; fall back to haversine * 1.35 (road factor)
+    if (bookingType === "HOURLY" || bookingType === "DAY_HIRE") {
+      const hours = bookingType === "DAY_HIRE" ? 8 : (body.durationHours ?? 3);
+      const hourlyRate = HOURLY_RATES[vc] ?? 50;
+      const subtotal = hourlyRate * hours;
+      const isNight = isNightTime(pickupDate);
+      const nightSurcharge = isNight ? Math.round(subtotal * NIGHT_SURCHARGE_RATE * 100) / 100 : 0;
+      const hasAirport = isAirportLocation(pickupLat, pickupLng);
+      const airportSurcharge = hasAirport ? AIRPORT_SURCHARGE : 0;
+      const totalAmount = Math.round((subtotal + nightSurcharge + airportSurcharge) * 100) / 100;
+
+      return NextResponse.json({
+        vehicleClass: vc,
+        distanceKm:   0,
+        durationMin:  hours * 60,
+        baseFare:     subtotal,
+        distanceFare: 0,
+        airportSurcharge,
+        nightSurcharge,
+        totalAmount,
+        currency:     "EUR",
+        hourlyRate,
+        hours,
+      });
+    }
+
+    // TRANSFER / CORPORATE — distance-based quote
+    const dropoffLat = body.dropoffLat ?? 0;
+    const dropoffLng = body.dropoffLng ?? 0;
+
     let distanceKm: number;
     let durationMin: number;
 
-    const osrm = await getOsrmDistance(pickupLat, pickupLng, dropoffLat, dropoffLng);
-    if (osrm) {
-      distanceKm  = osrm.distanceKm;
-      durationMin = osrm.durationMin;
+    if (dropoffLat && dropoffLng) {
+      const osrm = await getOsrmDistance(pickupLat, pickupLng, dropoffLat, dropoffLng);
+      if (osrm) {
+        distanceKm  = osrm.distanceKm;
+        durationMin = osrm.durationMin;
+      } else {
+        distanceKm  = Math.round(haversineKm(pickupLat, pickupLng, dropoffLat, dropoffLng) * 1.35 * 10) / 10;
+        durationMin = Math.ceil((distanceKm / 50) * 60);
+      }
     } else {
-      distanceKm  = Math.round(haversineKm(pickupLat, pickupLng, dropoffLat, dropoffLng) * 1.35 * 10) / 10;
-      durationMin = Math.ceil((distanceKm / 50) * 60);
+      distanceKm  = 0;
+      durationMin = 0;
     }
 
     const quote = calculateQuote(
-      vehicleClass as VehicleClass,
-      distanceKm,
-      durationMin,
+      vc, distanceKm, durationMin,
       pickupLat, pickupLng,
       dropoffLat, dropoffLng,
-      new Date(pickupDatetime)
+      pickupDate
     );
 
-    return NextResponse.json({ vehicleClass, ...quote });
+    return NextResponse.json({ vehicleClass: vc, ...quote });
   } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.errors[0].message }, { status: 422 });
+    if (err instanceof z.ZodError)
+      return NextResponse.json({ error: err.errors[0].message }, { status: 422 });
     return NextResponse.json({ error: "Quote failed" }, { status: 500 });
   }
 }

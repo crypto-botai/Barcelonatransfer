@@ -188,12 +188,16 @@ model Booking {
   passengers      Int           @default(1)
   luggage         Int           @default(0)
   vehicleClass    VehicleClass
+  bookingType     String        @default("TRANSFER")
+  durationHours   Int?
   flightNumber    String?
   specialRequests String?       @db.Text
-  distanceKm      Float
-  durationMin     Int
+  extras          Json?
+  extrasCost      Float         @default(0)
+  distanceKm      Float         @default(0)
+  durationMin     Int           @default(0)
   baseFare        Float
-  distanceFare    Float
+  distanceFare    Float         @default(0)
   airportSurcharge Float        @default(0)
   nightSurcharge  Float         @default(0)
   totalAmount     Float
