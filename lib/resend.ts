@@ -1,6 +1,11 @@
 import { Resend } from "resend";
 
-export const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | undefined;
+function getResend(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY!);
+  return _resend;
+}
+export const resend = new Proxy({} as Resend, { get: (_, p) => (getResend() as any)[p as string] });
 
 const FROM = "Élite BCN Transfers <noreply@elitebcntransfers.com>";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com";
