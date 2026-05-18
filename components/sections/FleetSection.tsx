@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Users, Briefcase, Zap, ChevronRight } from "lucide-react";
+import { Users, Briefcase, Zap, ChevronRight, ChevronLeft } from "lucide-react";
 import { VEHICLE_CATALOG } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { DEFAULT_PRICING } from "@/lib/pricing";
@@ -12,6 +12,13 @@ import { DEFAULT_PRICING } from "@/lib/pricing";
 export default function FleetSection() {
   const [active, setActive] = useState(0);
   const vehicle = VEHICLE_CATALOG[active];
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (dir: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir === "right" ? 300 : -300, behavior: "smooth" });
+  };
 
   return (
     <section className="py-24 bg-[#070707]" id="fleet">
@@ -71,22 +78,21 @@ export default function FleetSection() {
             className="grid lg:grid-cols-2 gap-8 items-center"
           >
             {/* Image panel */}
-            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-dark-800 vehicle-card group">
+            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-[#e8e8e8] vehicle-card group">
               <Image
                 src={vehicle.image}
                 alt={vehicle.label}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                className="object-contain p-4 transition-transform duration-700 group-hover:scale-105"
                 priority={active === 0}
               />
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none z-10" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent pointer-events-none z-10" />
+              {/* Subtle bottom gradient for text legibility only */}
+              <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/60 to-transparent pointer-events-none z-10" />
 
               {/* Vehicle class badge */}
               <div className="absolute top-4 left-4 z-20">
-                <span className="px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm border border-gold-500/30 text-gold-400 text-xs tracking-wider uppercase font-medium">
+                <span className="px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm border border-gold-500/30 text-gold-400 text-xs tracking-wider uppercase font-medium">
                   {vehicle.class.replace(/_/g, " ")}
                 </span>
               </div>
@@ -95,8 +101,9 @@ export default function FleetSection() {
               {vehicle.badge && (
                 <div className="absolute top-4 right-4 z-20">
                   <span className={`px-3 py-1.5 rounded-full text-xs font-semibold tracking-wider ${
-                    vehicle.badge === "VIP"     ? "bg-gold-500 text-black" :
-                    vehicle.badge === "Popular" ? "bg-blue-500/80 text-white" :
+                    vehicle.badge === "VIP"        ? "bg-gold-500 text-black" :
+                    vehicle.badge === "Popular"    ? "bg-blue-500/80 text-white" :
+                    vehicle.badge === "Large Group"? "bg-purple-500/80 text-white" :
                     "bg-green-500/80 text-white"
                   }`}>
                     {vehicle.badge}
@@ -108,12 +115,12 @@ export default function FleetSection() {
               <div className="absolute bottom-0 left-0 right-0 z-20 p-5">
                 <div className="flex items-end justify-between">
                   <div>
-                    <p className="text-dark-400 text-xs tracking-wider uppercase mb-1">From</p>
+                    <p className="text-white/70 text-xs tracking-wider uppercase mb-1">From</p>
                     <p className="font-display text-3xl text-gold-400">
                       {formatCurrency(DEFAULT_PRICING[vehicle.class].minimumFare)}
                     </p>
                   </div>
-                  <p className="text-dark-300 text-sm">{vehicle.models[0]}</p>
+                  <p className="text-white/80 text-sm">{vehicle.models[0]}</p>
                 </div>
               </div>
             </div>
@@ -185,40 +192,68 @@ export default function FleetSection() {
           </motion.div>
         </AnimatePresence>
 
-        {/* All fleet thumbnail grid */}
-        <div className="mt-16 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {VEHICLE_CATALOG.map((v, i) => (
-            <motion.button
-              key={v.class}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.04 }}
-              onClick={() => setActive(i)}
-              className={`group relative rounded-xl overflow-hidden border transition-all duration-200 aspect-[4/3] ${
-                active === i
-                  ? "border-gold-500/60 ring-1 ring-gold-500/30"
-                  : "border-white/[0.06] hover:border-gold-500/30"
-              }`}
-            >
-              <Image
-                src={v.image}
-                alt={v.label}
-                fill
-                sizes="200px"
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/10" />
-              <div className="absolute bottom-0 left-0 right-0 p-2.5">
-                <p className={`text-xs font-medium leading-tight transition-colors ${
-                  active === i ? "text-gold-400" : "text-white group-hover:text-gold-400"
-                }`}>
-                  {v.label}
-                </p>
-                <p className="text-dark-500 text-[10px] mt-0.5">up to {v.maxPassengers} pax</p>
-              </div>
-            </motion.button>
-          ))}
+        {/* Fleet scroll strip */}
+        <div className="mt-16">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-dark-400 text-xs tracking-[0.2em] uppercase">All Vehicles</p>
+            <div className="flex gap-2">
+              <button onClick={() => scroll("left")}
+                className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-dark-400 hover:text-gold-400 hover:border-gold-500/30 transition-all">
+                <ChevronLeft size={14} />
+              </button>
+              <button onClick={() => scroll("right")}
+                className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-dark-400 hover:text-gold-400 hover:border-gold-500/30 transition-all">
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto scroll-smooth pb-3"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {VEHICLE_CATALOG.map((v, i) => (
+              <button
+                key={v.class}
+                onClick={() => setActive(i)}
+                className={`group flex-shrink-0 w-52 rounded-xl overflow-hidden border transition-all duration-200 ${
+                  active === i
+                    ? "border-gold-500/60 ring-1 ring-gold-500/30"
+                    : "border-white/[0.06] hover:border-gold-500/30"
+                }`}
+              >
+                {/* Car image — light background */}
+                <div className="relative h-32 bg-[#e8e8e8]">
+                  <Image
+                    src={v.image}
+                    alt={v.label}
+                    fill
+                    sizes="208px"
+                    className="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {v.badge && (
+                    <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                      v.badge === "VIP"        ? "bg-gold-500 text-black" :
+                      v.badge === "Popular"    ? "bg-blue-500/80 text-white" :
+                      v.badge === "Large Group"? "bg-purple-500/80 text-white" :
+                      "bg-green-500/80 text-white"
+                    }`}>
+                      {v.badge}
+                    </span>
+                  )}
+                </div>
+                {/* Label */}
+                <div className="bg-[#0f0f0f] px-3 py-2.5 text-left">
+                  <p className={`text-xs font-medium transition-colors ${
+                    active === i ? "text-gold-400" : "text-white group-hover:text-gold-400"
+                  }`}>
+                    {v.label}
+                  </p>
+                  <p className="text-dark-500 text-[10px] mt-0.5">up to {v.maxPassengers} pax</p>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </section>
