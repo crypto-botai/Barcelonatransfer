@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, Phone, MessageCircle, MapPin, Instagram, Facebook } from "lucide-react";
+import { Mail, Phone, MessageCircle, MapPin, Instagram, Facebook, Car, Shield } from "lucide-react";
 
 const SERVICES = [
   { label: "Airport Transfers",  href: "/airport-transfers" },
@@ -147,11 +147,17 @@ export default function Footer() {
               ))}
               <li className="pt-3 border-t border-white/[0.06] mt-1">
                 <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-3 font-medium">Staff Access</h4>
-                <div className="flex flex-col gap-2">
-                  <Link href="/auth/login" className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
+                <div className="flex flex-col gap-2.5">
+                  <Link href="/auth/login" className="flex items-center gap-2 text-sm text-dark-400 hover:text-gold-400 transition-colors">
+                    <Car size={12} className="text-gold-500/50 flex-shrink-0" />
                     Driver Login
                   </Link>
-                  <Link href="/auth/login" className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
+                  <Link href="/driver/register" className="flex items-center gap-2 text-sm text-dark-400 hover:text-gold-400 transition-colors">
+                    <Car size={12} className="text-gold-500/50 flex-shrink-0" />
+                    Driver Registration
+                  </Link>
+                  <Link href="/admin" className="flex items-center gap-2 text-sm text-dark-400 hover:text-gold-400 transition-colors">
+                    <Shield size={12} className="text-gold-500/50 flex-shrink-0" />
                     Admin Login
                   </Link>
                 </div>
