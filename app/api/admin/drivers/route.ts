@@ -11,7 +11,10 @@ export async function GET(_req: NextRequest) {
   }
   const drivers = await prisma.driver.findMany({
     orderBy: { createdAt: "desc" },
-    include: { user: { select: { name: true, email: true, phone: true } } },
+    include: {
+      user: { select: { name: true, email: true, phone: true } },
+      withdrawals: { orderBy: { createdAt: "desc" }, take: 5 },
+    },
   });
   return NextResponse.json(drivers);
 }

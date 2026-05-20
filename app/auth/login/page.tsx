@@ -98,7 +98,13 @@ export default function LoginPage() {
         <p className="text-center text-sm text-dark-400 mt-6">
           Don&apos;t have an account?{" "}
           <Link href="/auth/register" className="text-gold-400 hover:text-gold-300 transition-colors">
-            Sign Up
+            Customer Sign Up
+          </Link>
+        </p>
+        <p className="text-center text-sm text-dark-400 mt-2">
+          Are you a driver?{" "}
+          <Link href="/driver/register" className="text-gold-400 hover:text-gold-300 transition-colors">
+            Driver Registration
           </Link>
         </p>
       </motion.div>

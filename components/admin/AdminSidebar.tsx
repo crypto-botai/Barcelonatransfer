@@ -4,18 +4,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, CalendarCheck, Car, Users, DollarSign,
-  Settings, LogOut, ChevronRight
+  Settings, LogOut, ChevronRight, Wallet
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { icon: LayoutDashboard, label: "Overview",  href: "/admin" },
-  { icon: CalendarCheck,   label: "Bookings",  href: "/admin/bookings" },
-  { icon: Users,           label: "Drivers",   href: "/admin/drivers" },
-  { icon: Car,             label: "Fleet",     href: "/admin/fleet" },
-  { icon: DollarSign,      label: "Pricing",   href: "/admin/pricing" },
-  { icon: Settings,        label: "Settings",  href: "/admin/settings" },
+  { icon: LayoutDashboard, label: "Overview",    href: "/admin" },
+  { icon: CalendarCheck,   label: "Bookings",    href: "/admin/bookings" },
+  { icon: Users,           label: "Drivers",     href: "/admin/drivers" },
+  { icon: Wallet,          label: "Withdrawals", href: "/admin/withdrawals" },
+  { icon: Car,             label: "Fleet",       href: "/admin/fleet" },
+  { icon: DollarSign,      label: "Pricing",     href: "/admin/pricing" },
+  { icon: Settings,        label: "Settings",    href: "/admin/settings" },
 ];
 
 export default function AdminSidebar() {

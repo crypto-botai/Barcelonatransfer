@@ -12,7 +12,10 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/auth/login");
 
-  const user = session.user as { id: string; name?: string; email: string };
+  const user = session.user as { id: string; name?: string; email: string; role?: string };
+
+  if (user.role === "ADMIN")  redirect("/admin");
+  if (user.role === "DRIVER") redirect("/driver");
 
   const bookings = await prisma.booking.findMany({
     where: { userId: user.id },
