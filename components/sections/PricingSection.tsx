@@ -9,49 +9,56 @@ import { formatCurrency } from "@/lib/utils";
 const TABS = ["Airport & City", "Costa Dorada", "Costa Brava", "Hourly"];
 
 const AIRPORT = [
-  { route: "El Prat Airport ⇄ Barcelona City",   p1: 50,  p2: 65,  p3: 95,  p4: 80  },
-  { route: "El Prat Airport ⇄ Cruise Terminal",  p1: 50,  p2: 65,  p3: 95,  p4: 80  },
-  { route: "Cruise Terminal ⇄ Barcelona City",   p1: 50,  p2: 65,  p3: 95,  p4: 80  },
-  { route: "El Prat Airport ⇄ Sants Station",    p1: 55,  p2: 65,  p3: 105, p4: 90  },
-  { route: "Barcelona ⇄ La Roca Village",        p1: 80,  p2: 100, p3: 170, p4: 150 },
-  { route: "Barcelona ⇄ Montserrat",             p1: 120, p2: 140, p3: 210, p4: 190 },
-  { route: "Barcelona ⇄ Girona Airport",         p1: 140, p2: 155, p3: 220, p4: 200 },
-  { route: "Barcelona ⇄ Andorra",               p1: 260, p2: 285, p3: 380, p4: 350 },
+  { route: "El Prat Airport ⇄ Barcelona City",   eco: 50,  bus: 65,  van: 65,  vcl: 70,  mbs: 150 },
+  { route: "El Prat Airport ⇄ Cruise Terminal",  eco: 50,  bus: 65,  van: 65,  vcl: 70,  mbs: 150 },
+  { route: "Cruise Terminal ⇄ Barcelona City",   eco: 50,  bus: 65,  van: 65,  vcl: 70,  mbs: 150 },
+  { route: "El Prat Airport ⇄ Sants Station",    eco: 55,  bus: 65,  van: 65,  vcl: 75,  mbs: 155 },
+  { route: "Barcelona ⇄ La Roca Village",        eco: 80,  bus: 100, van: 100, vcl: 120, mbs: 200 },
+  { route: "Barcelona ⇄ Montserrat",             eco: 120, bus: 140, van: 140, vcl: 160, mbs: 240 },
+  { route: "Barcelona ⇄ Girona Airport",         eco: 140, bus: 155, van: 155, vcl: 175, mbs: 255 },
+  { route: "Barcelona ⇄ Andorra",                eco: 285, bus: 350, van: 450, vcl: 550, mbs: 630 },
 ];
 
 const DORADA = [
-  { route: "Barcelona ⇄ Castelldefels", p1: 50,  p2: 60,  p3: 100, p4: 85  },
-  { route: "Barcelona ⇄ Sitges",        p1: 80,  p2: 100, p3: 160, p4: 140 },
-  { route: "Barcelona ⇄ Cubelles",      p1: 90,  p2: 110, p3: 175, p4: 155 },
-  { route: "Barcelona ⇄ Calafell",      p1: 100, p2: 120, p3: 190, p4: 170 },
-  { route: "Barcelona ⇄ Tarragona",     p1: 150, p2: 170, p3: 240, p4: 220 },
-  { route: "Barcelona ⇄ Salou",         p1: 155, p2: 175, p3: 250, p4: 230 },
-  { route: "Barcelona ⇄ PortAventura",  p1: 155, p2: 175, p3: 250, p4: 230 },
-  { route: "Barcelona ⇄ Cambrils",      p1: 160, p2: 180, p3: 260, p4: 240 },
+  { route: "Barcelona ⇄ Castelldefels", eco: 50,  bus: 60,  van: 60,  vcl: 70,  mbs: 150 },
+  { route: "Barcelona ⇄ Sitges",        eco: 80,  bus: 100, van: 100, vcl: 120, mbs: 200 },
+  { route: "Barcelona ⇄ Cubelles",      eco: 90,  bus: 110, van: 110, vcl: 130, mbs: 210 },
+  { route: "Barcelona ⇄ Calafell",      eco: 100, bus: 120, van: 120, vcl: 140, mbs: 220 },
+  { route: "Barcelona ⇄ Vendrell",      eco: 110, bus: 130, van: 130, vcl: 150, mbs: 230 },
+  { route: "Barcelona ⇄ Tarragona",     eco: 150, bus: 170, van: 170, vcl: 190, mbs: 270 },
+  { route: "Barcelona ⇄ La Pineda",     eco: 155, bus: 175, van: 175, vcl: 195, mbs: 275 },
+  { route: "Barcelona ⇄ Salou",         eco: 155, bus: 175, van: 175, vcl: 195, mbs: 275 },
+  { route: "Barcelona ⇄ PortAventura",  eco: 155, bus: 175, van: 175, vcl: 195, mbs: 275 },
+  { route: "Barcelona ⇄ Cambrils",      eco: 160, bus: 180, van: 180, vcl: 200, mbs: 280 },
 ];
 
 const BRAVA = [
-  { route: "Barcelona ⇄ Mataró",        p1: 90,  p2: 110, p3: 175, p4: 155 },
-  { route: "Barcelona ⇄ Calella",       p1: 110, p2: 130, p3: 200, p4: 180 },
-  { route: "Barcelona ⇄ Santa Susanna", p1: 120, p2: 140, p3: 210, p4: 190 },
-  { route: "Barcelona ⇄ Blanes",        p1: 135, p2: 155, p3: 230, p4: 210 },
-  { route: "Barcelona ⇄ Lloret de Mar", p1: 145, p2: 165, p3: 240, p4: 220 },
-  { route: "Barcelona ⇄ Tossa de Mar",  p1: 155, p2: 175, p3: 255, p4: 235 },
-  { route: "Barcelona ⇄ Platja d'Aro",  p1: 160, p2: 180, p3: 260, p4: 240 },
-  { route: "Barcelona ⇄ Cadaqués",      p1: 240, p2: 260, p3: 360, p4: 330 },
+  { route: "Barcelona ⇄ Mataró",         eco: 90,  bus: 110, van: 110, vcl: 130, mbs: 210 },
+  { route: "Barcelona ⇄ Calella",        eco: 110, bus: 130, van: 130, vcl: 150, mbs: 230 },
+  { route: "Barcelona ⇄ Pineda de Mar",  eco: 115, bus: 135, van: 135, vcl: 155, mbs: 235 },
+  { route: "Barcelona ⇄ Santa Susanna",  eco: 120, bus: 140, van: 140, vcl: 160, mbs: 240 },
+  { route: "Barcelona ⇄ Malgrat de Mar", eco: 125, bus: 145, van: 145, vcl: 165, mbs: 245 },
+  { route: "Barcelona ⇄ Blanes",         eco: 135, bus: 155, van: 155, vcl: 175, mbs: 255 },
+  { route: "Barcelona ⇄ Lloret de Mar",  eco: 145, bus: 165, van: 165, vcl: 185, mbs: 265 },
+  { route: "Barcelona ⇄ Tossa de Mar",   eco: 155, bus: 175, van: 175, vcl: 195, mbs: 275 },
+  { route: "Barcelona ⇄ S'Agaró",        eco: 155, bus: 175, van: 175, vcl: 195, mbs: 275 },
+  { route: "Barcelona ⇄ Platja d'Aro",   eco: 160, bus: 180, van: 180, vcl: 200, mbs: 280 },
+  { route: "Barcelona ⇄ Palamós",        eco: 185, bus: 205, van: 205, vcl: 225, mbs: 305 },
+  { route: "Barcelona ⇄ Roses",          eco: 205, bus: 225, van: 225, vcl: 245, mbs: 325 },
+  { route: "Barcelona ⇄ Empuriabrava",   eco: 210, bus: 230, van: 230, vcl: 250, mbs: 330 },
+  { route: "Barcelona ⇄ Figueres",       eco: 200, bus: 220, van: 220, vcl: 240, mbs: 320 },
+  { route: "Barcelona ⇄ Cadaqués",       eco: 240, bus: 260, van: 260, vcl: 280, mbs: 360 },
 ];
 
 const HOURLY = [
-  { label: "Economy / Business",       price: 45,  unit: "/ hour", min: "Min. 4 hours" },
-  { label: "Luxury Sedan",             price: 65,  unit: "/ hour", min: "Min. 4 hours" },
-  { label: "First Class",              price: 110, unit: "/ hour", min: "Min. 4 hours" },
-  { label: "Executive SUV",            price: 75,  unit: "/ hour", min: "Min. 4 hours" },
-  { label: "Minivan (Vito)",           price: 55,  unit: "/ hour", min: "Min. 4 hours" },
-  { label: "Luxury Minivan (V-Class)", price: 65,  unit: "/ hour", min: "Min. 4 hours" },
-  { label: "Minibus",                  price: 160, unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Economy (1–3 pax)",   price: 40, unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Business (1–3 pax)",  price: 40, unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Minivan (4–6 pax)",   price: 50, unit: "/ hour", min: "Min. 4 hours" },
+  { label: "V-Class (7–8 pax)",   price: 60, unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Minibus (9+ pax)",    price: 80, unit: "/ hour", min: "Min. 4 hours" },
 ];
 
-type Row = { route: string; p1: number; p2: number; p3: number; p4: number };
+type Row = { route: string; eco: number; bus: number; van: number; vcl: number; mbs: number };
 
 function PriceTable({ data, search }: { data: Row[]; search: string }) {
   const filtered = data.filter((r) =>
@@ -65,8 +72,9 @@ function PriceTable({ data, search }: { data: Row[]; search: string }) {
             <th className="text-left py-3 px-4 text-xs text-dark-400 tracking-wider uppercase font-medium">Route</th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Economy<br /><span className="text-dark-600 normal-case">1–3 pax</span></th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Business<br /><span className="text-dark-600 normal-case">1–3 pax</span></th>
-            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">V-Class<br /><span className="text-dark-600 normal-case">5–7 pax</span></th>
-            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minivan<br /><span className="text-dark-600 normal-case">4–7 pax</span></th>
+            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minivan<br /><span className="text-dark-600 normal-case">4–6 pax</span></th>
+            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">V-Class<br /><span className="text-dark-600 normal-case">7–8 pax</span></th>
+            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minibus<br /><span className="text-dark-600 normal-case">9+ pax</span></th>
             <th className="py-3 px-4" />
           </tr>
         </thead>
@@ -74,10 +82,11 @@ function PriceTable({ data, search }: { data: Row[]; search: string }) {
           {filtered.map((r) => (
             <tr key={r.route} className="price-row border-b border-white/[0.04]">
               <td className="py-3.5 px-4 text-sm text-dark-200">{r.route}</td>
-              <td className="py-3.5 px-3 text-center text-sm text-white font-medium">€{r.p1}</td>
-              <td className="py-3.5 px-3 text-center text-sm text-white font-medium">€{r.p2}</td>
-              <td className="py-3.5 px-3 text-center text-sm text-gold-400 font-semibold">€{r.p3}</td>
-              <td className="py-3.5 px-3 text-center text-sm text-white font-medium">€{r.p4}</td>
+              <td className="py-3.5 px-3 text-center text-sm text-white font-medium">€{r.eco}</td>
+              <td className="py-3.5 px-3 text-center text-sm text-white font-medium">€{r.bus}</td>
+              <td className="py-3.5 px-3 text-center text-sm text-white font-medium">€{r.van}</td>
+              <td className="py-3.5 px-3 text-center text-sm text-gold-400 font-semibold">€{r.vcl}</td>
+              <td className="py-3.5 px-3 text-center text-sm text-white font-medium">€{r.mbs}</td>
               <td className="py-3.5 px-4">
                 <Link
                   href={`/book?route=${encodeURIComponent(r.route)}`}
@@ -90,7 +99,7 @@ function PriceTable({ data, search }: { data: Row[]; search: string }) {
           ))}
           {filtered.length === 0 && (
             <tr>
-              <td colSpan={6} className="py-8 text-center text-dark-500 text-sm">
+              <td colSpan={7} className="py-8 text-center text-dark-500 text-sm">
                 No routes found.{" "}
                 <Link href="/book" className="text-gold-500 hover:text-gold-400">Request a custom quote</Link>
               </td>
@@ -184,7 +193,7 @@ export default function PricingSection() {
             {tab === 1 && <PriceTable data={DORADA}  search={search} />}
             {tab === 2 && <PriceTable data={BRAVA}   search={search} />}
             {tab === 3 && (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 p-4">
                 {HOURLY.map((h) => (
                   <div key={h.label} className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 text-center">
                     <h3 className="text-white text-sm font-medium mb-3">{h.label}</h3>
@@ -203,7 +212,7 @@ export default function PricingSection() {
           {/* Footer note */}
           <div className="p-5 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-dark-500 text-xs">
-              All prices include professional chauffeur, luxury vehicle, tolls, and meet & greet. Child seats available free.
+              All prices include professional chauffeur, luxury vehicle, tolls, and meet & greet. VAT 10% included. Child seats available free.
             </p>
             <Link href="/book" className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">
               Get Custom Quote <ArrowRight size={12} />

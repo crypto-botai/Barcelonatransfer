@@ -53,6 +53,10 @@ export async function POST(req: NextRequest) {
     const body    = schema.parse(await req.json());
 
     const pickupDatetime = new Date(`${body.date}T${body.time}`);
+    if (isNaN(pickupDatetime.getTime())) {
+      return NextResponse.json({ error: "Invalid date or time" }, { status: 422 });
+    }
+
     const extrasCost     = (body.extras ?? []).reduce((sum, e) => sum + e.price * e.quantity, 0);
     const totalWithExtras = Math.round((body.quote.totalAmount + extrasCost) * 100) / 100;
 
@@ -69,35 +73,42 @@ export async function POST(req: NextRequest) {
       : metaPrefix.trimEnd();
 
     // Step 1: Always create the booking record first
-    const booking = await prisma.booking.create({
-      data: {
-        userId:           user?.id ?? null,
-        guestName:        body.guestName,
-        guestEmail:       body.guestEmail,
-        guestPhone:       body.guestPhone,
-        pickupAddress:    body.pickupAddress,
-        pickupLat:        body.pickupLat,
-        pickupLng:        body.pickupLng,
-        dropoffAddress:   body.dropoffAddress,
-        dropoffLat:       body.dropoffLat,
-        dropoffLng:       body.dropoffLng,
-        pickupDatetime,
-        passengers:       body.passengers,
-        luggage:          body.luggage,
-        vehicleClass:     body.vehicleClass as VehicleClass,
-        flightNumber:     body.flightNumber ?? null,
-        specialRequests,
-        distanceKm:       body.quote.distanceKm,
-        durationMin:      body.quote.durationMin,
-        baseFare:         body.quote.baseFare,
-        distanceFare:     body.quote.distanceFare,
-        airportSurcharge: body.quote.airportSurcharge,
-        nightSurcharge:   body.quote.nightSurcharge,
-        totalAmount:      totalWithExtras,
-        status:           "PENDING",
-        paymentStatus:    "PENDING",
-      },
-    });
+    let booking;
+    try {
+      booking = await prisma.booking.create({
+        data: {
+          userId:           user?.id ?? null,
+          guestName:        body.guestName,
+          guestEmail:       body.guestEmail,
+          guestPhone:       body.guestPhone,
+          pickupAddress:    body.pickupAddress,
+          pickupLat:        body.pickupLat,
+          pickupLng:        body.pickupLng,
+          dropoffAddress:   body.dropoffAddress,
+          dropoffLat:       body.dropoffLat,
+          dropoffLng:       body.dropoffLng,
+          pickupDatetime,
+          passengers:       body.passengers,
+          luggage:          body.luggage,
+          vehicleClass:     body.vehicleClass as VehicleClass,
+          flightNumber:     body.flightNumber ?? null,
+          specialRequests,
+          distanceKm:       body.quote.distanceKm,
+          durationMin:      Math.round(body.quote.durationMin),
+          baseFare:         body.quote.baseFare,
+          distanceFare:     body.quote.distanceFare,
+          airportSurcharge: body.quote.airportSurcharge,
+          nightSurcharge:   body.quote.nightSurcharge,
+          totalAmount:      totalWithExtras,
+          status:           "PENDING",
+          paymentStatus:    "PENDING",
+        },
+      });
+    } catch (dbErr) {
+      const msg = dbErr instanceof Error ? dbErr.message : String(dbErr);
+      console.error("[bookings] DB create failed:", msg, dbErr);
+      return NextResponse.json({ error: `Could not save booking: ${msg}` }, { status: 500 });
+    }
 
     // Step 2: Notify admin (fire-and-forget — never blocks)
     sendAdminNewBookingAlert({
@@ -151,7 +162,8 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     if (err instanceof z.ZodError)
       return NextResponse.json({ error: err.errors[0].message }, { status: 422 });
-    console.error("[bookings/POST]", err);
-    return NextResponse.json({ error: "Booking failed" }, { status: 500 });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[bookings/POST]", msg, err);
+    return NextResponse.json({ error: msg || "Booking failed" }, { status: 500 });
   }
 }

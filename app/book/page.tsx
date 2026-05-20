@@ -565,13 +565,17 @@ function BookingPageInner() {
                         >
                           <div className="flex">
                             {/* Vehicle image */}
-                            <div className="relative w-28 sm:w-36 flex-shrink-0 aspect-[4/3] bg-[#e8e8e8]">
+                            <div
+                              className="relative w-28 sm:w-36 flex-shrink-0 aspect-[4/3]"
+                              style={{ background: "radial-gradient(ellipse at 60% 40%, #1a1a1a, #0a0a0a)" }}
+                            >
                               <Image
                                 src={v.image}
                                 alt={v.label}
                                 fill
                                 sizes="144px"
                                 className="object-contain p-2"
+                                style={{ filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.8))" }}
                               />
                               {v.badge && (
                                 <div className="absolute top-2 left-2 z-10">
