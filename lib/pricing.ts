@@ -8,8 +8,8 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
   minimumFare: number;
 }> = {
   // minimumFare = cheapest fixed route price for each class
-  ECONOMY:        { baseFare: 15,  pricePerKm: 1.30, pricePerMinute: 0.18, minimumFare: 50  },
-  BUSINESS:       { baseFare: 20,  pricePerKm: 1.55, pricePerMinute: 0.22, minimumFare: 60  },
+  ECONOMY:        { baseFare: 15,  pricePerKm: 1.30, pricePerMinute: 0.18, minimumFare: 45  },
+  BUSINESS:       { baseFare: 20,  pricePerKm: 1.55, pricePerMinute: 0.22, minimumFare: 55  },
   LUXURY:         { baseFare: 28,  pricePerKm: 1.80, pricePerMinute: 0.28, minimumFare: 70  },
   FIRST_CLASS:    { baseFare: 45,  pricePerKm: 2.80, pricePerMinute: 0.45, minimumFare: 120 },
   ELECTRIC_VIP:   { baseFare: 38,  pricePerKm: 2.20, pricePerMinute: 0.35, minimumFare: 50  },
@@ -94,15 +94,15 @@ const KNOWN_LOCATIONS: Record<string, GeoPoint> = {
 type FixedPrices = { ECONOMY: number; BUSINESS: number; MINIVAN: number; VCLASS: number; MINIBUS: number };
 
 const ROUTE_PRICES: Array<[string, string, FixedPrices]> = [
-  // ── Airport & City ───────────────────────────────────────────────────────────────
-  ["airport", "barcelona_city", { ECONOMY: 50,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 70,  MINIBUS: 150 }],
-  ["airport", "cruise",         { ECONOMY: 50,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 70,  MINIBUS: 150 }],
-  ["cruise",  "barcelona_city", { ECONOMY: 50,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 70,  MINIBUS: 150 }],
-  ["airport", "sants",          { ECONOMY: 55,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 155 }],
-  ["barcelona_city", "la_roca",        { ECONOMY: 80,  BUSINESS: 100, MINIVAN: 100, VCLASS: 120, MINIBUS: 200 }],
-  ["barcelona_city", "montserrat",     { ECONOMY: 120, BUSINESS: 140, MINIVAN: 140, VCLASS: 160, MINIBUS: 240 }],
-  ["barcelona_city", "girona_airport", { ECONOMY: 140, BUSINESS: 155, MINIVAN: 155, VCLASS: 175, MINIBUS: 255 }],
-  ["barcelona_city", "andorra",        { ECONOMY: 285, BUSINESS: 350, MINIVAN: 450, VCLASS: 550, MINIBUS: 630 }],
+  // ── Airport & City (promotional discount: Economy -€5, Business -€10, Minivan -€5) ──
+  ["airport", "barcelona_city", { ECONOMY: 45,  BUSINESS: 55,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 150 }],
+  ["airport", "cruise",         { ECONOMY: 45,  BUSINESS: 55,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 150 }],
+  ["cruise",  "barcelona_city", { ECONOMY: 45,  BUSINESS: 55,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 150 }],
+  ["airport", "sants",          { ECONOMY: 50,  BUSINESS: 55,  MINIVAN: 60,  VCLASS: 75,  MINIBUS: 155 }],
+  ["barcelona_city", "la_roca",        { ECONOMY: 75,  BUSINESS: 90,  MINIVAN: 100, VCLASS: 120, MINIBUS: 200 }],
+  ["barcelona_city", "montserrat",     { ECONOMY: 115, BUSINESS: 130, MINIVAN: 140, VCLASS: 160, MINIBUS: 240 }],
+  ["barcelona_city", "girona_airport", { ECONOMY: 135, BUSINESS: 145, MINIVAN: 155, VCLASS: 175, MINIBUS: 255 }],
+  ["barcelona_city", "andorra",        { ECONOMY: 280, BUSINESS: 340, MINIVAN: 450, VCLASS: 550, MINIBUS: 630 }],
   // ── Costa Daurada ────────────────────────────────────────────────────────────────
   ["barcelona_city", "castelldefels", { ECONOMY: 50,  BUSINESS: 60,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 150 }],
   ["barcelona_city", "sitges",        { ECONOMY: 80,  BUSINESS: 100, MINIVAN: 100, VCLASS: 120, MINIBUS: 200 }],

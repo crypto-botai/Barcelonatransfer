@@ -538,6 +538,7 @@ function BookingPageInner() {
 
                   {/* Vehicle cards */}
                   {VEHICLE_CATALOG
+                    .filter((v) => v.class !== "FIRST_CLASS")
                     .filter((v) => v.maxPassengers >= (data.passengers ?? 1))
                     .map((v) => {
                       const sel = data.vehicleClass === v.class;
