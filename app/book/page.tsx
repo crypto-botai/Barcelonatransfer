@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, Suspense } from "react";
+import { useState, useCallback, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -55,6 +55,89 @@ function roundUpToNext30(): string {
   return `${now.getHours().toString().padStart(2, "0")}:${m}`;
 }
 
+// ─── SumUp Payment Modal ────────────────────────────────────
+function SumUpPaymentModal({
+  checkoutId,
+  bookingId,
+  total,
+  onClose,
+}: {
+  checkoutId: string;
+  bookingId: string;
+  total: number;
+  onClose: () => void;
+}) {
+  const mountedRef = useRef(false);
+
+  useEffect(() => {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+
+    const script = document.createElement("script");
+    script.src = "https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const SumUpCard = (window as any).SumUpCard;
+      if (!SumUpCard) return;
+      SumUpCard.mount({
+        id: "sumup-card-widget",
+        checkoutId,
+        onResponse: (type: string) => {
+          if (type === "success") {
+            window.location.href = `/booking/success?booking_id=${bookingId}`;
+          } else if (type === "error" || type === "expired") {
+            window.location.href = `/booking/failed?booking_id=${bookingId}`;
+          }
+        },
+      });
+    };
+
+    return () => {
+      script.remove();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm">
+      <div className="relative w-full max-w-md">
+        <div className="glass-card rounded-2xl overflow-hidden shadow-2xl border border-gold-500/20">
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+            <div>
+              <p className="text-gold-400 text-xs uppercase tracking-[0.2em] font-medium">Secure Payment</p>
+              <p className="text-white font-display text-lg mt-0.5">Complete Your Booking</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <p className="font-display text-xl text-gold-400">{formatCurrency(total)}</p>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-dark-400 hover:text-white hover:border-white/30 transition-all text-sm"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          {/* SumUp widget mounts here */}
+          <div className="p-6">
+            <div id="sumup-card-widget" className="min-h-[280px]" />
+          </div>
+
+          <div className="px-6 pb-4 text-center">
+            <p className="text-dark-500 text-xs">
+              🔒 Secured by SumUp · PCI DSS Level 1 · 256-bit SSL encryption
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Inner Component ───────────────────────────────────
 function BookingPageInner() {
   const params = useSearchParams();
@@ -88,9 +171,12 @@ function BookingPageInner() {
     extras:          [],
   });
 
-  const [quote,      setQuote]      = useState<QuoteResponse | null>(null);
-  const [loadingQ,   setLoadingQ]   = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [quote,        setQuote]        = useState<QuoteResponse | null>(null);
+  const [loadingQ,     setLoadingQ]     = useState(false);
+  const [submitting,   setSubmitting]   = useState(false);
+  const [paymentOpen,  setPaymentOpen]  = useState(false);
+  const [checkoutId,   setCheckoutId]   = useState<string | null>(null);
+  const [bookingId,    setBookingId]    = useState<string | null>(null);
 
   const bookingType = data.bookingType ?? "TRANSFER";
 
@@ -197,7 +283,17 @@ function BookingPageInner() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Booking failed");
-      window.location.href = json.checkoutUrl;
+
+      setBookingId(json.bookingId);
+
+      if (json.checkoutId) {
+        // SumUp configured — open embedded payment modal
+        setCheckoutId(json.checkoutId);
+        setPaymentOpen(true);
+      } else {
+        // Fallback (SumUp not configured) — go to pending page
+        window.location.href = json.checkoutUrl;
+      }
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Booking failed. Please try again.");
     } finally {
@@ -844,6 +940,16 @@ function BookingPageInner() {
           </AnimatePresence>
         </div>
       </main>
+
+      {/* SumUp Payment Modal */}
+      {paymentOpen && checkoutId && bookingId && (
+        <SumUpPaymentModal
+          checkoutId={checkoutId}
+          bookingId={bookingId}
+          total={grandTotal}
+          onClose={() => setPaymentOpen(false)}
+        />
+      )}
     </>
   );
 }

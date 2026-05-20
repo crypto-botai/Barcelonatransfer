@@ -77,55 +77,66 @@ export default function FleetSection() {
             transition={{ duration: 0.3 }}
             className="grid lg:grid-cols-2 gap-8 items-center"
           >
-            {/* Image panel */}
-            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-[#e8e8e8] vehicle-card group">
+            {/* Image panel — dark luxury studio look */}
+            <div
+              className="relative aspect-[16/10] rounded-2xl overflow-hidden group"
+              style={{ background: "radial-gradient(ellipse at 60% 40%, #1e1e1e 0%, #0c0c0c 70%)" }}
+            >
+              {/* Gold floor reflection */}
+              <div
+                className="absolute bottom-0 left-0 right-0 h-2/5 pointer-events-none z-[1]"
+                style={{ background: "radial-gradient(ellipse at 50% 100%, rgba(201,168,76,0.18) 0%, transparent 65%)" }}
+              />
+
               <Image
                 src={vehicle.image}
                 alt={vehicle.label}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-contain p-4 transition-transform duration-700 group-hover:scale-105"
+                className="object-contain p-6 transition-transform duration-700 group-hover:scale-105 relative z-[2]"
+                style={{ filter: "drop-shadow(0 25px 50px rgba(0,0,0,0.9))" }}
                 priority={active === 0}
               />
-              {/* Subtle bottom gradient for text legibility only */}
-              <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/60 to-transparent pointer-events-none z-10" />
+
+              {/* Bottom gradient for text legibility */}
+              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/95 via-black/50 to-transparent pointer-events-none z-[3]" />
 
               {/* Vehicle class badge */}
-              <div className="absolute top-4 left-4 z-20">
-                <span className="px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm border border-gold-500/30 text-gold-400 text-xs tracking-wider uppercase font-medium">
+              <div className="absolute top-4 left-4 z-[4]">
+                <span className="px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm border border-gold-500/30 text-gold-400 text-xs tracking-wider uppercase font-medium">
                   {vehicle.class.replace(/_/g, " ")}
                 </span>
               </div>
 
-              {/* Badge (VIP / Popular / Eco) */}
+              {/* Special badge */}
               {vehicle.badge && (
-                <div className="absolute top-4 right-4 z-20">
+                <div className="absolute top-4 right-4 z-[4]">
                   <span className={`px-3 py-1.5 rounded-full text-xs font-semibold tracking-wider ${
-                    vehicle.badge === "VIP"        ? "bg-gold-500 text-black" :
-                    vehicle.badge === "Popular"    ? "bg-blue-500/80 text-white" :
-                    vehicle.badge === "Large Group"? "bg-purple-500/80 text-white" :
-                    "bg-green-500/80 text-white"
+                    vehicle.badge === "VIP"         ? "bg-gold-500 text-black" :
+                    vehicle.badge === "Popular"     ? "bg-blue-500/90 text-white" :
+                    vehicle.badge === "Large Group" ? "bg-purple-500/90 text-white" :
+                    "bg-emerald-600/90 text-white"
                   }`}>
                     {vehicle.badge}
                   </span>
                 </div>
               )}
 
-              {/* Bottom overlay: price */}
-              <div className="absolute bottom-0 left-0 right-0 z-20 p-5">
+              {/* Price overlay */}
+              <div className="absolute bottom-0 left-0 right-0 z-[4] p-5">
                 <div className="flex items-end justify-between">
                   <div>
-                    <p className="text-white/70 text-xs tracking-wider uppercase mb-1">From</p>
+                    <p className="text-white/50 text-xs tracking-wider uppercase mb-1">From</p>
                     <p className="font-display text-3xl text-gold-400">
                       {formatCurrency(DEFAULT_PRICING[vehicle.class].minimumFare)}
                     </p>
                   </div>
-                  <p className="text-white/80 text-sm">{vehicle.models[0]}</p>
+                  <p className="text-white/60 text-sm">{vehicle.models[0]}</p>
                 </div>
               </div>
             </div>
 
-            {/* Details */}
+            {/* Details panel */}
             <div className="space-y-6">
               <div>
                 <h3 className="font-display text-3xl text-white mb-1">{vehicle.label}</h3>
@@ -179,6 +190,7 @@ export default function FleetSection() {
                   <p className="font-display text-3xl text-gold-400 mt-1">
                     {formatCurrency(DEFAULT_PRICING[vehicle.class].minimumFare)}
                   </p>
+                  <p className="text-dark-500 text-xs mt-0.5">incl. VAT · fixed price</p>
                 </div>
                 <Link
                   href={`/book?vehicle=${vehicle.class}`}
@@ -222,34 +234,44 @@ export default function FleetSection() {
                     : "border-white/[0.06] hover:border-gold-500/30"
                 }`}
               >
-                {/* Car image — light background */}
-                <div className="relative h-32 bg-[#e8e8e8]">
+                {/* Thumbnail — dark luxury */}
+                <div
+                  className="relative h-32 overflow-hidden"
+                  style={{ background: "radial-gradient(ellipse at 60% 40%, #1a1a1a, #0a0a0a)" }}
+                >
+                  <div
+                    className="absolute bottom-0 left-0 right-0 h-1/2 pointer-events-none z-[1]"
+                    style={{ background: "radial-gradient(ellipse at 50% 100%, rgba(201,168,76,0.12) 0%, transparent 60%)" }}
+                  />
                   <Image
                     src={v.image}
                     alt={v.label}
                     fill
                     sizes="208px"
-                    className="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+                    className="object-contain p-2 transition-transform duration-500 group-hover:scale-105 relative z-[2]"
+                    style={{ filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.8))" }}
                   />
                   {v.badge && (
-                    <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                      v.badge === "VIP"        ? "bg-gold-500 text-black" :
-                      v.badge === "Popular"    ? "bg-blue-500/80 text-white" :
-                      v.badge === "Large Group"? "bg-purple-500/80 text-white" :
-                      "bg-green-500/80 text-white"
+                    <span className={`absolute top-2 right-2 z-[3] px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                      v.badge === "VIP"         ? "bg-gold-500 text-black" :
+                      v.badge === "Popular"     ? "bg-blue-500/90 text-white" :
+                      v.badge === "Large Group" ? "bg-purple-500/90 text-white" :
+                      "bg-emerald-600/90 text-white"
                     }`}>
                       {v.badge}
                     </span>
                   )}
                 </div>
                 {/* Label */}
-                <div className="bg-[#0f0f0f] px-3 py-2.5 text-left">
+                <div className="bg-[#0f0f0f] px-3 py-2.5 text-left border-t border-white/[0.04]">
                   <p className={`text-xs font-medium transition-colors ${
                     active === i ? "text-gold-400" : "text-white group-hover:text-gold-400"
                   }`}>
                     {v.label}
                   </p>
-                  <p className="text-dark-500 text-[10px] mt-0.5">up to {v.maxPassengers} pax</p>
+                  <p className="text-dark-500 text-[10px] mt-0.5">
+                    up to {v.maxPassengers} pax · from {formatCurrency(DEFAULT_PRICING[v.class].minimumFare)}
+                  </p>
                 </div>
               </button>
             ))}

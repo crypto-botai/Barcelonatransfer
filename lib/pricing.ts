@@ -86,37 +86,36 @@ const KNOWN_LOCATIONS: Record<string, GeoPoint> = {
 };
 
 // Prices indexed as [from][to][vehicleClass] — symmetric routes share one entry.
-// "Economy" column also covers SUV at +€20, Luxury Minivan at +€30, Minibus at +€60.
-// These are the FIXED prices from the spec (ECONOMY | BUSINESS | LUXURY | MINIVAN).
-type FixedPrices = { ECONOMY: number; BUSINESS: number; LUXURY: number; MINIVAN: number };
+// Columns: ECONOMY (sedan 1-3 pax) | BUSINESS (premium sedan 1-3 pax) | VCLASS (V-Class 5-7 pax) | MINIVAN (Vito 4-7 pax)
+type FixedPrices = { ECONOMY: number; BUSINESS: number; VCLASS: number; MINIVAN: number };
 
 const ROUTE_PRICES: Array<[string, string, FixedPrices]> = [
-  ["airport", "barcelona_city", { ECONOMY: 50, BUSINESS: 65, LUXURY: 70, MINIVAN: 80 }],
-  ["airport", "cruise",         { ECONOMY: 50, BUSINESS: 65, LUXURY: 70, MINIVAN: 80 }],
-  ["cruise",  "barcelona_city", { ECONOMY: 50, BUSINESS: 65, LUXURY: 70, MINIVAN: 80 }],
-  ["airport", "sants",          { ECONOMY: 55, BUSINESS: 65, LUXURY: 75, MINIVAN: 90 }],
-  ["barcelona_city", "la_roca", { ECONOMY: 80,  BUSINESS: 100, LUXURY: 120, MINIVAN: 150 }],
-  ["barcelona_city", "montserrat",   { ECONOMY: 120, BUSINESS: 140, LUXURY: 160, MINIVAN: 190 }],
-  ["barcelona_city", "girona_airport", { ECONOMY: 140, BUSINESS: 155, LUXURY: 175, MINIVAN: 200 }],
-  ["barcelona_city", "andorra",       { ECONOMY: 260, BUSINESS: 285, LUXURY: 300, MINIVAN: 350 }],
+  ["airport", "barcelona_city", { ECONOMY: 50, BUSINESS: 65, VCLASS: 95,  MINIVAN: 80  }],
+  ["airport", "cruise",         { ECONOMY: 50, BUSINESS: 65, VCLASS: 95,  MINIVAN: 80  }],
+  ["cruise",  "barcelona_city", { ECONOMY: 50, BUSINESS: 65, VCLASS: 95,  MINIVAN: 80  }],
+  ["airport", "sants",          { ECONOMY: 55, BUSINESS: 65, VCLASS: 105, MINIVAN: 90  }],
+  ["barcelona_city", "la_roca",        { ECONOMY: 80,  BUSINESS: 100, VCLASS: 170, MINIVAN: 150 }],
+  ["barcelona_city", "montserrat",     { ECONOMY: 120, BUSINESS: 140, VCLASS: 210, MINIVAN: 190 }],
+  ["barcelona_city", "girona_airport", { ECONOMY: 140, BUSINESS: 155, VCLASS: 220, MINIVAN: 200 }],
+  ["barcelona_city", "andorra",        { ECONOMY: 260, BUSINESS: 285, VCLASS: 380, MINIVAN: 350 }],
   // Costa Daurada
-  ["barcelona_city", "castelldefels", { ECONOMY: 50,  BUSINESS: 60,  LUXURY: 70,  MINIVAN: 85  }],
-  ["barcelona_city", "sitges",        { ECONOMY: 80,  BUSINESS: 100, LUXURY: 120, MINIVAN: 140 }],
-  ["barcelona_city", "cubelles",      { ECONOMY: 90,  BUSINESS: 110, LUXURY: 130, MINIVAN: 155 }],
-  ["barcelona_city", "calafell",      { ECONOMY: 100, BUSINESS: 120, LUXURY: 140, MINIVAN: 170 }],
-  ["barcelona_city", "tarragona",     { ECONOMY: 150, BUSINESS: 170, LUXURY: 190, MINIVAN: 220 }],
-  ["barcelona_city", "salou",         { ECONOMY: 155, BUSINESS: 175, LUXURY: 195, MINIVAN: 230 }],
-  ["barcelona_city", "portaventura",  { ECONOMY: 155, BUSINESS: 175, LUXURY: 195, MINIVAN: 230 }],
-  ["barcelona_city", "cambrils",      { ECONOMY: 160, BUSINESS: 180, LUXURY: 200, MINIVAN: 240 }],
+  ["barcelona_city", "castelldefels", { ECONOMY: 50,  BUSINESS: 60,  VCLASS: 100, MINIVAN: 85  }],
+  ["barcelona_city", "sitges",        { ECONOMY: 80,  BUSINESS: 100, VCLASS: 160, MINIVAN: 140 }],
+  ["barcelona_city", "cubelles",      { ECONOMY: 90,  BUSINESS: 110, VCLASS: 175, MINIVAN: 155 }],
+  ["barcelona_city", "calafell",      { ECONOMY: 100, BUSINESS: 120, VCLASS: 190, MINIVAN: 170 }],
+  ["barcelona_city", "tarragona",     { ECONOMY: 150, BUSINESS: 170, VCLASS: 240, MINIVAN: 220 }],
+  ["barcelona_city", "salou",         { ECONOMY: 155, BUSINESS: 175, VCLASS: 250, MINIVAN: 230 }],
+  ["barcelona_city", "portaventura",  { ECONOMY: 155, BUSINESS: 175, VCLASS: 250, MINIVAN: 230 }],
+  ["barcelona_city", "cambrils",      { ECONOMY: 160, BUSINESS: 180, VCLASS: 260, MINIVAN: 240 }],
   // Costa Brava
-  ["barcelona_city", "mataro",        { ECONOMY: 90,  BUSINESS: 110, LUXURY: 130, MINIVAN: 155 }],
-  ["barcelona_city", "calella",       { ECONOMY: 110, BUSINESS: 130, LUXURY: 150, MINIVAN: 180 }],
-  ["barcelona_city", "santa_susanna", { ECONOMY: 120, BUSINESS: 140, LUXURY: 160, MINIVAN: 190 }],
-  ["barcelona_city", "blanes",        { ECONOMY: 135, BUSINESS: 155, LUXURY: 175, MINIVAN: 210 }],
-  ["barcelona_city", "lloret",        { ECONOMY: 145, BUSINESS: 165, LUXURY: 185, MINIVAN: 220 }],
-  ["barcelona_city", "tossa",         { ECONOMY: 155, BUSINESS: 175, LUXURY: 195, MINIVAN: 235 }],
-  ["barcelona_city", "platja_daro",   { ECONOMY: 160, BUSINESS: 180, LUXURY: 200, MINIVAN: 240 }],
-  ["barcelona_city", "cadaques",      { ECONOMY: 240, BUSINESS: 260, LUXURY: 280, MINIVAN: 330 }],
+  ["barcelona_city", "mataro",        { ECONOMY: 90,  BUSINESS: 110, VCLASS: 175, MINIVAN: 155 }],
+  ["barcelona_city", "calella",       { ECONOMY: 110, BUSINESS: 130, VCLASS: 200, MINIVAN: 180 }],
+  ["barcelona_city", "santa_susanna", { ECONOMY: 120, BUSINESS: 140, VCLASS: 210, MINIVAN: 190 }],
+  ["barcelona_city", "blanes",        { ECONOMY: 135, BUSINESS: 155, VCLASS: 230, MINIVAN: 210 }],
+  ["barcelona_city", "lloret",        { ECONOMY: 145, BUSINESS: 165, VCLASS: 240, MINIVAN: 220 }],
+  ["barcelona_city", "tossa",         { ECONOMY: 155, BUSINESS: 175, VCLASS: 255, MINIVAN: 235 }],
+  ["barcelona_city", "platja_daro",   { ECONOMY: 160, BUSINESS: 180, VCLASS: 260, MINIVAN: 240 }],
+  ["barcelona_city", "cadaques",      { ECONOMY: 240, BUSINESS: 260, VCLASS: 360, MINIVAN: 330 }],
 ];
 
 function nearLocation(lat: number, lng: number, loc: GeoPoint): boolean {
@@ -141,15 +140,13 @@ function lookupFixedPrice(
 
   for (const [a, b, prices] of ROUTE_PRICES) {
     if ((a === from && b === to) || (a === to && b === from)) {
-      // Map vehicle class to price column
-      if (vc === "ECONOMY" || vc === "ELECTRIC_VIP")  return prices.ECONOMY;
-      if (vc === "BUSINESS")                           return prices.BUSINESS;
-      if (vc === "LUXURY" || vc === "FIRST_CLASS")     return prices.LUXURY;
-      if (vc === "SUV")                                return prices.BUSINESS;    // SUV = Business+
-      if (vc === "LUXURY_SUV")                         return prices.LUXURY + 20; // premium
-      if (vc === "MINIVAN")                            return prices.MINIVAN;
-      if (vc === "LUXURY_MINIVAN")                     return prices.MINIVAN + 30;
-      if (vc === "MINIBUS")                            return prices.MINIVAN + 60;
+      if (vc === "ECONOMY" || vc === "ELECTRIC_VIP")       return prices.ECONOMY;
+      if (vc === "BUSINESS" || vc === "SUV")               return prices.BUSINESS;
+      if (vc === "LUXURY" || vc === "FIRST_CLASS")         return prices.BUSINESS; // luxury sedans → business column
+      if (vc === "LUXURY_SUV")                             return prices.BUSINESS + 20;
+      if (vc === "LUXURY_MINIVAN")                         return prices.VCLASS;   // Mercedes V-Class
+      if (vc === "MINIVAN")                                return prices.MINIVAN;
+      if (vc === "MINIBUS")                                return prices.MINIVAN + 60;
     }
   }
   return null;

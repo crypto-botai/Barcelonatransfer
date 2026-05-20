@@ -9,36 +9,36 @@ import { formatCurrency } from "@/lib/utils";
 const TABS = ["Airport & City", "Costa Dorada", "Costa Brava", "Hourly"];
 
 const AIRPORT = [
-  { route: "El Prat Airport ⇄ Barcelona City",   p1: 50,  p2: 65,  p3: 70,  p4: 80  },
-  { route: "El Prat Airport ⇄ Cruise Terminal",  p1: 50,  p2: 65,  p3: 70,  p4: 80  },
-  { route: "Cruise Terminal ⇄ Barcelona City",   p1: 50,  p2: 65,  p3: 70,  p4: 80  },
-  { route: "El Prat Airport ⇄ Sants Station",    p1: 55,  p2: 65,  p3: 75,  p4: 90  },
-  { route: "Barcelona ⇄ La Roca Village",        p1: 80,  p2: 100, p3: 120, p4: 150 },
-  { route: "Barcelona ⇄ Montserrat",             p1: 120, p2: 140, p3: 160, p4: 190 },
-  { route: "Barcelona ⇄ Girona Airport",         p1: 140, p2: 155, p3: 175, p4: 200 },
-  { route: "Barcelona ⇄ Andorra",               p1: 260, p2: 285, p3: 300, p4: 350 },
+  { route: "El Prat Airport ⇄ Barcelona City",   p1: 50,  p2: 65,  p3: 95,  p4: 80  },
+  { route: "El Prat Airport ⇄ Cruise Terminal",  p1: 50,  p2: 65,  p3: 95,  p4: 80  },
+  { route: "Cruise Terminal ⇄ Barcelona City",   p1: 50,  p2: 65,  p3: 95,  p4: 80  },
+  { route: "El Prat Airport ⇄ Sants Station",    p1: 55,  p2: 65,  p3: 105, p4: 90  },
+  { route: "Barcelona ⇄ La Roca Village",        p1: 80,  p2: 100, p3: 170, p4: 150 },
+  { route: "Barcelona ⇄ Montserrat",             p1: 120, p2: 140, p3: 210, p4: 190 },
+  { route: "Barcelona ⇄ Girona Airport",         p1: 140, p2: 155, p3: 220, p4: 200 },
+  { route: "Barcelona ⇄ Andorra",               p1: 260, p2: 285, p3: 380, p4: 350 },
 ];
 
 const DORADA = [
-  { route: "Barcelona ⇄ Castelldefels", p1: 50,  p2: 60,  p3: 70,  p4: 85  },
-  { route: "Barcelona ⇄ Sitges",        p1: 80,  p2: 100, p3: 120, p4: 140 },
-  { route: "Barcelona ⇄ Cubelles",      p1: 90,  p2: 110, p3: 130, p4: 155 },
-  { route: "Barcelona ⇄ Calafell",      p1: 100, p2: 120, p3: 140, p4: 170 },
-  { route: "Barcelona ⇄ Tarragona",     p1: 150, p2: 170, p3: 190, p4: 220 },
-  { route: "Barcelona ⇄ Salou",         p1: 155, p2: 175, p3: 195, p4: 230 },
-  { route: "Barcelona ⇄ PortAventura",  p1: 155, p2: 175, p3: 195, p4: 230 },
-  { route: "Barcelona ⇄ Cambrils",      p1: 160, p2: 180, p3: 200, p4: 240 },
+  { route: "Barcelona ⇄ Castelldefels", p1: 50,  p2: 60,  p3: 100, p4: 85  },
+  { route: "Barcelona ⇄ Sitges",        p1: 80,  p2: 100, p3: 160, p4: 140 },
+  { route: "Barcelona ⇄ Cubelles",      p1: 90,  p2: 110, p3: 175, p4: 155 },
+  { route: "Barcelona ⇄ Calafell",      p1: 100, p2: 120, p3: 190, p4: 170 },
+  { route: "Barcelona ⇄ Tarragona",     p1: 150, p2: 170, p3: 240, p4: 220 },
+  { route: "Barcelona ⇄ Salou",         p1: 155, p2: 175, p3: 250, p4: 230 },
+  { route: "Barcelona ⇄ PortAventura",  p1: 155, p2: 175, p3: 250, p4: 230 },
+  { route: "Barcelona ⇄ Cambrils",      p1: 160, p2: 180, p3: 260, p4: 240 },
 ];
 
 const BRAVA = [
-  { route: "Barcelona ⇄ Mataró",        p1: 90,  p2: 110, p3: 130, p4: 155 },
-  { route: "Barcelona ⇄ Calella",       p1: 110, p2: 130, p3: 150, p4: 180 },
-  { route: "Barcelona ⇄ Santa Susanna", p1: 120, p2: 140, p3: 160, p4: 190 },
-  { route: "Barcelona ⇄ Blanes",        p1: 135, p2: 155, p3: 175, p4: 210 },
-  { route: "Barcelona ⇄ Lloret de Mar", p1: 145, p2: 165, p3: 185, p4: 220 },
-  { route: "Barcelona ⇄ Tossa de Mar",  p1: 155, p2: 175, p3: 195, p4: 235 },
-  { route: "Barcelona ⇄ Platja d'Aro",  p1: 160, p2: 180, p3: 200, p4: 240 },
-  { route: "Barcelona ⇄ Cadaqués",      p1: 240, p2: 260, p3: 280, p4: 330 },
+  { route: "Barcelona ⇄ Mataró",        p1: 90,  p2: 110, p3: 175, p4: 155 },
+  { route: "Barcelona ⇄ Calella",       p1: 110, p2: 130, p3: 200, p4: 180 },
+  { route: "Barcelona ⇄ Santa Susanna", p1: 120, p2: 140, p3: 210, p4: 190 },
+  { route: "Barcelona ⇄ Blanes",        p1: 135, p2: 155, p3: 230, p4: 210 },
+  { route: "Barcelona ⇄ Lloret de Mar", p1: 145, p2: 165, p3: 240, p4: 220 },
+  { route: "Barcelona ⇄ Tossa de Mar",  p1: 155, p2: 175, p3: 255, p4: 235 },
+  { route: "Barcelona ⇄ Platja d'Aro",  p1: 160, p2: 180, p3: 260, p4: 240 },
+  { route: "Barcelona ⇄ Cadaqués",      p1: 240, p2: 260, p3: 360, p4: 330 },
 ];
 
 const HOURLY = [
@@ -65,7 +65,7 @@ function PriceTable({ data, search }: { data: Row[]; search: string }) {
             <th className="text-left py-3 px-4 text-xs text-dark-400 tracking-wider uppercase font-medium">Route</th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Economy<br /><span className="text-dark-600 normal-case">1–3 pax</span></th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Business<br /><span className="text-dark-600 normal-case">1–3 pax</span></th>
-            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Luxury<br /><span className="text-dark-600 normal-case">1–3 pax</span></th>
+            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">V-Class<br /><span className="text-dark-600 normal-case">5–7 pax</span></th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minivan<br /><span className="text-dark-600 normal-case">4–7 pax</span></th>
             <th className="py-3 px-4" />
           </tr>

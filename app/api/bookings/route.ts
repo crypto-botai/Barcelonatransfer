@@ -132,6 +132,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({
           bookingId:   booking.id,
+          checkoutId:  checkout.id,
           checkoutUrl: getSumUpCheckoutUrl(checkout.id),
         });
       } catch (sumupErr) {
