@@ -7,7 +7,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   CheckCircle2, XCircle, Clock, Calendar, MapPin,
-  MessageCircle, Mail, RefreshCw, CreditCard,
+  MessageCircle, Mail, RefreshCw, CreditCard, FileText,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 
@@ -191,13 +191,23 @@ function SuccessInner() {
               <Link href="/" className="btn-gold w-full py-3.5 rounded-xl font-semibold">
                 Back to Home
               </Link>
+              {bookingId && (
+                <Link
+                  href={`/booking/${bookingId}/invoice`}
+                  target="_blank"
+                  className="btn-outline-gold w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2"
+                >
+                  <FileText size={16} />
+                  View / Print Receipt
+                </Link>
+              )}
               <a
                 href="https://wa.me/34635383712"
                 target="_blank"
                 rel="noreferrer"
-                className="btn-outline-gold w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2"
+                className="text-sm text-dark-400 hover:text-white flex items-center justify-center gap-2 transition-colors"
               >
-                <MessageCircle size={16} />
+                <MessageCircle size={14} />
                 WhatsApp Support
               </a>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, CheckCircle2, XCircle, User, Loader2, X, Car, MapPin, Calendar, Phone, Mail, Plane, FileText, Save, UserCheck } from "lucide-react";
+import { Search, CheckCircle2, XCircle, User, Loader2, X, Car, MapPin, Calendar, Phone, Mail, Plane, FileText, Save, UserCheck, Receipt } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
 import toast from "react-hot-toast";
@@ -77,9 +77,20 @@ function BookingDrawer({ booking, drivers, onClose, onSaved }: {
             <p className="text-gold-400 font-mono text-lg tracking-widest">{booking.confirmationCode}</p>
             <p className="text-dark-500 text-xs mt-0.5">{new Date(booking.createdAt).toLocaleString("en-GB")}</p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-dark-400 hover:text-white transition-colors">
-            <X size={14} />
-          </button>
+          <div className="flex items-center gap-2">
+            <a
+              href={`/booking/${booking.id}/invoice`}
+              target="_blank"
+              rel="noreferrer"
+              className="p-2 rounded-lg bg-gold-500/10 text-gold-400 hover:bg-gold-500/20 transition-colors"
+              title="View invoice"
+            >
+              <Receipt size={14} />
+            </a>
+            <button onClick={onClose} className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-dark-400 hover:text-white transition-colors">
+              <X size={14} />
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 p-5 space-y-5 overflow-y-auto">
@@ -306,9 +317,21 @@ export default function AdminBookingsPage() {
                       <span className={`status-badge ${STATUS_COLORS[b.status]}`}>{STATUS_LABELS[b.status]}</span>
                     </td>
                     <td className="py-3 px-3">
-                      <button className="px-2.5 py-1 rounded-lg bg-gold-500/10 text-gold-400 text-xs hover:bg-gold-500/20 transition-colors whitespace-nowrap">
-                        Open →
-                      </button>
+                      <div className="flex items-center gap-1.5">
+                        <button className="px-2.5 py-1 rounded-lg bg-gold-500/10 text-gold-400 text-xs hover:bg-gold-500/20 transition-colors whitespace-nowrap">
+                          Open →
+                        </button>
+                        <a
+                          href={`/booking/${b.id}/invoice`}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-1.5 rounded-lg bg-white/[0.04] text-dark-400 hover:text-white transition-colors"
+                          title="View invoice"
+                        >
+                          <Receipt size={13} />
+                        </a>
+                      </div>
                     </td>
                   </tr>
                 ))}
