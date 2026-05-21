@@ -20,9 +20,10 @@ export default async function DriverPage() {
         take:    50,
         select: {
           id: true, confirmationCode: true, status: true,
-          pickupAddress: true, dropoffAddress: true,
-          pickupDatetime: true, passengers: true,
+          pickupAddress: true, dropoffAddress: true, pickupLat: true, pickupLng: true,
+          pickupDatetime: true, passengers: true, luggage: true,
           vehicleClass: true, totalAmount: true, driverAmount: true,
+          guestName: true, guestPhone: true, flightNumber: true,
         },
       },
       withdrawals: {
@@ -59,9 +60,14 @@ export default async function DriverPage() {
     );
   }
 
-  const completedCount = await prisma.booking.count({
-    where: { driverId: driver.id, status: "COMPLETED" },
-  });
+  const [completedCount, earningsResult] = await Promise.all([
+    prisma.booking.count({ where: { driverId: driver.id, status: "COMPLETED" } }),
+    prisma.booking.aggregate({
+      where: { driverId: driver.id, status: "COMPLETED" },
+      _sum: { driverAmount: true },
+    }),
+  ]);
+  const totalEarnings = earningsResult._sum.driverAmount ?? 0;
 
   return (
     <>
@@ -78,6 +84,7 @@ export default async function DriverPage() {
         bookings={driver.bookings as Parameters<typeof DriverDashboard>[0]["bookings"]}
         withdrawals={driver.withdrawals as Parameters<typeof DriverDashboard>[0]["withdrawals"]}
         completedCount={completedCount}
+        totalEarnings={totalEarnings}
       />
     </>
   );

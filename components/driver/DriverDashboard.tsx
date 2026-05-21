@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import {
   Car, MapPin, Calendar, Star, Wallet, Plus, Loader2,
   CheckCircle2, Clock, XCircle, AlertCircle, TrendingUp,
-  CreditCard, Smartphone
+  CreditCard, Smartphone, Phone, MessageCircle, Navigation,
+  Power, Plane,
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
@@ -17,11 +18,17 @@ type Booking = {
   status: string;
   pickupAddress: string;
   dropoffAddress: string;
+  pickupLat?: number | null;
+  pickupLng?: number | null;
   pickupDatetime: Date | string;
   passengers: number;
+  luggage?: number;
   vehicleClass: string;
   totalAmount: number;
   driverAmount: number | null;
+  guestName?: string | null;
+  guestPhone?: string | null;
+  flightNumber?: string | null;
 };
 
 type Withdrawal = {
@@ -49,6 +56,7 @@ type Props = {
   bookings: Booking[];
   withdrawals: Withdrawal[];
   completedCount: number;
+  totalEarnings?: number;
 };
 
 type Tab = "upcoming" | "all" | "completed" | "cancelled" | "withdrawals";
@@ -69,10 +77,34 @@ const WITHDRAWAL_STATUS_STYLE: Record<string, string> = {
   TRANSFERRED: "bg-green-500/20 text-green-400",
 };
 
-export default function DriverDashboard({ driver, bookings, withdrawals: initialWithdrawals, completedCount }: Props) {
-  const [tab,         setTab]         = useState<Tab>("upcoming");
-  const [withdrawals, setWithdrawals] = useState(initialWithdrawals);
+export default function DriverDashboard({ driver, bookings, withdrawals: initialWithdrawals, completedCount, totalEarnings = 0 }: Props) {
+  const [tab,            setTab]            = useState<Tab>("upcoming");
+  const [withdrawals,    setWithdrawals]    = useState(initialWithdrawals);
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
+  const [driverStatus,   setDriverStatus]   = useState(driver.status);
+  const [togglingStatus, setTogglingStatus] = useState(false);
+
+  const toggleStatus = async () => {
+    const next = driverStatus === "ONLINE" ? "OFFLINE" : "ONLINE";
+    setTogglingStatus(true);
+    try {
+      const res = await fetch("/api/driver/status", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: next }),
+      });
+      if (res.ok) {
+        setDriverStatus(next);
+        toast.success(`You are now ${next}`);
+      } else {
+        toast.error("Failed to update status");
+      }
+    } catch {
+      toast.error("Network error");
+    } finally {
+      setTogglingStatus(false);
+    }
+  };
   const [withdrawForm, setWithdrawForm] = useState({
     amount: "", method: "BANK" as "BANK" | "BIZUM", bankIban: "", bankName: "", bizumPhone: "",
   });
@@ -150,29 +182,46 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
             <h1 className="font-display text-3xl text-white">
               Welcome, {driver.user.name ?? "Driver"}
             </h1>
-            <p className="text-dark-400 mt-1 text-sm">
-              Status:{" "}
+            <p className="text-dark-400 mt-1 text-sm flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full ${driverStatus === "ONLINE" || driverStatus === "ON_RIDE" ? "bg-green-400" : "bg-gray-500"}`} />
               <span className={
-                driver.status === "ONLINE"  ? "text-green-400" :
-                driver.status === "ON_RIDE" ? "text-blue-400"  : "text-yellow-400"
+                driverStatus === "ONLINE"  ? "text-green-400" :
+                driverStatus === "ON_RIDE" ? "text-blue-400"  : "text-yellow-400"
               }>
-                {driver.status.replace(/_/g, " ")}
+                {driverStatus.replace(/_/g, " ")}
               </span>
             </p>
           </div>
-          <button
-            onClick={() => { setShowWithdrawForm(true); setTab("withdrawals"); }}
-            className="btn-gold flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold"
-          >
-            <Wallet size={15} /> Request Withdrawal
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Online/Offline toggle */}
+            {driverStatus !== "ON_RIDE" && (
+              <button
+                onClick={toggleStatus}
+                disabled={togglingStatus}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  driverStatus === "ONLINE"
+                    ? "bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/30"
+                    : "bg-white/[0.04] text-dark-400 border border-white/[0.08] hover:bg-green-500/20 hover:text-green-400 hover:border-green-500/30"
+                }`}
+              >
+                {togglingStatus ? <Loader2 size={15} className="animate-spin" /> : <Power size={15} />}
+                {driverStatus === "ONLINE" ? "Go Offline" : "Go Online"}
+              </button>
+            )}
+            <button
+              onClick={() => { setShowWithdrawForm(true); setTab("withdrawals"); }}
+              className="btn-gold flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold"
+            >
+              <Wallet size={15} /> Withdraw
+            </button>
+          </div>
         </motion.div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {[
-            { icon: Car,        label: "Total Rides",   value: driver.totalRides,                                 color: "text-gold-400" },
-            { icon: CheckCircle2,label:"Completed",     value: completedCount,                                    color: "text-green-400" },
+            { icon: Wallet,     label: "Total Earned",  value: formatCurrency(totalEarnings),                    color: "text-gold-400" },
+            { icon: CheckCircle2,label:"Completed",     value: completedCount,                                   color: "text-green-400" },
             { icon: Star,       label: "Rating",        value: driver.rating > 0 ? `${driver.rating.toFixed(1)}★` : "—", color: "text-yellow-400" },
             { icon: TrendingUp, label: "Upcoming",      value: bookings.filter(b => ["PENDING","CONFIRMED","DRIVER_ASSIGNED"].includes(b.status)).length, color: "text-blue-400" },
           ].map(({ icon: Icon, label, value, color }) => (
@@ -239,19 +288,57 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                             <MapPin size={13} className="text-dark-600 mt-0.5 flex-shrink-0" />
                             <span className="truncate">{b.dropoffAddress}</span>
                           </div>
-                          <div className="flex items-center gap-3 mt-2 text-xs text-dark-500">
+                          <div className="flex items-center gap-3 mt-2 text-xs text-dark-500 flex-wrap">
                             <span className="flex items-center gap-1">
                               <Calendar size={11} /> {formatDate(new Date(b.pickupDatetime))}
                             </span>
                             <span>{b.passengers} pax</span>
-                            <span>{b.vehicleClass.replace(/_/g, " ")}</span>
+                            {b.luggage != null && b.luggage > 0 && <span>{b.luggage} bags</span>}
+                            {b.flightNumber && <span className="flex items-center gap-1 text-blue-400"><Plane size={10} />{b.flightNumber}</span>}
                           </div>
                         </div>
-                        {b.driverAmount != null
-                          ? <p className="font-display text-xl text-gold-400">{formatCurrency(b.driverAmount)}</p>
-                          : <p className="font-display text-xl text-dark-600">TBC</p>
-                        }
+                        <div className="flex flex-col items-end gap-2">
+                          {b.driverAmount != null
+                            ? <p className="font-display text-xl text-gold-400">{formatCurrency(b.driverAmount)}</p>
+                            : <p className="font-display text-xl text-dark-600">TBC</p>
+                          }
+                        </div>
                       </div>
+
+                      {/* Customer contact + navigation (only for active/upcoming rides) */}
+                      {["DRIVER_ASSIGNED","IN_PROGRESS","CONFIRMED","PENDING"].includes(b.status) && (
+                        <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-white/[0.04]">
+                          {b.guestName && (
+                            <span className="text-xs text-dark-400 flex items-center gap-1">
+                              <Car size={10} className="text-gold-500" /> {b.guestName}
+                            </span>
+                          )}
+                          {b.guestPhone && (
+                            <>
+                              <a href={`tel:${b.guestPhone}`}
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs hover:bg-blue-500/15 transition-colors">
+                                <Phone size={10} /> Call
+                              </a>
+                              <a href={`https://wa.me/${b.guestPhone.replace(/[^0-9]/g, "")}`} target="_blank" rel="noreferrer"
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-xs hover:bg-green-500/15 transition-colors">
+                                <MessageCircle size={10} /> WhatsApp
+                              </a>
+                            </>
+                          )}
+                          <a
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(b.pickupAddress)}`}
+                            target="_blank" rel="noreferrer"
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gold-500/10 border border-gold-500/20 text-gold-400 text-xs hover:bg-gold-500/15 transition-colors">
+                            <Navigation size={10} /> Navigate
+                          </a>
+                          <a
+                            href={`https://waze.com/ul?q=${encodeURIComponent(b.pickupAddress)}&navigate=yes`}
+                            target="_blank" rel="noreferrer"
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs hover:bg-cyan-500/15 transition-colors">
+                            <Navigation size={10} /> Waze
+                          </a>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
