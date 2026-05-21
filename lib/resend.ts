@@ -113,8 +113,8 @@ export async function sendBookingConfirmation({
       <span class="total-value">€${totalAmount.toFixed(2)}</span>
     </div>
     <div class="divider"></div>
-    <p style="color:#888;font-size:13px;">Need help or changes? Contact us anytime:</p>
-    <div style="text-align:center;margin-top:16px;">
+    <div style="text-align:center;margin:20px 0;display:flex;flex-direction:column;gap:10px;align-items:center;">
+      ${bookingId ? `<a href="${SITE_URL}/booking/${bookingId}/invoice" class="outline-btn" style="display:inline-block;">🧾 View / Print Receipt</a>` : ""}
       <a href="https://wa.me/34635383712?text=Booking%20${confirmationCode}" class="wa-btn">💬 WhatsApp Support</a>
     </div>
   `);
