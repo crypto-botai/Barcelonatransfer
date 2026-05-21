@@ -7,7 +7,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   CheckCircle2, XCircle, Clock, Calendar, MapPin,
-  MessageCircle, Mail, RefreshCw,
+  MessageCircle, Mail, RefreshCw, CreditCard,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 
@@ -20,16 +20,18 @@ type BookingData = {
   vehicleClass?: string;
   totalAmount?: number;
   guestEmail?: string;
+  hasCheckout?: boolean;
 };
 
 function SuccessInner() {
   const params    = useSearchParams();
   const bookingId = params.get("booking_id");
   const { status: sessionStatus } = useSession();
-  const [data,     setData]     = useState<BookingData | null>(null);
-  const [loading,  setLoading]  = useState(true);
-  const [attempts, setAttempts] = useState(0);
+  const [data,          setData]          = useState<BookingData | null>(null);
+  const [loading,       setLoading]       = useState(true);
+  const [attempts,      setAttempts]      = useState(0);
   const [manualChecking, setManualChecking] = useState(false);
+  const [payLoading,    setPayLoading]    = useState(false);
 
   const MAX_AUTO_ATTEMPTS = 20; // 20 × 3s = 60 seconds of polling
 
@@ -59,6 +61,25 @@ function SuccessInner() {
     verify();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId, attempts]);
+
+  const retryPayment = async () => {
+    if (!bookingId) return;
+    setPayLoading(true);
+    try {
+      const res = await fetch("/api/payments/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed to create payment");
+      window.location.href = json.checkoutUrl;
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Could not start payment. Please contact us.");
+    } finally {
+      setPayLoading(false);
+    }
+  };
 
   const manualCheck = async () => {
     if (!bookingId) return;
@@ -229,28 +250,38 @@ function SuccessInner() {
               </div>
             )}
 
-            <button
-              onClick={manualCheck}
-              disabled={manualChecking}
-              className="btn-outline-gold w-full py-3 rounded-xl text-sm flex items-center justify-center gap-2 mb-3"
-            >
-              <RefreshCw size={14} className={manualChecking ? "animate-spin" : ""} />
-              {manualChecking ? "Checking…" : "Check Payment Status"}
-            </button>
+            <div className="flex flex-col gap-3 mb-4">
+              <button
+                onClick={retryPayment}
+                disabled={payLoading}
+                className="btn-gold w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2"
+              >
+                <CreditCard size={16} className={payLoading ? "animate-pulse" : ""} />
+                {payLoading ? "Connecting to SumUp…" : "Pay Now with SumUp"}
+              </button>
+              <button
+                onClick={manualCheck}
+                disabled={manualChecking}
+                className="btn-outline-gold w-full py-3 rounded-xl text-sm flex items-center justify-center gap-2"
+              >
+                <RefreshCw size={14} className={manualChecking ? "animate-spin" : ""} />
+                {manualChecking ? "Checking…" : "Already paid? Check status"}
+              </button>
+            </div>
 
             <div className="flex flex-col gap-3">
               <a
                 href={`https://wa.me/34635383712?text=${encodeURIComponent(
-                  `Hi! I have booking reference ${data?.confirmationCode ?? ""} and need to complete payment of €${data?.totalAmount?.toFixed(2) ?? ""}.`
+                  `Hi! I have booking reference ${data?.confirmationCode ?? ""} and need to complete payment of EUR${data?.totalAmount?.toFixed(2) ?? ""}.`
                 )}`}
                 target="_blank"
                 rel="noreferrer"
-                className="btn-gold w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2"
+                className="text-sm text-dark-400 hover:text-white flex items-center justify-center gap-2 transition-colors"
               >
-                <MessageCircle size={16} />
-                Complete via WhatsApp
+                <MessageCircle size={14} />
+                Problems? Pay via WhatsApp instead
               </a>
-              <Link href="/" className="btn-outline-gold w-full py-3.5 rounded-xl font-semibold">
+              <Link href="/" className="text-xs text-dark-600 hover:text-dark-400 text-center transition-colors">
                 Back to Home
               </Link>
             </div>

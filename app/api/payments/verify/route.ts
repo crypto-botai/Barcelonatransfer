@@ -91,7 +91,18 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ status: "PENDING" });
+    // Return PENDING with booking details so the UI can show them
+    return NextResponse.json({
+      status:           "PENDING",
+      confirmationCode: booking.confirmationCode,
+      pickupAddress:    booking.pickupAddress,
+      dropoffAddress:   booking.dropoffAddress,
+      pickupDatetime:   booking.pickupDatetime,
+      vehicleClass:     booking.vehicleClass,
+      totalAmount:      booking.totalAmount,
+      guestEmail:       booking.guestEmail,
+      hasCheckout:      !!booking.stripeSessionId,
+    });
   } catch (err) {
     console.error("[payments/verify]", err);
     return NextResponse.json({ error: "Verification failed" }, { status: 500 });

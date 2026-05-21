@@ -221,17 +221,26 @@ export async function POST(req: NextRequest) {
           email:           accountCreated ? body.guestEmail : undefined,
         });
       } catch (sumupErr) {
-        console.error("[bookings] SumUp checkout failed:", sumupErr);
-        // Fall through to WhatsApp fallback below
+        const errMsg = sumupErr instanceof Error ? sumupErr.message : String(sumupErr);
+        console.error("[bookings] SumUp checkout failed:", errMsg);
+        // Fall through — return booking saved + sumup error so UI can retry
+        return NextResponse.json({
+          bookingId:    booking.id,
+          checkoutUrl:  `/booking/success?booking_id=${booking.id}`,
+          accountCreated,
+          email:        accountCreated ? body.guestEmail : undefined,
+          sumupError:   errMsg,
+        });
       }
     }
 
-    // Fallback: booking is saved — redirect to success/pending page
+    // Fallback: SumUp not configured — redirect to pending page
     return NextResponse.json({
       bookingId:       booking.id,
       checkoutUrl:     `/booking/success?booking_id=${booking.id}`,
       accountCreated,
       email:           accountCreated ? body.guestEmail : undefined,
+      sumupError:      "SumUp not configured",
     });
 
   } catch (err) {
