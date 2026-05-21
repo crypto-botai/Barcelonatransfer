@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { type BookingStatus } from "@/types";
 
 export async function GET(
   _req: NextRequest,
@@ -41,16 +40,19 @@ export async function PATCH(
   if (!session || user?.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
   try {
     const body = await req.json();
-    const booking = await prisma.booking.update({
-      where: { id },
-      data: {
-        ...(body.status    ? { status: body.status as BookingStatus } : {}),
-        ...(body.driverId  ? { driverId: body.driverId, status: "DRIVER_ASSIGNED", driverAssignedAt: new Date() } : {}),
-      },
-    });
+    const data: Record<string, unknown> = {};
+    if (body.status) data.status = body.status;
+    if (body.adminNotes !== undefined) data.adminNotes = body.adminNotes;
+    if (body.totalAmount !== undefined) data.totalAmount = parseFloat(body.totalAmount);
+    if (body.driverAmount !== undefined) data.driverAmount = body.driverAmount === null ? null : parseFloat(body.driverAmount);
+    if (body.driverId) {
+      data.driverId = body.driverId;
+      data.status = "DRIVER_ASSIGNED";
+      data.driverAssignedAt = new Date();
+    }
+    const booking = await prisma.booking.update({ where: { id }, data });
     return NextResponse.json(booking);
   } catch {
     return NextResponse.json({ error: "Update failed" }, { status: 500 });

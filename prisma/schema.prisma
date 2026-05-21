@@ -77,10 +77,11 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts  Account[]
-  sessions  Session[]
-  bookings  Booking[]
-  driver    Driver?
+  accounts        Account[]
+  sessions        Session[]
+  bookings        Booking[]
+  driver          Driver?
+  customerProfile CustomerProfile?
 
   @@map("users")
 }
@@ -209,6 +210,8 @@ model Booking {
   vehicleClass    VehicleClass
   flightNumber    String?
   specialRequests String?       @db.Text
+  driverAmount    Float?
+  adminNotes      String?       @db.Text
   distanceKm      Float         @default(0)
   durationMin     Int           @default(0)
   baseFare        Float
@@ -310,4 +313,156 @@ model Withdrawal {
   driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
 
   @@map("withdrawals")
+}
+
+// ─── CRM & Operations Models ─────────────────────────────────
+
+model CustomerProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  isVip         Boolean  @default(false)
+  isBlacklisted Boolean  @default(false)
+  vipSince      DateTime?
+  notes         String?  @db.Text
+  totalSpent    Float    @default(0)
+  totalRides    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("customer_profiles")
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  adminId   String?
+  adminName String?
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([entity])
+  @@index([adminId])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
+// ─── Marketing & Automation Models ──────────────────────────
+
+model BookingSession {
+  id           String   @id @default(cuid())
+  sessionId    String   @unique
+  email        String?
+  name         String?
+  phone        String?
+  formData     Json
+  step         Int      @default(1)
+  lastActivity DateTime @default(now())
+  converted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  abandonedBooking AbandonedBooking?
+
+  @@index([email])
+  @@index([lastActivity])
+  @@map("booking_sessions")
+}
+
+model AbandonedBooking {
+  id          String    @id @default(cuid())
+  sessionId   String    @unique
+  email       String
+  name        String?
+  phone       String?
+  formSnapshot Json
+  couponId    String?   @unique
+  emailSentAt DateTime?
+  convertedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  session BookingSession @relation(fields: [sessionId], references: [sessionId])
+  coupon  Coupon?        @relation(fields: [couponId], references: [id])
+
+  @@index([email])
+  @@index([createdAt])
+  @@map("abandoned_bookings")
+}
+
+model Coupon {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  email       String?
+  discountPct Float     @default(5)
+  discountAmt Float?
+  usedAt      DateTime?
+  expiresAt   DateTime
+  isActive    Boolean   @default(true)
+  bookingId   String?
+  createdAt   DateTime  @default(now())
+
+  abandonedBooking AbandonedBooking?
+
+  @@index([code])
+  @@index([email])
+  @@index([expiresAt])
+  @@map("coupons")
+}
+
+model NewsletterSubscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String?
+  isActive       Boolean   @default(true)
+  confirmedAt    DateTime?
+  unsubscribedAt DateTime?
+  source         String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([email])
+  @@index([isActive])
+  @@map("newsletter_subscribers")
+}
+
+model EmailCampaign {
+  id          String    @id @default(cuid())
+  subject     String
+  htmlBody    String    @db.Text
+  status      String    @default("DRAFT")
+  sentAt      DateTime?
+  scheduledAt DateTime?
+  targetCount Int       @default(0)
+  openCount   Int       @default(0)
+  clickCount  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  logs EmailLog[]
+
+  @@map("email_campaigns")
+}
+
+model EmailLog {
+  id         String    @id @default(cuid())
+  to         String
+  subject    String
+  type       String
+  status     String    @default("SENT")
+  resendId   String?
+  campaignId String?
+  bookingId  String?
+  openedAt   DateTime?
+  clickedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  campaign EmailCampaign? @relation(fields: [campaignId], references: [id])
+
+  @@index([to])
+  @@index([type])
+  @@index([createdAt])
+  @@map("email_logs")
 }

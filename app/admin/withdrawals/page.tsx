@@ -56,7 +56,7 @@ export default function AdminWithdrawalsPage() {
   const totalPending = withdrawals.filter((w) => w.status === "PENDING").reduce((s, w) => s + w.amount, 0);
 
   return (
-    <div className="p-8">
+    <div className="p-4 pt-16 lg:pt-6 lg:p-8">
       <div className="mb-6">
         <h1 className="font-display text-3xl text-white">Withdrawals</h1>
         <p className="text-dark-400 mt-1">

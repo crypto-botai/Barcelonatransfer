@@ -10,7 +10,7 @@ import {
   ArrowRight, ArrowLeft, MapPin, Calendar, Clock, Users,
   User, Mail, Phone, MessageSquare, Plane, Zap, Loader2,
   CheckCircle2, Briefcase, Car, Timer, Building2, Plus, Minus,
-  Shield, CreditCard,
+  Shield, CreditCard, Tag, X,
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
@@ -20,6 +20,16 @@ import {
 } from "@/types";
 import { DEFAULT_PRICING, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import toast from "react-hot-toast";
+
+function getOrCreateSessionId(): string {
+  if (typeof window === "undefined") return "";
+  let sid = localStorage.getItem("elite_session_id");
+  if (!sid) {
+    sid = `sess_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem("elite_session_id", sid);
+  }
+  return sid;
+}
 
 // ─── Constants ──────────────────────────────────────────────
 const STEPS = [
@@ -55,88 +65,6 @@ function roundUpToNext30(): string {
   return `${now.getHours().toString().padStart(2, "0")}:${m}`;
 }
 
-// ─── SumUp Payment Modal ────────────────────────────────────
-function SumUpPaymentModal({
-  checkoutId,
-  bookingId,
-  total,
-  onClose,
-}: {
-  checkoutId: string;
-  bookingId: string;
-  total: number;
-  onClose: () => void;
-}) {
-  const mountedRef = useRef(false);
-
-  useEffect(() => {
-    if (mountedRef.current) return;
-    mountedRef.current = true;
-
-    const script = document.createElement("script");
-    script.src = "https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js";
-    script.async = true;
-    document.body.appendChild(script);
-
-    script.onload = () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const SumUpCard = (window as any).SumUpCard;
-      if (!SumUpCard) return;
-      SumUpCard.mount({
-        id: "sumup-card-widget",
-        checkoutId,
-        onResponse: (type: string) => {
-          if (type === "success") {
-            window.location.href = `/booking/success?booking_id=${bookingId}`;
-          } else if (type === "error" || type === "expired") {
-            window.location.href = `/booking/failed?booking_id=${bookingId}`;
-          }
-        },
-      });
-    };
-
-    return () => {
-      script.remove();
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm">
-      <div className="relative w-full max-w-md">
-        <div className="glass-card rounded-2xl overflow-hidden shadow-2xl border border-gold-500/20">
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-            <div>
-              <p className="text-gold-400 text-xs uppercase tracking-[0.2em] font-medium">Secure Payment</p>
-              <p className="text-white font-display text-lg mt-0.5">Complete Your Booking</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <p className="font-display text-xl text-gold-400">{formatCurrency(total)}</p>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-dark-400 hover:text-white hover:border-white/30 transition-all text-sm"
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-
-          {/* SumUp widget mounts here */}
-          <div className="p-6">
-            <div id="sumup-card-widget" className="min-h-[280px]" />
-          </div>
-
-          <div className="px-6 pb-4 text-center">
-            <p className="text-dark-500 text-xs">
-              🔒 Secured by SumUp · PCI DSS Level 1 · 256-bit SSL encryption
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── Main Inner Component ───────────────────────────────────
 function BookingPageInner() {
@@ -174,11 +102,74 @@ function BookingPageInner() {
   const [quote,        setQuote]        = useState<QuoteResponse | null>(null);
   const [loadingQ,     setLoadingQ]     = useState(false);
   const [submitting,   setSubmitting]   = useState(false);
-  const [paymentOpen,  setPaymentOpen]  = useState(false);
-  const [checkoutId,   setCheckoutId]   = useState<string | null>(null);
   const [bookingId,    setBookingId]    = useState<string | null>(null);
 
+  // Coupon state
+  const [couponCode,   setCouponCode]   = useState("");
+  const [couponInput,  setCouponInput]  = useState("");
+  const [couponPct,    setCouponPct]    = useState(0);
+  const [couponError,  setCouponError]  = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  // Session auto-save
+  const sessionId    = useRef<string>("");
+  const saveDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const bookingType = data.bookingType ?? "TRANSFER";
+
+  // ── Session auto-save ──────────────────────────────────────
+  useEffect(() => {
+    sessionId.current = getOrCreateSessionId();
+  }, []);
+
+  const saveSession = useCallback(() => {
+    if (!sessionId.current) return;
+    if (saveDebounce.current) clearTimeout(saveDebounce.current);
+    saveDebounce.current = setTimeout(() => {
+      fetch("/api/booking-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: sessionId.current,
+          email:     data.guestEmail || undefined,
+          name:      data.guestName  || undefined,
+          phone:     data.guestPhone || undefined,
+          formData:  { ...data },
+          step,
+        }),
+      }).catch(() => {});
+    }, 1500);
+  }, [data, step]);
+
+  useEffect(() => {
+    if (step >= 1) saveSession();
+  }, [data.guestEmail, data.guestName, data.guestPhone, step, saveSession]);
+
+  // ── Coupon validation ──────────────────────────────────────
+  const applyCoupon = async () => {
+    if (!couponInput || !data.guestEmail) {
+      setCouponError(!data.guestEmail ? "Enter your email first" : "Enter a coupon code");
+      return;
+    }
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const res  = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponInput, email: data.guestEmail }),
+      });
+      const json = await res.json();
+      if (!json.valid) throw new Error(json.reason ?? "Invalid coupon");
+      setCouponCode(couponInput.toUpperCase());
+      setCouponPct(json.discountPct);
+      toast.success(`${json.discountPct}% discount applied!`);
+    } catch (err) {
+      setCouponError(err instanceof Error ? err.message : "Invalid coupon");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
 
   // ── Quote fetcher ──────────────────────────────────────────
   const fetchQuote = useCallback(async (vehicleClass: VehicleClass, bType?: BookingType) => {
@@ -222,8 +213,10 @@ function BookingPageInner() {
   }, []);
 
   // ── Extras helpers ─────────────────────────────────────────
-  const extrasTotal = (data.extras ?? []).reduce((s, e) => s + e.price * e.quantity, 0);
-  const grandTotal  = (quote?.totalAmount ?? 0) + extrasTotal;
+  const extrasTotal  = (data.extras ?? []).reduce((s, e) => s + e.price * e.quantity, 0);
+  const subtotal     = (quote?.totalAmount ?? 0) + extrasTotal;
+  const couponSaving = couponPct > 0 ? Math.round((subtotal * couponPct / 100) * 100) / 100 : 0;
+  const grandTotal   = Math.max(0, subtotal - couponSaving);
 
   const toggleExtra = (id: string) => {
     const catalog = EXTRAS_CATALOG.find((e) => e.id === id)!;
@@ -276,24 +269,24 @@ function BookingPageInner() {
   const handlePay = async () => {
     setSubmitting(true);
     try {
+      // Override quote total with coupon-discounted total
+      const finalQuote = quote ? { ...quote, totalAmount: grandTotal } : quote;
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, quote }),
+        body: JSON.stringify({ ...data, quote: finalQuote, couponCode: couponCode || undefined }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Booking failed");
 
       setBookingId(json.bookingId);
 
-      if (json.checkoutId) {
-        // SumUp configured — open embedded payment modal
-        setCheckoutId(json.checkoutId);
-        setPaymentOpen(true);
-      } else {
-        // Fallback (SumUp not configured) — go to pending page
-        window.location.href = json.checkoutUrl;
+      // Mark session as converted
+      if (sessionId.current) {
+        fetch(`/api/booking-session?sessionId=${sessionId.current}`, { method: "DELETE" }).catch(() => {});
       }
+
+      window.location.href = json.checkoutUrl;
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Booking failed. Please try again.");
     } finally {
@@ -913,6 +906,14 @@ function BookingPageInner() {
                       </div>
                     </div>
 
+                    {/* Coupon savings */}
+                    {couponSaving > 0 && (
+                      <div className="mt-2 flex items-center justify-between text-sm bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
+                        <span className="text-green-400 flex items-center gap-1.5"><Tag size={12} /> Coupon {couponCode}</span>
+                        <span className="text-green-400 font-medium">-{formatCurrency(couponSaving)}</span>
+                      </div>
+                    )}
+
                     {/* Guarantees */}
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 text-xs text-dark-500">
                       <span className="flex items-center gap-1"><Zap size={11} className="text-gold-500" /> Fixed price</span>
@@ -920,6 +921,43 @@ function BookingPageInner() {
                       <span className="flex items-center gap-1"><CreditCard size={11} className="text-gold-500" /> Secure SumUp payment</span>
                     </div>
                   </div>
+
+                  {/* Coupon input */}
+                  {!couponCode ? (
+                    <div className="glass-card rounded-xl p-4">
+                      <label className="text-xs text-dark-400 uppercase tracking-wider block mb-2">Have a coupon code?</label>
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <Tag size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
+                          <input
+                            type="text" value={couponInput}
+                            onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
+                            placeholder="ELITE-XXXXXX"
+                            className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm"
+                          />
+                        </div>
+                        <button
+                          onClick={applyCoupon}
+                          disabled={couponLoading}
+                          className="btn-outline-gold px-4 py-3 rounded-xl text-sm whitespace-nowrap"
+                        >
+                          {couponLoading ? <Loader2 size={14} className="animate-spin" /> : "Apply"}
+                        </button>
+                      </div>
+                      {couponError && <p className="text-red-400 text-xs mt-1">{couponError}</p>}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between bg-green-500/8 border border-green-500/20 rounded-xl px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Tag size={14} className="text-green-400" />
+                        <span className="text-sm text-white font-medium">{couponCode}</span>
+                        <span className="text-sm text-green-400">{couponPct}% OFF applied</span>
+                      </div>
+                      <button onClick={() => { setCouponCode(""); setCouponPct(0); setCouponInput(""); }} className="text-dark-400 hover:text-red-400 transition-colors">
+                        <X size={14} />
+                      </button>
+                    </div>
+                  )}
 
                   <div className="flex gap-3">
                     <button onClick={() => setStep(3)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
@@ -946,15 +984,6 @@ function BookingPageInner() {
         </div>
       </main>
 
-      {/* SumUp Payment Modal */}
-      {paymentOpen && checkoutId && bookingId && (
-        <SumUpPaymentModal
-          checkoutId={checkoutId}
-          bookingId={bookingId}
-          total={grandTotal}
-          onClose={() => setPaymentOpen(false)}
-        />
-      )}
     </>
   );
 }

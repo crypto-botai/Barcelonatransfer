@@ -24,16 +24,27 @@ export async function createSumUpCheckout({
   description: string;
   customerEmail?: string;
 }): Promise<SumUpCheckout> {
-  const baseUrl = process.env.NEXTAUTH_URL ?? "https://barcelonatransfer-gsj6.vercel.app";
+  const baseUrl = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
+  // Remove trailing slash and ensure production URL
+  const cleanBase = baseUrl.replace(/\/$/, "").replace("http://localhost:3000", "https://www.elitebcn.info");
+
+  // Truncate description to 100 chars max (SumUp limit)
+  const safeDesc = description
+    .replace(/[^\x00-\x7F]/g, (c) => {
+      // keep common accented chars, replace rare ones
+      const map: Record<string, string> = { "→": "->", "←": "<-", "É": "E", "é": "e", "à": "a", "ó": "o", "ú": "u", "í": "i", "ñ": "n" };
+      return map[c] ?? c;
+    })
+    .slice(0, 100);
 
   const body: Record<string, unknown> = {
     checkout_reference: bookingId,
     amount: Math.round(amount * 100) / 100,
     currency: currency.toUpperCase(),
-    description,
+    description: safeDesc,
     merchant_code: process.env.SUMUP_MERCHANT_CODE,
-    return_url: `${baseUrl}/booking/success?booking_id=${bookingId}`,
-    redirect_url: `${baseUrl}/booking/success?booking_id=${bookingId}`,
+    return_url: `${cleanBase}/booking/success?booking_id=${bookingId}`,
+    redirect_url: `${cleanBase}/booking/success?booking_id=${bookingId}`,
   };
 
   if (customerEmail) body.customer_email = customerEmail;

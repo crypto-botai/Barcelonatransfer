@@ -21,6 +21,7 @@ type Booking = {
   passengers: number;
   vehicleClass: string;
   totalAmount: number;
+  driverAmount: number | null;
 };
 
 type Withdrawal = {
@@ -246,7 +247,10 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                             <span>{b.vehicleClass.replace(/_/g, " ")}</span>
                           </div>
                         </div>
-                        <p className="font-display text-xl text-gold-400">{formatCurrency(b.totalAmount)}</p>
+                        {b.driverAmount != null
+                          ? <p className="font-display text-xl text-gold-400">{formatCurrency(b.driverAmount)}</p>
+                          : <p className="font-display text-xl text-dark-600">TBC</p>
+                        }
                       </div>
                     </div>
                   );

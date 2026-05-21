@@ -22,7 +22,7 @@ export default async function DriverPage() {
           id: true, confirmationCode: true, status: true,
           pickupAddress: true, dropoffAddress: true,
           pickupDatetime: true, passengers: true,
-          vehicleClass: true, totalAmount: true,
+          vehicleClass: true, totalAmount: true, driverAmount: true,
         },
       },
       withdrawals: {

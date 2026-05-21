@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
+import ExitIntentPopup from "@/components/marketing/ExitIntentPopup";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -128,18 +129,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-dark-950 antialiased">
         <AuthProvider>
-        {children}
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: "#1a1a1a",
-              color: "#fff",
-              border: "1px solid rgba(201,168,76,0.3)",
-              borderRadius: "8px",
-            },
-          }}
-        />
+          {children}
+          <ExitIntentPopup />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: "#1a1a1a",
+                color: "#fff",
+                border: "1px solid rgba(201,168,76,0.3)",
+                borderRadius: "8px",
+              },
+            }}
+          />
         </AuthProvider>
       </body>
     </html>

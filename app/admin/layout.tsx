@@ -11,7 +11,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="flex min-h-screen bg-[#050505]">
       <AdminSidebar />
-      <div className="flex-1 overflow-auto">
+      {/* Main content — offset on desktop for sidebar, full-width on mobile with bottom padding */}
+      <div className="flex-1 overflow-auto min-w-0 pb-20 lg:pb-0">
         {children}
       </div>
     </div>

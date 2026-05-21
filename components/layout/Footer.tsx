@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Mail, Phone, MessageCircle, MapPin, Instagram, Facebook, Car, Shield } from "lucide-react";
+import NewsletterForm from "@/components/marketing/NewsletterForm";
 
 const SERVICES = [
   { label: "Airport Transfers",  href: "/airport-transfers" },
@@ -33,11 +34,24 @@ const FLEET_LINKS = [
 export default function Footer() {
   return (
     <footer className="bg-[#050505] border-t border-white/[0.06]">
-      {/* Top CTA bar */}
+      {/* Newsletter bar */}
       <div className="border-b border-gold-500/15 bg-gradient-to-r from-transparent via-gold-500/5 to-transparent">
-        <div className="container mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-center md:text-left">
+            <h3 className="font-display text-xl text-white">Barcelona Travel Insider</h3>
+            <p className="text-dark-400 text-sm mt-1">Exclusive deals, airport tips &amp; luxury travel guides — free.</p>
+          </div>
+          <div className="w-full md:w-auto md:min-w-[340px]">
+            <NewsletterForm source="footer" />
+          </div>
+        </div>
+      </div>
+
+      {/* Top CTA bar */}
+      <div className="border-b border-gold-500/15">
+        <div className="container mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h3 className="font-display text-xl text-white">Ready for your luxury transfer?</h3>
+            <h3 className="font-display text-lg text-white">Ready for your luxury transfer?</h3>
             <p className="text-dark-400 text-sm mt-1">Book online in 2 minutes. Instant confirmation.</p>
           </div>
           <div className="flex gap-3">

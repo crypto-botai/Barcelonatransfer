@@ -54,7 +54,7 @@ export default function AdminPricingPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 pt-16 lg:pt-6 lg:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-display text-3xl text-white">Pricing Rules</h1>

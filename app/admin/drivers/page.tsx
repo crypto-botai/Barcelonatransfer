@@ -249,7 +249,7 @@ export default function AdminDriversPage() {
   const filtered     = filter === "ALL" ? drivers : drivers.filter((d) => d.status === filter);
 
   return (
-    <div className="p-8">
+    <div className="p-4 pt-16 lg:pt-6 lg:p-8">
       <div className="mb-6">
         <h1 className="font-display text-3xl text-white">Drivers</h1>
         <p className="text-dark-400 mt-1">{drivers.length} registered drivers</p>
