@@ -145,12 +145,25 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
     { id: "withdrawals",label: "Withdrawals", count: withdrawals.length },
   ];
 
-  const filteredBookings = bookings.filter((b) => {
-    if (tab === "upcoming")  return ["PENDING","CONFIRMED","DRIVER_ASSIGNED","IN_PROGRESS"].includes(b.status);
-    if (tab === "completed") return b.status === "COMPLETED";
-    if (tab === "cancelled") return b.status === "CANCELLED" || b.status === "REFUNDED";
-    return true;
-  });
+  const STATUS_ORDER: Record<string, number> = {
+    IN_PROGRESS: 0, DRIVER_ASSIGNED: 1, CONFIRMED: 2, PENDING: 3,
+  };
+
+  const filteredBookings = bookings
+    .filter((b) => {
+      if (tab === "upcoming")  return ["PENDING","CONFIRMED","DRIVER_ASSIGNED","IN_PROGRESS"].includes(b.status);
+      if (tab === "completed") return b.status === "COMPLETED";
+      if (tab === "cancelled") return b.status === "CANCELLED" || b.status === "REFUNDED";
+      return true;
+    })
+    .sort((a, b) => {
+      if (tab === "upcoming") {
+        const orderA = STATUS_ORDER[a.status] ?? 99;
+        const orderB = STATUS_ORDER[b.status] ?? 99;
+        if (orderA !== orderB) return orderA - orderB;
+      }
+      return new Date(a.pickupDatetime).getTime() - new Date(b.pickupDatetime).getTime();
+    });
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -210,12 +223,16 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
               Welcome, {driver.user.name ?? "Driver"}
             </h1>
             <p className="text-dark-400 mt-1 text-sm flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${driverStatus === "ONLINE" || driverStatus === "ON_RIDE" ? "bg-green-400" : "bg-gray-500"}`} />
+              <span className={`w-2 h-2 rounded-full ${
+                driverStatus === "ONLINE"   ? "bg-green-400" :
+                driverStatus === "ON_RIDE"  ? "bg-blue-400 animate-pulse" :
+                "bg-gray-500"
+              }`} />
               <span className={
                 driverStatus === "ONLINE"  ? "text-green-400" :
                 driverStatus === "ON_RIDE" ? "text-blue-400"  : "text-yellow-400"
               }>
-                {driverStatus.replace(/_/g, " ")}
+                {driverStatus === "ON_RIDE" ? "On Ride" : driverStatus.replace(/_/g, " ")}
               </span>
             </p>
           </div>
