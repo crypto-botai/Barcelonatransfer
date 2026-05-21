@@ -93,12 +93,16 @@ export default function AdminWithdrawalsPage() {
         ) : filtered.length === 0 ? (
           <div className="py-12 text-center text-dark-500 text-sm">No withdrawals in this category.</div>
         ) : (
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/[0.06]">
-                {["Driver", "Method / Details", "Amount", "Status", "Date", "Actions"].map((h) => (
-                  <th key={h} className="text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">{h}</th>
-                ))}
+                <th className="text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Driver</th>
+                <th className="hidden md:table-cell text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Method / Details</th>
+                <th className="text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Amount</th>
+                <th className="text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Status</th>
+                <th className="hidden lg:table-cell text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Date</th>
+                <th className="text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -107,8 +111,11 @@ export default function AdminWithdrawalsPage() {
                   <td className="py-3 px-4">
                     <p className="text-sm text-white">{w.driver.user.name ?? "—"}</p>
                     <p className="text-xs text-dark-500">{w.driver.user.email}</p>
+                    <p className="md:hidden text-xs text-dark-600 mt-0.5">
+                      {w.method === "BIZUM" ? w.bizumPhone : (w.bankIban ?? w.bankName ?? w.method)}
+                    </p>
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="hidden md:table-cell py-3 px-4">
                     <div className="flex items-center gap-2">
                       {w.method === "BIZUM"
                         ? <Smartphone size={13} className="text-dark-400" />
@@ -130,19 +137,19 @@ export default function AdminWithdrawalsPage() {
                       {w.status}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-xs text-dark-500">
+                  <td className="hidden lg:table-cell py-3 px-4 text-xs text-dark-500">
                     {new Date(w.createdAt).toLocaleDateString("en-GB")}
                   </td>
                   <td className="py-3 px-4">
                     {w.status === "PENDING" && (
-                      <div className="flex gap-1.5">
+                      <div className="flex flex-wrap gap-1.5">
                         <button onClick={() => update(w.id, "COMPLETED")}
                           className="px-2.5 py-1.5 rounded-lg bg-blue-500/15 text-blue-400 hover:bg-blue-500/25 text-xs transition-colors flex items-center gap-1">
-                          <CheckCircle2 size={11} /> Complete
+                          <CheckCircle2 size={11} /> <span className="hidden sm:inline">Complete</span>
                         </button>
                         <button onClick={() => update(w.id, "TRANSFERRED")}
                           className="px-2.5 py-1.5 rounded-lg bg-green-500/15 text-green-400 hover:bg-green-500/25 text-xs transition-colors flex items-center gap-1">
-                          <CheckCircle2 size={11} /> Transfer
+                          <CheckCircle2 size={11} /> <span className="hidden sm:inline">Transfer</span>
                         </button>
                       </div>
                     )}
@@ -151,6 +158,7 @@ export default function AdminWithdrawalsPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

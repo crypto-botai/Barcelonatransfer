@@ -138,7 +138,7 @@ function DriverRow({ d, onUpdate }: { d: Driver; onUpdate: () => void }) {
             </div>
           </div>
         </td>
-        <td className="py-3 px-4">
+        <td className="hidden md:table-cell py-3 px-4">
           <p className="text-xs text-dark-300">{d.user.email}</p>
           <p className="text-xs text-dark-500">{d.user.phone ?? "—"}</p>
         </td>
@@ -147,9 +147,9 @@ function DriverRow({ d, onUpdate }: { d: Driver; onUpdate: () => void }) {
             {d.status.replace(/_/g, " ")}
           </span>
         </td>
-        <td className="py-3 px-4 text-sm text-gold-400">{d.rating > 0 ? `${d.rating.toFixed(1)}★` : "—"}</td>
-        <td className="py-3 px-4 text-sm text-dark-300">{d.totalRides}</td>
-        <td className="py-3 px-4 text-xs text-dark-500">
+        <td className="hidden lg:table-cell py-3 px-4 text-sm text-gold-400">{d.rating > 0 ? `${d.rating.toFixed(1)}★` : "—"}</td>
+        <td className="hidden lg:table-cell py-3 px-4 text-sm text-dark-300">{d.totalRides}</td>
+        <td className="hidden lg:table-cell py-3 px-4 text-xs text-dark-500">
           {new Date(d.createdAt).toLocaleDateString("en-GB")}
         </td>
         <td className="py-3 px-4">
@@ -302,12 +302,17 @@ export default function AdminDriversPage() {
             <Loader2 size={24} className="text-gold-500 animate-spin" />
           </div>
         ) : (
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/[0.06]">
-                {["Driver", "Contact", "Status", "Rating", "Rides", "Joined", "Actions"].map((h) => (
-                  <th key={h} className="text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">{h}</th>
-                ))}
+                <th className="text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Driver</th>
+                <th className="hidden md:table-cell text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Contact</th>
+                <th className="text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Status</th>
+                <th className="hidden lg:table-cell text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Rating</th>
+                <th className="hidden lg:table-cell text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Rides</th>
+                <th className="hidden lg:table-cell text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Joined</th>
+                <th className="text-left py-3 px-4 text-xs text-dark-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -321,6 +326,7 @@ export default function AdminDriversPage() {
               )}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>
