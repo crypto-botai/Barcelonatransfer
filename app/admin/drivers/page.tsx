@@ -52,6 +52,8 @@ const WITHDRAWAL_STATUS_STYLE: Record<string, string> = {
 };
 
 function DocLink({ url, label, icon: Icon }: { url: string | null; label: string; icon: React.ElementType }) {
+  const [preview, setPreview] = useState(false);
+
   if (!url || url.startsWith("[pending:")) {
     return (
       <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.06] text-dark-500 text-xs">
@@ -59,13 +61,30 @@ function DocLink({ url, label, icon: Icon }: { url: string | null; label: string
       </span>
     );
   }
+
+  const isImage = url.startsWith("data:image") || /\.(jpg|jpeg|png|webp|gif)$/i.test(url);
+  const isData  = url.startsWith("data:");
+
   return (
-    <a
-      href={url} target="_blank" rel="noopener noreferrer"
-      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gold-500/10 border border-gold-500/20 text-gold-400 text-xs hover:bg-gold-500/15 transition-colors"
-    >
-      <Icon size={11} /> {label} <ExternalLink size={10} />
-    </a>
+    <div className="flex flex-col gap-1">
+      <button
+        onClick={() => isImage ? setPreview(!preview) : undefined}
+        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gold-500/10 border border-gold-500/20 text-gold-400 text-xs hover:bg-gold-500/15 transition-colors"
+      >
+        <Icon size={11} /> {label}
+        {isData
+          ? (isImage ? <span>(view)</span> : <a href={url} download={label} className="text-gold-300 hover:underline">↓ download</a>)
+          : <a href={url} target="_blank" rel="noopener noreferrer"><ExternalLink size={10} /></a>
+        }
+      </button>
+      {isImage && preview && (
+        <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={url} alt={label} className="max-w-[240px] max-h-[180px] rounded-lg object-contain border border-white/10" />
+          <button onClick={() => setPreview(false)} className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 text-white text-[10px] flex items-center justify-center">✕</button>
+        </div>
+      )}
+    </div>
   );
 }
 
