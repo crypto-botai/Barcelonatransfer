@@ -5,7 +5,6 @@ import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import HeroSection from "@/components/sections/HeroSection";
 import ServicesSection from "@/components/sections/ServicesSection";
 import FleetSection from "@/components/sections/FleetSection";
-import StatsSection from "@/components/sections/StatsSection";
 import PricingSection from "@/components/sections/PricingSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 
@@ -21,7 +20,6 @@ export default function HomePage() {
       <Navbar />
       <main>
         <HeroSection />
-        <StatsSection />
         <ServicesSection />
         <FleetSection />
         <PricingSection />
