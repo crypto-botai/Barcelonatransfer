@@ -6,7 +6,7 @@ import {
   Car, MapPin, Calendar, Star, Wallet, Plus, Loader2,
   CheckCircle2, Clock, XCircle, AlertCircle, TrendingUp,
   CreditCard, Smartphone, Phone, MessageCircle, Navigation,
-  Power, Plane,
+  Power, Plane, PlayCircle, FlagTriangleRight,
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
@@ -83,6 +83,33 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
   const [driverStatus,   setDriverStatus]   = useState(driver.status);
   const [togglingStatus, setTogglingStatus] = useState(false);
+  const [rideAction,     setRideAction]     = useState<string | null>(null); // bookingId being acted on
+
+  const handleRideAction = async (bookingId: string, action: "START" | "COMPLETE") => {
+    setRideAction(bookingId);
+    try {
+      const res = await fetch("/api/driver/ride", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId, action }),
+      });
+      if (res.ok) {
+        const { status } = await res.json();
+        toast.success(action === "START" ? "Ride started!" : "Ride completed!");
+        if (action === "START")    setDriverStatus("ON_RIDE");
+        if (action === "COMPLETE") setDriverStatus("ONLINE");
+        // Update local booking status
+        window.location.reload(); // simplest refresh to reflect new status
+      } else {
+        const err = await res.json();
+        toast.error(err.error ?? "Failed to update ride");
+      }
+    } catch {
+      toast.error("Network error");
+    } finally {
+      setRideAction(null);
+    }
+  };
 
   const toggleStatus = async () => {
     const next = driverStatus === "ONLINE" ? "OFFLINE" : "ONLINE";
@@ -304,6 +331,32 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                           }
                         </div>
                       </div>
+
+                      {/* Ride action buttons */}
+                      {b.status === "DRIVER_ASSIGNED" && (
+                        <div className="mt-3 pt-3 border-t border-white/[0.04]">
+                          <button
+                            onClick={() => handleRideAction(b.id, "START")}
+                            disabled={rideAction === b.id}
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/30 text-sm font-medium hover:bg-blue-500/25 transition-colors"
+                          >
+                            {rideAction === b.id ? <Loader2 size={14} className="animate-spin" /> : <PlayCircle size={14} />}
+                            Start Ride
+                          </button>
+                        </div>
+                      )}
+                      {b.status === "IN_PROGRESS" && (
+                        <div className="mt-3 pt-3 border-t border-white/[0.04]">
+                          <button
+                            onClick={() => handleRideAction(b.id, "COMPLETE")}
+                            disabled={rideAction === b.id}
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/15 text-green-400 border border-green-500/30 text-sm font-medium hover:bg-green-500/25 transition-colors"
+                          >
+                            {rideAction === b.id ? <Loader2 size={14} className="animate-spin" /> : <FlagTriangleRight size={14} />}
+                            Complete Ride
+                          </button>
+                        </div>
+                      )}
 
                       {/* Customer contact + navigation (only for active/upcoming rides) */}
                       {["DRIVER_ASSIGNED","IN_PROGRESS","CONFIRMED","PENDING"].includes(b.status) && (
