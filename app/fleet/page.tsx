@@ -6,9 +6,16 @@ import FleetSection from "@/components/sections/FleetSection";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Luxury Fleet — Mercedes, BMW, Tesla, Range Rover",
+  title: "Luxury Transfer Fleet Barcelona — Mercedes, Tesla, BMW",
   description:
-    "Explore our luxury fleet: Mercedes S-Class, BMW 7 Series, Tesla Model S, Range Rover Autobiography, Mercedes V-Class, and Sprinter Minibus. All available for private hire in Barcelona.",
+    "Our Barcelona private transfer fleet: Mercedes V-Class (7 seats), Mercedes E-Class, Tesla Model S (electric), BMW 5 Series. All vehicles under 3 years old, air-conditioned, complimentary WiFi & water.",
+  alternates: { canonical: "https://www.elitebcn.info/fleet" },
+  openGraph: {
+    title: "Luxury Transfer Fleet Barcelona — Mercedes, Tesla, BMW",
+    description: "Mercedes V-Class, E-Class, Tesla Model S, BMW 5 Series. Premium private hire vehicles for Barcelona airport transfers and chauffeur services.",
+    url: "https://www.elitebcn.info/fleet",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function FleetPage() {

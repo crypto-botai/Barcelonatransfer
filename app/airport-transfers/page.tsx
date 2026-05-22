@@ -6,8 +6,15 @@ import Link from "next/link";
 import { Plane, Anchor, Clock, Shield, Star, CheckCircle2 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Barcelona Airport Transfer — El Prat & Cruise Port",
-  description: "Luxury private transfers to/from Barcelona El Prat Airport & Cruise Terminal. Meet & greet, flight monitoring, 60-min free wait. Book online — fixed prices.",
+  title: "Barcelona Airport Transfer — BCN El Prat T1 & T2 | Fixed Price",
+  description: "Luxury private transfer from Barcelona El Prat Airport (BCN) from €45. Meet & greet in arrivals hall, real-time flight tracking, 60 min free waiting. Mercedes, Tesla, BMW. Fixed price, no surprises.",
+  alternates: { canonical: "https://www.elitebcn.info/airport-transfers" },
+  openGraph: {
+    title: "Barcelona Airport Transfer — BCN El Prat T1 & T2 | Fixed Price",
+    description: "Private luxury transfer from Barcelona Airport from €45. Meet & greet, flight tracking, 60 min free wait. No surge pricing.",
+    url: "https://www.elitebcn.info/airport-transfers",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function AirportTransfersPage() {

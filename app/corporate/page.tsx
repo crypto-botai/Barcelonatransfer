@@ -5,8 +5,15 @@ import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Corporate Chauffeur Service Barcelona — Executive Travel",
-  description: "Premium corporate chauffeur accounts in Barcelona. Executive transfers, roadshows, event transportation. Dedicated fleet, invoicing, account manager.",
+  title: "Corporate Chauffeur Barcelona — Executive Transfers & Business Travel",
+  description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, board meetings, MICE events. Dedicated fleet, monthly invoicing, account manager. VTC licensed.",
+  alternates: { canonical: "https://www.elitebcn.info/corporate" },
+  openGraph: {
+    title: "Corporate Chauffeur Barcelona — Executive Transfers & Business Travel",
+    description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, events. Monthly invoicing, account manager.",
+    url: "https://www.elitebcn.info/corporate",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function CorporatePage() {

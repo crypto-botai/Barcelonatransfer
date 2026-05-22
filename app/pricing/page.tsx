@@ -5,8 +5,15 @@ import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import PricingSection from "@/components/sections/PricingSection";
 
 export const metadata: Metadata = {
-  title: "Fixed Transfer Prices — Barcelona Airport & Destinations",
-  description: "View all fixed prices for luxury transfers from Barcelona Airport, Cruise Terminal, and city. No hidden fees. Instant online booking.",
+  title: "Barcelona Transfer Prices — Fixed Rates, No Surge Pricing",
+  description: "Fixed prices for luxury private transfers from Barcelona Airport (BCN). From €45 city centre · €65 Sitges · €95 Tarragona · €110 Girona · €220 Andorra. No hidden fees, ever.",
+  alternates: { canonical: "https://www.elitebcn.info/pricing" },
+  openGraph: {
+    title: "Barcelona Transfer Prices — Fixed Rates, No Surge Pricing",
+    description: "Fixed prices for luxury private transfers from Barcelona Airport. From €45. No hidden fees. Book online instantly.",
+    url: "https://www.elitebcn.info/pricing",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function PricingPage() {

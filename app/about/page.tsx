@@ -5,8 +5,15 @@ import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About Élite BCN — Barcelona's Luxury Transfer Company",
-  description: "Élite BCN is Barcelona's premier luxury chauffeur company. Founded 2018, 5,000+ transfers, 4.9★ rating. Professional drivers, premium fleet, impeccable service.",
+  title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
+  description: "Élite BCN is Barcelona's premier licensed VTC transfer company. 4.9★ rated, 500+ five-star reviews. Professional multilingual drivers, premium Mercedes & Tesla fleet, impeccable service since 2024.",
+  alternates: { canonical: "https://www.elitebcn.info/about" },
+  openGraph: {
+    title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
+    description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet. 500+ five-star reviews.",
+    url: "https://www.elitebcn.info/about",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function AboutPage() {
