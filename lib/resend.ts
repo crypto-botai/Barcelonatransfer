@@ -8,9 +8,22 @@ function getResend(): Resend {
 }
 export const resend = new Proxy({} as Resend, { get: (_, p) => (getResend() as any)[p as string] });
 
-const FROM = "Élite BCN Transfers <noreply@elitebcntransfers.com>";
+// FROM must match a verified domain in Resend dashboard (resend.com/domains)
+// Set RESEND_FROM in Vercel env once your domain is verified.
+// Until verified, only onboarding@resend.dev works (but only to your Resend account email).
+const FROM = process.env.RESEND_FROM ?? "Élite BCN Transfers <noreply@elitebcntransfers.com>";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com";
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
+
+async function sendEmail(payload: Parameters<Resend["emails"]["send"]>[0]): Promise<string | undefined> {
+  const result = await resend.emails.send(payload);
+  if (result?.error) {
+    const errMsg = (result.error as { message?: string }).message ?? JSON.stringify(result.error);
+    console.error(`[resend] FAILED from=${payload.from} to=${payload.to} subject="${payload.subject}": ${errMsg}`);
+    throw new Error(`Resend error: ${errMsg}`);
+  }
+  return result?.data?.id;
+}
 
 // ─── Shared HTML Layout ─────────────────────────────────────
 function emailLayout(body: string): string {
@@ -119,13 +132,8 @@ export async function sendBookingConfirmation({
     </div>
   `);
 
-  const result = await resend.emails.send({
-    from: FROM, to,
-    subject: `✓ Booking Confirmed — ${confirmationCode} | Élite BCN`,
-    html,
-  });
-  if (result?.error) console.error("[resend] booking confirmation failed:", result.error);
-  await logEmail({ to, subject: `Booking Confirmed — ${confirmationCode}`, type: "CONFIRMATION", resendId: result?.data?.id, bookingId });
+  const id = await sendEmail({ from: FROM, to, subject: `✓ Booking Confirmed — ${confirmationCode} | Élite BCN`, html });
+  await logEmail({ to, subject: `Booking Confirmed — ${confirmationCode}`, type: "CONFIRMATION", resendId: id, bookingId });
 }
 
 // ─── Admin Alert ─────────────────────────────────────────────
@@ -161,12 +169,7 @@ export async function sendAdminNewBookingAlert({
       <a href="${SITE_URL}/admin/bookings" class="cta-btn">Assign Driver Now →</a>
     </div>
   `);
-  const result = await resend.emails.send({
-    from: FROM, to: ADMIN_EMAIL,
-    subject: `🚗 New Booking — ${confirmationCode} · €${totalAmount.toFixed(2)}`,
-    html,
-  });
-  if (result?.error) console.error("[resend] admin alert failed:", result.error);
+  await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject: `🚗 New Booking — ${confirmationCode} · €${totalAmount.toFixed(2)}`, html });
 }
 
 // ─── Welcome Email ───────────────────────────────────────────
@@ -190,13 +193,8 @@ export async function sendWelcomeEmail({
     </div>
   `);
 
-  const result = await resend.emails.send({
-    from: FROM, to,
-    subject: `Welcome to Élite BCN — Your Account & Booking ${confirmationCode}`,
-    html,
-  });
-  if (result?.error) console.error("[resend] welcome email failed:", result.error);
-  await logEmail({ to, subject: `Welcome to Élite BCN`, type: "WELCOME", resendId: result?.data?.id });
+  const id = await sendEmail({ from: FROM, to, subject: `Welcome to Élite BCN — Your Account & Booking ${confirmationCode}`, html });
+  await logEmail({ to, subject: `Welcome to Élite BCN`, type: "WELCOME", resendId: id });
 }
 
 // ─── Abandoned Booking Recovery ──────────────────────────────
@@ -234,12 +232,8 @@ export async function sendAbandonedBookingEmail({
     <p style="font-size:12px;color:#555;">✓ Professional licensed chauffeurs &nbsp; ✓ Fixed prices, no surprises &nbsp; ✓ Free cancellation 24h before pickup</p>
   `);
 
-  const result = await resend.emails.send({
-    from: FROM, to,
-    subject: `🚗 Complete your Barcelona transfer — 5% OFF inside`,
-    html,
-  });
-  await logEmail({ to, subject: `Abandoned booking recovery`, type: "ABANDONED", resendId: result?.data?.id });
+  const id = await sendEmail({ from: FROM, to, subject: `🚗 Complete your Barcelona transfer — 5% OFF inside`, html });
+  await logEmail({ to, subject: `Abandoned booking recovery`, type: "ABANDONED", resendId: id });
 }
 
 // ─── Pickup Reminder ─────────────────────────────────────────
@@ -274,12 +268,8 @@ export async function sendPickupReminder({
     </div>
   `);
 
-  const result = await resend.emails.send({
-    from: FROM, to,
-    subject: `📍 Reminder: Your Élite BCN Transfer Tomorrow — ${confirmationCode}`,
-    html,
-  });
-  await logEmail({ to, subject: `Pickup reminder`, type: "REMINDER", resendId: result?.data?.id });
+  const id = await sendEmail({ from: FROM, to, subject: `📍 Reminder: Your Élite BCN Transfer Tomorrow — ${confirmationCode}`, html });
+  await logEmail({ to, subject: `Pickup reminder`, type: "REMINDER", resendId: id });
 }
 
 // ─── Driver Assigned ─────────────────────────────────────────
@@ -310,13 +300,8 @@ export async function sendDriverAssignedEmail({
     </div>
   `);
 
-  const result = await resend.emails.send({
-    from: FROM, to,
-    subject: `🚗 Driver Assigned — ${confirmationCode} | Élite BCN`,
-    html,
-  });
-  if (result?.error) console.error("[resend] driver assigned email failed:", result.error);
-  await logEmail({ to, subject: `Driver assigned`, type: "DRIVER_ASSIGNED", resendId: result?.data?.id });
+  const id = await sendEmail({ from: FROM, to, subject: `🚗 Driver Assigned — ${confirmationCode} | Élite BCN`, html });
+  await logEmail({ to, subject: `Driver assigned`, type: "DRIVER_ASSIGNED", resendId: id });
 }
 
 // ─── Review Request ──────────────────────────────────────────
@@ -344,12 +329,8 @@ export async function sendReviewRequestEmail({
     </div>
   `);
 
-  const result = await resend.emails.send({
-    from: FROM, to,
-    subject: `How was your Élite BCN experience? — ${confirmationCode}`,
-    html,
-  });
-  await logEmail({ to, subject: `Review request`, type: "REVIEW", resendId: result?.data?.id });
+  const id = await sendEmail({ from: FROM, to, subject: `How was your Élite BCN experience? — ${confirmationCode}`, html });
+  await logEmail({ to, subject: `Review request`, type: "REVIEW", resendId: id });
 }
 
 // ─── Payment Confirmation (Receipt) ──────────────────────────
@@ -392,13 +373,8 @@ export async function sendPaymentConfirmationEmail({
       <a href="https://wa.me/34635383712?text=Booking%20${confirmationCode}" class="wa-btn">💬 WhatsApp Support</a>
     </div>
   `);
-  const result = await resend.emails.send({
-    from: FROM, to,
-    subject: `✓ Payment Confirmed — ${confirmationCode} | Élite BCN`,
-    html,
-  });
-  if (result?.error) console.error("[resend] payment confirmation failed:", result.error);
-  await logEmail({ to, subject: `Payment Confirmed — ${confirmationCode}`, type: "PAYMENT_CONFIRMATION", resendId: result?.data?.id, bookingId });
+  const id = await sendEmail({ from: FROM, to, subject: `✓ Payment Confirmed — ${confirmationCode} | Élite BCN`, html });
+  await logEmail({ to, subject: `Payment Confirmed — ${confirmationCode}`, type: "PAYMENT_CONFIRMATION", resendId: id, bookingId });
 }
 
 // ─── Failed Payment ───────────────────────────────────────────
@@ -424,13 +400,8 @@ export async function sendFailedPaymentEmail({
     <div class="divider"></div>
     <p style="font-size:12px;color:#555;text-align:center;">Reference: <strong style="color:#c9a84c;">${confirmationCode}</strong> · No charge has been made to your account.</p>
   `);
-  const result = await resend.emails.send({
-    from: FROM, to,
-    subject: `⚠️ Payment Failed — ${confirmationCode} | Élite BCN`,
-    html,
-  });
-  if (result?.error) console.error("[resend] failed payment email:", result.error);
-  await logEmail({ to, subject: `Payment failed — ${confirmationCode}`, type: "PAYMENT_FAILED", resendId: result?.data?.id, bookingId });
+  const id = await sendEmail({ from: FROM, to, subject: `⚠️ Payment Failed — ${confirmationCode} | Élite BCN`, html });
+  await logEmail({ to, subject: `Payment failed — ${confirmationCode}`, type: "PAYMENT_FAILED", resendId: id, bookingId });
 }
 
 // ─── Booking Cancelled ────────────────────────────────────────
@@ -458,13 +429,8 @@ export async function sendBookingCancelledEmail({
       <a href="https://wa.me/34635383712" class="wa-btn">💬 Questions? Chat with Us</a>
     </div>
   `);
-  const result = await resend.emails.send({
-    from: FROM, to,
-    subject: `Booking Cancelled — ${confirmationCode} | Élite BCN`,
-    html,
-  });
-  if (result?.error) console.error("[resend] booking cancelled email:", result.error);
-  await logEmail({ to, subject: `Booking cancelled — ${confirmationCode}`, type: "CANCELLED", resendId: result?.data?.id });
+  const id = await sendEmail({ from: FROM, to, subject: `Booking Cancelled — ${confirmationCode} | Élite BCN`, html });
+  await logEmail({ to, subject: `Booking cancelled — ${confirmationCode}`, type: "CANCELLED", resendId: id });
 }
 
 // ─── Driver Booking Details ───────────────────────────────────
@@ -508,13 +474,8 @@ export async function sendDriverBookingDetailsEmail({
       <a href="https://wa.me/34635383712" class="outline-btn" style="display:inline-block;">📞 Contact Dispatch</a>
     </div>
   `);
-  const result = await resend.emails.send({
-    from: FROM, to,
-    subject: `📋 New Booking — ${confirmationCode} | Élite BCN`,
-    html,
-  });
-  if (result?.error) console.error("[resend] driver booking details email:", result.error);
-  await logEmail({ to, subject: `Driver booking assigned — ${confirmationCode}`, type: "DRIVER_BOOKING", resendId: result?.data?.id });
+  const id = await sendEmail({ from: FROM, to, subject: `📋 New Booking — ${confirmationCode} | Élite BCN`, html });
+  await logEmail({ to, subject: `Driver booking assigned — ${confirmationCode}`, type: "DRIVER_BOOKING", resendId: id });
 }
 
 // ─── Newsletter Campaign ─────────────────────────────────────
@@ -526,9 +487,7 @@ export async function sendNewsletterCampaign({
   const unsubUrl = `${SITE_URL}/api/newsletter/unsubscribe?token=${unsubToken}`;
   const fullHtml = htmlBody.replace("{{UNSUB_URL}}", unsubUrl);
 
-  const result = await resend.emails.send({
-    from: FROM, to, subject, html: fullHtml,
-  });
-  await logEmail({ to, subject, type: "NEWSLETTER", status: result?.data?.id ? "SENT" : "FAILED", resendId: result?.data?.id, campaignId });
-  return result;
+  const id = await sendEmail({ from: FROM, to, subject, html: fullHtml });
+  await logEmail({ to, subject, type: "NEWSLETTER", status: id ? "SENT" : "FAILED", resendId: id, campaignId });
+  return { data: { id }, error: null };
 }
