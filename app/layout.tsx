@@ -89,6 +89,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        {/* IndexNow key for Bing/Yandex/Google auto-indexing */}
+        <meta name="indexnow-key" content="a1b2c3d4e5f6789012345678elitebcn" />
         {/* Geo meta tags for local SEO */}
         <meta name="geo.region" content="ES-CT" />
         <meta name="geo.placename" content="Barcelona, Catalonia, Spain" />
