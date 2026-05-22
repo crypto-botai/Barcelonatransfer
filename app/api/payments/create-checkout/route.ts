@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
     // Use existing checkout if it exists
     if (booking.stripeSessionId) {
-      return NextResponse.json({ checkoutUrl: getSumUpCheckoutUrl(booking.stripeSessionId) });
+      return NextResponse.json({ checkoutUrl: getSumUpCheckoutUrl(booking.stripeSessionId, booking.id) });
     }
 
     const desc = `Elite BCN: ${booking.pickupAddress} -> ${booking.dropoffAddress || "Transfer"}`.slice(0, 100);
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       data:  { stripeSessionId: checkout.id },
     });
 
-    return NextResponse.json({ checkoutUrl: getSumUpCheckoutUrl(checkout.id) });
+    return NextResponse.json({ checkoutUrl: getSumUpCheckoutUrl(checkout.id, booking.id) });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[payments/create-checkout]", msg);

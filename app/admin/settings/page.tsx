@@ -10,10 +10,15 @@ export default function AdminSettingsPage() {
   const testEmail = async () => {
     setTestingEmail(true);
     try {
-      const res = await fetch("/api/admin/settings/test-email", { method: "POST" });
-      if (res.ok) toast.success("Test email sent to vtcbcn2025@gmail.com");
-      else toast.error("Email test failed");
-    } catch { toast.error("Failed"); }
+      const res  = await fetch("/api/admin/settings/test-email", { method: "POST" });
+      const json = await res.json();
+      if (res.ok && json.ok) {
+        toast.success(`Test email sent to ${json.to}`);
+      } else {
+        const hint = json.hint ? ` — ${json.hint}` : "";
+        toast.error(`Email failed: ${json.error ?? "unknown error"}${hint}`, { duration: 8000 });
+      }
+    } catch { toast.error("Failed to reach server"); }
     finally { setTestingEmail(false); }
   };
 

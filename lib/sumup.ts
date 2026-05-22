@@ -81,6 +81,6 @@ export async function getSumUpCheckout(checkoutId: string): Promise<SumUpCheckou
   return response.json();
 }
 
-export function getSumUpCheckoutUrl(checkoutId: string): string {
-  return `https://checkout.sumup.com/checkout/${checkoutId}`;
+export function getSumUpCheckoutUrl(checkoutId: string, bookingId?: string): string {
+  return `/booking/pay/${checkoutId}${bookingId ? `?booking_id=${bookingId}` : ""}`;
 }

@@ -124,6 +124,7 @@ export async function sendBookingConfirmation({
     subject: `✓ Booking Confirmed — ${confirmationCode} | Élite BCN`,
     html,
   });
+  if (result?.error) console.error("[resend] booking confirmation failed:", result.error);
   await logEmail({ to, subject: `Booking Confirmed — ${confirmationCode}`, type: "CONFIRMATION", resendId: result?.data?.id, bookingId });
 }
 
@@ -178,6 +179,7 @@ export async function sendWelcomeEmail({
     subject: `Welcome to Élite BCN — Your Account & Booking ${confirmationCode}`,
     html,
   });
+  if (result?.error) console.error("[resend] welcome email failed:", result.error);
   await logEmail({ to, subject: `Welcome to Élite BCN`, type: "WELCOME", resendId: result?.data?.id });
 }
 
@@ -297,6 +299,7 @@ export async function sendDriverAssignedEmail({
     subject: `🚗 Driver Assigned — ${confirmationCode} | Élite BCN`,
     html,
   });
+  if (result?.error) console.error("[resend] driver assigned email failed:", result.error);
   await logEmail({ to, subject: `Driver assigned`, type: "DRIVER_ASSIGNED", resendId: result?.data?.id });
 }
 

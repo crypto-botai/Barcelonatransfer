@@ -146,7 +146,7 @@ function BookingDrawer({ booking, drivers, onClose, onSaved }: {
               {drivers.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.user.name ?? "Unknown"} {d.user.phone ? `(${d.user.phone})` : ""}
-                  {d.vehicles[0] ? ` · ${d.vehicles[0].make} ${d.vehicles[0].model}` : ""}
+                  {d.vehicles?.[0] ? ` · ${d.vehicles[0].make} ${d.vehicles[0].model}` : ""}
                 </option>
               ))}
             </select>

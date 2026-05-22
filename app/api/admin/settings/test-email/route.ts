@@ -8,12 +8,28 @@ export async function POST() {
   const user = session?.user as { role?: string } | undefined;
   if (!session || user?.role !== "ADMIN") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await resend.emails.send({
-    from: "Élite BCN Transfers <noreply@elitebcntransfers.com>",
-    to: process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com",
-    subject: "✓ Email Test — Élite BCN Admin",
-    html: "<p>Your email system is working correctly.</p><p>This test was triggered from the admin settings page.</p>",
-  });
+  const to = process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com";
 
-  return NextResponse.json({ ok: true });
+  try {
+    const result = await resend.emails.send({
+      from: "Élite BCN Transfers <noreply@elitebcntransfers.com>",
+      to,
+      subject: "✓ Email Test — Élite BCN Admin",
+      html: "<p>Your email system is working correctly.</p><p>This test was triggered from the admin settings page.</p>",
+    });
+
+    if (result?.error) {
+      return NextResponse.json({
+        ok: false,
+        error: result.error.message ?? "Resend rejected the email",
+        detail: result.error,
+        hint: "Domain 'elitebcntransfers.com' must be verified in Resend dashboard → Domains. Add the required DNS records to your domain registrar.",
+      }, { status: 400 });
+    }
+
+    return NextResponse.json({ ok: true, id: result?.data?.id, to });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
+  }
 }

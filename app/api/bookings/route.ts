@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
-import { sendAdminNewBookingAlert, sendWelcomeEmail } from "@/lib/resend";
+import { sendAdminNewBookingAlert, sendBookingConfirmation, sendWelcomeEmail } from "@/lib/resend";
 import { redeemCoupon, validateCoupon, logEmail } from "@/lib/marketing";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -179,8 +179,19 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Step 2c: Log booking confirmation email
-    logEmail({ to: body.guestEmail, subject: `Booking Confirmed — ${booking.confirmationCode}`, type: "CONFIRMATION", bookingId: booking.id }).catch(() => {});
+    // Step 2c: Send booking confirmation email to customer
+    sendBookingConfirmation({
+      to:               body.guestEmail,
+      name:             body.guestName,
+      confirmationCode: booking.confirmationCode,
+      pickupAddress:    body.pickupAddress,
+      dropoffAddress:   body.dropoffAddress || body.bookingType,
+      pickupDatetime:   pickupDatetime.toLocaleString("en-GB"),
+      vehicleClass:     body.vehicleClass,
+      totalAmount:      totalWithExtras,
+      passengers:       body.passengers,
+      bookingId:        booking.id,
+    }).catch(() => {});
 
     // Step 3: Notify admin (fire-and-forget — never blocks)
     sendAdminNewBookingAlert({
@@ -216,7 +227,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           bookingId:       booking.id,
           checkoutId:      checkout.id,
-          checkoutUrl:     getSumUpCheckoutUrl(checkout.id),
+          checkoutUrl:     getSumUpCheckoutUrl(checkout.id, booking.id),
           accountCreated,
           email:           accountCreated ? body.guestEmail : undefined,
         });
