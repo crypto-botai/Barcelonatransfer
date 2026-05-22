@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSumUpCheckout } from "@/lib/sumup";
-import { sendBookingConfirmation } from "@/lib/resend";
+import { sendPaymentConfirmationEmail, sendAdminNewBookingAlert } from "@/lib/resend";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -57,17 +57,38 @@ export async function GET(req: NextRequest) {
         });
 
         if (updated.guestEmail) {
-          sendBookingConfirmation({
-            to:               updated.guestEmail,
-            name:             updated.guestName ?? "Valued Client",
-            confirmationCode: updated.confirmationCode,
-            pickupAddress:    updated.pickupAddress,
-            dropoffAddress:   updated.dropoffAddress,
-            pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
-            vehicleClass:     updated.vehicleClass,
-            totalAmount:      updated.totalAmount,
-            passengers:       updated.passengers,
-          }).catch(() => {});
+          // Dedup: skip if payment confirmation already sent for this booking
+          const alreadySent = await prisma.emailLog.findFirst({
+            where: { bookingId, type: "PAYMENT_CONFIRMATION" },
+          }).catch(() => null);
+
+          if (!alreadySent) {
+            const transactionId = checkout.transaction_id ?? checkout.id;
+            sendPaymentConfirmationEmail({
+              to:               updated.guestEmail,
+              name:             updated.guestName ?? "Valued Client",
+              confirmationCode: updated.confirmationCode,
+              pickupAddress:    updated.pickupAddress,
+              dropoffAddress:   updated.dropoffAddress,
+              pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
+              vehicleClass:     updated.vehicleClass,
+              totalAmount:      updated.totalAmount,
+              passengers:       updated.passengers,
+              bookingId,
+              transactionId:    typeof transactionId === "string" ? transactionId : undefined,
+            }).catch(e => console.error("[resend] payment confirmation (verify):", e));
+
+            sendAdminNewBookingAlert({
+              confirmationCode: updated.confirmationCode,
+              guestName:        updated.guestName ?? "Guest",
+              guestEmail:       updated.guestEmail,
+              pickupAddress:    updated.pickupAddress,
+              dropoffAddress:   updated.dropoffAddress ?? "",
+              pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
+              vehicleClass:     updated.vehicleClass,
+              totalAmount:      updated.totalAmount,
+            }).catch(e => console.error("[resend] admin alert (verify):", e));
+          }
         }
 
         return NextResponse.json({

@@ -137,20 +137,36 @@ export async function sendAdminNewBookingAlert({
   pickupAddress: string; dropoffAddress: string; pickupDatetime: string;
   vehicleClass: string; totalAmount: number;
 }) {
-  await resend.emails.send({
-    from: FROM,
-    to: ADMIN_EMAIL,
-    subject: `🚗 New Booking — ${confirmationCode}`,
-    html: `<h2>New Booking Received</h2>
-      <p><b>Code:</b> ${confirmationCode}</p>
-      <p><b>Client:</b> ${guestName} (${guestEmail})</p>
-      <p><b>Pickup:</b> ${pickupAddress}</p>
-      <p><b>Dropoff:</b> ${dropoffAddress}</p>
-      <p><b>DateTime:</b> ${pickupDatetime}</p>
-      <p><b>Vehicle:</b> ${vehicleClass}</p>
-      <p><b>Amount:</b> €${totalAmount}</p>
-      <p><a href="${SITE_URL}/admin/bookings">View in Admin Panel</a></p>`,
+  const html = emailLayout(`
+    <h2>New Booking Received</h2>
+    <p>A new luxury transfer booking requires driver assignment.</p>
+    <div class="code-box">
+      <p style="color:#888;font-size:11px;margin-bottom:8px;letter-spacing:3px;text-transform:uppercase;">Confirmation Code</p>
+      <div class="code">${confirmationCode}</div>
+    </div>
+    <table class="detail-table">
+      <tr><td>Client</td><td>${guestName}</td></tr>
+      <tr><td>Email</td><td>${guestEmail}</td></tr>
+      <tr><td>Pick-up</td><td>${pickupAddress}</td></tr>
+      <tr><td>Drop-off</td><td>${dropoffAddress || "—"}</td></tr>
+      <tr><td>Date & Time</td><td>${pickupDatetime}</td></tr>
+      <tr><td>Vehicle</td><td>${vehicleClass.replace(/_/g, " ")}</td></tr>
+    </table>
+    <div class="total-row">
+      <span class="total-label">Amount</span>
+      <span class="total-value">€${totalAmount.toFixed(2)}</span>
+    </div>
+    <div class="divider"></div>
+    <div style="text-align:center;margin-top:16px;">
+      <a href="${SITE_URL}/admin/bookings" class="cta-btn">Assign Driver Now →</a>
+    </div>
+  `);
+  const result = await resend.emails.send({
+    from: FROM, to: ADMIN_EMAIL,
+    subject: `🚗 New Booking — ${confirmationCode} · €${totalAmount.toFixed(2)}`,
+    html,
   });
+  if (result?.error) console.error("[resend] admin alert failed:", result.error);
 }
 
 // ─── Welcome Email ───────────────────────────────────────────
@@ -334,6 +350,171 @@ export async function sendReviewRequestEmail({
     html,
   });
   await logEmail({ to, subject: `Review request`, type: "REVIEW", resendId: result?.data?.id });
+}
+
+// ─── Payment Confirmation (Receipt) ──────────────────────────
+export async function sendPaymentConfirmationEmail({
+  to, name, confirmationCode, pickupAddress, dropoffAddress,
+  pickupDatetime, vehicleClass, totalAmount, passengers, bookingId, transactionId,
+}: {
+  to: string; name: string; confirmationCode: string; pickupAddress: string;
+  dropoffAddress: string | null; pickupDatetime: string; vehicleClass: string;
+  totalAmount: number; passengers: number; bookingId: string; transactionId?: string;
+}) {
+  const html = emailLayout(`
+    <h2>Payment Confirmed</h2>
+    <p>Dear ${name},</p>
+    <p>Your payment has been received. Your luxury transfer is fully confirmed and a chauffeur will be assigned shortly.</p>
+    <div class="code-box">
+      <p style="color:#888;font-size:11px;margin-bottom:8px;letter-spacing:3px;text-transform:uppercase;">Booking Reference</p>
+      <div class="code">${confirmationCode}</div>
+    </div>
+    <table class="detail-table">
+      <tr><td>Pick-up</td><td>${pickupAddress}</td></tr>
+      <tr><td>Drop-off</td><td>${dropoffAddress || "—"}</td></tr>
+      <tr><td>Date & Time</td><td>${pickupDatetime}</td></tr>
+      <tr><td>Vehicle</td><td>${vehicleClass.replace(/_/g, " ")}</td></tr>
+      <tr><td>Passengers</td><td>${passengers}</td></tr>
+      ${transactionId ? `<tr><td>Transaction ID</td><td style="font-size:12px;font-family:'Courier New',monospace;">${transactionId}</td></tr>` : ""}
+    </table>
+    <div class="total-row">
+      <span class="total-label">Amount Paid</span>
+      <span class="total-value">€${totalAmount.toFixed(2)}</span>
+    </div>
+    <div class="divider"></div>
+    <div style="text-align:center;margin:20px 0;display:flex;flex-direction:column;gap:10px;align-items:center;">
+      <a href="${SITE_URL}/booking/${bookingId}/invoice" class="outline-btn" style="display:inline-block;">🧾 Download Receipt</a>
+      <a href="${SITE_URL}/dashboard/tracking/${bookingId}" class="cta-btn">Track My Transfer →</a>
+    </div>
+    <div class="divider"></div>
+    <p style="color:#888;font-size:13px;">Questions? Our team is available 24/7:</p>
+    <div style="text-align:center;margin-top:12px;">
+      <a href="https://wa.me/34635383712?text=Booking%20${confirmationCode}" class="wa-btn">💬 WhatsApp Support</a>
+    </div>
+  `);
+  const result = await resend.emails.send({
+    from: FROM, to,
+    subject: `✓ Payment Confirmed — ${confirmationCode} | Élite BCN`,
+    html,
+  });
+  if (result?.error) console.error("[resend] payment confirmation failed:", result.error);
+  await logEmail({ to, subject: `Payment Confirmed — ${confirmationCode}`, type: "PAYMENT_CONFIRMATION", resendId: result?.data?.id, bookingId });
+}
+
+// ─── Failed Payment ───────────────────────────────────────────
+export async function sendFailedPaymentEmail({
+  to, name, confirmationCode, bookingId,
+}: {
+  to: string; name: string; confirmationCode: string; bookingId: string;
+}) {
+  const retryUrl = `${SITE_URL}/booking/pay?booking_id=${bookingId}`;
+  const html = emailLayout(`
+    <h2>Payment Unsuccessful</h2>
+    <p>Dear ${name},</p>
+    <p>Unfortunately, your payment for booking <strong style="color:#c9a84c;">${confirmationCode}</strong> could not be processed.</p>
+    <p style="margin-top:12px;">Your booking is still saved — please retry to confirm your transfer.</p>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="${retryUrl}" class="cta-btn">Retry Payment →</a>
+    </div>
+    <div class="divider"></div>
+    <p style="color:#888;font-size:13px;">Having trouble? Our team is available 24/7:</p>
+    <div style="text-align:center;margin-top:12px;">
+      <a href="https://wa.me/34635383712?text=Payment%20issue%20for%20${confirmationCode}" class="wa-btn">💬 WhatsApp Support</a>
+    </div>
+    <div class="divider"></div>
+    <p style="font-size:12px;color:#555;text-align:center;">Reference: <strong style="color:#c9a84c;">${confirmationCode}</strong> · No charge has been made to your account.</p>
+  `);
+  const result = await resend.emails.send({
+    from: FROM, to,
+    subject: `⚠️ Payment Failed — ${confirmationCode} | Élite BCN`,
+    html,
+  });
+  if (result?.error) console.error("[resend] failed payment email:", result.error);
+  await logEmail({ to, subject: `Payment failed — ${confirmationCode}`, type: "PAYMENT_FAILED", resendId: result?.data?.id, bookingId });
+}
+
+// ─── Booking Cancelled ────────────────────────────────────────
+export async function sendBookingCancelledEmail({
+  to, name, confirmationCode, pickupDatetime, totalAmount,
+}: {
+  to: string; name: string; confirmationCode: string; pickupDatetime: string; totalAmount: number;
+}) {
+  const html = emailLayout(`
+    <h2>Booking Cancelled</h2>
+    <p>Dear ${name},</p>
+    <p>Your booking <strong style="color:#c9a84c;">${confirmationCode}</strong> has been successfully cancelled.</p>
+    <table class="detail-table" style="margin-top:20px;">
+      <tr><td>Reference</td><td>${confirmationCode}</td></tr>
+      <tr><td>Pickup Date</td><td>${pickupDatetime}</td></tr>
+    </table>
+    <div class="total-row">
+      <span class="total-label">Amount</span>
+      <span class="total-value">€${totalAmount.toFixed(2)}</span>
+    </div>
+    <div class="divider"></div>
+    <p style="color:#aaa;font-size:14px;">If a refund is applicable, it will be processed within 5–7 business days to your original payment method.</p>
+    <div style="text-align:center;margin-top:24px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+      <a href="${SITE_URL}/book" class="cta-btn">Book a New Transfer →</a>
+      <a href="https://wa.me/34635383712" class="wa-btn">💬 Questions? Chat with Us</a>
+    </div>
+  `);
+  const result = await resend.emails.send({
+    from: FROM, to,
+    subject: `Booking Cancelled — ${confirmationCode} | Élite BCN`,
+    html,
+  });
+  if (result?.error) console.error("[resend] booking cancelled email:", result.error);
+  await logEmail({ to, subject: `Booking cancelled — ${confirmationCode}`, type: "CANCELLED", resendId: result?.data?.id });
+}
+
+// ─── Driver Booking Details ───────────────────────────────────
+export async function sendDriverBookingDetailsEmail({
+  to, driverName, confirmationCode, guestName, guestPhone,
+  pickupAddress, dropoffAddress, pickupDatetime, vehicleClass,
+  passengers, luggage, flightNumber, specialRequests, driverAmount,
+}: {
+  to: string; driverName: string; confirmationCode: string; guestName: string;
+  guestPhone: string; pickupAddress: string; dropoffAddress: string | null;
+  pickupDatetime: string; vehicleClass: string; passengers: number; luggage: number;
+  flightNumber?: string | null; specialRequests?: string | null; driverAmount?: number | null;
+}) {
+  const html = emailLayout(`
+    <h2>New Booking Assigned</h2>
+    <p>Hi ${driverName},</p>
+    <p>A new booking has been assigned to you. Please review the details below.</p>
+    <div class="code-box">
+      <p style="color:#888;font-size:11px;margin-bottom:8px;letter-spacing:3px;text-transform:uppercase;">Booking Reference</p>
+      <div class="code">${confirmationCode}</div>
+    </div>
+    <table class="detail-table">
+      <tr><td>Client</td><td>${guestName}</td></tr>
+      <tr><td>Client Phone</td><td><a href="tel:${guestPhone}" style="color:#c9a84c;">${guestPhone}</a></td></tr>
+      <tr><td>Pick-up</td><td>${pickupAddress}</td></tr>
+      <tr><td>Drop-off</td><td>${dropoffAddress || "—"}</td></tr>
+      <tr><td>Date & Time</td><td>${pickupDatetime}</td></tr>
+      <tr><td>Vehicle Class</td><td>${vehicleClass.replace(/_/g, " ")}</td></tr>
+      <tr><td>Passengers</td><td>${passengers} pax · ${luggage} bags</td></tr>
+      ${flightNumber ? `<tr><td>Flight</td><td>${flightNumber}</td></tr>` : ""}
+      ${specialRequests ? `<tr><td>Notes</td><td>${specialRequests.replace(/\[META\][\s\S]*?\[\/META\]\n?/, "").trim() || "—"}</td></tr>` : ""}
+    </table>
+    ${driverAmount != null ? `
+    <div class="total-row">
+      <span class="total-label">Your Earnings</span>
+      <span class="total-value">€${driverAmount.toFixed(2)}</span>
+    </div>` : ""}
+    <div class="divider"></div>
+    <div style="text-align:center;margin-top:16px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+      <a href="https://wa.me/${guestPhone.replace(/\D/g, "")}?text=Hello%2C%20I'm%20your%20Élite%20BCN%20driver%20for%20booking%20${confirmationCode}" class="wa-btn">💬 WhatsApp Client</a>
+      <a href="https://wa.me/34635383712" class="outline-btn" style="display:inline-block;">📞 Contact Dispatch</a>
+    </div>
+  `);
+  const result = await resend.emails.send({
+    from: FROM, to,
+    subject: `📋 New Booking — ${confirmationCode} | Élite BCN`,
+    html,
+  });
+  if (result?.error) console.error("[resend] driver booking details email:", result.error);
+  await logEmail({ to, subject: `Driver booking assigned — ${confirmationCode}`, type: "DRIVER_BOOKING", resendId: result?.data?.id });
 }
 
 // ─── Newsletter Campaign ─────────────────────────────────────

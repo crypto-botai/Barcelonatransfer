@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { type VehicleClass } from "@/types";
+import { sendBookingConfirmation, sendAdminNewBookingAlert } from "@/lib/resend";
 
 async function requireAdmin() {
   const s = await getServerSession(authOptions);
@@ -116,6 +117,32 @@ export async function POST(req: NextRequest) {
         entityId:  booking.id,
         details:   { confirmationCode: booking.confirmationCode, amount: body.totalAmount } as never,
       },
+    }).catch(() => {});
+
+    // Notify customer
+    sendBookingConfirmation({
+      to:               body.guestEmail,
+      name:             body.guestName,
+      confirmationCode: booking.confirmationCode,
+      pickupAddress:    body.pickupAddress,
+      dropoffAddress:   body.dropoffAddress || "",
+      pickupDatetime:   pickup.toLocaleString("en-GB"),
+      vehicleClass:     body.vehicleClass,
+      totalAmount:      body.totalAmount,
+      passengers:       body.passengers,
+      bookingId:        booking.id,
+    }).catch(e => console.error("[resend] admin create booking confirmation:", e));
+
+    // Notify admin panel (useful if another admin created it)
+    sendAdminNewBookingAlert({
+      confirmationCode: booking.confirmationCode,
+      guestName:        body.guestName,
+      guestEmail:       body.guestEmail,
+      pickupAddress:    body.pickupAddress,
+      dropoffAddress:   body.dropoffAddress || "",
+      pickupDatetime:   pickup.toLocaleString("en-GB"),
+      vehicleClass:     body.vehicleClass,
+      totalAmount:      body.totalAmount,
     }).catch(() => {});
 
     return NextResponse.json(booking, { status: 201 });

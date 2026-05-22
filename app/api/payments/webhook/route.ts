@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendBookingConfirmation } from "@/lib/resend";
+import { sendPaymentConfirmationEmail, sendAdminNewBookingAlert, sendFailedPaymentEmail } from "@/lib/resend";
 import crypto from "crypto";
 
 // SumUp sends HMAC-SHA256 signature in X-Payload-Signature header
@@ -73,23 +73,53 @@ export async function POST(req: NextRequest) {
 
       const email = updated.guestEmail;
       if (email) {
-        await sendBookingConfirmation({
-          to:               email,
-          name:             updated.guestName ?? "Valued Client",
-          confirmationCode: updated.confirmationCode,
-          pickupAddress:    updated.pickupAddress,
-          dropoffAddress:   updated.dropoffAddress,
-          pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
-          vehicleClass:     updated.vehicleClass,
-          totalAmount:      updated.totalAmount,
-          passengers:       updated.passengers,
-        }).catch(console.error);
+        // Dedup: skip if payment confirmation already sent for this booking
+        const alreadySent = await prisma.emailLog.findFirst({
+          where: { bookingId: booking.id, type: "PAYMENT_CONFIRMATION" },
+        }).catch(() => null);
+
+        if (!alreadySent) {
+          const transactionId = (data.transaction_id ?? checkoutId) as string;
+          sendPaymentConfirmationEmail({
+            to:               email,
+            name:             updated.guestName ?? "Valued Client",
+            confirmationCode: updated.confirmationCode,
+            pickupAddress:    updated.pickupAddress,
+            dropoffAddress:   updated.dropoffAddress,
+            pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
+            vehicleClass:     updated.vehicleClass,
+            totalAmount:      updated.totalAmount,
+            passengers:       updated.passengers,
+            bookingId:        booking.id,
+            transactionId,
+          }).catch(e => console.error("[resend] payment confirmation (webhook):", e));
+
+          sendAdminNewBookingAlert({
+            confirmationCode: updated.confirmationCode,
+            guestName:        updated.guestName ?? "Guest",
+            guestEmail:       email,
+            pickupAddress:    updated.pickupAddress,
+            dropoffAddress:   updated.dropoffAddress ?? "",
+            pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
+            vehicleClass:     updated.vehicleClass,
+            totalAmount:      updated.totalAmount,
+          }).catch(e => console.error("[resend] admin alert (webhook):", e));
+        }
       }
     } else if (status === "FAILED" || status === "EXPIRED") {
-      await prisma.booking.update({
+      const failedBooking = await prisma.booking.update({
         where: { id: booking.id },
         data:  { paymentStatus: "FAILED" },
-      }).catch(() => {});
+      }).catch(() => null);
+
+      if (failedBooking?.guestEmail) {
+        sendFailedPaymentEmail({
+          to:               failedBooking.guestEmail,
+          name:             failedBooking.guestName ?? "Valued Client",
+          confirmationCode: failedBooking.confirmationCode,
+          bookingId:        failedBooking.id,
+        }).catch(e => console.error("[resend] failed payment (webhook):", e));
+      }
     }
   }
 
