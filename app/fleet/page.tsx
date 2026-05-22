@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     title: "Luxury Transfer Fleet Barcelona — Mercedes, Tesla, BMW",
     description: "Mercedes V-Class, E-Class, Tesla Model S, BMW 5 Series. Premium private hire vehicles for Barcelona airport transfers and chauffeur services.",
     url: "https://www.elitebcn.info/fleet",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
 };
 
