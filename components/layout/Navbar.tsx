@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Phone, ChevronDown, LayoutDashboard } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
@@ -242,6 +243,15 @@ export default function Navbar() {
                   <LayoutDashboard size={16} />
                   <span>{t("nav.dashboard")}</span>
                 </Link>
+              )}
+              {dashboardHref && (
+                <button
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors font-semibold"
+                >
+                  <LogOut size={16} />
+                  <span>Sign Out</span>
+                </button>
               )}
               <a
                 href="tel:+34635383712"

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Calendar, CreditCard, MapPin, Star,
-  Settings, HelpCircle, Gift, Bell, LogOut, X, Plane, Car
+  Settings, HelpCircle, Gift, Bell, LogOut, X, Plane, Car, User,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -132,13 +132,12 @@ export default function MobileDashboardNav({ isOpen, onClose, userName, memberTi
       {/* Bottom mobile tab bar */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-[#050505]/95 backdrop-blur-xl border-t border-white/[0.06] safe-area-inset-bottom">
         <div className="flex items-center justify-around px-2 py-2">
-          {[
+          {([
             { label: "Home",     href: "/dashboard",          icon: LayoutDashboard },
             { label: "Bookings", href: "/dashboard/bookings", icon: Calendar },
             { label: "Book",     href: "/book",               icon: Plane, special: true },
-            { label: "Pay",      href: "/dashboard/payments", icon: CreditCard },
-            { label: "Loyalty",  href: "/dashboard/loyalty",  icon: Star },
-          ].map(({ label, href, icon: Icon, special }) => {
+            { label: "Account",  href: "/dashboard/profile",  icon: User },
+          ] as Array<{ label: string; href: string; icon: React.ElementType; special?: boolean }>).map(({ label, href, icon: Icon, special }) => {
             const active = href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
             return (
               <Link
@@ -155,6 +154,13 @@ export default function MobileDashboardNav({ isOpen, onClose, userName, memberTi
               </Link>
             );
           })}
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="flex flex-col items-center gap-1 px-3 py-1 rounded-xl text-red-400/80 hover:text-red-400 transition-all"
+          >
+            <LogOut size={18} />
+            <span className="text-[10px] font-medium">Sign Out</span>
+          </button>
         </div>
       </div>
     </>
