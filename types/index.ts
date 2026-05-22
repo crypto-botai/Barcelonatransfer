@@ -236,17 +236,6 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     image: "/fleet/sedan-camry.png",
     description: "A step above standard — the Camry offers a smooth, quiet ride perfect for business and leisure travel.",
   },
-  {
-    class: "FIRST_CLASS",
-    label: "Private Coach",
-    models: ["Mercedes Sprinter VIP", "Mercedes Sprinter Executive"],
-    maxPassengers: 19,
-    maxLuggage: 20,
-    features: ["Extra Large Group", "Air Conditioning", "PA System", "Panoramic Windows", "Reclining Seats"],
-    image: "/fleet/bus.png",
-    description: "Our largest vehicle — the full-size Mercedes Sprinter coach for major group transfers and corporate events.",
-    badge: "Large Group",
-  },
 ];
 
 export const STATUS_COLORS: Record<BookingStatus, string> = {
