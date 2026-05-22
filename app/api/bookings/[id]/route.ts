@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { sendDriverAssignedEmail } from "@/lib/resend";
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -13,15 +13,33 @@ export async function GET(
     const booking = await prisma.booking.findUnique({
       where: { id },
       select: {
+        id: true,
         confirmationCode: true,
         pickupAddress: true,
         dropoffAddress: true,
         pickupDatetime: true,
         vehicleClass: true,
+        passengers: true,
+        luggage: true,
         totalAmount: true,
         guestEmail: true,
+        guestName: true,
         status: true,
         paymentStatus: true,
+        flightNumber: true,
+        specialRequests: true,
+        createdAt: true,
+        driver: {
+          select: {
+            user: { select: { name: true, image: true, phone: true } },
+            rating: true,
+            vehicles: { take: 1, select: { make: true, model: true, licensePlate: true, color: true } },
+          },
+        },
+        tracking: {
+          orderBy: { createdAt: "asc" },
+          select: { lat: true, lng: true, speed: true, heading: true, createdAt: true },
+        },
       },
     });
     if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -37,12 +55,19 @@ export async function PATCH(
 ) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
-  const user = session?.user as { role?: string } | undefined;
-  if (!session || user?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const sessionUser = session?.user as { id?: string; role?: string } | undefined;
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const body = await req.json();
+    // Allow customers to cancel their own bookings
+    if (sessionUser?.role !== "ADMIN") {
+      if (body.status !== "CANCELLED") return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      const booking = await prisma.booking.findUnique({ where: { id }, select: { userId: true, status: true } });
+      if (!booking || booking.userId !== sessionUser?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      if (!["PENDING", "CONFIRMED"].includes(booking.status)) return NextResponse.json({ error: "Cannot cancel at this stage" }, { status: 400 });
+      const updated = await prisma.booking.update({ where: { id }, data: { status: "CANCELLED" }, select: { id: true, status: true } });
+      return NextResponse.json(updated);
+    }
     const data: Record<string, unknown> = {};
     if (body.status) data.status = body.status;
     if (body.adminNotes !== undefined) data.adminNotes = body.adminNotes;

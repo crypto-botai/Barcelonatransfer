@@ -62,6 +62,30 @@ const schema = z.object({
   }),
 });
 
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const user = session.user as { id: string };
+  const bookings = await prisma.booking.findMany({
+    where: { userId: user.id },
+    orderBy: { pickupDatetime: "desc" },
+    select: {
+      id: true, confirmationCode: true, status: true, paymentStatus: true,
+      pickupAddress: true, dropoffAddress: true, pickupDatetime: true,
+      vehicleClass: true, passengers: true, luggage: true, totalAmount: true,
+      flightNumber: true, createdAt: true,
+      driver: {
+        select: {
+          user: { select: { name: true, image: true } },
+          rating: true,
+          vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } },
+        },
+      },
+    },
+  });
+  return NextResponse.json(bookings);
+}
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
