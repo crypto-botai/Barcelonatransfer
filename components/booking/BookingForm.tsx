@@ -20,7 +20,7 @@ export default function BookingForm({ compact = false }: Props) {
   const [date,    setDate]    = useState("");
   const [time,    setTime]    = useState("");
   const [pax,     setPax]     = useState(2);
-  const [vehicle, setVehicle] = useState<VehicleClass>("BUSINESS");
+  const [vehicle, setVehicle] = useState<VehicleClass>("LUXURY");
   const [quote,   setQuote]   = useState<QuoteResponse | null>(null);
   const [loading, setLoading] = useState(false);
 

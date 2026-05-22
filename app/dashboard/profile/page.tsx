@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, Lock, Shield, Bell, Globe, Save, Check } from "lucide-react";
 import toast from "react-hot-toast";
@@ -13,6 +13,18 @@ export default function ProfilePage() {
   const [phone, setPhone] = useState("");
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  // Pre-fill existing phone from DB on mount
+  useEffect(() => {
+    fetch("/api/user/profile")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.user?.phone) setPhone(d.user.phone);
+        if (d?.user?.name && !name) setName(d.user.name);
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);

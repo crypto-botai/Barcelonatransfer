@@ -120,13 +120,13 @@ export default function HeroSection() {
                 { value: "4.9★",   label: t("hero.stats.rating") },
                 { value: "7+",     label: t("hero.stats.years") },
               ].map((s, i) => (
-                <>
-                  {i > 0 && <div key={`sep-${i}`} className="w-px bg-white/[0.06]" />}
-                  <div key={s.label}>
+                <div key={s.label} className="flex items-center gap-8">
+                  {i > 0 && <div className="w-px h-8 bg-white/[0.06]" />}
+                  <div>
                     <p className="font-display text-2xl sm:text-3xl text-white">{s.value}</p>
                     <p className="text-white/30 text-[11px] tracking-wider uppercase mt-1">{s.label}</p>
                   </div>
-                </>
+                </div>
               ))}
             </motion.div>
           </div>

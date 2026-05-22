@@ -8,6 +8,7 @@ import ServicesSection from "@/components/sections/ServicesSection";
 import FleetSection from "@/components/sections/FleetSection";
 import PricingSection from "@/components/sections/PricingSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
+import FAQSection from "@/components/sections/FAQSection";
 
 export const metadata: Metadata = {
   title: "Élite BCN | Luxury Airport Transfers Barcelona — Fixed Prices from €45",
@@ -33,6 +34,7 @@ export default function HomePage() {
         <FleetSection />
         <PricingSection />
         <TestimonialsSection />
+        <FAQSection />
       </main>
       <Footer />
       <WhatsAppButton />
