@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
 import ExitIntentPopup from "@/components/marketing/ExitIntentPopup";
 import I18nProvider from "@/components/language/I18nProvider";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -278,6 +279,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </I18nProvider>
         </AuthProvider>
       </body>
+      <GoogleAnalytics gaId="G-E9QZFG5WZY" />
     </html>
   );
 }
