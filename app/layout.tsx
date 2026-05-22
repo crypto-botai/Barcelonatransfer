@@ -48,13 +48,13 @@ export const metadata: Metadata = {
     title: "Élite BCN | Luxury Airport Transfers Barcelona — Fixed Prices from €45",
     description:
       "Barcelona's premier luxury chauffeur service. Fixed-price airport transfers, VIP travel, executive transport. Mercedes, Tesla, BMW. No surge pricing, ever.",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Élite BCN — Luxury Private Transfer Barcelona Airport" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Luxury Private Transfer Barcelona Airport" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Élite BCN | Luxury Airport Transfers Barcelona — Fixed Prices",
     description: "Fixed-price luxury private transfers from Barcelona airport. Mercedes, Tesla, BMW. 24/7. Book instantly.",
-    images: ["/og-image.jpg"],
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true, follow: true,
@@ -94,7 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   "@id": "https://www.elitebcn.info/#organization",
                   name: "Élite BCN Transfers",
                   url: "https://www.elitebcn.info",
-                  logo: { "@type": "ImageObject", url: "https://www.elitebcn.info/og-image.jpg", width: 1200, height: 630 },
+                  logo: { "@type": "ImageObject", url: "https://www.elitebcn.info/opengraph-image", width: 1200, height: 630 },
                   telephone: "+34635383712",
                   email: "vtcbcn2025@gmail.com",
                   foundingDate: "2024",
@@ -133,8 +133,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   paymentAccepted: "Credit Card, Cash, Bank Transfer",
                   priceRange: "€€–€€€",
                   openingHours: "Mo-Su 00:00-24:00",
-                  image: "https://www.elitebcn.info/og-image.jpg",
-                  logo: "https://www.elitebcn.info/og-image.jpg",
+                  image: "https://www.elitebcn.info/opengraph-image",
+                  logo: "https://www.elitebcn.info/opengraph-image",
                   address: {
                     "@type": "PostalAddress",
                     streetAddress: "Barcelona El Prat Airport",
