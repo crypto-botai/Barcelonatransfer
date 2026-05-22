@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
 import ExitIntentPopup from "@/components/marketing/ExitIntentPopup";
+import I18nProvider from "@/components/language/I18nProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -62,7 +63,17 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "https://www.elitebcn.info",
-    languages: { "en-GB": "https://www.elitebcn.info", "es-ES": "https://www.elitebcn.info", "x-default": "https://www.elitebcn.info" },
+    languages: {
+      "en": "https://www.elitebcn.info",
+      "es": "https://www.elitebcn.info",
+      "fr": "https://www.elitebcn.info",
+      "de": "https://www.elitebcn.info",
+      "it": "https://www.elitebcn.info",
+      "ru": "https://www.elitebcn.info",
+      "zh": "https://www.elitebcn.info",
+      "ar": "https://www.elitebcn.info",
+      "x-default": "https://www.elitebcn.info",
+    },
   },
 };
 
@@ -250,6 +261,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-dark-950 antialiased">
         <AuthProvider>
+          <I18nProvider>
           {children}
           <ExitIntentPopup />
           <Toaster
@@ -263,6 +275,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
             }}
           />
+          </I18nProvider>
         </AuthProvider>
       </body>
     </html>

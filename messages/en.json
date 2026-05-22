@@ -1,0 +1,163 @@
+{
+  "nav": {
+    "services": "Services",
+    "fleet": "Fleet",
+    "pricing": "Pricing",
+    "transfers": "Transfers",
+    "airportTransfers": "Airport Transfers",
+    "corporateTravel": "Corporate Travel",
+    "hourlyChaufeur": "Hourly Chauffeur",
+    "about": "About",
+    "contact": "Contact",
+    "bookNow": "Book Now",
+    "signIn": "Sign In",
+    "dashboard": "Dashboard",
+    "mobileBook": "Book Your Transfer"
+  },
+  "hero": {
+    "badge": "Barcelona's #1 Luxury Chauffeur Service",
+    "title1": "Luxury",
+    "title2": "Private",
+    "title3": "Transfers",
+    "description": "Premium chauffeur service with Mercedes S-Class, BMW 7 Series, and Tesla Model S. Airport transfers, executive travel, and VIP transportation across Barcelona and Spain.",
+    "trust": {
+      "meetGreet": "Meet & Greet",
+      "flightMonitoring": "Flight Monitoring",
+      "freeWaiting": "Free Waiting",
+      "fixedPrices": "Fixed Prices",
+      "support": "24/7 Support"
+    },
+    "cta": {
+      "book": "Book Your Transfer",
+      "fleet": "View Our Fleet"
+    },
+    "stats": {
+      "clients": "Happy Clients",
+      "rating": "Google Rating",
+      "years": "Years Active"
+    },
+    "badges": {
+      "rating": "4.9★ Rating",
+      "ratingsSub": "1,200+ reviews",
+      "vtc": "Licensed VTC",
+      "vtcSub": "Fully insured",
+      "service": "24/7 Service",
+      "serviceSub": "Always available",
+      "transfers": "5,000+ Transfers",
+      "transfersSub": "Since 2018"
+    }
+  },
+  "fleet": {
+    "sectionLabel": "Our Fleet",
+    "title": "Choose Your",
+    "titleAccent": "Luxury Vehicle",
+    "subtitle": "Every vehicle under 3 years old, maintained to concierge standards.",
+    "allVehicles": "All Vehicles",
+    "collectionLabel": "Full Collection",
+    "collectionTitle": "Every Vehicle,",
+    "collectionAccent": "Detailed",
+    "from": "From",
+    "startingFrom": "Starting from",
+    "bookNow": "Book Now",
+    "reserveVehicle": "Reserve This Vehicle",
+    "reserveNow": "Reserve Now",
+    "pax": "pax",
+    "bags": "bags",
+    "passengers": "passengers",
+    "maxCapacity": "max capacity",
+    "luggage": "luggage",
+    "inclVat": "incl. VAT · fixed price"
+  },
+  "services": {
+    "label": "Our Services",
+    "title": "Premium Chauffeur",
+    "titleAccent": "Services",
+    "subtitle": "Every journey crafted to perfection — from airport arrivals to private tours across Catalonia and Spain.",
+    "learnMore": "Learn more",
+    "features": {
+      "flightMonitoring": "Flight Monitoring",
+      "freeWaiting": "Free Waiting",
+      "meetGreet": "Meet & Greet",
+      "fixedPrices": "Fixed Prices",
+      "realTime": "Real-time tracking",
+      "sixtyMin": "60 min at airports",
+      "nameBoard": "Name board in arrivals",
+      "noSurge": "No surge, ever"
+    },
+    "list": {
+      "airport": { "title": "Airport Transfers", "desc": "Meet & greet with real-time flight monitoring. Complimentary 60-minute wait." },
+      "cruise": { "title": "Cruise Port Transfers", "desc": "Seamless door-to-ship service at Barcelona Cruise Terminal." },
+      "executive": { "title": "Executive Chauffeur", "desc": "Dedicated professional chauffeur for business meetings and corporate events." },
+      "corporate": { "title": "Corporate Accounts", "desc": "Premium corporate accounts with priority fleet, invoicing, and dedicated manager." },
+      "vipEvents": { "title": "VIP Events", "desc": "Luxury transportation for weddings, galas, film sets, and private events." },
+      "hourly": { "title": "Hourly Chauffeur Hire", "desc": "Your private driver at your disposal — minimum 4 hours, maximum flexibility." },
+      "costaBrava": { "title": "Costa Brava Transfers", "desc": "Lloret de Mar, Platja d'Aro, Tossa, Cadaqués — the complete coast." },
+      "costaDorada": { "title": "Costa Dorada Transfers", "desc": "Sitges, Salou, PortAventura, Tarragona in maximum comfort." },
+      "andorra": { "title": "Andorra Transfers", "desc": "Premium transfer from Barcelona to Andorra — shopping, skiing, or business." },
+      "hotel": { "title": "Hotel Transfers", "desc": "Door-to-door luxury service to all 4 and 5-star hotels across Barcelona." },
+      "vip": { "title": "VIP Transportation", "desc": "Discrete, exclusive service for high-profile clients requiring absolute privacy." },
+      "tours": { "title": "Private Day Tours", "desc": "Montserrat, La Roca Village, Girona wine country, and Dalí's museums." }
+    }
+  },
+  "footer": {
+    "tagline": "Barcelona's premier luxury chauffeur service. Professional drivers, premium vehicles, impeccable service — 24/7, 365 days a year.",
+    "newsletter": {
+      "title": "Barcelona Travel Insider",
+      "subtitle": "Exclusive deals, airport tips & luxury travel guides — free."
+    },
+    "cta": {
+      "title": "Ready for your luxury transfer?",
+      "subtitle": "Book online in 2 minutes. Instant confirmation.",
+      "button": "Book Online"
+    },
+    "sections": {
+      "services": "Services",
+      "fleet": "Fleet",
+      "destinations": "Destinations",
+      "staff": "Staff Access"
+    },
+    "links": {
+      "airportTransfers": "Airport Transfers",
+      "corporateTravel": "Corporate Travel",
+      "hourlyChaufeur": "Hourly Chauffeur",
+      "cruisePort": "Cruise Port",
+      "vipTransportation": "VIP Transportation",
+      "privateTours": "Private Day Tours",
+      "standardSedan": "Standard Sedan",
+      "luxurySedan": "Luxury Sedan",
+      "executiveMinivan": "Executive Minivan",
+      "luxuryMinivan": "Luxury Minivan",
+      "groupMinibus": "Group Minibus",
+      "electricVehicle": "Electric Vehicle",
+      "barcelonaAirport": "Barcelona Airport",
+      "sitges": "Sitges",
+      "lloretDeMar": "Lloret de Mar",
+      "portAventura": "PortAventura",
+      "andorra": "Andorra",
+      "gironaAirport": "Girona Airport",
+      "tarragona": "Tarragona",
+      "cadaques": "Cadaqués",
+      "driverLogin": "Driver Login",
+      "driverRegister": "Driver Registration",
+      "adminLogin": "Admin Login"
+    },
+    "legal": {
+      "faq": "FAQ",
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions",
+      "cookies": "Cookie Policy"
+    },
+    "contact": {
+      "whatsapp": "WhatsApp Chat",
+      "location": "Barcelona, Spain · Licensed VTC"
+    },
+    "copyright": "All rights reserved. Licensed VTC Operator — Barcelona, Spain."
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "tryAgain": "Try Again",
+    "close": "Close",
+    "or": "or"
+  }
+}

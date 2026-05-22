@@ -6,26 +6,13 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone, ChevronDown, LayoutDashboard } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-
-const NAV_LINKS = [
-  { label: "Services", href: "/#services" },
-  { label: "Fleet",    href: "/fleet" },
-  { label: "Pricing",  href: "/pricing" },
-  {
-    label: "Transfers",
-    href: "#",
-    children: [
-      { label: "Airport Transfers",  href: "/airport-transfers" },
-      { label: "Corporate Travel",   href: "/corporate" },
-      { label: "Hourly Chauffeur",   href: "/hourly" },
-    ],
-  },
-  { label: "About",   href: "/about" },
-  { label: "Contact", href: "/contact" },
-];
+import LanguageSwitcher from "@/components/language/LanguageSwitcher";
+import "@/lib/i18n";
 
 export default function Navbar() {
+  const { t } = useTranslation();
   const [scrolled, setScrolled]   = useState(false);
   const [mobileOpen, setMobile]   = useState(false);
   const [dropdown, setDropdown]   = useState<string | null>(null);
@@ -33,6 +20,23 @@ export default function Navbar() {
   const { data: session } = useSession();
   const role = (session?.user as { role?: string } | undefined)?.role;
   const dashboardHref = role === "ADMIN" ? "/admin" : role === "DRIVER" ? "/driver" : null;
+
+  const NAV_LINKS = [
+    { label: t("nav.services"),   href: "/#services" },
+    { label: t("nav.fleet"),      href: "/fleet" },
+    { label: t("nav.pricing"),    href: "/pricing" },
+    {
+      label: t("nav.transfers"),
+      href: "#",
+      children: [
+        { label: t("nav.airportTransfers"),  href: "/airport-transfers" },
+        { label: t("nav.corporateTravel"),   href: "/corporate" },
+        { label: t("nav.hourlyChaufeur"),    href: "/hourly" },
+      ],
+    },
+    { label: t("nav.about"),   href: "/about" },
+    { label: t("nav.contact"), href: "/contact" },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -126,7 +130,7 @@ export default function Navbar() {
             </ul>
 
             {/* CTA Group */}
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-3">
               <a
                 href="tel:+34635383712"
                 className="flex items-center gap-2 text-sm text-dark-300 hover:text-gold-400 transition-colors"
@@ -134,11 +138,12 @@ export default function Navbar() {
                 <Phone size={14} />
                 <span className="tracking-wide">+34 635 383 712</span>
               </a>
+              <LanguageSwitcher />
               <Link
                 href="/book"
                 className="btn-gold px-5 py-2.5 rounded-lg text-sm font-semibold tracking-wide"
               >
-                Book Now
+                {t("nav.bookNow")}
               </Link>
               {dashboardHref ? (
                 <Link
@@ -146,26 +151,29 @@ export default function Navbar() {
                   className="flex items-center gap-1.5 text-sm text-gold-400 hover:text-gold-300 transition-colors tracking-wide"
                 >
                   <LayoutDashboard size={14} />
-                  Dashboard
+                  {t("nav.dashboard")}
                 </Link>
               ) : (
                 <Link
                   href="/auth/login"
                   className="text-sm text-dark-400 hover:text-white transition-colors tracking-wide"
                 >
-                  Sign In
+                  {t("nav.signIn")}
                 </Link>
               )}
             </div>
 
-            {/* Mobile burger */}
-            <button
-              onClick={() => setMobile(!mobileOpen)}
-              className="lg:hidden p-2 text-dark-300 hover:text-gold-400 transition-colors"
-              aria-label="Toggle menu"
-            >
-              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
+            {/* Mobile right side */}
+            <div className="lg:hidden flex items-center gap-2">
+              <LanguageSwitcher compact />
+              <button
+                onClick={() => setMobile(!mobileOpen)}
+                className="p-2 text-dark-300 hover:text-gold-400 transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
           </div>
         </div>
       </motion.nav>
@@ -223,7 +231,7 @@ export default function Navbar() {
                 className="btn-gold w-full py-4 rounded-xl text-center text-base font-semibold tracking-wide"
                 onClick={() => setMobile(false)}
               >
-                Book Your Transfer
+                {t("nav.mobileBook")}
               </Link>
               {dashboardHref && (
                 <Link
@@ -232,7 +240,7 @@ export default function Navbar() {
                   onClick={() => setMobile(false)}
                 >
                   <LayoutDashboard size={16} />
-                  <span>Dashboard</span>
+                  <span>{t("nav.dashboard")}</span>
                 </Link>
               )}
               <a

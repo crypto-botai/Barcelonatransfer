@@ -1,0 +1,163 @@
+{
+  "nav": {
+    "services": "服务",
+    "fleet": "车队",
+    "pricing": "价格",
+    "transfers": "接送",
+    "airportTransfers": "机场接送",
+    "corporateTravel": "商务出行",
+    "hourlyChaufeur": "包车服务",
+    "about": "关于我们",
+    "contact": "联系我们",
+    "bookNow": "立即预订",
+    "signIn": "登录",
+    "dashboard": "控制台",
+    "mobileBook": "预订接送"
+  },
+  "hero": {
+    "badge": "巴塞罗那第一豪华司机服务",
+    "title1": "豪华",
+    "title2": "私人",
+    "title3": "接送服务",
+    "description": "提供奔驰S级、宝马7系和特斯拉Model S的高端司机服务。涵盖机场接送、商务出行及巴塞罗那和西班牙全境VIP交通。",
+    "trust": {
+      "meetGreet": "专人迎接",
+      "flightMonitoring": "航班追踪",
+      "freeWaiting": "免费等候",
+      "fixedPrices": "固定价格",
+      "support": "24/7 支持"
+    },
+    "cta": {
+      "book": "预订接送",
+      "fleet": "查看车队"
+    },
+    "stats": {
+      "clients": "满意客户",
+      "rating": "谷歌评分",
+      "years": "服务年限"
+    },
+    "badges": {
+      "rating": "4.9★ 评分",
+      "ratingsSub": "1,200+ 条评价",
+      "vtc": "持牌VTC",
+      "vtcSub": "全额保险",
+      "service": "24/7 服务",
+      "serviceSub": "随时为您服务",
+      "transfers": "5,000+ 接送",
+      "transfersSub": "自2018年起"
+    }
+  },
+  "fleet": {
+    "sectionLabel": "我们的车队",
+    "title": "选择您的",
+    "titleAccent": "豪华座驾",
+    "subtitle": "所有车辆车龄不超过3年，按礼宾标准维护保养。",
+    "allVehicles": "全部车辆",
+    "collectionLabel": "完整系列",
+    "collectionTitle": "每辆车型，",
+    "collectionAccent": "详细介绍",
+    "from": "起价",
+    "startingFrom": "起价",
+    "bookNow": "立即预订",
+    "reserveVehicle": "预订此车型",
+    "reserveNow": "立即预订",
+    "pax": "位",
+    "bags": "件行李",
+    "passengers": "名乘客",
+    "maxCapacity": "最大容量",
+    "luggage": "行李",
+    "inclVat": "含增值税 · 固定价格"
+  },
+  "services": {
+    "label": "我们的服务",
+    "title": "高端",
+    "titleAccent": "司机服务",
+    "subtitle": "每一段旅程精心设计——从机场接机到加泰罗尼亚和西班牙各地的私人游览。",
+    "learnMore": "了解更多",
+    "features": {
+      "flightMonitoring": "航班追踪",
+      "freeWaiting": "免费等候",
+      "meetGreet": "专人迎接",
+      "fixedPrices": "固定价格",
+      "realTime": "实时追踪",
+      "sixtyMin": "机场等候60分钟",
+      "nameBoard": "到达厅举牌迎接",
+      "noSurge": "不收取动态加价"
+    },
+    "list": {
+      "airport": { "title": "机场接送", "desc": "实时航班监控，专人举牌迎接，免费等候60分钟。" },
+      "cruise": { "title": "邮轮港口接送", "desc": "巴塞罗那邮轮码头无缝门到船服务。" },
+      "executive": { "title": "行政专车", "desc": "为商务会议和企业活动配备专职职业司机。" },
+      "corporate": { "title": "企业账户", "desc": "优先车队、对公开票和专属客户经理的高端企业账户。" },
+      "vipEvents": { "title": "VIP 活动用车", "desc": "为婚礼、晚宴、影视拍摄和私人活动提供豪华用车。" },
+      "hourly": { "title": "按小时包车", "desc": "专属私人司机随时待命——最少4小时，灵活便捷。" },
+      "costaBrava": { "title": "布拉瓦海岸接送", "desc": "略雷特德马尔、普拉亚达罗、托萨、卡达克斯——全程海岸。" },
+      "costaDorada": { "title": "黄金海岸接送", "desc": "锡切斯、萨洛、冒险乐园、塔拉戈纳，舒适至极。" },
+      "andorra": { "title": "安道尔接送", "desc": "巴塞罗那至安道尔高端专车——购物、滑雪或商务出行。" },
+      "hotel": { "title": "酒店接送", "desc": "为巴塞罗那所有四星和五星酒店提供点对点豪华服务。" },
+      "vip": { "title": "VIP 专属用车", "desc": "为高端客户提供需要绝对隐私的低调专属服务。" },
+      "tours": { "title": "私人日游", "desc": "蒙特塞拉特、拉罗卡购物村、赫罗纳葡萄酒庄和达利博物馆。" }
+    }
+  },
+  "footer": {
+    "tagline": "巴塞罗那顶级豪华司机服务。专业司机，豪华车辆，无可挑剔的服务——全年365天，每天24小时。",
+    "newsletter": {
+      "title": "Barcelona Travel Insider",
+      "subtitle": "独家优惠、机场小贴士及豪华旅行指南——完全免费。"
+    },
+    "cta": {
+      "title": "准备好享受豪华接送了吗？",
+      "subtitle": "在线预订仅需2分钟，即时确认。",
+      "button": "在线预订"
+    },
+    "sections": {
+      "services": "服务",
+      "fleet": "车队",
+      "destinations": "目的地",
+      "staff": "员工入口"
+    },
+    "links": {
+      "airportTransfers": "机场接送",
+      "corporateTravel": "商务出行",
+      "hourlyChaufeur": "按小时包车",
+      "cruisePort": "邮轮港口",
+      "vipTransportation": "VIP 专车",
+      "privateTours": "私人日游",
+      "standardSedan": "标准轿车",
+      "luxurySedan": "豪华轿车",
+      "executiveMinivan": "行政商务车",
+      "luxuryMinivan": "豪华商务车",
+      "groupMinibus": "团体面包车",
+      "electricVehicle": "新能源车",
+      "barcelonaAirport": "巴塞罗那机场",
+      "sitges": "锡切斯",
+      "lloretDeMar": "略雷特德马尔",
+      "portAventura": "冒险乐园",
+      "andorra": "安道尔",
+      "gironaAirport": "赫罗纳机场",
+      "tarragona": "塔拉戈纳",
+      "cadaques": "卡达克斯",
+      "driverLogin": "司机登录",
+      "driverRegister": "司机注册",
+      "adminLogin": "管理员登录"
+    },
+    "legal": {
+      "faq": "常见问题",
+      "privacy": "隐私政策",
+      "terms": "服务条款",
+      "cookies": "Cookie政策"
+    },
+    "contact": {
+      "whatsapp": "WhatsApp联系",
+      "location": "西班牙巴塞罗那 · 持牌VTC"
+    },
+    "copyright": "版权所有。持牌VTC运营商 — 西班牙巴塞罗那。"
+  },
+  "common": {
+    "loading": "加载中…",
+    "error": "出现错误",
+    "tryAgain": "重试",
+    "close": "关闭",
+    "or": "或"
+  }
+}

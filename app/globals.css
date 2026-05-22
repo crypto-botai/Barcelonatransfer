@@ -301,6 +301,30 @@
   pointer-events: none;
 }
 
+/* ─── RTL (Arabic) Support ─────────────────────────────── */
+[dir="rtl"] body {
+  font-family: "Cairo", var(--font-inter), system-ui, sans-serif;
+}
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6 {
+  font-family: "Cairo", var(--font-playfair), Georgia, serif;
+}
+[dir="rtl"] .text-left  { text-align: right; }
+[dir="rtl"] .text-right { text-align: left; }
+[dir="rtl"] .ltr-only   { direction: ltr; }
+
+/* ─── Chinese font ──────────────────────────────────────── */
+:lang(zh) body,
+:lang(zh) h1,
+:lang(zh) h2,
+:lang(zh) h3 {
+  font-family: "Noto Sans SC", var(--font-inter), system-ui, sans-serif;
+}
+
 /* ─── Google Places Autocomplete Dropdown ──────────────── */
 .pac-container {
   background: #111 !important;

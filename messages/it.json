@@ -1,0 +1,163 @@
+{
+  "nav": {
+    "services": "Servizi",
+    "fleet": "Flotta",
+    "pricing": "Prezzi",
+    "transfers": "Transfer",
+    "airportTransfers": "Transfer Aeroporto",
+    "corporateTravel": "Viaggi d'Affari",
+    "hourlyChaufeur": "Autista a Ore",
+    "about": "Chi Siamo",
+    "contact": "Contatti",
+    "bookNow": "Prenota Ora",
+    "signIn": "Accedi",
+    "dashboard": "Pannello",
+    "mobileBook": "Prenota il Transfer"
+  },
+  "hero": {
+    "badge": "Il Servizio di Autista di Lusso N°1 a Barcellona",
+    "title1": "Transfer",
+    "title2": "Privati",
+    "title3": "di Lusso",
+    "description": "Servizio autista premium con Mercedes Classe S, BMW Serie 7 e Tesla Model S. Transfer aeroporto, viaggi executive e trasporto VIP a Barcellona e in tutta Spagna.",
+    "trust": {
+      "meetGreet": "Accoglienza Personalizzata",
+      "flightMonitoring": "Monitoraggio Voli",
+      "freeWaiting": "Attesa Gratuita",
+      "fixedPrices": "Prezzi Fissi",
+      "support": "Assistenza 24/7"
+    },
+    "cta": {
+      "book": "Prenota il Transfer",
+      "fleet": "Vedi la Nostra Flotta"
+    },
+    "stats": {
+      "clients": "Clienti Soddisfatti",
+      "rating": "Valutazione Google",
+      "years": "Anni di Attività"
+    },
+    "badges": {
+      "rating": "Valutazione 4.9★",
+      "ratingsSub": "+1.200 recensioni",
+      "vtc": "VTC Autorizzato",
+      "vtcSub": "Completamente assicurato",
+      "service": "Servizio 24/7",
+      "serviceSub": "Sempre disponibile",
+      "transfers": "+5.000 Transfer",
+      "transfersSub": "Dal 2018"
+    }
+  },
+  "fleet": {
+    "sectionLabel": "La Nostra Flotta",
+    "title": "Scegli Il Tuo",
+    "titleAccent": "Veicolo di Lusso",
+    "subtitle": "Ogni veicolo ha meno di 3 anni, mantenuto secondo gli standard del concierge.",
+    "allVehicles": "Tutti i Veicoli",
+    "collectionLabel": "Collezione Completa",
+    "collectionTitle": "Ogni Veicolo,",
+    "collectionAccent": "nel Dettaglio",
+    "from": "Da",
+    "startingFrom": "A partire da",
+    "bookNow": "Prenota Ora",
+    "reserveVehicle": "Prenota Questo Veicolo",
+    "reserveNow": "Prenota Ora",
+    "pax": "pax",
+    "bags": "bagagli",
+    "passengers": "passeggeri",
+    "maxCapacity": "capacità massima",
+    "luggage": "bagaglio",
+    "inclVat": "IVA incl. · prezzo fisso"
+  },
+  "services": {
+    "label": "I Nostri Servizi",
+    "title": "Servizio Autista",
+    "titleAccent": "Premium",
+    "subtitle": "Ogni viaggio curato alla perfezione — dall'arrivo in aeroporto ai tour privati attraverso Catalogna e Spagna.",
+    "learnMore": "Scopri di più",
+    "features": {
+      "flightMonitoring": "Monitoraggio Voli",
+      "freeWaiting": "Attesa Gratuita",
+      "meetGreet": "Accoglienza Personalizzata",
+      "fixedPrices": "Prezzi Fissi",
+      "realTime": "Tracciamento in tempo reale",
+      "sixtyMin": "60 min agli aeroporti",
+      "nameBoard": "Cartello nominativo all'arrivo",
+      "noSurge": "Mai tariffe dinamiche"
+    },
+    "list": {
+      "airport": { "title": "Transfer Aeroporto", "desc": "Accoglienza personalizzata con monitoraggio voli in tempo reale. 60 minuti di attesa gratuita." },
+      "cruise": { "title": "Transfer Porto Crociere", "desc": "Servizio porta-a-nave al Terminal Crociere di Barcellona." },
+      "executive": { "title": "Autista Executive", "desc": "Autista professionista dedicato per meeting d'affari e eventi aziendali." },
+      "corporate": { "title": "Account Aziendali", "desc": "Account corporate premium con flotta prioritaria, fatturazione e manager dedicato." },
+      "vipEvents": { "title": "Eventi VIP", "desc": "Trasporto di lusso per matrimoni, gala, set cinematografici e eventi privati." },
+      "hourly": { "title": "Autista a Ore", "desc": "Il tuo autista privato a disposizione — minimo 4 ore, massima flessibilità." },
+      "costaBrava": { "title": "Transfer Costa Brava", "desc": "Lloret de Mar, Platja d'Aro, Tossa, Cadaqués — tutta la costa." },
+      "costaDorada": { "title": "Transfer Costa Dorada", "desc": "Sitges, Salou, PortAventura, Tarragona nel massimo comfort." },
+      "andorra": { "title": "Transfer Andorra", "desc": "Transfer premium da Barcellona ad Andorra — shopping, sci o affari." },
+      "hotel": { "title": "Transfer Hotel", "desc": "Servizio di lusso porta-a-porta a tutti gli hotel 4 e 5 stelle di Barcellona." },
+      "vip": { "title": "Trasporto VIP", "desc": "Servizio discreto ed esclusivo per clienti di alto profilo che richiedono assoluta privacy." },
+      "tours": { "title": "Tour Privati", "desc": "Montserrat, La Roca Village, vigneti di Girona e musei di Dalí." }
+    }
+  },
+  "footer": {
+    "tagline": "Il principale servizio di autista di lusso di Barcellona. Autisti professionisti, veicoli premium, servizio impeccabile — 24/7, 365 giorni all'anno.",
+    "newsletter": {
+      "title": "Barcelona Travel Insider",
+      "subtitle": "Offerte esclusive, consigli per l'aeroporto e guide di viaggio di lusso — gratis."
+    },
+    "cta": {
+      "title": "Pronto per il tuo transfer di lusso?",
+      "subtitle": "Prenota online in 2 minuti. Conferma immediata.",
+      "button": "Prenota Online"
+    },
+    "sections": {
+      "services": "Servizi",
+      "fleet": "Flotta",
+      "destinations": "Destinazioni",
+      "staff": "Accesso Personale"
+    },
+    "links": {
+      "airportTransfers": "Transfer Aeroporto",
+      "corporateTravel": "Viaggi d'Affari",
+      "hourlyChaufeur": "Autista a Ore",
+      "cruisePort": "Porto Crociere",
+      "vipTransportation": "Trasporto VIP",
+      "privateTours": "Tour Privati",
+      "standardSedan": "Berlina Standard",
+      "luxurySedan": "Berlina di Lusso",
+      "executiveMinivan": "Minivan Executive",
+      "luxuryMinivan": "Minivan di Lusso",
+      "groupMinibus": "Minibus di Gruppo",
+      "electricVehicle": "Veicolo Elettrico",
+      "barcelonaAirport": "Aeroporto di Barcellona",
+      "sitges": "Sitges",
+      "lloretDeMar": "Lloret de Mar",
+      "portAventura": "PortAventura",
+      "andorra": "Andorra",
+      "gironaAirport": "Aeroporto di Girona",
+      "tarragona": "Tarragona",
+      "cadaques": "Cadaqués",
+      "driverLogin": "Accesso Autista",
+      "driverRegister": "Registrazione Autista",
+      "adminLogin": "Accesso Admin"
+    },
+    "legal": {
+      "faq": "FAQ",
+      "privacy": "Informativa sulla Privacy",
+      "terms": "Termini e Condizioni",
+      "cookies": "Informativa sui Cookie"
+    },
+    "contact": {
+      "whatsapp": "Chat WhatsApp",
+      "location": "Barcellona, Spagna · VTC Autorizzato"
+    },
+    "copyright": "Tutti i diritti riservati. Operatore VTC Autorizzato — Barcellona, Spagna."
+  },
+  "common": {
+    "loading": "Caricamento…",
+    "error": "Qualcosa è andato storto",
+    "tryAgain": "Riprova",
+    "close": "Chiudi",
+    "or": "o"
+  }
+}

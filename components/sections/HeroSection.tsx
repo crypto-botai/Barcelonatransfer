@@ -1,19 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Star, Shield, Clock, Award } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import BookingForm from "@/components/booking/BookingForm";
-
-const TRUST_BADGES = [
-  { icon: Star,   label: "4.9★ Rating",     sub: "1,200+ reviews" },
-  { icon: Shield, label: "Licensed VTC",     sub: "Fully insured" },
-  { icon: Clock,  label: "24/7 Service",     sub: "Always available" },
-  { icon: Award,  label: "5,000+ Transfers", sub: "Since 2018" },
-];
+import "@/lib/i18n";
 
 export default function HeroSection() {
+  const { t } = useTranslation();
   const [count, setCount] = useState({ clients: 0, rating: 0, years: 0 });
 
   useEffect(() => {
@@ -30,20 +26,30 @@ export default function HeroSection() {
     return () => clearTimeout(timer);
   }, []);
 
+  const TRUST_BADGES = [
+    { icon: Star,   label: t("hero.badges.rating"),    sub: t("hero.badges.ratingsSub") },
+    { icon: Shield, label: t("hero.badges.vtc"),        sub: t("hero.badges.vtcSub") },
+    { icon: Clock,  label: t("hero.badges.service"),    sub: t("hero.badges.serviceSub") },
+    { icon: Award,  label: t("hero.badges.transfers"),  sub: t("hero.badges.transfersSub") },
+  ];
+
+  const TRUST_PILLS = [
+    t("hero.trust.meetGreet"),
+    t("hero.trust.flightMonitoring"),
+    t("hero.trust.freeWaiting"),
+    t("hero.trust.fixedPrices"),
+    t("hero.trust.support"),
+  ];
+
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#050505]">
       {/* Background layers */}
       <div className="absolute inset-0 z-0">
-        {/* Deep gradient */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(201,168,76,0.08),transparent)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_80%_60%,rgba(201,168,76,0.05),transparent)]" />
-
-        {/* Gold orbs */}
         <div className="gold-orb w-[600px] h-[600px] -top-48 -left-48 opacity-60" />
         <div className="gold-orb w-[400px] h-[400px] top-1/2 -right-32 opacity-40" />
         <div className="gold-orb w-[300px] h-[300px] bottom-0 left-1/3 opacity-30" />
-
-        {/* Grid lines */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -67,7 +73,7 @@ export default function HeroSection() {
             >
               <span className="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse" />
               <span className="text-gold-400 text-xs tracking-[0.2em] uppercase font-medium">
-                Barcelona&apos;s #1 Luxury Chauffeur Service
+                {t("hero.badge")}
               </span>
             </motion.div>
 
@@ -77,11 +83,11 @@ export default function HeroSection() {
               transition={{ duration: 0.7, delay: 0.1 }}
               className="font-display text-5xl sm:text-6xl xl:text-7xl leading-[1.05] mb-6"
             >
-              <span className="text-white">Luxury</span>
+              <span className="text-white">{t("hero.title1")}</span>
               <br />
-              <span className="text-gold-gradient">Private</span>
+              <span className="text-gold-gradient">{t("hero.title2")}</span>
               <br />
-              <span className="text-white">Transfers</span>
+              <span className="text-white">{t("hero.title3")}</span>
             </motion.h1>
 
             <motion.p
@@ -90,8 +96,7 @@ export default function HeroSection() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-dark-300 text-lg leading-relaxed mb-8 max-w-md"
             >
-              Premium chauffeur service with Mercedes S-Class, BMW 7 Series, and Tesla Model S.
-              Airport transfers, executive travel, and VIP transportation across Barcelona and Spain.
+              {t("hero.description")}
             </motion.p>
 
             {/* Trust pills */}
@@ -101,12 +106,12 @@ export default function HeroSection() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="flex flex-wrap gap-2 mb-10"
             >
-              {["Meet & Greet", "Flight Monitoring", "Free Waiting", "Fixed Prices", "24/7 Support"].map((t) => (
+              {TRUST_PILLS.map((pill) => (
                 <span
-                  key={t}
+                  key={pill}
                   className="text-xs text-dark-300 border border-white/10 rounded-full px-3 py-1 bg-white/[0.03]"
                 >
-                  ✦ {t}
+                  ✦ {pill}
                 </span>
               ))}
             </motion.div>
@@ -122,14 +127,14 @@ export default function HeroSection() {
                 href="/book"
                 className="btn-gold flex items-center gap-2 px-7 py-4 rounded-xl text-sm font-semibold tracking-wide"
               >
-                Book Your Transfer
+                {t("hero.cta.book")}
                 <ArrowRight size={16} />
               </Link>
               <Link
                 href="/fleet"
                 className="btn-outline-gold flex items-center gap-2 px-7 py-4 rounded-xl text-sm font-semibold tracking-wide"
               >
-                View Our Fleet
+                {t("hero.cta.fleet")}
               </Link>
             </motion.div>
 
@@ -142,17 +147,17 @@ export default function HeroSection() {
             >
               <div>
                 <p className="font-display text-3xl text-white stat-number">{count.clients.toLocaleString()}+</p>
-                <p className="text-dark-400 text-xs tracking-wider uppercase mt-1">Happy Clients</p>
+                <p className="text-dark-400 text-xs tracking-wider uppercase mt-1">{t("hero.stats.clients")}</p>
               </div>
               <div className="w-px bg-white/[0.06]" />
               <div>
                 <p className="font-display text-3xl text-white stat-number">{(count.rating / 10).toFixed(1)}★</p>
-                <p className="text-dark-400 text-xs tracking-wider uppercase mt-1">Google Rating</p>
+                <p className="text-dark-400 text-xs tracking-wider uppercase mt-1">{t("hero.stats.rating")}</p>
               </div>
               <div className="w-px bg-white/[0.06]" />
               <div>
                 <p className="font-display text-3xl text-white stat-number">{count.years}+</p>
-                <p className="text-dark-400 text-xs tracking-wider uppercase mt-1">Years Active</p>
+                <p className="text-dark-400 text-xs tracking-wider uppercase mt-1">{t("hero.stats.years")}</p>
               </div>
             </motion.div>
           </div>
