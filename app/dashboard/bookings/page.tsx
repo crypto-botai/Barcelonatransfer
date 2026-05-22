@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,7 +44,7 @@ const STATUS_BY_TAB: Record<Tab, string[]> = {
   pending:   ["PENDING"],
 };
 
-export default function BookingsPage() {
+function BookingsContent() {
   const searchParams = useSearchParams();
   const tabParam = (searchParams.get("tab") as Tab) ?? "all";
   const [activeTab, setActiveTab] = useState<Tab>(tabParam);
@@ -276,5 +276,13 @@ export default function BookingsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function BookingsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <BookingsContent />
+    </Suspense>
   );
 }
