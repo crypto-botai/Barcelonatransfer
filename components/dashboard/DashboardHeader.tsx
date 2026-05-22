@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Plus, Menu, X, Search, Phone } from "lucide-react";
+import { Bell, Plus, Menu, X, Phone, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 interface Notification {
   id: string;
@@ -156,6 +157,16 @@ export default function DashboardHeader({ userName, memberTier = "Gold", notific
           <Plus size={13} />
           <span className="hidden sm:inline">Book Transfer</span>
         </Link>
+
+        {/* Sign Out */}
+        <button
+          onClick={() => signOut({ callbackUrl: "/" })}
+          title="Sign Out"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-400/80 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all"
+        >
+          <LogOut size={13} />
+          <span className="hidden sm:inline">Sign Out</span>
+        </button>
       </div>
     </header>
   );

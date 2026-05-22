@@ -119,7 +119,7 @@ export default function MobileDashboardNav({ isOpen, onClose, userName, memberTi
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-dark-500 hover:text-red-400 hover:bg-red-500/5 transition-all"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400/70 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all"
               >
                 <LogOut size={15} />
                 <span>Sign Out</span>

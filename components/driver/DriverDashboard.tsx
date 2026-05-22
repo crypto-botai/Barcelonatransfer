@@ -6,8 +6,9 @@ import {
   Car, MapPin, Calendar, Star, Wallet, Plus, Loader2,
   CheckCircle2, Clock, XCircle, AlertCircle, TrendingUp,
   CreditCard, Smartphone, Phone, MessageCircle, Navigation,
-  Power, Plane, PlayCircle, FlagTriangleRight,
+  Power, Plane, PlayCircle, FlagTriangleRight, LogOut,
 } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
 import toast from "react-hot-toast";
@@ -257,6 +258,12 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
               className="btn-gold flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold"
             >
               <Wallet size={15} /> Withdraw
+            </button>
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-red-400/80 hover:text-red-400 hover:bg-red-500/10 border border-red-500/20 hover:border-red-500/40 transition-all"
+            >
+              <LogOut size={15} /> Sign Out
             </button>
           </div>
         </motion.div>
