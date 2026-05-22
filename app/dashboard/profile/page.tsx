@@ -16,11 +16,25 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     setSaving(true);
-    await new Promise(r => setTimeout(r, 800));
-    setSaving(false);
-    setSaved(true);
-    toast.success("Profile updated successfully");
-    setTimeout(() => setSaved(false), 3000);
+    try {
+      const res = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone }),
+      });
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error ?? "Failed to save");
+      }
+      await update({ name });
+      setSaved(true);
+      toast.success("Profile updated successfully");
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to save profile");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

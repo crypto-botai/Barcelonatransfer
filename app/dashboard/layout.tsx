@@ -10,6 +10,7 @@ import MobileDashboardNav from "@/components/dashboard/MobileDashboardNav";
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [memberTier, setMemberTier] = useState("Standard");
   const router = useRouter();
 
   const user = session?.user as { id?: string; name?: string; email?: string; role?: string } | undefined;
@@ -23,6 +24,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       router.replace("/driver");
     }
   }, [status, user?.role, router]);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    fetch("/api/user/stats")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.memberTier) setMemberTier(d.memberTier); })
+      .catch(() => {});
+  }, [status]);
 
   if (status === "loading" || !user || status === "unauthenticated" || user.role === "ADMIN" || user.role === "DRIVER") {
     return (
@@ -42,7 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Desktop sidebar */}
       <DashboardSidebar
         userName={user.name ?? user.email}
-        memberTier="Gold"
+        memberTier={memberTier}
         notificationCount={0}
       />
 
@@ -51,14 +60,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         userName={user.name ?? user.email}
-        memberTier="Gold"
+        memberTier={memberTier}
       />
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <DashboardHeader
           userName={user.name ?? user.email}
-          memberTier="Gold"
+          memberTier={memberTier}
           notifications={[]}
           onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
           mobileMenuOpen={mobileMenuOpen}
