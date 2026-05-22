@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import MobileDashboardNav from "@/components/dashboard/MobileDashboardNav";
@@ -10,8 +10,21 @@ import MobileDashboardNav from "@/components/dashboard/MobileDashboardNav";
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
-  if (status === "loading") {
+  const user = session?.user as { id?: string; name?: string; email?: string; role?: string } | undefined;
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/auth/login");
+    } else if (status === "authenticated" && user?.role === "ADMIN") {
+      router.replace("/admin");
+    } else if (status === "authenticated" && user?.role === "DRIVER") {
+      router.replace("/driver");
+    }
+  }, [status, user?.role, router]);
+
+  if (status === "loading" || !user || status === "unauthenticated" || user.role === "ADMIN" || user.role === "DRIVER") {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -23,12 +36,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
     );
   }
-
-  if (!session) {
-    redirect("/auth/login");
-  }
-
-  const user = session.user as { id?: string; name?: string; email?: string; role?: string };
 
   return (
     <div className="flex h-screen bg-[#050505] overflow-hidden">
