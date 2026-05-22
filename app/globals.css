@@ -36,6 +36,8 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* No scroll-snap on root — prevents sections from hijacking scroll */
+    overflow-anchor: none;
   }
 
   body {
@@ -43,7 +45,12 @@
     color: hsl(var(--foreground));
     font-family: var(--font-inter), system-ui, sans-serif;
     overflow-x: hidden;
+    /* Prevents content layout shift on mobile address bar resize */
+    min-height: 100dvh;
   }
+
+  /* Prevent tap highlight flash on mobile */
+  * { -webkit-tap-highlight-color: transparent; }
 
   /* Custom scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -269,15 +276,12 @@
 .vehicle-card {
   position: relative;
   overflow: hidden;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-              box-shadow 0.4s ease;
 }
-.vehicle-card:hover { transform: translateY(-6px); }
 .vehicle-card::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
   pointer-events: none;
 }
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Star, Shield, Clock, Award } from "lucide-react";
@@ -8,29 +7,20 @@ import { useTranslation } from "react-i18next";
 import BookingForm from "@/components/booking/BookingForm";
 import "@/lib/i18n";
 
+const fade = (delay = 0) => ({
+  initial:    { opacity: 0, y: 14 },
+  animate:    { opacity: 1, y: 0 },
+  transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] as [number,number,number,number] },
+});
+
 export default function HeroSection() {
   const { t } = useTranslation();
-  const [count, setCount] = useState({ clients: 0, rating: 0, years: 0 });
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const interval = setInterval(() => {
-        setCount((prev) => ({
-          clients: Math.min(prev.clients + 83, 5000),
-          rating:  prev.rating >= 49 ? 49 : prev.rating + 1,
-          years:   Math.min(prev.years + 1, 7),
-        }));
-      }, 16);
-      return () => clearInterval(interval);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, []);
 
   const TRUST_BADGES = [
-    { icon: Star,   label: t("hero.badges.rating"),    sub: t("hero.badges.ratingsSub") },
-    { icon: Shield, label: t("hero.badges.vtc"),        sub: t("hero.badges.vtcSub") },
-    { icon: Clock,  label: t("hero.badges.service"),    sub: t("hero.badges.serviceSub") },
-    { icon: Award,  label: t("hero.badges.transfers"),  sub: t("hero.badges.transfersSub") },
+    { icon: Star,   label: t("hero.badges.rating"),   sub: t("hero.badges.ratingsSub") },
+    { icon: Shield, label: t("hero.badges.vtc"),       sub: t("hero.badges.vtcSub") },
+    { icon: Clock,  label: t("hero.badges.service"),   sub: t("hero.badges.serviceSub") },
+    { icon: Award,  label: t("hero.badges.transfers"), sub: t("hero.badges.transfersSub") },
   ];
 
   const TRUST_PILLS = [
@@ -42,46 +32,41 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#050505]">
-      {/* Background layers */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(201,168,76,0.08),transparent)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_80%_60%,rgba(201,168,76,0.05),transparent)]" />
-        <div className="gold-orb w-[600px] h-[600px] -top-48 -left-48 opacity-60" />
-        <div className="gold-orb w-[400px] h-[400px] top-1/2 -right-32 opacity-40" />
-        <div className="gold-orb w-[300px] h-[300px] bottom-0 left-1/3 opacity-30" />
+    <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden bg-[#050505]">
+      {/* Static background — no motion */}
+      <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_-10%,rgba(201,168,76,0.07),transparent)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_35%_at_80%_60%,rgba(201,168,76,0.04),transparent)]" />
+        <div className="absolute -top-48 -left-48 w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(201,168,76,0.1)_0%,transparent_65%)] blur-[70px]" />
+        <div className="absolute bottom-0 left-1/3 w-[300px] h-[300px] rounded-full bg-[radial-gradient(circle,rgba(201,168,76,0.06)_0%,transparent_65%)] blur-[60px]" />
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          aria-hidden
+          className="absolute inset-0 opacity-[0.025]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px)",
+              "linear-gradient(rgba(201,168,76,1) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,1) 1px,transparent 1px)",
             backgroundSize: "80px 80px",
           }}
         />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 pt-32 pb-16">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 container mx-auto px-4 pt-28 pb-12 sm:pt-32 sm:pb-16">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+
           {/* Left — Copy */}
           <div>
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold-500/30 bg-gold-500/5 mb-6"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse" />
-              <span className="text-gold-400 text-xs tracking-[0.2em] uppercase font-medium">
+            <motion.div {...fade(0)} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9a84c]/25 bg-[#c9a84c]/[0.05] mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#c9a84c]" />
+              <span className="text-[#c9a84c] text-[11px] tracking-[0.22em] uppercase font-medium">
                 {t("hero.badge")}
               </span>
             </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              className="font-display text-5xl sm:text-6xl xl:text-7xl leading-[1.05] mb-6"
+              transition={{ duration: 0.65, delay: 0.08 }}
+              className="font-display text-[2.8rem] sm:text-[3.5rem] xl:text-[4.2rem] leading-[1.05] mb-6"
             >
               <span className="text-white">{t("hero.title1")}</span>
               <br />
@@ -90,26 +75,16 @@ export default function HeroSection() {
               <span className="text-white">{t("hero.title3")}</span>
             </motion.h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-dark-300 text-lg leading-relaxed mb-8 max-w-md"
-            >
+            <motion.p {...fade(0.14)} className="text-white/45 text-base sm:text-lg leading-relaxed mb-8 max-w-md">
               {t("hero.description")}
             </motion.p>
 
             {/* Trust pills */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-wrap gap-2 mb-10"
-            >
+            <motion.div {...fade(0.2)} className="flex flex-wrap gap-2 mb-9">
               {TRUST_PILLS.map((pill) => (
                 <span
                   key={pill}
-                  className="text-xs text-dark-300 border border-white/10 rounded-full px-3 py-1 bg-white/[0.03]"
+                  className="text-xs text-white/35 border border-white/[0.08] rounded-full px-3 py-1"
                 >
                   ✦ {pill}
                 </span>
@@ -117,22 +92,17 @@ export default function HeroSection() {
             </motion.div>
 
             {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-wrap gap-3 mb-12"
-            >
+            <motion.div {...fade(0.25)} className="flex flex-wrap gap-3 mb-12">
               <Link
                 href="/book"
-                className="btn-gold flex items-center gap-2 px-7 py-4 rounded-xl text-sm font-semibold tracking-wide"
+                className="btn-gold inline-flex items-center gap-2 px-7 py-4 rounded-xl text-sm font-semibold tracking-wide"
               >
                 {t("hero.cta.book")}
-                <ArrowRight size={16} />
+                <ArrowRight size={15} />
               </Link>
               <Link
                 href="/fleet"
-                className="btn-outline-gold flex items-center gap-2 px-7 py-4 rounded-xl text-sm font-semibold tracking-wide"
+                className="btn-outline-gold inline-flex items-center gap-2 px-7 py-4 rounded-xl text-sm font-semibold tracking-wide"
               >
                 {t("hero.cta.fleet")}
               </Link>
@@ -142,31 +112,30 @@ export default function HeroSection() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
+              transition={{ duration: 0.6, delay: 0.35 }}
               className="flex gap-8 border-t border-white/[0.06] pt-8"
             >
-              <div>
-                <p className="font-display text-3xl text-white stat-number">{count.clients.toLocaleString()}+</p>
-                <p className="text-dark-400 text-xs tracking-wider uppercase mt-1">{t("hero.stats.clients")}</p>
-              </div>
-              <div className="w-px bg-white/[0.06]" />
-              <div>
-                <p className="font-display text-3xl text-white stat-number">{(count.rating / 10).toFixed(1)}★</p>
-                <p className="text-dark-400 text-xs tracking-wider uppercase mt-1">{t("hero.stats.rating")}</p>
-              </div>
-              <div className="w-px bg-white/[0.06]" />
-              <div>
-                <p className="font-display text-3xl text-white stat-number">{count.years}+</p>
-                <p className="text-dark-400 text-xs tracking-wider uppercase mt-1">{t("hero.stats.years")}</p>
-              </div>
+              {[
+                { value: "5,000+", label: t("hero.stats.clients") },
+                { value: "4.9★",   label: t("hero.stats.rating") },
+                { value: "7+",     label: t("hero.stats.years") },
+              ].map((s, i) => (
+                <>
+                  {i > 0 && <div key={`sep-${i}`} className="w-px bg-white/[0.06]" />}
+                  <div key={s.label}>
+                    <p className="font-display text-2xl sm:text-3xl text-white">{s.value}</p>
+                    <p className="text-white/30 text-[11px] tracking-wider uppercase mt-1">{s.label}</p>
+                  </div>
+                </>
+              ))}
             </motion.div>
           </div>
 
           {/* Right — Booking Form */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            transition={{ duration: 0.65, delay: 0.2 }}
           >
             <BookingForm compact />
           </motion.div>
@@ -175,21 +144,21 @@ export default function HeroSection() {
 
       {/* Trust badges strip */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.8 }}
-        className="relative z-10 border-t border-white/[0.06] bg-black/40 backdrop-blur-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className="relative z-10 border-t border-white/[0.05] bg-black/30 backdrop-blur-sm"
       >
         <div className="container mx-auto px-4 py-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             {TRUST_BADGES.map(({ icon: Icon, label, sub }) => (
               <div key={label} className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gold-500/10 border border-gold-500/20 flex items-center justify-center flex-shrink-0">
-                  <Icon size={16} className="text-gold-500" />
+                <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/[0.08] border border-[#c9a84c]/15 flex items-center justify-center flex-shrink-0">
+                  <Icon size={15} className="text-[#c9a84c]" />
                 </div>
                 <div>
-                  <p className="text-white text-sm font-medium">{label}</p>
-                  <p className="text-dark-400 text-xs">{sub}</p>
+                  <p className="text-white text-sm font-medium leading-snug">{label}</p>
+                  <p className="text-white/30 text-xs">{sub}</p>
                 </div>
               </div>
             ))}
