@@ -28,16 +28,6 @@ export const metadata: Metadata = {
   },
   description:
     "Barcelona's #1 luxury private transfer. Fixed prices from €45 — no surge pricing, ever. BCN El Prat T1/T2, cruise port, hotels. Mercedes, Tesla, BMW. Book instantly 24/7.",
-  keywords: [
-    "Barcelona airport transfer", "transfer aeropuerto Barcelona", "BCN airport private transfer",
-    "luxury transfer Barcelona", "private chauffeur Barcelona", "El Prat airport taxi Barcelona",
-    "airport transfer Barcelona fixed price", "Barcelona VTC service", "VTC Barcelona aeropuerto",
-    "luxury chauffeur service Barcelona", "private driver Barcelona airport", "VIP transfer Barcelona",
-    "executive chauffeur Barcelona", "Mercedes V-Class Barcelona hire", "airport to Barcelona city centre",
-    "Sitges transfer from airport", "Girona transfer Barcelona", "Tarragona transfer Barcelona",
-    "Andorra transfer Barcelona airport", "Costa Brava transfer Barcelona",
-    "cruise port Barcelona transfer", "corporate chauffeur Barcelona",
-  ],
   authors: [{ name: "Élite BCN Transfers" }],
   creator: "Élite BCN Transfers",
   publisher: "Élite BCN Transfers",
@@ -168,13 +158,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     { "@type": "AdministrativeArea", name: "Costa Daurada" },
                     { "@type": "AdministrativeArea", name: "Catalonia" },
                   ],
-                  aggregateRating: {
-                    "@type": "AggregateRating",
-                    ratingValue: "4.9",
-                    reviewCount: "500",
-                    bestRating: "5",
-                    worstRating: "1",
-                  },
                   hasOfferCatalog: {
                     "@type": "OfferCatalog",
                     name: "Barcelona Private Transfer Services",

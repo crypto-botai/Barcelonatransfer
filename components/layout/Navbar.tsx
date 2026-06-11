@@ -7,13 +7,12 @@ import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone, ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
-import "@/lib/i18n";
 
 export default function Navbar() {
-  const { t } = useTranslation();
+  const t = useTranslations("nav");
   const [scrolled, setScrolled]   = useState(false);
   const [mobileOpen, setMobile]   = useState(false);
   const [dropdown, setDropdown]   = useState<string | null>(null);
@@ -23,20 +22,20 @@ export default function Navbar() {
   const dashboardHref = role === "ADMIN" ? "/admin" : role === "DRIVER" ? "/driver" : null;
 
   const NAV_LINKS = [
-    { label: t("nav.services"),   href: "/#services" },
-    { label: t("nav.fleet"),      href: "/fleet" },
-    { label: t("nav.pricing"),    href: "/pricing" },
+    { label: t("services"),   href: "/#services" },
+    { label: t("fleet"),      href: "/fleet" },
+    { label: t("pricing"),    href: "/pricing" },
     {
-      label: t("nav.transfers"),
+      label: t("transfers"),
       href: "#",
       children: [
-        { label: t("nav.airportTransfers"),  href: "/airport-transfers" },
-        { label: t("nav.corporateTravel"),   href: "/corporate" },
-        { label: t("nav.hourlyChaufeur"),    href: "/hourly" },
+        { label: t("airportTransfers"),  href: "/airport-transfers" },
+        { label: t("corporateTravel"),   href: "/corporate" },
+        { label: t("hourlyChaufeur"),    href: "/hourly" },
       ],
     },
-    { label: t("nav.about"),   href: "/about" },
-    { label: t("nav.contact"), href: "/contact" },
+    { label: t("about"),   href: "/about" },
+    { label: t("contact"), href: "/contact" },
   ];
 
   useEffect(() => {
@@ -144,7 +143,7 @@ export default function Navbar() {
                 href="/book"
                 className="btn-gold px-5 py-2.5 rounded-lg text-sm font-semibold tracking-wide"
               >
-                {t("nav.bookNow")}
+                {t("bookNow")}
               </Link>
               {dashboardHref ? (
                 <Link
@@ -152,14 +151,14 @@ export default function Navbar() {
                   className="flex items-center gap-1.5 text-sm text-gold-400 hover:text-gold-300 transition-colors tracking-wide"
                 >
                   <LayoutDashboard size={14} />
-                  {t("nav.dashboard")}
+                  {t("dashboard")}
                 </Link>
               ) : (
                 <Link
                   href="/auth/login"
                   className="text-sm text-dark-400 hover:text-white transition-colors tracking-wide"
                 >
-                  {t("nav.signIn")}
+                  {t("signIn")}
                 </Link>
               )}
             </div>
@@ -232,7 +231,7 @@ export default function Navbar() {
                 className="btn-gold w-full py-4 rounded-xl text-center text-base font-semibold tracking-wide"
                 onClick={() => setMobile(false)}
               >
-                {t("nav.mobileBook")}
+                {t("mobileBook")}
               </Link>
               {dashboardHref && (
                 <Link
@@ -241,7 +240,7 @@ export default function Navbar() {
                   onClick={() => setMobile(false)}
                 >
                   <LayoutDashboard size={16} />
-                  <span>{t("nav.dashboard")}</span>
+                  <span>{t("dashboard")}</span>
                 </Link>
               )}
               {dashboardHref && (

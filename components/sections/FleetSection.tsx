@@ -5,11 +5,10 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Users, Briefcase, ChevronRight } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { VEHICLE_CATALOG } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { DEFAULT_PRICING } from "@/lib/pricing";
-import "@/lib/i18n";
 
 function badgeClass(badge: string) {
   if (badge === "VIP")         return "bg-[#c9a84c] text-black";
@@ -28,7 +27,7 @@ function FleetCard({
   index: number;
   mobile?: boolean;
 }) {
-  const { t } = useTranslation();
+  const t = useTranslations("fleet");
   const price = DEFAULT_PRICING[vehicle.class].minimumFare;
 
   return (
@@ -68,7 +67,7 @@ function FleetCard({
               <p className="text-white/25 text-xs mt-0.5 truncate">{vehicle.models[0]}</p>
             </div>
             <div className="text-right shrink-0">
-              <p className="text-[9px] text-white/20 uppercase tracking-widest">{t("fleet.from")}</p>
+              <p className="text-[9px] text-white/20 uppercase tracking-widest">{t("from")}</p>
               <p className="font-display text-xl text-[#c9a84c] leading-tight">{formatCurrency(price)}</p>
             </div>
           </div>
@@ -76,22 +75,22 @@ function FleetCard({
           <div className="flex items-center gap-5">
             <span className="flex items-center gap-1.5 text-xs text-white/35">
               <Users size={11} className="text-[#c9a84c]/60" />
-              {vehicle.maxPassengers} {t("fleet.pax")}
+              {vehicle.maxPassengers} {t("pax")}
             </span>
             <span className="flex items-center gap-1.5 text-xs text-white/35">
               <Briefcase size={11} className="text-[#c9a84c]/60" />
-              {vehicle.maxLuggage} {t("fleet.bags")}
+              {vehicle.maxLuggage} {t("bags")}
             </span>
           </div>
 
-          <p className="text-[9px] text-white/15 tracking-wider">{t("fleet.inclVat")}</p>
+          <p className="text-[9px] text-white/15 tracking-wider">{t("inclVat")}</p>
 
           <div className="mt-auto">
             <Link
               href={`/book?vehicle=${vehicle.class}`}
               className="group/btn flex items-center justify-between w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.07] text-sm text-white/45 hover:text-[#c9a84c] hover:border-[#c9a84c]/28 hover:bg-[#c9a84c]/[0.04] transition-all duration-300"
             >
-              <span className="font-medium">{t("fleet.reserveVehicle")}</span>
+              <span className="font-medium">{t("reserveVehicle")}</span>
               <ChevronRight size={14} className="text-white/25 group-hover/btn:text-[#c9a84c] group-hover/btn:translate-x-0.5 transition-all duration-300" />
             </Link>
           </div>
@@ -102,7 +101,7 @@ function FleetCard({
 }
 
 export default function FleetSection() {
-  const { t } = useTranslation();
+  const t = useTranslations("fleet");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -120,7 +119,7 @@ export default function FleetSection() {
           >
             <div className="h-px w-8 bg-[#c9a84c]/40" />
             <span className="text-[#c9a84c] text-[11px] tracking-[0.4em] uppercase font-medium">
-              {t("fleet.sectionLabel")}
+              {t("sectionLabel")}
             </span>
             <div className="h-px w-8 bg-[#c9a84c]/40" />
           </motion.div>
@@ -132,8 +131,8 @@ export default function FleetSection() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-display text-4xl sm:text-5xl lg:text-6xl text-white leading-tight mb-4"
           >
-            {t("fleet.title")}{" "}
-            <span className="text-gold-gradient">{t("fleet.titleAccent")}</span>
+            {t("title")}{" "}
+            <span className="text-gold-gradient">{t("titleAccent")}</span>
           </motion.h2>
 
           <motion.p
@@ -143,7 +142,7 @@ export default function FleetSection() {
             transition={{ duration: 0.6, delay: 0.18 }}
             className="text-white/35 max-w-md mx-auto text-sm sm:text-base leading-relaxed"
           >
-            {t("fleet.subtitle")}
+            {t("subtitle")}
           </motion.p>
         </div>
 
@@ -187,7 +186,7 @@ export default function FleetSection() {
             href="/fleet"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl border border-[#c9a84c]/30 text-[#c9a84c] text-sm font-semibold tracking-wide hover:bg-[#c9a84c]/[0.06] hover:border-[#c9a84c]/50 transition-all duration-300"
           >
-            {t("fleet.allVehicles")}
+            {t("allVehicles")}
             <ChevronRight size={14} />
           </Link>
         </motion.div>

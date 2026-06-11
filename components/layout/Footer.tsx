@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { Mail, Phone, MessageCircle, MapPin, Instagram, Facebook, Car, Shield } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import NewsletterForm from "@/components/marketing/NewsletterForm";
-import "@/lib/i18n";
 
 export default function Footer() {
-  const { t } = useTranslation();
+  const t = useTranslations("footer");
 
   const SERVICES = [
     { key: "airportTransfers",  href: "/airport-transfers" },
@@ -44,8 +43,8 @@ export default function Footer() {
       <div className="border-b border-gold-500/15 bg-gradient-to-r from-transparent via-gold-500/5 to-transparent">
         <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
-            <h3 className="font-display text-xl text-white">{t("footer.newsletter.title")}</h3>
-            <p className="text-dark-400 text-sm mt-1">{t("footer.newsletter.subtitle")}</p>
+            <h3 className="font-display text-xl text-white">{t("newsletter.title")}</h3>
+            <p className="text-dark-400 text-sm mt-1">{t("newsletter.subtitle")}</p>
           </div>
           <div className="w-full md:w-auto md:min-w-[340px]">
             <NewsletterForm source="footer" />
@@ -57,15 +56,15 @@ export default function Footer() {
       <div className="border-b border-gold-500/15">
         <div className="container mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h3 className="font-display text-lg text-white">{t("footer.cta.title")}</h3>
-            <p className="text-dark-400 text-sm mt-1">{t("footer.cta.subtitle")}</p>
+            <h3 className="font-display text-lg text-white">{t("cta.title")}</h3>
+            <p className="text-dark-400 text-sm mt-1">{t("cta.subtitle")}</p>
           </div>
           <div className="flex gap-3">
             <Link
               href="/book"
               className="btn-gold px-6 py-3 rounded-lg text-sm font-semibold tracking-wide whitespace-nowrap"
             >
-              {t("footer.cta.button")}
+              {t("cta.button")}
             </Link>
             <a
               href="https://wa.me/34635383712"
@@ -95,7 +94,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-dark-400 text-sm leading-relaxed mb-6 max-w-xs">
-              {t("footer.tagline")}
+              {t("tagline")}
             </p>
             <div className="flex flex-col gap-3">
               <a href="tel:+34635383712" className="flex items-center gap-3 text-sm text-dark-400 hover:text-gold-400 transition-colors">
@@ -108,11 +107,11 @@ export default function Footer() {
               </a>
               <a href="https://wa.me/34635383712" target="_blank" rel="noreferrer" className="flex items-center gap-3 text-sm text-dark-400 hover:text-gold-400 transition-colors">
                 <MessageCircle size={14} className="text-gold-500/60" />
-                {t("footer.contact.whatsapp")}
+                {t("contact.whatsapp")}
               </a>
               <p className="flex items-center gap-3 text-sm text-dark-400">
                 <MapPin size={14} className="text-gold-500/60 flex-shrink-0" />
-                {t("footer.contact.location")}
+                {t("contact.location")}
               </p>
             </div>
             <div className="flex gap-3 mt-5">
@@ -127,12 +126,12 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("footer.sections.services")}</h4>
+            <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("sections.services")}</h4>
             <ul className="flex flex-col gap-2.5">
               {SERVICES.map((s) => (
                 <li key={s.key}>
                   <Link href={s.href} className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
-                    {t(`footer.links.${s.key}`)}
+                    {t(`links.${s.key}`)}
                   </Link>
                 </li>
               ))}
@@ -141,12 +140,12 @@ export default function Footer() {
 
           {/* Fleet */}
           <div>
-            <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("footer.sections.fleet")}</h4>
+            <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("sections.fleet")}</h4>
             <ul className="flex flex-col gap-2.5">
               {FLEET_LINKS.map((f) => (
                 <li key={f.key}>
                   <Link href={f.href} className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
-                    {t(`footer.links.${f.key}`)}
+                    {t(`links.${f.key}`)}
                   </Link>
                 </li>
               ))}
@@ -155,29 +154,29 @@ export default function Footer() {
 
           {/* Destinations */}
           <div>
-            <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("footer.sections.destinations")}</h4>
+            <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("sections.destinations")}</h4>
             <ul className="flex flex-col gap-2.5">
               {DESTINATIONS.map(({ key, href }) => (
                 <li key={key}>
                   <Link href={href} className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
-                    {t(`footer.links.${key}`)}
+                    {t(`links.${key}`)}
                   </Link>
                 </li>
               ))}
               <li className="pt-3 border-t border-white/[0.06] mt-1">
-                <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-3 font-medium">{t("footer.sections.staff")}</h4>
+                <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-3 font-medium">{t("sections.staff")}</h4>
                 <div className="flex flex-col gap-2.5">
                   <Link href="/auth/login" className="flex items-center gap-2 text-sm text-dark-400 hover:text-gold-400 transition-colors">
                     <Car size={12} className="text-gold-500/50 flex-shrink-0" />
-                    {t("footer.links.driverLogin")}
+                    {t("links.driverLogin")}
                   </Link>
                   <Link href="/driver/register" className="flex items-center gap-2 text-sm text-dark-400 hover:text-gold-400 transition-colors">
                     <Car size={12} className="text-gold-500/50 flex-shrink-0" />
-                    {t("footer.links.driverRegister")}
+                    {t("links.driverRegister")}
                   </Link>
                   <Link href="/admin" className="flex items-center gap-2 text-sm text-dark-400 hover:text-gold-400 transition-colors">
                     <Shield size={12} className="text-gold-500/50 flex-shrink-0" />
-                    {t("footer.links.adminLogin")}
+                    {t("links.adminLogin")}
                   </Link>
                 </div>
               </li>
@@ -190,13 +189,13 @@ export default function Footer() {
       <div className="border-t border-white/[0.06]">
         <div className="container mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-dark-500 text-xs">
-            © {new Date().getFullYear()} Élite BCN Transfers. {t("footer.copyright")}
+            © {new Date().getFullYear()} Élite BCN Transfers. {t("copyright")}
           </p>
           <div className="flex gap-5">
-            <Link href="/faq"     className="text-xs text-dark-500 hover:text-gold-400 transition-colors">{t("footer.legal.faq")}</Link>
-            <Link href="/privacy" className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("footer.legal.privacy")}</Link>
-            <Link href="/terms"   className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("footer.legal.terms")}</Link>
-            <Link href="/cookies" className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("footer.legal.cookies")}</Link>
+            <Link href="/faq"     className="text-xs text-dark-500 hover:text-gold-400 transition-colors">{t("legal.faq")}</Link>
+            <Link href="/privacy" className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.privacy")}</Link>
+            <Link href="/terms"   className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.terms")}</Link>
+            <Link href="/cookies" className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.cookies")}</Link>
           </div>
         </div>
       </div>

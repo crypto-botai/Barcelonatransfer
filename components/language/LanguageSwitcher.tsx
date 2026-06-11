@@ -1,19 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check } from "lucide-react";
 import { SUPPORTED_LOCALES, LANGUAGE_META, type SupportedLocale } from "@/lib/i18n";
-import "@/lib/i18n";
+import { useI18n } from "@/components/language/I18nProvider";
 import { cn } from "@/lib/utils";
 
 export default function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
-  const { i18n } = useTranslation();
+  const { locale, setLocale } = useI18n();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const current = (i18n.language?.split("-")[0] || "en") as SupportedLocale;
-  const currentMeta = LANGUAGE_META[current] ?? LANGUAGE_META.en;
+  const currentMeta = LANGUAGE_META[locale] ?? LANGUAGE_META.en;
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -23,8 +21,8 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const handleSelect = (locale: SupportedLocale) => {
-    i18n.changeLanguage(locale);
+  const handleSelect = (l: SupportedLocale) => {
+    setLocale(l);
     setOpen(false);
   };
 
@@ -66,13 +64,13 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
             )}
           >
             <div className="py-1">
-              {SUPPORTED_LOCALES.map((locale) => {
-                const meta = LANGUAGE_META[locale];
-                const isActive = locale === current;
+              {SUPPORTED_LOCALES.map((l) => {
+                const meta = LANGUAGE_META[l];
+                const isActive = l === locale;
                 return (
                   <button
-                    key={locale}
-                    onClick={() => handleSelect(locale)}
+                    key={l}
+                    onClick={() => handleSelect(l)}
                     className={cn(
                       "w-full flex items-center gap-3 px-3.5 py-2.5 text-left transition-colors duration-150",
                       isActive

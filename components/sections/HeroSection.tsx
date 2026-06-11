@@ -3,9 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Star, Shield, Clock, Award } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import BookingForm from "@/components/booking/BookingForm";
-import "@/lib/i18n";
 
 const fade = (delay = 0) => ({
   initial:    { opacity: 0, y: 14 },
@@ -14,21 +13,21 @@ const fade = (delay = 0) => ({
 });
 
 export default function HeroSection() {
-  const { t } = useTranslation();
+  const t = useTranslations("hero");
 
   const TRUST_BADGES = [
-    { icon: Star,   label: t("hero.badges.rating"),   sub: t("hero.badges.ratingsSub") },
-    { icon: Shield, label: t("hero.badges.vtc"),       sub: t("hero.badges.vtcSub") },
-    { icon: Clock,  label: t("hero.badges.service"),   sub: t("hero.badges.serviceSub") },
-    { icon: Award,  label: t("hero.badges.transfers"), sub: t("hero.badges.transfersSub") },
+    { icon: Star,   label: t("badges.rating"),   sub: t("badges.ratingsSub") },
+    { icon: Shield, label: t("badges.vtc"),       sub: t("badges.vtcSub") },
+    { icon: Clock,  label: t("badges.service"),   sub: t("badges.serviceSub") },
+    { icon: Award,  label: t("badges.transfers"), sub: t("badges.transfersSub") },
   ];
 
   const TRUST_PILLS = [
-    t("hero.trust.meetGreet"),
-    t("hero.trust.flightMonitoring"),
-    t("hero.trust.freeWaiting"),
-    t("hero.trust.fixedPrices"),
-    t("hero.trust.support"),
+    t("trust.meetGreet"),
+    t("trust.flightMonitoring"),
+    t("trust.freeWaiting"),
+    t("trust.fixedPrices"),
+    t("trust.support"),
   ];
 
   return (
@@ -58,7 +57,7 @@ export default function HeroSection() {
             <motion.div {...fade(0)} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9a84c]/25 bg-[#c9a84c]/[0.05] mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-[#c9a84c]" />
               <span className="text-[#c9a84c] text-[11px] tracking-[0.22em] uppercase font-medium">
-                {t("hero.badge")}
+                {t("badge")}
               </span>
             </motion.div>
 
@@ -68,15 +67,15 @@ export default function HeroSection() {
               transition={{ duration: 0.65, delay: 0.08 }}
               className="font-display text-[2.8rem] sm:text-[3.5rem] xl:text-[4.2rem] leading-[1.05] mb-6"
             >
-              <span className="text-white">{t("hero.title1")}</span>
+              <span className="text-white">{t("title1")}</span>
               <br />
-              <span className="text-gold-gradient">{t("hero.title2")}</span>
+              <span className="text-gold-gradient">{t("title2")}</span>
               <br />
-              <span className="text-white">{t("hero.title3")}</span>
+              <span className="text-white">{t("title3")}</span>
             </motion.h1>
 
             <motion.p {...fade(0.14)} className="text-white/45 text-base sm:text-lg leading-relaxed mb-8 max-w-md">
-              {t("hero.description")}
+              {t("description")}
             </motion.p>
 
             {/* Trust pills */}
@@ -97,14 +96,14 @@ export default function HeroSection() {
                 href="/book"
                 className="btn-gold inline-flex items-center gap-2 px-7 py-4 rounded-xl text-sm font-semibold tracking-wide"
               >
-                {t("hero.cta.book")}
+                {t("cta.book")}
                 <ArrowRight size={15} />
               </Link>
               <Link
                 href="/fleet"
                 className="btn-outline-gold inline-flex items-center gap-2 px-7 py-4 rounded-xl text-sm font-semibold tracking-wide"
               >
-                {t("hero.cta.fleet")}
+                {t("cta.fleet")}
               </Link>
             </motion.div>
 
@@ -116,9 +115,9 @@ export default function HeroSection() {
               className="flex gap-8 border-t border-white/[0.06] pt-8"
             >
               {[
-                { value: "5,000+", label: t("hero.stats.clients") },
-                { value: "4.9★",   label: t("hero.stats.rating") },
-                { value: "7+",     label: t("hero.stats.years") },
+                { value: "5,000+", label: t("stats.clients") },
+                { value: "4.9★",   label: t("stats.rating") },
+                { value: "7+",     label: t("stats.years") },
               ].map((s, i) => (
                 <div key={s.label} className="flex items-center gap-8">
                   {i > 0 && <div className="w-px h-8 bg-white/[0.06]" />}

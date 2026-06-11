@@ -3,8 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Plane, Anchor, Briefcase, Building2, Theater, Clock, Waves, Sunset, Mountain, Hotel, Crown, Map, ArrowRight } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import "@/lib/i18n";
+import { useTranslations } from "next-intl";
 
 const SERVICE_ICONS = [Plane, Anchor, Briefcase, Building2, Theater, Clock, Waves, Sunset, Mountain, Hotel, Crown, Map];
 const SERVICE_KEYS = ["airport", "cruise", "executive", "corporate", "vipEvents", "hourly", "costaBrava", "costaDorada", "andorra", "hotel", "vip", "tours"] as const;
@@ -14,13 +13,13 @@ const SERVICE_HREFS = [
 ];
 
 export default function ServicesSection() {
-  const { t } = useTranslation();
+  const t = useTranslations("services");
 
   const FEATURES = [
-    { icon: "🛫", title: t("services.features.flightMonitoring"), desc: t("services.features.realTime") },
-    { icon: "⏳", title: t("services.features.freeWaiting"),      desc: t("services.features.sixtyMin") },
-    { icon: "🪧", title: t("services.features.meetGreet"),        desc: t("services.features.nameBoard") },
-    { icon: "💳", title: t("services.features.fixedPrices"),      desc: t("services.features.noSurge") },
+    { icon: "🛫", title: t("features.flightMonitoring"), desc: t("features.realTime") },
+    { icon: "⏳", title: t("features.freeWaiting"),      desc: t("features.sixtyMin") },
+    { icon: "🪧", title: t("features.meetGreet"),        desc: t("features.nameBoard") },
+    { icon: "💳", title: t("features.fixedPrices"),      desc: t("features.noSurge") },
   ];
 
   return (
@@ -33,7 +32,7 @@ export default function ServicesSection() {
             viewport={{ once: true }}
             className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4"
           >
-            {t("services.label")}
+            {t("label")}
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -42,7 +41,7 @@ export default function ServicesSection() {
             transition={{ delay: 0.1 }}
             className="font-display text-4xl sm:text-5xl text-white mb-4"
           >
-            {t("services.title")} <span className="text-gold-gradient">{t("services.titleAccent")}</span>
+            {t("title")} <span className="text-gold-gradient">{t("titleAccent")}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -51,7 +50,7 @@ export default function ServicesSection() {
             transition={{ delay: 0.2 }}
             className="text-dark-400 max-w-xl mx-auto"
           >
-            {t("services.subtitle")}
+            {t("subtitle")}
           </motion.p>
           <div className="gold-divider mt-6" />
         </div>
@@ -75,13 +74,13 @@ export default function ServicesSection() {
                     <Icon size={18} className="text-gold-500" />
                   </div>
                   <h3 className="text-white font-medium mb-2 group-hover:text-gold-400 transition-colors">
-                    {t(`services.list.${key}.title`)}
+                    {t(`list.${key}.title`)}
                   </h3>
                   <p className="text-dark-400 text-sm leading-relaxed flex-1">
-                    {t(`services.list.${key}.desc`)}
+                    {t(`list.${key}.desc`)}
                   </p>
                   <div className="flex items-center gap-1 mt-4 text-gold-500/60 group-hover:text-gold-400 transition-colors text-xs">
-                    <span>{t("services.learnMore")}</span>
+                    <span>{t("learnMore")}</span>
                     <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>

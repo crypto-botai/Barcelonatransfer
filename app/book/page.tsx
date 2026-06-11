@@ -296,8 +296,7 @@ function BookingPageInner() {
 
   return (
     <>
-      <Navbar />
-      <main className="min-h-screen pt-20 bg-[#050505]">
+      <main className="min-h-screen bg-[#050505]">
         <div className="container mx-auto px-4 py-10 max-w-3xl">
 
           {/* ── Step Indicator ── */}
@@ -990,8 +989,21 @@ function BookingPageInner() {
 
 export default function BookPage() {
   return (
-    <Suspense>
-      <BookingPageInner />
-    </Suspense>
+    <>
+      <Navbar />
+      <div className="pt-20 pb-6 bg-[#050505]">
+        <div className="container mx-auto px-4 max-w-3xl text-center">
+          <h1 className="font-display text-3xl sm:text-4xl text-white mb-2">
+            Book Your <span className="text-gold-gradient">Barcelona Transfer</span>
+          </h1>
+          <p className="text-dark-400 text-sm max-w-lg mx-auto">
+            Fixed prices from €45. BCN El Prat T1/T2, cruise port, hotels, Sitges and Andorra. Instant confirmation 24/7.
+          </p>
+        </div>
+      </div>
+      <Suspense>
+        <BookingPageInner />
+      </Suspense>
+    </>
   );
 }
