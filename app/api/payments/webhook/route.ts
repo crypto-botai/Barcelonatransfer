@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPaymentConfirmationEmail, sendAdminNewBookingAlert, sendFailedPaymentEmail } from "@/lib/resend";
+import { sendWhatsAppBookingConfirmation } from "@/lib/whatsapp";
 import crypto from "crypto";
 
 // SumUp sends HMAC-SHA256 signature in X-Payload-Signature header
@@ -80,30 +81,56 @@ export async function POST(req: NextRequest) {
 
         if (!alreadySent) {
           const transactionId = (data.transaction_id ?? checkoutId) as string;
-          sendPaymentConfirmationEmail({
-            to:               email,
-            name:             updated.guestName ?? "Valued Client",
-            confirmationCode: updated.confirmationCode,
-            pickupAddress:    updated.pickupAddress,
-            dropoffAddress:   updated.dropoffAddress,
-            pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
-            vehicleClass:     updated.vehicleClass,
-            totalAmount:      updated.totalAmount,
-            passengers:       updated.passengers,
-            bookingId:        booking.id,
-            transactionId,
-          }).catch(e => console.error("[resend] payment confirmation (webhook):", e));
+          const route = updated.dropoffAddress
+            ? `${updated.pickupAddress} → ${updated.dropoffAddress}`
+            : updated.pickupAddress;
 
-          sendAdminNewBookingAlert({
-            confirmationCode: updated.confirmationCode,
-            guestName:        updated.guestName ?? "Guest",
-            guestEmail:       email,
-            pickupAddress:    updated.pickupAddress,
-            dropoffAddress:   updated.dropoffAddress ?? "",
-            pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
-            vehicleClass:     updated.vehicleClass,
-            totalAmount:      updated.totalAmount,
-          }).catch(e => console.error("[resend] admin alert (webhook):", e));
+          // Await both emails — fire-and-forget kills on Vercel serverless
+          const [custResult, adminResult] = await Promise.allSettled([
+            sendPaymentConfirmationEmail({
+              to:               email,
+              name:             updated.guestName ?? "Valued Client",
+              confirmationCode: updated.confirmationCode,
+              pickupAddress:    updated.pickupAddress,
+              dropoffAddress:   updated.dropoffAddress,
+              pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
+              vehicleClass:     updated.vehicleClass,
+              totalAmount:      updated.totalAmount,
+              passengers:       updated.passengers,
+              bookingId:        booking.id,
+              transactionId,
+            }),
+            sendAdminNewBookingAlert({
+              confirmationCode: updated.confirmationCode,
+              guestName:        updated.guestName ?? "Guest",
+              guestEmail:       email,
+              guestPhone:       updated.guestPhone ?? undefined,
+              pickupAddress:    updated.pickupAddress,
+              dropoffAddress:   updated.dropoffAddress ?? "",
+              pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
+              vehicleClass:     updated.vehicleClass,
+              totalAmount:      updated.totalAmount,
+            }),
+          ]);
+
+          if (custResult.status === "rejected")
+            console.error("[resend] customer email (webhook):", custResult.reason);
+          if (adminResult.status === "rejected")
+            console.error("[resend] admin alert (webhook):", adminResult.reason);
+
+          // WhatsApp — isolated so failure never breaks the webhook response
+          if (updated.guestPhone) {
+            try {
+              await sendWhatsAppBookingConfirmation({
+                phone:          updated.guestPhone,
+                bookingRef:     updated.confirmationCode,
+                pickupDatetime: updated.pickupDatetime.toLocaleString("en-GB"),
+                route,
+              });
+            } catch (waErr) {
+              console.error("[whatsapp] booking confirmation (webhook):", waErr);
+            }
+          }
         }
       }
     } else if (status === "FAILED" || status === "EXPIRED") {
@@ -113,12 +140,16 @@ export async function POST(req: NextRequest) {
       }).catch(() => null);
 
       if (failedBooking?.guestEmail) {
-        sendFailedPaymentEmail({
-          to:               failedBooking.guestEmail,
-          name:             failedBooking.guestName ?? "Valued Client",
-          confirmationCode: failedBooking.confirmationCode,
-          bookingId:        failedBooking.id,
-        }).catch(e => console.error("[resend] failed payment (webhook):", e));
+        try {
+          await sendFailedPaymentEmail({
+            to:               failedBooking.guestEmail,
+            name:             failedBooking.guestName ?? "Valued Client",
+            confirmationCode: failedBooking.confirmationCode,
+            bookingId:        failedBooking.id,
+          });
+        } catch (e) {
+          console.error("[resend] failed payment (webhook):", e);
+        }
       }
     }
   }

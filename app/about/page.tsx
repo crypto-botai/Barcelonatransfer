@@ -12,7 +12,13 @@ export const metadata: Metadata = {
     title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
     description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet. 500+ five-star reviews.",
     url: "https://www.elitebcn.info/about",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
+    description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet.",
+    images: ["/opengraph-image"],
   },
 };
 

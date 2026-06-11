@@ -201,6 +201,17 @@ function SuccessInner() {
                   View / Print Receipt
                 </Link>
               )}
+              {data?.confirmationCode && (
+                <a
+                  href={`https://wa.me/34635383712?text=${encodeURIComponent(`Hi! I just booked a transfer. Booking ref: ${data.confirmationCode}. Please confirm receipt.`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20c05c] text-white transition-colors"
+                >
+                  <MessageCircle size={16} />
+                  Confirm via WhatsApp
+                </a>
+              )}
               <a
                 href="https://wa.me/34635383712"
                 target="_blank"

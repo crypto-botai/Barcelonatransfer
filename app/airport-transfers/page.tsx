@@ -13,7 +13,13 @@ export const metadata: Metadata = {
     title: "Barcelona Airport Transfer — BCN El Prat T1 & T2 | Fixed Price",
     description: "Private luxury transfer from Barcelona Airport from €45. Meet & greet, flight tracking, 60 min free wait. No surge pricing.",
     url: "https://www.elitebcn.info/airport-transfers",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Barcelona Airport Transfer — BCN El Prat T1 & T2 | Fixed Price",
+    description: "Private luxury transfer from Barcelona Airport from €45. Meet & greet, flight tracking, 60 min free wait. No surge pricing.",
+    images: ["/opengraph-image"],
   },
 };
 

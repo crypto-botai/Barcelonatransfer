@@ -13,7 +13,13 @@ export const metadata: Metadata = {
     title: "Hourly Chauffeur Hire Barcelona — Private Driver from €45/hr",
     description: "Book a private chauffeur in Barcelona by the hour from €45/hr. Flexible disposal for meetings, shopping, events, or sightseeing.",
     url: "https://www.elitebcn.info/hourly",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Hourly Chauffeur Hire Barcelona — Private Driver from €45/hr",
+    description: "Book a private chauffeur in Barcelona by the hour from €45/hr. Flexible disposal for meetings, shopping, events, or sightseeing.",
+    images: ["/opengraph-image"],
   },
 };
 

@@ -12,7 +12,13 @@ export const metadata: Metadata = {
     title: "Corporate Chauffeur Barcelona — Executive Transfers & Business Travel",
     description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, events. Monthly invoicing, account manager.",
     url: "https://www.elitebcn.info/corporate",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Corporate Chauffeur Barcelona — Executive Transfers & Business Travel",
+    description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, events. Monthly invoicing, account manager.",
+    images: ["/opengraph-image"],
   },
 };
 

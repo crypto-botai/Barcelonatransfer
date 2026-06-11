@@ -138,10 +138,10 @@ export async function sendBookingConfirmation({
 
 // ─── Admin Alert ─────────────────────────────────────────────
 export async function sendAdminNewBookingAlert({
-  confirmationCode, guestName, guestEmail, pickupAddress, dropoffAddress,
+  confirmationCode, guestName, guestEmail, guestPhone, pickupAddress, dropoffAddress,
   pickupDatetime, vehicleClass, totalAmount,
 }: {
-  confirmationCode: string; guestName: string; guestEmail: string;
+  confirmationCode: string; guestName: string; guestEmail: string; guestPhone?: string;
   pickupAddress: string; dropoffAddress: string; pickupDatetime: string;
   vehicleClass: string; totalAmount: number;
 }) {
@@ -169,7 +169,13 @@ export async function sendAdminNewBookingAlert({
       <a href="${SITE_URL}/admin/bookings" class="cta-btn">Assign Driver Now →</a>
     </div>
   `);
-  await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject: `🚗 New Booking — ${confirmationCode} · €${totalAmount.toFixed(2)}`, html });
+  await sendEmail({
+    from: FROM,
+    to: ADMIN_EMAIL,
+    replyTo: guestEmail,
+    subject: `🚗 New Booking — ${confirmationCode} · €${totalAmount.toFixed(2)}`,
+    html,
+  });
 }
 
 // ─── Welcome Email ───────────────────────────────────────────

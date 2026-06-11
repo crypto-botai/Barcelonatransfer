@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSumUpCheckout } from "@/lib/sumup";
 import { sendPaymentConfirmationEmail, sendAdminNewBookingAlert } from "@/lib/resend";
+import { sendWhatsAppBookingConfirmation } from "@/lib/whatsapp";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -64,30 +65,56 @@ export async function GET(req: NextRequest) {
 
           if (!alreadySent) {
             const transactionId = checkout.transaction_id ?? checkout.id;
-            sendPaymentConfirmationEmail({
-              to:               updated.guestEmail,
-              name:             updated.guestName ?? "Valued Client",
-              confirmationCode: updated.confirmationCode,
-              pickupAddress:    updated.pickupAddress,
-              dropoffAddress:   updated.dropoffAddress,
-              pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
-              vehicleClass:     updated.vehicleClass,
-              totalAmount:      updated.totalAmount,
-              passengers:       updated.passengers,
-              bookingId,
-              transactionId:    typeof transactionId === "string" ? transactionId : undefined,
-            }).catch(e => console.error("[resend] payment confirmation (verify):", e));
+            const route = updated.dropoffAddress
+              ? `${updated.pickupAddress} → ${updated.dropoffAddress}`
+              : updated.pickupAddress;
 
-            sendAdminNewBookingAlert({
-              confirmationCode: updated.confirmationCode,
-              guestName:        updated.guestName ?? "Guest",
-              guestEmail:       updated.guestEmail,
-              pickupAddress:    updated.pickupAddress,
-              dropoffAddress:   updated.dropoffAddress ?? "",
-              pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
-              vehicleClass:     updated.vehicleClass,
-              totalAmount:      updated.totalAmount,
-            }).catch(e => console.error("[resend] admin alert (verify):", e));
+            // Await both emails — fire-and-forget kills on Vercel serverless
+            const [custResult, adminResult] = await Promise.allSettled([
+              sendPaymentConfirmationEmail({
+                to:               updated.guestEmail,
+                name:             updated.guestName ?? "Valued Client",
+                confirmationCode: updated.confirmationCode,
+                pickupAddress:    updated.pickupAddress,
+                dropoffAddress:   updated.dropoffAddress,
+                pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
+                vehicleClass:     updated.vehicleClass,
+                totalAmount:      updated.totalAmount,
+                passengers:       updated.passengers,
+                bookingId,
+                transactionId:    typeof transactionId === "string" ? transactionId : undefined,
+              }),
+              sendAdminNewBookingAlert({
+                confirmationCode: updated.confirmationCode,
+                guestName:        updated.guestName ?? "Guest",
+                guestEmail:       updated.guestEmail,
+                guestPhone:       updated.guestPhone ?? undefined,
+                pickupAddress:    updated.pickupAddress,
+                dropoffAddress:   updated.dropoffAddress ?? "",
+                pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
+                vehicleClass:     updated.vehicleClass,
+                totalAmount:      updated.totalAmount,
+              }),
+            ]);
+
+            if (custResult.status === "rejected")
+              console.error("[resend] customer email (verify):", custResult.reason);
+            if (adminResult.status === "rejected")
+              console.error("[resend] admin alert (verify):", adminResult.reason);
+
+            // WhatsApp — isolated so failure never breaks the response
+            if (updated.guestPhone) {
+              try {
+                await sendWhatsAppBookingConfirmation({
+                  phone:           updated.guestPhone,
+                  bookingRef:      updated.confirmationCode,
+                  pickupDatetime:  updated.pickupDatetime.toLocaleString("en-GB"),
+                  route,
+                });
+              } catch (waErr) {
+                console.error("[whatsapp] booking confirmation (verify):", waErr);
+              }
+            }
           }
         }
 
