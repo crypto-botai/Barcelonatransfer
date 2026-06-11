@@ -180,7 +180,7 @@ export async function POST(req: NextRequest) {
           password:         accountPassword,
           confirmationCode: booking.confirmationCode,
           totalAmount:      totalWithExtras,
-        }).catch(() => {});
+        }).catch(e => console.error("[bookings/welcome-email]", e?.message ?? e));
       } else {
         // Link booking to existing user
         await prisma.booking.update({
@@ -215,7 +215,7 @@ export async function POST(req: NextRequest) {
       totalAmount:      totalWithExtras,
       passengers:       body.passengers,
       bookingId:        booking.id,
-    }).catch(() => {});
+    }).catch(e => console.error("[bookings/confirmation-email]", e?.message ?? e));
 
     // Step 3: Notify admin (fire-and-forget — never blocks)
     sendAdminNewBookingAlert({
@@ -227,7 +227,7 @@ export async function POST(req: NextRequest) {
       pickupDatetime:   pickupDatetime.toLocaleString("en-GB"),
       vehicleClass:     body.vehicleClass,
       totalAmount:      totalWithExtras,
-    }).catch(() => {});
+    }).catch(e => console.error("[bookings/admin-alert-email]", e?.message ?? e));
 
     // Step 4: Try to create SumUp checkout — if not configured, use WhatsApp fallback
     const sumupConfigured =

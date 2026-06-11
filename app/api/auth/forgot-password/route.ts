@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
     const resetUrl = `${SITE_URL}/auth/reset-password?token=${token}`;
 
-    await resend.emails.send({
+    const emailResult = await resend.emails.send({
       from: FROM,
       to: normalised,
       subject: "Reset your Élite BCN password",
@@ -88,6 +88,12 @@ export async function POST(req: Request) {
 </body>
 </html>`,
     });
+
+    if (emailResult?.error) {
+      const msg = (emailResult.error as { message?: string }).message ?? JSON.stringify(emailResult.error);
+      console.error("[forgot-password] Resend error:", msg);
+      return NextResponse.json({ error: "Failed to send email. Please try again." }, { status: 500 });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
