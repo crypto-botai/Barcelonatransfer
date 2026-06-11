@@ -13,23 +13,29 @@ export default function Footer() {
     { key: "airportTransfers",  href: "/airport-transfers" },
     { key: "corporateTravel",   href: "/corporate" },
     { key: "hourlyChaufeur",    href: "/hourly" },
-    { key: "cruisePort",        href: "/airport-transfers#cruise" },
+    { key: "cruisePort",        href: "/transfers/cruise-port" },
     { key: "vipTransportation", href: "/fleet" },
-    { key: "privateTours",      href: "/about#tours" },
+    { key: "privateTours",      href: "/about" },
   ];
 
   const FLEET_LINKS = [
-    { key: "standardSedan",    href: "/fleet#economy" },
-    { key: "luxurySedan",      href: "/fleet#luxury" },
-    { key: "executiveMinivan", href: "/fleet#minivan" },
-    { key: "luxuryMinivan",    href: "/fleet#luxury-minivan" },
-    { key: "groupMinibus",     href: "/fleet#minibus" },
-    { key: "electricVehicle",  href: "/fleet#electric" },
+    { key: "standardSedan",    href: "/fleet" },
+    { key: "luxurySedan",      href: "/fleet" },
+    { key: "executiveMinivan", href: "/fleet" },
+    { key: "luxuryMinivan",    href: "/fleet" },
+    { key: "groupMinibus",     href: "/fleet" },
+    { key: "electricVehicle",  href: "/fleet" },
   ];
 
-  const DESTINATION_KEYS = [
-    "barcelonaAirport", "sitges", "lloretDeMar", "portAventura",
-    "andorra", "gironaAirport", "tarragona", "cadaques",
+  const DESTINATIONS = [
+    { key: "barcelonaAirport", href: "/airport-transfers" },
+    { key: "sitges",           href: "/transfers/sitges" },
+    { key: "lloretDeMar",      href: "/transfers/costa-brava" },
+    { key: "portAventura",     href: "/transfers/port-aventura" },
+    { key: "andorra",          href: "/transfers/andorra" },
+    { key: "gironaAirport",    href: "/transfers/girona" },
+    { key: "tarragona",        href: "/transfers/tarragona" },
+    { key: "cadaques",         href: "/transfers/costa-brava" },
   ] as const;
 
   return (
@@ -110,10 +116,10 @@ export default function Footer() {
               </p>
             </div>
             <div className="flex gap-3 mt-5">
-              <a href="#" className="w-9 h-9 border border-white/10 rounded-lg flex items-center justify-center text-dark-400 hover:text-gold-400 hover:border-gold-500/30 transition-all">
+              <a href="https://www.instagram.com/elitebcntransfers" target="_blank" rel="noreferrer" aria-label="Instagram" className="w-9 h-9 border border-white/10 rounded-lg flex items-center justify-center text-dark-400 hover:text-gold-400 hover:border-gold-500/30 transition-all">
                 <Instagram size={16} />
               </a>
-              <a href="#" className="w-9 h-9 border border-white/10 rounded-lg flex items-center justify-center text-dark-400 hover:text-gold-400 hover:border-gold-500/30 transition-all">
+              <a href="https://www.facebook.com/elitebcntransfers" target="_blank" rel="noreferrer" aria-label="Facebook" className="w-9 h-9 border border-white/10 rounded-lg flex items-center justify-center text-dark-400 hover:text-gold-400 hover:border-gold-500/30 transition-all">
                 <Facebook size={16} />
               </a>
             </div>
@@ -151,9 +157,9 @@ export default function Footer() {
           <div>
             <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("footer.sections.destinations")}</h4>
             <ul className="flex flex-col gap-2.5">
-              {DESTINATION_KEYS.map((key) => (
+              {DESTINATIONS.map(({ key, href }) => (
                 <li key={key}>
-                  <Link href="/pricing" className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
+                  <Link href={href} className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
                     {t(`footer.links.${key}`)}
                   </Link>
                 </li>

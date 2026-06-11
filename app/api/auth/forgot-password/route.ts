@@ -4,7 +4,7 @@ import { resend } from "@/lib/resend";
 import crypto from "crypto";
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
-const FROM = process.env.RESEND_FROM ?? "Élite BCN Transfers <noreply@elitebcntransfers.com>";
+const FROM = process.env.RESEND_FROM ?? "Élite BCN Transfers <noreply@elitebcn.info>";
 
 export async function POST(req: Request) {
   try {

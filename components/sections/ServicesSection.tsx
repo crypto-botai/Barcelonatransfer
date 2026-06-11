@@ -9,8 +9,8 @@ import "@/lib/i18n";
 const SERVICE_ICONS = [Plane, Anchor, Briefcase, Building2, Theater, Clock, Waves, Sunset, Mountain, Hotel, Crown, Map];
 const SERVICE_KEYS = ["airport", "cruise", "executive", "corporate", "vipEvents", "hourly", "costaBrava", "costaDorada", "andorra", "hotel", "vip", "tours"] as const;
 const SERVICE_HREFS = [
-  "/airport-transfers", "/airport-transfers#cruise", "/corporate", "/corporate",
-  "/fleet", "/hourly", "/pricing", "/pricing", "/pricing", "/book", "/fleet#first-class", "/about#tours",
+  "/airport-transfers", "/transfers/cruise-port", "/corporate", "/corporate",
+  "/fleet", "/hourly", "/transfers/costa-brava", "/transfers/tarragona", "/transfers/andorra", "/book", "/fleet", "/about",
 ];
 
 export default function ServicesSection() {

@@ -111,14 +111,15 @@ export async function GET(req: NextRequest) {
     prisma.emailLog.count(),
 
     // Daily revenue for chart (last N days)
+    // NOTE: DB columns are camelCase (no snake_case mapping in migrations)
     prisma.$queryRaw<{ date: string; revenue: number; bookings: number }[]>`
       SELECT
-        DATE(created_at AT TIME ZONE 'UTC')::text as date,
-        COALESCE(SUM(total_amount) FILTER (WHERE payment_status = 'PAID'), 0)::float as revenue,
+        DATE("createdAt" AT TIME ZONE 'UTC')::text as date,
+        COALESCE(SUM("totalAmount") FILTER (WHERE "paymentStatus" = 'PAID'), 0)::float as revenue,
         COUNT(*)::int as bookings
       FROM bookings
-      WHERE created_at >= ${since}
-      GROUP BY DATE(created_at AT TIME ZONE 'UTC')
+      WHERE "createdAt" >= ${since}
+      GROUP BY DATE("createdAt" AT TIME ZONE 'UTC')
       ORDER BY date ASC
     `,
   ]);

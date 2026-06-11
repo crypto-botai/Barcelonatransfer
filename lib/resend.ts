@@ -11,7 +11,7 @@ export const resend = new Proxy({} as Resend, { get: (_, p) => (getResend() as a
 // FROM must match a verified domain in Resend dashboard (resend.com/domains)
 // Set RESEND_FROM in Vercel env once your domain is verified.
 // Until verified, only onboarding@resend.dev works (but only to your Resend account email).
-const FROM = process.env.RESEND_FROM ?? "Élite BCN Transfers <noreply@elitebcntransfers.com>";
+const FROM = process.env.RESEND_FROM ?? "Élite BCN Transfers <noreply@elitebcn.info>";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com";
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
 
