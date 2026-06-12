@@ -1,35 +1,38 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
-import { Mail, Phone, MessageCircle, MapPin, Send, Loader2 } from "lucide-react";
-import toast from "react-hot-toast";
+import { Mail, Phone, MessageCircle, MapPin } from "lucide-react";
+import ContactFormClient from "./ContactFormClient";
+
+export const metadata: Metadata = {
+  title: "Contact Élite BCN — 24/7 Luxury Transfer Support Barcelona",
+  description:
+    "Contact Élite BCN Transfers for bookings, support, or enquiries. Available 24/7 by phone, WhatsApp, or email. Barcelona's premier private chauffeur service.",
+  alternates: { canonical: "https://www.elitebcn.info/contact" },
+  openGraph: {
+    title: "Contact Élite BCN — 24/7 Support",
+    description:
+      "Reach our team 24/7 by phone, WhatsApp, or email. Barcelona luxury private transfer specialists.",
+    url: "https://www.elitebcn.info/contact",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Contact Élite BCN Transfers" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Élite BCN — 24/7 Support",
+    description: "Reach our team 24/7 by phone, WhatsApp, or email. Barcelona luxury private transfer specialists.",
+    images: ["/opengraph-image"],
+  },
+};
+
+const CONTACT_ITEMS = [
+  { icon: Phone,         label: "Phone",    value: "+34 635 383 712",      href: "tel:+34635383712",               external: false },
+  { icon: Mail,          label: "Email",    value: "vtcbcn2025@gmail.com", href: "mailto:vtcbcn2025@gmail.com",    external: false },
+  { icon: MessageCircle, label: "WhatsApp", value: "Chat with us now",     href: "https://wa.me/34635383712",      external: true },
+  { icon: MapPin,        label: "Location", value: "Barcelona, Spain",     href: "https://maps.google.com/?q=Barcelona,Spain", external: true },
+];
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) throw new Error("failed");
-      toast.success("Message sent! We'll reply within 2 hours.");
-      setForm({ name: "", email: "", phone: "", message: "" });
-    } catch {
-      toast.error("Could not send message. Please try WhatsApp or email directly.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <>
       <Navbar />
@@ -50,18 +53,16 @@ export default function ContactPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
-              {/* Contact info */}
+              {/* Contact info — static, no client state needed */}
               <div>
                 <h2 className="font-display text-3xl text-white mb-8">We&apos;re Here to Help</h2>
                 <div className="space-y-5">
-                  {[
-                    { icon: Phone,         label: "Phone",     value: "+34 635 383 712",     href: "tel:+34635383712" },
-                    { icon: Mail,          label: "Email",     value: "vtcbcn2025@gmail.com", href: "mailto:vtcbcn2025@gmail.com" },
-                    { icon: MessageCircle, label: "WhatsApp",  value: "Chat with us now",     href: "https://wa.me/34635383712" },
-                    { icon: MapPin,        label: "Location",  value: "Barcelona, Spain",     href: "#" },
-                  ].map((c) => (
-                    <a key={c.label} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer"
-                      className="flex items-center gap-4 p-4 rounded-xl glass-card gold-hover-border group">
+                  {CONTACT_ITEMS.map((c) => (
+                    <a key={c.label} href={c.href}
+                      target={c.external ? "_blank" : undefined}
+                      rel={c.external ? "noreferrer" : undefined}
+                      className="flex items-center gap-4 p-4 rounded-xl glass-card gold-hover-border group"
+                    >
                       <div className="w-10 h-10 rounded-lg bg-gold-500/10 flex items-center justify-center">
                         <c.icon size={18} className="text-gold-500" />
                       </div>
@@ -74,44 +75,8 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* Form */}
-              <div className="glass-card rounded-2xl p-8">
-                <h2 className="font-display text-2xl text-white mb-6">Send a Message</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Name</label>
-                      <input required type="text" value={form.name}
-                        onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                        placeholder="Your name" className="input-luxury w-full px-4 py-3 rounded-xl text-sm" />
-                    </div>
-                    <div>
-                      <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Phone</label>
-                      <input type="tel" value={form.phone}
-                        onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                        placeholder="+34..." className="input-luxury w-full px-4 py-3 rounded-xl text-sm" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Email</label>
-                    <input required type="email" value={form.email}
-                      onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                      placeholder="your@email.com" className="input-luxury w-full px-4 py-3 rounded-xl text-sm" />
-                  </div>
-                  <div>
-                    <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Message</label>
-                    <textarea required rows={5} value={form.message}
-                      onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-                      placeholder="How can we help you?"
-                      className="input-luxury w-full px-4 py-3 rounded-xl text-sm resize-none" />
-                  </div>
-                  <button type="submit" disabled={loading}
-                    className="btn-gold w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
-                    {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                    {loading ? "Sending…" : "Send Message"}
-                  </button>
-                </form>
-              </div>
+              {/* Interactive form — client component */}
+              <ContactFormClient />
             </div>
           </div>
         </section>
