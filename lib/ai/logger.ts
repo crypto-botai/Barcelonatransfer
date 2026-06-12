@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 type LogLevel = "info" | "warn" | "error";
 
@@ -23,7 +24,7 @@ export async function log(entry: LogEntry): Promise<void> {
         action:     entry.action,
         level:      entry.level     ?? "info",
         message:    entry.message,
-        metadata:   entry.metadata  ?? undefined,
+        metadata:   (entry.metadata ?? undefined) as Prisma.InputJsonValue | undefined,
         tokensUsed: entry.tokensUsed ?? 0,
         costCents:  entry.costCents  ?? 0,
         durationMs: entry.durationMs ?? 0,

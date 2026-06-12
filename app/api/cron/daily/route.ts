@@ -29,7 +29,7 @@ async function runAbandonedCheck(): Promise<number> {
 
     // Import coupon creation from marketing
     const { createAbandonedCoupon } = await import("@/lib/marketing");
-    const coupon = await createAbandonedCoupon(s.email!, s.name ?? "there");
+    const couponId = await createAbandonedCoupon(s.email!);
 
     await prisma.abandonedBooking.create({
       data: {
@@ -37,8 +37,8 @@ async function runAbandonedCheck(): Promise<number> {
         email:        s.email!,
         name:         s.name ?? null,
         phone:        s.phone ?? null,
-        formSnapshot: s.formData,
-        couponId:     coupon.id,
+        formSnapshot: (s.formData ?? {}) as import("@prisma/client").Prisma.InputJsonValue,
+        couponId,
       },
     }).catch(() => {});
 

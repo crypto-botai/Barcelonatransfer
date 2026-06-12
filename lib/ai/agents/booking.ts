@@ -1,8 +1,13 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { BaseAgent } from "@/lib/ai/agents/base";
 import { callClaude } from "@/lib/ai/claude";
 import { saveMemory } from "@/lib/ai/memory";
 import { Resend } from "resend";
+
+type BookingWithUser = Prisma.BookingGetPayload<{
+  include: { user: { select: { id: true; createdAt: true; bookings: { select: { id: true } } } } };
+}>;
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -30,7 +35,7 @@ export class BookingAgent extends BaseAgent {
     }
   }
 
-  private async analyseBooking(b: Awaited<ReturnType<typeof prisma.booking.findMany>>[number]): Promise<void> {
+  private async analyseBooking(b: BookingWithUser): Promise<void> {
     const isNew       = !b.userId || (b.user?.bookings.length ?? 0) <= 1;
     const isHighValue = b.totalAmount >= 150;
     const hoursOut    = (b.pickupDatetime.getTime() - Date.now()) / 3_600_000;
