@@ -20,7 +20,13 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const role = token.role as string | undefined;
+  const role               = token.role as string | undefined;
+  const mustChangePassword = token.mustChangePassword as boolean | undefined;
+
+  // ── Force password change for auto-created accounts ──────────
+  if (mustChangePassword && !pathname.startsWith("/auth/change-password") && !pathname.startsWith("/auth/logout")) {
+    return NextResponse.redirect(new URL("/auth/change-password", req.url));
+  }
 
   // ── Already logged-in users hitting /auth/login → redirect to their dashboard ─
   if (pathname.startsWith("/auth/login") || pathname.startsWith("/auth/register")) {
@@ -64,5 +70,6 @@ export const config = {
     "/driver/:path*",
     "/auth/login",
     "/auth/register",
+    "/auth/change-password",
   ],
 };

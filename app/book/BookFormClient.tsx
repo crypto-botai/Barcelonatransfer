@@ -9,7 +9,7 @@ import {
   ArrowRight, ArrowLeft, MapPin, Calendar, Clock, Users,
   User, Mail, Phone, MessageSquare, Plane, Zap, Loader2,
   CheckCircle2, Briefcase, Car, Timer, Building2, Plus, Minus,
-  Shield, CreditCard, Tag, X,
+  Shield, CreditCard, Tag, X, AlertCircle,
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
@@ -236,7 +236,15 @@ export default function BookFormClient() {
     else                       setData((d) => ({ ...d, date: tomorrowStr(), time: "14:00" }));
   };
 
+  const hoursUntilPickup = data.date && data.time
+    ? (new Date(`${data.date}T${data.time}`).getTime() - Date.now()) / 3_600_000
+    : Infinity;
+
   const goToStep2 = () => {
+    if (hoursUntilPickup < 1) {
+      toast.error("Bookings require at least 1 hour notice. For urgent transfers, call +34 635 383 712.");
+      return;
+    }
     setStep(2);
     if (data.vehicleClass) fetchQuote(data.vehicleClass);
   };
@@ -256,6 +264,16 @@ export default function BookFormClient() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Booking failed");
       setBookingId(json.bookingId);
+      // Store temp credentials in sessionStorage — shown once on success page
+      if (json.accountCreated && json.tempPassword) {
+        try {
+          sessionStorage.setItem("elite_new_account", JSON.stringify({
+            email:        json.email,
+            tempPassword: json.tempPassword,
+            ts:           Date.now(),
+          }));
+        } catch { /* ignore */ }
+      }
       if (sessionId.current) {
         fetch(`/api/booking-session?sessionId=${sessionId.current}`, { method: "DELETE" }).catch(() => {});
       }
@@ -407,6 +425,20 @@ export default function BookFormClient() {
                         </select>
                       </div>
                     </div>
+
+                    {/* Timing warnings */}
+                    {data.date && data.time && hoursUntilPickup < 1 && (
+                      <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400">
+                        <AlertCircle size={13} className="mt-0.5 flex-shrink-0" />
+                        <span>Bookings require at least 1 hour notice. For urgent transfers, call <a href="tel:+34635383712" className="underline font-medium">+34 635 383 712</a>.</span>
+                      </div>
+                    )}
+                    {data.date && data.time && hoursUntilPickup >= 1 && hoursUntilPickup < 4 && (
+                      <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-400">
+                        <Zap size={13} className="mt-0.5 flex-shrink-0" />
+                        <span><strong>Last-minute booking</strong> — a 15% priority dispatch fee will be added to the fare.</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -758,6 +790,12 @@ export default function BookFormClient() {
                             <span>Night surcharge</span><span>{formatCurrency(quote.nightSurcharge)}</span>
                           </div>
                         )}
+                        {(quote.lastMinuteSurcharge ?? 0) > 0 && (
+                          <div className="flex justify-between text-amber-400">
+                            <span className="flex items-center gap-1"><Zap size={11} /> Last-minute fee (+15%)</span>
+                            <span>{formatCurrency(quote.lastMinuteSurcharge!)}</span>
+                          </div>
+                        )}
                       </>
                     )}
                     {(data.extras ?? []).filter((e) => e.price > 0).map((e) => (
@@ -781,8 +819,12 @@ export default function BookFormClient() {
 
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 text-xs text-dark-500">
                     <span className="flex items-center gap-1"><Zap size={11} className="text-gold-500" /> Fixed price</span>
-                    <span className="flex items-center gap-1"><Shield size={11} className="text-gold-500" /> Free cancellation 24h before</span>
+                    <span className="flex items-center gap-1"><Shield size={11} className="text-gold-500" /> Free cancellation 24h+ before</span>
+                    <span className="flex items-center gap-1"><Clock size={11} className="text-gold-500" /> Pickup change up to 8h before</span>
                     <span className="flex items-center gap-1"><CreditCard size={11} className="text-gold-500" /> Secure SumUp payment</span>
+                    {hoursUntilPickup < 4 && hoursUntilPickup >= 1 && (
+                      <span className="flex items-center gap-1 text-amber-400 font-medium"><Zap size={11} /> 15% last-minute fee applied</span>
+                    )}
                   </div>
                 </div>
 

@@ -84,3 +84,19 @@ export async function getSumUpCheckout(checkoutId: string): Promise<SumUpCheckou
 export function getSumUpCheckoutUrl(checkoutId: string, bookingId?: string): string {
   return `/booking/pay/${checkoutId}${bookingId ? `?booking_id=${bookingId}` : ""}`;
 }
+
+export async function refundSumUpTransaction(transactionId: string, amount: number): Promise<void> {
+  const res = await fetch(`${SUMUP_API}/v0.1/me/refund/${transactionId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${process.env.SUMUP_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ amount: Math.round(amount * 100) / 100 }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`SumUp refund failed (${res.status}): ${text}`);
+  }
+}

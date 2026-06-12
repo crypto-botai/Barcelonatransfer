@@ -7,7 +7,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   CheckCircle2, XCircle, Clock, Calendar, MapPin,
-  MessageCircle, Mail, RefreshCw, CreditCard, FileText,
+  MessageCircle, Mail, RefreshCw, CreditCard, FileText, Copy, Eye, EyeOff,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 
@@ -32,8 +32,25 @@ function SuccessInner() {
   const [attempts,      setAttempts]      = useState(0);
   const [manualChecking, setManualChecking] = useState(false);
   const [payLoading,    setPayLoading]    = useState(false);
+  const [newAccount,    setNewAccount]    = useState<{ email: string; tempPassword: string } | null>(null);
+  const [showPw,        setShowPw]        = useState(false);
+  const [copied,        setCopied]        = useState(false);
 
   const MAX_AUTO_ATTEMPTS = 20; // 20 × 3s = 60 seconds of polling
+
+  // Read temp credentials stored before SumUp redirect — shown once only
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("elite_new_account");
+      if (raw) {
+        const parsed = JSON.parse(raw) as { email: string; tempPassword: string; ts: number };
+        if (parsed.ts > Date.now() - 600_000) { // valid for 10 min
+          setNewAccount({ email: parsed.email, tempPassword: parsed.tempPassword });
+        }
+        sessionStorage.removeItem("elite_new_account");
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   useEffect(() => {
     if (!bookingId) { setLoading(false); return; }
@@ -172,7 +189,50 @@ function SuccessInner() {
               </div>
             )}
 
-            {sessionStatus !== "authenticated" && data?.guestEmail && (
+            {newAccount ? (
+              <div className="bg-black/40 border border-gold-500/30 rounded-xl p-5 mb-4 text-left">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg bg-gold-500/10 flex items-center justify-center">
+                    <Mail size={13} className="text-gold-400" />
+                  </div>
+                  <p className="text-sm font-semibold text-white">Account Created — Save Now</p>
+                </div>
+                <p className="text-xs text-amber-400 font-medium mb-3">
+                  These credentials are shown once only. Screenshot or copy them before leaving.
+                </p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2.5">
+                    <span className="text-dark-400 text-xs uppercase tracking-wider">Email</span>
+                    <span className="text-white font-mono text-xs">{newAccount.email}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2.5 gap-2">
+                    <span className="text-dark-400 text-xs uppercase tracking-wider">Password</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-white font-mono text-xs">
+                        {showPw ? newAccount.tempPassword : "••••••••••"}
+                      </span>
+                      <button onClick={() => setShowPw(v => !v)} className="text-dark-400 hover:text-white transition-colors">
+                        {showPw ? <EyeOff size={12} /> : <Eye size={12} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`Email: ${newAccount.email}\nPassword: ${newAccount.tempPassword}`).catch(() => {});
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-gold-500/20 text-xs text-gold-400 hover:bg-gold-500/5 transition-all"
+                >
+                  <Copy size={12} />
+                  {copied ? "Copied!" : "Copy credentials"}
+                </button>
+                <p className="text-xs text-dark-500 mt-2 text-center">
+                  Change your password after first login at <Link href="/dashboard" className="text-gold-500 hover:underline">your dashboard</Link>.
+                </p>
+              </div>
+            ) : sessionStatus !== "authenticated" && data?.guestEmail && (
               <div className="bg-gold-500/8 border border-gold-500/20 rounded-xl p-4 mb-4 flex items-start gap-3 text-left">
                 <Mail size={16} className="text-gold-400 flex-shrink-0 mt-0.5" />
                 <div>

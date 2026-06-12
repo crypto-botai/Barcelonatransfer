@@ -40,36 +40,53 @@ export const authOptions: NextAuthOptions = {
         if (!isValid) return null;
 
         return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          image: user.image,
+          id:                user.id,
+          email:             user.email,
+          name:              user.name,
+          role:              user.role,
+          image:             user.image,
+          mustChangePassword: user.mustChangePassword,
         };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger }) {
       if (user) {
-        token.id = user.id;
-        token.role = (user as { role?: string }).role;
+        token.id                = user.id;
+        token.role              = (user as { role?: string }).role;
+        token.mustChangePassword = (user as { mustChangePassword?: boolean }).mustChangePassword;
       }
       // For OAuth sign-ins (Google), role is not in the OAuth profile —
       // fetch it from the database so role-based routing works correctly.
       if (account?.provider === "google" && token.id && !token.role) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { role: true },
+          select: { role: true, mustChangePassword: true },
         });
-        if (dbUser) token.role = dbUser.role;
+        if (dbUser) {
+          token.role               = dbUser.role;
+          token.mustChangePassword = dbUser.mustChangePassword;
+        }
+      }
+      // Re-fetch when session is updated (e.g. after password change)
+      if (trigger === "update" && token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { role: true, mustChangePassword: true },
+        });
+        if (dbUser) {
+          token.role               = dbUser.role;
+          token.mustChangePassword = dbUser.mustChangePassword;
+        }
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as { id?: string }).id = token.id as string;
-        (session.user as { role?: string }).role = token.role as string;
+        (session.user as { id?: string }).id                = token.id as string;
+        (session.user as { role?: string }).role            = token.role as string;
+        (session.user as { mustChangePassword?: boolean }).mustChangePassword = token.mustChangePassword as boolean | undefined;
       }
       return session;
     },

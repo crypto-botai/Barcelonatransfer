@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { calculateQuote, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE } from "@/lib/pricing";
+import { calculateQuote, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, calculateLastMinuteSurcharge } from "@/lib/pricing";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
 import { type VehicleClass } from "@/types";
 
@@ -61,7 +61,9 @@ export async function POST(req: NextRequest) {
       const nightSurcharge = isNight ? Math.round(subtotal * NIGHT_SURCHARGE_RATE * 100) / 100 : 0;
       const hasAirport = isAirportLocation(pickupLat, pickupLng);
       const airportSurcharge = hasAirport ? AIRPORT_SURCHARGE : 0;
-      const totalAmount = Math.round((subtotal + nightSurcharge + airportSurcharge) * 100) / 100;
+      const baseTotal = Math.round((subtotal + nightSurcharge + airportSurcharge) * 100) / 100;
+      const lastMinuteSurcharge = calculateLastMinuteSurcharge(baseTotal, pickupDate);
+      const totalAmount = Math.round((baseTotal + lastMinuteSurcharge) * 100) / 100;
 
       return NextResponse.json({
         vehicleClass: vc,
@@ -71,6 +73,7 @@ export async function POST(req: NextRequest) {
         distanceFare: 0,
         airportSurcharge,
         nightSurcharge,
+        lastMinuteSurcharge,
         vatAmount:    0,
         totalAmount,
         currency:     "EUR",

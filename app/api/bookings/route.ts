@@ -4,7 +4,9 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
 import { sendAdminNewBookingAlert, sendBookingConfirmation, sendWelcomeEmail } from "@/lib/resend";
-import { redeemCoupon, validateCoupon, logEmail } from "@/lib/marketing";
+import { redeemCoupon, validateCoupon } from "@/lib/marketing";
+import { calculateQuote, calculateLastMinuteSurcharge, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, MIN_BOOKING_HOURS } from "@/lib/pricing";
+import { isAirportLocation, isNightTime } from "@/lib/utils";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { type VehicleClass } from "@/types";
@@ -51,14 +53,15 @@ const schema = z.object({
   guestEmail:      z.string().email(),
   guestPhone:      z.string().min(6),
   quote: z.object({
-    distanceKm:       z.number(),
-    durationMin:      z.number(),
-    baseFare:         z.number(),
-    distanceFare:     z.number(),
-    airportSurcharge: z.number(),
-    nightSurcharge:   z.number(),
-    vatAmount:        z.number().default(0),
-    totalAmount:      z.number(),
+    distanceKm:          z.number(),
+    durationMin:         z.number(),
+    baseFare:            z.number(),
+    distanceFare:        z.number(),
+    airportSurcharge:    z.number(),
+    nightSurcharge:      z.number(),
+    lastMinuteSurcharge: z.number().default(0),
+    vatAmount:           z.number().default(0),
+    totalAmount:         z.number(),
   }),
 });
 
@@ -97,8 +100,55 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid date or time" }, { status: 422 });
     }
 
-    const extrasCost     = (body.extras ?? []).reduce((sum, e) => sum + e.price * e.quantity, 0);
-    const totalWithExtras = Math.round((body.quote.totalAmount + extrasCost) * 100) / 100;
+    // Block bookings with < 1h notice
+    const minsUntilPickup = (pickupDatetime.getTime() - Date.now()) / 60_000;
+    if (minsUntilPickup < MIN_BOOKING_HOURS * 60) {
+      return NextResponse.json({
+        error: `Bookings require at least ${MIN_BOOKING_HOURS} hour notice. For urgent transfers, please call or WhatsApp us at +34 635 383 712.`,
+      }, { status: 422 });
+    }
+
+    // Server-side price recalculation (authoritative — client amount is advisory only)
+    const vc = body.vehicleClass as VehicleClass;
+    let serverBaseTotal: number;
+
+    if (body.bookingType === "HOURLY" || body.bookingType === "DAY_HIRE") {
+      const minH  = MIN_HOURLY_HOURS[vc] ?? 4;
+      const hours = body.bookingType === "DAY_HIRE" ? 8 : Math.max(body.durationHours ?? 4, minH);
+      const hourlyRate = HOURLY_RATES[vc] ?? 50;
+      const subtotal = hourlyRate * hours;
+      const nightSurcharge = isNightTime(pickupDatetime) ? subtotal * NIGHT_SURCHARGE_RATE : 0;
+      const airportSurcharge = isAirportLocation(body.pickupLat, body.pickupLng) ? AIRPORT_SURCHARGE : 0;
+      serverBaseTotal = Math.round((subtotal + nightSurcharge + airportSurcharge) * 100) / 100;
+    } else {
+      const sq = calculateQuote(
+        vc, body.quote.distanceKm, Math.round(body.quote.durationMin),
+        body.pickupLat, body.pickupLng, body.dropoffLat, body.dropoffLng,
+        pickupDatetime
+      );
+      // sq.totalAmount already includes last-minute surcharge from calculateQuote
+      serverBaseTotal = sq.totalAmount;
+    }
+
+    // Apply last-minute surcharge for HOURLY/DAY_HIRE (TRANSFER already has it from calculateQuote)
+    const lmSurcharge = (body.bookingType === "HOURLY" || body.bookingType === "DAY_HIRE")
+      ? calculateLastMinuteSurcharge(serverBaseTotal, pickupDatetime)
+      : 0;
+    const serverTotal = Math.round((serverBaseTotal + lmSurcharge) * 100) / 100;
+
+    // Coupon discount (validate server-side)
+    const couponResult = body.couponCode
+      ? await validateCoupon(body.couponCode, body.guestEmail).catch(() => null)
+      : null;
+    const couponDiscountPct = couponResult?.valid
+      ? (couponResult as { coupon?: { discountPct?: number } }).coupon?.discountPct ?? 0
+      : 0;
+    const couponDiscount = couponDiscountPct > 0
+      ? Math.round(serverTotal * (couponDiscountPct / 100) * 100) / 100
+      : 0;
+
+    const extrasCost = (body.extras ?? []).reduce((sum, e) => sum + e.price * e.quantity, 0);
+    const totalWithExtras = Math.round((serverTotal + extrasCost - couponDiscount) * 100) / 100;
 
     // Encode booking metadata into specialRequests
     const metaObj = {
@@ -161,11 +211,12 @@ export async function POST(req: NextRequest) {
         const hash = await bcrypt.hash(accountPassword, 12);
         const newUser = await prisma.user.create({
           data: {
-            name:         body.guestName,
-            email:        body.guestEmail,
-            phone:        body.guestPhone,
-            passwordHash: hash,
-            role:         "CUSTOMER",
+            name:               body.guestName,
+            email:              body.guestEmail,
+            phone:              body.guestPhone,
+            passwordHash:       hash,
+            role:               "CUSTOMER",
+            mustChangePassword: true,
           },
         });
         await prisma.booking.update({
@@ -202,12 +253,9 @@ export async function POST(req: NextRequest) {
       data:  { converted: true },
     }).catch(() => {});
 
-    // Redeem coupon if provided
-    if (body.couponCode) {
-      const couponCheck = await validateCoupon(body.couponCode, body.guestEmail);
-      if (couponCheck.valid) {
-        await redeemCoupon(body.couponCode, booking.id);
-      }
+    // Redeem coupon if valid
+    if (body.couponCode && couponResult?.valid) {
+      await redeemCoupon(body.couponCode, booking.id).catch(() => {});
     }
 
     // Step 2c & 3: Send emails — awaited so Vercel doesn't kill them before response
@@ -261,21 +309,22 @@ export async function POST(req: NextRequest) {
         });
 
         return NextResponse.json({
-          bookingId:       booking.id,
-          checkoutId:      checkout.id,
-          checkoutUrl:     getSumUpCheckoutUrl(checkout.id, booking.id),
+          bookingId:    booking.id,
+          checkoutId:   checkout.id,
+          checkoutUrl:  getSumUpCheckoutUrl(checkout.id, booking.id),
           accountCreated,
-          email:           accountCreated ? body.guestEmail : undefined,
+          email:        accountCreated ? body.guestEmail : undefined,
+          tempPassword: accountCreated ? accountPassword : undefined,
         });
       } catch (sumupErr) {
         const errMsg = sumupErr instanceof Error ? sumupErr.message : String(sumupErr);
         console.error("[bookings] SumUp checkout failed:", errMsg);
-        // Fall through — return booking saved + sumup error so UI can retry
         return NextResponse.json({
           bookingId:    booking.id,
           checkoutUrl:  `/booking/success?booking_id=${booking.id}`,
           accountCreated,
           email:        accountCreated ? body.guestEmail : undefined,
+          tempPassword: accountCreated ? accountPassword : undefined,
           sumupError:   errMsg,
         });
       }
@@ -283,11 +332,12 @@ export async function POST(req: NextRequest) {
 
     // Fallback: SumUp not configured — redirect to pending page
     return NextResponse.json({
-      bookingId:       booking.id,
-      checkoutUrl:     `/booking/success?booking_id=${booking.id}`,
+      bookingId:    booking.id,
+      checkoutUrl:  `/booking/success?booking_id=${booking.id}`,
       accountCreated,
-      email:           accountCreated ? body.guestEmail : undefined,
-      sumupError:      "SumUp not configured",
+      email:        accountCreated ? body.guestEmail : undefined,
+      tempPassword: accountCreated ? accountPassword : undefined,
+      sumupError:   "SumUp not configured",
     });
 
   } catch (err) {

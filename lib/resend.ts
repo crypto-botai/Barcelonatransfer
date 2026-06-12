@@ -1110,6 +1110,100 @@ export async function sendNewsletterIssue({
   return { data: { id }, error: null };
 }
 
+// ─── Cancellation emails ─────────────────────────────────────
+export async function sendCancellationEmail({
+  to, name, confirmationCode, refundProcessed, totalAmount,
+}: {
+  to: string; name: string; confirmationCode: string; refundProcessed: boolean; totalAmount: number;
+}) {
+  const html = emailLayout(`
+    <h2>Booking Cancelled</h2>
+    <p>Dear ${esc(name)},</p>
+    <p>Your booking <strong style="color:#c9a84c;">${esc(confirmationCode)}</strong> has been cancelled.</p>
+    ${refundProcessed ? `
+    <div style="background:#0f2a1a;border:1px solid #2a6b3a;border-radius:6px;padding:16px;margin:20px 0;">
+      <p style="color:#4caf78;font-weight:600;margin:0 0 6px 0;">✓ Refund Initiated</p>
+      <p style="color:#aaa;font-size:13px;margin:0;">€${totalAmount.toFixed(2)} will be returned to your original payment method within 3–5 business days.</p>
+    </div>
+    ` : `
+    <p style="color:#aaa;font-size:14px;">No payment was charged for this booking, or a refund was not applicable under our policy.</p>
+    `}
+    <div style="text-align:center;margin-top:24px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+      <a href="${SITE_URL}/book" class="cta-btn">Book a New Transfer →</a>
+      <a href="https://wa.me/34635383712" class="wa-btn">💬 Questions? Chat with Us</a>
+    </div>
+  `);
+  const id = await sendEmail({ from: FROM, to, subject: `Booking Cancelled — ${confirmationCode} | Élite BCN`, html });
+  await logEmail({ to, subject: `Booking cancelled — ${confirmationCode}`, type: "CANCELLED", resendId: id });
+}
+
+export async function sendAdminCancellationAlert({
+  confirmationCode, guestName, guestEmail, totalAmount, refundProcessed, pickupDatetime, pickupAddress,
+}: {
+  confirmationCode: string; guestName: string; guestEmail: string;
+  totalAmount: number; refundProcessed: boolean;
+  pickupDatetime: string; pickupAddress: string;
+}) {
+  const html = emailLayout(`
+    <h2>⚠ Booking Cancelled</h2>
+    <p>A customer has cancelled their booking.</p>
+    <table class="detail-table">
+      <tr><td>Booking</td><td>${esc(confirmationCode)}</td></tr>
+      <tr><td>Guest</td><td>${esc(guestName)} (${esc(guestEmail)})</td></tr>
+      <tr><td>Pickup</td><td>${esc(pickupAddress)}</td></tr>
+      <tr><td>Pickup Date</td><td>${esc(pickupDatetime)}</td></tr>
+      <tr><td>Amount</td><td>€${totalAmount.toFixed(2)}</td></tr>
+      <tr><td>Refund</td><td>${refundProcessed ? "✓ Processed automatically" : "⚠ Manual action may be needed"}</td></tr>
+    </table>
+  `);
+  await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject: `🚫 Booking Cancelled — ${confirmationCode}`, html });
+}
+
+// ─── Pickup changed emails ────────────────────────────────────
+export async function sendPickupChangedEmail({
+  to, name, confirmationCode, newPickupAddress, pickupDatetime,
+}: {
+  to: string; name: string; confirmationCode: string;
+  newPickupAddress: string; pickupDatetime: string;
+}) {
+  const html = emailLayout(`
+    <h2>Pickup Address Updated</h2>
+    <p>Dear ${esc(name)},</p>
+    <p>The pickup address for your booking <strong style="color:#c9a84c;">${esc(confirmationCode)}</strong> has been updated.</p>
+    <table class="detail-table" style="margin-top:20px;">
+      <tr><td>New Pickup</td><td>${esc(newPickupAddress)}</td></tr>
+      <tr><td>Date & Time</td><td>${esc(pickupDatetime)}</td></tr>
+    </table>
+    <p style="color:#aaa;font-size:13px;">Your driver will be directed to the new address. If you need further changes, please contact us at least 8 hours before pickup.</p>
+    <div style="text-align:center;margin-top:24px;">
+      <a href="https://wa.me/34635383712" class="wa-btn">💬 Contact Us on WhatsApp</a>
+    </div>
+  `);
+  const id = await sendEmail({ from: FROM, to, subject: `Pickup Updated — ${confirmationCode} | Élite BCN`, html });
+  await logEmail({ to, subject: `Pickup changed — ${confirmationCode}`, type: "PICKUP_CHANGED", resendId: id });
+}
+
+export async function sendAdminPickupChangedAlert({
+  confirmationCode, guestName, guestEmail, oldPickupAddress, newPickupAddress, pickupDatetime,
+}: {
+  confirmationCode: string; guestName: string; guestEmail: string;
+  oldPickupAddress: string; newPickupAddress: string; pickupDatetime: string;
+}) {
+  const html = emailLayout(`
+    <h2>📍 Pickup Address Changed</h2>
+    <p>A customer has updated their pickup address.</p>
+    <table class="detail-table">
+      <tr><td>Booking</td><td>${esc(confirmationCode)}</td></tr>
+      <tr><td>Guest</td><td>${esc(guestName)} (${esc(guestEmail)})</td></tr>
+      <tr><td>Old Pickup</td><td><span style="color:#e06c6c;">${esc(oldPickupAddress)}</span></td></tr>
+      <tr><td>New Pickup</td><td><span style="color:#4caf78;">${esc(newPickupAddress)}</span></td></tr>
+      <tr><td>Date & Time</td><td>${esc(pickupDatetime)}</td></tr>
+    </table>
+    <p style="color:#aaa;font-size:13px;">Please update the assigned driver if one has been notified.</p>
+  `);
+  await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject: `📍 Pickup Changed — ${confirmationCode}`, html });
+}
+
 // ─── Newsletter Campaign ─────────────────────────────────────
 export async function sendNewsletterCampaign({
   to, subject, htmlBody, campaignId, unsubToken,

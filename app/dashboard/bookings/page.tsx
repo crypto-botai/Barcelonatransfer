@@ -5,12 +5,15 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Search, Filter, Calendar, Clock, CheckCircle2, XCircle,
-  AlertCircle, ChevronRight, Download, RefreshCw, Car,
-  MapPin, Users, ArrowUpDown, CreditCard, Star
+  Search, Calendar, Clock, CheckCircle2, XCircle,
+  AlertCircle, ChevronRight, Download, Car,
+  MapPin, Users, ArrowUpDown, Star, X, Pencil, Loader2,
+  MessageCircle, Trash2, Lock,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
+import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
+import toast from "react-hot-toast";
 
 type Tab = "all" | "upcoming" | "completed" | "cancelled" | "pending";
 
@@ -25,6 +28,8 @@ interface Booking {
   vehicleClass: string;
   passengers: number;
   totalAmount: number;
+  pickupLat: number;
+  pickupLng: number;
   createdAt: string;
 }
 
@@ -48,19 +53,82 @@ function BookingsContent() {
   const searchParams = useSearchParams();
   const tabParam = (searchParams.get("tab") as Tab) ?? "all";
   const [activeTab, setActiveTab] = useState<Tab>(tabParam);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [filtered, setFiltered] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [page, setPage] = useState(1);
+  const [bookings,       setBookings]       = useState<Booking[]>([]);
+  const [filtered,       setFiltered]       = useState<Booking[]>([]);
+  const [loading,        setLoading]        = useState(true);
+  const [search,         setSearch]         = useState("");
+  const [sortDir,        setSortDir]        = useState<"asc" | "desc">("desc");
+  const [page,           setPage]           = useState(1);
   const PER_PAGE = 10;
 
-  useEffect(() => {
+  const [cancellingId,   setCancellingId]   = useState<string | null>(null);
+  const [editingPickupId, setEditingPickupId] = useState<string | null>(null);
+  const [editPickup,     setEditPickup]     = useState<{ address: string; lat: number; lng: number } | null>(null);
+  const [savingPickup,   setSavingPickup]   = useState(false);
+
+  const fetchBookings = useCallback(() => {
     fetch("/api/bookings")
       .then(r => r.json())
-      .then(d => { setBookings(Array.isArray(d) ? d : (d.bookings ?? [])); setLoading(false); });
+      .then(d => { setBookings(Array.isArray(d) ? d : (d.bookings ?? [])); setLoading(false); })
+      .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => { fetchBookings(); }, [fetchBookings]);
+
+  const handleCancel = async (b: Booking) => {
+    const hoursLeft = (new Date(b.pickupDatetime).getTime() - Date.now()) / 3_600_000;
+    const canRefund = hoursLeft > 24;
+    const msg = canRefund
+      ? "Cancel this booking? You will receive a full refund."
+      : "Cancel this booking? No refund is available within 24 hours of pickup.";
+    if (!confirm(msg)) return;
+
+    setCancellingId(b.id);
+    try {
+      const res = await fetch(`/api/bookings/${b.id}/cancel`, { method: "POST" });
+      const json = await res.json();
+      if (!res.ok) {
+        if (json.whatsappUrl) {
+          toast.error(json.error ?? "Cannot cancel");
+        } else {
+          throw new Error(json.error ?? "Failed to cancel");
+        }
+        return;
+      }
+      toast.success(json.message ?? "Booking cancelled");
+      fetchBookings();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not cancel booking");
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
+  const handleSavePickup = async (bookingId: string) => {
+    if (!editPickup) return;
+    setSavingPickup(true);
+    try {
+      const res = await fetch(`/api/bookings/${bookingId}/pickup`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pickupAddress: editPickup.address,
+          pickupLat:     editPickup.lat,
+          pickupLng:     editPickup.lng,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed to update");
+      toast.success("Pickup address updated");
+      setBookings(bs => bs.map(bk => bk.id === bookingId ? { ...bk, pickupAddress: editPickup.address } : bk));
+      setEditingPickupId(null);
+      setEditPickup(null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not update pickup");
+    } finally {
+      setSavingPickup(false);
+    }
+  };
 
   const applyFilters = useCallback(() => {
     let result = [...bookings];
@@ -239,6 +307,81 @@ function BookingsContent() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Policy action row — upcoming bookings only */}
+                    {!isPast && !["CANCELLED", "REFUNDED", "COMPLETED"].includes(b.status) && (() => {
+                      const msLeft = new Date(b.pickupDatetime).getTime() - Date.now();
+                      const hoursLeft = msLeft / 3_600_000;
+                      const canCancel = hoursLeft > 24;
+                      const canEdit   = hoursLeft > 8;
+                      return (
+                        <div className="mt-3 pt-3 border-t border-white/[0.04] flex flex-wrap items-center gap-2">
+                          {/* Edit pickup */}
+                          {canEdit ? (
+                            <button
+                              onClick={() => { setEditingPickupId(b.id); setEditPickup({ address: b.pickupAddress, lat: b.pickupLat ?? 0, lng: b.pickupLng ?? 0 }); }}
+                              className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border border-white/[0.08] text-dark-300 hover:text-gold-400 hover:border-gold-500/20 transition-all"
+                            >
+                              <Pencil size={10} /> Edit Pickup
+                            </button>
+                          ) : (
+                            <span className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border border-white/[0.04] text-dark-600 cursor-not-allowed" title="Pickup address locked within 8 hours">
+                              <Lock size={10} /> Pickup Locked
+                            </span>
+                          )}
+
+                          {/* Cancel */}
+                          {canCancel ? (
+                            <button
+                              onClick={() => handleCancel(b)}
+                              disabled={cancellingId === b.id}
+                              className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/8 transition-all disabled:opacity-50"
+                            >
+                              {cancellingId === b.id ? <Loader2 size={10} className="animate-spin" /> : <Trash2 size={10} />}
+                              {cancellingId === b.id ? "Cancelling…" : "Cancel & Refund"}
+                            </button>
+                          ) : (
+                            <a
+                              href={`https://wa.me/34635383712?text=${encodeURIComponent(`Hi, I need help with booking #${b.confirmationCode}`)}`}
+                              target="_blank" rel="noreferrer"
+                              className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border border-white/[0.08] text-dark-400 hover:text-green-400 hover:border-green-500/20 transition-all"
+                              title="No refund within 24h — contact via WhatsApp"
+                            >
+                              <MessageCircle size={10} /> No Refund — WhatsApp Us
+                            </a>
+                          )}
+                        </div>
+                      );
+                    })()}
+
+                    {/* Inline pickup edit form */}
+                    {editingPickupId === b.id && (
+                      <div className="mt-3 p-3 bg-black/30 rounded-xl border border-gold-500/20 space-y-2">
+                        <p className="text-xs text-dark-400 uppercase tracking-wider">New Pickup Address</p>
+                        <AddressAutocomplete
+                          value={editPickup?.address ?? ""}
+                          onChange={({ address, lat, lng }) => setEditPickup({ address, lat, lng })}
+                          placeholder="Type new pickup address…"
+                          className="text-sm"
+                        />
+                        <div className="flex gap-2 pt-1">
+                          <button
+                            onClick={() => handleSavePickup(b.id)}
+                            disabled={savingPickup || !editPickup?.lat}
+                            className="flex-1 btn-gold py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50"
+                          >
+                            {savingPickup ? <Loader2 size={12} className="animate-spin" /> : <MapPin size={12} />}
+                            {savingPickup ? "Saving…" : "Save Pickup"}
+                          </button>
+                          <button
+                            onClick={() => { setEditingPickupId(null); setEditPickup(null); }}
+                            className="px-3 py-2 rounded-xl border border-white/[0.08] text-dark-400 hover:text-white transition-all text-xs"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               );

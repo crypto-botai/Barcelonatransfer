@@ -72,18 +72,19 @@ export interface QuoteRequest {
 }
 
 export interface QuoteResponse {
-  vehicleClass:     VehicleClass;
-  distanceKm:       number;
-  durationMin:      number;
-  baseFare:         number;
-  distanceFare:     number;
-  airportSurcharge: number;
-  nightSurcharge:   number;
-  vatAmount:        number;
-  totalAmount:      number;
-  currency:         string;
-  hourlyRate?:      number;
-  hours?:           number;
+  vehicleClass:        VehicleClass;
+  distanceKm:          number;
+  durationMin:         number;
+  baseFare:            number;
+  distanceFare:        number;
+  airportSurcharge:    number;
+  nightSurcharge:      number;
+  lastMinuteSurcharge?: number;
+  vatAmount:           number;
+  totalAmount:         number;
+  currency:            string;
+  hourlyRate?:         number;
+  hours?:              number;
 }
 
 export interface BookingFormData {

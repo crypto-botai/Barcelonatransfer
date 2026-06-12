@@ -23,6 +23,22 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
 export const AIRPORT_SURCHARGE = 8;
 export const NIGHT_SURCHARGE_RATE = 0.20;
 
+// Last-minute booking policy
+export const LAST_MINUTE_SURCHARGE_RATE = 0.15; // +15% if pickup < 4h away
+export const LAST_MINUTE_HOURS = 4;             // hours threshold for surcharge
+export const MIN_BOOKING_HOURS = 1;             // minimum advance notice
+
+export function hoursUntilPickup(pickupDatetime: Date): number {
+  return (pickupDatetime.getTime() - Date.now()) / 3_600_000;
+}
+
+export function calculateLastMinuteSurcharge(totalBefore: number, pickupDatetime: Date): number {
+  if (hoursUntilPickup(pickupDatetime) < LAST_MINUTE_HOURS) {
+    return Math.round(totalBefore * LAST_MINUTE_SURCHARGE_RATE * 100) / 100;
+  }
+  return 0;
+}
+
 // Hourly rates: 1-3 pax €40/h · Minivan (4-6 pax) €50/h · V-Class (7-8 pax) €60/h
 export const HOURLY_RATES: Record<VehicleClass, number> = {
   ECONOMY:        40,
@@ -182,18 +198,20 @@ export function calculateQuote(
   // Check for a fixed route price first
   const fixedPrice = lookupFixedPrice(pickupLat, pickupLng, dropoffLat, dropoffLng, vehicleClass);
   if (fixedPrice !== null) {
-    // Fixed routes: price + 10% VAT only — no surcharges
     const vatAmount = Math.round(fixedPrice * 0.10 * 100) / 100;
+    const baseTotal = Math.round((fixedPrice + vatAmount) * 100) / 100;
+    const lastMinuteSurcharge = calculateLastMinuteSurcharge(baseTotal, pickupDatetime);
     return {
-      distanceKm:       Math.round(distanceKm * 10) / 10,
+      distanceKm:          Math.round(distanceKm * 10) / 10,
       durationMin,
-      baseFare:         fixedPrice,
-      distanceFare:     0,
-      airportSurcharge: 0,
-      nightSurcharge:   0,
+      baseFare:            fixedPrice,
+      distanceFare:        0,
+      airportSurcharge:    0,
+      nightSurcharge:      0,
+      lastMinuteSurcharge,
       vatAmount,
-      totalAmount:      Math.round((fixedPrice + vatAmount) * 100) / 100,
-      currency:         "EUR",
+      totalAmount:         Math.round((baseTotal + lastMinuteSurcharge) * 100) / 100,
+      currency:            "EUR",
     };
   }
 
@@ -207,17 +225,19 @@ export function calculateQuote(
   const isNight = isNightTime(pickupDatetime);
   const nightSurcharge = isNight ? subtotal * NIGHT_SURCHARGE_RATE : 0;
 
-  const total = Math.max(subtotal + airportSurcharge + nightSurcharge, p.minimumFare);
+  const baseTotal = Math.max(subtotal + airportSurcharge + nightSurcharge, p.minimumFare);
+  const lastMinuteSurcharge = calculateLastMinuteSurcharge(baseTotal, pickupDatetime);
 
   return {
-    distanceKm:      Math.round(distanceKm * 10) / 10,
+    distanceKm:         Math.round(distanceKm * 10) / 10,
     durationMin,
-    baseFare:        p.baseFare,
-    distanceFare:    Math.round(distanceFare * 100) / 100,
+    baseFare:           p.baseFare,
+    distanceFare:       Math.round(distanceFare * 100) / 100,
     airportSurcharge,
-    nightSurcharge:  Math.round(nightSurcharge * 100) / 100,
-    vatAmount:       0,
-    totalAmount:     Math.round(total * 100) / 100,
-    currency:        "EUR",
+    nightSurcharge:     Math.round(nightSurcharge * 100) / 100,
+    lastMinuteSurcharge,
+    vatAmount:          0,
+    totalAmount:        Math.round((baseTotal + lastMinuteSurcharge) * 100) / 100,
+    currency:           "EUR",
   };
 }
