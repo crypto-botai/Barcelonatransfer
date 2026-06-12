@@ -74,6 +74,16 @@ export async function POST(req: NextRequest) {
 
       const email = updated.guestEmail;
       if (email) {
+        // Mark any abandoned booking as converted now that payment succeeded
+        await prisma.abandonedBooking.updateMany({
+          where: { email, convertedAt: null },
+          data:  { convertedAt: new Date() },
+        }).catch(() => {});
+        await prisma.bookingSession.updateMany({
+          where: { email, converted: false },
+          data:  { converted: true },
+        }).catch(() => {});
+
         // Dedup: skip if payment confirmation already sent for this booking
         const alreadySent = await prisma.emailLog.findFirst({
           where: { bookingId: booking.id, type: "PAYMENT_CONFIRMATION" },

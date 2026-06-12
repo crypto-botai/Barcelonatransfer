@@ -189,16 +189,24 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Step 2b: Redeem coupon if provided
+    // Step 2b: Mark any abandoned booking as converted (booking = intent to pay)
+    const now = new Date();
+    await prisma.abandonedBooking.updateMany({
+      where: { email: body.guestEmail, convertedAt: null },
+      data:  { convertedAt: now },
+    }).catch(() => {});
+
+    // Mark booking session as converted
+    await prisma.bookingSession.updateMany({
+      where: { email: body.guestEmail, converted: false },
+      data:  { converted: true },
+    }).catch(() => {});
+
+    // Redeem coupon if provided
     if (body.couponCode) {
       const couponCheck = await validateCoupon(body.couponCode, body.guestEmail);
       if (couponCheck.valid) {
         await redeemCoupon(body.couponCode, booking.id);
-        // Mark associated abandoned booking as converted
-        await prisma.abandonedBooking.updateMany({
-          where: { email: body.guestEmail, convertedAt: null },
-          data:  { convertedAt: new Date() },
-        }).catch(() => {});
       }
     }
 

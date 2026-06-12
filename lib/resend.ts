@@ -398,6 +398,291 @@ function adminNewBookingAlertHtml({
 </html>`;
 }
 
+// ─── Welcome Email Template ─────────────────────────────────
+function welcomeHtml({
+  firstName, email, password, unsubUrl,
+}: {
+  firstName: string; email: string; password: string; unsubUrl?: string;
+}): string {
+  return `<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Welcome — Élite BCN</title>
+</head>
+<body style="margin:0; padding:0; background-color:#efece5; -webkit-text-size-adjust:100%;">
+<div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">Welcome to Élite BCN — your luxury chauffeur service in Barcelona.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#efece5;">
+<tr><td align="center" style="padding:32px 12px;">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:100%;">
+    <tr><td style="background-color:#141414; padding:36px 40px 32px 40px; text-align:center;">
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:26px; letter-spacing:8px; color:#ffffff;">ÉLITE<span style="color:#c9a96e;">BCN</span></div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#8a8a8a; padding-top:10px;">LUXURY TRANSFERS &nbsp;·&nbsp; BARCELONA</div>
+    </td></tr>
+    <tr><td style="height:3px; background-color:#c9a96e; font-size:0; line-height:0;">&nbsp;</td></tr>
+    <tr><td style="background-color:#faf8f4; padding:48px 48px 24px 48px;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:4px; color:#b39159; text-transform:uppercase;">Welcome Aboard</div>
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:30px; line-height:38px; color:#1a1a1a; padding-top:14px;">The keys are yours,<br>${esc(firstName)}.</div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:23px; color:#5c5c5c; padding-top:16px;">Your Élite BCN account is ready. From El Prat Airport to your hotel, from Montserrat to Sitges — a professional chauffeur is one tap away.</div>
+    </td></tr>
+    <tr><td style="background-color:#faf8f4; padding:0 48px 28px 48px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e0d8c8; border-radius:2px;">
+        <tr><td style="padding:20px 24px 12px 24px;">
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1a1a1a;"><span style="color:#b39159; margin-right:8px;">✦</span><strong>Professional licensed chauffeurs</strong></div>
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#8a8a8a; padding-top:3px; padding-left:20px;">VTC-certified, background-checked, always in uniform</div>
+        </td></tr>
+        <tr><td style="padding:0 24px 12px 24px;">
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1a1a1a;"><span style="color:#b39159; margin-right:8px;">✦</span><strong>Fixed prices, no surprises</strong></div>
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#8a8a8a; padding-top:3px; padding-left:20px;">Your price is locked at booking — no meter, no surge pricing</div>
+        </td></tr>
+        <tr><td style="padding:0 24px 12px 24px;">
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1a1a1a;"><span style="color:#b39159; margin-right:8px;">✦</span><strong>Free cancellation 24h before pickup</strong></div>
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#8a8a8a; padding-top:3px; padding-left:20px;">Plans change — cancel anytime up to 24 hours before departure</div>
+        </td></tr>
+        <tr><td style="padding:0 24px 20px 24px;">
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1a1a1a;"><span style="color:#b39159; margin-right:8px;">✦</span><strong>Flight tracking &amp; meet &amp; greet</strong></div>
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#8a8a8a; padding-top:3px; padding-left:20px;">We monitor your flight and wait at arrivals with your name board</div>
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td style="background-color:#faf8f4; padding:0 48px 32px 48px;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:3px; color:#9a9a9a; text-transform:uppercase; margin-bottom:12px;">Your Login Details</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0ede6; border:1px solid #e0d8c8; border-radius:2px;">
+        <tr><td style="padding:14px 20px; border-bottom:1px solid #e0d8c8;">
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#9a9a9a; text-transform:uppercase; letter-spacing:2px;">Email</div>
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a; padding-top:4px;">${esc(email)}</div>
+        </td></tr>
+        <tr><td style="padding:14px 20px;">
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#9a9a9a; text-transform:uppercase; letter-spacing:2px;">Temporary Password</div>
+          <div style="font-family:Georgia,'Times New Roman',serif; font-size:18px; letter-spacing:4px; color:#b39159; padding-top:4px;">${esc(password)}</div>
+        </td></tr>
+      </table>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#9a9a9a; padding-top:10px;">Change your password after your first login at <a href="${SITE_URL}/auth/login" style="color:#b39159; text-decoration:none;">elitebcn.info</a></div>
+    </td></tr>
+    <tr><td style="background-color:#faf8f4; padding:0 48px 48px 48px; text-align:center;">
+      <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+        <tr><td style="background-color:#b39159; border-radius:2px;">
+          <a href="${SITE_URL}/book" style="display:inline-block; padding:15px 38px; font-family:Helvetica,Arial,sans-serif; font-size:13px; letter-spacing:2px; color:#ffffff; text-decoration:none; text-transform:uppercase;">Book Your First Transfer</a>
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td style="background-color:#141414; padding:32px 48px; text-align:center;">
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:15px; letter-spacing:5px; color:#ffffff;">ÉLITE<span style="color:#c9a96e;">BCN</span></div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; line-height:19px; color:#8a8a8a; padding-top:14px;">+34 635 383 712 &nbsp;·&nbsp; www.elitebcn.info<br>Licensed VTC Operator — Barcelona, Spain</div>
+      ${unsubUrl ? `<div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#4a4a4a; padding-top:14px;"><a href="${unsubUrl}" style="color:#4a4a4a; text-decoration:underline;">Unsubscribe</a></div>` : ""}
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#5c5c5c; padding-top:8px;">&copy; ${new Date().getFullYear()} Élite BCN Transfers. All rights reserved.</div>
+    </td></tr>
+  </table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
+// ─── Abandoned Booking Email Template ────────────────────────
+function abandonedBookingHtml({
+  firstName, pickupShort, dropoffShort, date, time, quoteAmount, resumeUrl, unsubUrl,
+}: {
+  firstName: string; pickupShort: string; dropoffShort: string;
+  date: string; time: string; quoteAmount: number; resumeUrl: string; unsubUrl?: string;
+}): string {
+  const waLink = "https://wa.me/34635383712?text=I%20need%20help%20with%20my%20Barcelona%20transfer";
+  const priceStr = quoteAmount > 0 ? `€${quoteAmount.toFixed(2)}` : "Quote saved";
+  const fromTo = dropoffShort
+    ? `${esc(pickupShort)} → ${esc(dropoffShort)}`
+    : esc(pickupShort);
+  const dateTime = time ? `${esc(date)} &nbsp;&middot;&nbsp; ${esc(time)}` : esc(date);
+
+  return `<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Your booking is waiting — Élite BCN</title>
+</head>
+<body style="margin:0; padding:0; background-color:#efece5; -webkit-text-size-adjust:100%;">
+<div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">Your luxury transfer is saved — complete your booking in one click.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#efece5;">
+<tr><td align="center" style="padding:32px 12px;">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:100%;">
+    <tr><td style="background-color:#141414; padding:36px 40px 32px 40px; text-align:center;">
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:26px; letter-spacing:8px; color:#ffffff;">ÉLITE<span style="color:#c9a96e;">BCN</span></div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#8a8a8a; padding-top:10px;">LUXURY TRANSFERS &nbsp;·&nbsp; BARCELONA</div>
+    </td></tr>
+    <tr><td style="height:3px; background-color:#c9a96e; font-size:0; line-height:0;">&nbsp;</td></tr>
+    <tr><td style="background-color:#faf8f4; padding:48px 48px 16px 48px;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:4px; color:#b39159; text-transform:uppercase;">Saved Transfer</div>
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:28px; line-height:36px; color:#1a1a1a; padding-top:14px;">Your chauffeur is still<br>holding the door, ${esc(firstName)}.</div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:23px; color:#5c5c5c; padding-top:16px;">You were one step away from your luxury transfer. We've saved your quote — complete your booking before it expires.</div>
+    </td></tr>
+    <tr><td style="background-color:#faf8f4; padding:20px 48px 8px 48px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#141414; border-radius:2px;">
+        <tr><td colspan="2" style="padding:18px 24px 6px 24px;">
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#8a8a8a; text-transform:uppercase;">Your Saved Quote</div>
+        </td></tr>
+        <tr><td colspan="2" style="padding:4px 24px 4px 24px;">
+          <div style="border-top:1px solid #2a2a2a; font-size:0; line-height:0;">&nbsp;</div>
+        </td></tr>
+        <tr>
+          <td style="padding:8px 12px 4px 24px; vertical-align:top; width:55%;">
+            <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#7a7a7a; text-transform:uppercase;">Route</div>
+            <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; line-height:20px; color:#ffffff; padding-top:4px;">${fromTo}</div>
+          </td>
+          <td style="padding:8px 24px 4px 0; vertical-align:top;">
+            <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#7a7a7a; text-transform:uppercase;">Date &amp; Time</div>
+            <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#ffffff; padding-top:4px;">${dateTime}</div>
+          </td>
+        </tr>
+        <tr><td colspan="2" style="padding:16px 24px 0 24px;">
+          <div style="border-top:1px solid #2a2a2a; font-size:0; line-height:0;">&nbsp;</div>
+        </td></tr>
+        <tr><td colspan="2" style="padding:14px 24px 22px 24px;">
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#7a7a7a; text-transform:uppercase;">Fixed Price</div>
+          <div style="font-family:Georgia,'Times New Roman',serif; font-size:28px; color:#c9a96e; padding-top:6px;">${priceStr}</div>
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td style="background-color:#faf8f4; padding:24px 48px 16px 48px; text-align:center;">
+      <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+        <tr><td style="background-color:#b39159; border-radius:2px;">
+          <a href="${esc(resumeUrl)}" style="display:inline-block; padding:16px 42px; font-family:Helvetica,Arial,sans-serif; font-size:13px; letter-spacing:2px; color:#ffffff; text-decoration:none; text-transform:uppercase;">Complete My Booking</a>
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td style="background-color:#faf8f4; padding:8px 48px 24px 48px; text-align:center;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; line-height:20px; color:#8a8a8a;">✦ No charge until confirmed &nbsp;&nbsp; ✦ Free cancellation 24h &nbsp;&nbsp; ✦ 24/7 support</div>
+    </td></tr>
+    <tr><td style="background-color:#faf8f4; padding:0 48px 40px 48px; text-align:center;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#5c5c5c; margin-bottom:14px;">Need help? We're available 24/7.</div>
+      <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+        <tr><td style="background-color:#25D366; border-radius:2px;">
+          <a href="${waLink}" style="display:inline-block; padding:12px 28px; font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#ffffff; text-decoration:none;">Chat on WhatsApp</a>
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td style="background-color:#141414; padding:32px 48px; text-align:center;">
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:15px; letter-spacing:5px; color:#ffffff;">ÉLITE<span style="color:#c9a96e;">BCN</span></div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; line-height:19px; color:#8a8a8a; padding-top:14px;">+34 635 383 712 &nbsp;·&nbsp; www.elitebcn.info<br>Licensed VTC Operator — Barcelona, Spain</div>
+      ${unsubUrl ? `<div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#4a4a4a; padding-top:14px;"><a href="${unsubUrl}" style="color:#4a4a4a; text-decoration:underline;">Unsubscribe</a></div>` : ""}
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#5c5c5c; padding-top:8px;">&copy; ${new Date().getFullYear()} Élite BCN Transfers. All rights reserved.</div>
+    </td></tr>
+  </table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
+// ─── Newsletter Issue Template ────────────────────────────────
+export function newsletterIssueHtml({
+  issueTeaser, issueMonth, issueYear, issueNumber,
+  leadHeadline, leadBody, leadLink,
+  tipHeadline, tipBody,
+  eventHeadline, eventBody,
+  offerHeadline, offerBody, offerLink, offerCta,
+  unsubUrl,
+}: {
+  issueTeaser: string; issueMonth: string; issueYear: string; issueNumber: string;
+  leadHeadline: string; leadBody: string; leadLink?: string;
+  tipHeadline: string; tipBody: string;
+  eventHeadline: string; eventBody: string;
+  offerHeadline: string; offerBody: string; offerLink: string; offerCta: string;
+  unsubUrl: string;
+}): string {
+  return `<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>The Barcelona Travel Insider — Élite BCN</title>
+</head>
+<body style="margin:0; padding:0; background-color:#efece5; -webkit-text-size-adjust:100%;">
+<div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">${esc(issueTeaser)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#efece5;">
+<tr><td align="center" style="padding:32px 12px;">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:100%;">
+
+    <!-- Masthead -->
+    <tr><td style="background-color:#141414; padding:36px 40px 24px 40px; text-align:center;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:5px; color:#8a8a8a; text-transform:uppercase; margin-bottom:14px;">Élite BCN Presents</div>
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:22px; letter-spacing:3px; color:#ffffff;">The Barcelona Travel Insider</div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#c9a96e; padding-top:10px; text-transform:uppercase;">${esc(issueMonth)} ${esc(issueYear)} &nbsp;·&nbsp; Issue No. ${esc(issueNumber)}</div>
+    </td></tr>
+    <tr><td style="height:3px; background-color:#c9a96e; font-size:0; line-height:0;">&nbsp;</td></tr>
+
+    <!-- Lead Story -->
+    <tr><td style="background-color:#faf8f4; padding:40px 48px 24px 48px;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#b39159; text-transform:uppercase; margin-bottom:14px;">Lead Story</div>
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:24px; line-height:32px; color:#1a1a1a; margin-bottom:16px;">${esc(leadHeadline)}</div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:23px; color:#5c5c5c;">${esc(leadBody)}</div>
+      ${leadLink ? `<div style="margin-top:20px;"><a href="${esc(leadLink)}" style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#b39159; text-decoration:none; letter-spacing:1px;">Read more &rarr;</a></div>` : ""}
+    </td></tr>
+    <tr><td style="background-color:#faf8f4; padding:0 48px 32px 48px;">
+      <div style="border-top:1px solid #e9e3d6; font-size:0; line-height:0;">&nbsp;</div>
+    </td></tr>
+
+    <!-- Two-column: Insider Tip | What's On -->
+    <tr><td style="background-color:#faf8f4; padding:0 48px 32px 48px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="vertical-align:top; width:50%; padding-right:16px; border-right:1px solid #e9e3d6;">
+            <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#b39159; text-transform:uppercase; margin-bottom:12px;">Insider Tip</div>
+            <div style="font-family:Georgia,'Times New Roman',serif; font-size:16px; line-height:24px; color:#1a1a1a; margin-bottom:10px;">${esc(tipHeadline)}</div>
+            <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; line-height:21px; color:#5c5c5c;">${esc(tipBody)}</div>
+          </td>
+          <td style="vertical-align:top; width:50%; padding-left:16px;">
+            <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#b39159; text-transform:uppercase; margin-bottom:12px;">What's On</div>
+            <div style="font-family:Georgia,'Times New Roman',serif; font-size:16px; line-height:24px; color:#1a1a1a; margin-bottom:10px;">${esc(eventHeadline)}</div>
+            <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; line-height:21px; color:#5c5c5c;">${esc(eventBody)}</div>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+
+    <!-- Subscriber Privilege Offer -->
+    <tr><td style="background-color:#141414; padding:36px 48px; text-align:center;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#c9a96e; text-transform:uppercase; margin-bottom:14px;">Subscriber Privilege</div>
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:20px; line-height:28px; color:#ffffff; margin-bottom:14px;">${esc(offerHeadline)}</div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; line-height:21px; color:#9a9a9a; margin-bottom:24px;">${esc(offerBody)}</div>
+      <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+        <tr><td style="background-color:#c9a96e; border-radius:2px;">
+          <a href="${esc(offerLink)}" style="display:inline-block; padding:14px 36px; font-family:Helvetica,Arial,sans-serif; font-size:13px; letter-spacing:2px; color:#1a1a1a; text-decoration:none; text-transform:uppercase; font-weight:bold;">${esc(offerCta)}</a>
+        </td></tr>
+      </table>
+    </td></tr>
+
+    <!-- Sign-off -->
+    <tr><td style="background-color:#faf8f4; padding:36px 48px; text-align:center;">
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:16px; color:#1a1a1a; font-style:italic;">See you at arrivals,</div>
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:14px; color:#b39159; margin-top:8px;">The Élite BCN Team</div>
+    </td></tr>
+
+    <!-- Footer -->
+    <tr><td style="background-color:#141414; padding:28px 48px; text-align:center;">
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:14px; letter-spacing:5px; color:#ffffff;">ÉLITE<span style="color:#c9a96e;">BCN</span></div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; line-height:19px; color:#8a8a8a; padding-top:12px;">+34 635 383 712 &nbsp;·&nbsp; www.elitebcn.info</div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#4a4a4a; padding-top:12px;">
+        <a href="${unsubUrl}" style="color:#4a4a4a; text-decoration:underline;">Unsubscribe</a>
+        &nbsp;&nbsp;·&nbsp;&nbsp;
+        <a href="${SITE_URL}/privacy" style="color:#4a4a4a; text-decoration:underline;">Privacy Policy</a>
+      </div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#5c5c5c; padding-top:8px;">&copy; ${new Date().getFullYear()} Élite BCN Transfers. All rights reserved.</div>
+    </td></tr>
+
+  </table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
 // ─── Shared HTML Layout ─────────────────────────────────────
 function emailLayout(body: string): string {
   return `<!DOCTYPE html>
@@ -531,22 +816,13 @@ export async function sendWelcomeEmail({
 }: {
   to: string; name: string; password: string; confirmationCode: string; totalAmount: number;
 }) {
-  const html = emailLayout(`
-    <h2>Welcome, ${name}!</h2>
-    <p>Your booking <strong style="color:#c9a84c;">${confirmationCode}</strong> for <strong>€${totalAmount.toFixed(2)}</strong> has been received.</p>
-    <p style="margin-top:12px;">We've automatically created an account so you can track your booking, view driver details, and manage future rides.</p>
-    <div class="cred-box">
-      <p style="color:#888;font-size:11px;letter-spacing:3px;text-transform:uppercase;text-align:center;margin-bottom:14px;">Your Login Details</p>
-      <div class="cred-row"><span class="cred-label">Email</span><span class="cred-value">${to}</span></div>
-      <div class="cred-row" style="border:none;"><span class="cred-label">Password</span><span class="cred-value">${password}</span></div>
-    </div>
-    <p style="color:#888;font-size:13px;">You can change your password after logging in.</p>
-    <div style="text-align:center;margin-top:20px;">
-      <a href="${SITE_URL}/auth/login" class="cta-btn">View My Booking →</a>
-    </div>
-  `);
-
-  const id = await sendEmail({ from: FROM, to, subject: `Welcome to Élite BCN — Your Account & Booking ${confirmationCode}`, html });
+  const html = welcomeHtml({
+    firstName: name.split(" ")[0],
+    email:     to,
+    password,
+    unsubUrl:  `${SITE_URL}/contact`,
+  });
+  const id = await sendEmail({ from: FROM, to, subject: `Welcome to Élite BCN — Your Account is Ready`, html });
   await logEmail({ to, subject: `Welcome to Élite BCN`, type: "WELCOME", resendId: id });
 }
 
@@ -554,38 +830,44 @@ export async function sendWelcomeEmail({
 export async function sendAbandonedBookingEmail({
   to, name, couponCode, expiresAt, formData,
 }: {
-  to: string; name: string; couponCode: string; expiresAt: Date; formData?: Record<string, unknown>;
+  to: string; name: string; couponCode?: string; expiresAt?: Date; formData?: Record<string, unknown>;
 }) {
-  const hoursLeft = Math.round((expiresAt.getTime() - Date.now()) / 3600000);
-  const bookUrl = formData
-    ? `${SITE_URL}/book?${new URLSearchParams(Object.entries(formData).filter(([,v]) => v != null).map(([k,v]) => [k, String(v)])).toString()}`
-    : `${SITE_URL}/book`;
+  const fd = (formData ?? {}) as Record<string, unknown>;
 
-  const html = emailLayout(`
-    <h2>You Left Something Behind…</h2>
-    <p>Hi ${name || "there"},</p>
-    <p>You started booking a luxury transfer but didn't complete it. We saved your details — and we'd love to welcome you on board.</p>
-    <p style="margin-top:12px;">As a special thank-you for your interest, here's an exclusive discount just for you:</p>
-    <div class="coupon-box">
-      <div class="coupon-pct">5%</div>
-      <p style="color:#888;font-size:13px;margin-top:6px;">OFF YOUR BOOKING</p>
-      <p class="coupon-code-label">Use code at checkout</p>
-      <div class="coupon-code">${couponCode}</div>
-      <p class="coupon-exp">⏱ Expires in ${hoursLeft} hours · One-time use · Your email only</p>
-    </div>
-    <div style="text-align:center;margin:24px 0;">
-      <a href="${bookUrl}" class="cta-btn" style="margin-right:8px;">Complete My Booking →</a>
-    </div>
-    <div class="divider"></div>
-    <p style="color:#888;font-size:13px;">Questions? Our team is available 24/7:</p>
-    <div style="text-align:center;margin-top:12px;">
-      <a href="https://wa.me/34635383712" class="wa-btn">💬 Chat on WhatsApp</a>
-    </div>
-    <div class="divider"></div>
-    <p style="font-size:12px;color:#555;">✓ Professional licensed chauffeurs &nbsp; ✓ Fixed prices, no surprises &nbsp; ✓ Free cancellation 24h before pickup</p>
-  `);
+  // Extract route details from formData (try multiple field name conventions)
+  const rawPickup  = String(fd.pickupAddress  ?? fd.pickup  ?? "").trim();
+  const rawDropoff = String(fd.dropoffAddress ?? fd.dropoff ?? "").trim();
+  const pickupShort  = rawPickup.split(",")[0].trim()  || "your pickup";
+  const dropoffShort = rawDropoff.split(",")[0].trim() || "";
+  const date = String(fd.date ?? "");
+  const time = String(fd.time ?? "");
 
-  const id = await sendEmail({ from: FROM, to, subject: `🚗 Complete your Barcelona transfer — 5% OFF inside`, html });
+  // Extract price (quote object or flat totalAmount)
+  const quoteObj   = fd.quote as Record<string, number> | undefined;
+  const quoteAmount = Number(quoteObj?.totalAmount ?? fd.totalAmount ?? 0);
+
+  // Build resume URL — embed coupon so it auto-applies
+  const params = new URLSearchParams();
+  const urlFields = ["pickupAddress","dropoffAddress","date","time","passengers","vehicleClass","pickupLat","pickupLng","dropoffLat","dropoffLng"];
+  for (const k of urlFields) {
+    const v = fd[k];
+    if (v != null) params.set(k, String(v));
+  }
+  if (couponCode) params.set("coupon", couponCode);
+  const resumeUrl = `${SITE_URL}/book?${params.toString()}`;
+
+  const html = abandonedBookingHtml({
+    firstName:    name.split(" ")[0] || name,
+    pickupShort,
+    dropoffShort,
+    date,
+    time,
+    quoteAmount,
+    resumeUrl,
+    unsubUrl: `${SITE_URL}/contact`,
+  });
+
+  const id = await sendEmail({ from: FROM, to, subject: `Your Élite BCN transfer is still waiting — complete your booking`, html });
   await logEmail({ to, subject: `Abandoned booking recovery`, type: "ABANDONED", resendId: id });
 }
 
@@ -808,6 +1090,24 @@ export async function sendDriverBookingDetailsEmail({
   `);
   const id = await sendEmail({ from: FROM, to, subject: `📋 New Booking — ${confirmationCode} | Élite BCN`, html });
   await logEmail({ to, subject: `Driver booking assigned — ${confirmationCode}`, type: "DRIVER_BOOKING", resendId: id });
+}
+
+// ─── Newsletter Issue (structured) ──────────────────────────
+export async function sendNewsletterIssue({
+  to, subject, campaignId, unsubToken, ...templateParams
+}: {
+  to: string; subject: string; campaignId: string; unsubToken: string;
+  issueTeaser: string; issueMonth: string; issueYear: string; issueNumber: string;
+  leadHeadline: string; leadBody: string; leadLink?: string;
+  tipHeadline: string; tipBody: string;
+  eventHeadline: string; eventBody: string;
+  offerHeadline: string; offerBody: string; offerLink: string; offerCta: string;
+}) {
+  const unsubUrl = `${SITE_URL}/api/newsletter/unsubscribe?token=${unsubToken}`;
+  const html = newsletterIssueHtml({ ...templateParams, unsubUrl });
+  const id = await sendEmail({ from: FROM, to, subject, html });
+  await logEmail({ to, subject, type: "NEWSLETTER", status: id ? "SENT" : "FAILED", resendId: id, campaignId });
+  return { data: { id }, error: null };
 }
 
 // ─── Newsletter Campaign ─────────────────────────────────────
