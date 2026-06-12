@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { BaseAgent } from "@/lib/ai/agents/base";
-import { callClaude } from "@/lib/ai/claude";
+import { callProvider } from "@/lib/ai/providers";
 import { saveMemory } from "@/lib/ai/memory";
 import { Resend } from "resend";
 
@@ -56,12 +56,14 @@ Booking:
 Reply with JSON only:
 {"leadScore":"hot|warm|cold","noShowRisk":"low|medium|high","summary":"1 sentence","action":"string"}`;
 
-    const { text, inputTokens, outputTokens, costCents } = await callClaude({
-      model: "haiku",
-      system: "You are a booking intelligence system. Reply only with valid JSON.",
-      messages: [{ role: "user", content: prompt }],
-      maxTokens: 256,
-    });
+    const { text, inputTokens, outputTokens, costCents } = await callProvider(
+      "booking",
+      [
+        { role: "system", content: "You are a booking intelligence system. Reply only with valid JSON." },
+        { role: "user",   content: prompt },
+      ],
+      { maxTokens: 256 },
+    );
 
     await this.trackSpend(costCents, inputTokens, outputTokens);
 
