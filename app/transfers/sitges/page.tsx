@@ -9,11 +9,6 @@ export const metadata: Metadata = {
   title: "Barcelona Airport to Sitges Transfer — from €65 | Fixed Price",
   description:
     "Luxury private transfer from Barcelona Airport (BCN) to Sitges. Fixed price from €65. 35-minute journey in Mercedes, Tesla or BMW. Meet & greet, no surge pricing. Book instantly.",
-  keywords: [
-    "Barcelona airport to Sitges transfer", "Sitges private transfer", "BCN to Sitges taxi",
-    "transfer Sitges Barcelona airport", "transfer aeropuerto Barcelona Sitges",
-    "Sitges private chauffeur", "Sitges luxury transfer",
-  ],
   alternates: { canonical: "https://www.elitebcn.info/transfers/sitges" },
   openGraph: {
     title: "Barcelona Airport to Sitges Transfer — from €65 | Fixed Price",

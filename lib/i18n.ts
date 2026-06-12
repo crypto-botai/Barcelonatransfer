@@ -1,5 +1,4 @@
 // i18n constants — used by I18nProvider, LanguageSwitcher, and locale-aware utils
-// Translation lookup is handled by next-intl; this file only exports static config
 
 export const SUPPORTED_LOCALES = ["en", "es", "fr", "ar", "ru", "zh", "de", "it"] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];

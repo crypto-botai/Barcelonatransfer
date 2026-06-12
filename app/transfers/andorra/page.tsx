@@ -9,12 +9,6 @@ export const metadata: Metadata = {
   title: "Barcelona Airport to Andorra Transfer — from €220 | Fixed Price",
   description:
     "Luxury private transfer from Barcelona Airport (BCN) to Andorra la Vella. Fixed price from €220. 3-hour journey in Mercedes, Tesla, BMW. Ski season & shopping trips. Book instantly.",
-  keywords: [
-    "Barcelona airport to Andorra transfer", "BCN to Andorra private transfer",
-    "transfer Barcelona Andorra la Vella", "Andorra private chauffeur",
-    "transfer aeropuerto Barcelona Andorra", "Grandvalira ski transfer Barcelona",
-    "Andorra ski transfer from Barcelona airport",
-  ],
   alternates: { canonical: "https://www.elitebcn.info/transfers/andorra" },
   openGraph: {
     title: "Barcelona Airport to Andorra Transfer — from €220 | Fixed Price",

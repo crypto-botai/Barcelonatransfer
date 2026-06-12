@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone, ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/components/language/I18nProvider";
 import { cn } from "@/lib/utils";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 

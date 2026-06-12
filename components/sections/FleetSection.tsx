@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Users, Briefcase, ChevronRight } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/components/language/I18nProvider";
 import { VEHICLE_CATALOG } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { DEFAULT_PRICING } from "@/lib/pricing";

@@ -23,7 +23,7 @@ export async function POST() {
         ok: false,
         error: result.error.message ?? "Resend rejected the email",
         detail: result.error,
-        hint: "Domain 'elitebcntransfers.com' must be verified in Resend dashboard → Domains. Add the required DNS records to your domain registrar.",
+        hint: "Domain 'elitebcn.info' must be verified in Resend dashboard → Domains. Add the required DNS records to your domain registrar.",
       }, { status: 400 });
     }
 

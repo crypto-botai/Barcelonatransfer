@@ -9,11 +9,6 @@ export const metadata: Metadata = {
   title: "Barcelona Airport to Montserrat Transfer — from €85 | Fixed Price",
   description:
     "Luxury private transfer from Barcelona Airport (BCN) to Montserrat monastery. Fixed price from €85. 50-minute journey. Meet & greet, no surge pricing. Book instantly.",
-  keywords: [
-    "Barcelona airport to Montserrat transfer", "BCN to Montserrat private transfer",
-    "Montserrat private transfer", "transfer aeropuerto Barcelona Montserrat",
-    "Montserrat monastery transfer", "Montserrat day trip Barcelona",
-  ],
   alternates: { canonical: "https://www.elitebcn.info/transfers/montserrat" },
   openGraph: {
     title: "Barcelona Airport to Montserrat Transfer — from €85 | Fixed Price",

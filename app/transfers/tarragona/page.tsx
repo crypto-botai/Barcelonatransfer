@@ -9,11 +9,6 @@ export const metadata: Metadata = {
   title: "Barcelona Airport to Tarragona Transfer — from €95 | Fixed Price",
   description:
     "Luxury private transfer from Barcelona Airport (BCN) to Tarragona or PortAventura World. Fixed price from €95. 1-hour journey in Mercedes, Tesla, BMW. Meet & greet included.",
-  keywords: [
-    "Barcelona airport to Tarragona transfer", "BCN to Tarragona private transfer",
-    "Barcelona airport to PortAventura transfer", "PortAventura private transfer",
-    "transfer aeropuerto Barcelona Tarragona", "Tarragona private chauffeur",
-  ],
   alternates: { canonical: "https://www.elitebcn.info/transfers/tarragona" },
   openGraph: {
     title: "Barcelona Airport to Tarragona Transfer — from €95 | Fixed Price",

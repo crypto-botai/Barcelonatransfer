@@ -9,10 +9,6 @@ export const metadata: Metadata = {
   title: "Barcelona Airport to Girona Transfer — from €110 | Fixed Price",
   description:
     "Luxury private transfer from Barcelona Airport (BCN) to Girona city or Girona Costa Brava Airport (GRO). Fixed price from €110. 1 hr 10 min. Mercedes, Tesla, BMW. Book instantly.",
-  keywords: [
-    "Barcelona airport to Girona transfer", "BCN to Girona private transfer", "transfer Barcelona Girona",
-    "Girona airport transfer", "transfer aeropuerto Barcelona Girona", "Girona private chauffeur",
-  ],
   alternates: { canonical: "https://www.elitebcn.info/transfers/girona" },
   openGraph: {
     title: "Barcelona Airport to Girona Transfer — from €110 | Fixed Price",

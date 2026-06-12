@@ -9,12 +9,6 @@ export const metadata: Metadata = {
   title: "Barcelona Cruise Port Transfer — World Trade Centre & Moll Adossat | from €45",
   description:
     "Luxury private transfer to Barcelona cruise port. World Trade Centre (T-A to T-D) & Moll Adossat. Vessel tracking, meet & greet, fixed price from €45. Book instantly 24/7.",
-  keywords: [
-    "Barcelona cruise port transfer", "Barcelona cruise terminal transfer",
-    "World Trade Centre Barcelona transfer", "Moll Adossat transfer",
-    "Barcelona port cruise private transfer", "transfer puerto cruceros Barcelona",
-    "cruise ship transfer Barcelona airport",
-  ],
   alternates: { canonical: "https://www.elitebcn.info/transfers/cruise-port" },
   openGraph: {
     title: "Barcelona Cruise Port Transfer — from €45 | Fixed Price",

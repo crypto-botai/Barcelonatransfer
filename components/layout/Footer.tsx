@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Mail, Phone, MessageCircle, MapPin, Instagram, Facebook, Car, Shield } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/components/language/I18nProvider";
 import NewsletterForm from "@/components/marketing/NewsletterForm";
 
 export default function Footer() {

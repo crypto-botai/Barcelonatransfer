@@ -173,8 +173,7 @@ export async function POST(req: NextRequest) {
           data:  { userId: newUser.id },
         });
         accountCreated = true;
-        // Fire-and-forget welcome email
-        sendWelcomeEmail({
+        await sendWelcomeEmail({
           to:               body.guestEmail,
           name:             body.guestName,
           password:         accountPassword,
@@ -203,31 +202,33 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Step 2c: Send booking confirmation email to customer
-    sendBookingConfirmation({
-      to:               body.guestEmail,
-      name:             body.guestName,
-      confirmationCode: booking.confirmationCode,
-      pickupAddress:    body.pickupAddress,
-      dropoffAddress:   body.dropoffAddress || body.bookingType,
-      pickupDatetime:   pickupDatetime.toLocaleString("en-GB"),
-      vehicleClass:     body.vehicleClass,
-      totalAmount:      totalWithExtras,
-      passengers:       body.passengers,
-      bookingId:        booking.id,
-    }).catch(e => console.error("[bookings/confirmation-email]", e?.message ?? e));
-
-    // Step 3: Notify admin (fire-and-forget — never blocks)
-    sendAdminNewBookingAlert({
-      confirmationCode: booking.confirmationCode,
-      guestName:        body.guestName,
-      guestEmail:       body.guestEmail,
-      pickupAddress:    body.pickupAddress,
-      dropoffAddress:   body.dropoffAddress || `${body.bookingType} – ${body.durationHours ?? ""}h`,
-      pickupDatetime:   pickupDatetime.toLocaleString("en-GB"),
-      vehicleClass:     body.vehicleClass,
-      totalAmount:      totalWithExtras,
-    }).catch(e => console.error("[bookings/admin-alert-email]", e?.message ?? e));
+    // Step 2c & 3: Send emails — awaited so Vercel doesn't kill them before response
+    const [confResult, adminResult] = await Promise.allSettled([
+      sendBookingConfirmation({
+        to:               body.guestEmail,
+        name:             body.guestName,
+        confirmationCode: booking.confirmationCode,
+        pickupAddress:    body.pickupAddress,
+        dropoffAddress:   body.dropoffAddress || body.bookingType,
+        pickupDatetime:   pickupDatetime.toLocaleString("en-GB"),
+        vehicleClass:     body.vehicleClass,
+        totalAmount:      totalWithExtras,
+        passengers:       body.passengers,
+        bookingId:        booking.id,
+      }),
+      sendAdminNewBookingAlert({
+        confirmationCode: booking.confirmationCode,
+        guestName:        body.guestName,
+        guestEmail:       body.guestEmail,
+        pickupAddress:    body.pickupAddress,
+        dropoffAddress:   body.dropoffAddress || `${body.bookingType} – ${body.durationHours ?? ""}h`,
+        pickupDatetime:   pickupDatetime.toLocaleString("en-GB"),
+        vehicleClass:     body.vehicleClass,
+        totalAmount:      totalWithExtras,
+      }),
+    ]);
+    if (confResult.status === "rejected")  console.error("[bookings/confirmation-email]", confResult.reason);
+    if (adminResult.status === "rejected") console.error("[bookings/admin-alert-email]", adminResult.reason);
 
     // Step 4: Try to create SumUp checkout — if not configured, use WhatsApp fallback
     const sumupConfigured =

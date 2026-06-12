@@ -9,12 +9,6 @@ export const metadata: Metadata = {
   title: "Barcelona Airport to PortAventura Transfer — from €99 | Fixed Price",
   description:
     "Luxury private transfer from Barcelona Airport (BCN) to PortAventura World theme park. Fixed price from €99. 70-minute journey. Families welcome, luggage included. Book instantly.",
-  keywords: [
-    "Barcelona airport to PortAventura transfer", "BCN to PortAventura private transfer",
-    "PortAventura World transfer from airport", "transfer aeropuerto Barcelona PortAventura",
-    "Ferrari Land transfer Barcelona airport", "PortAventura private chauffeur",
-    "Salou transfer from Barcelona airport",
-  ],
   alternates: { canonical: "https://www.elitebcn.info/transfers/port-aventura" },
   openGraph: {
     title: "Barcelona Airport to PortAventura Transfer — from €99 | Fixed Price",

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Plane, Anchor, Briefcase, Building2, Theater, Clock, Waves, Sunset, Mountain, Hotel, Crown, Map, ArrowRight } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/components/language/I18nProvider";
 
 const SERVICE_ICONS = [Plane, Anchor, Briefcase, Building2, Theater, Clock, Waves, Sunset, Mountain, Hotel, Crown, Map];
 const SERVICE_KEYS = ["airport", "cruise", "executive", "corporate", "vipEvents", "hourly", "costaBrava", "costaDorada", "andorra", "hotel", "vip", "tours"] as const;

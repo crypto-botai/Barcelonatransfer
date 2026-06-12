@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Star, Shield, Clock, Award } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/components/language/I18nProvider";
 import BookingForm from "@/components/booking/BookingForm";
 
 const fade = (delay = 0) => ({

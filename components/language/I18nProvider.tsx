@@ -1,11 +1,19 @@
 "use client";
 
-import { useState, createContext, useContext, useEffect } from "react";
-import { NextIntlClientProvider } from "next-intl";
-import type { AbstractIntlMessages } from "next-intl";
+/**
+ * Self-contained i18n system using plain React context.
+ * All 8 locale JSON files are bundled at build time.
+ * The context DEFAULT VALUE is the English messages object, so even without
+ * any Provider in the tree (which can happen during Next.js SSR of client
+ * component subtrees), useTranslations() always returns real English text —
+ * never raw keys.
+ */
+
+import { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import { SUPPORTED_LOCALES, RTL_LOCALES, LANGUAGE_META, type SupportedLocale } from "@/lib/i18n";
 
-// Bundle all 8 locales at build time — no runtime fetching
+// Statically import all locales — bundled at build time, zero runtime fetch
 import enMsg from "@/messages/en.json";
 import esMsg from "@/messages/es.json";
 import frMsg from "@/messages/fr.json";
@@ -15,49 +23,73 @@ import zhMsg from "@/messages/zh.json";
 import deMsg from "@/messages/de.json";
 import itMsg from "@/messages/it.json";
 
-const ALL_MESSAGES: Record<SupportedLocale, AbstractIntlMessages> = {
-  en: enMsg as AbstractIntlMessages,
-  es: esMsg as AbstractIntlMessages,
-  fr: frMsg as AbstractIntlMessages,
-  ar: arMsg as AbstractIntlMessages,
-  ru: ruMsg as AbstractIntlMessages,
-  zh: zhMsg as AbstractIntlMessages,
-  de: deMsg as AbstractIntlMessages,
-  it: itMsg as AbstractIntlMessages,
+type Messages = typeof enMsg;
+type Namespace = keyof Messages;
+
+const ALL_MESSAGES: Record<SupportedLocale, Messages> = {
+  en: enMsg,
+  es: esMsg as unknown as Messages,
+  fr: frMsg as unknown as Messages,
+  ar: arMsg as unknown as Messages,
+  ru: ruMsg as unknown as Messages,
+  zh: zhMsg as unknown as Messages,
+  de: deMsg as unknown as Messages,
+  it: itMsg as unknown as Messages,
 };
 
-function getStoredLocale(): SupportedLocale {
-  if (typeof document === "undefined") return "en";
-  const cookie = document.cookie
-    .split(";")
-    .find((c) => c.trim().startsWith("NEXT_LOCALE="));
-  const val = cookie?.split("=")?.[1]?.trim() as SupportedLocale | undefined;
-  return val && SUPPORTED_LOCALES.includes(val) ? val : "en";
-}
+// ─── Contexts ────────────────────────────────────────────────────────────────
+// Default = English messages. useContext() falls back to this default during
+// SSR even if the Provider hasn't rendered yet — guarantees real text in HTML.
+const MessagesCtx = createContext<Messages>(enMsg);
 
-interface I18nCtx {
+interface LocaleCtxValue {
   locale: SupportedLocale;
   setLocale: (l: SupportedLocale) => void;
 }
+const LocaleCtx = createContext<LocaleCtxValue>({ locale: "en", setLocale: () => {} });
 
-export const I18nContext = createContext<I18nCtx>({
-  locale: "en",
-  setLocale: () => {},
-});
+// ─── Public hooks ─────────────────────────────────────────────────────────────
+export function useI18n(): LocaleCtxValue {
+  return useContext(LocaleCtx);
+}
 
-export const useI18n = () => useContext(I18nContext);
+/**
+ * Drop-in replacement for next-intl's useTranslations().
+ * Works identically: const t = useTranslations("hero"); t("title1");
+ * Supports nested dot-notation: t("badges.rating")
+ */
+export function useTranslations(namespace: Namespace) {
+  const messages = useContext(MessagesCtx);
+  const ns = messages[namespace] as Record<string, unknown> | undefined;
 
-export default function I18nProvider({ children }: { children: React.ReactNode }) {
-  // SSR always starts with English so the initial HTML has real text, not raw keys
+  return function t(key: string): string {
+    if (!ns) return key;
+    const parts = key.split(".");
+    let cur: unknown = ns;
+    for (const part of parts) {
+      if (cur == null || typeof cur !== "object") return key;
+      cur = (cur as Record<string, unknown>)[part];
+    }
+    return typeof cur === "string" ? cur : key;
+  };
+}
+
+// ─── Provider ────────────────────────────────────────────────────────────────
+export default function I18nProvider({ children }: { children: ReactNode }) {
+  // Start with English — guarantees SSR HTML has real text, not keys.
+  // useEffect fires only on the client, after hydration is complete.
   const [locale, setLocaleState] = useState<SupportedLocale>("en");
 
   useEffect(() => {
-    // After hydration, sync to user's stored preference
-    const stored = getStoredLocale();
-    if (stored !== "en") setLocaleState(stored);
+    // Read stored preference from cookie (set by setLocale below)
+    const cookie = document.cookie.split(";").find((c) => c.trim().startsWith("NEXT_LOCALE="));
+    const stored = cookie?.split("=")?.[1]?.trim() as SupportedLocale | undefined;
+    if (stored && SUPPORTED_LOCALES.includes(stored) && stored !== "en") {
+      setLocaleState(stored);
+    }
   }, []);
 
-  const setLocale = (newLocale: SupportedLocale) => {
+  function setLocale(newLocale: SupportedLocale) {
     setLocaleState(newLocale);
     document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000`;
     document.documentElement.lang = newLocale;
@@ -70,13 +102,13 @@ export default function I18nProvider({ children }: { children: React.ReactNode }
       link.setAttribute("data-i18n-font", newLocale);
       document.head.appendChild(link);
     }
-  };
+  }
 
   return (
-    <I18nContext.Provider value={{ locale, setLocale }}>
-      <NextIntlClientProvider locale={locale} messages={ALL_MESSAGES[locale]}>
+    <LocaleCtx.Provider value={{ locale, setLocale }}>
+      <MessagesCtx.Provider value={ALL_MESSAGES[locale]}>
         {children}
-      </NextIntlClientProvider>
-    </I18nContext.Provider>
+      </MessagesCtx.Provider>
+    </LocaleCtx.Provider>
   );
 }
