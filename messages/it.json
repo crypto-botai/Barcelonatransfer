@@ -85,18 +85,54 @@
       "noSurge": "Mai tariffe dinamiche"
     },
     "list": {
-      "airport": { "title": "Transfer Aeroporto", "desc": "Accoglienza personalizzata con monitoraggio voli in tempo reale. 60 minuti di attesa gratuita." },
-      "cruise": { "title": "Transfer Porto Crociere", "desc": "Servizio porta-a-nave al Terminal Crociere di Barcellona." },
-      "executive": { "title": "Autista Executive", "desc": "Autista professionista dedicato per meeting d'affari e eventi aziendali." },
-      "corporate": { "title": "Account Aziendali", "desc": "Account corporate premium con flotta prioritaria, fatturazione e manager dedicato." },
-      "vipEvents": { "title": "Eventi VIP", "desc": "Trasporto di lusso per matrimoni, gala, set cinematografici e eventi privati." },
-      "hourly": { "title": "Autista a Ore", "desc": "Il tuo autista privato a disposizione — minimo 4 ore, massima flessibilità." },
-      "costaBrava": { "title": "Transfer Costa Brava", "desc": "Lloret de Mar, Platja d'Aro, Tossa, Cadaqués — tutta la costa." },
-      "costaDorada": { "title": "Transfer Costa Dorada", "desc": "Sitges, Salou, PortAventura, Tarragona nel massimo comfort." },
-      "andorra": { "title": "Transfer Andorra", "desc": "Transfer premium da Barcellona ad Andorra — shopping, sci o affari." },
-      "hotel": { "title": "Transfer Hotel", "desc": "Servizio di lusso porta-a-porta a tutti gli hotel 4 e 5 stelle di Barcellona." },
-      "vip": { "title": "Trasporto VIP", "desc": "Servizio discreto ed esclusivo per clienti di alto profilo che richiedono assoluta privacy." },
-      "tours": { "title": "Tour Privati", "desc": "Montserrat, La Roca Village, vigneti di Girona e musei di Dalí." }
+      "airport": {
+        "title": "Transfer Aeroporto",
+        "desc": "Accoglienza personalizzata con monitoraggio voli in tempo reale. 60 minuti di attesa gratuita."
+      },
+      "cruise": {
+        "title": "Transfer Porto Crociere",
+        "desc": "Servizio porta-a-nave al Terminal Crociere di Barcellona."
+      },
+      "executive": {
+        "title": "Autista Executive",
+        "desc": "Autista professionista dedicato per meeting d'affari e eventi aziendali."
+      },
+      "corporate": {
+        "title": "Account Aziendali",
+        "desc": "Account corporate premium con flotta prioritaria, fatturazione e manager dedicato."
+      },
+      "vipEvents": {
+        "title": "Eventi VIP",
+        "desc": "Trasporto di lusso per matrimoni, gala, set cinematografici e eventi privati."
+      },
+      "hourly": {
+        "title": "Autista a Ore",
+        "desc": "Il tuo autista privato a disposizione — minimo 4 ore, massima flessibilità."
+      },
+      "costaBrava": {
+        "title": "Transfer Costa Brava",
+        "desc": "Lloret de Mar, Platja d'Aro, Tossa, Cadaqués — tutta la costa."
+      },
+      "costaDorada": {
+        "title": "Transfer Costa Dorada",
+        "desc": "Sitges, Salou, PortAventura, Tarragona nel massimo comfort."
+      },
+      "andorra": {
+        "title": "Transfer Andorra",
+        "desc": "Transfer premium da Barcellona ad Andorra — shopping, sci o affari."
+      },
+      "hotel": {
+        "title": "Transfer Hotel",
+        "desc": "Servizio di lusso porta-a-porta a tutti gli hotel 4 e 5 stelle di Barcellona."
+      },
+      "vip": {
+        "title": "Trasporto VIP",
+        "desc": "Servizio discreto ed esclusivo per clienti di alto profilo che richiedono assoluta privacy."
+      },
+      "tours": {
+        "title": "Tour Privati",
+        "desc": "Montserrat, La Roca Village, vigneti di Girona e musei di Dalí."
+      }
     }
   },
   "footer": {
@@ -159,5 +195,29 @@
     "tryAgain": "Riprova",
     "close": "Chiudi",
     "or": "o"
+  },
+  "routes": {
+    "heroTitle": "Transfer Aeroporto Barcellona a {name}",
+    "heroSubtitle": "Transfer privato di lusso dall'aeroporto BCN El Prat a {name}. Prezzo fisso da €{price}. Circa {duration} minuti. Nessun sovrapprezzo.",
+    "bookNow": "Prenota ora — da €{price}",
+    "fixedPrice": "Prezzo fisso",
+    "duration": "{min} minuti",
+    "distance": "{km} km",
+    "meetGreet": "Accoglienza in sala arrivi",
+    "meetGreetDesc": "Il vostro autista vi aspetta nella sala arrivi con il vostro nome su un cartello. 60 minuti di attesa gratuita.",
+    "flightTracking": "Monitoraggio volo in tempo reale",
+    "flightTrackingDesc": "Monitoriamo il vostro volo in diretta. In caso di ritardi, l'autista si adatta automaticamente senza costi aggiuntivi.",
+    "fixedPriceDesc": "Il prezzo visualizzato è il prezzo da pagare. Nessun tassametro, nessun supplemento aeroportuale.",
+    "vehiclesAvail": "Veicoli disponibili",
+    "priceTable": "Prezzi per {name}",
+    "faqTitle": "Domande frequenti",
+    "relatedTitle": "Transfer correlati",
+    "ctaTitle": "Pronto a prenotare il transfer per {name}?",
+    "ctaSubtitle": "Conferma immediata. Cancellazione gratuita fino a 24 ore prima del ritiro.",
+    "sedan": "Mercedes Classe E / BMW Serie 5",
+    "tesla": "Tesla Model S",
+    "mpv": "Mercedes Classe V (MPV)",
+    "paxLabel": "passeggeri",
+    "allInclusive": "Tutti i prezzi includono pedaggi, accoglienza e 60 min di attesa gratuita. Nessuna tariffa nascosta."
   }
 }

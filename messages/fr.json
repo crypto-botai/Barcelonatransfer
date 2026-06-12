@@ -85,18 +85,54 @@
       "noSurge": "Jamais de surcharges"
     },
     "list": {
-      "airport": { "title": "Transferts Aéroport", "desc": "Accueil personnalisé avec suivi des vols en temps réel. 60 minutes d'attente offertes." },
-      "cruise": { "title": "Transferts Port de Croisière", "desc": "Service porte-à-passerelle au Terminal de Croisières de Barcelone." },
-      "executive": { "title": "Chauffeur Exécutif", "desc": "Chauffeur professionnel dédié pour réunions d'affaires et événements d'entreprise." },
-      "corporate": { "title": "Comptes Corporate", "desc": "Comptes professionnels premium avec flotte prioritaire, facturation et gestionnaire dédié." },
-      "vipEvents": { "title": "Événements VIP", "desc": "Transport de luxe pour mariages, galas, tournages et événements privés." },
-      "hourly": { "title": "Chauffeur à l'Heure", "desc": "Votre chauffeur privé à votre disposition — minimum 4 heures, flexibilité maximale." },
-      "costaBrava": { "title": "Transferts Costa Brava", "desc": "Lloret de Mar, Platja d'Aro, Tossa, Cadaqués — toute la côte." },
-      "costaDorada": { "title": "Transferts Costa Dorada", "desc": "Sitges, Salou, PortAventura, Tarragone dans un confort absolu." },
-      "andorra": { "title": "Transferts Andorre", "desc": "Transfert premium de Barcelone vers Andorre — shopping, ski ou affaires." },
-      "hotel": { "title": "Transferts Hôtels", "desc": "Service de luxe porte-à-porte vers tous les hôtels 4 et 5 étoiles de Barcelone." },
-      "vip": { "title": "Transport VIP", "desc": "Service discret et exclusif pour clients très médiatisés exigeant une confidentialité absolue." },
-      "tours": { "title": "Tours Privés", "desc": "Montserrat, La Roca Village, vignobles de Gérone et musées Dalí." }
+      "airport": {
+        "title": "Transferts Aéroport",
+        "desc": "Accueil personnalisé avec suivi des vols en temps réel. 60 minutes d'attente offertes."
+      },
+      "cruise": {
+        "title": "Transferts Port de Croisière",
+        "desc": "Service porte-à-passerelle au Terminal de Croisières de Barcelone."
+      },
+      "executive": {
+        "title": "Chauffeur Exécutif",
+        "desc": "Chauffeur professionnel dédié pour réunions d'affaires et événements d'entreprise."
+      },
+      "corporate": {
+        "title": "Comptes Corporate",
+        "desc": "Comptes professionnels premium avec flotte prioritaire, facturation et gestionnaire dédié."
+      },
+      "vipEvents": {
+        "title": "Événements VIP",
+        "desc": "Transport de luxe pour mariages, galas, tournages et événements privés."
+      },
+      "hourly": {
+        "title": "Chauffeur à l'Heure",
+        "desc": "Votre chauffeur privé à votre disposition — minimum 4 heures, flexibilité maximale."
+      },
+      "costaBrava": {
+        "title": "Transferts Costa Brava",
+        "desc": "Lloret de Mar, Platja d'Aro, Tossa, Cadaqués — toute la côte."
+      },
+      "costaDorada": {
+        "title": "Transferts Costa Dorada",
+        "desc": "Sitges, Salou, PortAventura, Tarragone dans un confort absolu."
+      },
+      "andorra": {
+        "title": "Transferts Andorre",
+        "desc": "Transfert premium de Barcelone vers Andorre — shopping, ski ou affaires."
+      },
+      "hotel": {
+        "title": "Transferts Hôtels",
+        "desc": "Service de luxe porte-à-porte vers tous les hôtels 4 et 5 étoiles de Barcelone."
+      },
+      "vip": {
+        "title": "Transport VIP",
+        "desc": "Service discret et exclusif pour clients très médiatisés exigeant une confidentialité absolue."
+      },
+      "tours": {
+        "title": "Tours Privés",
+        "desc": "Montserrat, La Roca Village, vignobles de Gérone et musées Dalí."
+      }
     }
   },
   "footer": {
@@ -159,5 +195,29 @@
     "tryAgain": "Réessayer",
     "close": "Fermer",
     "or": "ou"
+  },
+  "routes": {
+    "heroTitle": "Transfert Aéroport de Barcelone vers {name}",
+    "heroSubtitle": "Transfert privé de luxe depuis l'aéroport BCN El Prat vers {name}. Prix fixe à partir de €{price}. Environ {duration} minutes. Sans majoration, jamais.",
+    "bookNow": "Réserver — à partir de €{price}",
+    "fixedPrice": "Prix fixe",
+    "duration": "{min} minutes",
+    "distance": "{km} km",
+    "meetGreet": "Accueil en salle d'arrivée",
+    "meetGreetDesc": "Votre chauffeur vous attend dans la salle des arrivées avec votre nom sur un panneau. 60 minutes d'attente gratuites.",
+    "flightTracking": "Suivi de vol en temps réel",
+    "flightTrackingDesc": "Nous suivons votre vol en direct. Si votre vol est retardé, votre chauffeur s'adapte automatiquement.",
+    "fixedPriceDesc": "Le prix affiché est le prix payé. Pas de compteur, pas de suppléments aéroport.",
+    "vehiclesAvail": "Véhicules disponibles",
+    "priceTable": "Tarifs pour {name}",
+    "faqTitle": "Questions fréquentes",
+    "relatedTitle": "Transferts similaires",
+    "ctaTitle": "Prêt à réserver votre transfert vers {name} ?",
+    "ctaSubtitle": "Confirmation instantanée. Annulation gratuite jusqu'à 24 heures avant la prise en charge.",
+    "sedan": "Mercedes E-Class / BMW Série 5",
+    "tesla": "Tesla Model S",
+    "mpv": "Mercedes V-Class (MPV)",
+    "paxLabel": "passagers",
+    "allInclusive": "Tous les prix incluent péages, accueil et 60 min d'attente gratuite. Sans frais cachés."
   }
 }
