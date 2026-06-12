@@ -138,11 +138,14 @@ export async function POST(req: NextRequest) {
       confirmationCode: booking.confirmationCode,
       guestName:        body.guestName,
       guestEmail:       body.guestEmail,
+      guestPhone:       body.guestPhone,
       pickupAddress:    body.pickupAddress,
       dropoffAddress:   body.dropoffAddress || "",
       pickupDatetime:   pickup.toLocaleString("en-GB"),
       vehicleClass:     body.vehicleClass,
       totalAmount:      body.totalAmount,
+      passengers:       body.passengers,
+      specialRequests:  body.specialRequests,
     }).catch(() => {});
 
     return NextResponse.json(booking, { status: 201 });

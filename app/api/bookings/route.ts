@@ -220,11 +220,14 @@ export async function POST(req: NextRequest) {
         confirmationCode: booking.confirmationCode,
         guestName:        body.guestName,
         guestEmail:       body.guestEmail,
+        guestPhone:       body.guestPhone,
         pickupAddress:    body.pickupAddress,
         dropoffAddress:   body.dropoffAddress || `${body.bookingType} – ${body.durationHours ?? ""}h`,
         pickupDatetime:   pickupDatetime.toLocaleString("en-GB"),
         vehicleClass:     body.vehicleClass,
         totalAmount:      totalWithExtras,
+        passengers:       body.passengers,
+        specialRequests:  body.specialRequests,
       }),
     ]);
     if (confResult.status === "rejected")  console.error("[bookings/confirmation-email]", confResult.reason);

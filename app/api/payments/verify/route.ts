@@ -94,6 +94,8 @@ export async function GET(req: NextRequest) {
                 pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
                 vehicleClass:     updated.vehicleClass,
                 totalAmount:      updated.totalAmount,
+                passengers:       updated.passengers,
+                specialRequests:  updated.specialRequests,
               }),
             ]);
 

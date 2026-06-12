@@ -25,6 +25,379 @@ async function sendEmail(payload: Parameters<Resend["emails"]["send"]>[0]): Prom
   return result?.data?.id;
 }
 
+// ─── Vehicle class → display name ────────────────────────────
+const VEHICLE_NAMES: Record<string, string> = {
+  ECONOMY:       "Standard Sedan",
+  BUSINESS:      "Business Sedan",
+  LUXURY:        "Luxury Sedan",
+  FIRST_CLASS:   "First Class Sedan",
+  ELECTRIC_VIP:  "Electric Vehicle (Tesla)",
+  SUV:           "SUV",
+  LUXURY_SUV:    "Luxury SUV",
+  MINIVAN:       "Executive Minivan",
+  LUXURY_MINIVAN:"Luxury Minivan",
+  MINIBUS:       "Group Minibus",
+};
+function vehicleName(cls: string): string {
+  return VEHICLE_NAMES[cls] ?? cls.replace(/_/g, " ");
+}
+
+function esc(s: string | number | undefined | null): string {
+  return String(s ?? "—")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function splitDatetime(dt: string): { date: string; time: string } {
+  const parts = dt.split(",").map((p) => p.trim());
+  return parts.length >= 2
+    ? { date: parts[0], time: parts[1] }
+    : { date: dt, time: "" };
+}
+
+// ─── Booking Confirmation Template ──────────────────────────
+function bookingConfirmationHtml({
+  confirmationCode, clientFirstName, pickupAddress, dropoffAddress,
+  pickupDatetime, vehicleClass, passengers, totalAmount,
+}: {
+  confirmationCode: string; clientFirstName: string;
+  pickupAddress: string; dropoffAddress?: string | null;
+  pickupDatetime: string; vehicleClass: string;
+  passengers: number; totalAmount: number;
+}): string {
+  const { date, time } = splitDatetime(pickupDatetime);
+  const code     = esc(confirmationCode);
+  const waLink   = `https://wa.me/34635383712?text=Booking%20${encodeURIComponent(confirmationCode)}`;
+
+  return `<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Booking Confirmed — Élite BCN</title>
+</head>
+<body style="margin:0; padding:0; background-color:#efece5; -webkit-text-size-adjust:100%;">
+
+<div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
+  Your luxury transfer is confirmed — code ${code}. Your chauffeur details will follow shortly.
+</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#efece5;">
+<tr><td align="center" style="padding:32px 12px;">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:100%;">
+
+    <tr><td style="background-color:#141414; padding:36px 40px 32px 40px; text-align:center;">
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:26px; letter-spacing:8px; color:#ffffff;">
+        ÉLITE<span style="color:#c9a96e;">BCN</span>
+      </div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#8a8a8a; padding-top:10px;">
+        LUXURY TRANSFERS &nbsp;·&nbsp; BARCELONA
+      </div>
+    </td></tr>
+
+    <tr><td style="height:3px; background-color:#c9a96e; font-size:0; line-height:0;">&nbsp;</td></tr>
+
+    <tr><td style="background-color:#faf8f4; padding:48px 48px 8px 48px;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:4px; color:#b39159; text-transform:uppercase;">
+        Booking Confirmed
+      </div>
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:30px; line-height:38px; color:#1a1a1a; padding-top:14px;">
+        Your chauffeur awaits,<br>${esc(clientFirstName)}.
+      </div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:23px; color:#5c5c5c; padding-top:16px;">
+        Your luxury transfer has been confirmed and paid. Your chauffeur will be assigned shortly — you'll receive their name, photo and vehicle plate before pickup.
+      </div>
+    </td></tr>
+
+    <tr><td style="background-color:#faf8f4; padding:32px 48px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #c9a96e; border-radius:2px;">
+        <tr><td style="padding:26px 20px 8px 20px; text-align:center;">
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#9a9a9a; text-transform:uppercase;">
+            Confirmation Code
+          </div>
+          <div style="font-family:Georgia,'Times New Roman',serif; font-size:34px; letter-spacing:10px; color:#b39159; padding:12px 0 6px 0;">
+            ${code}
+          </div>
+        </td></tr>
+        <tr><td style="padding:0 20px;">
+          <div style="border-top:1px dashed #d8cdb8; font-size:0; line-height:0;">&nbsp;</div>
+        </td></tr>
+        <tr><td style="padding:10px 20px 22px 20px; text-align:center;">
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#8a8a8a;">
+            Show this code to your chauffeur &middot; Keep this email for your records
+          </div>
+        </td></tr>
+      </table>
+    </td></tr>
+
+    <tr><td style="background-color:#faf8f4; padding:8px 48px 16px 48px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+
+        <tr>
+          <td style="padding:16px 0; border-bottom:1px solid #e9e3d6; vertical-align:top; width:120px;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Pick-up</span>
+          </td>
+          <td style="padding:16px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#1a1a1a;">${esc(pickupAddress)}</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:16px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Drop-off</span>
+          </td>
+          <td style="padding:16px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#1a1a1a;">${esc(dropoffAddress)}</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:16px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Date &amp; Time</span>
+          </td>
+          <td style="padding:16px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a;">${esc(date)}${time ? ` &nbsp;&middot;&nbsp; ${esc(time)}` : ""}</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:16px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Vehicle</span>
+          </td>
+          <td style="padding:16px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a;">${esc(vehicleName(vehicleClass))}</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:16px 0; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Passengers</span>
+          </td>
+          <td style="padding:16px 0;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a;">${passengers}</span>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+
+    <tr><td style="background-color:#faf8f4; padding:0 48px 36px 48px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#141414; border-radius:2px;">
+        <tr>
+          <td style="padding:20px 24px;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:3px; color:#9a9a9a; text-transform:uppercase;">Total Paid</span>
+          </td>
+          <td style="padding:20px 24px; text-align:right;">
+            <span style="font-family:Georgia,'Times New Roman',serif; font-size:24px; color:#c9a96e;">€${totalAmount.toFixed(2)}</span>
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#8a8a8a;">&nbsp; incl. VAT</span>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+
+    <tr><td style="background-color:#faf8f4; padding:0 48px 36px 48px; text-align:center;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; line-height:20px; color:#8a8a8a;">
+        ✦ Meet &amp; Greet &nbsp;&nbsp; ✦ Flight Monitoring &nbsp;&nbsp; ✦ 60 min Free Waiting &nbsp;&nbsp; ✦ Free Cancellation 24h
+      </div>
+    </td></tr>
+
+    <tr><td style="background-color:#faf8f4; padding:0 48px 48px 48px; text-align:center;">
+      <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+        <tr><td style="background-color:#b39159; border-radius:2px;">
+          <a href="${waLink}" style="display:inline-block; padding:15px 38px; font-family:Helvetica,Arial,sans-serif; font-size:13px; letter-spacing:2px; color:#ffffff; text-decoration:none; text-transform:uppercase;">
+            Contact Us on WhatsApp
+          </a>
+        </td></tr>
+      </table>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#9a9a9a; padding-top:16px;">
+        Need to modify your booking? Reply to this email or message us anytime.
+      </div>
+    </td></tr>
+
+    <tr><td style="background-color:#141414; padding:32px 48px; text-align:center;">
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:15px; letter-spacing:5px; color:#ffffff;">ÉLITE<span style="color:#c9a96e;">BCN</span></div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; line-height:19px; color:#8a8a8a; padding-top:14px;">
+        +34 635 383 712 &nbsp;·&nbsp; www.elitebcn.info<br>
+        Licensed VTC Operator — Barcelona, Spain
+      </div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#5c5c5c; padding-top:14px;">
+        &copy; ${new Date().getFullYear()} Élite BCN Transfers. All rights reserved.
+      </div>
+    </td></tr>
+
+  </table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
+// ─── Admin New Booking Alert Template ───────────────────────
+function adminNewBookingAlertHtml({
+  confirmationCode, clientName, clientEmail, clientPhone,
+  pickupAddress, dropoffAddress, pickupDatetime, vehicleClass,
+  passengers, totalAmount, specialRequests,
+}: {
+  confirmationCode: string; clientName: string; clientEmail: string; clientPhone?: string | null;
+  pickupAddress: string; dropoffAddress?: string | null; pickupDatetime: string;
+  vehicleClass: string; passengers: number; totalAmount: number; specialRequests?: string | null;
+}): string {
+  const { date, time } = splitDatetime(pickupDatetime);
+  const code = esc(confirmationCode);
+  const notes = esc(specialRequests?.replace(/\[META\][\s\S]*?\[\/META\]\n?/, "").trim()) || "—";
+
+  return `<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>New Booking — Élite BCN</title>
+</head>
+<body style="margin:0; padding:0; background-color:#efece5; -webkit-text-size-adjust:100%;">
+
+<div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
+  ${code} &middot; ${esc(date)} ${esc(time)} &middot; ${esc(vehicleName(vehicleClass))} &middot; €${totalAmount.toFixed(2)} — driver assignment required.
+</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#efece5;">
+<tr><td align="center" style="padding:32px 12px;">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:100%;">
+
+    <tr><td style="background-color:#141414; padding:28px 40px; text-align:center;">
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:22px; letter-spacing:7px; color:#ffffff;">
+        ÉLITE<span style="color:#c9a96e;">BCN</span>
+      </div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#8a8a8a; padding-top:8px;">
+        ADMIN &nbsp;&middot;&nbsp; OPERATIONS
+      </div>
+    </td></tr>
+    <tr><td style="height:3px; background-color:#c9a96e; font-size:0; line-height:0;">&nbsp;</td></tr>
+
+    <tr><td style="background-color:#faf8f4; padding:40px 48px 8px 48px;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:4px; color:#b39159; text-transform:uppercase;">
+        New Booking &middot; Paid
+      </div>
+      <div style="font-family:Georgia,'Times New Roman',serif; font-size:26px; line-height:34px; color:#1a1a1a; padding-top:12px;">
+        Driver assignment required
+      </div>
+    </td></tr>
+
+    <tr><td style="background-color:#faf8f4; padding:24px 48px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #c9a96e; border-radius:2px;">
+        <tr>
+          <td style="padding:18px 24px;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:3px; color:#9a9a9a; text-transform:uppercase;">Code</span><br>
+            <span style="font-family:Georgia,'Times New Roman',serif; font-size:24px; letter-spacing:6px; color:#b39159;">${code}</span>
+          </td>
+          <td style="padding:18px 24px; text-align:right; vertical-align:middle;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:3px; color:#9a9a9a; text-transform:uppercase;">Amount</span><br>
+            <span style="font-family:Georgia,'Times New Roman',serif; font-size:24px; color:#1a1a1a;">€${totalAmount.toFixed(2)}</span>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+
+    <tr><td style="background-color:#faf8f4; padding:8px 48px 16px 48px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+
+        <tr>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top; width:120px;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Client</span>
+          </td>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a;">${esc(clientName)}</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Contact</span>
+          </td>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#1a1a1a;">
+              <a href="mailto:${esc(clientEmail)}" style="color:#b39159; text-decoration:none;">${esc(clientEmail)}</a><br>
+              ${clientPhone ? `<a href="tel:${esc(clientPhone)}" style="color:#b39159; text-decoration:none;">${esc(clientPhone)}</a>` : "<span style=\"color:#9a9a9a;\">—</span>"}
+            </span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Pick-up</span>
+          </td>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#1a1a1a;">${esc(pickupAddress)}</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Drop-off</span>
+          </td>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#1a1a1a;">${esc(dropoffAddress)}</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Date &amp; Time</span>
+          </td>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a; font-weight:bold;">${esc(date)}${time ? ` &nbsp;&middot;&nbsp; ${esc(time)}` : ""}</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Vehicle</span>
+          </td>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a;">${esc(vehicleName(vehicleClass))} &nbsp;&middot;&nbsp; ${passengers} pax</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:14px 0; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Notes</span>
+          </td>
+          <td style="padding:14px 0;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#5c5c5c;">${notes}</span>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+
+    <tr><td style="background-color:#faf8f4; padding:16px 48px 44px 48px; text-align:center;">
+      <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+        <tr><td style="background-color:#141414; border-radius:2px;">
+          <a href="${SITE_URL}/admin/bookings" style="display:inline-block; padding:15px 38px; font-family:Helvetica,Arial,sans-serif; font-size:13px; letter-spacing:2px; color:#c9a96e; text-decoration:none; text-transform:uppercase;">
+            Assign Driver
+          </a>
+        </td></tr>
+      </table>
+    </td></tr>
+
+    <tr><td style="background-color:#141414; padding:24px 48px; text-align:center;">
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#5c5c5c;">
+        INTERNAL NOTIFICATION &middot; ÉLITE BCN OPERATIONS &middot; ${esc(date)}
+      </div>
+    </td></tr>
+
+  </table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
 // ─── Shared HTML Layout ─────────────────────────────────────
 function emailLayout(body: string): string {
   return `<!DOCTYPE html>
@@ -106,74 +479,48 @@ export async function sendBookingConfirmation({
   dropoffAddress: string; pickupDatetime: string; vehicleClass: string;
   totalAmount: number; passengers: number; bookingId?: string;
 }) {
-  const html = emailLayout(`
-    <h2>Booking Confirmed</h2>
-    <p>Dear ${name},</p>
-    <p>Your luxury transfer has been confirmed. Your chauffeur will be assigned shortly and you'll receive a notification.</p>
-    <div class="code-box">
-      <p style="color:#888;font-size:11px;margin-bottom:8px;letter-spacing:3px;text-transform:uppercase;">Confirmation Code</p>
-      <div class="code">${confirmationCode}</div>
-    </div>
-    <table class="detail-table">
-      <tr><td>Pick-up</td><td>${pickupAddress}</td></tr>
-      <tr><td>Drop-off</td><td>${dropoffAddress || "—"}</td></tr>
-      <tr><td>Date & Time</td><td>${pickupDatetime}</td></tr>
-      <tr><td>Vehicle</td><td>${vehicleClass.replace(/_/g, " ")}</td></tr>
-      <tr><td>Passengers</td><td>${passengers}</td></tr>
-    </table>
-    <div class="total-row">
-      <span class="total-label">Total Paid</span>
-      <span class="total-value">€${totalAmount.toFixed(2)}</span>
-    </div>
-    <div class="divider"></div>
-    <div style="text-align:center;margin:20px 0;display:flex;flex-direction:column;gap:10px;align-items:center;">
-      ${bookingId ? `<a href="${SITE_URL}/booking/${bookingId}/invoice" class="outline-btn" style="display:inline-block;">🧾 View / Print Receipt</a>` : ""}
-      <a href="https://wa.me/34635383712?text=Booking%20${confirmationCode}" class="wa-btn">💬 WhatsApp Support</a>
-    </div>
-  `);
+  const html = bookingConfirmationHtml({
+    confirmationCode,
+    clientFirstName: name.split(" ")[0],
+    pickupAddress,
+    dropoffAddress,
+    pickupDatetime,
+    vehicleClass,
+    passengers,
+    totalAmount,
+  });
 
-  const id = await sendEmail({ from: FROM, to, subject: `✓ Booking Confirmed — ${confirmationCode} | Élite BCN`, html });
+  const id = await sendEmail({ from: FROM, to, subject: `Booking Confirmed — ${confirmationCode} | Élite BCN`, html });
   await logEmail({ to, subject: `Booking Confirmed — ${confirmationCode}`, type: "CONFIRMATION", resendId: id, bookingId });
 }
 
 // ─── Admin Alert ─────────────────────────────────────────────
 export async function sendAdminNewBookingAlert({
   confirmationCode, guestName, guestEmail, guestPhone, pickupAddress, dropoffAddress,
-  pickupDatetime, vehicleClass, totalAmount,
+  pickupDatetime, vehicleClass, totalAmount, passengers, specialRequests,
 }: {
   confirmationCode: string; guestName: string; guestEmail: string; guestPhone?: string;
   pickupAddress: string; dropoffAddress: string; pickupDatetime: string;
-  vehicleClass: string; totalAmount: number;
+  vehicleClass: string; totalAmount: number; passengers?: number; specialRequests?: string | null;
 }) {
-  const html = emailLayout(`
-    <h2>New Booking Received</h2>
-    <p>A new luxury transfer booking requires driver assignment.</p>
-    <div class="code-box">
-      <p style="color:#888;font-size:11px;margin-bottom:8px;letter-spacing:3px;text-transform:uppercase;">Confirmation Code</p>
-      <div class="code">${confirmationCode}</div>
-    </div>
-    <table class="detail-table">
-      <tr><td>Client</td><td>${guestName}</td></tr>
-      <tr><td>Email</td><td>${guestEmail}</td></tr>
-      <tr><td>Pick-up</td><td>${pickupAddress}</td></tr>
-      <tr><td>Drop-off</td><td>${dropoffAddress || "—"}</td></tr>
-      <tr><td>Date & Time</td><td>${pickupDatetime}</td></tr>
-      <tr><td>Vehicle</td><td>${vehicleClass.replace(/_/g, " ")}</td></tr>
-    </table>
-    <div class="total-row">
-      <span class="total-label">Amount</span>
-      <span class="total-value">€${totalAmount.toFixed(2)}</span>
-    </div>
-    <div class="divider"></div>
-    <div style="text-align:center;margin-top:16px;">
-      <a href="${SITE_URL}/admin/bookings" class="cta-btn">Assign Driver Now →</a>
-    </div>
-  `);
+  const html = adminNewBookingAlertHtml({
+    confirmationCode,
+    clientName:      guestName,
+    clientEmail:     guestEmail,
+    clientPhone:     guestPhone,
+    pickupAddress,
+    dropoffAddress,
+    pickupDatetime,
+    vehicleClass,
+    passengers:      passengers ?? 1,
+    totalAmount,
+    specialRequests,
+  });
   await sendEmail({
-    from: FROM,
-    to: ADMIN_EMAIL,
+    from:    FROM,
+    to:      ADMIN_EMAIL,
     replyTo: guestEmail,
-    subject: `🚗 New Booking — ${confirmationCode} · €${totalAmount.toFixed(2)}`,
+    subject: `New Booking — ${confirmationCode} · €${totalAmount.toFixed(2)}`,
     html,
   });
 }
@@ -342,44 +689,23 @@ export async function sendReviewRequestEmail({
 // ─── Payment Confirmation (Receipt) ──────────────────────────
 export async function sendPaymentConfirmationEmail({
   to, name, confirmationCode, pickupAddress, dropoffAddress,
-  pickupDatetime, vehicleClass, totalAmount, passengers, bookingId, transactionId,
+  pickupDatetime, vehicleClass, totalAmount, passengers, bookingId,
 }: {
   to: string; name: string; confirmationCode: string; pickupAddress: string;
   dropoffAddress: string | null; pickupDatetime: string; vehicleClass: string;
   totalAmount: number; passengers: number; bookingId: string; transactionId?: string;
 }) {
-  const html = emailLayout(`
-    <h2>Payment Confirmed</h2>
-    <p>Dear ${name},</p>
-    <p>Your payment has been received. Your luxury transfer is fully confirmed and a chauffeur will be assigned shortly.</p>
-    <div class="code-box">
-      <p style="color:#888;font-size:11px;margin-bottom:8px;letter-spacing:3px;text-transform:uppercase;">Booking Reference</p>
-      <div class="code">${confirmationCode}</div>
-    </div>
-    <table class="detail-table">
-      <tr><td>Pick-up</td><td>${pickupAddress}</td></tr>
-      <tr><td>Drop-off</td><td>${dropoffAddress || "—"}</td></tr>
-      <tr><td>Date & Time</td><td>${pickupDatetime}</td></tr>
-      <tr><td>Vehicle</td><td>${vehicleClass.replace(/_/g, " ")}</td></tr>
-      <tr><td>Passengers</td><td>${passengers}</td></tr>
-      ${transactionId ? `<tr><td>Transaction ID</td><td style="font-size:12px;font-family:'Courier New',monospace;">${transactionId}</td></tr>` : ""}
-    </table>
-    <div class="total-row">
-      <span class="total-label">Amount Paid</span>
-      <span class="total-value">€${totalAmount.toFixed(2)}</span>
-    </div>
-    <div class="divider"></div>
-    <div style="text-align:center;margin:20px 0;display:flex;flex-direction:column;gap:10px;align-items:center;">
-      <a href="${SITE_URL}/booking/${bookingId}/invoice" class="outline-btn" style="display:inline-block;">🧾 Download Receipt</a>
-      <a href="${SITE_URL}/dashboard/tracking/${bookingId}" class="cta-btn">Track My Transfer →</a>
-    </div>
-    <div class="divider"></div>
-    <p style="color:#888;font-size:13px;">Questions? Our team is available 24/7:</p>
-    <div style="text-align:center;margin-top:12px;">
-      <a href="https://wa.me/34635383712?text=Booking%20${confirmationCode}" class="wa-btn">💬 WhatsApp Support</a>
-    </div>
-  `);
-  const id = await sendEmail({ from: FROM, to, subject: `✓ Payment Confirmed — ${confirmationCode} | Élite BCN`, html });
+  const html = bookingConfirmationHtml({
+    confirmationCode,
+    clientFirstName: name.split(" ")[0],
+    pickupAddress,
+    dropoffAddress,
+    pickupDatetime,
+    vehicleClass,
+    passengers,
+    totalAmount,
+  });
+  const id = await sendEmail({ from: FROM, to, subject: `Booking Confirmed — ${confirmationCode} | Élite BCN`, html });
   await logEmail({ to, subject: `Payment Confirmed — ${confirmationCode}`, type: "PAYMENT_CONFIRMATION", resendId: id, bookingId });
 }
 
