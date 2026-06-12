@@ -6,11 +6,11 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
-  description: "Élite BCN is Barcelona's premier licensed VTC transfer company. 4.9★ rated, 500+ five-star reviews. Professional multilingual drivers, premium Mercedes & Tesla fleet, impeccable service since 2024.",
+  description: "Élite BCN is Barcelona's premier licensed VTC transfer company. 4.9★ rated, 1,200+ five-star reviews. Professional multilingual drivers, premium Mercedes & Tesla fleet, impeccable service since 2018.",
   alternates: { canonical: "https://www.elitebcn.info/about" },
   openGraph: {
     title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
-    description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet. 500+ five-star reviews.",
+    description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet. 1,200+ five-star reviews.",
     url: "https://www.elitebcn.info/about",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },

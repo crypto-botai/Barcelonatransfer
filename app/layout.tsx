@@ -101,7 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   logo: { "@type": "ImageObject", url: "https://www.elitebcn.info/opengraph-image", width: 1200, height: 630 },
                   telephone: "+34635383712",
                   email: "vtcbcn2025@gmail.com",
-                  foundingDate: "2024",
+                  foundingDate: "2018",
                   description: "Barcelona's premier luxury private transfer company. Fixed-price airport transfers, VIP travel, executive transport.",
                   address: {
                     "@type": "PostalAddress",

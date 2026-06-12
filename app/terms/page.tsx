@@ -4,8 +4,19 @@ import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions",
+  title: "Terms & Conditions | Élite BCN Transfers",
   description: "Terms and Conditions for Élite BCN Transfers luxury chauffeur service.",
+  alternates: { canonical: "https://www.elitebcn.info/terms" },
+  openGraph: {
+    title: "Terms & Conditions | Élite BCN Transfers",
+    description: "Terms and Conditions for Élite BCN Transfers luxury chauffeur service.",
+    url: "https://www.elitebcn.info/terms",
+  },
+  twitter: {
+    card: "summary",
+    title: "Terms & Conditions | Élite BCN Transfers",
+    description: "Terms and Conditions for Élite BCN Transfers luxury chauffeur service.",
+  },
 };
 
 export default function TermsPage() {

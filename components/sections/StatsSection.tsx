@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
+import { COMPANY_FACTS } from "@/lib/company-facts";
 
 const STATS = [
-  { value: 5000, suffix: "+", label: "Transfers Completed", sub: "Since 2018" },
-  { value: 49, suffix: "★", label: "Average Google Rating", sub: "From 300+ reviews", transform: (v: number) => (v / 10).toFixed(1) },
+  { value: COMPANY_FACTS.totalTransfers, suffix: "+", label: "Transfers Completed", sub: `Since ${COMPANY_FACTS.foundedYear}` },
+  { value: 49, suffix: "★", label: "Average Google Rating", sub: `From ${COMPANY_FACTS.googleReviewCount} Google reviews`, transform: (v: number) => (v / 10).toFixed(1) },
   { value: 24, suffix: "/7", label: "Hours Available",       sub: "365 days a year" },
   { value: 100, suffix: "%",  label: "On-Time Guarantee",   sub: "Flight monitoring" },
 ];

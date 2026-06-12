@@ -4,8 +4,19 @@ import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy",
+  title: "Cookie Policy | Élite BCN Transfers",
   description: "Cookie Policy for Élite BCN Transfers — how we use cookies and similar technologies.",
+  alternates: { canonical: "https://www.elitebcn.info/cookies" },
+  openGraph: {
+    title: "Cookie Policy | Élite BCN Transfers",
+    description: "Cookie Policy for Élite BCN Transfers — how we use cookies and similar technologies.",
+    url: "https://www.elitebcn.info/cookies",
+  },
+  twitter: {
+    card: "summary",
+    title: "Cookie Policy | Élite BCN Transfers",
+    description: "Cookie Policy for Élite BCN Transfers — how we use cookies and similar technologies.",
+  },
 };
 
 export default function CookiesPage() {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Star, Shield, Clock, Award } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
 import BookingForm from "@/components/booking/BookingForm";
+import { COMPANY_FACTS } from "@/lib/company-facts";
 
 const fade = (delay = 0) => ({
   initial:    { opacity: 0, y: 14 },
@@ -115,9 +116,9 @@ export default function HeroSection() {
               className="flex gap-8 border-t border-white/[0.06] pt-8"
             >
               {[
-                { value: "5,000+", label: t("stats.clients") },
-                { value: "4.9★",   label: t("stats.rating") },
-                { value: "7+",     label: t("stats.years") },
+                { value: COMPANY_FACTS.transfersDisplay,   label: t("stats.clients") },
+                { value: COMPANY_FACTS.ratingDisplay,      label: t("stats.rating") },
+                { value: COMPANY_FACTS.yearsDisplay,       label: t("stats.years") },
               ].map((s, i) => (
                 <div key={s.label} className="flex items-center gap-8">
                   {i > 0 && <div className="w-px h-8 bg-white/[0.06]" />}

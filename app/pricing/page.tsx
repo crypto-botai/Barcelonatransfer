@@ -6,7 +6,7 @@ import PricingSection from "@/components/sections/PricingSection";
 
 export const metadata: Metadata = {
   title: "Barcelona Transfer Prices — Fixed Rates, No Surge Pricing",
-  description: "Fixed prices for luxury private transfers from Barcelona Airport (BCN). From €45 city centre · €65 Sitges · €95 Tarragona · €110 Girona · €220 Andorra. No hidden fees, ever.",
+  description: "Fixed transfer prices for Barcelona airport, cruise port, Sitges, Andorra & more. All-inclusive rates from €45 — chauffeur, tolls, meet & greet, VAT. No surge pricing.",
   alternates: { canonical: "https://www.elitebcn.info/pricing" },
   openGraph: {
     title: "Barcelona Transfer Prices — Fixed Rates, No Surge Pricing",

@@ -182,7 +182,7 @@ export default function TransfersHubPage() {
           <div className="container mx-auto px-4">
             <div className="flex flex-wrap justify-center gap-8 text-center">
               {[
-                { icon: Star, label: "4.9★ Rating", sub: "500+ reviews" },
+                { icon: Star, label: "4.9★ Rating", sub: "1,200+ reviews" },
                 { icon: Clock, label: "24/7 Available", sub: "All flights & arrivals" },
                 { icon: MapPin, label: "Fixed Prices", sub: "No surge pricing" },
               ].map(({ icon: Icon, label, sub }) => (
