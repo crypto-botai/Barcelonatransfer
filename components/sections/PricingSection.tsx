@@ -14,7 +14,7 @@ const AIRPORT = [
   { route: "Cruise Terminal ⇄ Barcelona City",   eco: 45,  bus: 55,  van: 60,  vcl: 70,  mbs: 150, wasEco: 50,  wasBus: 65 },
   { route: "El Prat Airport ⇄ Sants Station",    eco: 50,  bus: 55,  van: 60,  vcl: 75,  mbs: 155, wasEco: 55,  wasBus: 65 },
   { route: "Barcelona ⇄ La Roca Village",        eco: 75,  bus: 90,  van: 100, vcl: 120, mbs: 200, wasEco: 80,  wasBus: 100 },
-  { route: "Barcelona ⇄ Montserrat",             eco: 115, bus: 130, van: 140, vcl: 160, mbs: 240, wasEco: 120, wasBus: 140 },
+  { route: "El Prat Airport ⇄ Montserrat",        eco: 85,  bus: 95,  van: 105, vcl: 125, mbs: 200, wasEco: 95,  wasBus: 110 },
   { route: "Barcelona ⇄ Girona Airport",         eco: 135, bus: 145, van: 155, vcl: 175, mbs: 255, wasEco: 140, wasBus: 155 },
   { route: "Barcelona ⇄ Andorra",                eco: 280, bus: 340, van: 450, vcl: 550, mbs: 630, wasEco: 285, wasBus: 350 },
 ];

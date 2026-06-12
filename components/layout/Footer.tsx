@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, Phone, MessageCircle, MapPin, Instagram, Facebook, Car, Shield } from "lucide-react";
+import { Mail, Phone, MessageCircle, MapPin, Instagram, Facebook } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
 import NewsletterForm from "@/components/marketing/NewsletterForm";
 
@@ -13,8 +13,9 @@ export default function Footer() {
     { key: "corporateTravel",   href: "/corporate" },
     { key: "hourlyChaufeur",    href: "/hourly" },
     { key: "cruisePort",        href: "/transfers/cruise-port" },
-    { key: "vipTransportation", href: "/fleet" },
-    { key: "privateTours",      href: "/about" },
+    { key: "hotelTransfers",    href: "/hotel-transfers" },
+    { key: "vipTransportation", href: "/vip-transportation" },
+    { key: "privateTours",      href: "/day-tours" },
   ];
 
   const FLEET_LINKS = [
@@ -163,23 +164,6 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
-              <li className="pt-3 border-t border-white/[0.06] mt-1">
-                <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-3 font-medium">{t("sections.staff")}</h4>
-                <div className="flex flex-col gap-2.5">
-                  <Link href="/auth/login" className="flex items-center gap-2 text-sm text-dark-400 hover:text-gold-400 transition-colors">
-                    <Car size={12} className="text-gold-500/50 flex-shrink-0" />
-                    {t("links.driverLogin")}
-                  </Link>
-                  <Link href="/driver/register" className="flex items-center gap-2 text-sm text-dark-400 hover:text-gold-400 transition-colors">
-                    <Car size={12} className="text-gold-500/50 flex-shrink-0" />
-                    {t("links.driverRegister")}
-                  </Link>
-                  <Link href="/admin" className="flex items-center gap-2 text-sm text-dark-400 hover:text-gold-400 transition-colors">
-                    <Shield size={12} className="text-gold-500/50 flex-shrink-0" />
-                    {t("links.adminLogin")}
-                  </Link>
-                </div>
-              </li>
             </ul>
           </div>
         </div>

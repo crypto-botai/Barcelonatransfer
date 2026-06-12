@@ -98,6 +98,7 @@ const config: Config = {
         "pulse-gold": "pulseGold 2s ease-in-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fleet-marquee": "fleetMarquee 40s linear infinite",
       },
       keyframes: {
         fadeIn: { from: { opacity: "0" }, to: { opacity: "1" } },
@@ -121,6 +122,10 @@ const config: Config = {
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
+        },
+        fleetMarquee: {
+          from: { transform: "translateX(0)" },
+          to:   { transform: "translateX(-50%)" },
         },
       },
       borderRadius: {

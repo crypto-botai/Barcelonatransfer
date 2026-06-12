@@ -25,6 +25,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/about`,                     priority: 0.7,  changeFrequency: "monthly", lastModified: NOW },
     { url: `${BASE}/contact`,                   priority: 0.7,  changeFrequency: "monthly", lastModified: NOW },
 
+    // ── Service pages ─────────────────────────────────
+    { url: `${BASE}/vip-transportation`,             priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+    { url: `${BASE}/day-tours`,                      priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+    { url: `${BASE}/hotel-transfers`,                priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+
     // ── Tools ─────────────────────────────────────────
     { url: `${BASE}/tools/transfer-cost-calculator`, priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
 

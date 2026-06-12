@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,6 +15,91 @@ function badgeClass(badge: string) {
   if (badge === "Popular")     return "bg-blue-600/80 text-white";
   if (badge === "Large Group") return "bg-violet-600/80 text-white";
   return "bg-white/10 text-white";
+}
+
+function FleetCardInner({
+  vehicle,
+  t,
+  price,
+  asHeading,
+}: {
+  vehicle: (typeof VEHICLE_CATALOG)[number];
+  t: ReturnType<typeof useTranslations>;
+  price: number;
+  asHeading: boolean;
+}) {
+  const Name = asHeading ? "h3" : "div";
+  return (
+    <div className="group flex flex-col h-full rounded-2xl overflow-hidden border border-white/[0.07] bg-[#0b0b0b] hover:border-[#c9a84c]/30 transition-colors duration-300">
+      <div className="relative h-44 bg-[#080808] overflow-hidden">
+        {vehicle.badge && (
+          <span className={`absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide ${badgeClass(vehicle.badge)}`}>
+            {vehicle.badge}
+          </span>
+        )}
+        <Image
+          src={vehicle.image}
+          alt={asHeading ? vehicle.label : ""}
+          fill
+          sizes="(max-width: 1024px) 268px, (max-width: 1280px) 33vw, 25vw"
+          className="object-contain p-6 transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+          style={{ filter: "drop-shadow(0 18px 36px rgba(0,0,0,0.92))" }}
+        />
+      </div>
+      <div className="h-px bg-gradient-to-r from-transparent via-[#c9a84c]/18 to-transparent" />
+      <div className="flex flex-col flex-1 p-5 gap-3.5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <Name className="font-display text-[1.1rem] text-white leading-snug">{vehicle.label}</Name>
+            <p className="text-white/25 text-xs mt-0.5 truncate">{vehicle.models[0]}</p>
+          </div>
+          <div className="text-right shrink-0">
+            <p className="text-[9px] text-white/20 uppercase tracking-widest">{t("from")}</p>
+            <p className="font-display text-xl text-[#c9a84c] leading-tight">{formatCurrency(price)}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-5">
+          <span className="flex items-center gap-1.5 text-xs text-white/35">
+            <Users size={11} className="text-[#c9a84c]/60" />
+            {vehicle.maxPassengers} {t("pax")}
+          </span>
+          <span className="flex items-center gap-1.5 text-xs text-white/35">
+            <Briefcase size={11} className="text-[#c9a84c]/60" />
+            {vehicle.maxLuggage} {t("bags")}
+          </span>
+        </div>
+        <p className="text-[9px] text-white/15 tracking-wider">{t("inclVat")}</p>
+        <div className="mt-auto">
+          <Link
+            href={`/book?vehicle=${vehicle.class}`}
+            className="group/btn flex items-center justify-between w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.07] text-sm text-white/45 hover:text-[#c9a84c] hover:border-[#c9a84c]/28 hover:bg-[#c9a84c]/[0.04] transition-all duration-300"
+            tabIndex={asHeading ? 0 : -1}
+          >
+            <span className="font-medium">{t("reserveVehicle")}</span>
+            <ChevronRight size={14} className="text-white/25 group-hover/btn:text-[#c9a84c] group-hover/btn:translate-x-0.5 transition-all duration-300" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MarqueeCloneSet() {
+  const t = useTranslations("fleet");
+  return (
+    <div aria-hidden="true" className="flex gap-4">
+      {VEHICLE_CATALOG.map((vehicle) => (
+        <div key={`clone-${vehicle.class}`} className="flex-shrink-0 w-[268px]">
+          <FleetCardInner
+            vehicle={vehicle}
+            t={t}
+            price={DEFAULT_PRICING[vehicle.class].minimumFare}
+            asHeading={false}
+          />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function FleetCard({
@@ -36,73 +120,15 @@ function FleetCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: mobile ? 0 : Math.min(index * 0.04, 0.28) }}
-      className={mobile ? "flex-shrink-0 w-[268px] snap-start" : ""}
+      className={mobile ? "flex-shrink-0 w-[268px]" : ""}
     >
-      <div className="group flex flex-col h-full rounded-2xl overflow-hidden border border-white/[0.07] bg-[#0b0b0b] hover:border-[#c9a84c]/30 transition-colors duration-300">
-        {/* Vehicle image */}
-        <div className="relative h-44 bg-[#080808] overflow-hidden">
-          {vehicle.badge && (
-            <span className={`absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide ${badgeClass(vehicle.badge)}`}>
-              {vehicle.badge}
-            </span>
-          )}
-          <Image
-            src={vehicle.image}
-            alt={vehicle.label}
-            fill
-            sizes="(max-width: 1024px) 268px, (max-width: 1280px) 33vw, 25vw"
-            className="object-contain p-6 transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-            style={{ filter: "drop-shadow(0 18px 36px rgba(0,0,0,0.92))" }}
-          />
-        </div>
-
-        {/* Separator */}
-        <div className="h-px bg-gradient-to-r from-transparent via-[#c9a84c]/18 to-transparent" />
-
-        {/* Content */}
-        <div className="flex flex-col flex-1 p-5 gap-3.5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h3 className="font-display text-[1.1rem] text-white leading-snug">{vehicle.label}</h3>
-              <p className="text-white/25 text-xs mt-0.5 truncate">{vehicle.models[0]}</p>
-            </div>
-            <div className="text-right shrink-0">
-              <p className="text-[9px] text-white/20 uppercase tracking-widest">{t("from")}</p>
-              <p className="font-display text-xl text-[#c9a84c] leading-tight">{formatCurrency(price)}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-5">
-            <span className="flex items-center gap-1.5 text-xs text-white/35">
-              <Users size={11} className="text-[#c9a84c]/60" />
-              {vehicle.maxPassengers} {t("pax")}
-            </span>
-            <span className="flex items-center gap-1.5 text-xs text-white/35">
-              <Briefcase size={11} className="text-[#c9a84c]/60" />
-              {vehicle.maxLuggage} {t("bags")}
-            </span>
-          </div>
-
-          <p className="text-[9px] text-white/15 tracking-wider">{t("inclVat")}</p>
-
-          <div className="mt-auto">
-            <Link
-              href={`/book?vehicle=${vehicle.class}`}
-              className="group/btn flex items-center justify-between w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.07] text-sm text-white/45 hover:text-[#c9a84c] hover:border-[#c9a84c]/28 hover:bg-[#c9a84c]/[0.04] transition-all duration-300"
-            >
-              <span className="font-medium">{t("reserveVehicle")}</span>
-              <ChevronRight size={14} className="text-white/25 group-hover/btn:text-[#c9a84c] group-hover/btn:translate-x-0.5 transition-all duration-300" />
-            </Link>
-          </div>
-        </div>
-      </div>
+      <FleetCardInner vehicle={vehicle} t={t} price={price} asHeading />
     </motion.div>
   );
 }
 
 export default function FleetSection() {
   const t = useTranslations("fleet");
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
     <section id="fleet" className="py-20 sm:py-28 bg-[#050505]">
@@ -146,25 +172,24 @@ export default function FleetSection() {
           </motion.p>
         </div>
 
-        {/* Mobile: CSS snap horizontal scroll */}
+        {/* Mobile: infinite CSS marquee */}
         <div
-          ref={scrollRef}
-          className="flex gap-4 overflow-x-auto pb-4 lg:hidden"
-          style={{
-            scrollbarWidth:          "none",
-            msOverflowStyle:         "none",
-            scrollSnapType:          "x mandatory",
-            WebkitOverflowScrolling: "touch",
-            paddingLeft:             "1rem",
-            paddingRight:            "1rem",
-          }}
+          className="overflow-hidden lg:hidden"
+          style={{ maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)" }}
         >
-          <style>{`.fleet-scroll::-webkit-scrollbar { display: none; }`}</style>
-          {VEHICLE_CATALOG.map((vehicle, i) => (
-            <FleetCard key={vehicle.class} vehicle={vehicle} index={i} mobile />
-          ))}
-          {/* Right fade sentinel */}
-          <div className="flex-shrink-0 w-4" />
+          <style>{`
+            @media (prefers-reduced-motion: reduce) { .fleet-marquee-track { animation: none !important; } }
+          `}</style>
+          <div
+            className="fleet-marquee-track flex gap-4 w-max animate-fleet-marquee hover:[animation-play-state:paused]"
+          >
+            {/* Primary set — read by screen readers */}
+            {VEHICLE_CATALOG.map((vehicle, i) => (
+              <FleetCard key={vehicle.class} vehicle={vehicle} index={i} mobile />
+            ))}
+            {/* Clone set — visual loop only, hidden from assistive tech */}
+            <MarqueeCloneSet />
+          </div>
         </div>
 
         {/* Desktop: grid */}

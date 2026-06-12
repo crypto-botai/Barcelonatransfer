@@ -85,18 +85,54 @@
       "noSurge": "No surge, ever"
     },
     "list": {
-      "airport": { "title": "Airport Transfers", "desc": "Meet & greet with real-time flight monitoring. Complimentary 60-minute wait." },
-      "cruise": { "title": "Cruise Port Transfers", "desc": "Seamless door-to-ship service at Barcelona Cruise Terminal." },
-      "executive": { "title": "Executive Chauffeur", "desc": "Dedicated professional chauffeur for business meetings and corporate events." },
-      "corporate": { "title": "Corporate Accounts", "desc": "Premium corporate accounts with priority fleet, invoicing, and dedicated manager." },
-      "vipEvents": { "title": "VIP Events", "desc": "Luxury transportation for weddings, galas, film sets, and private events." },
-      "hourly": { "title": "Hourly Chauffeur Hire", "desc": "Your private driver at your disposal — minimum 4 hours, maximum flexibility." },
-      "costaBrava": { "title": "Costa Brava Transfers", "desc": "Lloret de Mar, Platja d'Aro, Tossa, Cadaqués — the complete coast." },
-      "costaDorada": { "title": "Costa Dorada Transfers", "desc": "Sitges, Salou, PortAventura, Tarragona in maximum comfort." },
-      "andorra": { "title": "Andorra Transfers", "desc": "Premium transfer from Barcelona to Andorra — shopping, skiing, or business." },
-      "hotel": { "title": "Hotel Transfers", "desc": "Door-to-door luxury service to all 4 and 5-star hotels across Barcelona." },
-      "vip": { "title": "VIP Transportation", "desc": "Discrete, exclusive service for high-profile clients requiring absolute privacy." },
-      "tours": { "title": "Private Day Tours", "desc": "Montserrat, La Roca Village, Girona wine country, and Dalí's museums." }
+      "airport": {
+        "title": "Airport Transfers",
+        "desc": "Meet & greet with real-time flight monitoring. Complimentary 60-minute wait."
+      },
+      "cruise": {
+        "title": "Cruise Port Transfers",
+        "desc": "Seamless door-to-ship service at Barcelona Cruise Terminal."
+      },
+      "executive": {
+        "title": "Executive Chauffeur",
+        "desc": "Dedicated professional chauffeur for business meetings and corporate events."
+      },
+      "corporate": {
+        "title": "Corporate Accounts",
+        "desc": "Premium corporate accounts with priority fleet, invoicing, and dedicated manager."
+      },
+      "vipEvents": {
+        "title": "VIP Events",
+        "desc": "Luxury transportation for weddings, galas, film sets, and private events."
+      },
+      "hourly": {
+        "title": "Hourly Chauffeur Hire",
+        "desc": "Your private driver at your disposal — minimum 4 hours, maximum flexibility."
+      },
+      "costaBrava": {
+        "title": "Costa Brava Transfers",
+        "desc": "Lloret de Mar, Platja d'Aro, Tossa, Cadaqués — the complete coast."
+      },
+      "costaDorada": {
+        "title": "Costa Dorada Transfers",
+        "desc": "Sitges, Salou, PortAventura, Tarragona in maximum comfort."
+      },
+      "andorra": {
+        "title": "Andorra Transfers",
+        "desc": "Premium transfer from Barcelona to Andorra — shopping, skiing, or business."
+      },
+      "hotel": {
+        "title": "Hotel Transfers",
+        "desc": "Door-to-door luxury service to all 4 and 5-star hotels across Barcelona."
+      },
+      "vip": {
+        "title": "VIP Transportation",
+        "desc": "Discrete, exclusive service for high-profile clients requiring absolute privacy."
+      },
+      "tours": {
+        "title": "Private Day Tours",
+        "desc": "Montserrat, La Roca Village, Girona wine country, and Dalí's museums."
+      }
     }
   },
   "footer": {
@@ -139,7 +175,8 @@
       "cadaques": "Cadaqués",
       "driverLogin": "Driver Login",
       "driverRegister": "Driver Registration",
-      "adminLogin": "Admin Login"
+      "adminLogin": "Admin Login",
+      "hotelTransfers": "Hotel Transfers"
     },
     "legal": {
       "faq": "FAQ",

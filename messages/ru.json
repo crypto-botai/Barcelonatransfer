@@ -175,7 +175,8 @@
       "cadaques": "Кадакес",
       "driverLogin": "Вход Водителя",
       "driverRegister": "Регистрация Водителя",
-      "adminLogin": "Вход Администратора"
+      "adminLogin": "Вход Администратора",
+      "hotelTransfers": "Трансферы к Отелю"
     },
     "legal": {
       "faq": "Вопросы и Ответы",
