@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
 import ExitIntentPopup from "@/components/marketing/ExitIntentPopup";
 import I18nProvider from "@/components/language/I18nProvider";
+import ChatWidget from "@/components/ai/ChatWidget";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({
@@ -249,6 +250,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <I18nProvider>
           {children}
+          <ChatWidget />
           <ExitIntentPopup />
           <Toaster
             position="top-right"

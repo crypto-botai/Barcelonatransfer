@@ -467,3 +467,274 @@ model EmailLog {
   @@index([createdAt])
   @@map("email_logs")
 }
+
+// ─── AI Platform Models ───────────────────────────────────────
+
+enum AgentStatus {
+  ACTIVE
+  IDLE
+  RUNNING
+  WARNING
+  ERROR
+  OFFLINE
+  PAUSED
+}
+
+enum AiTaskStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+  DEAD_LETTER
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MemoryType {
+  REPORT
+  DECISION
+  FINDING
+  METRIC
+  OBSERVATION
+}
+
+model AiAgent {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  description String
+  status      AgentStatus @default(IDLE)
+  isEnabled   Boolean     @default(true)
+  budgetCents Int         @default(500)
+  spentCents  Int         @default(0)
+  lastRunAt   DateTime?
+  nextRunAt   DateTime?
+  successRate Float       @default(100)
+  errorCount  Int         @default(0)
+  totalRuns   Int         @default(0)
+  avgDurationMs Int       @default(0)
+  config      Json        @default("{}")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  tasks  AiTask[]
+  logs   AiLog[]
+  alerts AiAlert[]
+
+  @@map("ai_agents")
+}
+
+model AiTask {
+  id          String      @id @default(cuid())
+  agentId     String
+  status      AiTaskStatus @default(QUEUED)
+  input       Json
+  output      Json?
+  error       String?     @db.Text
+  durationMs  Int         @default(0)
+  tokensUsed  Int         @default(0)
+  costCents   Int         @default(0)
+  retryCount  Int         @default(0)
+  maxRetries  Int         @default(3)
+  queuedAt    DateTime    @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime    @default(now())
+
+  agent AiAgent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, status])
+  @@index([status, queuedAt])
+  @@map("ai_tasks")
+}
+
+model AiMemory {
+  id         String     @id @default(cuid())
+  agentId    String?
+  type       MemoryType
+  title      String
+  content    String     @db.Text
+  tags       String[]
+  importance Int        @default(3)
+  expiresAt  DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([agentId, type])
+  @@index([createdAt])
+  @@map("ai_memory")
+}
+
+model AiLog {
+  id         String   @id @default(cuid())
+  agentId    String?
+  taskId     String?
+  action     String
+  level      String   @default("info")
+  message    String   @db.Text
+  metadata   Json?
+  tokensUsed Int      @default(0)
+  costCents  Int      @default(0)
+  durationMs Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  agent AiAgent? @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([agentId, createdAt])
+  @@index([level, createdAt])
+  @@map("ai_logs")
+}
+
+model AiAlert {
+  id          String        @id @default(cuid())
+  agentId     String?
+  severity    AlertSeverity
+  title       String
+  message     String        @db.Text
+  channel     String        @default("dashboard")
+  isRead      Boolean       @default(false)
+  isDismissed Boolean       @default(false)
+  dedupeKey   String        @unique
+  emailSentAt DateTime?
+  createdAt   DateTime      @default(now())
+
+  agent AiAgent? @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([severity, isRead])
+  @@index([createdAt])
+  @@map("ai_alerts")
+}
+
+model ApprovalItem {
+  id          String         @id @default(cuid())
+  agentId     String?
+  type        String
+  title       String
+  preview     String         @db.Text
+  diffBefore  String?        @db.Text
+  diffAfter   String         @db.Text
+  status      ApprovalStatus @default(PENDING)
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  reviewNote  String?
+  metadata    Json?
+  expiresAt   DateTime
+  createdAt   DateTime       @default(now())
+
+  @@index([status, createdAt])
+  @@map("ai_approvals")
+}
+
+model AiBudgetConfig {
+  id                       String   @id @default(cuid())
+  globalMonthlyBudgetCents Int      @default(2000)
+  globalKillSwitch         Boolean  @default(false)
+  alertAt50                Boolean  @default(true)
+  alertAt80                Boolean  @default(true)
+  alertAt100               Boolean  @default(true)
+  quietHoursStart          Int      @default(23)
+  quietHoursEnd            Int      @default(8)
+  alertEmail               String   @default("vtcbcn2025@gmail.com")
+  updatedAt                DateTime @updatedAt
+
+  @@map("ai_budget_config")
+}
+
+model KnowledgeBase {
+  id         String   @id @default(cuid())
+  category   String
+  question   String
+  answer     String   @db.Text
+  isActive   Boolean  @default(true)
+  language   String   @default("en")
+  tags       String[]
+  usageCount Int      @default(0)
+  lastUsedAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([category, isActive])
+  @@index([language])
+  @@map("knowledge_base")
+}
+
+model ConversationLog {
+  id                  String   @id @default(cuid())
+  sessionId           String
+  visitorIp           String   @default("")
+  messages            Json
+  language            String   @default("en")
+  escalated           Boolean  @default(false)
+  escalatedAt         DateTime?
+  satisfactionRating  Int?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("conversation_logs")
+}
+
+model WebsiteAuditResult {
+  id        String   @id @default(cuid())
+  pageUrl   String
+  checkType String
+  severity  String
+  title     String
+  details   String   @db.Text
+  isFixed   Boolean  @default(false)
+  firstSeen DateTime @default(now())
+  lastSeen  DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@index([severity, isFixed])
+  @@index([pageUrl])
+  @@map("website_audit_results")
+}
+
+model ContentDraft {
+  id                       String         @id @default(cuid())
+  agentId                  String?
+  type                     String
+  title                    String
+  slug                     String?
+  content                  String         @db.Text
+  metaTitle                String?
+  metaDesc                 String?
+  targetKeyword            String?
+  language                 String         @default("en")
+  status                   ApprovalStatus @default(PENDING)
+  approvedBy               String?
+  approvedAt               DateTime?
+  publishedAt              DateTime?
+  internalLinkSuggestions  Json?
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+
+  @@index([status, type])
+  @@map("content_drafts")
+}
+
+model CompetitorConfig {
+  id             String    @id @default(cuid())
+  name           String
+  url            String
+  isActive       Boolean   @default(true)
+  checkFrequency String    @default("weekly")
+  lastCheckedAt  DateTime?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("competitor_configs")
+}
