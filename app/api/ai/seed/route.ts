@@ -12,6 +12,8 @@ export async function POST(req: NextRequest) {
 
   const results: Record<string, number> = {};
 
+  try {
+
   // 1. Budget config
   const budgetExists = await prisma.aiBudgetConfig.findFirst();
   if (!budgetExists) {
@@ -96,4 +98,10 @@ export async function POST(req: NextRequest) {
   results.knowledgeBase = kbCreated;
 
   return NextResponse.json({ ok: true, results });
+
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[seed] error:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }
