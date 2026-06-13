@@ -6,7 +6,7 @@ import type { HQData } from "@/lib/ai/hqData";
 // CANVAS CONFIG — resize the office by editing CW / CH / RW / RH
 // ═══════════════════════════════════════════════════════════════
 const CW   = 1200; // canvas logical width
-const CH   = 720;  // canvas logical height
+const CH   = 968;  // canvas logical height — 4 rows × 221 + 3 gaps × 28
 const RW   = 380;  // room width
 const RH   = 221;  // room height
 const HGAP = 30;   // hallway width between columns
@@ -26,10 +26,10 @@ function ry(row: number) { return row * (RH + VGAP); }
 // ═══════════════════════════════════════════════════════════════
 interface RoomCfg {
   id: string; name: string; shortName: string;
-  col: 0|1|2; row: 0|1|2;
+  col: 0|1|2; row: 0|1|2|3;
   accent: string;   // neon glow color
   bg:     string;   // floor base (very dark)
-  type:   "ceo"|"booking"|"ops"|"seo"|"analytics"|"support"|"marketing"|"knowledge"|"health";
+  type:   "ceo"|"booking"|"ops"|"seo"|"analytics"|"support"|"marketing"|"knowledge"|"health"|"meeting"|"cafe";
 }
 const ROOMS: RoomCfg[] = [
   { id:"ceo",       name:"CEO War Room",       shortName:"CEO",       col:0,row:0, accent:"#c9a84c", bg:"#0e0800", type:"ceo"       },
@@ -41,6 +41,8 @@ const ROOMS: RoomCfg[] = [
   { id:"marketing", name:"Marketing & Growth",  shortName:"Marketing", col:0,row:2, accent:"#ef4444", bg:"#0e0000", type:"marketing" },
   { id:"knowledge", name:"Knowledge Library",   shortName:"Knowledge", col:1,row:2, accent:"#c9a84c", bg:"#0d0800", type:"knowledge" },
   { id:"health",    name:"Health Monitor",      shortName:"Health",    col:2,row:2, accent:"#06b6d4", bg:"#000c10", type:"health"    },
+  { id:"meeting",   name:"Meeting Room",        shortName:"Meeting",   col:0,row:3, accent:"#94a3b8", bg:"#06080a", type:"meeting"   },
+  { id:"cafe",      name:"Café / Bar",          shortName:"Café",      col:1,row:3, accent:"#f97316", bg:"#0e0600", type:"cafe"      },
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -160,7 +162,7 @@ function computePath(fromId: string, toId: string, fromPos: V2, toPos: V2): V2[]
   if (fromId === toId) return [toPos];
   const fr = ROOMS.find(r => r.id === fromId)!;
   const to = ROOMS.find(r => r.id === toId)!;
-  const midH = [RH + VGAP / 2, RH + VGAP + RH + VGAP / 2]; // h-corridor center y
+  const midH = [RH + VGAP / 2, (RH + VGAP) + RH + VGAP / 2, 2*(RH + VGAP) + RH + VGAP / 2]; // h-corridor center y per row pair
   const midV = [RW + HGAP / 2, RW + HGAP + RW + HGAP / 2]; // v-corridor center x
   const pts: V2[] = [];
 
@@ -198,6 +200,10 @@ const PARTICLE_ROUTES: { path: V2[]; color: string; speed: number; size: number 
   { path:[{x:1010,y:609},{x:1010,y:484},{x:1010,y:360},{x:1010,y:110}], color:"#06b6d4", speed:0.25, size:2 },
   // Marketing → Booking (red)
   { path:[{x:190,y:609},{x:395,y:609},{x:395,y:484},{x:395,y:235},{x:600,y:235},{x:600,y:110}], color:"#ef4444", speed:0.15, size:2 },
+  // All agents → Meeting Room (slate — standup data flow)
+  { path:[{x:600,y:609},{x:395,y:609},{x:395,y:733},{x:190,y:858}], color:"#94a3b8", speed:0.14, size:2 },
+  // Café → Knowledge (warm orange — insights from breaks)
+  { path:[{x:600,y:858},{x:600,y:733},{x:600,y:609}], color:"#f97316", speed:0.12, size:2 },
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -346,7 +352,7 @@ function drawWalls(ctx: CanvasRenderingContext2D, room: RoomCfg, doorProg: Recor
   const hasLeft   = room.col > 0;
   const hasRight  = room.col < 2;
   const hasTop    = room.row > 0;
-  const hasBottom = room.row < 2;
+  const hasBottom = room.row < 3;
 
   const dcy = by2 + (RH - DOOR) / 2;   // door start Y (left/right walls)
   const dcx = bx  + (RW - DOOR) / 2;   // door start X (top/bottom walls)
@@ -618,6 +624,140 @@ function drawFurniture(ctx: CanvasRenderingContext2D, room: RoomCfg, t: number) 
       drawMonitor(ctx, bx + 140, by2 + 123, 28, 18, ac, t, "UPTIME");
       break;
     }
+
+    case "meeting": {
+      // "DAILY STANDUP" label above table
+      ctx.fillStyle = hexAlpha(ac, 0.55);
+      ctx.font = "5px monospace";
+      ctx.fillText("DAILY STANDUP", bx + RW/2 - 33, by2 + WTH + 14);
+
+      // Whiteboard on left wall
+      const mwx = bx + WTH + 4, mwy = by2 + WTH + 22;
+      ctx.fillStyle = "#10131a"; ctx.fillRect(mwx, mwy, 52, 80);
+      ctx.strokeStyle = hexAlpha(ac, 0.45); ctx.lineWidth = 1; ctx.strokeRect(mwx, mwy, 52, 80);
+      ctx.fillStyle = hexAlpha(ac, 0.55); ctx.fillRect(mwx, mwy, 52, 9);
+      ctx.fillStyle = "#fff"; ctx.font = "4px monospace"; ctx.fillText("AGENDA", mwx + 10, mwy + 7);
+      ["1. Booking review","2. Alerts check","3. KB updates","4. SEO scan","5. Marketing"].forEach((line, i) => {
+        ctx.fillStyle = hexAlpha(ac, 0.55); ctx.font = "4px monospace";
+        ctx.fillText(line, mwx + 3, mwy + 18 + i * 12);
+      });
+
+      // Large oval conference table center
+      const tx2 = bx + 100, ty = by2 + 80, tw = 180, th = 80;
+      ctx.fillStyle = "#100d08"; ctx.fillRect(tx2, ty, tw, th);
+      ctx.strokeStyle = hexAlpha(ac, 0.35); ctx.lineWidth = 2; ctx.strokeRect(tx2, ty, tw, th);
+      // Table highlight edge
+      ctx.fillStyle = hexAlpha(ac, 0.12); ctx.fillRect(tx2 + 2, ty + 2, tw - 4, 4);
+      // Table nameplate strip
+      ctx.fillStyle = hexAlpha(ac, 0.20); ctx.fillRect(tx2 + tw/2 - 28, ty + th/2 - 6, 56, 12);
+      ctx.fillStyle = hexAlpha(ac, 0.7); ctx.font = "4px monospace";
+      ctx.fillText("ÉLITE BCN HQ", tx2 + tw/2 - 24, ty + th/2 + 2);
+
+      // Chairs around the table (6 chairs)
+      const chairColor = "#0e0c0a";
+      const chairAccent = hexAlpha(ac, 0.25);
+      // Top row (3 chairs)
+      [tx2 + 18, tx2 + 78, tx2 + 138].forEach(cx3 => {
+        ctx.fillStyle = chairColor; ctx.fillRect(cx3, ty - 16, 20, 14);
+        ctx.fillStyle = chairAccent; ctx.fillRect(cx3, ty - 16, 20, 4);
+        ctx.fillStyle = "#060504"; ctx.fillRect(cx3 + 2, ty - 2, 4, 4); ctx.fillRect(cx3 + 14, ty - 2, 4, 4);
+      });
+      // Bottom row (3 chairs)
+      [tx2 + 18, tx2 + 78, tx2 + 138].forEach(cx3 => {
+        ctx.fillStyle = chairColor; ctx.fillRect(cx3, ty + th + 2, 20, 14);
+        ctx.fillStyle = chairAccent; ctx.fillRect(cx3, ty + th + 12, 20, 4);
+        ctx.fillStyle = "#060504"; ctx.fillRect(cx3 + 2, ty + th, 4, 4); ctx.fillRect(cx3 + 14, ty + th, 4, 4);
+      });
+      // Side chairs
+      ctx.fillStyle = chairColor; ctx.fillRect(tx2 - 16, ty + th/2 - 10, 14, 20);
+      ctx.fillStyle = chairAccent; ctx.fillRect(tx2 - 16, ty + th/2 - 10, 4, 20);
+      ctx.fillStyle = chairColor; ctx.fillRect(tx2 + tw + 2, ty + th/2 - 10, 14, 20);
+      ctx.fillStyle = chairAccent; ctx.fillRect(tx2 + tw + 12, ty + th/2 - 10, 4, 20);
+
+      // Projector screen (right wall)
+      const sx = bx + RW - WTH - 36, sy = by2 + WTH + 20;
+      ctx.fillStyle = "#e8eaed"; ctx.fillRect(sx, sy, 30, 48);
+      ctx.strokeStyle = hexAlpha(ac, 0.6); ctx.lineWidth = 1; ctx.strokeRect(sx, sy, 30, 48);
+      // "screen content" — pie chart or bar
+      ctx.fillStyle = "#1a1a2e"; ctx.fillRect(sx + 1, sy + 1, 28, 46);
+      drawBarChart(ctx, sx + 2, sy + 4, 26, 36, ac, t);
+      ctx.fillStyle = hexAlpha(ac, 0.5); ctx.font = "3px monospace"; ctx.fillText("KPI TODAY", sx + 3, sy + 45);
+
+      // Projector device on ceiling (small box)
+      ctx.fillStyle = "#0a0a0a"; ctx.fillRect(bx + RW/2 - 8, by2 + WTH + 1, 16, 8);
+      ctx.fillStyle = hexAlpha(ac, 0.4); ctx.fillRect(bx + RW/2 - 4, by2 + WTH + 3, 8, 4);
+
+      // Room accent corner marks
+      ctx.fillStyle = hexAlpha(ac, 0.3);
+      [WTH+2, RW-WTH-6].forEach(cx3 => [WTH+2, RH-WTH-6].forEach(cy3 => {
+        ctx.fillRect(bx + cx3, by2 + cy3, 4, 4);
+      }));
+      break;
+    }
+
+    case "cafe": {
+      // Bar counter along left wall
+      const barx = bx + WTH + 4, bary = by2 + WTH + 6;
+      ctx.fillStyle = "#1a0a00"; ctx.fillRect(barx, bary, 18, RH - WTH * 2 - 8);
+      ctx.fillStyle = hexAlpha(ac, 0.5); ctx.fillRect(barx, bary, 18, 5);      // bar top edge
+      ctx.fillStyle = hexAlpha(ac, 0.25); ctx.fillRect(barx + 14, bary, 4, RH - WTH * 2 - 8); // bar front
+      ctx.fillStyle = "#251000"; ctx.font = "4px monospace"; ctx.fillText("BAR", barx + 2, bary + 20);
+
+      // Coffee machine on bar (top)
+      const cmx = barx + 1, cmy = bary + 6;
+      ctx.fillStyle = "#0d0d0d"; ctx.fillRect(cmx, cmy, 14, 22);
+      ctx.fillStyle = hexAlpha(ac, 0.6); ctx.fillRect(cmx + 1, cmy + 1, 12, 6);
+      ctx.fillStyle = "#251000"; ctx.fillRect(cmx + 4, cmy + 10, 6, 6);
+      // Steam animation
+      const steamOpacity = 0.3 + Math.abs(Math.sin(t * 3)) * 0.3;
+      ctx.fillStyle = `rgba(255,255,255,${steamOpacity})`;
+      ctx.fillRect(cmx + 5, cmy - 3, 2, 3);
+      ctx.fillRect(cmx + 8, cmy - 4, 2, 4);
+
+      // Bottles on shelf above bar
+      [[barx+2, bary+32, "#ef4444"], [barx+6, bary+30, "#10b981"], [barx+10, bary+34, "#f59e0b"]].forEach(([bx3, by3, bc]) => {
+        ctx.fillStyle = hexAlpha(bc as string, 0.5); ctx.fillRect(bx3 as number, by3 as number, 3, 12);
+        ctx.fillStyle = hexAlpha(bc as string, 0.8); ctx.fillRect(bx3 as number, by3 as number, 3, 3);
+      });
+
+      // High stools at bar (right side of bar)
+      [by2 + 60, by2 + 95, by2 + 130].forEach(sy2 => {
+        ctx.fillStyle = "#150a00"; ctx.fillRect(barx + 22, sy2, 12, 10);   // seat
+        ctx.fillStyle = hexAlpha(ac, 0.3); ctx.fillRect(barx + 22, sy2, 12, 3); // seat top
+        ctx.fillStyle = "#0a0600"; ctx.fillRect(barx + 26, sy2 + 10, 4, 16);   // leg
+      });
+
+      // Round café tables (center + right)
+      [[bx + 120, by2 + 60], [bx + 200, by2 + 55], [bx + 160, by2 + 135]].forEach(([ctx2, cty], i) => {
+        // Table
+        ctx.fillStyle = "#1a0c00"; ctx.fillRect(ctx2 as number, cty as number, 30, 22);
+        ctx.strokeStyle = hexAlpha(ac, 0.35); ctx.lineWidth = 1; ctx.strokeRect(ctx2 as number, cty as number, 30, 22);
+        ctx.fillStyle = hexAlpha(ac, 0.15); ctx.fillRect((ctx2 as number) + 2, (cty as number) + 2, 26, 4);
+        // Coffee cups on table
+        if (i < 2) {
+          ctx.fillStyle = "#2a1a00"; ctx.fillRect((ctx2 as number) + 8, (cty as number) + 8, 8, 6);
+          ctx.fillStyle = "#3a2a00"; ctx.fillRect((ctx2 as number) + 10, (cty as number) + 6, 4, 4);
+        }
+        // Table leg
+        ctx.fillStyle = "#0e0700"; ctx.fillRect((ctx2 as number) + 13, (cty as number) + 22, 4, 10);
+        ctx.fillRect((ctx2 as number) + 9, (cty as number) + 30, 12, 3);
+        // Chairs beside each table
+        ctx.fillStyle = "#100800"; ctx.fillRect((ctx2 as number) - 10, (cty as number) + 2, 8, 14);
+        ctx.fillStyle = hexAlpha(ac, 0.20); ctx.fillRect((ctx2 as number) - 10, (cty as number) + 2, 8, 3);
+        ctx.fillStyle = "#100800"; ctx.fillRect((ctx2 as number) + 32, (cty as number) + 2, 8, 14);
+        ctx.fillStyle = hexAlpha(ac, 0.20); ctx.fillRect((ctx2 as number) + 32, (cty as number) + 2, 8, 3);
+      });
+
+      // "CAFÉ" sign on top wall
+      const sgx = bx + RW/2 - 16, sgy = by2 + WTH + 4;
+      ctx.fillStyle = hexAlpha(ac, 0.4); ctx.fillRect(sgx, sgy, 32, 10);
+      ctx.fillStyle = hexAlpha(ac, 0.9); ctx.font = "5px monospace"; ctx.fillText("☕ CAFÉ", sgx + 2, sgy + 8);
+
+      // Warm ambient glow on floor
+      const glowA = 0.04 + Math.sin(t * 0.5) * 0.01;
+      ctx.fillStyle = `rgba(249,115,22,${glowA})`; ctx.fillRect(bx + WTH + 4, by2 + WTH + 4, RW - WTH * 2 - 8, RH - WTH * 2 - 8);
+      break;
+    }
   }
 }
 
@@ -626,10 +766,11 @@ function drawFurniture(ctx: CanvasRenderingContext2D, room: RoomCfg, t: number) 
 // ═══════════════════════════════════════════════════════════════
 function drawHallways(ctx: CanvasRenderingContext2D, t: number) {
   ctx.fillStyle = "#050505";
-  // Horizontal corridors
-  ctx.fillRect(0, RH, CW, VGAP);
-  ctx.fillRect(0, 2 * (RH + VGAP) - VGAP, CW, VGAP);
-  // Vertical corridors
+  // Horizontal corridors (between each row pair)
+  ctx.fillRect(0, RH,                     CW, VGAP);   // row 0-1
+  ctx.fillRect(0, 2 * (RH + VGAP) - VGAP, CW, VGAP);  // row 1-2
+  ctx.fillRect(0, 3 * (RH + VGAP) - VGAP, CW, VGAP);  // row 2-3 (NEW)
+  // Vertical corridors (span all 4 rows)
   ctx.fillRect(RW, 0, HGAP, CH);
   ctx.fillRect(2 * (RW + HGAP) - HGAP, 0, HGAP, CH);
 
@@ -641,14 +782,20 @@ function drawHallways(ctx: CanvasRenderingContext2D, t: number) {
   // Emergency lighting strips along corridor edges
   const stripColor = (alpha: number) => `rgba(60,80,255,${alpha})`;
   const blink = 0.12 + Math.sin(t * 2.5) * 0.04;
-  [[RW, RH, HGAP, 2],[RW, 2*RH+VGAP-2, HGAP, 2],[2*(RW+HGAP)-HGAP, RH, HGAP, 2],[2*(RW+HGAP)-HGAP, 2*RH+VGAP-2, HGAP, 2]].forEach(([ex,ey,ew,eh]) => {
+  [[RW, RH, HGAP, 2],[RW, 2*RH+VGAP-2, HGAP, 2],[2*(RW+HGAP)-HGAP, RH, HGAP, 2],[2*(RW+HGAP)-HGAP, 2*RH+VGAP-2, HGAP, 2],
+   // row 2-3 corridor v-strips (NEW)
+   [RW, 3*(RH+VGAP)-VGAP, HGAP, 2],[2*(RW+HGAP)-HGAP, 3*(RH+VGAP)-VGAP, HGAP, 2],
+  ].forEach(([ex,ey,ew,eh]) => {
     ctx.fillStyle = stripColor(blink); ctx.fillRect(ex, ey, ew, eh);
   });
-  // H-corridor strips
+  // H-corridor strips (top + bottom edge of each horizontal corridor)
   [[0, RH, RW, 2],[0, RH+VGAP-2, RW, 2],[RW+HGAP, RH, RW, 2],[RW+HGAP, RH+VGAP-2, RW, 2],
    [2*(RW+HGAP), RH, RW, 2],[2*(RW+HGAP), RH+VGAP-2, RW, 2],
    [0, 2*RH+VGAP, RW, 2],[0, 3*RH+2*VGAP-2, RW, 2],[RW+HGAP, 2*RH+VGAP, RW, 2],[RW+HGAP, 3*RH+2*VGAP-2, RW, 2],
    [2*(RW+HGAP), 2*RH+VGAP, RW, 2],[2*(RW+HGAP), 3*RH+2*VGAP-2, RW, 2],
+   // row 2-3 h-corridor strips (NEW)
+   [0, 3*(RH+VGAP)-VGAP, RW, 2],[0, 3*(RH+VGAP)-2, RW, 2],
+   [RW+HGAP, 3*(RH+VGAP)-VGAP, RW, 2],[RW+HGAP, 3*(RH+VGAP)-2, RW, 2],
   ].forEach(([ex,ey,ew,eh]) => { ctx.fillStyle = stripColor(blink * 0.6); ctx.fillRect(ex, ey, ew, eh); });
 }
 
@@ -753,7 +900,7 @@ export default function OfficeCanvas({ initialData }: { initialData: HQData }) {
       if (r.col > 0) doorsRef.current[r.id + "-left"]   = 0;
       if (r.col < 2) doorsRef.current[r.id + "-right"]  = 0;
       if (r.row > 0) doorsRef.current[r.id + "-top"]    = 0;
-      if (r.row < 2) doorsRef.current[r.id + "-bottom"] = 0;
+      if (r.row < 3) doorsRef.current[r.id + "-bottom"] = 0;
     });
     // Init particles (offset each one along path)
     partRef.current = PARTICLE_ROUTES.flatMap((r, ri) => (
@@ -797,8 +944,14 @@ export default function OfficeCanvas({ initialData }: { initialData: HQData }) {
       const ag   = eligible[Math.floor(Math.random() * eligible.length)];
       const room = ROOMS.find(r => r.id === ag.roomId)!;
 
+      // 15% chance to visit café for a break
+      if (Math.random() < 0.15) {
+        assignTask(ag, "☕ Coffee break", "cafe");
+        return;
+      }
+
       // 20% chance to visit neighbor room
-      const neighbors = ROOMS.filter(r => r.id !== room.id && (r.col === room.col || r.row === room.row));
+      const neighbors = ROOMS.filter(r => r.id !== room.id && r.id !== "meeting" && r.id !== "cafe" && (r.col === room.col || r.row === room.row));
       const goVisit   = Math.random() < 0.2 && neighbors.length > 0;
       const targetId  = goVisit ? neighbors[Math.floor(Math.random() * neighbors.length)].id : ag.roomId;
       const phrase    = ag.phrases[Math.floor(Math.random() * ag.phrases.length)];
@@ -808,6 +961,35 @@ export default function OfficeCanvas({ initialData }: { initialData: HQData }) {
     tickRef.current = setInterval(tick, 3000 + Math.random() * 2000);
     tick();
     return () => clearInterval(tickRef.current);
+  }, [assignTask]);
+
+  // ── Daily standup animation (every 4 minutes real-time) ───────
+  useEffect(() => {
+    function triggerStandup() {
+      const m = hqRef.current.metrics;
+      const standupTopics = [
+        `${m.bookingsToday} bookings today`,
+        m.alertCount > 0 ? `${m.alertCount} alert${m.alertCount > 1 ? "s" : ""} pending` : "All systems clear",
+        `${m.completedToday} tasks done`,
+        m.agentsError > 0 ? `${m.agentsError} agent error${m.agentsError > 1 ? "s" : ""}` : "All agents healthy",
+        `${m.avgSuccess}% success rate`,
+        `${m.kbCount} KB entries`,
+        `Budget ${m.budgetPct}% used`,
+        `${m.conversations7d} chats this week`,
+      ];
+      const eligible = AGENTS.filter(a => simRef.current[a.id]?.state === "idle").slice(0, 3);
+      eligible.forEach((ag, i) => {
+        setTimeout(() => {
+          const topic = standupTopics[i % standupTopics.length];
+          assignTask(ag, topic, "meeting");
+        }, i * 800); // stagger entries
+      });
+    }
+
+    const iv = setInterval(triggerStandup, 4 * 60 * 1000); // every 4 minutes
+    // First standup 30 seconds after load (let agents settle first)
+    const initial = setTimeout(triggerStandup, 30_000);
+    return () => { clearInterval(iv); clearTimeout(initial); };
   }, [assignTask]);
 
   // ── Animation loop ────────────────────────────────────────────
