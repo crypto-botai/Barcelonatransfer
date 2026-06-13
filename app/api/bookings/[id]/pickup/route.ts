@@ -13,12 +13,13 @@ const schema = z.object({
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const user = session.user as { id: string; email?: string };
+  const { id } = await params;
 
   let body: z.infer<typeof schema>;
   try {
@@ -28,7 +29,7 @@ export async function PATCH(
     return NextResponse.json({ error: msg }, { status: 422 });
   }
 
-  const booking = await prisma.booking.findUnique({ where: { id: params.id } });
+  const booking = await prisma.booking.findUnique({ where: { id } });
   if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   // Verify ownership

@@ -7,14 +7,15 @@ import { sendCancellationEmail, sendAdminCancellationAlert } from "@/lib/resend"
 
 export async function POST(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const user = session.user as { id: string; email?: string };
+  const { id } = await params;
 
-  const booking = await prisma.booking.findUnique({ where: { id: params.id } });
+  const booking = await prisma.booking.findUnique({ where: { id } });
   if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   // Verify ownership
