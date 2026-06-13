@@ -39,11 +39,12 @@ export async function POST(req: NextRequest) {
 
   let agentsCreated = 0;
   for (const def of agentDefs) {
-    const existing = await prisma.aiAgent.findUnique({ where: { name: def.name } });
-    if (!existing) {
-      await prisma.aiAgent.create({ data: def });
-      agentsCreated++;
-    }
+    await prisma.aiAgent.upsert({
+      where:  { name: def.name },
+      update: { description: def.description, status: "IDLE", isEnabled: true },
+      create: { ...def, status: "IDLE", isEnabled: true },
+    });
+    agentsCreated++;
   }
   results.agents = agentsCreated;
 
