@@ -5,13 +5,23 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard, CalendarCheck, Car, Users, DollarSign,
-  Settings, LogOut, ChevronRight, Wallet, Clock, Tag, Mail,
-  BarChart2, TrendingUp, UserCheck, PieChart, Menu, X,
+  Settings, LogOut, ChevronRight, ChevronDown, Wallet, Clock,
+  Tag, Mail, BarChart2, TrendingUp, UserCheck, PieChart, Menu, X,
+  Building2, Brain, Activity, Bell, BookOpen, Zap, CreditCard,
+  FlaskConical, MessageSquare, Eye, Shield,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
-const NAV = [
+// ─── Nav structure ─────────────────────────────────────────────────────────────
+interface NavItem {
+  icon: React.ElementType;
+  label: string;
+  href: string;
+  sub?: { icon: React.ElementType; label: string; href: string }[];
+}
+
+const NAV: NavItem[] = [
   { icon: LayoutDashboard, label: "Overview",    href: "/admin" },
   { icon: CalendarCheck,   label: "Bookings",    href: "/admin/bookings" },
   { icon: PieChart,        label: "Analytics",   href: "/admin/analytics" },
@@ -25,20 +35,62 @@ const NAV = [
   { icon: Tag,             label: "Coupons",     href: "/admin/coupons" },
   { icon: Mail,            label: "Newsletter",  href: "/admin/newsletter" },
   { icon: BarChart2,       label: "Email Logs",  href: "/admin/email-logs" },
-  { icon: Settings,        label: "Settings",    href: "/admin/settings" },
+
+  // ── AI System ────────────────────────────────────────────────────────────────
+  {
+    icon:  Building2,
+    label: "AI HQ",
+    href:  "/admin/hq",
+    sub: [
+      { icon: Eye,           label: "Live Office",      href: "/admin/hq" },
+      { icon: Activity,      label: "Agent Reports",    href: "/admin/hq/reports" },
+      { icon: FlaskConical,  label: "Learning Queue",   href: "/admin/hq/learning" },
+    ],
+  },
+  {
+    icon:  Brain,
+    label: "AI System",
+    href:  "/admin/ai",
+    sub: [
+      { icon: Shield,        label: "Command Center",   href: "/admin/ai" },
+      { icon: Zap,           label: "Agent Control",    href: "/admin/ai/agents" },
+      { icon: Brain,         label: "Memory / Brain",   href: "/admin/ai/memory" },
+      { icon: BookOpen,      label: "Knowledge Base",   href: "/admin/ai/knowledge" },
+      { icon: Bell,          label: "Alerts",           href: "/admin/ai/alerts" },
+      { icon: Activity,      label: "Activity Logs",    href: "/admin/ai/logs" },
+      { icon: MessageSquare, label: "Support Chats",    href: "/admin/ai/support" },
+      { icon: CreditCard,    label: "Cost & Budget",    href: "/admin/ai/cost" },
+    ],
+  },
+
+  { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];
 
-// Bottom-nav items for mobile (most important ones)
+// Bottom-nav items for mobile
 const MOBILE_BOTTOM_NAV = [
   { icon: LayoutDashboard, label: "Home",      href: "/admin" },
   { icon: CalendarCheck,   label: "Bookings",  href: "/admin/bookings" },
-  { icon: UserCheck,       label: "Customers", href: "/admin/customers" },
+  { icon: Brain,           label: "AI",        href: "/admin/ai" },
   { icon: TrendingUp,      label: "Revenue",   href: "/admin/revenue" },
 ];
 
+// ─── Sidebar component ─────────────────────────────────────────────────────────
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerOpen,   setDrawerOpen]   = useState(false);
+  const [expandedSubs, setExpandedSubs] = useState<string[]>([]);
+
+  // Auto-expand any group whose child is currently active
+  useEffect(() => {
+    const active = NAV.filter(n => n.sub && n.sub.some(s => pathname.startsWith(s.href) || pathname === s.href));
+    if (active.length) {
+      setExpandedSubs(prev => {
+        const next = [...prev];
+        active.forEach(n => { if (!next.includes(n.href)) next.push(n.href); });
+        return next;
+      });
+    }
+  }, [pathname]);
 
   // Close drawer on route change
   useEffect(() => { setDrawerOpen(false); }, [pathname]);
@@ -52,13 +104,71 @@ export default function AdminSidebar() {
   const isActive = (href: string) =>
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
 
+  const toggleSub = (href: string) =>
+    setExpandedSubs(prev => prev.includes(href) ? prev.filter(h => h !== href) : [...prev, href]);
+
   const NavLinks = () => (
     <nav className="flex-1 p-4 space-y-0.5 overflow-y-auto">
-      {NAV.map(({ icon: Icon, label, href }) => {
-        const active = isActive(href);
+      {NAV.map(({ icon: Icon, label, href, sub }) => {
+        const active    = isActive(href);
+        const expanded  = expandedSubs.includes(href);
+        const hasActive = sub?.some(s => pathname.startsWith(s.href));
+
+        if (sub) {
+          return (
+            <div key={href}>
+              {/* Group header — click expands/collapses */}
+              <button
+                type="button"
+                onClick={() => toggleSub(href)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all",
+                  hasActive ? "nav-active font-medium" : "text-dark-400 hover:text-white hover:bg-white/[0.04]"
+                )}
+              >
+                <Icon size={16} className="flex-shrink-0" />
+                <span className="truncate flex-1 text-left">{label}</span>
+                {expanded
+                  ? <ChevronDown size={12} className="flex-shrink-0 opacity-50" />
+                  : <ChevronRight size={12} className="flex-shrink-0 opacity-50" />}
+              </button>
+
+              {/* Sub-links */}
+              {expanded && (
+                <div className="ml-4 mt-0.5 space-y-0.5 border-l border-white/[0.05] pl-3">
+                  {sub.map(({ icon: SIcon, label: sLabel, href: sHref }) => {
+                    const sActive = sHref === "/admin/hq" || sHref === "/admin/ai"
+                      ? pathname === sHref
+                      : pathname.startsWith(sHref);
+                    return (
+                      <Link
+                        key={sHref}
+                        href={sHref}
+                        onClick={() => setDrawerOpen(false)}
+                        className={cn(
+                          "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs transition-all",
+                          sActive
+                            ? "text-[#c9a84c] bg-[#c9a84c]/10 font-medium"
+                            : "text-dark-500 hover:text-white hover:bg-white/[0.04]"
+                        )}
+                      >
+                        <SIcon size={13} className="flex-shrink-0" />
+                        <span className="truncate">{sLabel}</span>
+                        {sActive && <span className="ml-auto w-1 h-1 rounded-full bg-[#c9a84c]" />}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        // Flat link
         return (
           <Link
-            key={href} href={href}
+            key={href}
+            href={href}
             onClick={() => setDrawerOpen(false)}
             className={cn(
               "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all",
@@ -76,7 +186,7 @@ export default function AdminSidebar() {
 
   return (
     <>
-      {/* ── Desktop sidebar (hidden on mobile) ── */}
+      {/* ── Desktop sidebar ──────────────────────────────────────────────── */}
       <aside className="hidden lg:flex w-60 flex-shrink-0 bg-[#0a0a0a] border-r border-white/[0.06] min-h-screen flex-col sticky top-0">
         {/* Logo */}
         <div className="p-5 border-b border-white/[0.06]">
@@ -102,7 +212,7 @@ export default function AdminSidebar() {
         </div>
       </aside>
 
-      {/* ── Mobile top header ── */}
+      {/* ── Mobile top header ─────────────────────────────────────────────── */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0a0a0a] border-b border-white/[0.06] flex items-center justify-between px-4 h-14">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-6 h-6 border border-gold-500 rotate-45 flex items-center justify-center">
@@ -124,7 +234,7 @@ export default function AdminSidebar() {
         </div>
       </div>
 
-      {/* ── Mobile drawer overlay ── */}
+      {/* ── Mobile drawer overlay ──────────────────────────────────────────── */}
       {drawerOpen && (
         <div
           className="lg:hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
@@ -132,7 +242,7 @@ export default function AdminSidebar() {
         />
       )}
 
-      {/* ── Mobile drawer ── */}
+      {/* ── Mobile drawer ─────────────────────────────────────────────────── */}
       <aside
         className={cn(
           "lg:hidden fixed top-0 right-0 bottom-0 z-50 w-72 bg-[#0a0a0a] border-l border-white/[0.06] flex flex-col transition-transform duration-300 ease-in-out",
@@ -163,7 +273,7 @@ export default function AdminSidebar() {
         </div>
       </aside>
 
-      {/* ── Mobile bottom navigation bar ── */}
+      {/* ── Mobile bottom navigation bar ──────────────────────────────────── */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a0a0a] border-t border-white/[0.06] flex items-center">
         {MOBILE_BOTTOM_NAV.map(({ icon: Icon, label, href }) => {
           const active = isActive(href);

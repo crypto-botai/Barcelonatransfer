@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { calculateQuote, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, calculateLastMinuteSurcharge } from "@/lib/pricing";
+import { calculateQuote, DEFAULT_PRICING, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, calculateLastMinuteSurcharge } from "@/lib/pricing";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
+import { prisma } from "@/lib/prisma";
 import { type VehicleClass } from "@/types";
 
 const schema = z.object({
@@ -103,11 +104,24 @@ export async function POST(req: NextRequest) {
       durationMin = 0;
     }
 
+    // Merge DB pricing rule (if admin has customised this class) over the defaults
+    const dbRule = await prisma.pricingRule.findUnique({ where: { vehicleClass: vc } }).catch(() => null);
+    const pricingMap = { ...DEFAULT_PRICING };
+    if (dbRule) {
+      pricingMap[vc] = {
+        baseFare:       dbRule.baseFare,
+        pricePerKm:     dbRule.pricePerKm,
+        pricePerMinute: dbRule.pricePerMinute,
+        minimumFare:    dbRule.minimumFare,
+      };
+    }
+
     const quote = calculateQuote(
       vc, distanceKm, durationMin,
       pickupLat, pickupLng,
       dropoffLat, dropoffLng,
-      pickupDate
+      pickupDate,
+      pricingMap
     );
 
     return NextResponse.json({ vehicleClass: vc, ...quote });
