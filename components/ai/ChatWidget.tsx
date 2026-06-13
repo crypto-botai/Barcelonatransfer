@@ -1,12 +1,23 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Loader2, ChevronDown, ExternalLink } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, ChevronDown, ExternalLink, CreditCard, AlertCircle } from "lucide-react";
+
+interface BookingInfo {
+  id?: string;
+  reference?: string;
+  paymentUrl?: string;
+  amount?: number;
+  currency?: string;
+  error?: string;
+  whatsapp?: string;
+}
 
 interface Message {
   role: "user" | "assistant";
   content: string;
   escalate?: boolean;
+  booking?: BookingInfo;
 }
 
 const SESSION_KEY = "elite_chat_session";
@@ -33,13 +44,65 @@ const SUGGESTED = [
   "Do you offer child seats?",
 ];
 
+function BookingCard({ booking }: { booking: BookingInfo }) {
+  if (booking.error) {
+    return (
+      <div className="mt-2 rounded-xl border border-red-500/30 bg-red-500/10 p-3">
+        <div className="flex items-start gap-2">
+          <AlertCircle size={14} className="text-red-400 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="text-red-300 text-xs font-medium">Booking not processed</p>
+            <p className="text-red-400/80 text-[11px] mt-0.5">{booking.error}</p>
+            {booking.whatsapp && (
+              <a
+                href={booking.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 flex items-center gap-1 text-xs text-green-400 hover:text-green-300"
+              >
+                <ExternalLink size={11} /> Contact us on WhatsApp
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-2 rounded-xl border border-[#c9a84c]/30 bg-[#c9a84c]/5 p-3">
+      <p className="text-[#c9a84c] text-xs font-semibold mb-1 flex items-center gap-1.5">
+        <CreditCard size={12} /> Booking Created
+      </p>
+      {booking.reference && (
+        <p className="text-white/60 text-[11px] mb-2">
+          Ref: <span className="text-white/90 font-mono">{booking.reference}</span>
+          {booking.amount != null && (
+            <span className="ml-2">· Total: <strong className="text-white">{booking.currency ?? "EUR"} {booking.amount.toFixed(2)}</strong></span>
+          )}
+        </p>
+      )}
+      {booking.paymentUrl && (
+        <a
+          href={booking.paymentUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full rounded-lg bg-[#c9a84c] text-black text-xs font-semibold py-2 hover:bg-[#d4af5a] transition-colors"
+        >
+          <CreditCard size={12} /> Pay Securely Now
+        </a>
+      )}
+      <p className="text-white/30 text-[10px] text-center mt-1.5">Secure payment · No card details shared in chat</p>
+    </div>
+  );
+}
+
 export default function ChatWidget() {
   const [open, setOpen]           = useState(false);
   const [messages, setMessages]   = useState<Message[]>([]);
   const [input, setInput]         = useState("");
   const [loading, setLoading]     = useState(false);
   const [unread, setUnread]       = useState(0);
-  const [escalated, setEscalated] = useState(false);
   const bottomRef                 = useRef<HTMLDivElement>(null);
   const inputRef                  = useRef<HTMLInputElement>(null);
   const sessionId                 = useRef(getSessionId());
@@ -50,7 +113,7 @@ export default function ChatWidget() {
     if (open && messages.length === 0) {
       setMessages([{
         role: "assistant",
-        content: "Hello! 👋 I'm the Élite BCN AI assistant. How can I help you today?\n\nYou can ask me about pricing, our fleet, pickup locations, or anything else.",
+        content: "Hello! 👋 I'm the Élite BCN AI assistant. How can I help you today?\n\nYou can ask me about pricing, our fleet, pickup locations, or I can help you book a transfer right now.",
       }]);
       inputRef.current?.focus();
     }
@@ -69,12 +132,13 @@ export default function ChatWidget() {
     setInput("");
     setLoading(true);
 
+    // Only pass role/content to the API (strip display-only fields)
     const allMessages = [...messages, userMsg].map((m) => ({
       role:    m.role,
       content: m.content,
     }));
 
-    // Add a placeholder assistant message we'll stream into
+    // Placeholder assistant message for streaming
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
     try {
@@ -106,7 +170,13 @@ export default function ChatWidget() {
           if (!line.startsWith("data: ")) continue;
           const raw = line.slice(6);
           try {
-            const parsed = JSON.parse(raw) as { text?: string; done?: boolean; escalate?: boolean; error?: string };
+            const parsed = JSON.parse(raw) as {
+              text?:    string;
+              done?:    boolean;
+              escalate?: boolean;
+              error?:   string;
+              booking?: BookingInfo;
+            };
 
             if (parsed.text) {
               setMessages((prev) => {
@@ -118,14 +188,22 @@ export default function ChatWidget() {
               });
             }
 
-            if (parsed.done) {
-              if (parsed.escalate) {
-                setEscalated(true);
-                setMessages((prev) => {
-                  const last = prev[prev.length - 1];
-                  return last ? [...prev.slice(0, -1), { ...last, escalate: true }] : prev;
-                });
-              }
+            if (parsed.done && parsed.escalate) {
+              setMessages((prev) => {
+                const last = prev[prev.length - 1];
+                return last ? [...prev.slice(0, -1), { ...last, escalate: true }] : prev;
+              });
+            }
+
+            if (parsed.booking) {
+              setMessages((prev) => {
+                const last = prev[prev.length - 1];
+                if (last?.role === "assistant") {
+                  return [...prev.slice(0, -1), { ...last, booking: parsed.booking }];
+                }
+                // Append as new message if no active assistant message
+                return [...prev, { role: "assistant", content: "", booking: parsed.booking }];
+              });
             }
 
             if (parsed.error) {
@@ -160,7 +238,7 @@ export default function ChatWidget() {
       if (part === "\n") return <br key={i} />;
       if (/^\*\*[^*]+\*\*$/.test(part)) return <strong key={i}>{part.slice(2, -2)}</strong>;
       const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
-      if (linkMatch) return <a key={i} href={linkMatch[2]} target="_blank" rel="noopener noreferrer" className="underline text-gold-400 hover:text-gold-300">{linkMatch[1]}</a>;
+      if (linkMatch) return <a key={i} href={linkMatch[2]} target="_blank" rel="noopener noreferrer" className="underline text-[#c9a84c] hover:text-[#d4af5a]">{linkMatch[1]}</a>;
       return part;
     });
   }
@@ -196,7 +274,7 @@ export default function ChatWidget() {
             <div className="flex-1 min-w-0">
               <p className="text-white text-sm font-semibold leading-none">Élite BCN Assistant</p>
               <p className="text-green-400 text-xs mt-0.5 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" /> Online
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" /> Online · Book &amp; pay in chat
               </p>
             </div>
             <button onClick={() => setOpen(false)} className="text-white/40 hover:text-white transition-colors p-1">
@@ -215,7 +293,7 @@ export default function ChatWidget() {
                       : "bg-white/[0.06] text-white/90 rounded-bl-sm border border-white/[0.08]"
                   }`}
                 >
-                  {m.role === "assistant" && m.content === "" && loading && i === messages.length - 1 ? (
+                  {m.role === "assistant" && m.content === "" && loading && i === messages.length - 1 && !m.booking ? (
                     <span className="flex gap-1 items-center h-4">
                       {[0, 1, 2].map((d) => (
                         <span key={d} className="w-1.5 h-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: `${d * 150}ms` }} />
@@ -224,7 +302,7 @@ export default function ChatWidget() {
                   ) : (
                     renderContent(m.content)
                   )}
-                  {m.escalate && (
+                  {m.escalate && !m.booking && (
                     <a
                       href="https://wa.me/34635383712"
                       target="_blank"
@@ -234,6 +312,7 @@ export default function ChatWidget() {
                       <ExternalLink size={11} /> Chat on WhatsApp
                     </a>
                   )}
+                  {m.booking && <BookingCard booking={m.booking} />}
                 </div>
               </div>
             ))}
@@ -277,7 +356,7 @@ export default function ChatWidget() {
                 {loading ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
               </button>
             </div>
-            <p className="text-white/15 text-[10px] text-center mt-1.5">AI · Not a booking confirmation</p>
+            <p className="text-white/15 text-[10px] text-center mt-1.5">Secure payment via SumUp · Never share card details in chat</p>
           </div>
         </div>
       )}

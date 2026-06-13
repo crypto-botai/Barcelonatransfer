@@ -36,7 +36,7 @@ export async function getSupportReply(
 ): Promise<{ reply: string; escalate: boolean }> {
   const agentRecord  = await prisma.aiAgent.findUnique({ where: { name: AGENT_NAME } });
   const kbText       = await buildKbText(language);
-  const systemPrompt = buildSupportSystemPrompt(kbText, language);
+  const systemPrompt = await buildSupportSystemPrompt(kbText, language);
 
   const sanitisedMessages: { role: "user" | "assistant"; content: string }[] = messages.map((m) =>
     m.role === "user" ? { role: "user" as const, content: wrapAsData("customer_message", m.content) } : { role: "assistant" as const, content: m.content },
@@ -45,7 +45,7 @@ export async function getSupportReply(
   const { text, inputTokens, outputTokens, costCents } = await callProvider(
     AGENT_NAME,
     [{ role: "system", content: systemPrompt }, ...sanitisedMessages],
-    { maxTokens: 512 },
+    { maxTokens: 1024 },
   );
 
   if (agentRecord) {
@@ -65,7 +65,7 @@ export async function* streamSupportReply(
 ): AsyncGenerator<{ type: "text"; text: string } | { type: "done"; escalate: boolean }> {
   const agentRecord  = await prisma.aiAgent.findUnique({ where: { name: AGENT_NAME } });
   const kbText       = await buildKbText(language);
-  const systemPrompt = buildSupportSystemPrompt(kbText, language);
+  const systemPrompt = await buildSupportSystemPrompt(kbText, language);
 
   const sanitisedMessages: { role: "user" | "assistant"; content: string }[] = messages.map((m) =>
     m.role === "user" ? { role: "user" as const, content: wrapAsData("customer_message", m.content) } : { role: "assistant" as const, content: m.content },
@@ -76,7 +76,7 @@ export async function* streamSupportReply(
   for await (const chunk of streamProvider(
     AGENT_NAME,
     [{ role: "system", content: systemPrompt }, ...sanitisedMessages],
-    { maxTokens: 512 },
+    { maxTokens: 1024 },
   )) {
     if (chunk.type === "text") {
       fullText += chunk.text;
