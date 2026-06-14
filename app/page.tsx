@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import ScrollReset from "@/components/layout/ScrollReset";
 import HeroSection from "@/components/sections/HeroSection";
 import ServicesSection from "@/components/sections/ServicesSection";
@@ -37,7 +36,6 @@ export default function HomePage() {
         <FAQSection />
       </main>
       <Footer />
-      <WhatsAppButton />
     </>
   );
 }

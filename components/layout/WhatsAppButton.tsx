@@ -8,7 +8,7 @@ export default function WhatsAppButton() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-6 left-6 z-50 flex flex-col items-start gap-3">
       <AnimatePresence>
         {open && (
           <motion.div
@@ -16,7 +16,7 @@ export default function WhatsAppButton() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.9 }}
             transition={{ duration: 0.2 }}
-            className="glass-card rounded-2xl p-5 w-72 shadow-luxury mb-2"
+            className="glass-card rounded-2xl p-5 w-72 shadow-luxury mb-2 ml-0"
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center">

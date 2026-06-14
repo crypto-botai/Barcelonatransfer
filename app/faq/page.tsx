@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import Link from "next/link";
 
@@ -228,7 +227,6 @@ export default function FAQPage() {
         </section>
       </main>
       <Footer />
-      <WhatsAppButton />
     </>
   );
 }
