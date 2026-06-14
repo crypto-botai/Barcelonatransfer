@@ -237,7 +237,7 @@ const TEST_CONFIGS: Record<string, { url: string; model: string; extra?: Record<
 export async function testRawKey(
   provider: string,
   rawKey:   string,
-): Promise<{ ok: boolean; error?: string; latencyMs: number }> {
+): Promise<{ ok: boolean; warning?: string; error?: string; latencyMs: number }> {
   const cfg = TEST_CONFIGS[provider];
   if (!cfg) return { ok: false, error: `Unknown provider: ${provider}`, latencyMs: 0 };
 
@@ -260,10 +260,23 @@ export async function testRawKey(
     });
 
     const ms = Date.now() - t0;
+
+    // 429 = key is valid but rate-limited or quota exhausted — still save it
+    if (res.status === 429) {
+      return { ok: true, warning: "Rate limited / quota hit — key saved but may need quota top-up", latencyMs: ms };
+    }
+
+    // 401 / 403 = key is genuinely invalid
+    if (res.status === 401 || res.status === 403) {
+      const body = await res.text().catch(() => "");
+      return { ok: false, error: `Invalid key (HTTP ${res.status}): ${body.slice(0, 150)}`, latencyMs: ms };
+    }
+
     if (!res.ok) {
       const body = await res.text().catch(() => "");
       return { ok: false, error: `HTTP ${res.status}: ${body.slice(0, 200)}`, latencyMs: ms };
     }
+
     return { ok: true, latencyMs: ms };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : String(err), latencyMs: Date.now() - t0 };

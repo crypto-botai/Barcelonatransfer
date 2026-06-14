@@ -55,14 +55,15 @@ function StatusBadge({ status }: { status: string }) {
 // ─── Add Key form ─────────────────────────────────────────────────────────────
 
 function AddKeyForm({ onAdded }: { onAdded: () => void }) {
-  const [open, setOpen]     = useState(false);
-  const [busy, setBusy]     = useState(false);
-  const [error, setError]   = useState("");
-  const [form, setForm]     = useState({ provider: "groq", label: "", rawKey: "", assignedAgent: "pool" });
+  const [open, setOpen]       = useState(false);
+  const [busy, setBusy]       = useState(false);
+  const [error, setError]     = useState("");
+  const [warning, setWarning] = useState("");
+  const [form, setForm]       = useState({ provider: "groq", label: "", rawKey: "", assignedAgent: "pool" });
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
+    setError(""); setWarning("");
     setBusy(true);
     try {
       const res  = await fetch("/api/admin/api-keys", {
@@ -72,6 +73,7 @@ function AddKeyForm({ onAdded }: { onAdded: () => void }) {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Failed"); return; }
+      if (data.warning) setWarning(data.warning);
       setOpen(false);
       setForm({ provider: "groq", label: "", rawKey: "", assignedAgent: "pool" });
       onAdded();
@@ -145,7 +147,8 @@ function AddKeyForm({ onAdded }: { onAdded: () => void }) {
         />
       </div>
 
-      {error && <p className="text-red-400 text-xs">{error}</p>}
+      {error   && <p className="text-red-400 text-xs">{error}</p>}
+      {warning && <p className="text-amber-400 text-xs">⚠ {warning}</p>}
 
       <div className="flex items-center gap-2 pt-1">
         <button

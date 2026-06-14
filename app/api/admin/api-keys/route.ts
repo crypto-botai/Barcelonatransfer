@@ -27,13 +27,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "provider, label, rawKey are required" }, { status: 400 });
   }
 
+  let warning: string | undefined;
   if (!skipTest) {
     const test = await testRawKey(provider, rawKey);
     if (!test.ok) {
       return NextResponse.json({ error: `Key validation failed: ${test.error}`, latencyMs: test.latencyMs }, { status: 422 });
     }
+    if (test.warning) warning = test.warning;
   }
 
   const id = await addKey({ provider, label, rawKey, assignedAgent });
-  return NextResponse.json({ ok: true, id }, { status: 201 });
+  return NextResponse.json({ ok: true, id, warning }, { status: 201 });
 }
