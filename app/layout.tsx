@@ -208,7 +208,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {
                   "@type": "Question",
                   name: "What is the best way to get from Barcelona Airport to the city?",
-                  acceptedAnswer: { "@type": "Answer", text: "The best way to get from Barcelona Airport to the city centre is by private transfer. Élite BCN Transfers offers fixed-price luxury transfers from €45 in Mercedes, Tesla, and BMW vehicles. Unlike taxis, prices are fixed and confirmed at booking. Unlike the Aerobus (€6.75), you get door-to-door service with your luggage handled. The journey takes 20–40 minutes depending on traffic." },
+                  acceptedAnswer: { "@type": "Answer", text: "The best way to get from Barcelona Airport to the city centre is by private transfer. Élite BCN Transfers offers fixed-price luxury transfers from €45 in Mercedes V-Class and E-Class vehicles. Unlike taxis, prices are fixed and confirmed at booking. Unlike the Aerobus (€6.75), you get door-to-door service with your luggage handled. The journey takes 20–40 minutes depending on traffic." },
                 },
                 {
                   "@type": "Question",

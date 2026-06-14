@@ -92,8 +92,8 @@ function PriceTable({ data, search }: { data: Row[]; search: string }) {
             <th className="text-left py-3 px-4 text-xs text-dark-400 tracking-wider uppercase font-medium">Route</th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Economy<br /><span className="text-dark-600 normal-case">1–3 pax</span></th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Business<br /><span className="text-dark-600 normal-case">1–3 pax</span></th>
-            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minivan<br /><span className="text-dark-600 normal-case">4–6 pax</span></th>
-            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">V-Class<br /><span className="text-dark-600 normal-case">7–8 pax</span></th>
+            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minivan<br /><span className="text-dark-600 normal-case">4–8 pax</span></th>
+            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">V-Class<br /><span className="text-dark-600 normal-case">7 pax</span></th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minibus<br /><span className="text-dark-600 normal-case">9+ pax</span></th>
             <th className="py-3 px-4" />
           </tr>
