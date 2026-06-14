@@ -9,9 +9,9 @@ import { formatCurrency } from "@/lib/utils";
 const TABS = ["Airport & City", "Costa Dorada", "Costa Brava", "Hourly"];
 
 const AIRPORT = [
-  { route: "El Prat Airport ⇄ Barcelona City",   eco: 45,  bus: 55,  van: 60,  vcl: 70,  mbs: 150, wasEco: 50,  wasBus: 65 },
-  { route: "El Prat Airport ⇄ Cruise Terminal",  eco: 45,  bus: 55,  van: 60,  vcl: 70,  mbs: 150, wasEco: 50,  wasBus: 65 },
-  { route: "Cruise Terminal ⇄ Barcelona City",   eco: 45,  bus: 55,  van: 60,  vcl: 70,  mbs: 150, wasEco: 50,  wasBus: 65 },
+  { route: "El Prat Airport ⇄ Barcelona City",   eco: 45,  bus: 55,  van: 60,  vcl: 70,  mbs: 180, wasEco: 50,  wasBus: 65 },
+  { route: "El Prat Airport ⇄ Cruise Terminal",  eco: 45,  bus: 55,  van: 60,  vcl: 70,  mbs: 180, wasEco: 50,  wasBus: 65 },
+  { route: "Cruise Terminal ⇄ Barcelona City",   eco: 45,  bus: 55,  van: 60,  vcl: 70,  mbs: 180, wasEco: 50,  wasBus: 65 },
   { route: "El Prat Airport ⇄ Sants Station",    eco: 50,  bus: 55,  van: 60,  vcl: 75,  mbs: 155, wasEco: 55,  wasBus: 65 },
   { route: "Barcelona ⇄ La Roca Village",        eco: 75,  bus: 90,  van: 100, vcl: 120, mbs: 200, wasEco: 80,  wasBus: 100 },
   { route: "El Prat Airport ⇄ Montserrat",        eco: 85,  bus: 95,  van: 105, vcl: 125, mbs: 200, wasEco: 95,  wasBus: 110 },
@@ -20,7 +20,7 @@ const AIRPORT = [
 ];
 
 const DORADA = [
-  { route: "Barcelona ⇄ Castelldefels", eco: 50,  bus: 60,  van: 60,  vcl: 70,  mbs: 150 },
+  { route: "Barcelona ⇄ Castelldefels", eco: 50,  bus: 60,  van: 60,  vcl: 70,  mbs: 180 },
   { route: "Barcelona ⇄ Sitges",        eco: 80,  bus: 100, van: 100, vcl: 120, mbs: 200 },
   { route: "Barcelona ⇄ Cubelles",      eco: 90,  bus: 110, van: 110, vcl: 130, mbs: 210 },
   { route: "Barcelona ⇄ Calafell",      eco: 100, bus: 120, van: 120, vcl: 140, mbs: 220 },
@@ -53,8 +53,8 @@ const BRAVA = [
 const HOURLY = [
   { label: "Economy (1–3 pax)",   price: 40, unit: "/ hour", min: "Min. 4 hours" },
   { label: "Business (1–3 pax)",  price: 40, unit: "/ hour", min: "Min. 4 hours" },
-  { label: "Minivan (4–6 pax)",   price: 50, unit: "/ hour", min: "Min. 4 hours" },
-  { label: "V-Class (7–8 pax)",   price: 60, unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Minivan Vito (4–8 pax)", price: 50, unit: "/ hour", min: "Min. 4 hours" },
+  { label: "V-Class Luxury (7 pax)", price: 60, unit: "/ hour", min: "Min. 4 hours" },
   { label: "Minibus (9+ pax)",    price: 80, unit: "/ hour", min: "Min. 4 hours" },
 ];
 

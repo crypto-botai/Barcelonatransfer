@@ -7,7 +7,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: { absolute: "Luxury Fleet Barcelona — Mercedes V-Class & E-Class | Élite BCN" },
   description:
-    "Barcelona transfer fleet: Mercedes V-Class (7 seats), Mercedes E-Class & Mercedes Vito. All vehicles under 3 years old, air-conditioned, WiFi & water.",
+    "Barcelona transfer fleet: Mercedes V-Class (7-seat luxury), Mercedes E-Class & Mercedes Vito (8-seat minivan). All vehicles under 3 years old, air-conditioned, WiFi & water.",
   alternates: { canonical: "https://www.elitebcn.info/fleet" },
   openGraph: {
     title: "Luxury Fleet Barcelona — Mercedes V-Class & E-Class | Élite BCN",

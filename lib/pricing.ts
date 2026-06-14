@@ -17,7 +17,7 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
   LUXURY_SUV:     { baseFare: 55,  pricePerKm: 2.50, pricePerMinute: 0.45, minimumFare: 100 },
   MINIVAN:        { baseFare: 30,  pricePerKm: 1.65, pricePerMinute: 0.28, minimumFare: 60  },
   LUXURY_MINIVAN: { baseFare: 50,  pricePerKm: 2.20, pricePerMinute: 0.40, minimumFare: 70  },
-  MINIBUS:        { baseFare: 70,  pricePerKm: 2.40, pricePerMinute: 0.50, minimumFare: 150 },
+  MINIBUS:        { baseFare: 70,  pricePerKm: 2.40, pricePerMinute: 0.50, minimumFare: 180 },
 };
 
 export const AIRPORT_SURCHARGE = 8;
@@ -111,16 +111,16 @@ type FixedPrices = { ECONOMY: number; BUSINESS: number; MINIVAN: number; VCLASS:
 
 const ROUTE_PRICES: Array<[string, string, FixedPrices]> = [
   // ── Airport & City (promotional discount: Economy -€5, Business -€10, Minivan -€5) ──
-  ["airport", "barcelona_city", { ECONOMY: 45,  BUSINESS: 55,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 150 }],
-  ["airport", "cruise",         { ECONOMY: 45,  BUSINESS: 55,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 150 }],
-  ["cruise",  "barcelona_city", { ECONOMY: 45,  BUSINESS: 55,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 150 }],
+  ["airport", "barcelona_city", { ECONOMY: 45,  BUSINESS: 55,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 180 }],
+  ["airport", "cruise",         { ECONOMY: 45,  BUSINESS: 55,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 180 }],
+  ["cruise",  "barcelona_city", { ECONOMY: 45,  BUSINESS: 55,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 180 }],
   ["airport", "sants",          { ECONOMY: 50,  BUSINESS: 55,  MINIVAN: 60,  VCLASS: 75,  MINIBUS: 155 }],
   ["barcelona_city", "la_roca",        { ECONOMY: 75,  BUSINESS: 90,  MINIVAN: 100, VCLASS: 120, MINIBUS: 200 }],
   ["barcelona_city", "montserrat",     { ECONOMY: 115, BUSINESS: 130, MINIVAN: 140, VCLASS: 160, MINIBUS: 240 }],
   ["barcelona_city", "girona_airport", { ECONOMY: 135, BUSINESS: 145, MINIVAN: 155, VCLASS: 175, MINIBUS: 255 }],
   ["barcelona_city", "andorra",        { ECONOMY: 280, BUSINESS: 340, MINIVAN: 450, VCLASS: 550, MINIBUS: 630 }],
   // ── Costa Daurada ────────────────────────────────────────────────────────────────
-  ["barcelona_city", "castelldefels", { ECONOMY: 50,  BUSINESS: 60,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 150 }],
+  ["barcelona_city", "castelldefels", { ECONOMY: 50,  BUSINESS: 60,  MINIVAN: 60,  VCLASS: 70,  MINIBUS: 180 }],
   ["barcelona_city", "sitges",        { ECONOMY: 80,  BUSINESS: 100, MINIVAN: 100, VCLASS: 120, MINIBUS: 200 }],
   ["barcelona_city", "cubelles",      { ECONOMY: 90,  BUSINESS: 110, MINIVAN: 110, VCLASS: 130, MINIBUS: 210 }],
   ["barcelona_city", "calafell",      { ECONOMY: 100, BUSINESS: 120, MINIVAN: 120, VCLASS: 140, MINIBUS: 220 }],

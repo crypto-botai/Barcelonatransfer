@@ -27,8 +27,8 @@ const HOURLY_RATES = [
   { class: "Luxury Sedan",          rate: 65,  pax: "1–3",  min: 4 },
   { class: "First Class",           rate: 110, pax: "1–3",  min: 4 },
   { class: "Executive SUV",         rate: 75,  pax: "1–5",  min: 4 },
-  { class: "Minivan (Vito)",        rate: 55,  pax: "1–7",  min: 4 },
-  { class: "Luxury Minivan (V-Class)", rate: 65, pax: "1–7", min: 4 },
+  { class: "Minivan (Vito)",           rate: 55,  pax: "1–8",  min: 4 },
+  { class: "Luxury Minivan (V-Class)", rate: 65,  pax: "1–7",  min: 4 },
   { class: "Minibus",               rate: 160, pax: "1–16", min: 4 },
 ];
 

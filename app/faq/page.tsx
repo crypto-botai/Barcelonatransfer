@@ -58,7 +58,7 @@ const FAQ_GROUPS = [
     items: [
       {
         q: "What vehicles do you offer?",
-        a: "Our fleet includes: Mercedes E-Class (executive saloon, up to 3 pax), Mercedes Vito (executive minivan, up to 7 pax), Mercedes V-Class (luxury minivan, up to 7 pax), and Group Minibuses (up to 16 pax). All are less than 3 years old, air-conditioned, with complimentary water and WiFi.",
+        a: "Our fleet includes: Mercedes E-Class (executive saloon, up to 3 pax), Mercedes Vito (executive minivan, up to 8 pax), Mercedes V-Class (luxury 7-seat MPV, ideal for families), and Group Minibuses (up to 16 pax). All are less than 3 years old, air-conditioned, with complimentary water and WiFi.",
       },
       {
         q: "Are the vehicles clean and well-maintained?",

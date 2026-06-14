@@ -193,7 +193,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       "@type": "Vehicle",
                       name: "Mercedes Vito",
                       vehicleModelDate: "2023",
-                      description: "Executive minivan for groups up to 7 passengers — Barcelona airport transfers",
+                      description: "Executive minivan for groups up to 8 passengers — Barcelona airport transfers",
                       offers: { "@type": "Offer", price: "60", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
                       aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
                     },
@@ -259,7 +259,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {
                   "@type": "Question",
                   name: "What vehicles does Élite BCN Transfers use?",
-                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers operates a fleet of premium Mercedes vehicles: Mercedes V-Class (7 seats, ideal for groups and families), Mercedes E-Class (executive saloon), and Mercedes Vito (executive minivan, up to 7 passengers). All vehicles are less than 3 years old, air-conditioned, and equipped with complimentary water and WiFi." },
+                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers operates a fleet of premium Mercedes vehicles: Mercedes V-Class (7 seats, luxury — ideal for groups and families), Mercedes E-Class (executive saloon, up to 3 pax), and Mercedes Vito (executive minivan, up to 8 passengers). All vehicles are less than 3 years old, air-conditioned, and equipped with complimentary water and WiFi." },
                 },
               ],
             }),

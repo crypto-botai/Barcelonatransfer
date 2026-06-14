@@ -22,7 +22,7 @@ const CLASS_LABEL: Record<string, string> = {
   ELECTRIC_VIP:    "Electric VIP",
   SUV:             "SUV",
   LUXURY_SUV:      "Luxury SUV",
-  MINIVAN:         "Minivan (up to 7 pax)",
+  MINIVAN:         "Minivan (up to 8 pax)",
   LUXURY_MINIVAN:  "Luxury Minivan",
   MINIBUS:         "Minibus (up to 16 pax)",
 };
@@ -45,8 +45,8 @@ async function buildLivePricingSection(): Promise<string> {
 function buildFallbackPricing(): string {
   return `## PRICING (indicative — exact quote provided on confirmation)
 - **Business** (1–3 pax): from €45
-- **Minivan** (4–7 pax): from €65
-- **Minibus** (8–16 pax): from €120
+- **Minivan** (4–8 pax): from €60
+- **Minibus** (9–16 pax): from €180
 Airport surcharge applies | Night surcharge (22:00–06:00): 25%`;
 }
 
@@ -64,7 +64,7 @@ ${langInstruction}
 ## OUR FLEET
 - **Mercedes V-Class** — 7 seats, perfect for groups and families with luggage
 - **Mercedes E-Class** — Executive saloon, ideal for business travel
-- **Mercedes Vito** — Executive minivan, up to 7 passengers
+- **Mercedes Vito** — Executive minivan, up to 8 passengers
 
 All vehicles are: less than 3 years old, air-conditioned, equipped with complimentary water and WiFi, professionally chauffeured.
 
