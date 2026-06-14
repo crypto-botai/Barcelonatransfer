@@ -523,6 +523,7 @@ model AiAgent {
   errorCount  Int         @default(0)
   totalRuns   Int         @default(0)
   avgDurationMs Int       @default(0)
+  lastError   String?     @db.Text
   config      Json        @default("{}")
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt

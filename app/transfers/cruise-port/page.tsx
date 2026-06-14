@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight, Anchor } from "lucide-react";
 
@@ -148,7 +147,6 @@ export default function CruisePortTransferPage() {
         </section>
       </main>
       <Footer />
-      <WhatsAppButton />
     </>
   );
 }

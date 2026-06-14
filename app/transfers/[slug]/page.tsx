@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import destinations from "@/data/destinations.json";
 
@@ -398,7 +397,6 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
       </main>
 
       <Footer />
-      <WhatsAppButton />
     </>
   );
 }

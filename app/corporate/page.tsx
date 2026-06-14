@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -64,7 +63,6 @@ export default function CorporatePage() {
         </section>
       </main>
       <Footer />
-      <WhatsAppButton />
     </>
   );
 }

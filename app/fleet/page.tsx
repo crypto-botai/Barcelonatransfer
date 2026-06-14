@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import FleetSection from "@/components/sections/FleetSection";
 import Link from "next/link";
 
@@ -57,7 +56,6 @@ export default function FleetPage() {
         </section>
       </main>
       <Footer />
-      <WhatsAppButton />
     </>
   );
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
 
 export const metadata: Metadata = {
   title: "Cookie Policy | Élite BCN Transfers",
@@ -150,7 +149,6 @@ export default function CookiesPage() {
         </section>
       </main>
       <Footer />
-      <WhatsAppButton />
     </>
   );
 }
