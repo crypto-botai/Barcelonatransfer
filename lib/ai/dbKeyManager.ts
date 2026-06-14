@@ -143,22 +143,56 @@ export async function addKey(opts: {
   return row.id;
 }
 
-/** Seed DB from GROQ_KEY_1..N, GEMINI_KEY_1..N, OPENROUTER_KEY_1..N env vars. */
+/** Seed DB from env vars. Checks multiple naming conventions. */
 export async function seedKeysFromEnv(): Promise<{ added: number; skipped: number }> {
-  const defs = [
-    { provider: "groq",       prefix: "GROQ_KEY_"       },
-    { provider: "gemini",     prefix: "GEMINI_KEY_"     },
-    { provider: "openrouter", prefix: "OPENROUTER_KEY_" },
+  // Each entry: provider name + ordered list of env var names to try
+  const defs: Array<{ provider: string; vars: string[] }> = [
+    {
+      provider: "groq",
+      vars: [
+        // Standard format
+        "GROQ_KEY_1","GROQ_KEY_2","GROQ_KEY_3","GROQ_KEY_4","GROQ_KEY_5",
+        // Vercel lowercase format (gorq / gorq2 / gorq3 / gorq4)
+        "gorq","gorq2","gorq3","gorq4",
+        // Alternate spellings
+        "GROQ_1","GROQ_2","GROQ_3","GROQ_4",
+        "groq1","groq2","groq3","groq4",
+      ],
+    },
+    {
+      provider: "gemini",
+      vars: [
+        // Standard format
+        "GEMINI_KEY_1","GEMINI_KEY_2","GEMINI_KEY_3","GEMINI_KEY_4","GEMINI_KEY_5",
+        // Vercel lowercase format (gemini1 / gemini2 / gemini3 / gemini4)
+        "gemini1","gemini2","gemini3","gemini4",
+        // Alternate spellings
+        "GEMINI_1","GEMINI_2","GEMINI_3","GEMINI_4",
+        "GOOGLE_AI_KEY",
+      ],
+    },
+    {
+      provider: "openrouter",
+      vars: [
+        "OPENROUTER_KEY_1","OPENROUTER_KEY_2","OPENROUTER_KEY_3","OPENROUTER_KEY_4",
+        "openrouter1","openrouter2","openrouter3","openrouter4",
+        "OPENROUTER_1","OPENROUTER_2","OPENROUTER_3","OPENROUTER_4",
+      ],
+    },
   ];
 
-  let added = 0, skipped = 0;
+  let added = 0, skipped = 0, seq = 0;
 
-  for (const { provider, prefix } of defs) {
-    for (let i = 1; i <= 20; i++) {
-      const raw = process.env[`${prefix}${i}`];
-      if (!raw) break;
+  for (const { provider, vars } of defs) {
+    seq = 0;
+    const seen = new Set<string>(); // deduplicate by raw value
+    for (const envName of vars) {
+      const raw = process.env[envName];
+      if (!raw || seen.has(raw)) continue;
+      seen.add(raw);
+      seq++;
 
-      const label    = `${provider.charAt(0).toUpperCase() + provider.slice(1)} Key ${i}`;
+      const label    = `${provider.charAt(0).toUpperCase() + provider.slice(1)} Key ${seq}`;
       const existing = await prisma.adminApiKey.findFirst({ where: { provider, label } });
       if (existing) { skipped++; continue; }
 
