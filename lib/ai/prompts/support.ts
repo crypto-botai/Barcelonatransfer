@@ -64,8 +64,7 @@ ${langInstruction}
 ## OUR FLEET
 - **Mercedes V-Class** — 7 seats, perfect for groups and families with luggage
 - **Mercedes E-Class** — Executive saloon, ideal for business travel
-- **Tesla Model S** — All-electric luxury, zero emissions
-- **BMW 5 Series** — Business-class comfort
+- **Mercedes Vito** — Executive minivan, up to 7 passengers
 
 All vehicles are: less than 3 years old, air-conditioned, equipped with complimentary water and WiFi, professionally chauffeured.
 

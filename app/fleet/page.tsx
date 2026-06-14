@@ -5,20 +5,20 @@ import FleetSection from "@/components/sections/FleetSection";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: { absolute: "Luxury Fleet Barcelona — Mercedes, Tesla, BMW | Élite BCN" },
+  title: { absolute: "Luxury Fleet Barcelona — Mercedes V-Class & E-Class | Élite BCN" },
   description:
-    "Barcelona transfer fleet: Mercedes V-Class (7 seats), E-Class, Tesla Model S & BMW 5 Series. All vehicles under 3 years old, air-conditioned, WiFi & water.",
+    "Barcelona transfer fleet: Mercedes V-Class (7 seats), Mercedes E-Class & Mercedes Vito. All vehicles under 3 years old, air-conditioned, WiFi & water.",
   alternates: { canonical: "https://www.elitebcn.info/fleet" },
   openGraph: {
-    title: "Luxury Fleet Barcelona — Mercedes, Tesla, BMW | Élite BCN",
-    description: "Mercedes V-Class, E-Class, Tesla Model S, BMW 5 Series. Premium private hire vehicles for Barcelona airport transfers and chauffeur services.",
+    title: "Luxury Fleet Barcelona — Mercedes V-Class & E-Class | Élite BCN",
+    description: "Mercedes V-Class, E-Class & Vito. Premium private hire vehicles for Barcelona airport transfers and chauffeur services.",
     url: "https://www.elitebcn.info/fleet",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Luxury Fleet Barcelona — Mercedes, Tesla, BMW | Élite BCN",
-    description: "Mercedes V-Class, E-Class, Tesla Model S, BMW 5 Series. Premium private hire vehicles for Barcelona airport transfers.",
+    title: "Luxury Fleet Barcelona — Mercedes V-Class & E-Class | Élite BCN",
+    description: "Mercedes V-Class, E-Class & Vito. Premium private hire vehicles for Barcelona airport transfers.",
     images: ["/opengraph-image"],
   },
 };
