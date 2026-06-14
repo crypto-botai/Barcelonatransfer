@@ -6,7 +6,7 @@ import BookFormClient from "./BookFormClient";
 export const metadata: Metadata = {
   title: { absolute: "Book Your Barcelona Transfer | Élite BCN" },
   description:
-    "Book your private luxury transfer in Barcelona in 60 seconds. Fixed prices from €45. BCN El Prat T1/T2, cruise port, hotels, Sitges, Andorra and beyond. Instant confirmation 24/7.",
+    "Book your Barcelona luxury transfer in 60 seconds. Fixed prices from €45. BCN El Prat T1/T2, cruise port, hotels, Sitges & Andorra. Instant confirmation 24/7.",
   alternates: {
     canonical: "https://www.elitebcn.info/book",
   },

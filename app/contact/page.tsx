@@ -5,7 +5,7 @@ import { Mail, Phone, MessageCircle, MapPin } from "lucide-react";
 import ContactFormClient from "./ContactFormClient";
 
 export const metadata: Metadata = {
-  title: "Contact Élite BCN — 24/7 Luxury Transfer Support Barcelona",
+  title: { absolute: "Contact Élite BCN | 24/7 Transfer Support Barcelona" },
   description:
     "Contact Élite BCN Transfers for bookings, support, or enquiries. Available 24/7 by phone, WhatsApp, or email. Barcelona's premier private chauffeur service.",
   alternates: { canonical: "https://www.elitebcn.info/contact" },

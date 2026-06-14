@@ -5,18 +5,18 @@ import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Hourly Chauffeur Hire Barcelona — Private Driver from €45/hr",
-  description: "Book a private chauffeur in Barcelona by the hour from €45/hr (4-hour minimum). Flexible disposal for business meetings, shopping, city tours, events, or day trips. Mercedes, Tesla, BMW.",
+  title: { absolute: "Hourly Chauffeur Barcelona — From €45/hr | Élite BCN" },
+  description: "Private chauffeur in Barcelona by the hour from €45/hr (4-hr minimum). Flexible disposal for meetings, shopping, city tours & events. Mercedes, Tesla, BMW.",
   alternates: { canonical: "https://www.elitebcn.info/hourly" },
   openGraph: {
-    title: "Hourly Chauffeur Hire Barcelona — Private Driver from €45/hr",
+    title: "Hourly Chauffeur Barcelona — From €45/hr | Élite BCN",
     description: "Book a private chauffeur in Barcelona by the hour from €45/hr. Flexible disposal for meetings, shopping, events, or sightseeing.",
     url: "https://www.elitebcn.info/hourly",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Hourly Chauffeur Hire Barcelona — Private Driver from €45/hr",
+    title: "Hourly Chauffeur Barcelona — From €45/hr | Élite BCN",
     description: "Book a private chauffeur in Barcelona by the hour from €45/hr. Flexible disposal for meetings, shopping, events, or sightseeing.",
     images: ["/opengraph-image"],
   },

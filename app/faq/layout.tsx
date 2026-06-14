@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "FAQ — Barcelona Airport Transfer Questions Answered",
+  title: { absolute: "Barcelona Transfer FAQ — Common Questions | Élite BCN" },
   description:
-    "Answers to the most common questions about our Barcelona private transfer service. Pricing, vehicles, booking, cancellations, airport pickups, and more.",
+    "Answers to common questions about Barcelona airport transfers, pricing, booking, cancellation, fleet vehicles and chauffeur services. Book from €45.",
   alternates: { canonical: "https://www.elitebcn.info/faq" },
   openGraph: {
     title: "FAQ — Barcelona Airport Transfers | Élite BCN",

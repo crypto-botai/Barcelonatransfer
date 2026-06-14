@@ -4,18 +4,18 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Corporate Chauffeur Barcelona — Executive Transfers & Business Travel",
-  description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, board meetings, MICE events. Dedicated fleet, monthly invoicing, account manager. VTC licensed.",
+  title: { absolute: "Corporate Chauffeur Barcelona | Élite BCN" },
+  description: "Corporate chauffeur in Barcelona. Executive airport transfers, roadshows, board meetings & MICE events. Monthly invoicing, account manager. VTC licensed.",
   alternates: { canonical: "https://www.elitebcn.info/corporate" },
   openGraph: {
-    title: "Corporate Chauffeur Barcelona — Executive Transfers & Business Travel",
+    title: "Corporate Chauffeur Barcelona | Élite BCN",
     description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, events. Monthly invoicing, account manager.",
     url: "https://www.elitebcn.info/corporate",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Corporate Chauffeur Barcelona — Executive Transfers & Business Travel",
+    title: "Corporate Chauffeur Barcelona | Élite BCN",
     description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, events. Monthly invoicing, account manager.",
     images: ["/opengraph-image"],
   },

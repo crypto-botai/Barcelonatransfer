@@ -10,13 +10,13 @@ import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import FAQSection from "@/components/sections/FAQSection";
 
 export const metadata: Metadata = {
-  title: "Élite BCN | Luxury Airport Transfers Barcelona — Fixed Prices from €45",
+  title: { absolute: "Élite BCN | Barcelona Airport Transfers — From €45" },
   description:
-    "Barcelona's #1 luxury private transfer. Fixed prices from €45 — no surge pricing, ever. BCN El Prat T1/T2, cruise port & hotels. Mercedes, Tesla, BMW. Book instantly 24/7.",
+    "Barcelona's #1 luxury private transfer. Fixed prices from €45, no surge pricing. BCN El Prat T1/T2, cruise port, hotels. Mercedes, Tesla, BMW. 24/7.",
   alternates: { canonical: "https://www.elitebcn.info" },
   openGraph: {
-    title: "Élite BCN | Luxury Airport Transfers Barcelona — Fixed Prices from €45",
-    description: "Barcelona's #1 luxury private transfer. Fixed prices from €45 — no surge pricing, ever. Mercedes, Tesla, BMW. Book 24/7.",
+    title: "Élite BCN | Barcelona Airport Transfers — From €45",
+    description: "Barcelona's #1 luxury private transfer. Fixed prices from €45, no surge pricing. BCN El Prat T1/T2. Mercedes, Tesla, BMW. Book 24/7.",
     url: "https://www.elitebcn.info",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Luxury Private Transfer Barcelona Airport" }],
   },

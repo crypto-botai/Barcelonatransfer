@@ -5,18 +5,18 @@ import Link from "next/link";
 import { Plane, Anchor, Clock, Shield, Star, CheckCircle2 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Barcelona Airport Transfer — BCN El Prat T1 & T2 | Fixed Price",
-  description: "Luxury private transfer from Barcelona El Prat Airport (BCN) from €45. Meet & greet in arrivals hall, real-time flight tracking, 60 min free waiting. Mercedes, Tesla, BMW. Fixed price, no surprises.",
+  title: { absolute: "Barcelona Airport Transfer — BCN El Prat | Élite BCN" },
+  description: "Private transfer from Barcelona Airport from €45. Meet & greet in arrivals, real-time flight tracking, 60 min free waiting. Mercedes, Tesla, BMW. Fixed price.",
   alternates: { canonical: "https://www.elitebcn.info/airport-transfers" },
   openGraph: {
-    title: "Barcelona Airport Transfer — BCN El Prat T1 & T2 | Fixed Price",
+    title: "Barcelona Airport Transfer — BCN El Prat | Élite BCN",
     description: "Private luxury transfer from Barcelona Airport from €45. Meet & greet, flight tracking, 60 min free wait. No surge pricing.",
     url: "https://www.elitebcn.info/airport-transfers",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Airport Transfer — BCN El Prat T1 & T2 | Fixed Price",
+    title: "Barcelona Airport Transfer — BCN El Prat | Élite BCN",
     description: "Private luxury transfer from Barcelona Airport from €45. Meet & greet, flight tracking, 60 min free wait. No surge pricing.",
     images: ["/opengraph-image"],
   },

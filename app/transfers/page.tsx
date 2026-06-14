@@ -5,12 +5,12 @@ import Link from "next/link";
 import { MapPin, ChevronRight, Clock, Star } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Barcelona Private Transfer Destinations — All Routes & Prices",
+  title: { absolute: "Barcelona Transfer Destinations | Élite BCN" },
   description:
-    "Private luxury transfers from Barcelona to all major destinations: Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat, cruise port & more. Fixed prices, no surge pricing.",
+    "Luxury transfers from Barcelona to Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat, cruise port & more. Fixed prices, no surge pricing.",
   alternates: { canonical: "https://www.elitebcn.info/transfers" },
   openGraph: {
-    title: "Barcelona Private Transfer Destinations — All Routes & Prices",
+    title: "Barcelona Transfer Destinations | Élite BCN",
     description: "Fixed-price luxury private transfers from Barcelona Airport to Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat and more.",
     url: "https://www.elitebcn.info/transfers",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],

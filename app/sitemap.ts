@@ -1,10 +1,12 @@
 import { MetadataRoute } from "next";
 import destinations from "@/data/destinations.json";
 
+export const dynamic = "force-dynamic";
+
 const BASE = "https://www.elitebcn.info";
-const NOW  = new Date();
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const NOW = new Date();
   const dynamicPages: MetadataRoute.Sitemap = destinations.map((d) => ({
     url: `${BASE}/transfers/${d.slug}`,
     priority: d.type === "hotel" ? 0.75 : d.type === "cruise" ? 0.8 : d.type === "event" ? 0.8 : 0.85,

@@ -5,19 +5,19 @@ import FleetSection from "@/components/sections/FleetSection";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Luxury Transfer Fleet Barcelona — Mercedes, Tesla, BMW",
+  title: { absolute: "Luxury Fleet Barcelona — Mercedes, Tesla, BMW | Élite BCN" },
   description:
-    "Our Barcelona private transfer fleet: Mercedes V-Class (7 seats), Mercedes E-Class, Tesla Model S (electric), BMW 5 Series. All vehicles under 3 years old, air-conditioned, complimentary WiFi & water.",
+    "Barcelona transfer fleet: Mercedes V-Class (7 seats), E-Class, Tesla Model S & BMW 5 Series. All vehicles under 3 years old, air-conditioned, WiFi & water.",
   alternates: { canonical: "https://www.elitebcn.info/fleet" },
   openGraph: {
-    title: "Luxury Transfer Fleet Barcelona — Mercedes, Tesla, BMW",
+    title: "Luxury Fleet Barcelona — Mercedes, Tesla, BMW | Élite BCN",
     description: "Mercedes V-Class, E-Class, Tesla Model S, BMW 5 Series. Premium private hire vehicles for Barcelona airport transfers and chauffeur services.",
     url: "https://www.elitebcn.info/fleet",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Luxury Transfer Fleet Barcelona — Mercedes, Tesla, BMW",
+    title: "Luxury Fleet Barcelona — Mercedes, Tesla, BMW | Élite BCN",
     description: "Mercedes V-Class, E-Class, Tesla Model S, BMW 5 Series. Premium private hire vehicles for Barcelona airport transfers.",
     images: ["/opengraph-image"],
   },
