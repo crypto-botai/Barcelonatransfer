@@ -60,8 +60,8 @@ const AGENTS: AgentCfg[] = [
   { id:"a-seo", name:"SEO Specialist",  agentKey:"seo",          roomId:"seo",        hc:"#c084fc", bc:"#3b0764", phrases:["Scanning meta","Keyword found","Core Vitals 98","Backlinks +3","Schema ready"] },
   { id:"a-ana", name:"Analytics AI",    agentKey:"analytics",    roomId:"analytics",  hc:"#fbbf24", bc:"#451a03", phrases:["Traffic +12%","Conversion up","Report ready","Funnel analysis","Dashboard live"] },
   { id:"a-sup", name:"Support AI",      agentKey:"support",      roomId:"support",    hc:"#34d399", bc:"#064e3b", phrases:["Chat resolved","New inquiry","FAQ sent","Escalating","CSAT 98%"] },
-  { id:"a-mkt", name:"Marketing AI",    agentKey:null,           roomId:"marketing",  hc:"#f87171", bc:"#450a0a", phrases:["Blog drafted","Campaign live","Ad optimized","Content ready","Reach +18%"] },
-  { id:"a-kb",  name:"Knowledge AI",    agentKey:null,           roomId:"knowledge",  hc:"#fcd34d", bc:"#451a03", phrases:["FAQ updated","Entry indexed","Search improved","Doc added","KB synced"] },
+  { id:"a-mkt", name:"Marketing AI",    agentKey:"marketing",    roomId:"marketing",  hc:"#f87171", bc:"#450a0a", phrases:["Blog drafted","Campaign live","Ad optimized","Content ready","Reach +18%"] },
+  { id:"a-kb",  name:"Knowledge AI",    agentKey:"knowledge",    roomId:"knowledge",  hc:"#fcd34d", bc:"#451a03", phrases:["FAQ updated","Entry indexed","Search improved","Doc added","KB synced"] },
   { id:"a-hlt", name:"Health Monitor",  agentKey:"health",       roomId:"health",     hc:"#22d3ee", bc:"#0c4a6e", phrases:["Site OK","Page speed 94","Gateway OK","SSL valid","No errors"] },
 ];
 
@@ -954,7 +954,15 @@ export default function OfficeCanvas({ initialData }: { initialData: HQData }) {
       const neighbors = ROOMS.filter(r => r.id !== room.id && r.id !== "meeting" && r.id !== "cafe" && (r.col === room.col || r.row === room.row));
       const goVisit   = Math.random() < 0.2 && neighbors.length > 0;
       const targetId  = goVisit ? neighbors[Math.floor(Math.random() * neighbors.length)].id : ag.roomId;
-      const phrase    = ag.phrases[Math.floor(Math.random() * ag.phrases.length)];
+
+      // Prefer real last-log message over fake phrase (70% if available)
+      let phrase = ag.phrases[Math.floor(Math.random() * ag.phrases.length)];
+      if (ag.agentKey) {
+        const dbAgent = hqRef.current.agents.find(a => a.name === ag.agentKey);
+        if (dbAgent?.lastLog && Math.random() < 0.7) {
+          phrase = dbAgent.lastLog.slice(0, 45);
+        }
+      }
 
       assignTask(ag, phrase, targetId);
     }
@@ -962,6 +970,32 @@ export default function OfficeCanvas({ initialData }: { initialData: HQData }) {
     tick();
     return () => clearInterval(tickRef.current);
   }, [assignTask]);
+
+  // ── Real DB status injection ──────────────────────────────────
+  // Every 5 s, sync real agent status from the DB snapshot (hqRef) into
+  // simulation speech bubbles. RUNNING agents show their live task text;
+  // ERROR agents show a warning. IDLE agents keep their ambient simulation.
+  useEffect(() => {
+    const iv = setInterval(() => {
+      hqRef.current.agents.forEach(dbAgent => {
+        const canvasAgent = AGENTS.find(a => a.agentKey === dbAgent.name);
+        if (!canvasAgent) return;
+        const s = simRef.current[canvasAgent.id];
+        if (!s) return;
+
+        if (dbAgent.status === "RUNNING") {
+          const text = (dbAgent.lastLog ?? `${dbAgent.name} running…`).slice(0, 45);
+          s.speech  = text;
+          s.speechT = Math.max(s.speechT, 20);
+        } else if (dbAgent.status === "ERROR") {
+          const errText = dbAgent.lastError ? dbAgent.lastError.slice(0, 30) : "check agent reports";
+          s.speech  = `⚠ ${errText}`;
+          s.speechT = Math.max(s.speechT, 15);
+        }
+      });
+    }, 5_000);
+    return () => clearInterval(iv);
+  }, []);
 
   // ── Daily standup animation (every 4 minutes real-time) ───────
   useEffect(() => {

@@ -148,29 +148,39 @@ const PROVIDERS: Record<string, ProviderDef> = {
 };
 
 // ─── Primary provider per agent ───────────────────────────────────────────────
+// "Primary" = first live key tried. Display only — actual routing from FALLBACK_CHAIN.
 export const AGENT_PROVIDER: Record<AgentName, string> = {
-  support:      "kimi",
-  booking:      "deepseek",
-  orchestrator: "nvidia_mistral",
-  health:       "openrouter",
-  seo:          "gemma",
-  analytics:    "github",
-  marketing:    "minimax",
-  knowledge:    "glm",
+  support:      "kimi",          // complex: keep NVIDIA NIM quality
+  booking:      "deepseek",      // complex: needs best reasoning
+  orchestrator: "groq",          // orchestration: fast, free, no credit burn
+  health:       "groq",          // light task: groq free is fast + reliable
+  seo:          "groq",          // light task: groq free
+  analytics:    "groq",          // light task: groq free
+  marketing:    "minimax",       // creative: NVIDIA NIM gives best quality
+  knowledge:    "glm",           // knowledge: NVIDIA NIM GLM
 };
 
 // ─── Ordered fallback chains per agent ───────────────────────────────────────
-// First entry = primary. Remaining = fallback in priority order.
-// Keys not in the list will never be tried for that agent.
+// STRATEGY:
+//   • Light tasks (health, seo, analytics, orchestrator): FREE-FIRST
+//     → groq → gemini → github → openrouter → NVIDIA NIM → paid as last resort
+//   • Heavy tasks (booking, support, knowledge, marketing): QUALITY-FIRST
+//     → NVIDIA NIM primaries → groq/gemini fallback → paid last resort
+//
+// This conserves NVIDIA NIM credits for tasks that need quality reasoning.
+// Groq (Llama 3.1), Gemini Flash, GitHub (GPT-4o-mini) are rate-limited but free.
 const FALLBACK_CHAIN: Record<string, string[]> = {
-  support:      ["kimi",         "glm",    "deepseek", "minimax", "nvidia_mistral", "gemma", "groq",   "openrouter"],
-  booking:      ["deepseek",     "nvidia_mistral", "kimi", "glm", "minimax", "mistral", "cerebras"],
-  orchestrator: ["nvidia_mistral","mistral", "kimi",   "openrouter", "groq"],
-  health:       ["openrouter",   "glm",    "minimax",  "groq",   "mistral"],
-  seo:          ["gemma",        "nvidia_mistral", "openrouter", "groq"],
-  analytics:    ["github",       "deepseek", "kimi",   "groq"],
-  marketing:    ["minimax",      "kimi",   "glm",      "nvidia_mistral", "groq"],
-  knowledge:    ["glm",          "kimi",   "minimax",  "nvidia_mistral", "groq"],
+  // ── Light tasks — free models first, NVIDIA NIM as backup ─────────────────
+  health:       ["groq", "gemini", "github", "openrouter", "glm",    "nvidia_mistral", "mistral"],
+  seo:          ["groq", "gemini", "github", "openrouter", "gemma",  "nvidia_mistral", "mistral"],
+  analytics:    ["groq", "gemini", "github", "openrouter", "kimi",   "deepseek",       "mistral"],
+  orchestrator: ["groq", "gemini", "github",               "nvidia_mistral", "mistral", "kimi"],
+
+  // ── Quality tasks — NVIDIA NIM first, free models as fallback ─────────────
+  support:      ["kimi", "glm", "deepseek", "minimax", "nvidia_mistral", "groq", "gemini", "openrouter"],
+  booking:      ["deepseek", "kimi", "nvidia_mistral", "glm",   "groq", "gemini", "mistral", "cerebras"],
+  marketing:    ["minimax",  "kimi", "glm", "nvidia_mistral",   "groq", "gemini"],
+  knowledge:    ["glm",      "kimi", "minimax", "nvidia_mistral","groq", "gemini"],
 };
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────

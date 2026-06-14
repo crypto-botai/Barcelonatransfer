@@ -67,12 +67,15 @@ function timeAgo(d: Date | string | null): string {
 
 /* ── Main HQ Client ──────────────────────────────────────────────────────── */
 type View = "map" | "agents" | "activity" | "ceo" | "comms";
+type AgentAction = "idle" | "running" | "done" | "error";
 
 export default function HQClient({ initialData }: { initialData: HQData }) {
   const [data, setData]               = useState<HQData>(initialData);
   const [view, setView]               = useState<View>("map");
   const [selectedNode, setSelectedNode] = useState<OrgNode | null>(null);
   const [tick, setTick]               = useState(0);
+  const [runAllState, setRunAllState] = useState<AgentAction>("idle");
+  const [resetState,  setResetState]  = useState<AgentAction>("idle");
 
   const refresh = useCallback(async () => {
     try {
@@ -80,6 +83,38 @@ export default function HQClient({ initialData }: { initialData: HQData }) {
       if (r.ok) setData(await r.json());
     } catch {}
   }, []);
+
+  // Run all agents and refresh dashboard on completion
+  const runAllAgents = useCallback(async () => {
+    if (runAllState === "running") return;
+    setRunAllState("running");
+    try {
+      const r = await fetch("/api/ai/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agentName: "all" }),
+      });
+      setRunAllState(r.ok ? "done" : "error");
+      await refresh();
+    } catch {
+      setRunAllState("error");
+    }
+    setTimeout(() => setRunAllState("idle"), 4000);
+  }, [runAllState, refresh]);
+
+  // Reset all ERROR / WARNING agents to IDLE
+  const resetErrors = useCallback(async () => {
+    if (resetState === "running") return;
+    setResetState("running");
+    try {
+      const r = await fetch("/api/ai/run", { method: "PATCH" });
+      setResetState(r.ok ? "done" : "error");
+      await refresh();
+    } catch {
+      setResetState("error");
+    }
+    setTimeout(() => setResetState("idle"), 3000);
+  }, [resetState, refresh]);
 
   useEffect(() => {
     const iv = setInterval(() => { refresh(); setTick(t => t + 1); }, 15000);
@@ -152,6 +187,41 @@ export default function HQClient({ initialData }: { initialData: HQData }) {
               <div className="flex items-center gap-1.5 pl-4 border-l border-white/10">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#22c55e] hq-pulse" />
                 <span className="text-[9px] text-white/40 uppercase tracking-widest">Live</span>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center gap-2 pl-4 border-l border-white/10">
+                {/* Reset Errors — only shown when there are error agents */}
+                {metrics.agentsError > 0 && (
+                  <button
+                    onClick={resetErrors}
+                    disabled={resetState === "running"}
+                    className="px-3 py-1.5 rounded text-[10px] font-mono uppercase tracking-wider transition-all border"
+                    style={{
+                      background: resetState === "done" ? "rgba(34,197,94,.15)" : "rgba(239,68,68,.1)",
+                      borderColor: resetState === "done" ? "rgba(34,197,94,.4)" : "rgba(239,68,68,.4)",
+                      color: resetState === "done" ? "#22c55e" : "#ef4444",
+                      opacity: resetState === "running" ? 0.6 : 1,
+                    }}
+                  >
+                    {resetState === "running" ? "Resetting…" : resetState === "done" ? "✓ Reset" : `⚠ Reset ${metrics.agentsError} Error${metrics.agentsError > 1 ? "s" : ""}`}
+                  </button>
+                )}
+
+                {/* Run All Agents */}
+                <button
+                  onClick={runAllAgents}
+                  disabled={runAllState === "running"}
+                  className="px-3 py-1.5 rounded text-[10px] font-mono uppercase tracking-wider transition-all border"
+                  style={{
+                    background: runAllState === "done" ? "rgba(34,197,94,.15)" : runAllState === "error" ? "rgba(239,68,68,.1)" : "rgba(201,168,76,.1)",
+                    borderColor: runAllState === "done" ? "rgba(34,197,94,.4)" : runAllState === "error" ? "rgba(239,68,68,.4)" : "rgba(201,168,76,.4)",
+                    color: runAllState === "done" ? "#22c55e" : runAllState === "error" ? "#ef4444" : "#c9a84c",
+                    opacity: runAllState === "running" ? 0.6 : 1,
+                  }}
+                >
+                  {runAllState === "running" ? "▶ Running…" : runAllState === "done" ? "✓ All Done" : runAllState === "error" ? "⚠ Error" : "▶ Run All"}
+                </button>
               </div>
             </div>
           </div>

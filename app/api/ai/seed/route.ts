@@ -28,13 +28,16 @@ export async function POST(req: NextRequest) {
   }
 
   // 2. Agent records
+  // Add new agents here to have them appear in the HQ dashboard.
   const agentDefs = [
     { name: "support",      description: "Customer support chat — auto-replies to visitor questions using the knowledge base." },
     { name: "booking",      description: "Booking intelligence — scores leads, auto-confirms paid bookings, alerts admin." },
     { name: "orchestrator", description: "Master orchestrator — coordinates all agents on the daily cron schedule." },
-    { name: "health",       description: "Website health — checks for broken links, SEO issues, and uptime daily." },
+    { name: "health",       description: "Website health — checks all key pages for uptime and response time daily." },
     { name: "seo",          description: "SEO monitor — weekly scan of all pages for metadata and content improvements." },
-    { name: "analytics",    description: "Analytics agent — surfaces insights from traffic and conversion data." },
+    { name: "analytics",    description: "Analytics agent — surfaces revenue, conversion, and booking trend insights." },
+    { name: "marketing",    description: "Marketing & Growth — drafts social posts, newsletters, and campaigns for admin approval." },
+    { name: "knowledge",    description: "Knowledge Manager — mines chat logs to keep the AI knowledge base accurate and complete." },
   ];
 
   let agentsCreated = 0;

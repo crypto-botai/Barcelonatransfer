@@ -14,6 +14,10 @@ export interface HQAgent {
   lastError: string | null;
   memoryCount: number;
   tasksToday: { completed: number; failed: number; running: number; queued: number };
+  // Real last action — used for live speech bubbles in the HQ canvas
+  lastLog: string | null;
+  lastLogAction: string | null;
+  lastLogAt: Date | null;
 }
 
 export interface HQTask {
@@ -96,6 +100,7 @@ export async function getHQData(): Promise<HQData> {
     kbCount,
     budgetConfig,
     monthlySpend,
+    latestLogsPerAgent,
   ] = await Promise.all([
     prisma.aiAgent.findMany({ orderBy: { name: "asc" } }),
 
@@ -134,6 +139,14 @@ export async function getHQData(): Promise<HQData> {
     prisma.knowledgeBase.count({ where: { isActive: true } }),
     prisma.aiBudgetConfig.findFirst(),
     prisma.aiLog.aggregate({ where: { createdAt: { gte: monthStart } }, _sum: { costCents: true } }),
+    // Most recent meaningful log per agent (skip raw token-tracking entries)
+    prisma.aiLog.findMany({
+      where: { agentId: { not: null }, action: { notIn: ["api_call"] } },
+      orderBy: { createdAt: "desc" },
+      distinct: ["agentId"],
+      take: 30,
+      select: { agentId: true, message: true, action: true, createdAt: true },
+    }),
   ]);
 
   let revenueToday = 0;
@@ -148,6 +161,11 @@ export async function getHQData(): Promise<HQData> {
   // Build enrichment maps
   const memoryMap: Record<string, number> = {};
   for (const m of memoryCounts) if (m.agentId) memoryMap[m.agentId] = m._count;
+
+  const logMap: Record<string, { message: string; action: string; createdAt: Date }> = {};
+  for (const l of latestLogsPerAgent) {
+    if (l.agentId) logMap[l.agentId] = { message: l.message, action: l.action, createdAt: l.createdAt };
+  }
 
   const taskMap: Record<string, Record<string, number>> = {};
   for (const t of tasksByAgentStatus) {
@@ -167,7 +185,10 @@ export async function getHQData(): Promise<HQData> {
     avgDurationMs: a.avgDurationMs,
     lastRunAt:    a.lastRunAt,
     lastError:    a.lastError,
-    memoryCount:  memoryMap[a.id] ?? 0,
+    memoryCount:   memoryMap[a.id] ?? 0,
+    lastLog:       logMap[a.id]?.message   ?? null,
+    lastLogAction: logMap[a.id]?.action    ?? null,
+    lastLogAt:     logMap[a.id]?.createdAt ?? null,
     tasksToday: {
       completed: taskMap[a.id]?.COMPLETED ?? 0,
       failed:    taskMap[a.id]?.FAILED    ?? 0,
