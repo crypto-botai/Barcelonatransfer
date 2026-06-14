@@ -26,6 +26,7 @@
  */
 
 import { getKeyStatus, markSuccess, markFailed } from "@/lib/ai/keyManager";
+import { pickKey, markDbKeyFailed, markDbKeySuccess } from "@/lib/ai/dbKeyManager";
 
 export type AgentName =
   | "support"
@@ -162,25 +163,23 @@ export const AGENT_PROVIDER: Record<AgentName, string> = {
 
 // ─── Ordered fallback chains per agent ───────────────────────────────────────
 // STRATEGY:
-//   • Light tasks (health, seo, analytics, orchestrator): FREE-FIRST
-//     → groq → gemini → github → openrouter → NVIDIA NIM → paid as last resort
-//   • Heavy tasks (booking, support, knowledge, marketing): QUALITY-FIRST
-//     → NVIDIA NIM primaries → groq/gemini fallback → paid last resort
+//   • Light tasks: DB pool keys (groq/gemini/openrouter) → github (env) → paid last resort
+//   • Heavy tasks: DB pool keys first, then NVIDIA NIM, then paid fallbacks
 //
-// This conserves NVIDIA NIM credits for tasks that need quality reasoning.
-// Groq (Llama 3.1), Gemini Flash, GitHub (GPT-4o-mini) are rate-limited but free.
+// DB keys (from admin_api_keys table) are tried before any env-var key.
+// NVIDIA NIM removed from light chains — conserved for quality tasks only.
 const FALLBACK_CHAIN: Record<string, string[]> = {
-  // ── Light tasks — free models first, NVIDIA NIM as backup ─────────────────
-  health:       ["groq", "gemini", "github", "openrouter", "glm",    "nvidia_mistral", "mistral"],
-  seo:          ["groq", "gemini", "github", "openrouter", "gemma",  "nvidia_mistral", "mistral"],
-  analytics:    ["groq", "gemini", "github", "openrouter", "kimi",   "deepseek",       "mistral"],
-  orchestrator: ["groq", "gemini", "github",               "nvidia_mistral", "mistral", "kimi"],
+  // ── Light tasks — DB pool keys first, then github free, paid as last resort ─
+  health:       ["groq", "gemini", "openrouter", "github", "mistral"],
+  seo:          ["groq", "gemini", "openrouter", "github", "mistral"],
+  analytics:    ["groq", "gemini", "openrouter", "github", "mistral"],
+  orchestrator: ["groq", "gemini", "github",               "nvidia_mistral", "mistral"],
 
-  // ── Quality tasks — NVIDIA NIM first, free models as fallback ─────────────
-  support:      ["kimi", "glm", "deepseek", "minimax", "nvidia_mistral", "groq", "gemini", "openrouter"],
-  booking:      ["deepseek", "kimi", "nvidia_mistral", "glm",   "groq", "gemini", "mistral", "cerebras"],
-  marketing:    ["minimax",  "kimi", "glm", "nvidia_mistral",   "groq", "gemini"],
-  knowledge:    ["glm",      "kimi", "minimax", "nvidia_mistral","groq", "gemini"],
+  // ── Quality tasks — NVIDIA NIM first, DB pool as fallback ─────────────────
+  support:      ["kimi", "glm", "deepseek", "minimax", "groq", "gemini", "openrouter"],
+  booking:      ["deepseek", "kimi", "nvidia_mistral", "glm", "groq", "gemini", "mistral"],
+  marketing:    ["minimax",  "kimi", "glm", "nvidia_mistral",  "groq", "gemini"],
+  knowledge:    ["glm",      "kimi", "minimax", "nvidia_mistral", "groq", "gemini"],
 };
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
@@ -195,12 +194,6 @@ function resolveChain(agentName: string): ProviderDef[] {
       if (getKeyStatus(p.envKey, p.label) === "dead") return false; // permanently dead
       return true;
     });
-}
-
-function apiKey(p: ProviderDef): string {
-  const k = process.env[p.envKey] ?? "";
-  if (!k) throw new Error(`Missing env var ${p.envKey}`);
-  return k;
 }
 
 function buildHeaders(p: ProviderDef, key: string): Record<string, string> {
@@ -230,15 +223,27 @@ export async function callProvider(
   let lastError: Error = new Error("No providers attempted");
 
   for (const p of chain) {
-    // Skip cooling keys (will be auto-revived by keyManager on next status check)
+    // Skip cooling env-var keys
     if (getKeyStatus(p.envKey, p.label) === "cooling") continue;
+
+    // Prefer a DB key for this provider; fall back to single env-var key
+    const dbEntry = await pickKey(p.key, agentName).catch(() => null);
+    let rawKey: string;
+    let dbKeyId: string | null = null;
+
+    if (dbEntry) {
+      rawKey  = dbEntry.rawKey;
+      dbKeyId = dbEntry.id;
+    } else {
+      rawKey = process.env[p.envKey] ?? "";
+      if (!rawKey) continue;
+    }
 
     const t0 = Date.now();
     try {
-      const key = apiKey(p);
       const res = await fetch(`${p.baseURL}/chat/completions`, {
         method:  "POST",
-        headers: buildHeaders(p, key),
+        headers: buildHeaders(p, rawKey),
         body: JSON.stringify({
           model:       p.model,
           messages,
@@ -255,10 +260,11 @@ export async function callProvider(
         const body = await res.text().catch(() => "");
         const isTransient = res.status === 429 || res.status >= 500 || body.includes("quota") || body.includes("rate_limit");
         const reason = `HTTP ${res.status}: ${body.slice(0, 150)}`;
-        markFailed(p.envKey, reason, p.label);
+        if (dbKeyId) await markDbKeyFailed(dbKeyId, reason).catch(() => {});
+        else markFailed(p.envKey, reason, p.label);
         lastError = new Error(`[${p.label}] ${reason}`);
-        if (isTransient) continue; // try next provider
-        throw lastError;           // non-transient error — stop
+        if (isTransient) continue;
+        throw lastError;
       }
 
       const data = await res.json() as {
@@ -271,7 +277,8 @@ export async function callProvider(
       const outputTokens = data.usage?.completion_tokens ?? 0;
       const costCents    = computeCost(p, inputTokens, outputTokens);
 
-      markSuccess(p.envKey, latency, p.label);
+      if (dbKeyId) await markDbKeySuccess(dbKeyId).catch(() => {});
+      else markSuccess(p.envKey, latency, p.label);
 
       return { text, inputTokens, outputTokens, costCents, provider: p.label, model: p.model, latencyMs: latency };
 
@@ -280,14 +287,12 @@ export async function callProvider(
       const msg = err instanceof Error ? err.message : String(err);
 
       if ((err as Error).name === "TimeoutError") {
-        markFailed(p.envKey, `Timeout after ${latency}ms`, p.label);
+        const reason = `Timeout after ${latency}ms`;
+        if (dbKeyId) await markDbKeyFailed(dbKeyId, reason).catch(() => {});
+        else markFailed(p.envKey, reason, p.label);
         lastError = new Error(`[${p.label}] Timeout`);
         continue;
       }
-      if (msg.includes("Missing env var")) {
-        continue; // already filtered by resolveChain but be safe
-      }
-      // Already marked failed above for HTTP errors — re-throw non-transient
       lastError = err instanceof Error ? err : new Error(msg);
     }
   }
@@ -313,13 +318,23 @@ export async function* streamProvider(
   for (const p of chain) {
     if (getKeyStatus(p.envKey, p.label) === "cooling") continue;
 
+    const dbEntry = await pickKey(p.key, agentName).catch(() => null);
+    let rawKey: string;
+    let dbKeyId: string | null = null;
+
+    if (dbEntry) {
+      rawKey  = dbEntry.rawKey;
+      dbKeyId = dbEntry.id;
+    } else {
+      rawKey = process.env[p.envKey] ?? "";
+      if (!rawKey) continue;
+    }
+
     const t0 = Date.now();
     try {
-      const key = apiKey(p);
-
       const res = await fetch(`${p.baseURL}/chat/completions`, {
         method:  "POST",
-        headers: buildHeaders(p, key),
+        headers: buildHeaders(p, rawKey),
         body: JSON.stringify({
           model:          p.model,
           messages,
@@ -335,13 +350,14 @@ export async function* streamProvider(
       if (!res.ok) {
         const body = await res.text().catch(() => "");
         const isTransient = res.status === 429 || res.status >= 500 || body.includes("quota");
-        markFailed(p.envKey, `HTTP ${res.status}`, p.label);
-        lastError = new Error(`[${p.label}] HTTP ${res.status}`);
+        const reason = `HTTP ${res.status}`;
+        if (dbKeyId) await markDbKeyFailed(dbKeyId, reason).catch(() => {});
+        else markFailed(p.envKey, reason, p.label);
+        lastError = new Error(`[${p.label}] ${reason}`);
         if (isTransient) continue;
         throw lastError;
       }
 
-      // Successfully connected — stream from this provider
       const reader  = res.body!.getReader();
       const decoder = new TextDecoder();
       let sseBuffer    = "";
@@ -384,7 +400,8 @@ export async function* streamProvider(
       const latency   = Date.now() - t0;
       const costCents = computeCost(p, inputTokens, outputTokens);
 
-      markSuccess(p.envKey, latency, p.label);
+      if (dbKeyId) await markDbKeySuccess(dbKeyId).catch(() => {});
+      else markSuccess(p.envKey, latency, p.label);
 
       yield { type: "done", inputTokens, outputTokens, costCents, provider: p.label, model: p.model, latencyMs: latency };
       return;
@@ -392,12 +409,13 @@ export async function* streamProvider(
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       if ((err as Error).name === "TimeoutError") {
-        markFailed(p.envKey, "Stream timeout", p.label);
-        lastError = new Error(`[${p.label}] Stream timeout`);
+        const reason = "Stream timeout";
+        if (dbKeyId) await markDbKeyFailed(dbKeyId, reason).catch(() => {});
+        else markFailed(p.envKey, reason, p.label);
+        lastError = new Error(`[${p.label}] ${reason}`);
         continue;
       }
       lastError = err instanceof Error ? err : new Error(msg);
-      if (msg.includes("Missing env var")) continue;
     }
   }
 

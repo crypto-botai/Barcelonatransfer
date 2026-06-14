@@ -739,3 +739,31 @@ model CompetitorConfig {
 
   @@map("competitor_configs")
 }
+
+// ── DB-backed API key pool ──────────────────────────────────────────────────
+// Keys are AES-256-GCM encrypted at rest. The plaintext key is NEVER stored
+// and NEVER sent to the frontend. Decryption happens server-side only at call time.
+//
+// provider:      "gemini" | "groq" | "openrouter"
+// assignedAgent: agent name (e.g. "booking") OR "pool" (shared by all agents)
+// status:        "live" | "cooling" | "dead"
+// cooldownUntil: set to now+24h on failure; null when live
+model AdminApiKey {
+  id            String    @id @default(cuid())
+  provider      String                      // "gemini" | "groq" | "openrouter"
+  label         String                      // human-readable, e.g. "Groq Key 1"
+  encryptedKey  String    @db.Text          // AES-256-GCM(iv+tag+ciphertext), hex-encoded
+  assignedAgent String    @default("pool")  // agent name OR "pool"
+  status        String    @default("live")  // "live" | "cooling" | "dead"
+  cooldownUntil DateTime?                   // null = no cooldown; set on failure
+  lastUsedAt    DateTime?
+  lastError     String?   @db.Text
+  requestCount  Int       @default(0)
+  isEnabled     Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([provider, status])
+  @@index([assignedAgent, status])
+  @@map("admin_api_keys")
+}
