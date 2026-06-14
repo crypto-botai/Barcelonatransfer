@@ -13,10 +13,11 @@ async function isAdmin(): Promise<boolean> {
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   if (!await isAdmin()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { id } = await params;
   const body = await req.json().catch(() => ({}));
   const patch: Record<string, unknown> = {};
 
@@ -24,22 +25,22 @@ export async function PATCH(
   if (body.assignedAgent !== undefined) patch.assignedAgent = body.assignedAgent;
   if (body.isEnabled     !== undefined) patch.isEnabled     = body.isEnabled;
 
-  // Explicit revive: reset cooling / dead back to live
   if (body.status === "live") {
     patch.status        = "live";
     patch.cooldownUntil = null;
     patch.lastError     = null;
   }
 
-  const row = await prisma.adminApiKey.update({ where: { id: params.id }, data: patch });
+  const row = await prisma.adminApiKey.update({ where: { id }, data: patch });
   return NextResponse.json({ ok: true, row });
 }
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   if (!await isAdmin()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  await prisma.adminApiKey.delete({ where: { id: params.id } });
+  const { id } = await params;
+  await prisma.adminApiKey.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }

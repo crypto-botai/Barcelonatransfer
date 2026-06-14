@@ -9,12 +9,13 @@ export const dynamic = "force-dynamic";
 
 export async function POST(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const key = await prisma.adminApiKey.findUnique({ where: { id: params.id } });
+  const { id } = await params;
+  const key = await prisma.adminApiKey.findUnique({ where: { id } });
   if (!key) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   let rawKey: string;
@@ -27,9 +28,9 @@ export async function POST(
   const result = await testRawKey(key.provider, rawKey);
 
   if (result.ok) {
-    await markDbKeySuccess(params.id);
+    await markDbKeySuccess(id);
   } else {
-    await markDbKeyFailed(params.id, result.error ?? "Test failed");
+    await markDbKeyFailed(id, result.error ?? "Test failed");
   }
 
   return NextResponse.json(result);
