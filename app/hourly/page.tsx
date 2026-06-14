@@ -47,7 +47,7 @@ export default function HourlyPage() {
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Your professional chauffeur at complete disposal for meetings, shopping, touring, or multi-stop business days. Minimum 4 hours.
             </p>
-            <Link href="/book?type=hourly" className="btn-gold px-8 py-4 rounded-xl font-semibold">
+            <Link href="/book" className="btn-gold px-8 py-4 rounded-xl font-semibold">
               Book Hourly Chauffeur
             </Link>
           </div>
@@ -64,7 +64,7 @@ export default function HourlyPage() {
                   </p>
                   <p className="text-dark-500 text-xs mb-1">per hour · {r.pax} passengers</p>
                   <p className="text-dark-500 text-xs mb-5">Minimum {r.min} hours</p>
-                  <Link href="/book?type=hourly" className="btn-gold block py-2.5 rounded-lg text-xs font-semibold">
+                  <Link href="/book" className="btn-gold block py-2.5 rounded-lg text-xs font-semibold">
                     Book Now
                   </Link>
                 </div>

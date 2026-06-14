@@ -109,7 +109,7 @@ function PriceTable({ data, search }: { data: Row[]; search: string }) {
               <td className="py-3.5 px-3 text-center text-sm text-white font-medium">€{r.mbs}</td>
               <td className="py-3.5 px-4">
                 <Link
-                  href={`/book?route=${encodeURIComponent(r.route)}`}
+                  href="/book"
                   className="text-xs text-gold-500/70 hover:text-gold-400 transition-colors whitespace-nowrap"
                 >
                   Book →

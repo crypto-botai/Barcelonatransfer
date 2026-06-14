@@ -39,7 +39,7 @@ function FleetCardInner({
         )}
         <Image
           src={vehicle.image}
-          alt={asHeading ? vehicle.label : ""}
+          alt={vehicle.label}
           fill
           sizes="(max-width: 1024px) 268px, (max-width: 1280px) 33vw, 25vw"
           className="object-contain p-6 transition-transform duration-500 ease-out group-hover:scale-[1.04]"

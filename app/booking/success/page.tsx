@@ -288,7 +288,7 @@ function SuccessInner() {
             <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6">
               <XCircle size={36} className="text-red-400" />
             </div>
-            <h1 className="font-display text-3xl text-white mb-2">Payment Failed</h1>
+            <h1 className="font-display text-3xl text-white mb-2">Payment Unsuccessful</h1>
             <p className="text-dark-400 mb-8">
               Your payment could not be processed. No charge was made. Please try again or contact us.
             </p>
