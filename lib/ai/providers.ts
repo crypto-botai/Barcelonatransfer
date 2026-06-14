@@ -1,16 +1,16 @@
 /**
- * Multi-provider AI client — NVIDIA NIM primary, 11 providers as fallback pool.
+ * Multi-provider AI client — Groq + Gemini primary, with fallback pool.
  * All providers use the OpenAI-compatible chat completions format.
  *
  * ─── AGENT → PRIMARY PROVIDER ────────────────────────────────────────────────
- *   support      → Kimi K2.6  (NVIDIA_KIMI_KEY)
- *   booking      → DeepSeek V4 Pro (NVIDIA_DEEPSEEK_KEY)
- *   orchestrator → Mistral Medium 3.5 (NVIDIA_MISTRAL_KEY)
- *   health       → OpenRouter (OPENROUTER_API_KEY)
- *   seo          → Gemma 4 31B (NVIDIA_MISTRAL_KEY — shared, own key not needed)
- *   analytics    → GitHub Models (GITHUB_AI_TOKEN)
- *   marketing    → MiniMax M3 (NVIDIA_MINIMAX_KEY)
- *   knowledge    → GLM 5.1 (NVIDIA_GLM_KEY)
+ *   support      → Groq Llama  (GROQ_API_KEY / DB pool)
+ *   booking      → Groq Llama  (GROQ_API_KEY / DB pool)
+ *   orchestrator → Groq Llama  (GROQ_API_KEY / DB pool)
+ *   health       → Groq Llama  (GROQ_API_KEY / DB pool)
+ *   seo          → Groq Llama  (GROQ_API_KEY / DB pool)
+ *   analytics    → Groq Llama  (GROQ_API_KEY / DB pool)
+ *   marketing    → Gemini Flash (GOOGLE_AI_KEY / DB pool)
+ *   knowledge    → Groq Llama  (GROQ_API_KEY / DB pool)
  *
  * ─── KEY HEALTH ──────────────────────────────────────────────────────────────
  * Uses keyManager.ts for per-key cooldown / dead tracking.
@@ -151,41 +151,34 @@ const PROVIDERS: Record<string, ProviderDef> = {
 // ─── Primary provider per agent ───────────────────────────────────────────────
 // "Primary" = first live key tried. Display only — actual routing from FALLBACK_CHAIN.
 export const AGENT_PROVIDER: Record<AgentName, string> = {
-  support:      "kimi",          // complex: keep NVIDIA NIM quality
-  booking:      "deepseek",      // complex: needs best reasoning
-  orchestrator: "groq",          // orchestration: fast, free, no credit burn
-  health:       "groq",          // light task: groq free is fast + reliable
-  seo:          "groq",          // light task: groq free
-  analytics:    "groq",          // light task: groq free
-  marketing:    "minimax",       // creative: NVIDIA NIM gives best quality
-  knowledge:    "glm",           // knowledge: NVIDIA NIM GLM
+  support:      "groq",
+  booking:      "groq",
+  orchestrator: "groq",
+  health:       "groq",
+  seo:          "groq",
+  analytics:    "groq",
+  marketing:    "gemini",
+  knowledge:    "groq",
 };
 
 // ─── Ordered fallback chains per agent ───────────────────────────────────────
-// STRATEGY:
-//   • Light tasks: DB pool keys (groq/gemini/openrouter) → github (env) → paid last resort
-//   • Heavy tasks: DB pool keys first, then NVIDIA NIM, then paid fallbacks
-//
-// DB keys (from admin_api_keys table) are tried before any env-var key.
-// NVIDIA NIM removed from light chains — conserved for quality tasks only.
+// STRATEGY: Groq DB pool → Gemini DB pool → OpenRouter free → GitHub free → paid last resort
+// DB keys (from admin_api_keys table, seeded via /admin/api-keys) are tried first.
 const FALLBACK_CHAIN: Record<string, string[]> = {
-  // ── Light tasks — DB pool keys first, then github free, paid as last resort ─
   health:       ["groq", "gemini", "openrouter", "github", "mistral"],
   seo:          ["groq", "gemini", "openrouter", "github", "mistral"],
   analytics:    ["groq", "gemini", "openrouter", "github", "mistral"],
-  orchestrator: ["groq", "gemini", "github",               "nvidia_mistral", "mistral"],
-
-  // ── Quality tasks — NVIDIA NIM first, DB pool as fallback ─────────────────
-  support:      ["kimi", "glm", "deepseek", "minimax", "groq", "gemini", "openrouter"],
-  booking:      ["deepseek", "kimi", "nvidia_mistral", "glm", "groq", "gemini", "mistral"],
-  marketing:    ["minimax",  "kimi", "glm", "nvidia_mistral",  "groq", "gemini"],
-  knowledge:    ["glm",      "kimi", "minimax", "nvidia_mistral", "groq", "gemini"],
+  orchestrator: ["groq", "gemini", "openrouter", "github", "mistral"],
+  support:      ["groq", "gemini", "openrouter", "github", "mistral"],
+  booking:      ["groq", "gemini", "openrouter", "github", "mistral"],
+  marketing:    ["gemini", "groq", "openrouter", "github", "mistral"],
+  knowledge:    ["groq", "gemini", "openrouter", "github", "mistral"],
 };
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
 
 function resolveChain(agentName: string): ProviderDef[] {
-  const chain = FALLBACK_CHAIN[agentName] ?? ["kimi", "groq"];
+  const chain = FALLBACK_CHAIN[agentName] ?? ["groq", "gemini"];
   return chain
     .map((k) => PROVIDERS[k])
     .filter((p): p is ProviderDef => {
