@@ -172,32 +172,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       { "@type": "Offer", name: "Executive Hourly Chauffeur Barcelona", price: "65", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Hourly Chauffeur Service Barcelona", description: "By-the-hour luxury chauffeur hire in Barcelona for meetings, events, city tours." } },
                     ],
                   },
-                  vehicle: [
-                    {
-                      "@type": "Vehicle",
-                      name: "Mercedes V-Class",
-                      vehicleModelDate: "2022",
-                      description: "7-seat luxury MPV — ideal for groups and families travelling from Barcelona Airport",
-                      offers: { "@type": "Offer", price: "65", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
-                      aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
-                    },
-                    {
-                      "@type": "Vehicle",
-                      name: "Mercedes E-Class",
-                      vehicleModelDate: "2023",
-                      description: "Premium executive saloon for Barcelona airport transfers — up to 3 passengers",
-                      offers: { "@type": "Offer", price: "45", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
-                      aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
-                    },
-                    {
-                      "@type": "Vehicle",
-                      name: "Mercedes Vito",
-                      vehicleModelDate: "2023",
-                      description: "Executive minivan for groups up to 8 passengers — Barcelona airport transfers",
-                      offers: { "@type": "Offer", price: "60", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
-                      aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
-                    },
-                  ],
                   parentOrganization: { "@id": "https://www.elitebcn.info/#organization" },
                 },
                 {

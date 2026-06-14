@@ -23,10 +23,59 @@ export const metadata: Metadata = {
   },
 };
 
+const fleetSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Élite BCN Transfers Fleet",
+  description: "Luxury private transfer fleet available in Barcelona — fixed prices, no surge pricing.",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      item: {
+        "@type": "Product",
+        name: "Mercedes V-Class — Luxury 7-Seat Minivan",
+        description: "7-seat luxury MPV ideal for groups and families. Perfect for airport transfers from Barcelona El Prat.",
+        image: "https://www.elitebcn.info/fleet/v-class-mercedes.png",
+        brand: { "@type": "Brand", name: "Mercedes-Benz" },
+        offers: { "@type": "Offer", price: "65", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
+        aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
+      },
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      item: {
+        "@type": "Product",
+        name: "Mercedes E-Class — Executive Saloon",
+        description: "Premium executive saloon for solo and small-group airport transfers in Barcelona. Up to 3 passengers.",
+        image: "https://www.elitebcn.info/fleet/e-class.png",
+        brand: { "@type": "Brand", name: "Mercedes-Benz" },
+        offers: { "@type": "Offer", price: "45", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
+        aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
+      },
+    },
+    {
+      "@type": "ListItem",
+      position: 3,
+      item: {
+        "@type": "Product",
+        name: "Mercedes Vito — Executive 8-Seat Minivan",
+        description: "Executive minivan for groups up to 8 passengers. Spacious and practical for families and large groups.",
+        image: "https://www.elitebcn.info/fleet/mercedes-vito.png",
+        brand: { "@type": "Brand", name: "Mercedes-Benz" },
+        offers: { "@type": "Offer", price: "60", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
+        aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
+      },
+    },
+  ],
+};
+
 export default function FleetPage() {
   return (
     <>
       <Navbar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(fleetSchema) }} />
       <main className="pt-20">
         {/* Page header */}
         <section className="py-16 bg-[#050505] border-b border-white/[0.06] relative overflow-hidden">
