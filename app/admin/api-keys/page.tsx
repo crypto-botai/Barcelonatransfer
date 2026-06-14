@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  Key, Plus, RefreshCw, Zap, Trash2, RotateCcw, ChevronDown,
+  Key, Plus, RefreshCw, Zap, Trash2, RotateCcw,
   CheckCircle2, XCircle, Clock, AlertTriangle, Server,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
