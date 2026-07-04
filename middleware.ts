@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
+  // Block crawling on any non-production host (Vercel preview URLs, *.vercel.app)
+  // so Google never sees canonical-pointing pages on non-canonical domains
+  const host = req.headers.get("host") ?? "";
+  if (host !== "www.elitebcn.info" && host !== "elitebcn.info") {
+    const res = NextResponse.next();
+    res.headers.set("X-Robots-Tag", "noindex, nofollow");
+    return res;
+  }
+
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
 
@@ -65,11 +74,8 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
-    "/admin/:path*",
-    "/driver/:path*",
-    "/auth/login",
-    "/auth/register",
-    "/auth/change-password",
+    // Run on all page routes — needed to inject X-Robots-Tag on non-production hosts.
+    // Excludes static assets, Next.js internals, and image optimization endpoints.
+    "/((?!_next/static|_next/image|favicon\\.svg|opengraph-image|.*\\.(?:png|jpg|jpeg|gif|ico|webp|svg|woff2?|ttf)).*)",
   ],
 };

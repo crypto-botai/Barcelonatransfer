@@ -7,15 +7,7 @@ import destinations from "@/data/destinations.json";
 
 type Destination = (typeof destinations)[number];
 
-const TOP_10_ROUTE_SLUGS = [
-  "valencia-transfer", "madrid-transfer", "perpignan-transfer", "lleida-transfer",
-  "reus-airport", "girona-airport", "castelldefels-transfer", "salou-transfer",
-  "mataro-transfer", "terrassa-transfer",
-];
-
 const BASE = "https://www.elitebcn.info";
-
-const HREFLANG_LOCALES = ["fr", "de", "it", "ru"] as const;
 
 function getDestination(slug: string): Destination | undefined {
   return destinations.find((d) => d.slug === slug);
@@ -30,17 +22,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const dest = getDestination(slug);
   if (!dest) return { title: "Transfer | Élite BCN" };
 
-  const isRoute = TOP_10_ROUTE_SLUGS.includes(slug);
-  const hreflangAlternates = isRoute
-    ? Object.fromEntries(HREFLANG_LOCALES.map((l) => [l, `${BASE}/${l}/transfers/${slug}`]))
-    : {};
-
   return {
     title: { absolute: `Barcelona Airport to ${dest.name} Transfer — From €${dest.prices.sedan} | Élite BCN` },
     description: dest.description,
     alternates: {
       canonical: `${BASE}/transfers/${slug}`,
-      ...(isRoute ? { languages: hreflangAlternates } : {}),
     },
     openGraph: {
       title: `Barcelona Airport to ${dest.name} Transfer — Fixed Price from €${dest.prices.sedan}`,

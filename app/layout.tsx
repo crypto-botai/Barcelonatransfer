@@ -55,17 +55,6 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "https://www.elitebcn.info",
-    languages: {
-      "en": "https://www.elitebcn.info",
-      "es": "https://www.elitebcn.info",
-      "fr": "https://www.elitebcn.info",
-      "de": "https://www.elitebcn.info",
-      "it": "https://www.elitebcn.info",
-      "ru": "https://www.elitebcn.info",
-      "zh": "https://www.elitebcn.info",
-      "ar": "https://www.elitebcn.info",
-      "x-default": "https://www.elitebcn.info",
-    },
   },
 };
 
