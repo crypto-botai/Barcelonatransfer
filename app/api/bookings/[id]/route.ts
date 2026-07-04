@@ -85,6 +85,8 @@ export async function PATCH(
     if (body.adminNotes !== undefined) data.adminNotes = body.adminNotes;
     if (body.totalAmount !== undefined) data.totalAmount = parseFloat(body.totalAmount);
     if (body.driverAmount !== undefined) data.driverAmount = body.driverAmount === null ? null : parseFloat(body.driverAmount);
+    if (body.isDeleted === true)  { data.isDeleted = true;  data.deletedAt = new Date(); }
+    if (body.isDeleted === false) { data.isDeleted = false; data.deletedAt = null; }
     const isNewDriverAssignment = body.driverId && body.driverId !== (await prisma.booking.findUnique({ where: { id }, select: { driverId: true } }))?.driverId;
     if (body.driverId) {
       data.driverId = body.driverId;

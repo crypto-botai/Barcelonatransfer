@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, CheckCircle2, XCircle, User, Loader2, X, Car, MapPin, Calendar, Phone, Mail, Plane, FileText, Save, UserCheck, Receipt } from "lucide-react";
+import { Search, CheckCircle2, XCircle, User, Loader2, X, Car, MapPin, Calendar, Phone, Mail, Plane, FileText, Save, UserCheck, Receipt, Trash2, RotateCcw, Clock, CheckCheck, Archive } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
 import toast from "react-hot-toast";
@@ -17,25 +17,30 @@ type Booking = {
   totalAmount: number; driverAmount: number | null;
   status: BookingStatus; paymentStatus: string;
   driverId: string | null; adminNotes: string | null;
+  isDeleted: boolean; deletedAt: string | null;
   createdAt: string;
 };
 
+type MainTab = "ALL" | "PENDING" | "COMPLETED" | "DELETED";
+
 const ALL_STATUSES: BookingStatus[] = ["PENDING","CONFIRMED","DRIVER_ASSIGNED","IN_PROGRESS","COMPLETED","CANCELLED"];
 
-function BookingDrawer({ booking, drivers, onClose, onSaved }: {
+function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
   booking: Booking;
   drivers: Driver[];
   onClose: () => void;
   onSaved: () => void;
+  onDeleted: () => void;
 }) {
-  const [status, setStatus]           = useState<BookingStatus>(booking.status);
-  const [driverId, setDriverId]       = useState(booking.driverId ?? "");
+  const [status, setStatus]             = useState<BookingStatus>(booking.status);
+  const [driverId, setDriverId]         = useState(booking.driverId ?? "");
   const [driverAmount, setDriverAmount] = useState(booking.driverAmount?.toString() ?? "");
-  const [totalAmount, setTotalAmount] = useState(booking.totalAmount.toString());
-  const [adminNotes, setAdminNotes]   = useState(booking.adminNotes ?? "");
-  const [saving, setSaving]           = useState(false);
+  const [totalAmount, setTotalAmount]   = useState(booking.totalAmount.toString());
+  const [adminNotes, setAdminNotes]     = useState(booking.adminNotes ?? "");
+  const [saving, setSaving]             = useState(false);
+  const [deleting, setDeleting]         = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
-  // Parse meta from specialRequests
   const metaMatch = booking.specialRequests?.match(/\[META\]([\s\S]*?)\[\/META\]/);
   let meta: Record<string, unknown> = {};
   try { if (metaMatch) meta = JSON.parse(metaMatch[1]); } catch { /* */ }
@@ -62,6 +67,25 @@ function BookingDrawer({ booking, drivers, onClose, onSaved }: {
       toast.error("Failed to save");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const softDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/bookings/${booking.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isDeleted: true }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      toast.success("Booking moved to Deleted");
+      onDeleted();
+    } catch {
+      toast.error("Failed to delete booking");
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(false);
     }
   };
 
@@ -188,6 +212,40 @@ function BookingDrawer({ booking, drivers, onClose, onSaved }: {
               className="input-luxury w-full px-3 py-2 rounded-lg text-sm resize-none" />
           </section>
 
+          {/* Danger Zone */}
+          <section className="glass-card rounded-xl p-4 border border-red-500/20">
+            <p className="text-xs text-dark-500 uppercase tracking-wider mb-3">Danger Zone</p>
+            {!confirmDelete ? (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-red-500/30 text-red-400 text-xs hover:bg-red-500/10 transition-colors"
+              >
+                <Trash2 size={13} />
+                Move to Deleted
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-red-300">This booking will be hidden and moved to the Deleted tab. You can restore it anytime.</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={softDelete}
+                    disabled={deleting}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-500/20 border border-red-500/40 text-red-400 text-xs hover:bg-red-500/30 transition-colors"
+                  >
+                    {deleting ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                    Confirm Delete
+                  </button>
+                  <button
+                    onClick={() => setConfirmDelete(false)}
+                    className="px-3 py-2 rounded-lg border border-white/10 text-dark-400 text-xs hover:text-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </section>
+
         </div>
 
         {/* Footer */}
@@ -203,38 +261,128 @@ function BookingDrawer({ booking, drivers, onClose, onSaved }: {
   );
 }
 
+function DeletedBookingRow({ b, onRestore }: { b: Booking; onRestore: (id: string) => void }) {
+  const [restoring, setRestoring] = useState(false);
+
+  const restore = async () => {
+    setRestoring(true);
+    try {
+      const res = await fetch(`/api/bookings/${b.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isDeleted: false }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      toast.success("Booking restored");
+      onRestore(b.id);
+    } catch {
+      toast.error("Failed to restore");
+    } finally {
+      setRestoring(false);
+    }
+  };
+
+  return (
+    <tr className="price-row border-b border-white/[0.04]">
+      <td className="py-3 px-3 text-xs font-mono text-dark-500 tracking-widest line-through">{b.confirmationCode}</td>
+      <td className="py-3 px-3">
+        <p className="text-sm text-dark-400 whitespace-nowrap">{b.guestName ?? "—"}</p>
+        <p className="text-xs text-dark-600 truncate max-w-[120px]">{b.guestEmail}</p>
+      </td>
+      <td className="hidden md:table-cell py-3 px-3 text-xs text-dark-500 whitespace-nowrap">{b.guestPhone ?? "—"}</td>
+      <td className="hidden sm:table-cell py-3 px-3 text-xs text-dark-500 max-w-[120px]">
+        <p className="truncate">{b.pickupAddress}</p>
+        <p className="truncate text-dark-600">→ {b.dropoffAddress}</p>
+      </td>
+      <td className="py-3 px-3 text-xs text-dark-500 whitespace-nowrap">
+        {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { day:"2-digit", month:"short" })}<br />
+        <span className="text-dark-600">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit" })}</span>
+      </td>
+      <td className="hidden lg:table-cell py-3 px-3 text-xs text-dark-500 whitespace-nowrap">{b.vehicleClass.replace(/_/g, " ")}</td>
+      <td className="py-3 px-3 text-sm text-dark-500 font-semibold whitespace-nowrap">{formatCurrency(b.totalAmount)}</td>
+      <td className="py-3 px-3">
+        <span className={`status-badge ${STATUS_COLORS[b.status]}`}>{STATUS_LABELS[b.status]}</span>
+      </td>
+      <td className="py-3 px-3">
+        <button
+          onClick={restore}
+          disabled={restoring}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.06] text-dark-300 text-xs hover:bg-white/[0.10] hover:text-white transition-colors whitespace-nowrap"
+        >
+          {restoring ? <Loader2 size={11} className="animate-spin" /> : <RotateCcw size={11} />}
+          Restore
+        </button>
+      </td>
+    </tr>
+  );
+}
+
+const MAIN_TABS: { id: MainTab; label: string; icon: React.ReactNode }[] = [
+  { id: "ALL",       label: "All Bookings", icon: <Archive size={14} /> },
+  { id: "PENDING",   label: "Pending",      icon: <Clock size={14} /> },
+  { id: "COMPLETED", label: "Completed",    icon: <CheckCheck size={14} /> },
+  { id: "DELETED",   label: "Deleted",      icon: <Trash2 size={14} /> },
+];
+
 export default function AdminBookingsPage() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [drivers,  setDrivers]  = useState<Driver[]>([]);
-  const [loading,  setLoading]  = useState(true);
-  const [search,   setSearch]   = useState("");
-  const [filter,   setFilter]   = useState<BookingStatus | "ALL">("ALL");
-  const [selected, setSelected] = useState<Booking | null>(null);
+  const [bookings,  setBookings]  = useState<Booking[]>([]);
+  const [deleted,   setDeleted]   = useState<Booking[]>([]);
+  const [drivers,   setDrivers]   = useState<Driver[]>([]);
+  const [loading,   setLoading]   = useState(true);
+  const [search,    setSearch]    = useState("");
+  const [filter,    setFilter]    = useState<BookingStatus | "ALL">("ALL");
+  const [mainTab,   setMainTab]   = useState<MainTab>("ALL");
+  const [selected,  setSelected]  = useState<Booking | null>(null);
+
+  const loadBookings = async () => {
+    const res = await fetch("/api/admin/bookings");
+    if (res.ok) setBookings(await res.json());
+  };
+
+  const loadDeleted = async () => {
+    const res = await fetch("/api/admin/bookings?deleted=true");
+    if (res.ok) setDeleted(await res.json());
+  };
+
+  const loadDrivers = async () => {
+    const res = await fetch("/api/admin/drivers");
+    if (res.ok) {
+      const all = await res.json();
+      setDrivers(all.filter((d: { status: string }) => d.status === "APPROVED"));
+    }
+  };
 
   const load = async () => {
     setLoading(true);
-    const [bRes, dRes] = await Promise.all([
-      fetch("/api/admin/bookings"),
-      fetch("/api/admin/drivers"),
-    ]);
-    if (bRes.ok) setBookings(await bRes.json());
-    if (dRes.ok) {
-      const allDrivers = await dRes.json();
-      setDrivers(allDrivers.filter((d: { status: string }) => d.status === "APPROVED"));
-    }
+    await Promise.all([loadBookings(), loadDeleted(), loadDrivers()]);
     setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
 
+  // When switching to DELETED tab, ensure data is fresh
+  useEffect(() => {
+    if (mainTab === "DELETED") loadDeleted();
+  }, [mainTab]);
+
+  // Determine the status pre-filter from the main tab
+  const tabStatusFilter: BookingStatus | "ALL" =
+    mainTab === "PENDING"   ? "PENDING"   :
+    mainTab === "COMPLETED" ? "COMPLETED" :
+    filter;
+
+  const activeFilter = mainTab === "ALL" ? filter : tabStatusFilter;
+
   const filtered = bookings.filter((b) => {
     const matchSearch = !search || [b.confirmationCode, b.guestName, b.guestEmail, b.guestPhone, b.pickupAddress]
       .some((v) => v?.toLowerCase().includes(search.toLowerCase()));
-    const matchFilter = filter === "ALL" || b.status === filter;
+    const matchFilter = activeFilter === "ALL" || b.status === activeFilter;
     return matchSearch && matchFilter;
   });
 
-  const pendingCount = bookings.filter((b) => b.status === "PENDING").length;
+  const pendingCount   = bookings.filter((b) => b.status === "PENDING").length;
+  const completedCount = bookings.filter((b) => b.status === "COMPLETED").length;
+  const deletedCount   = deleted.length;
 
   return (
     <div className="p-4 pt-16 lg:pt-6 lg:p-8">
@@ -245,111 +393,185 @@ export default function AdminBookingsPage() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400" />
-          <input type="text" placeholder="Search by code, name, phone…" value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="input-luxury pl-9 pr-4 py-2.5 rounded-xl text-sm w-72" />
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          {(["ALL", ...ALL_STATUSES] as (BookingStatus | "ALL")[]).map((s) => (
-            <button key={s} onClick={() => setFilter(s)}
-              className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                filter === s ? "bg-gold-500 text-black" : "border border-white/10 text-dark-400 hover:text-white"
-              }`}>
-              {s === "ALL" ? "All" : STATUS_LABELS[s]}
-              {s === "PENDING" && pendingCount > 0 && (
-                <span className="ml-1.5 px-1 py-0.5 rounded-full bg-yellow-500 text-black text-[9px] font-bold">{pendingCount}</span>
+      {/* Main Tabs */}
+      <div className="flex gap-1 mb-6 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1">
+        {MAIN_TABS.map((tab) => {
+          const count = tab.id === "PENDING" ? pendingCount : tab.id === "COMPLETED" ? completedCount : tab.id === "DELETED" ? deletedCount : null;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => { setMainTab(tab.id); if (tab.id !== "ALL") setFilter("ALL"); }}
+              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
+                mainTab === tab.id
+                  ? tab.id === "DELETED"
+                    ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                    : "bg-gold-500 text-black"
+                  : "text-dark-400 hover:text-white hover:bg-white/[0.04]"
+              }`}
+            >
+              {tab.icon}
+              <span className="hidden sm:inline">{tab.label}</span>
+              {count !== null && count > 0 && (
+                <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
+                  mainTab === tab.id
+                    ? tab.id === "DELETED" ? "bg-red-500/30 text-red-300" : "bg-black/20 text-black"
+                    : tab.id === "DELETED" ? "bg-red-500/20 text-red-400" : "bg-yellow-500 text-black"
+                }`}>
+                  {count}
+                </span>
               )}
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
-      <div className="glass-card rounded-2xl overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-16"><Loader2 size={24} className="text-gold-500 animate-spin" /></div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/[0.06]">
-                  <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Code</th>
-                  <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Client</th>
-                  <th className="hidden md:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Phone</th>
-                  <th className="hidden sm:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Route</th>
-                  <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Date</th>
-                  <th className="hidden lg:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Vehicle</th>
-                  <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Amount</th>
-                  <th className="hidden lg:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Driver Pay</th>
-                  <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Status</th>
-                  <th className="py-3 px-3" />
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((b) => (
-                  <tr key={b.id} onClick={() => setSelected(b)}
-                    className="price-row border-b border-white/[0.04] cursor-pointer hover:bg-white/[0.02]">
-                    <td className="py-3 px-3 text-xs font-mono text-gold-400 tracking-widest">{b.confirmationCode}</td>
-                    <td className="py-3 px-3">
-                      <p className="text-sm text-white whitespace-nowrap">{b.guestName ?? "—"}</p>
-                      <p className="text-xs text-dark-500 truncate max-w-[120px]">{b.guestEmail}</p>
-                    </td>
-                    <td className="hidden md:table-cell py-3 px-3 text-xs text-dark-400 whitespace-nowrap">{b.guestPhone ?? "—"}</td>
-                    <td className="hidden sm:table-cell py-3 px-3 text-xs text-dark-400 max-w-[120px]">
-                      <p className="truncate">{b.pickupAddress}</p>
-                      <p className="truncate text-dark-600">→ {b.dropoffAddress}</p>
-                    </td>
-                    <td className="py-3 px-3 text-xs text-dark-400 whitespace-nowrap">
-                      {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { day:"2-digit", month:"short" })}<br />
-                      <span className="text-dark-600">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit" })}</span>
-                    </td>
-                    <td className="hidden lg:table-cell py-3 px-3 text-xs text-dark-400 whitespace-nowrap">{b.vehicleClass.replace(/_/g, " ")}</td>
-                    <td className="py-3 px-3 text-sm text-gold-400 font-semibold whitespace-nowrap">{formatCurrency(b.totalAmount)}</td>
-                    <td className="hidden lg:table-cell py-3 px-3 text-sm whitespace-nowrap">
-                      {b.driverAmount != null
-                        ? <span className="text-green-400">{formatCurrency(b.driverAmount)}</span>
-                        : <span className="text-dark-600">—</span>}
-                    </td>
-                    <td className="py-3 px-3">
-                      <span className={`status-badge ${STATUS_COLORS[b.status]}`}>{STATUS_LABELS[b.status]}</span>
-                    </td>
-                    <td className="py-3 px-3">
-                      <div className="flex items-center gap-1.5">
-                        <button className="px-2.5 py-1 rounded-lg bg-gold-500/10 text-gold-400 text-xs hover:bg-gold-500/20 transition-colors whitespace-nowrap">
-                          Open →
-                        </button>
-                        <a
-                          href={`/booking/${b.id}/invoice`}
-                          target="_blank"
-                          rel="noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="p-1.5 rounded-lg bg-white/[0.04] text-dark-400 hover:text-white transition-colors"
-                          title="View invoice"
-                        >
-                          <Receipt size={13} />
-                        </a>
-                      </div>
-                    </td>
+      {mainTab === "DELETED" ? (
+        /* ── Deleted Bookings View ── */
+        <div className="glass-card rounded-2xl overflow-hidden">
+          {loading ? (
+            <div className="flex items-center justify-center py-16"><Loader2 size={24} className="text-gold-500 animate-spin" /></div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/[0.06]">
+                    <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Code</th>
+                    <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Client</th>
+                    <th className="hidden md:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Phone</th>
+                    <th className="hidden sm:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Route</th>
+                    <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Date</th>
+                    <th className="hidden lg:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Vehicle</th>
+                    <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Amount</th>
+                    <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Status</th>
+                    <th className="py-3 px-3" />
                   </tr>
+                </thead>
+                <tbody>
+                  {deleted.map((b) => (
+                    <DeletedBookingRow key={b.id} b={b} onRestore={(id) => setDeleted((prev) => prev.filter((x) => x.id !== id))} />
+                  ))}
+                  {deleted.length === 0 && (
+                    <tr><td colSpan={9} className="py-10 text-center text-dark-500">No deleted bookings.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* ── Active / Pending / Completed View ── */
+        <>
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3 mb-6">
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400" />
+              <input type="text" placeholder="Search by code, name, phone…" value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="input-luxury pl-9 pr-4 py-2.5 rounded-xl text-sm w-72" />
+            </div>
+            {/* Status sub-filters — only show when on All Bookings tab */}
+            {mainTab === "ALL" && (
+              <div className="flex gap-2 flex-wrap">
+                {(["ALL", ...ALL_STATUSES] as (BookingStatus | "ALL")[]).map((s) => (
+                  <button key={s} onClick={() => setFilter(s)}
+                    className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                      filter === s ? "bg-gold-500 text-black" : "border border-white/10 text-dark-400 hover:text-white"
+                    }`}>
+                    {s === "ALL" ? "All" : STATUS_LABELS[s]}
+                    {s === "PENDING" && pendingCount > 0 && (
+                      <span className="ml-1.5 px-1 py-0.5 rounded-full bg-yellow-500 text-black text-[9px] font-bold">{pendingCount}</span>
+                    )}
+                  </button>
                 ))}
-                {filtered.length === 0 && (
-                  <tr><td colSpan={10} className="py-10 text-center text-dark-500">No bookings found.</td></tr>
-                )}
-              </tbody>
-            </table>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+
+          <div className="glass-card rounded-2xl overflow-hidden">
+            {loading ? (
+              <div className="flex items-center justify-center py-16"><Loader2 size={24} className="text-gold-500 animate-spin" /></div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-white/[0.06]">
+                      <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Code</th>
+                      <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Client</th>
+                      <th className="hidden md:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Phone</th>
+                      <th className="hidden sm:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Route</th>
+                      <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Date</th>
+                      <th className="hidden lg:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Vehicle</th>
+                      <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Amount</th>
+                      <th className="hidden lg:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Driver Pay</th>
+                      <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Status</th>
+                      <th className="py-3 px-3" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((b) => (
+                      <tr key={b.id} onClick={() => setSelected(b)}
+                        className="price-row border-b border-white/[0.04] cursor-pointer hover:bg-white/[0.02]">
+                        <td className="py-3 px-3 text-xs font-mono text-gold-400 tracking-widest">{b.confirmationCode}</td>
+                        <td className="py-3 px-3">
+                          <p className="text-sm text-white whitespace-nowrap">{b.guestName ?? "—"}</p>
+                          <p className="text-xs text-dark-500 truncate max-w-[120px]">{b.guestEmail}</p>
+                        </td>
+                        <td className="hidden md:table-cell py-3 px-3 text-xs text-dark-400 whitespace-nowrap">{b.guestPhone ?? "—"}</td>
+                        <td className="hidden sm:table-cell py-3 px-3 text-xs text-dark-400 max-w-[120px]">
+                          <p className="truncate">{b.pickupAddress}</p>
+                          <p className="truncate text-dark-600">→ {b.dropoffAddress}</p>
+                        </td>
+                        <td className="py-3 px-3 text-xs text-dark-400 whitespace-nowrap">
+                          {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { day:"2-digit", month:"short" })}<br />
+                          <span className="text-dark-600">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit" })}</span>
+                        </td>
+                        <td className="hidden lg:table-cell py-3 px-3 text-xs text-dark-400 whitespace-nowrap">{b.vehicleClass.replace(/_/g, " ")}</td>
+                        <td className="py-3 px-3 text-sm text-gold-400 font-semibold whitespace-nowrap">{formatCurrency(b.totalAmount)}</td>
+                        <td className="hidden lg:table-cell py-3 px-3 text-sm whitespace-nowrap">
+                          {b.driverAmount != null
+                            ? <span className="text-green-400">{formatCurrency(b.driverAmount)}</span>
+                            : <span className="text-dark-600">—</span>}
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className={`status-badge ${STATUS_COLORS[b.status]}`}>{STATUS_LABELS[b.status]}</span>
+                        </td>
+                        <td className="py-3 px-3">
+                          <div className="flex items-center gap-1.5">
+                            <button className="px-2.5 py-1 rounded-lg bg-gold-500/10 text-gold-400 text-xs hover:bg-gold-500/20 transition-colors whitespace-nowrap">
+                              Open →
+                            </button>
+                            <a
+                              href={`/booking/${b.id}/invoice`}
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="p-1.5 rounded-lg bg-white/[0.04] text-dark-400 hover:text-white transition-colors"
+                              title="View invoice"
+                            >
+                              <Receipt size={13} />
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {filtered.length === 0 && (
+                      <tr><td colSpan={10} className="py-10 text-center text-dark-500">No bookings found.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       {selected && (
         <BookingDrawer
           booking={selected}
           drivers={drivers}
           onClose={() => setSelected(null)}
-          onSaved={() => { setSelected(null); load(); }}
+          onSaved={() => { setSelected(null); loadBookings(); }}
+          onDeleted={() => { setSelected(null); loadBookings(); loadDeleted(); }}
         />
       )}
     </div>

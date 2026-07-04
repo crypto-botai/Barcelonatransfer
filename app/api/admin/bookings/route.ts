@@ -24,12 +24,14 @@ function generateCode(phone: string): string {
 export async function GET(req: NextRequest) {
   if (!await requireAdmin()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const status = req.nextUrl.searchParams.get("status");
-  const search = req.nextUrl.searchParams.get("q");
-  const limit  = Math.min(parseInt(req.nextUrl.searchParams.get("limit") ?? "100"), 500);
+  const status    = req.nextUrl.searchParams.get("status");
+  const search    = req.nextUrl.searchParams.get("q");
+  const limit     = Math.min(parseInt(req.nextUrl.searchParams.get("limit") ?? "100"), 500);
+  const deleted   = req.nextUrl.searchParams.get("deleted") === "true";
 
   const bookings = await prisma.booking.findMany({
     where: {
+      isDeleted: deleted,
       ...(status ? { status: status as never } : {}),
       ...(search ? {
         OR: [
