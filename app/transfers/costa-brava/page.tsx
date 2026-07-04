@@ -13,7 +13,13 @@ export const metadata: Metadata = {
     title: "Barcelona Airport to Costa Brava Transfer — from €130 | Fixed Price",
     description: "Luxury private transfer from Barcelona Airport to Costa Brava from €130. Tossa de Mar, Lloret, Cadaqués, Roses. Fixed price.",
     url: "https://www.elitebcn.info/transfers/costa-brava",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Barcelona Airport to Costa Brava Transfer — from €130 | Fixed Price",
+    description: "Luxury private transfer from Barcelona Airport to Costa Brava from €130. Tossa de Mar, Lloret, Cadaqués, Roses. Fixed price.",
+    images: ["/opengraph-image"],
   },
 };
 

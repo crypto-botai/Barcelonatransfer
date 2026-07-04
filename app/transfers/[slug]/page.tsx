@@ -224,7 +224,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                 {
                   icon: CheckCircle2,
                   title: "Premium vehicles",
-                  body: "Mercedes V-Class, E-Class, Tesla Model S, or BMW 5 Series. Air-conditioned, water on board, child seats on request.",
+                  body: "Mercedes V-Class (7 pax), E-Class & Vito (8 pax). Air-conditioned, water on board, child seats on request.",
                 },
                 {
                   icon: MapPin,
@@ -284,9 +284,9 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                 </thead>
                 <tbody>
                   {[
-                    { vehicle: "Mercedes E-Class / BMW 5 Series", pax: "1–3", price: dest.prices.sedan },
-                    { vehicle: "Tesla Model S", pax: "1–3", price: dest.prices.tesla },
-                    { vehicle: "Mercedes V-Class (MPV)", pax: "1–7", price: dest.prices.mpv },
+                    { vehicle: "Mercedes E-Class", pax: "1–3", price: dest.prices.sedan },
+                    { vehicle: "Mercedes Vito (8 pax)", pax: "1–8", price: dest.prices.mpv },
+                    { vehicle: "Mercedes V-Class (7 pax)", pax: "1–7", price: dest.prices.mpv },
                   ].map((row) => (
                     <tr key={row.vehicle} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
                       <td className="p-4 text-white">{row.vehicle}</td>

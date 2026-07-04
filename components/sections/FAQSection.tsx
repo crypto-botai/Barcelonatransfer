@@ -20,7 +20,7 @@ const FAQS = [
   },
   {
     q: "What vehicles do you offer?",
-    a: "We offer 10 vehicle classes from Economy Sedans to Minibuses. Our fleet includes Mercedes E-Class, S-Class, V-Class VIP, BMW 5 and 7 Series, Tesla Model S, Range Rover Autobiography, Cadillac Escalade, and Mercedes Sprinter. All vehicles are professionally maintained and less than 3 years old.",
+    a: "We operate three premium Mercedes vehicles: E-Class (executive saloon, 1–3 pax), V-Class VIP (luxury 7-seat MPV for families & groups), and Vito (executive minivan, up to 8 pax). All vehicles are under 3 years old, air-conditioned, and equipped with complimentary water and WiFi.",
   },
   {
     q: "Can I cancel or modify my booking?",

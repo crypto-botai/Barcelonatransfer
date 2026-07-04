@@ -13,7 +13,13 @@ export const metadata: Metadata = {
     title: "Barcelona Airport to Montserrat Transfer — from €85 | Fixed Price",
     description: "Luxury private transfer Barcelona Airport to Montserrat monastery from €85. Fixed price, no surge pricing.",
     url: "https://www.elitebcn.info/transfers/montserrat",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Barcelona Airport to Montserrat Transfer — from €85 | Fixed Price",
+    description: "Luxury private transfer Barcelona Airport to Montserrat monastery from €85. Fixed price, no surge pricing.",
+    images: ["/opengraph-image"],
   },
 };
 

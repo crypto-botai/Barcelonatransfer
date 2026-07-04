@@ -13,7 +13,13 @@ export const metadata: Metadata = {
     title: "Barcelona Airport to PortAventura Transfer — from €99 | Fixed Price",
     description: "Luxury private transfer from Barcelona Airport to PortAventura World from €99. Fixed price, family-friendly, no surge pricing.",
     url: "https://www.elitebcn.info/transfers/port-aventura",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Barcelona Airport to PortAventura Transfer — from €99 | Fixed Price",
+    description: "Luxury private transfer from Barcelona Airport to PortAventura World from €99. Fixed price, family-friendly, no surge pricing.",
+    images: ["/opengraph-image"],
   },
 };
 

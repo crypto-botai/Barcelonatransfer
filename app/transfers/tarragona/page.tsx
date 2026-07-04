@@ -7,13 +7,19 @@ import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-
 export const metadata: Metadata = {
   title: "Barcelona Airport to Tarragona Transfer — from €95 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona Airport (BCN) to Tarragona or PortAventura World. Fixed price from €95. 1-hour journey in Mercedes, Tesla, BMW. Meet & greet included.",
+    "Luxury private transfer from Barcelona Airport (BCN) to Tarragona or PortAventura World. Fixed price from €95. 1-hour journey in Mercedes V-Class & E-Class. Meet & greet included.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/tarragona" },
   openGraph: {
     title: "Barcelona Airport to Tarragona Transfer — from €95 | Fixed Price",
     description: "Luxury private transfer Barcelona Airport to Tarragona or PortAventura from €95. Fixed price, no surge pricing.",
     url: "https://www.elitebcn.info/transfers/tarragona",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Barcelona Airport to Tarragona Transfer — from €95 | Fixed Price",
+    description: "Luxury private transfer Barcelona Airport to Tarragona or PortAventura from €95. Fixed price, no surge pricing.",
+    images: ["/opengraph-image"],
   },
 };
 

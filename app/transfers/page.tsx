@@ -13,7 +13,13 @@ export const metadata: Metadata = {
     title: "Barcelona Transfer Destinations | Élite BCN",
     description: "Fixed-price luxury private transfers from Barcelona Airport to Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat and more.",
     url: "https://www.elitebcn.info/transfers",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Barcelona Transfer Destinations | Élite BCN",
+    description: "Fixed-price luxury private transfers from Barcelona Airport to Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat and more.",
+    images: ["/opengraph-image"],
   },
 };
 

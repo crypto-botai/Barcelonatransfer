@@ -13,7 +13,13 @@ export const metadata: Metadata = {
     title: "Barcelona Cruise Port Transfer — from €45 | Fixed Price",
     description: "Luxury private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €45. Vessel tracking, meet & greet, no surge pricing.",
     url: "https://www.elitebcn.info/transfers/cruise-port",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Barcelona Cruise Port Transfer — from €45 | Fixed Price",
+    description: "Luxury private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €45. Vessel tracking, meet & greet, no surge pricing.",
+    images: ["/opengraph-image"],
   },
 };
 

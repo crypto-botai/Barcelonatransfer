@@ -7,13 +7,19 @@ import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-
 export const metadata: Metadata = {
   title: "Barcelona Airport to Girona Transfer — from €110 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona Airport (BCN) to Girona city or Girona Costa Brava Airport (GRO). Fixed price from €110. 1 hr 10 min. Mercedes, Tesla, BMW. Book instantly.",
+    "Luxury private transfer from Barcelona Airport (BCN) to Girona city or Girona Costa Brava Airport (GRO). Fixed price from €110. 1 hr 10 min. Mercedes V-Class & E-Class. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/girona" },
   openGraph: {
     title: "Barcelona Airport to Girona Transfer — from €110 | Fixed Price",
     description: "Luxury private transfer Barcelona to Girona from €110. Fixed price, meet & greet, no surge pricing.",
     url: "https://www.elitebcn.info/transfers/girona",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Barcelona Airport to Girona Transfer — from €110 | Fixed Price",
+    description: "Luxury private transfer Barcelona to Girona from €110. Fixed price, meet & greet, no surge pricing.",
+    images: ["/opengraph-image"],
   },
 };
 

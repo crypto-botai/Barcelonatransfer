@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { XCircle, ArrowLeft, MessageCircle } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
+
+export const metadata: Metadata = {
+  title: "Payment Failed | Élite BCN",
+  robots: { index: false, follow: false },
+};
 
 export default function FailedPage() {
   return (

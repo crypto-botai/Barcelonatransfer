@@ -7,13 +7,19 @@ import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-
 export const metadata: Metadata = {
   title: "Barcelona Airport to Andorra Transfer — from €220 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona Airport (BCN) to Andorra la Vella. Fixed price from €220. 3-hour journey in Mercedes, Tesla, BMW. Ski season & shopping trips. Book instantly.",
+    "Luxury private transfer from Barcelona Airport (BCN) to Andorra la Vella. Fixed price from €220. 3-hour journey in premium Mercedes V-Class & E-Class. Ski season & shopping trips. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/andorra" },
   openGraph: {
     title: "Barcelona Airport to Andorra Transfer — from €220 | Fixed Price",
     description: "Luxury private transfer from Barcelona Airport to Andorra la Vella from €220. Fixed price, no surge pricing. Ski season specialist.",
     url: "https://www.elitebcn.info/transfers/andorra",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Barcelona Airport to Andorra Transfer — from €220 | Fixed Price",
+    description: "Luxury private transfer Barcelona Airport to Andorra la Vella from €220. Fixed price, no surge pricing. Ski season specialist.",
+    images: ["/opengraph-image"],
   },
 };
 
