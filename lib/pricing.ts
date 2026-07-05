@@ -172,7 +172,7 @@ function lookupFixedPrice(
     if ((a === from && b === to) || (a === to && b === from)) {
       if (vc === "ECONOMY" || vc === "ELECTRIC_VIP")     return prices.ECONOMY;
       if (vc === "BUSINESS" || vc === "SUV")             return prices.BUSINESS;
-      if (vc === "LUXURY" || vc === "FIRST_CLASS")       return prices.BUSINESS + 20;
+      if (vc === "LUXURY" || vc === "FIRST_CLASS")       return prices.BUSINESS;
       if (vc === "LUXURY_SUV")                           return Math.round((prices.BUSINESS + prices.VCLASS) / 2);
       if (vc === "LUXURY_MINIVAN")                       return prices.VCLASS;
       if (vc === "MINIVAN")                              return prices.MINIVAN;
