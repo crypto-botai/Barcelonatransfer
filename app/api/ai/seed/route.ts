@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
       data: {
         globalMonthlyBudgetCents: 2000,
         globalKillSwitch: false,
-        alertEmail: process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com",
+        alertEmail: process.env.ADMIN_EMAIL ?? "bookings@elitebcn.info",
       },
     });
     results.budgetConfig = 1;
@@ -63,9 +63,9 @@ export async function POST(req: NextRequest) {
     { category: "pricing", question: "What is the price to Tarragona?", answer: "A transfer from Barcelona or the airport to Tarragona costs from **€150** for an Economy sedan. The journey takes approximately 1 hour.", tags: ["tarragona", "price"] },
 
     // Fleet
-    { category: "fleet", question: "What vehicles do you have?", answer: "Our fleet includes:\n- **Economy** — Mercedes C-Class or similar (up to 3 pax)\n- **Business** — Mercedes E-Class or similar (up to 3 pax)\n- **Minivan** — Mercedes Viano or similar (up to 6 pax)\n- **V-Class** — Mercedes V-Class (up to 8 pax)\n- **Minibus** — (up to 14 pax)\n\nAll vehicles are immaculate and never older than 3 years.", tags: ["fleet", "vehicles", "car"] },
+    { category: "fleet", question: "What vehicles do you have?", answer: "Our fleet includes:\n- **EQE 300 Electric** — Mercedes EQE 300 (up to 4 pax, 100% electric)\n- **V-Class VIP** — Mercedes V-Class (up to 7 pax)\n- **Vito** — Mercedes Vito (up to 8 pax)\n- **Minibus** — Mercedes Sprinter (up to 16 pax)\n\nAll vehicles are immaculate and never older than 3 years.", tags: ["fleet", "vehicles", "car"] },
     { category: "fleet", question: "Do you have child seats?", answer: "Yes. Baby seats and child booster seats are available free of charge. Please mention this when booking under Special Requests.", tags: ["child seat", "baby", "kids"] },
-    { category: "fleet", question: "Do you have wheelchair-accessible vehicles?", answer: "Please contact us directly via WhatsApp (+34 635 383 712) or email (vtcbcn2025@gmail.com) for accessibility requirements — we'll arrange the right vehicle for your needs.", tags: ["wheelchair", "accessibility"] },
+    { category: "fleet", question: "Do you have wheelchair-accessible vehicles?", answer: "Please contact us directly via WhatsApp (+34 635 383 712) or email (bookings@elitebcn.info) for accessibility requirements — we'll arrange the right vehicle for your needs.", tags: ["wheelchair", "accessibility"] },
 
     // Booking
     { category: "booking", question: "How do I book a transfer?", answer: "You can book instantly at **elitebcn.info/book** — takes about 2 minutes. Choose your route, date, time, and vehicle. You'll receive a confirmation email immediately.", tags: ["book", "how", "reservation"] },
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     { category: "service", question: "Do you offer transfers from the cruise port?", answer: "Yes. We serve the Barcelona Cruise Terminal. A transfer to/from the city centre starts from **€45**. Meet & greet is included at the port gate.", tags: ["cruise", "port", "terminal"] },
 
     // Contact
-    { category: "contact", question: "How can I contact you?", answer: "You can reach us via:\n- **WhatsApp / Phone:** +34 635 383 712\n- **Email:** vtcbcn2025@gmail.com\n- **Live chat:** Right here!\n\nFor urgent matters, WhatsApp is fastest.", tags: ["contact", "phone", "email", "whatsapp"] },
+    { category: "contact", question: "How can I contact you?", answer: "You can reach us via:\n- **WhatsApp / Phone:** +34 635 383 712\n- **Email:** bookings@elitebcn.info\n- **Live chat:** Right here!\n\nFor urgent matters, WhatsApp is fastest.", tags: ["contact", "phone", "email", "whatsapp"] },
     { category: "contact", question: "What is your WhatsApp number?", answer: "Our WhatsApp number is **+34 635 383 712**. You can also click this link to start a chat: https://wa.me/34635383712", tags: ["whatsapp", "number", "phone"] },
   ];
 

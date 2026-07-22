@@ -149,7 +149,7 @@ export default function VIPTransportationPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
               {[
                 { name: "Mercedes V-Class VIP", detail: "Up to 7 pax · Luxury MPV · Groups & families", from: "€70" },
-                { name: "Mercedes E-Class", detail: "Executive sedan · 1–3 pax · Airport meetings", from: "€55" },
+                { name: "Mercedes EQE 300 Electric", detail: "Executive sedan · 1–4 pax · Airport meetings", from: "€55" },
                 { name: "Mercedes Vito", detail: "Executive minivan · Up to 8 pax · Large groups", from: "€65" },
               ].map((v) => (
                 <div key={v.name} className="bg-dark-900 border border-white/[0.08] rounded-xl p-6">

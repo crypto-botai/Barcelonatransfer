@@ -20,7 +20,7 @@ const FAQS = [
   },
   {
     q: "What vehicles do you offer?",
-    a: "We operate three premium Mercedes vehicles: E-Class (executive saloon, 1–3 pax), V-Class VIP (luxury 7-seat MPV for families & groups), and Vito (executive minivan, up to 8 pax). All vehicles are under 3 years old, air-conditioned, and equipped with complimentary water and WiFi.",
+    a: "Our fleet includes the Mercedes EQE 300 Electric (executive sedan, up to 4 pax), Mercedes V-Class VIP (luxury 7-seat MPV for families & groups), Mercedes Vito (executive minivan, up to 8 pax), and Mercedes Sprinter (group minibus, up to 16 pax). All vehicles are under 3 years old, air-conditioned, and equipped with complimentary water and WiFi.",
   },
   {
     q: "Can I cancel or modify my booking?",

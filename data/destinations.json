@@ -12,7 +12,7 @@
     "highlights": ["Barceloneta beachfront location", "25-minute airport transfer", "Meet & greet in arrivals", "No surge pricing ever"],
     "faqs": [
       { "q": "How long is the transfer from Barcelona Airport to W Barcelona Hotel?", "a": "The door-to-door transfer from BCN El Prat Airport to the W Barcelona Hotel in Barceloneta takes approximately 25 minutes under normal traffic conditions, covering around 18 km. Your driver monitors live traffic and adjusts the route if needed." },
-      { "q": "How much does a private transfer from Barcelona Airport to W Barcelona Hotel cost?", "a": "A fixed-price private transfer from Barcelona Airport to the W Barcelona Hotel starts from €45 for a Mercedes E-Class or BMW 5 Series (up to 3 passengers). A Tesla Model S is €55 and a Mercedes V-Class for groups up to 7 costs €65. All prices include tolls, meet & greet, and 60 minutes free waiting." },
+      { "q": "How much does a private transfer from Barcelona Airport to W Barcelona Hotel cost?", "a": "A fixed-price private transfer from Barcelona Airport to the W Barcelona Hotel starts from €45 for a Mercedes EQE 300 Electric (up to 3 passengers). A EQE 300 Electric is €55 and a Mercedes V-Class for groups up to 7 costs €65. All prices include tolls, meet & greet, and 60 minutes free waiting." },
       { "q": "Can Élite BCN transfer us to the W Barcelona Hotel with surf or sports equipment?", "a": "Absolutely. The Mercedes V-Class has generous boot space and can accommodate surfboards, golf bags, skis, and oversized luggage. Simply note your equipment in the booking form and we will confirm the right vehicle for you." }
     ],
     "nearby": ["hotel-arts-barcelona", "pullman-barcelona-skipper", "the-serras-hotel"]
@@ -30,7 +30,7 @@
     "highlights": ["Olympic Port waterfront", "22-minute airport transfer", "44-storey landmark tower", "Flight tracking included"],
     "faqs": [
       { "q": "How long does the transfer from BCN Airport to Hotel Arts Barcelona take?", "a": "The private transfer from Barcelona El Prat Airport to Hotel Arts Barcelona in the Vila Olímpica district takes around 22 minutes (17 km). Traffic is typically lighter on the coastal access road, making this one of the fastest city-centre hotel transfers." },
-      { "q": "What vehicles are available for the Hotel Arts Barcelona airport transfer?", "a": "You can choose from a Mercedes E-Class (1–3 pax, €45), Tesla Model S (1–3 pax, €55), or Mercedes V-Class MPV (1–7 pax, €65). All vehicles are less than 3 years old and air-conditioned with complimentary water on board." },
+      { "q": "What vehicles are available for the Hotel Arts Barcelona airport transfer?", "a": "You can choose from a Mercedes EQE 300 Electric (1–4 pax, €45) or Mercedes V-Class MPV (1–7 pax, €65). All vehicles are less than 3 years old and air-conditioned with complimentary water on board." },
       { "q": "Does the Hotel Arts Barcelona transfer include meet & greet service?", "a": "Yes. Your chauffeur will be waiting in the BCN Airport arrivals hall with a personalised name board. We track your flight in real time and provide 60 minutes of free waiting from your actual landing time, at no extra charge." }
     ],
     "nearby": ["w-barcelona-hotel", "pullman-barcelona-skipper", "salon-nautico-barcelona"]
@@ -66,7 +66,7 @@
     "highlights": ["Historic grand hotel since 1919", "Gran Via & Pau Claris corner", "Rooftop pool and terrace", "26-minute airport transfer"],
     "faqs": [
       { "q": "How far is Hotel El Palace from Barcelona Airport?", "a": "Hotel El Palace Barcelona is 16 km from BCN El Prat Airport. By private transfer the journey takes around 26 minutes; by taxi it is similar in time but the metered fare including the €4.50 airport supplement will be approximately €25–€32 depending on time of day." },
-      { "q": "What luxury vehicles are available for the transfer to Hotel El Palace?", "a": "Élite BCN operates Mercedes E-Class saloons, BMW 5 Series, Tesla Model S, and Mercedes V-Class MPVs. All vehicles are presented in immaculate condition, less than 3 years old. Prices start from €45 fixed — no meters, no surprises." },
+      { "q": "What luxury vehicles are available for the transfer to Hotel El Palace?", "a": "Élite BCN operates Mercedes EQE 300 Electric, Mercedes Vito, and Mercedes V-Class MPVs. All vehicles are presented in immaculate condition, less than 3 years old. Prices start from €45 fixed — no meters, no surprises." },
       { "q": "Does Élite BCN offer return transfers from Hotel El Palace to Barcelona Airport?", "a": "Yes. We operate 24/7 outbound transfers from Hotel El Palace to BCN Airport. Your driver will be at the hotel entrance at your confirmed pickup time. We recommend a pickup 2.5 hours before departure for international flights, 2 hours for domestic." }
     ],
     "nearby": ["mandarin-oriental-barcelona", "majestic-hotel-barcelona", "cotton-house-hotel-barcelona"]
@@ -336,7 +336,7 @@
     "highlights": ["Upper Eixample location", "Sagrada Família 15 min walk", "Trendy Eixample dining scene", "25-minute airport transfer"],
     "faqs": [
       { "q": "How far is the Ayre Hotel Rosellón from Sagrada Família?", "a": "The Ayre Hotel Rosellón is approximately 1.2 km from the Sagrada Família Basilica, around a 15-minute walk or 5-minute taxi ride. The hotel's Eixample Dreta location makes it one of the best bases for exploring both Gaudí's architecture and the city's culinary scene." },
-      { "q": "What is the cost of the airport transfer to Ayre Hotel Rosellón?", "a": "A private transfer from BCN Airport to the Ayre Hotel Rosellón costs from €45 fixed for a Mercedes E-Class or BMW 5 Series (up to 3 passengers). A Mercedes V-Class for groups up to 7 is €65. All prices include meet & greet, luggage handling, and 60 minutes free waiting." },
+      { "q": "What is the cost of the airport transfer to Ayre Hotel Rosellón?", "a": "A private transfer from BCN Airport to the Ayre Hotel Rosellón costs from €45 fixed for a Mercedes EQE 300 Electric (up to 3 passengers). A Mercedes V-Class for groups up to 7 is €65. All prices include meet & greet, luggage handling, and 60 minutes free waiting." },
       { "q": "Is the Ayre Hotel Rosellón good for the LGBT district (Gayxample)?", "a": "Yes — the hotel is within the Eixample neighbourhood, and the Gayxample district (centred on Carrer del Consell de Cent) is approximately 10 minutes' walk away. Barcelona's Pride festival (also known as Diversity Barcelona) takes place every June within easy reach of the hotel." }
     ],
     "nearby": ["grand-hyatt-barcelona", "hotel-condes-barcelona", "mandarin-oriental-barcelona"]
@@ -444,7 +444,7 @@
     "highlights": ["Crown Princess homeport", "Elegant transfer for Princess guests", "20-minute airport connection", "Luggage from arrivals to terminal"],
     "faqs": [
       { "q": "How do I reach the Princess Cruises terminal in Barcelona from the airport?", "a": "The most seamless option is a private transfer with Élite BCN. Your driver meets you in the BCN Airport arrivals hall with a personalised sign, loads your luggage, and delivers you to the Princess Cruises terminal at Moll Adossat in approximately 20 minutes. Fixed from €45." },
-      { "q": "What is the baggage allowance on transfers to the Princess terminal?", "a": "Élite BCN has no luggage limit per se. The Mercedes E-Class handles 3 large suitcases plus hand luggage. The Mercedes V-Class comfortably fits 6–7 large cases plus carry-ons. If you have an unusually large volume of luggage, contact us in advance and we will arrange the right vehicle." },
+      { "q": "What is the baggage allowance on transfers to the Princess terminal?", "a": "Élite BCN has no luggage limit per se. The Mercedes EQE 300 Electric handles 3 large suitcases plus hand luggage. The Mercedes V-Class comfortably fits 6–7 large cases plus carry-ons. If you have an unusually large volume of luggage, contact us in advance and we will arrange the right vehicle." },
       { "q": "Does Élite BCN offer post-cruise transfers from the Princess terminal to hotels?", "a": "Yes. Disembarkation transfers from the Princess Cruises terminal to any Barcelona hotel or directly to BCN Airport are available 24/7. We monitor disembarkation schedules and will adjust pickup times based on your actual disembarkation slot, keeping your driver informed." }
     ],
     "nearby": ["celebrity-cruises-barcelona", "costa-cruises-barcelona", "msc-cruises-barcelona"]
@@ -480,7 +480,7 @@
     "highlights": ["World Trade Centre terminal access", "QM2 and Queen Victoria visits", "22-minute airport transfer", "White-glove service"],
     "faqs": [
       { "q": "Which terminal does Cunard use when Queen Mary 2 is in Barcelona?", "a": "Cunard's flagship Queen Mary 2 typically berths at the World Trade Centre (WTC) terminal in Barcelona's inner port, the most central location and approximately 22 minutes from BCN Airport. Some Cunard calls may use Moll Adossat — always verify with Cunard or on your boarding pass." },
-      { "q": "Is Élite BCN's service appropriate for Cunard passengers?", "a": "Absolutely. Élite BCN operates premium Mercedes, Tesla, and BMW vehicles with professional, suited chauffeurs — entirely in keeping with Cunard's world-class standards. We treat every passenger as a VIP regardless of vehicle class. Complimentary water is provided on all journeys." },
+      { "q": "Is Élite BCN's service appropriate for Cunard passengers?", "a": "Absolutely. Élite BCN operates premium Mercedes vehicles (EQE 300, V-Class, Vito) with professional, suited chauffeurs — entirely in keeping with Cunard's world-class standards. We treat every passenger as a VIP regardless of vehicle class. Complimentary water is provided on all journeys." },
       { "q": "Can Élite BCN provide a day tour of Barcelona for passengers on a Cunard port call?", "a": "Yes. Élite BCN offers bespoke day tours for cruise passengers on port calls. We can create a personalised itinerary covering the Sagrada Família, Gothic Quarter, Park Güell, and Montjuïc in a 4–6 hour tour, returning you to the ship well before departure. Contact us to arrange." }
     ],
     "nearby": ["princess-cruises-barcelona", "norwegian-cruise-barcelona", "royal-caribbean-barcelona"]
@@ -552,7 +552,7 @@
     "highlights": ["F1 Spanish Grand Prix venue", "32-minute transfer from airport", "Advance booking essential on race day", "All circuits via motorway"],
     "faqs": [
       { "q": "How do I get from Barcelona Airport to the F1 Spanish Grand Prix circuit?", "a": "The Circuit de Barcelona-Catalunya in Montmeló is 28 km from BCN Airport, approximately 32 minutes by private transfer via the AP-7 motorway. On race day, local roads around the circuit become heavily congested 3+ hours before the race; we recommend arriving early. Book your race weekend transfer well in advance." },
-      { "q": "How much does a private transfer to the F1 Spanish Grand Prix cost?", "a": "A private transfer from BCN Airport to the Circuit de Barcelona-Catalunya starts from €55 for a Mercedes E-Class or BMW 5 Series (1–3 passengers). The Tesla Model S is €65 and the Mercedes V-Class for groups up to 7 is €80. These prices are fixed regardless of race day traffic conditions." },
+      { "q": "How much does a private transfer to the F1 Spanish Grand Prix cost?", "a": "A private transfer from BCN Airport to the Circuit de Barcelona-Catalunya starts from €55 for a Mercedes EQE 300 Electric (1–4 passengers). The Mercedes V-Class for groups up to 7 is €80. These prices are fixed regardless of race day traffic conditions." },
       { "q": "Can Élite BCN wait at the circuit and bring us back to Barcelona after the race?", "a": "Yes. We can arrange a 'wait and return' package where your driver parks at a designated waiting area near the circuit and collects you after the race finishes. Alternatively, you can pre-book a return transfer for a specific post-race time. Contact us to arrange during F1 weekend." }
     ],
     "nearby": ["girona-transfer", "mataro-transfer", "hotel-condes-barcelona"]

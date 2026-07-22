@@ -41,6 +41,7 @@ function FleetCardInner({
           src={vehicle.image}
           alt={vehicle.label}
           fill
+          priority={asHeading && vehicle.class === "LUXURY"}
           sizes="(max-width: 1024px) 268px, (max-width: 1280px) 33vw, 25vw"
           className="object-contain p-6 transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           style={{ filter: "drop-shadow(0 18px 36px rgba(0,0,0,0.92))" }}

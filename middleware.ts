@@ -14,18 +14,29 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
 
-  // ── Unauthenticated → login ──────────────────────────────────
-  if (!token) {
-    if (
-      pathname.startsWith("/dashboard") ||
-      pathname.startsWith("/admin") ||
-      pathname.startsWith("/driver")
-    ) {
-      const loginUrl = req.nextUrl.clone();
-      loginUrl.pathname = "/auth/login";
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
+  // Noindex all staff/auth routes — never want these in Google
+  if (
+    pathname.startsWith("/auth") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/driver") ||
+    pathname.startsWith("/dashboard")
+  ) {
+    const res = NextResponse.next();
+    res.headers.set("X-Robots-Tag", "noindex, nofollow");
+    // Still enforce auth below — don't return here
+    if (pathname.startsWith("/admin") || pathname.startsWith("/driver") || pathname.startsWith("/dashboard")) {
+      if (!token) {
+        const loginUrl = req.nextUrl.clone();
+        loginUrl.pathname = "/auth/login";
+        loginUrl.searchParams.set("callbackUrl", pathname);
+        return NextResponse.redirect(loginUrl);
+      }
     }
+    return res;
+  }
+
+  // ── Unauthenticated public routes → pass through ──────────────
+  if (!token) {
     return NextResponse.next();
   }
 

@@ -287,7 +287,7 @@ export default function BookFormClient() {
 
   return (
     <main className="min-h-screen bg-[#050505]">
-      <div className="container mx-auto px-4 py-10 max-w-3xl">
+      <div className="container mx-auto px-4 py-10 max-w-3xl pb-28 sm:pb-10">
 
         {/* Step Indicator */}
         <div className="flex items-center justify-center mb-10">
@@ -879,6 +879,37 @@ export default function BookFormClient() {
 
         </AnimatePresence>
       </div>
+
+      {/* Mobile sticky price bar — visible on steps 2–4 when vehicle + quote ready */}
+      {step >= 2 && data.vehicleClass && grandTotal > 0 && (
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0d0d0d]/95 backdrop-blur border-t border-gold-500/20 px-4 py-3 flex items-center gap-3 safe-area-pb">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-dark-400 truncate">
+              {VEHICLE_CATALOG.find((v) => v.class === data.vehicleClass)?.label}
+            </p>
+            <p className="font-display text-lg text-gold-400 leading-tight">{formatCurrency(grandTotal)}</p>
+          </div>
+          {step === 2 && (
+            <button onClick={() => setStep(3)} disabled={!data.vehicleClass}
+              className="btn-gold px-5 py-3 rounded-xl text-sm font-semibold flex-shrink-0">
+              Continue
+            </button>
+          )}
+          {step === 3 && (
+            <button onClick={() => setStep(4)} disabled={!step3Valid}
+              className="btn-gold px-5 py-3 rounded-xl text-sm font-semibold flex-shrink-0 disabled:opacity-40">
+              Review
+            </button>
+          )}
+          {step === 4 && (
+            <button onClick={handlePay} disabled={submitting}
+              className="btn-gold px-5 py-3 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-2">
+              {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
+              {submitting ? "…" : `Pay ${formatCurrency(grandTotal)}`}
+            </button>
+          )}
+        </div>
+      )}
     </main>
   );
 }

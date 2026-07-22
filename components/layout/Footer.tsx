@@ -19,12 +19,12 @@ export default function Footer() {
   ];
 
   const FLEET_LINKS = [
-    { key: "standardSedan",    href: "/fleet" },
-    { key: "luxurySedan",      href: "/fleet" },
-    { key: "executiveMinivan", href: "/fleet" },
-    { key: "luxuryMinivan",    href: "/fleet" },
-    { key: "groupMinibus",     href: "/fleet" },
-    { key: "electricVehicle",  href: "/fleet" },
+    { key: "standardSedan",    href: "/fleet/standard-sedan" },
+    { key: "luxurySedan",      href: "/fleet/eqe-300-electric" },
+    { key: "executiveMinivan", href: "/fleet/executive-minivan" },
+    { key: "luxuryMinivan",    href: "/fleet/luxury-minivan" },
+    { key: "groupMinibus",     href: "/fleet/group-minibus" },
+    { key: "electricVehicle",  href: "/fleet/electric-vehicle" },
   ];
 
   const DESTINATIONS = [
@@ -102,9 +102,9 @@ export default function Footer() {
                 <Phone size={14} className="text-gold-500/60" />
                 +34 635 383 712
               </a>
-              <a href="mailto:vtcbcn2025@gmail.com" className="flex items-center gap-3 text-sm text-dark-400 hover:text-gold-400 transition-colors">
+              <a href="mailto:bookings@elitebcn.info" className="flex items-center gap-3 text-sm text-dark-400 hover:text-gold-400 transition-colors">
                 <Mail size={14} className="text-gold-500/60" />
-                vtcbcn2025@gmail.com
+                bookings@elitebcn.info
               </a>
               <a href="https://wa.me/34635383712" target="_blank" rel="noreferrer" className="flex items-center gap-3 text-sm text-dark-400 hover:text-gold-400 transition-colors">
                 <MessageCircle size={14} className="text-gold-500/60" />
@@ -176,10 +176,11 @@ export default function Footer() {
             © {new Date().getFullYear()} Élite BCN Transfers. {t("copyright")}
           </p>
           <div className="flex gap-5">
-            <Link href="/faq"     className="text-xs text-dark-500 hover:text-gold-400 transition-colors">{t("legal.faq")}</Link>
-            <Link href="/privacy" className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.privacy")}</Link>
-            <Link href="/terms"   className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.terms")}</Link>
-            <Link href="/cookies" className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.cookies")}</Link>
+            <Link href="/faq"          className="text-xs text-dark-500 hover:text-gold-400 transition-colors">{t("legal.faq")}</Link>
+            <Link href="/privacy"      className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.privacy")}</Link>
+            <Link href="/terms"        className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.terms")}</Link>
+            <Link href="/cookies"      className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.cookies")}</Link>
+            <Link href="/auth/login"   className="text-xs text-dark-600 hover:text-dark-400 transition-colors">Driver & Partner Login</Link>
           </div>
         </div>
       </div>

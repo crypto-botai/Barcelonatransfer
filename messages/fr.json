@@ -19,7 +19,7 @@
     "title1": "Transferts",
     "title2": "Privés",
     "title3": "de Luxe",
-    "description": "Service de chauffeur premium avec Mercedes Classe S, BMW Série 7 et Tesla Model S. Transferts aéroport, voyages d'affaires et transport VIP à Barcelone et en Espagne.",
+    "description": "Prix fixes, sans surcharge. Mercedes EQE 300 électrique, V-Class VIP et Vito — avec accueil, suivi de vol et aucun tarif dynamique. Jamais.",
     "trust": {
       "meetGreet": "Accueil Personnalisé",
       "flightMonitoring": "Suivi des Vols",
@@ -215,8 +215,8 @@
     "relatedTitle": "Transferts similaires",
     "ctaTitle": "Prêt à réserver votre transfert vers {name} ?",
     "ctaSubtitle": "Confirmation instantanée. Annulation gratuite jusqu'à 24 heures avant la prise en charge.",
-    "sedan": "Mercedes E-Class / BMW Série 5",
-    "tesla": "Tesla Model S",
+    "sedan": "Mercedes EQE 300 Electric",
+    "tesla": "Mercedes EQE 300",
     "mpv": "Mercedes V-Class (MPV)",
     "paxLabel": "passagers",
     "allInclusive": "Tous les prix incluent péages, accueil et 60 min d'attente gratuite. Sans frais cachés."

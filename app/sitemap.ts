@@ -32,6 +32,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/day-tours`,                      priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
     { url: `${BASE}/hotel-transfers`,                priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
 
+    // ── Fleet detail pages ────────────────────────────
+    { url: `${BASE}/fleet/standard-sedan`,    priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+    { url: `${BASE}/fleet/eqe-300-electric`,  priority: 0.9,  changeFrequency: "monthly", lastModified: NOW },
+    { url: `${BASE}/fleet/executive-minivan`, priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+    { url: `${BASE}/fleet/luxury-minivan`,    priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+    { url: `${BASE}/fleet/group-minibus`,     priority: 0.8,  changeFrequency: "monthly", lastModified: NOW },
+    { url: `${BASE}/fleet/electric-vehicle`,  priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+
     // ── Tools ─────────────────────────────────────────
     { url: `${BASE}/tools/transfer-cost-calculator`, priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
 

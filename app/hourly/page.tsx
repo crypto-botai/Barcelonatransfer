@@ -6,7 +6,7 @@ import { formatCurrency } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: { absolute: "Hourly Chauffeur Barcelona — From €45/hr | Élite BCN" },
-  description: "Private chauffeur in Barcelona by the hour from €45/hr (4-hr minimum). Flexible disposal for meetings, shopping, city tours & events. Mercedes V-Class & E-Class.",
+  description: "Private chauffeur in Barcelona by the hour from €45/hr (4-hr minimum). Flexible disposal for meetings, shopping, city tours & events. Mercedes V-Class & EQE 300 Electric.",
   alternates: { canonical: "https://www.elitebcn.info/hourly" },
   openGraph: {
     title: "Hourly Chauffeur Barcelona — From €45/hr | Élite BCN",

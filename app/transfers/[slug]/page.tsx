@@ -210,7 +210,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                 {
                   icon: CheckCircle2,
                   title: "Premium vehicles",
-                  body: "Mercedes V-Class (7 pax), E-Class & Vito (8 pax). Air-conditioned, water on board, child seats on request.",
+                  body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, water on board, child seats on request.",
                 },
                 {
                   icon: MapPin,
@@ -270,7 +270,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                 </thead>
                 <tbody>
                   {[
-                    { vehicle: "Mercedes E-Class", pax: "1–3", price: dest.prices.sedan },
+                    { vehicle: "Mercedes EQE 300 Electric", pax: "1–4", price: dest.prices.sedan },
                     { vehicle: "Mercedes Vito (8 pax)", pax: "1–8", price: dest.prices.mpv },
                     { vehicle: "Mercedes V-Class (7 pax)", pax: "1–7", price: dest.prices.mpv },
                   ].map((row) => (

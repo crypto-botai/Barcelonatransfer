@@ -5,20 +5,20 @@ import FleetSection from "@/components/sections/FleetSection";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: { absolute: "Luxury Fleet Barcelona — Mercedes V-Class & E-Class | Élite BCN" },
+  title: { absolute: "Luxury Fleet Barcelona — Mercedes V-Class & EQE 300 Electric | Élite BCN" },
   description:
-    "Barcelona transfer fleet: Mercedes V-Class (7-seat luxury), Mercedes E-Class & Mercedes Vito (8-seat minivan). All vehicles under 3 years old, air-conditioned, WiFi & water.",
+    "Barcelona transfer fleet: Mercedes V-Class (7-seat luxury), Mercedes EQE 300 Electric & Mercedes Vito (8-seat minivan). All vehicles under 3 years old, air-conditioned, WiFi & water.",
   alternates: { canonical: "https://www.elitebcn.info/fleet" },
   openGraph: {
-    title: "Luxury Fleet Barcelona — Mercedes V-Class & E-Class | Élite BCN",
-    description: "Mercedes V-Class, E-Class & Vito. Premium private hire vehicles for Barcelona airport transfers and chauffeur services.",
+    title: "Luxury Fleet Barcelona — Mercedes V-Class & EQE 300 Electric | Élite BCN",
+    description: "Mercedes V-Class, EQE 300 Electric & Vito. Premium private hire vehicles for Barcelona airport transfers and chauffeur services.",
     url: "https://www.elitebcn.info/fleet",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Luxury Fleet Barcelona — Mercedes V-Class & E-Class | Élite BCN",
-    description: "Mercedes V-Class, E-Class & Vito. Premium private hire vehicles for Barcelona airport transfers.",
+    title: "Luxury Fleet Barcelona — Mercedes V-Class & EQE 300 Electric | Élite BCN",
+    description: "Mercedes V-Class, EQE 300 Electric & Vito. Premium private hire vehicles for Barcelona airport transfers.",
     images: ["/opengraph-image"],
   },
 };
@@ -47,9 +47,9 @@ const fleetSchema = {
       position: 2,
       item: {
         "@type": "Product",
-        name: "Mercedes E-Class — Executive Saloon",
-        description: "Premium executive saloon for solo and small-group airport transfers in Barcelona. Up to 3 passengers.",
-        image: "https://www.elitebcn.info/fleet/e-class.png",
+        name: "Mercedes EQE 300 Electric — Executive Saloon",
+        description: "Premium all-electric executive saloon for airport transfers in Barcelona. Up to 4 passengers. Zero emissions.",
+        image: "https://www.elitebcn.info/fleet/eqe-300.png",
         brand: { "@type": "Brand", name: "Mercedes-Benz" },
         offers: { "@type": "Offer", price: "45", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
         aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },

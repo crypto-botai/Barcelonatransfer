@@ -7,7 +7,7 @@ import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-
 export const metadata: Metadata = {
   title: "Barcelona Airport to Andorra Transfer — from €220 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona Airport (BCN) to Andorra la Vella. Fixed price from €220. 3-hour journey in premium Mercedes V-Class & E-Class. Ski season & shopping trips. Book instantly.",
+    "Luxury private transfer from Barcelona Airport (BCN) to Andorra la Vella. Fixed price from €220. 3-hour journey in premium Mercedes V-Class & EQE 300 Electric. Ski season & shopping trips. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/andorra" },
   openGraph: {
     title: "Barcelona Airport to Andorra Transfer — from €220 | Fixed Price",
@@ -23,10 +23,21 @@ export const metadata: Metadata = {
   },
 };
 
+const BREADCRUMB = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",      item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "Transfers", item: "https://www.elitebcn.info/transfers" },
+    { "@type": "ListItem", position: 3, name: "Andorra",   item: "https://www.elitebcn.info/transfers/andorra" },
+  ],
+};
+
 export default function AndorraTransferPage() {
   return (
     <>
       <Navbar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,rgba(201,168,76,0.07),transparent)]" />

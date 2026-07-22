@@ -19,7 +19,7 @@
     "title1": "Люксовые",
     "title2": "Частные",
     "title3": "Трансферы",
-    "description": "Премиальный трансфер на Mercedes S-Class, BMW 7 серии и Tesla Model S. Аэропортовые трансферы, деловые поездки и VIP-перевозки по Барселоне и Испании.",
+    "description": "Фиксированные цены, без наценок. Mercedes EQE 300 Electric, V-Class VIP и Vito — встреча, отслеживание рейса и никаких динамических тарифов. Никогда.",
     "trust": {
       "meetGreet": "Встреча в Аэропорту",
       "flightMonitoring": "Отслеживание Рейсов",
@@ -215,8 +215,8 @@
     "relatedTitle": "Похожие трансферы",
     "ctaTitle": "Готовы забронировать трансфер до {name}?",
     "ctaSubtitle": "Мгновенное подтверждение. Бесплатная отмена за 24 часа до поездки.",
-    "sedan": "Mercedes E-Class / BMW 5 Series",
-    "tesla": "Tesla Model S",
+    "sedan": "Mercedes EQE 300 Electric",
+    "tesla": "Mercedes EQE 300",
     "mpv": "Mercedes V-Class (минивэн)",
     "paxLabel": "пассажиров",
     "allInclusive": "Все цены включают платные дороги, встречу и 60 мин бесплатного ожидания. Скрытых платежей нет."

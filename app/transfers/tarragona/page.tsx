@@ -7,7 +7,7 @@ import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-
 export const metadata: Metadata = {
   title: "Barcelona Airport to Tarragona Transfer — from €95 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona Airport (BCN) to Tarragona or PortAventura World. Fixed price from €95. 1-hour journey in Mercedes V-Class & E-Class. Meet & greet included.",
+    "Luxury private transfer from Barcelona Airport (BCN) to Tarragona or PortAventura World. Fixed price from €95. 1-hour journey in Mercedes V-Class & EQE 300 Electric. Meet & greet included.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/tarragona" },
   openGraph: {
     title: "Barcelona Airport to Tarragona Transfer — from €95 | Fixed Price",
@@ -23,10 +23,21 @@ export const metadata: Metadata = {
   },
 };
 
+const BREADCRUMB = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",      item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "Transfers", item: "https://www.elitebcn.info/transfers" },
+    { "@type": "ListItem", position: 3, name: "Tarragona", item: "https://www.elitebcn.info/transfers/tarragona" },
+  ],
+};
+
 export default function TarragonaTransferPage() {
   return (
     <>
       <Navbar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,rgba(201,168,76,0.07),transparent)]" />

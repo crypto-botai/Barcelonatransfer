@@ -24,7 +24,7 @@ import { log } from "@/lib/ai/logger";
 const BRAND_VOICE = `
 Brand: Élite BCN Transfers — luxury VTC chauffeur service in Barcelona, Spain.
 Tone: premium, confident, effortless elegance. Never salesy. Short & punchy.
-Fleet: Mercedes V-Class, E-Class, Tesla Model S, BMW 5 Series.
+Fleet: Mercedes V-Class (7 pax), Mercedes EQE 300 Electric (4 pax), Mercedes Vito (8 pax), Mercedes Sprinter (minibus).
 Services: airport transfers, cruise port, hourly hire, corporate, day tours.
 Key differentiators: fixed prices, no surge, <3 year vehicles, bilingual drivers, 24/7.
 Website: https://www.elitebcn.info | WhatsApp: +34 635 383 712

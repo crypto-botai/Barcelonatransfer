@@ -27,7 +27,7 @@ export default function Navbar() {
     { label: t("pricing"),    href: "/pricing" },
     {
       label: t("transfers"),
-      href: "#",
+      href: "/transfers",
       children: [
         { label: t("airportTransfers"),  href: "/airport-transfers" },
         { label: t("corporateTravel"),   href: "/corporate" },
@@ -82,16 +82,19 @@ export default function Navbar() {
                       onMouseEnter={() => setDropdown(link.label)}
                       onMouseLeave={() => setDropdown(null)}
                     >
-                      <button className={cn(
-                        "flex items-center gap-1 text-sm font-medium tracking-wider transition-colors duration-200",
-                        "text-dark-300 hover:text-gold-400"
-                      )}>
+                      <Link
+                        href={link.href}
+                        className={cn(
+                          "flex items-center gap-1 text-sm font-medium tracking-wider transition-colors duration-200",
+                          "text-dark-300 hover:text-gold-400"
+                        )}
+                      >
                         {link.label}
                         <ChevronDown size={14} className={cn(
                           "transition-transform duration-200",
                           dropdown === link.label && "rotate-180"
                         )} />
-                      </button>
+                      </Link>
                       <AnimatePresence>
                         {dropdown === link.label && (
                           <motion.div
@@ -145,20 +148,13 @@ export default function Navbar() {
               >
                 {t("bookNow")}
               </Link>
-              {dashboardHref ? (
+              {dashboardHref && (
                 <Link
                   href={dashboardHref}
                   className="flex items-center gap-1.5 text-sm text-gold-400 hover:text-gold-300 transition-colors tracking-wide"
                 >
                   <LayoutDashboard size={14} />
                   {t("dashboard")}
-                </Link>
-              ) : (
-                <Link
-                  href="/auth/login"
-                  className="text-sm text-dark-400 hover:text-white transition-colors tracking-wide"
-                >
-                  {t("signIn")}
                 </Link>
               )}
             </div>

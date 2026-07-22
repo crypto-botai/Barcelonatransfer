@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | Élite BCN Transfers",
   },
   description:
-    "Barcelona's #1 luxury private transfer. Fixed prices from €45 — no surge pricing, ever. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class & E-Class. Book 24/7.",
+    "Barcelona's #1 luxury private transfer. Fixed prices from €45 — no surge pricing, ever. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class, EQE 300 & Vito. Book 24/7.",
   authors: [{ name: "Élite BCN Transfers" }],
   creator: "Élite BCN Transfers",
   publisher: "Élite BCN Transfers",
@@ -40,13 +40,13 @@ export const metadata: Metadata = {
     siteName: "Élite BCN Transfers",
     title: "Élite BCN | Luxury Airport Transfers Barcelona — Fixed Prices from €45",
     description:
-      "Barcelona's premier luxury chauffeur service. Fixed-price airport transfers, VIP travel, executive transport. Mercedes V-Class & E-Class. No surge pricing, ever.",
+      "Barcelona's premier luxury chauffeur service. Fixed-price airport transfers, VIP travel, executive transport. Mercedes V-Class & EQE 300 Electric. No surge pricing, ever.",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Luxury Private Transfer Barcelona Airport" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Élite BCN | Luxury Airport Transfers Barcelona — Fixed Prices",
-    description: "Fixed-price luxury private transfers from Barcelona airport. Mercedes V-Class & E-Class. 24/7. Book instantly.",
+    description: "Fixed-price luxury private transfers from Barcelona airport. Mercedes V-Class & EQE 300 Electric. 24/7. Book instantly.",
     images: ["/opengraph-image"],
   },
   robots: {
@@ -69,8 +69,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        {/* IndexNow key for Bing/Yandex/Google auto-indexing */}
-        <meta name="indexnow-key" content="a1b2c3d4e5f6789012345678elitebcn" />
         {/* Geo meta tags for local SEO */}
         <meta name="geo.region" content="ES-CT" />
         <meta name="geo.placename" content="Barcelona, Catalonia, Spain" />
@@ -90,7 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   url: "https://www.elitebcn.info",
                   logo: { "@type": "ImageObject", url: "https://www.elitebcn.info/opengraph-image", width: 1200, height: 630 },
                   telephone: "+34635383712",
-                  email: "vtcbcn2025@gmail.com",
+                  email: "bookings@elitebcn.info",
                   foundingDate: "2018",
                   description: "Barcelona's premier luxury private transfer company. Fixed-price airport transfers, VIP travel, executive transport.",
                   address: {
@@ -119,10 +117,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   "@id": "https://www.elitebcn.info/#business",
                   name: "Élite BCN Transfers",
                   alternateName: ["Elite BCN", "Élite BCN", "Elite Barcelona Transfers", "VTC Barcelona"],
-                  description: "Luxury private airport transfers in Barcelona. Fixed prices from €45. Mercedes V-Class & E-Class. No surge pricing. Available 24/7. BCN El Prat T1/T2, cruise port, hotels, all Costa Daurada destinations.",
+                  description: "Luxury private airport transfers in Barcelona. Fixed prices from €45. Mercedes V-Class & EQE 300 Electric. No surge pricing. Available 24/7. BCN El Prat T1/T2, cruise port, hotels, all Costa Daurada destinations.",
                   url: "https://www.elitebcn.info",
                   telephone: "+34635383712",
-                  email: "vtcbcn2025@gmail.com",
+                  email: "bookings@elitebcn.info",
                   currenciesAccepted: "EUR",
                   paymentAccepted: "Credit Card, Cash, Bank Transfer",
                   priceRange: "€€–€€€",
@@ -152,7 +150,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     "@type": "OfferCatalog",
                     name: "Barcelona Private Transfer Services",
                     itemListElement: [
-                      { "@type": "Offer", name: "BCN Airport to Barcelona City Centre", price: "45", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "El Prat Airport to Barcelona City Transfer", description: "Fixed-price luxury private transfer from Barcelona El Prat Airport to city centre hotels. Mercedes V-Class & E-Class." } },
+                      { "@type": "Offer", name: "BCN Airport to Barcelona City Centre", price: "45", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "El Prat Airport to Barcelona City Transfer", description: "Fixed-price luxury private transfer from Barcelona El Prat Airport to city centre hotels. Mercedes V-Class & EQE 300 Electric." } },
                       { "@type": "Offer", name: "Barcelona to Sitges Transfer", price: "65", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Sitges Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Sitges. No surge pricing." } },
                       { "@type": "Offer", name: "Barcelona to Tarragona Transfer", price: "95", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Tarragona Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Tarragona and PortAventura." } },
                       { "@type": "Offer", name: "Barcelona to Girona Transfer", price: "110", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Girona Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Girona city or Girona Costa Brava Airport." } },
@@ -197,7 +195,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {
                   "@type": "Question",
                   name: "What is the best way to get from Barcelona Airport to the city?",
-                  acceptedAnswer: { "@type": "Answer", text: "The best way to get from Barcelona Airport to the city centre is by private transfer. Élite BCN Transfers offers fixed-price luxury transfers from €45 in Mercedes V-Class and E-Class vehicles. Unlike taxis, prices are fixed and confirmed at booking. Unlike the Aerobus (€6.75), you get door-to-door service with your luggage handled. The journey takes 20–40 minutes depending on traffic." },
+                  acceptedAnswer: { "@type": "Answer", text: "The best way to get from Barcelona Airport to the city centre is by private transfer. Élite BCN Transfers offers fixed-price luxury transfers from €45 in Mercedes V-Class, EQE 300 Electric, and Vito vehicles. Unlike taxis, prices are fixed and confirmed at booking. Unlike the Aerobus (€6.75), you get door-to-door service with your luggage handled. The journey takes 20–40 minutes depending on traffic." },
                 },
                 {
                   "@type": "Question",
@@ -222,7 +220,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {
                   "@type": "Question",
                   name: "What vehicles does Élite BCN Transfers use?",
-                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers operates a fleet of premium Mercedes vehicles: Mercedes V-Class (7 seats, luxury — ideal for groups and families), Mercedes E-Class (executive saloon, up to 3 pax), and Mercedes Vito (executive minivan, up to 8 passengers). All vehicles are less than 3 years old, air-conditioned, and equipped with complimentary water and WiFi." },
+                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers operates a fleet of premium vehicles: Mercedes EQE 300 Electric (executive sedan, up to 4 pax), Mercedes V-Class VIP (luxury 7-seat MPV), Mercedes Vito (executive minivan, up to 8 pax), and Mercedes Sprinter (group minibus, up to 16 pax). All vehicles are less than 3 years old, air-conditioned, and equipped with complimentary water and WiFi." },
                 },
               ],
             }),

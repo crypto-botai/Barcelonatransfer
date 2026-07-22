@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
-  description: "Élite BCN is Barcelona's premier licensed VTC transfer company. 4.9★ rated, 1,200+ five-star reviews. Professional multilingual drivers, premium Mercedes V-Class & E-Class fleet, impeccable service since 2018.",
+  description: "Élite BCN is Barcelona's premier licensed VTC transfer company. 4.9★ rated, 595+ five-star reviews. Professional multilingual drivers, premium Mercedes V-Class & EQE 300 Electric fleet, impeccable service since 2018.",
   alternates: { canonical: "https://www.elitebcn.info/about" },
   openGraph: {
     title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",

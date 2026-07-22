@@ -7,7 +7,7 @@ import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-
 export const metadata: Metadata = {
   title: "Barcelona Airport to Sitges Transfer — from €65 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona Airport (BCN) to Sitges. Fixed price from €65. 35-minute journey in Mercedes V-Class & E-Class. Meet & greet, no surge pricing. Book instantly.",
+    "Luxury private transfer from Barcelona Airport (BCN) to Sitges. Fixed price from €65. 35-minute journey in Mercedes V-Class & EQE 300 Electric. Meet & greet, no surge pricing. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/sitges" },
   openGraph: {
     title: "Barcelona Airport to Sitges Transfer — from €65 | Fixed Price",
@@ -21,6 +21,16 @@ export const metadata: Metadata = {
     description: "Luxury private transfer from Barcelona Airport to Sitges from €65. Fixed price, meet & greet, no surge pricing. 35 minutes.",
     images: ["/opengraph-image"],
   },
+};
+
+const BREADCRUMB = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",          item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "Transfers",     item: "https://www.elitebcn.info/transfers" },
+    { "@type": "ListItem", position: 3, name: "Sitges",        item: "https://www.elitebcn.info/transfers/sitges" },
+  ],
 };
 
 const SCHEMA = {
@@ -50,6 +60,7 @@ export default function SitgesTransferPage() {
   return (
     <>
       <Navbar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
       <main className="pt-20">
         {/* Hero */}
@@ -98,7 +109,7 @@ export default function SitgesTransferPage() {
                 { icon: Shield, title: "Fixed price €65", body: "The price you see is the price you pay. No meter, no traffic surcharges, no airport fees added at drop-off." },
                 { icon: Clock, title: "Meet & greet included", body: "Your driver waits in the arrivals hall with your name on a board. 60 minutes free waiting from your flight landing." },
                 { icon: Star, title: "Real-time flight tracking", body: "We monitor your flight live. If it's delayed, your driver adjusts automatically — no extra charge." },
-                { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), E-Class & Vito (8 pax). Air-conditioned, bottled water, WiFi on request." },
+                { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, bottled water, WiFi on request." },
                 { icon: MapPin, title: "Door-to-door service", body: "Dropped directly at your Sitges hotel, villa, or address. No sharing, no stops, no detours." },
                 { icon: Shield, title: "Licensed VTC operator", body: "Fully licensed VTC (Vehículo de Turismo con Conductor) under Generalitat de Catalunya regulations." },
               ].map(({ icon: Icon, title, body }) => (
@@ -158,7 +169,7 @@ export default function SitgesTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { vehicle: "Mercedes E-Class", pax: "1–3", price: "€65" },
+                    { vehicle: "Mercedes EQE 300 Electric", pax: "1–4", price: "€65" },
                     { vehicle: "Mercedes V-Class (7 pax)", pax: "1–7", price: "€85" },
                     { vehicle: "Mercedes Vito (8 pax)", pax: "1–8", price: "€80" },
                   ].map((row) => (

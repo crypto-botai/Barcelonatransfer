@@ -115,7 +115,7 @@ export default function CostCalculatorClient() {
     return [
       {
         method: "private-sedan",
-        label: "Private transfer (E-Class / BMW)",
+        label: "Private transfer (EQE 300 Electric)",
         costPerVehicle: dest.privateSedan,
         costPerPerson: dest.privateSedan / Math.min(pax, 3),
         totalForGroup: pax <= 3 ? dest.privateSedan : dest.privateMpv,
@@ -124,17 +124,6 @@ export default function CostCalculatorClient() {
         available: true,
         highlight: true,
         note: pax > 3 ? `V-Class (7 pax) — €${dest.privateMpv} total` : undefined,
-      },
-      {
-        method: "private-tesla",
-        label: "Private transfer (Tesla Model S)",
-        costPerVehicle: dest.privateTesla,
-        costPerPerson: dest.privateTesla / Math.min(pax, 3),
-        totalForGroup: pax <= 3 ? dest.privateTesla : dest.privateMpv,
-        durationMin: dest.durationMin,
-        comfort: 5,
-        available: true,
-        note: pax > 3 ? `V-Class (7 pax) — €${dest.privateMpv} total` : "Zero emissions",
       },
       {
         method: "taxi",
@@ -336,7 +325,7 @@ export default function CostCalculatorClient() {
               </thead>
               <tbody>
                 {[
-                  { label: "Private E-Class", prices: [1,2,3,4,6,7].map((n) => dest.privateSedan / Math.min(n, 3)) },
+                  { label: "Private EQE 300", prices: [1,2,3,4,6,7].map((n) => dest.privateSedan / Math.min(n, 4)) },
                   { label: "Private V-Class", prices: [1,2,3,4,6,7].map((n) => dest.privateMpv / n) },
                   { label: `Taxi (${tariff.toUpperCase()})`, prices: [1,2,3,4,6,7].map((n) => calcTaxi(dest.distanceKm, tariff) * Math.ceil(n / 4) / n) },
                   ...(dest.aerobusAvailable ? [{ label: "Aerobus", prices: [1,2,3,4,6,7].map(() => AEROBUS_PER_PERSON) }] : []),

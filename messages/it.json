@@ -19,7 +19,7 @@
     "title1": "Transfer",
     "title2": "Privati",
     "title3": "di Lusso",
-    "description": "Servizio autista premium con Mercedes Classe S, BMW Serie 7 e Tesla Model S. Transfer aeroporto, viaggi executive e trasporto VIP a Barcellona e in tutta Spagna.",
+    "description": "Prezzi fissi, nessun sovrapprezzo. Mercedes EQE 300 elettrica, V-Class VIP e Vito — con accoglienza, tracciamento voli e zero tariffe dinamiche. Mai.",
     "trust": {
       "meetGreet": "Accoglienza Personalizzata",
       "flightMonitoring": "Monitoraggio Voli",
@@ -215,8 +215,8 @@
     "relatedTitle": "Transfer correlati",
     "ctaTitle": "Pronto a prenotare il transfer per {name}?",
     "ctaSubtitle": "Conferma immediata. Cancellazione gratuita fino a 24 ore prima del ritiro.",
-    "sedan": "Mercedes Classe E / BMW Serie 5",
-    "tesla": "Tesla Model S",
+    "sedan": "Mercedes EQE 300 Electric",
+    "tesla": "Mercedes EQE 300",
     "mpv": "Mercedes Classe V (MPV)",
     "paxLabel": "passeggeri",
     "allInclusive": "Tutti i prezzi includono pedaggi, accoglienza e 60 min di attesa gratuita. Nessuna tariffa nascosta."

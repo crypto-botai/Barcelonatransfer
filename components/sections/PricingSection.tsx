@@ -74,7 +74,7 @@ function DiscountCell({ now, was, gold }: { now: number; was?: number; gold?: bo
         €{now}
       </span>
       {was && (
-        <span className="block text-[9px] text-green-500/70 leading-none mt-0.5">+10% VAT</span>
+        <span className="block text-[9px] text-green-500/70 leading-none mt-0.5">incl. VAT</span>
       )}
     </td>
   );
@@ -232,7 +232,7 @@ export default function PricingSection() {
           {/* Footer note */}
           <div className="p-5 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-dark-500 text-xs">
-              All prices include professional chauffeur, luxury vehicle, tolls, and meet & greet. VAT 10% added at checkout. Child seats available free. Airport &amp; City routes include promotional discount.
+              All prices include professional chauffeur, luxury vehicle, tolls, and meet & greet. VAT included. No hidden fees. Child seats free on request. Airport &amp; City routes include a limited-time promotional discount (struck price shows full rate).
             </p>
             <Link href="/book" className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">
               Get Custom Quote <ArrowRight size={12} />

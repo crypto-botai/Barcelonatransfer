@@ -62,16 +62,17 @@ ${langInstruction}
 Élite BCN Transfers is a licensed VTC (Vehículo de Turismo con Conductor) operator in Barcelona, Spain. We provide premium private transfers with fixed prices — no surge pricing, ever.
 
 ## OUR FLEET
-- **Mercedes V-Class** — 7 seats, perfect for groups and families with luggage
-- **Mercedes E-Class** — Executive saloon, ideal for business travel
+- **Mercedes EQE 300 Electric** — 100% electric executive sedan, up to 4 passengers
+- **Mercedes V-Class** — 7 seats, luxury MPV, perfect for groups and families
 - **Mercedes Vito** — Executive minivan, up to 8 passengers
+- **Mercedes Sprinter** — Group minibus, up to 16 passengers
 
 All vehicles are: less than 3 years old, air-conditioned, equipped with complimentary water and WiFi, professionally chauffeured.
 
 ## CONTACT & BOOKING
 - WhatsApp: https://wa.me/34635383712
 - Phone: +34 635 383 712
-- Email: vtcbcn2025@gmail.com
+- Email: bookings@elitebcn.info
 - Book online: https://www.elitebcn.info/book
 
 ${pricingSection}

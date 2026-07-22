@@ -19,7 +19,7 @@
     "title1": "Luxury",
     "title2": "Private",
     "title3": "Transfers",
-    "description": "Premium chauffeur service with Mercedes S-Class, BMW 7 Series, and Tesla Model S. Airport transfers, executive travel, and VIP transportation across Barcelona and Spain.",
+    "description": "Fixed-price private chauffeur across Barcelona and Catalonia. Mercedes EQE electric, V-Class VIP, and executive sedans — with meet & greet, flight tracking, and no surge pricing. Ever.",
     "trust": {
       "meetGreet": "Meet & Greet",
       "flightMonitoring": "Flight Monitoring",
@@ -32,13 +32,13 @@
       "fleet": "View Our Fleet"
     },
     "stats": {
-      "clients": "Happy Clients",
+      "clients": "Transfers Completed",
       "rating": "Google Rating",
       "years": "Years Active"
     },
     "badges": {
       "rating": "4.9★ Rating",
-      "ratingsSub": "1,200+ reviews",
+      "ratingsSub": "595 reviews",
       "vtc": "Licensed VTC",
       "vtcSub": "Fully insured",
       "service": "24/7 Service",
@@ -160,7 +160,7 @@
       "vipTransportation": "VIP Transportation",
       "privateTours": "Private Day Tours",
       "standardSedan": "Standard Sedan",
-      "luxurySedan": "Luxury Sedan",
+      "luxurySedan": "EQE 300 Electric",
       "executiveMinivan": "Executive Minivan",
       "luxuryMinivan": "Luxury Minivan",
       "groupMinibus": "Group Minibus",
