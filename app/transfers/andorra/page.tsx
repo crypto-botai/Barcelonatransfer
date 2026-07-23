@@ -3,22 +3,26 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
+import { ROUTES } from "@/lib/pricing";
+
+const andorraPrice =
+  ROUTES.find((r) => r.from === "airport" && r.to === "andorra")?.economy ?? 220;
 
 export const metadata: Metadata = {
-  title: "Barcelona Airport to Andorra Transfer — from €220 | Fixed Price",
+  title: `Barcelona Airport to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
   description:
-    "Luxury private transfer from Barcelona Airport (BCN) to Andorra la Vella. Fixed price from €220. 3-hour journey in premium Mercedes V-Class & EQE 300 Electric. Ski season & shopping trips. Book instantly.",
+    `Luxury private transfer from Barcelona Airport (BCN) to Andorra la Vella. Fixed price from €${andorraPrice}. 3-hour journey in premium Mercedes V-Class & EQE 300 Electric. Ski season & shopping trips. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/andorra" },
   openGraph: {
-    title: "Barcelona Airport to Andorra Transfer — from €220 | Fixed Price",
-    description: "Luxury private transfer from Barcelona Airport to Andorra la Vella from €220. Fixed price, no surge pricing. Ski season specialist.",
+    title: `Barcelona Airport to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
+    description: `Luxury private transfer from Barcelona Airport to Andorra la Vella from €${andorraPrice}. Fixed price, no surge pricing. Ski season specialist.`,
     url: "https://www.elitebcn.info/transfers/andorra",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Airport to Andorra Transfer — from €220 | Fixed Price",
-    description: "Luxury private transfer Barcelona Airport to Andorra la Vella from €220. Fixed price, no surge pricing. Ski season specialist.",
+    title: `Barcelona Airport to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
+    description: `Luxury private transfer Barcelona Airport to Andorra la Vella from €${andorraPrice}. Fixed price, no surge pricing. Ski season specialist.`,
     images: ["/opengraph-image"],
   },
 };
@@ -55,15 +59,15 @@ export default function AndorraTransferPage() {
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Private luxury transfer from BCN El Prat Airport direct to Andorra la Vella or Grandvalira ski resort.
-              Fixed price €220 — no meter, no tolls surprise, no surge pricing.
+              Fixed price €{andorraPrice} — no meter, no tolls surprise, no surge pricing.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> ~3 hours</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 210 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €220 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €{andorraPrice} fixed</div>
             </div>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Andorra Transfer — €220
+              Book Andorra Transfer — €{andorraPrice}
             </Link>
           </div>
         </section>
@@ -75,7 +79,7 @@ export default function AndorraTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "All-inclusive €220", body: "One fixed price covers the full 210 km journey including all tolls and mountain road sections. No surprises." },
+                { icon: Shield, title: `All-inclusive €${andorraPrice}`, body: `One fixed price covers the full 210 km journey including all tolls and mountain road sections. No surprises.` },
                 { icon: Clock, title: "Ski equipment transport", body: "Large boot space for ski bags, boot bags, and suitcases. The V-Class handles full ski kit for 4+ people." },
                 { icon: Star, title: "Winter mountain driving", body: "Our drivers are experienced in Pyrenean mountain routes year-round, including winter conditions." },
                 { icon: CheckCircle2, title: "Grandvalira ski station", body: "Direct drop-off at Grandvalira (Europe's largest ski area), Vallnord, or your Andorran hotel." },
@@ -128,11 +132,11 @@ export default function AndorraTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { route: "BCN Airport → Andorra la Vella (sedan)", price: "€220" },
+                    { route: "BCN Airport → Andorra la Vella (sedan)", price: `€${andorraPrice}` },
                     { route: "BCN Airport → Andorra la Vella (MPV, 7 seats)", price: "€250" },
                     { route: "BCN Airport → Grandvalira ski resort", price: "€240" },
                     { route: "BCN Airport → Vallnord ski resort", price: "€240" },
-                    { route: "Andorra la Vella → BCN Airport", price: "€220" },
+                    { route: "Andorra la Vella → BCN Airport", price: `€${andorraPrice}` },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.route}</td>
@@ -151,7 +155,7 @@ export default function AndorraTransferPage() {
             <h2 className="font-display text-3xl text-white mb-4">Ready to book your Andorra transfer?</h2>
             <p className="text-dark-400 mb-8">Instant confirmation. Free cancellation up to 24 hours before pickup.</p>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Now — from €220
+              Book Now — from €{andorraPrice}
             </Link>
           </div>
         </section>

@@ -3,21 +3,24 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { Plane, Anchor, Clock, Shield, Star, CheckCircle2 } from "lucide-react";
+import { ROUTES } from "@/lib/pricing";
+
+const airportCityEco = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona_city")?.economy ?? 45;
 
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Airport Transfer — BCN El Prat | Élite BCN" },
-  description: "Private transfer from Barcelona Airport from €45. Meet & greet in arrivals, real-time flight tracking, 60 min free waiting. Mercedes V-Class & EQE 300 Electric. Fixed price.",
+  description: `Private transfer from Barcelona Airport from €${airportCityEco}. Meet & greet in arrivals, real-time flight tracking, 60 min free waiting. Mercedes V-Class & EQE 300 Electric. Fixed price.`,
   alternates: { canonical: "https://www.elitebcn.info/airport-transfers" },
   openGraph: {
     title: "Barcelona Airport Transfer — BCN El Prat | Élite BCN",
-    description: "Private luxury transfer from Barcelona Airport from €45. Meet & greet, flight tracking, 60 min free wait. Mercedes V-Class & EQE 300 Electric. No surge pricing.",
+    description: `Private luxury transfer from Barcelona Airport from €${airportCityEco}. Meet & greet, flight tracking, 60 min free wait. Mercedes V-Class & EQE 300 Electric. No surge pricing.`,
     url: "https://www.elitebcn.info/airport-transfers",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Barcelona Airport Transfer — BCN El Prat | Élite BCN",
-    description: "Private luxury transfer from Barcelona Airport from €45. Meet & greet, flight tracking, 60 min free wait. Mercedes V-Class & EQE 300 Electric. No surge pricing.",
+    description: `Private luxury transfer from Barcelona Airport from €${airportCityEco}. Meet & greet, flight tracking, 60 min free wait. Mercedes V-Class & EQE 300 Electric. No surge pricing.`,
     images: ["/opengraph-image"],
   },
 };
@@ -90,17 +93,17 @@ export default function AirportTransfersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    ["El Prat Airport ⇄ Barcelona City",  "€50"],
-                    ["El Prat Airport ⇄ Cruise Terminal", "€50"],
-                    ["Cruise Terminal ⇄ Barcelona City",  "€50"],
-                    ["El Prat Airport ⇄ Sants Station",   "€55"],
-                    ["Barcelona ⇄ Girona Airport",        "€140"],
-                  ].map(([route, price]) => (
-                    <tr key={route} className="price-row border-b border-white/[0.04]">
-                      <td className="py-4 px-5 text-sm text-dark-200">{route}</td>
+                  {ROUTES.filter((r) =>
+                    (r.from === "airport" && r.to === "barcelona_city") ||
+                    (r.from === "airport" && r.to === "cruise") ||
+                    (r.from === "cruise"  && r.to === "barcelona_city") ||
+                    (r.from === "airport" && r.to === "sants") ||
+                    (r.from === "barcelona_city" && r.to === "girona_airport")
+                  ).map((r) => (
+                    <tr key={r.label} className="price-row border-b border-white/[0.04]">
+                      <td className="py-4 px-5 text-sm text-dark-200">{r.label}</td>
                       <td className="py-4 px-4 text-center">
-                        <span className="text-gold-400 font-semibold">{price}</span>
+                        <span className="text-gold-400 font-semibold">€{r.economy}</span>
                       </td>
                     </tr>
                   ))}

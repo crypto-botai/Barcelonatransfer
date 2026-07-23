@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { COMPANY } from "@/lib/company-facts";
 
 export default async function InvoicePage({
   params,
@@ -138,7 +139,7 @@ export default async function InvoicePage({
               ÉLITE<span className="gold">BCN</span>
             </div>
             <p style={{ fontSize: 11, color: "#888", marginTop: 4 }}>Luxury Private Transfers · Barcelona</p>
-            <p style={{ fontSize: 11, color: "#888" }}>vtcbcn2025@gmail.com</p>
+            <p style={{ fontSize: 11, color: "#888" }}>{COMPANY.email}</p>
           </div>
           <div className="invoice-meta">
             <h1>RECEIPT</h1>
@@ -219,7 +220,7 @@ export default async function InvoicePage({
         <div className="footer">
           <div>
             <p>Thank you for choosing Élite BCN Transfers.</p>
-            <p>For any questions, contact us at vtcbcn2025@gmail.com</p>
+            <p>For any questions, contact us at {COMPANY.email}</p>
           </div>
           <p>Booking #{booking.confirmationCode.slice(0, 12).toUpperCase()}</p>
         </div>

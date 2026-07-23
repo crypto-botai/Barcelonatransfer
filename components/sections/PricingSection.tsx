@@ -5,84 +5,27 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Search, ArrowRight } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { ROUTES, HOURLY_RATES, MIN_HOURLY_HOURS, type RoutePrice } from "@/lib/pricing";
+import PriceCell from "@/components/pricing/PriceCell";
 
 const TABS = ["Airport & City", "Costa Dorada", "Costa Brava", "Hourly"];
 
-const AIRPORT = [
-  { route: "El Prat Airport ⇄ Barcelona City",   eco: 45,  bus: 55,  van: 60,  vcl: 70,  mbs: 180, wasEco: 50,  wasBus: 65 },
-  { route: "El Prat Airport ⇄ Cruise Terminal",  eco: 45,  bus: 55,  van: 60,  vcl: 70,  mbs: 180, wasEco: 50,  wasBus: 65 },
-  { route: "Cruise Terminal ⇄ Barcelona City",   eco: 45,  bus: 55,  van: 60,  vcl: 70,  mbs: 180, wasEco: 50,  wasBus: 65 },
-  { route: "El Prat Airport ⇄ Sants Station",    eco: 50,  bus: 55,  van: 60,  vcl: 75,  mbs: 155, wasEco: 55,  wasBus: 65 },
-  { route: "Barcelona ⇄ La Roca Village",        eco: 75,  bus: 90,  van: 100, vcl: 120, mbs: 200, wasEco: 80,  wasBus: 100 },
-  { route: "El Prat Airport ⇄ Montserrat",        eco: 85,  bus: 95,  van: 105, vcl: 125, mbs: 200, wasEco: 95,  wasBus: 110 },
-  { route: "Barcelona ⇄ Girona Airport",         eco: 135, bus: 145, van: 155, vcl: 175, mbs: 255, wasEco: 140, wasBus: 155 },
-  { route: "Barcelona ⇄ Andorra",                eco: 280, bus: 340, van: 450, vcl: 550, mbs: 630, wasEco: 285, wasBus: 350 },
-];
-
-const DORADA = [
-  { route: "Barcelona ⇄ Castelldefels", eco: 50,  bus: 60,  van: 60,  vcl: 70,  mbs: 180 },
-  { route: "Barcelona ⇄ Sitges",        eco: 80,  bus: 100, van: 100, vcl: 120, mbs: 200 },
-  { route: "Barcelona ⇄ Cubelles",      eco: 90,  bus: 110, van: 110, vcl: 130, mbs: 210 },
-  { route: "Barcelona ⇄ Calafell",      eco: 100, bus: 120, van: 120, vcl: 140, mbs: 220 },
-  { route: "Barcelona ⇄ Vendrell",      eco: 110, bus: 130, van: 130, vcl: 150, mbs: 230 },
-  { route: "Barcelona ⇄ Tarragona",     eco: 150, bus: 170, van: 170, vcl: 190, mbs: 270 },
-  { route: "Barcelona ⇄ La Pineda",     eco: 155, bus: 175, van: 175, vcl: 195, mbs: 275 },
-  { route: "Barcelona ⇄ Salou",         eco: 155, bus: 175, van: 175, vcl: 195, mbs: 275 },
-  { route: "Barcelona ⇄ PortAventura",  eco: 155, bus: 175, van: 175, vcl: 195, mbs: 275 },
-  { route: "Barcelona ⇄ Cambrils",      eco: 160, bus: 180, van: 180, vcl: 200, mbs: 280 },
-];
-
-const BRAVA = [
-  { route: "Barcelona ⇄ Mataró",         eco: 90,  bus: 110, van: 110, vcl: 130, mbs: 210 },
-  { route: "Barcelona ⇄ Calella",        eco: 110, bus: 130, van: 130, vcl: 150, mbs: 230 },
-  { route: "Barcelona ⇄ Pineda de Mar",  eco: 115, bus: 135, van: 135, vcl: 155, mbs: 235 },
-  { route: "Barcelona ⇄ Santa Susanna",  eco: 120, bus: 140, van: 140, vcl: 160, mbs: 240 },
-  { route: "Barcelona ⇄ Malgrat de Mar", eco: 125, bus: 145, van: 145, vcl: 165, mbs: 245 },
-  { route: "Barcelona ⇄ Blanes",         eco: 135, bus: 155, van: 155, vcl: 175, mbs: 255 },
-  { route: "Barcelona ⇄ Lloret de Mar",  eco: 145, bus: 165, van: 165, vcl: 185, mbs: 265 },
-  { route: "Barcelona ⇄ Tossa de Mar",   eco: 155, bus: 175, van: 175, vcl: 195, mbs: 275 },
-  { route: "Barcelona ⇄ S'Agaró",        eco: 155, bus: 175, van: 175, vcl: 195, mbs: 275 },
-  { route: "Barcelona ⇄ Platja d'Aro",   eco: 160, bus: 180, van: 180, vcl: 200, mbs: 280 },
-  { route: "Barcelona ⇄ Palamós",        eco: 185, bus: 205, van: 205, vcl: 225, mbs: 305 },
-  { route: "Barcelona ⇄ Roses",          eco: 205, bus: 225, van: 225, vcl: 245, mbs: 325 },
-  { route: "Barcelona ⇄ Empuriabrava",   eco: 210, bus: 230, van: 230, vcl: 250, mbs: 330 },
-  { route: "Barcelona ⇄ Figueres",       eco: 200, bus: 220, van: 220, vcl: 240, mbs: 320 },
-  { route: "Barcelona ⇄ Cadaqués",       eco: 240, bus: 260, van: 260, vcl: 280, mbs: 360 },
-];
+const AIRPORT  = ROUTES.filter((r) => r.category === "airport");
+const DORADA   = ROUTES.filter((r) => r.category === "costa-dorada");
+const BRAVA    = ROUTES.filter((r) => r.category === "costa-brava");
 
 const HOURLY = [
-  { label: "Economy (1–3 pax)",   price: 40, unit: "/ hour", min: "Min. 4 hours" },
-  { label: "Business (1–3 pax)",  price: 40, unit: "/ hour", min: "Min. 4 hours" },
-  { label: "Minivan Vito (4–8 pax)", price: 50, unit: "/ hour", min: "Min. 4 hours" },
-  { label: "V-Class Luxury (7 pax)", price: 60, unit: "/ hour", min: "Min. 4 hours" },
-  { label: "Minibus (9+ pax)",    price: 80, unit: "/ hour", min: "Min. 4 hours" },
+  { label: "Economy (1–3 pax)",      price: HOURLY_RATES.ECONOMY,        min: MIN_HOURLY_HOURS.ECONOMY        },
+  { label: "Business (1–3 pax)",     price: HOURLY_RATES.BUSINESS,       min: MIN_HOURLY_HOURS.BUSINESS       },
+  { label: "Minivan Vito (4–8 pax)", price: HOURLY_RATES.MINIVAN,        min: MIN_HOURLY_HOURS.MINIVAN        },
+  { label: "V-Class Luxury (7 pax)", price: HOURLY_RATES.LUXURY_MINIVAN, min: MIN_HOURLY_HOURS.LUXURY_MINIVAN },
+  { label: "Minibus (9+ pax)",       price: HOURLY_RATES.MINIBUS,        min: MIN_HOURLY_HOURS.MINIBUS        },
 ];
 
-type Row = {
-  route: string;
-  eco: number; bus: number; van: number; vcl: number; mbs: number;
-  wasEco?: number; wasBus?: number;
-};
 
-function DiscountCell({ now, was, gold }: { now: number; was?: number; gold?: boolean }) {
-  return (
-    <td className="py-3.5 px-3 text-center">
-      {was && (
-        <span className="block text-[10px] text-dark-600 line-through leading-none mb-0.5">€{was}</span>
-      )}
-      <span className={`text-sm font-${gold ? "semibold" : "medium"} ${gold ? "text-gold-400" : "text-white"}`}>
-        €{now}
-      </span>
-      {was && (
-        <span className="block text-[9px] text-green-500/70 leading-none mt-0.5">incl. VAT</span>
-      )}
-    </td>
-  );
-}
-
-function PriceTable({ data, search }: { data: Row[]; search: string }) {
+function PriceTable({ data, search }: { data: RoutePrice[]; search: string }) {
   const filtered = data.filter((r) =>
-    r.route.toLowerCase().includes(search.toLowerCase())
+    r.label.toLowerCase().includes(search.toLowerCase())
   );
   return (
     <div className="overflow-x-auto">
@@ -100,13 +43,13 @@ function PriceTable({ data, search }: { data: Row[]; search: string }) {
         </thead>
         <tbody>
           {filtered.map((r) => (
-            <tr key={r.route} className="price-row border-b border-white/[0.04]">
-              <td className="py-3.5 px-4 text-sm text-dark-200">{r.route}</td>
-              <DiscountCell now={r.eco} was={r.wasEco} />
-              <DiscountCell now={r.bus} was={r.wasBus} />
-              <td className="py-3.5 px-3 text-center text-sm text-white font-medium">€{r.van}</td>
-              <DiscountCell now={r.vcl} gold />
-              <td className="py-3.5 px-3 text-center text-sm text-white font-medium">€{r.mbs}</td>
+            <tr key={r.label} className="price-row border-b border-white/[0.04]">
+              <td className="py-3.5 px-4 text-sm text-dark-200">{r.label}</td>
+              <PriceCell amount={r.economy}  wasAmount={r.wasEconomy}  />
+              <PriceCell amount={r.business} wasAmount={r.wasBusiness} />
+              <PriceCell amount={r.minivan} />
+              <PriceCell amount={r.vclass} gold />
+              <PriceCell amount={r.minibus} />
               <td className="py-3.5 px-4">
                 <Link
                   href="/book"
@@ -218,8 +161,8 @@ export default function PricingSection() {
                   <div key={h.label} className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 text-center">
                     <h3 className="text-white text-sm font-medium mb-3">{h.label}</h3>
                     <p className="font-display text-3xl text-gold-400">{formatCurrency(h.price)}</p>
-                    <p className="text-dark-400 text-xs mb-1">{h.unit}</p>
-                    <p className="text-dark-500 text-xs mb-4">{h.min}</p>
+                    <p className="text-dark-400 text-xs mb-1">/ hour</p>
+                    <p className="text-dark-500 text-xs mb-4">Min. {h.min} hours</p>
                     <Link href="/hourly" className="btn-gold block py-2.5 rounded-lg text-xs font-semibold">
                       Book Hourly
                     </Link>
@@ -232,7 +175,7 @@ export default function PricingSection() {
           {/* Footer note */}
           <div className="p-5 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-dark-500 text-xs">
-              All prices include professional chauffeur, luxury vehicle, tolls, and meet & greet. VAT included. No hidden fees. Child seats free on request. Airport &amp; City routes include a limited-time promotional discount (struck price shows full rate).
+              All prices are final and include VAT, tolls, professional chauffeur, and meet &amp; greet. Child seats free. Airport &amp; City routes include a limited-time promotional discount (struck price shows full rate).
             </p>
             <Link href="/book" className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">
               Get Custom Quote <ArrowRight size={12} />

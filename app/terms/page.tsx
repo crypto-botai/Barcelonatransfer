@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { COMPANY } from "@/lib/company-facts";
 
 export const metadata: Metadata = {
   title: "Terms & Conditions | Élite BCN Transfers",
@@ -112,7 +113,7 @@ export default function TermsPage() {
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">9. Complaints</h2>
-                  <p>Any complaints must be submitted in writing within 7 days of the journey to vtcbcn2025@gmail.com. We aim to respond within 48 hours.</p>
+                  <p>Any complaints must be submitted in writing within 7 days of the journey to {COMPANY.email}. We aim to respond within 48 hours.</p>
                 </div>
 
                 <div>
@@ -122,7 +123,7 @@ export default function TermsPage() {
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">11. Contact</h2>
-                  <p>Élite BCN Transfers · Barcelona, Spain · <a href="mailto:vtcbcn2025@gmail.com" className="text-gold-400 hover:text-gold-300">vtcbcn2025@gmail.com</a> · +34 635 383 712</p>
+                  <p>Élite BCN Transfers · Barcelona, Spain · <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300">{COMPANY.email}</a> · +34 635 383 712</p>
                 </div>
 
               </div>

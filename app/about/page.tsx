@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import { COMPANY } from "@/lib/company-facts";
 
 export const metadata: Metadata = {
   title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.elitebcn.info/about" },
   openGraph: {
     title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
-    description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet. 1,200+ five-star reviews.",
+    description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet. 595+ five-star reviews.",
     url: "https://www.elitebcn.info/about",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
@@ -87,7 +88,7 @@ export default function AboutPage() {
                 <div className="space-y-3 text-sm">
                   <p className="text-dark-400">
                     <span className="text-dark-200">Email: </span>
-                    <a href="mailto:vtcbcn2025@gmail.com" className="text-gold-400 hover:text-gold-300">vtcbcn2025@gmail.com</a>
+                    <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300">{COMPANY.email}</a>
                   </p>
                   <p className="text-dark-400">
                     <span className="text-dark-200">Phone: </span>

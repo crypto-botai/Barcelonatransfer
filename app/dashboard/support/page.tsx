@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { MessageCircle, Phone, Mail, ChevronRight, Send, HelpCircle, Clock } from "lucide-react";
 import toast from "react-hot-toast";
+import { COMPANY } from "@/lib/company-facts";
 
 const FAQS = [
   { q: "How do I cancel a booking?",            a: "You can cancel any confirmed booking up to 24 hours before pickup for a full refund. Go to My Bookings, open the booking, and tap Cancel." },
@@ -35,7 +36,7 @@ export default function SupportPage() {
         {[
           { icon: MessageCircle, label: "WhatsApp", sub: "Fastest response", href: "https://wa.me/34635383712", color: "text-[#25D366] bg-[#25D366]/10 border-[#25D366]/20" },
           { icon: Phone, label: "Call Us",   sub: "+34 635 383 712",   href: "tel:+34635383712",            color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
-          { icon: Mail,  label: "Email",     sub: "Reply in 2 hours",   href: "mailto:vtcbcn2025@gmail.com", color: "text-purple-400 bg-purple-500/10 border-purple-500/20" },
+          { icon: Mail,  label: "Email",     sub: "Reply in 2 hours",   href: `mailto:${COMPANY.email}`, color: "text-purple-400 bg-purple-500/10 border-purple-500/20" },
         ].map(({ icon: Icon, label, sub, href, color }) => (
           <a
             key={label}

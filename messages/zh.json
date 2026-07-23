@@ -19,7 +19,7 @@
     "title1": "豪华",
     "title2": "私人",
     "title3": "接送服务",
-    "description": "提供奔驰S级、宝马7系和特斯拉Model S的高端司机服务。涵盖机场接送、商务出行及巴塞罗那和西班牙全境VIP交通。",
+    "description": "提供奔驰EQE 300电动、V-Class MPV和Vito的高端专属接送服务。固定价格，含迎接服务，无浮动收费，服务覆盖巴塞罗那全境。",
     "trust": {
       "meetGreet": "专人迎接",
       "flightMonitoring": "航班追踪",
@@ -38,7 +38,7 @@
     },
     "badges": {
       "rating": "4.9★ 评分",
-      "ratingsSub": "1,200+ 条评价",
+      "ratingsSub": "条评价",
       "vtc": "持牌VTC",
       "vtcSub": "全额保险",
       "service": "24/7 服务",
@@ -66,7 +66,8 @@
     "passengers": "名乘客",
     "maxCapacity": "最大容量",
     "luggage": "行李",
-    "inclVat": "含增值税 · 固定价格"
+    "inclVat": "含增值税 · 固定价格",
+    "pricingNote": "所有价格为最终价格，含增值税、过路费、专业司机及接机服务。儿童安全座椅免费。"
   },
   "services": {
     "label": "我们的服务",

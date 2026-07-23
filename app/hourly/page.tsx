@@ -3,33 +3,37 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
+import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+
+const MIN_RATE = HOURLY_RATES.ECONOMY;
+const MIN_HOURS = MIN_HOURLY_HOURS.ECONOMY;
 
 export const metadata: Metadata = {
-  title: { absolute: "Hourly Chauffeur Barcelona — From €45/hr | Élite BCN" },
-  description: "Private chauffeur in Barcelona by the hour from €45/hr (4-hr minimum). Flexible disposal for meetings, shopping, city tours & events. Mercedes V-Class & EQE 300 Electric.",
+  title: { absolute: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Élite BCN` },
+  description: `Private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr (${MIN_HOURS}-hr minimum). Flexible disposal for meetings, shopping, city tours & events. Mercedes V-Class & EQE 300 Electric.`,
   alternates: { canonical: "https://www.elitebcn.info/hourly" },
   openGraph: {
-    title: "Hourly Chauffeur Barcelona — From €45/hr | Élite BCN",
-    description: "Book a private chauffeur in Barcelona by the hour from €45/hr. Flexible disposal for meetings, shopping, events, or sightseeing.",
+    title: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Élite BCN`,
+    description: `Book a private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr. Flexible disposal for meetings, shopping, events, or sightseeing.`,
     url: "https://www.elitebcn.info/hourly",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Hourly Chauffeur Barcelona — From €45/hr | Élite BCN",
-    description: "Book a private chauffeur in Barcelona by the hour from €45/hr. Flexible disposal for meetings, shopping, events, or sightseeing.",
+    title: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Élite BCN`,
+    description: `Book a private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr. Flexible disposal for meetings, shopping, events, or sightseeing.`,
     images: ["/opengraph-image"],
   },
 };
 
-const HOURLY_RATES = [
-  { class: "Economy / Business",    rate: 45,  pax: "1–3",  min: 4 },
-  { class: "Luxury Sedan",          rate: 65,  pax: "1–3",  min: 4 },
-  { class: "First Class",           rate: 110, pax: "1–3",  min: 4 },
-  { class: "Executive SUV",         rate: 75,  pax: "1–5",  min: 4 },
-  { class: "Minivan (Vito)",           rate: 55,  pax: "1–8",  min: 4 },
-  { class: "Luxury Minivan (V-Class)", rate: 65,  pax: "1–7",  min: 4 },
-  { class: "Minibus",               rate: 160, pax: "1–16", min: 4 },
+const RATE_CARDS = [
+  { class: "Economy / Business",       rate: HOURLY_RATES.ECONOMY,        pax: "1–3",  min: MIN_HOURLY_HOURS.ECONOMY        },
+  { class: "Luxury Sedan",             rate: HOURLY_RATES.LUXURY,         pax: "1–3",  min: MIN_HOURLY_HOURS.LUXURY         },
+  { class: "First Class",              rate: HOURLY_RATES.FIRST_CLASS,    pax: "1–3",  min: MIN_HOURLY_HOURS.FIRST_CLASS    },
+  { class: "Executive SUV",            rate: HOURLY_RATES.SUV,            pax: "1–5",  min: MIN_HOURLY_HOURS.SUV            },
+  { class: "Minivan (Vito)",           rate: HOURLY_RATES.MINIVAN,        pax: "1–8",  min: MIN_HOURLY_HOURS.MINIVAN        },
+  { class: "Luxury Minivan (V-Class)", rate: HOURLY_RATES.LUXURY_MINIVAN, pax: "1–7",  min: MIN_HOURLY_HOURS.LUXURY_MINIVAN },
+  { class: "Minibus",                  rate: HOURLY_RATES.MINIBUS,        pax: "1–16", min: MIN_HOURLY_HOURS.MINIBUS        },
 ];
 
 export default function HourlyPage() {
@@ -56,7 +60,7 @@ export default function HourlyPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-              {HOURLY_RATES.map((r) => (
+              {RATE_CARDS.map((r) => (
                 <div key={r.class} className="glass-card gold-hover-border rounded-xl p-6 text-center">
                   <h3 className="text-white font-medium mb-3">{r.class}</h3>
                   <p className="font-display text-4xl text-gold-400 mb-1">

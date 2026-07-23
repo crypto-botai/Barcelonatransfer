@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
+import { COMPANY } from "@/lib/company-facts";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -37,7 +38,7 @@ export async function createAlert(opts: CreateAlertOptions): Promise<void> {
   if (!alert) return;
 
   if (opts.sendEmail && opts.severity !== "INFO") {
-    const adminEmail = process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com";
+    const adminEmail = process.env.ADMIN_EMAIL ?? COMPANY.email;
     await resend.emails
       .send({
         from:    process.env.RESEND_FROM ?? "Élite BCN AI <noreply@elitebcn.info>",

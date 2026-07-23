@@ -33,8 +33,7 @@ function getOrCreateSessionId(): string {
 const STEPS = [
   { id: 1, label: "Journey" },
   { id: 2, label: "Vehicle" },
-  { id: 3, label: "Details" },
-  { id: 4, label: "Payment" },
+  { id: 3, label: "Confirm" },
 ];
 
 const BOOKING_TYPES: { type: BookingType; label: string; icon: React.ElementType; desc: string }[] = [
@@ -719,58 +718,11 @@ export default function BookFormClient() {
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <button onClick={() => setStep(2)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
-                    <ArrowLeft size={16} /> Back
-                  </button>
-                  <button onClick={() => setStep(4)} disabled={!step3Valid}
-                    className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40">
-                    Review & Pay <ArrowRight size={16} />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* STEP 4: Review & Pay */}
-          {step === 4 && quote && (
-            <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <div className="space-y-4">
-                <div className="glass-card rounded-2xl p-6">
-                  <h2 className="font-display text-2xl text-white mb-5">Booking Summary</h2>
-                  <div className="space-y-2.5 text-sm">
-                    {([
-                      ["Service",     BOOKING_TYPE_LABELS[bookingType]],
-                      ["Pick-up",     data.pickupAddress],
-                      ...(data.dropoffAddress ? [["Drop-off", data.dropoffAddress]] : []),
-                      ["Date & Time", `${data.date} at ${data.time}`],
-                      ["Vehicle",     VEHICLE_CATALOG.find((v) => v.class === data.vehicleClass)?.label ?? ""],
-                      ["Passengers",  String(data.passengers)],
-                      ["Luggage",     `${data.luggage} bags`],
-                      ["Name",        data.guestName],
-                      ["Email",       data.guestEmail],
-                      ["Phone",       data.guestPhone],
-                      ...(data.flightNumber ? [["Flight", data.flightNumber]] : []),
-                      ...(bookingType === "HOURLY" ? [["Duration", `${data.durationHours}h`]] : []),
-                    ] as [string, string | undefined][]).filter(([, v]) => v).map(([label, value]) => (
-                      <div key={label} className="flex justify-between border-b border-white/[0.04] pb-2.5">
-                        <span className="text-dark-400">{label}</span>
-                        <span className="text-white text-right max-w-xs truncate">{value}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-5 bg-black/30 rounded-xl p-4 space-y-2 text-sm">
-                    {quote.vatAmount > 0 ? (
-                      <>
-                        <div className="flex justify-between text-dark-400">
-                          <span>Transfer price</span><span>{formatCurrency(quote.baseFare)}</span>
-                        </div>
-                        <div className="flex justify-between text-dark-400">
-                          <span>VAT (10%)</span><span>{formatCurrency(quote.vatAmount)}</span>
-                        </div>
-                      </>
-                    ) : (
+                {/* Price summary — shown inline once a quote is loaded */}
+                {quote && (
+                  <div className="glass-card rounded-2xl p-6">
+                    <h2 className="font-display text-xl text-white mb-4">Price Summary</h2>
+                    <div className="bg-black/30 rounded-xl p-4 space-y-2 text-sm">
                       <>
                         <div className="flex justify-between text-dark-400">
                           <span>Base fare</span><span>{formatCurrency(quote.baseFare)}</span>
@@ -797,37 +749,34 @@ export default function BookFormClient() {
                           </div>
                         )}
                       </>
-                    )}
-                    {(data.extras ?? []).filter((e) => e.price > 0).map((e) => (
-                      <div key={e.id} className="flex justify-between text-dark-400">
-                        <span>{e.label} {e.quantity > 1 ? `×${e.quantity}` : ""}</span>
-                        <span>{formatCurrency(e.price * e.quantity)}</span>
+                      {(data.extras ?? []).filter((e) => e.price > 0).map((e) => (
+                        <div key={e.id} className="flex justify-between text-dark-400">
+                          <span>{e.label} {e.quantity > 1 ? `×${e.quantity}` : ""}</span>
+                          <span>{formatCurrency(e.price * e.quantity)}</span>
+                        </div>
+                      ))}
+                      {couponSaving > 0 && (
+                        <div className="flex justify-between text-green-400">
+                          <span className="flex items-center gap-1.5"><Tag size={11} /> Coupon {couponCode}</span>
+                          <span>-{formatCurrency(couponSaving)}</span>
+                        </div>
+                      )}
+                      <div className="border-t border-white/10 pt-3 flex justify-between items-end">
+                        <span className="text-white font-semibold">Total <span className="text-dark-500 text-xs font-normal">(VAT incl.)</span></span>
+                        <span className="font-display text-xl text-gold-400">{formatCurrency(grandTotal)}</span>
                       </div>
-                    ))}
-                    <div className="border-t border-white/10 pt-3 flex justify-between">
-                      <span className="text-white font-semibold">Total</span>
-                      <span className="font-display text-xl text-gold-400">{formatCurrency(grandTotal)}</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-xs text-dark-500">
+                      <span className="flex items-center gap-1"><Shield size={11} className="text-gold-500" /> Free cancellation 24h+</span>
+                      <span className="flex items-center gap-1"><CreditCard size={11} className="text-gold-500" /> Secure SumUp payment</span>
+                      {hoursUntilPickup < 4 && hoursUntilPickup >= 1 && (
+                        <span className="flex items-center gap-1 text-amber-400 font-medium"><Zap size={11} /> 15% last-minute fee applied</span>
+                      )}
                     </div>
                   </div>
+                )}
 
-                  {couponSaving > 0 && (
-                    <div className="mt-2 flex items-center justify-between text-sm bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
-                      <span className="text-green-400 flex items-center gap-1.5"><Tag size={12} /> Coupon {couponCode}</span>
-                      <span className="text-green-400 font-medium">-{formatCurrency(couponSaving)}</span>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 text-xs text-dark-500">
-                    <span className="flex items-center gap-1"><Zap size={11} className="text-gold-500" /> Fixed price</span>
-                    <span className="flex items-center gap-1"><Shield size={11} className="text-gold-500" /> Free cancellation 24h+ before</span>
-                    <span className="flex items-center gap-1"><Clock size={11} className="text-gold-500" /> Pickup change up to 8h before</span>
-                    <span className="flex items-center gap-1"><CreditCard size={11} className="text-gold-500" /> Secure SumUp payment</span>
-                    {hoursUntilPickup < 4 && hoursUntilPickup >= 1 && (
-                      <span className="flex items-center gap-1 text-amber-400 font-medium"><Zap size={11} /> 15% last-minute fee applied</span>
-                    )}
-                  </div>
-                </div>
-
+                {/* Coupon */}
                 {!couponCode ? (
                   <div className="glass-card rounded-xl p-4">
                     <label className="text-xs text-dark-400 uppercase tracking-wider block mb-2">Have a coupon code?</label>
@@ -839,12 +788,13 @@ export default function BookFormClient() {
                           placeholder="ELITE-XXXXXX"
                           className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm" />
                       </div>
-                      <button onClick={applyCoupon} disabled={couponLoading}
-                        className="btn-outline-gold px-4 py-3 rounded-xl text-sm whitespace-nowrap">
+                      <button onClick={applyCoupon} disabled={couponLoading || !data.guestEmail}
+                        className="btn-outline-gold px-4 py-3 rounded-xl text-sm whitespace-nowrap disabled:opacity-40">
                         {couponLoading ? <Loader2 size={14} className="animate-spin" /> : "Apply"}
                       </button>
                     </div>
                     {couponError && <p className="text-red-400 text-xs mt-1">{couponError}</p>}
+                    {!data.guestEmail && <p className="text-dark-500 text-[11px] mt-1">Enter your email above to apply a coupon</p>}
                   </div>
                 ) : (
                   <div className="flex items-center justify-between bg-green-500/8 border border-green-500/20 rounded-xl px-4 py-3">
@@ -860,13 +810,13 @@ export default function BookFormClient() {
                 )}
 
                 <div className="flex gap-3">
-                  <button onClick={() => setStep(3)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
+                  <button onClick={() => setStep(2)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
                     <ArrowLeft size={16} /> Back
                   </button>
-                  <button onClick={handlePay} disabled={submitting}
-                    className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
+                  <button onClick={handlePay} disabled={!step3Valid || submitting}
+                    className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40">
                     {submitting ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
-                    {submitting ? "Processing…" : `Pay ${formatCurrency(grandTotal)}`}
+                    {submitting ? "Processing…" : quote ? `Pay ${formatCurrency(grandTotal)}` : "Confirm Booking"}
                   </button>
                 </div>
 
@@ -896,14 +846,8 @@ export default function BookFormClient() {
             </button>
           )}
           {step === 3 && (
-            <button onClick={() => setStep(4)} disabled={!step3Valid}
-              className="btn-gold px-5 py-3 rounded-xl text-sm font-semibold flex-shrink-0 disabled:opacity-40">
-              Review
-            </button>
-          )}
-          {step === 4 && (
-            <button onClick={handlePay} disabled={submitting}
-              className="btn-gold px-5 py-3 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-2">
+            <button onClick={handlePay} disabled={!step3Valid || submitting}
+              className="btn-gold px-5 py-3 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-2 disabled:opacity-40">
               {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
               {submitting ? "…" : `Pay ${formatCurrency(grandTotal)}`}
             </button>

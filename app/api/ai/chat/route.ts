@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { isBudgetAvailable } from "@/lib/ai/budget";
 import { streamSupportReply } from "@/lib/ai/agents/support";
 import { createBookingFromChat, type ChatBookingDraft } from "@/lib/ai/bookingFromChat";
+import { COMPANY } from "@/lib/company-facts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
 
   if (!(await isBudgetAvailable())) {
     return NextResponse.json({
-      reply:   "Our AI assistant is temporarily unavailable. Please contact us via WhatsApp at +34 635 383 712 or email vtcbcn2025@gmail.com.",
+      reply:   `Our AI assistant is temporarily unavailable. Please contact us via WhatsApp at +34 635 383 712 or email ${COMPANY.email}.`,
       escalate: true,
     });
   }

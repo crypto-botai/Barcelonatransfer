@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { COMPANY } from "@/lib/company-facts";
 
 export const metadata: Metadata = {
   title: "Cookie Policy | Élite BCN Transfers",
@@ -140,7 +141,7 @@ export default function CookiesPage() {
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">Contact</h2>
-                  <p>If you have questions about our use of cookies, please contact us at <a href="mailto:vtcbcn2025@gmail.com" className="text-gold-400 hover:text-gold-300">vtcbcn2025@gmail.com</a>.</p>
+                  <p>If you have questions about our use of cookies, please contact us at <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300">{COMPANY.email}</a>.</p>
                 </div>
 
               </div>

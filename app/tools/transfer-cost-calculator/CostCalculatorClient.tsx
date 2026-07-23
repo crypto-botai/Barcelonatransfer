@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
@@ -10,36 +10,35 @@ interface Destination {
   distanceKm: number;
   durationMin: number;
   privateSedan: number;
-  privateTesla: number;
   privateMpv: number;
   aerobusAvailable: boolean;
   metroAvailable: boolean;
 }
 
 const DESTINATIONS: Destination[] = [
-  { label: "Barcelona City Centre (Eixample/Las Ramblas)", distanceKm: 16, durationMin: 25, privateSedan: 45, privateTesla: 55, privateMpv: 65, aerobusAvailable: true, metroAvailable: true },
-  { label: "W Barcelona Hotel / Barceloneta", slug: "w-barcelona-hotel", distanceKm: 18, durationMin: 25, privateSedan: 45, privateTesla: 55, privateMpv: 65, aerobusAvailable: false, metroAvailable: true },
-  { label: "Hotel Arts Barcelona / Pullman Skipper", slug: "hotel-arts-barcelona", distanceKm: 17, durationMin: 22, privateSedan: 45, privateTesla: 55, privateMpv: 65, aerobusAvailable: false, metroAvailable: true },
-  { label: "Passeig de Gràcia Hotels (Mandarin, Majestic…)", slug: "mandarin-oriental-barcelona", distanceKm: 16, durationMin: 26, privateSedan: 45, privateTesla: 55, privateMpv: 65, aerobusAvailable: true, metroAvailable: true },
-  { label: "Fairmont / Sofia Hotel (Diagonal)", slug: "fairmont-rey-juan-carlos", distanceKm: 12, durationMin: 18, privateSedan: 45, privateTesla: 55, privateMpv: 65, aerobusAvailable: false, metroAvailable: false },
-  { label: "Hilton Diagonal Mar / Parc del Fòrum", slug: "hilton-diagonal-mar", distanceKm: 14, durationMin: 20, privateSedan: 45, privateTesla: 55, privateMpv: 65, aerobusAvailable: false, metroAvailable: true },
-  { label: "Barcelona Cruise Port (Moll Adossat)", slug: "msc-cruises-barcelona", distanceKm: 14, durationMin: 20, privateSedan: 45, privateTesla: 55, privateMpv: 65, aerobusAvailable: false, metroAvailable: false },
-  { label: "Fira Gran Via (MWC / ISE)", slug: "mwc-2027-barcelona", distanceKm: 7, durationMin: 12, privateSedan: 35, privateTesla: 45, privateMpv: 55, aerobusAvailable: false, metroAvailable: true },
-  { label: "Castelldefels", slug: "castelldefels-transfer", distanceKm: 20, durationMin: 22, privateSedan: 48, privateTesla: 58, privateMpv: 68, aerobusAvailable: false, metroAvailable: false },
-  { label: "Sitges", distanceKm: 35, durationMin: 35, privateSedan: 65, privateTesla: 75, privateMpv: 85, aerobusAvailable: false, metroAvailable: false },
-  { label: "Mataró", slug: "mataro-transfer", distanceKm: 36, durationMin: 38, privateSedan: 55, privateTesla: 65, privateMpv: 75, aerobusAvailable: false, metroAvailable: false },
-  { label: "Terrassa", slug: "terrassa-transfer", distanceKm: 40, durationMin: 42, privateSedan: 60, privateTesla: 70, privateMpv: 85, aerobusAvailable: false, metroAvailable: false },
-  { label: "Salou / PortAventura", slug: "salou-transfer", distanceKm: 101, durationMin: 70, privateSedan: 100, privateTesla: 115, privateMpv: 135, aerobusAvailable: false, metroAvailable: false },
-  { label: "Reus Airport (REU)", slug: "reus-airport", distanceKm: 112, durationMin: 70, privateSedan: 110, privateTesla: 125, privateMpv: 145, aerobusAvailable: false, metroAvailable: false },
-  { label: "Tarragona", distanceKm: 95, durationMin: 65, privateSedan: 95, privateTesla: 110, privateMpv: 130, aerobusAvailable: false, metroAvailable: false },
-  { label: "Girona / Costa Brava", distanceKm: 100, durationMin: 65, privateSedan: 110, privateTesla: 125, privateMpv: 145, aerobusAvailable: false, metroAvailable: false },
-  { label: "Girona Airport (GRO)", slug: "girona-airport", distanceKm: 103, durationMin: 68, privateSedan: 105, privateTesla: 120, privateMpv: 140, aerobusAvailable: false, metroAvailable: false },
-  { label: "Montserrat", distanceKm: 58, durationMin: 50, privateSedan: 85, privateTesla: 95, privateMpv: 110, aerobusAvailable: false, metroAvailable: false },
-  { label: "Andorra la Vella", distanceKm: 205, durationMin: 155, privateSedan: 220, privateTesla: 250, privateMpv: 290, aerobusAvailable: false, metroAvailable: false },
-  { label: "Perpignan, France", slug: "perpignan-transfer", distanceKm: 188, durationMin: 125, privateSedan: 185, privateTesla: 210, privateMpv: 250, aerobusAvailable: false, metroAvailable: false },
-  { label: "Lleida", slug: "lleida-transfer", distanceKm: 172, durationMin: 105, privateSedan: 165, privateTesla: 185, privateMpv: 220, aerobusAvailable: false, metroAvailable: false },
-  { label: "Valencia", slug: "valencia-transfer", distanceKm: 355, durationMin: 215, privateSedan: 290, privateTesla: 320, privateMpv: 380, aerobusAvailable: false, metroAvailable: false },
-  { label: "Madrid", slug: "madrid-transfer", distanceKm: 628, durationMin: 335, privateSedan: 490, privateTesla: 540, privateMpv: 620, aerobusAvailable: false, metroAvailable: false },
+  { label: "Barcelona City Centre (Eixample/Las Ramblas)", distanceKm: 16, durationMin: 25, privateSedan: 45, privateMpv: 65, aerobusAvailable: true, metroAvailable: true },
+  { label: "W Barcelona Hotel / Barceloneta", slug: "w-barcelona-hotel", distanceKm: 18, durationMin: 25, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: true },
+  { label: "Hotel Arts Barcelona / Pullman Skipper", slug: "hotel-arts-barcelona", distanceKm: 17, durationMin: 22, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: true },
+  { label: "Passeig de Gràcia Hotels (Mandarin, Majestic…)", slug: "mandarin-oriental-barcelona", distanceKm: 16, durationMin: 26, privateSedan: 45, privateMpv: 65, aerobusAvailable: true, metroAvailable: true },
+  { label: "Fairmont / Sofia Hotel (Diagonal)", slug: "fairmont-rey-juan-carlos", distanceKm: 12, durationMin: 18, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: false },
+  { label: "Hilton Diagonal Mar / Parc del Fòrum", slug: "hilton-diagonal-mar", distanceKm: 14, durationMin: 20, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: true },
+  { label: "Barcelona Cruise Port (Moll Adossat)", slug: "msc-cruises-barcelona", distanceKm: 14, durationMin: 20, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: false },
+  { label: "Fira Gran Via (MWC / ISE)", slug: "mwc-2027-barcelona", distanceKm: 7, durationMin: 12, privateSedan: 35, privateMpv: 55, aerobusAvailable: false, metroAvailable: true },
+  { label: "Castelldefels", slug: "castelldefels-transfer", distanceKm: 20, durationMin: 22, privateSedan: 48, privateMpv: 68, aerobusAvailable: false, metroAvailable: false },
+  { label: "Sitges", distanceKm: 35, durationMin: 35, privateSedan: 65, privateMpv: 85, aerobusAvailable: false, metroAvailable: false },
+  { label: "Mataró", slug: "mataro-transfer", distanceKm: 36, durationMin: 38, privateSedan: 55, privateMpv: 75, aerobusAvailable: false, metroAvailable: false },
+  { label: "Terrassa", slug: "terrassa-transfer", distanceKm: 40, durationMin: 42, privateSedan: 60, privateMpv: 85, aerobusAvailable: false, metroAvailable: false },
+  { label: "Salou / PortAventura", slug: "salou-transfer", distanceKm: 101, durationMin: 70, privateSedan: 100, privateMpv: 135, aerobusAvailable: false, metroAvailable: false },
+  { label: "Reus Airport (REU)", slug: "reus-airport", distanceKm: 112, durationMin: 70, privateSedan: 110, privateMpv: 145, aerobusAvailable: false, metroAvailable: false },
+  { label: "Tarragona", distanceKm: 95, durationMin: 65, privateSedan: 95, privateMpv: 130, aerobusAvailable: false, metroAvailable: false },
+  { label: "Girona / Costa Brava", distanceKm: 100, durationMin: 65, privateSedan: 110, privateMpv: 145, aerobusAvailable: false, metroAvailable: false },
+  { label: "Girona Airport (GRO)", slug: "girona-airport", distanceKm: 103, durationMin: 68, privateSedan: 105, privateMpv: 140, aerobusAvailable: false, metroAvailable: false },
+  { label: "Montserrat", distanceKm: 58, durationMin: 50, privateSedan: 85, privateMpv: 110, aerobusAvailable: false, metroAvailable: false },
+  { label: "Andorra la Vella", distanceKm: 205, durationMin: 155, privateSedan: 220, privateMpv: 290, aerobusAvailable: false, metroAvailable: false },
+  { label: "Perpignan, France", slug: "perpignan-transfer", distanceKm: 188, durationMin: 125, privateSedan: 185, privateMpv: 250, aerobusAvailable: false, metroAvailable: false },
+  { label: "Lleida", slug: "lleida-transfer", distanceKm: 172, durationMin: 105, privateSedan: 165, privateMpv: 220, aerobusAvailable: false, metroAvailable: false },
+  { label: "Valencia", slug: "valencia-transfer", distanceKm: 355, durationMin: 215, privateSedan: 290, privateMpv: 380, aerobusAvailable: false, metroAvailable: false },
+  { label: "Madrid", slug: "madrid-transfer", distanceKm: 628, durationMin: 335, privateSedan: 490, privateMpv: 620, aerobusAvailable: false, metroAvailable: false },
 ];
 
 type TariffType = "t1" | "t2";

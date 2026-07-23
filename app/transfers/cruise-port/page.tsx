@@ -3,22 +3,25 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight, Anchor } from "lucide-react";
+import { ROUTES } from "@/lib/pricing";
+
+const cruisePrice = ROUTES.find((r) => r.from === "airport" && r.to === "cruise")?.economy ?? 45;
 
 export const metadata: Metadata = {
-  title: "Barcelona Cruise Port Transfer — World Trade Centre & Moll Adossat | from €45",
+  title: `Barcelona Cruise Port Transfer — World Trade Centre & Moll Adossat | from €${cruisePrice}`,
   description:
-    "Luxury private transfer to Barcelona cruise port. World Trade Centre (T-A to T-D) & Moll Adossat. Vessel tracking, meet & greet, fixed price from €45. Book instantly 24/7.",
+    `Luxury private transfer to Barcelona cruise port. World Trade Centre (T-A to T-D) & Moll Adossat. Vessel tracking, meet & greet, fixed price from €${cruisePrice}. Book instantly 24/7.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/cruise-port" },
   openGraph: {
-    title: "Barcelona Cruise Port Transfer — from €45 | Fixed Price",
-    description: "Luxury private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €45. Vessel tracking, meet & greet, no surge pricing.",
+    title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Fixed Price`,
+    description: `Luxury private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €${cruisePrice}. Vessel tracking, meet & greet, no surge pricing.`,
     url: "https://www.elitebcn.info/transfers/cruise-port",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Cruise Port Transfer — from €45 | Fixed Price",
-    description: "Luxury private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €45. Vessel tracking, meet & greet, no surge pricing.",
+    title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Fixed Price`,
+    description: `Luxury private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €${cruisePrice}. Vessel tracking, meet & greet, no surge pricing.`,
     images: ["/opengraph-image"],
   },
 };
@@ -49,10 +52,10 @@ export default function CruisePortTransferPage() {
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 20 minutes from BCN Airport</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 10 km from city centre</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €45 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €{cruisePrice} fixed</div>
             </div>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Cruise Port Transfer — from €45
+              Book Cruise Port Transfer — from €{cruisePrice}
             </Link>
           </div>
         </section>
@@ -123,9 +126,9 @@ export default function CruisePortTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { route: "BCN Airport → Cruise Port (sedan)", price: "€45" },
+                    { route: "BCN Airport → Cruise Port (sedan)", price: `€${cruisePrice}` },
                     { route: "BCN Airport → Cruise Port (MPV, 7 seats)", price: "€60" },
-                    { route: "Cruise Port → BCN Airport (sedan)", price: "€45" },
+                    { route: "Cruise Port → BCN Airport (sedan)", price: `€${cruisePrice}` },
                     { route: "Barcelona City Hotel → Cruise Port", price: "€35" },
                     { route: "Cruise Port → Sitges", price: "€65" },
                     { route: "Cruise Port → Tarragona / PortAventura", price: "€95" },
@@ -147,7 +150,7 @@ export default function CruisePortTransferPage() {
             <h2 className="font-display text-3xl text-white mb-4">Ready to book your cruise port transfer?</h2>
             <p className="text-dark-400 mb-8">Instant confirmation. Free cancellation up to 24 hours before pickup.</p>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Now — from €45
+              Book Now — from €{cruisePrice}
             </Link>
           </div>
         </section>

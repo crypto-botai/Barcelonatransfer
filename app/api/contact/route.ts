@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { resend } from "@/lib/resend";
+import { COMPANY } from "@/lib/company-facts";
 
 const schema = z.object({
   name:    z.string().min(2),
@@ -9,7 +10,7 @@ const schema = z.object({
   message: z.string().min(5),
 });
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? COMPANY.email;
 
 export async function POST(req: NextRequest) {
   try {

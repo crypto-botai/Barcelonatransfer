@@ -38,7 +38,7 @@
     },
     "badges": {
       "rating": "4.9★ Rating",
-      "ratingsSub": "595 reviews",
+      "ratingsSub": "reviews",
       "vtc": "Licensed VTC",
       "vtcSub": "Fully insured",
       "service": "24/7 Service",
@@ -66,7 +66,8 @@
     "passengers": "passengers",
     "maxCapacity": "max capacity",
     "luggage": "luggage",
-    "inclVat": "incl. VAT · fixed price"
+    "inclVat": "incl. VAT · fixed price",
+    "pricingNote": "All prices are final and include VAT, tolls, professional chauffeur, and meet & greet. Child seats free."
   },
   "services": {
     "label": "Our Services",

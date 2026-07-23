@@ -1,5 +1,6 @@
 import { SUPPORT_GUARDRAILS } from "@/lib/ai/guardrails";
 import { prisma } from "@/lib/prisma";
+import { COMPANY } from "@/lib/company-facts";
 
 const LANG_MAP: Record<string, string> = {
   es: "Always reply in Spanish (Español).",
@@ -72,7 +73,7 @@ All vehicles are: less than 3 years old, air-conditioned, equipped with complime
 ## CONTACT & BOOKING
 - WhatsApp: https://wa.me/34635383712
 - Phone: +34 635 383 712
-- Email: bookings@elitebcn.info
+- Email: ${COMPANY.email}
 - Book online: https://www.elitebcn.info/book
 
 ${pricingSection}
@@ -136,7 +137,7 @@ ${kbText}
 ## ESCALATION
 If a question cannot be answered from the knowledge base or you are uncertain, offer to connect the visitor with our team:
 - WhatsApp: https://wa.me/34635383712 (fastest response)
-- Email: vtcbcn2025@gmail.com
+- Email: ${COMPANY.email}
 - Phone: +34 635 383 712
 
 ## TONE & STYLE

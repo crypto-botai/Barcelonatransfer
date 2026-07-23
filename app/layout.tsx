@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { COMPANY } from "@/lib/company-facts";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
 import ExitIntentPopup from "@/components/marketing/ExitIntentPopup";
@@ -55,6 +56,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "https://www.elitebcn.info",
+    // No URL-based locale routing exists — all locales share the same URL.
+    // x-default tells Google this URL is the canonical for all languages.
+    languages: { "x-default": "https://www.elitebcn.info" },
   },
 };
 
@@ -88,7 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   url: "https://www.elitebcn.info",
                   logo: { "@type": "ImageObject", url: "https://www.elitebcn.info/opengraph-image", width: 1200, height: 630 },
                   telephone: "+34635383712",
-                  email: "bookings@elitebcn.info",
+                  email: COMPANY.email,
                   foundingDate: "2018",
                   description: "Barcelona's premier luxury private transfer company. Fixed-price airport transfers, VIP travel, executive transport.",
                   address: {
@@ -120,7 +124,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   description: "Luxury private airport transfers in Barcelona. Fixed prices from €45. Mercedes V-Class & EQE 300 Electric. No surge pricing. Available 24/7. BCN El Prat T1/T2, cruise port, hotels, all Costa Daurada destinations.",
                   url: "https://www.elitebcn.info",
                   telephone: "+34635383712",
-                  email: "bookings@elitebcn.info",
+                  email: COMPANY.email,
                   currenciesAccepted: "EUR",
                   paymentAccepted: "Credit Card, Cash, Bank Transfer",
                   priceRange: "€€–€€€",

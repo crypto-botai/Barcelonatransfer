@@ -15,10 +15,9 @@ const REVIEWS = [
   { name: "Laura J.",     location: "Oslo",      avatar: "LJ", rating: 5, text: "Organised transport for artist riders over two festival weekends. Zero complaints from any of the talent — the drivers were professional, quiet, and respected the no-photography requests completely." },
 ];
 
+// Only Google until Trustpilot/TripAdvisor profiles are confirmed live.
 const PLATFORMS = [
-  { platform: "Google",      rating: SOCIAL_PROOF.googleRating,      count: SOCIAL_PROOF.googleReviewCount },
-  { platform: "Trustpilot",  rating: SOCIAL_PROOF.trustpilotRating,  count: SOCIAL_PROOF.trustpilotReviewCount },
-  { platform: "TripAdvisor", rating: SOCIAL_PROOF.tripadvisorRating, count: SOCIAL_PROOF.tripadvisorReviewCount },
+  { platform: "Google", rating: SOCIAL_PROOF.google.rating, count: SOCIAL_PROOF.google.count },
 ] as const;
 
 export default function TestimonialsSection() {

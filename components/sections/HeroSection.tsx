@@ -17,7 +17,7 @@ export default function HeroSection() {
   const t = useTranslations("hero");
 
   const TRUST_BADGES = [
-    { icon: Star,   label: t("badges.rating"),   sub: t("badges.ratingsSub") },
+    { icon: Star,   label: t("badges.rating"),   sub: `${COMPANY_FACTS.totalReviewCount} ${t("badges.ratingsSub")}` },
     { icon: Shield, label: t("badges.vtc"),       sub: t("badges.vtcSub") },
     { icon: Clock,  label: t("badges.service"),   sub: t("badges.serviceSub") },
     { icon: Award,  label: t("badges.transfers"), sub: t("badges.transfersSub") },

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { COMPANY } from "@/lib/company-facts";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Élite BCN Transfers",
@@ -41,7 +42,7 @@ export default function PrivacyPage() {
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">1. Who We Are</h2>
-                  <p>Élite BCN Transfers (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is a licensed VTC operator based in Barcelona, Spain. We operate the website elitebcn.info and provide luxury private chauffeur services. Contact: vtcbcn2025@gmail.com · +34 635 383 712.</p>
+                  <p>Élite BCN Transfers (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is a licensed VTC operator based in Barcelona, Spain. We operate the website elitebcn.info and provide luxury private chauffeur services. Contact: {COMPANY.email} · +34 635 383 712.</p>
                 </div>
 
                 <div>
@@ -85,7 +86,7 @@ export default function PrivacyPage() {
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">6. Your Rights</h2>
-                  <p>Under GDPR you have the right to: access, rectify, erase, restrict processing of, and port your personal data. You may also object to processing and withdraw consent at any time. To exercise these rights, contact vtcbcn2025@gmail.com. You have the right to lodge a complaint with the Spanish Data Protection Agency (AEPD) at aepd.es.</p>
+                  <p>Under GDPR you have the right to: access, rectify, erase, restrict processing of, and port your personal data. You may also object to processing and withdraw consent at any time. To exercise these rights, contact {COMPANY.email}. You have the right to lodge a complaint with the Spanish Data Protection Agency (AEPD) at aepd.es.</p>
                 </div>
 
                 <div>
@@ -110,7 +111,7 @@ export default function PrivacyPage() {
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">10. Contact</h2>
-                  <p>For any privacy-related queries: <a href="mailto:vtcbcn2025@gmail.com" className="text-gold-400 hover:text-gold-300">vtcbcn2025@gmail.com</a></p>
+                  <p>For any privacy-related queries: <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300">{COMPANY.email}</a></p>
                 </div>
 
               </div>

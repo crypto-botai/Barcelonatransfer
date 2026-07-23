@@ -77,3 +77,33 @@ export async function sendWhatsAppBookingConfirmation({
   const data = await res.json() as { messages?: { id: string }[] };
   console.log("[whatsapp] sent", data.messages?.[0]?.id, "to", e164);
 }
+
+/**
+ * Fire-and-forget admin booking alert via WhatsApp text message.
+ * Uses the WA Cloud API freeform endpoint (works within 24 h session window).
+ * Silently no-ops when WA_PHONE_ID / WA_TOKEN are not configured.
+ */
+export async function notifyAdminWhatsApp(text: string): Promise<void> {
+  const phoneId = process.env.WA_PHONE_ID;
+  const token   = process.env.WA_TOKEN;
+  const adminWA = process.env.WA_ADMIN_NUMBER ?? process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+
+  if (!phoneId || !token || !adminWA) return;
+
+  const to = toE164(adminWA);
+  const body = JSON.stringify({
+    messaging_product: "whatsapp",
+    to,
+    type: "text",
+    text: { body: text },
+  });
+
+  await fetch(
+    `https://graph.facebook.com/${WA_API_VERSION}/${phoneId}/messages`,
+    {
+      method:  "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body,
+    }
+  ).catch((e) => console.warn("[whatsapp] admin notify failed:", e?.message));
+}

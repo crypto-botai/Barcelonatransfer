@@ -7,30 +7,32 @@ export const COMPANY = {
   phone:        "+34635383712",
   phoneDisplay: "+34 635 383 712",
   whatsapp:     "https://wa.me/34635383712",
-  // TODO: create mailbox and forward in domain registrar (bookings@elitebcn.info → your inbox)
-  email:        "bookings@elitebcn.info",
+  /**
+   * The mailbox that RECEIVES mail.
+   * Gmail is the working fallback until bookings@elitebcn.info has verified MX records.
+   * To switch: set NEXT_PUBLIC_CONTACT_EMAIL in Vercel. Zero code change needed.
+   */
+  email:        process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "vtcbcn2025@gmail.com",
   city:         "Barcelona",
+  region:       "Catalonia",
   country:      "ES",
   vtcLicensed:  true,
-} as const;
+};
 
 export const SOCIAL_PROOF = {
-  googleRating:           4.9,
-  googleReviewCount:      312,
-  trustpilotRating:       4.8,
-  trustpilotReviewCount:  189,
-  tripadvisorRating:      5.0,
-  tripadvisorReviewCount: 94,
+  google:      { rating: 4.9, count: 312 },
+  // Trustpilot and TripAdvisor: include only after confirming live profiles exist.
+  // Re-add and update COMPANY_FACTS.totalReviewCount once verified.
 } as const;
 
-// Derived — never hardcode downstream
-export const TOTAL_REVIEWS = (
-  SOCIAL_PROOF.googleReviewCount +
-  SOCIAL_PROOF.trustpilotReviewCount +
-  SOCIAL_PROOF.tripadvisorReviewCount
-); // 595
+// Functions so they recompute if counts change
+export function totalReviews(): number {
+  return SOCIAL_PROOF.google.count;
+}
 
-export const YEARS_ACTIVE = new Date().getFullYear() - COMPANY.foundedYear;
+export function yearsActive(): number {
+  return new Date().getFullYear() - COMPANY.foundedYear;
+}
 
 export const OPERATIONS = {
   transfersCompleted: 5000,
@@ -39,16 +41,16 @@ export const OPERATIONS = {
   supportHours:       "24/7",
 } as const;
 
-// Legacy alias kept for backward compatibility
+// Legacy alias kept for backward compatibility with HeroSection, StatsSection, etc.
 export const COMPANY_FACTS = {
   foundedYear:         COMPANY.foundedYear,
-  yearsInBusiness:     YEARS_ACTIVE,
+  yearsInBusiness:     yearsActive(),
   totalTransfers:      OPERATIONS.transfersCompleted,
-  googleReviewCount:   SOCIAL_PROOF.googleReviewCount,
-  totalReviewCount:    TOTAL_REVIEWS,
-  rating:              SOCIAL_PROOF.googleRating,
-  ratingDisplay:       `${SOCIAL_PROOF.googleRating}★`,
+  googleReviewCount:   SOCIAL_PROOF.google.count,
+  totalReviewCount:    totalReviews(),
+  rating:              SOCIAL_PROOF.google.rating,
+  ratingDisplay:       `${SOCIAL_PROOF.google.rating}★`,
   transfersDisplay:    OPERATIONS.transfersDisplay,
-  yearsDisplay:        `${YEARS_ACTIVE}+`,
-  totalReviewsDisplay: `${TOTAL_REVIEWS}`,
+  yearsDisplay:        `${yearsActive()}+`,
+  totalReviewsDisplay: `${totalReviews()}`,
 } as const;

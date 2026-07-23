@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { BaseAgent } from "@/lib/ai/agents/base";
 import { callProvider } from "@/lib/ai/providers";
 import { saveMemory } from "@/lib/ai/memory";
+import { COMPANY } from "@/lib/company-facts";
 import { Resend } from "resend";
 
 type BookingWithUser = Prisma.BookingGetPayload<{
@@ -127,7 +128,7 @@ Reply with JSON only:
     b: { confirmationCode: string; guestName?: string | null; guestEmail?: string | null; pickupAddress: string; dropoffAddress: string; totalAmount: number; pickupDatetime: Date },
     note: string,
   ): Promise<void> {
-    const adminEmail = process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com";
+    const adminEmail = process.env.ADMIN_EMAIL ?? COMPANY.email;
     await resend.emails
       .send({
         from:    process.env.RESEND_FROM ?? "Élite BCN AI <noreply@elitebcn.info>",

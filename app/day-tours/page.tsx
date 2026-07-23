@@ -3,13 +3,28 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { Clock, MapPin, Users, ChevronRight, Star } from "lucide-react";
+import { ROUTES } from "@/lib/pricing";
 
 const BASE = "https://www.elitebcn.info";
+
+// Helper: get Economy price from city for a given destination key
+function cityPrice(to: string): number {
+  return ROUTES.find((r) => r.from === "barcelona_city" && r.to === to)?.economy ?? 0;
+}
+
+const P = {
+  montserrat:   cityPrice("montserrat"),
+  sitges:       cityPrice("sitges"),
+  lloret:       cityPrice("lloret"),
+  andorra:      cityPrice("andorra"),
+  tarragona:    cityPrice("tarragona"),
+  cadaques:     cityPrice("cadaques"),
+} as const;
 
 export const metadata: Metadata = {
   title: { absolute: "Private Day Tours from Barcelona — Montserrat, Sitges, Costa Brava | Élite BCN" },
   description:
-    "Private day tours from Barcelona with a luxury chauffeur: Montserrat monastery (€85), Sitges beach town (€80), Costa Brava (€140), Andorra shopping (€280). Door-to-door, no groups.",
+    `Private day tours from Barcelona with a luxury chauffeur: Montserrat monastery (€${P.montserrat}), Sitges beach town (€${P.sitges}), Costa Brava Lloret (€${P.lloret}), Andorra (€${P.andorra}). Door-to-door, no groups.`,
   alternates: { canonical: `${BASE}/day-tours` },
   openGraph: {
     title: "Private Day Tours from Barcelona — Élite BCN",
@@ -38,7 +53,7 @@ const TOURS = [
     slug: "montserrat",
     distance: "50 km",
     duration: "50 min",
-    from: "€85",
+    from: `€${P.montserrat}`,
     highlight: "Catalonia's sacred mountain. See the Black Madonna, the Escolania choir, and panoramic views over the plains.",
     tags: ["Half day", "Cultural", "Hiking"],
   },
@@ -47,7 +62,7 @@ const TOURS = [
     slug: "sitges",
     distance: "35 km",
     duration: "35 min",
-    from: "€80",
+    from: `€${P.sitges}`,
     highlight: "Barcelona's glamorous coastal neighbour. White-washed old town, seafront promenade, and excellent restaurants.",
     tags: ["Half day", "Beach", "Food"],
   },
@@ -56,7 +71,7 @@ const TOURS = [
     slug: "costa-brava",
     distance: "100 km",
     duration: "80 min",
-    from: "€140",
+    from: `€${P.lloret}`,
     highlight: "Wild Mediterranean coastline: Tossa de Mar, Lloret, Palamós. Coastal villages and crystal-clear coves.",
     tags: ["Full day", "Beach", "Scenic"],
   },
@@ -65,7 +80,7 @@ const TOURS = [
     slug: "andorra",
     distance: "220 km",
     duration: "2h 45min",
-    from: "€280",
+    from: `€${P.andorra}`,
     highlight: "Duty-free shopping and Pyrenean mountain scenery. Perfect for electronics, spirits, and designer goods.",
     tags: ["Full day", "Shopping", "Mountains"],
   },
@@ -74,7 +89,7 @@ const TOURS = [
     slug: "tarragona",
     distance: "100 km",
     duration: "70 min",
-    from: "€150",
+    from: `€${P.tarragona}`,
     highlight: "UNESCO Roman ruins: amphitheatre, forum, aqueduct. Roman Tarraco with a striking sea-cliff setting.",
     tags: ["Half day", "History", "UNESCO"],
   },
@@ -83,7 +98,7 @@ const TOURS = [
     slug: "costa-brava",
     distance: "180 km",
     duration: "2h 15min",
-    from: "€240",
+    from: `€${P.cadaques}`,
     highlight: "The most beautiful village on the Costa Brava. Dalí's home, white cubed houses, cobalt Mediterranean.",
     tags: ["Full day", "Art", "Scenic"],
   },

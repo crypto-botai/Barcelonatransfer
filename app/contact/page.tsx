@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Mail, Phone, MessageCircle, MapPin } from "lucide-react";
 import ContactFormClient from "./ContactFormClient";
+import { COMPANY } from "@/lib/company-facts";
 
 export const metadata: Metadata = {
   title: { absolute: "Contact Élite BCN | 24/7 Transfer Support Barcelona" },
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
 
 const CONTACT_ITEMS = [
   { icon: Phone,         label: "Phone",    value: "+34 635 383 712",      href: "tel:+34635383712",               external: false },
-  { icon: Mail,          label: "Email",    value: "vtcbcn2025@gmail.com", href: "mailto:vtcbcn2025@gmail.com",    external: false },
+  { icon: Mail,          label: "Email",    value: COMPANY.email, href: `mailto:${COMPANY.email}`, external: false },
   { icon: MessageCircle, label: "WhatsApp", value: "Chat with us now",     href: "https://wa.me/34635383712",      external: true },
   { icon: MapPin,        label: "Location", value: "Barcelona, Spain",     href: "https://maps.google.com/?q=Barcelona,Spain", external: true },
 ];

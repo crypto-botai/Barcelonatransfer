@@ -217,17 +217,6 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     description: "Premium group transfers for corporate events, airport runs, and tours for up to 16 passengers.",
   },
   {
-    class: "ELECTRIC_VIP",
-    label: "Electric VIP",
-    models: ["Mercedes EQE 300"],
-    maxPassengers: 4,
-    maxLuggage: 3,
-    features: ["100% Electric", "Zero Emissions", "Premium Sound", "Fast Charging", "WiFi"],
-    image: "/fleet/eqe-300.png",
-    description: "Premium all-electric executive travel. Zero-emission comfort for those who demand sustainability without compromise.",
-    badge: "Electric",
-  },
-  {
     class: "BUSINESS",
     label: "Business Sedan",
     models: ["Toyota Camry", "Toyota Prius"],

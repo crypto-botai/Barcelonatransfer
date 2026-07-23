@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Mail, Phone, MessageCircle, MapPin, Instagram, Facebook } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
 import NewsletterForm from "@/components/marketing/NewsletterForm";
+import { COMPANY } from "@/lib/company-facts";
 
 export default function Footer() {
   const t = useTranslations("footer");
@@ -102,9 +103,9 @@ export default function Footer() {
                 <Phone size={14} className="text-gold-500/60" />
                 +34 635 383 712
               </a>
-              <a href="mailto:bookings@elitebcn.info" className="flex items-center gap-3 text-sm text-dark-400 hover:text-gold-400 transition-colors">
+              <a href={`mailto:${COMPANY.email}`} className="flex items-center gap-3 text-sm text-dark-400 hover:text-gold-400 transition-colors">
                 <Mail size={14} className="text-gold-500/60" />
-                bookings@elitebcn.info
+                {COMPANY.email}
               </a>
               <a href="https://wa.me/34635383712" target="_blank" rel="noreferrer" className="flex items-center gap-3 text-sm text-dark-400 hover:text-gold-400 transition-colors">
                 <MessageCircle size={14} className="text-gold-500/60" />

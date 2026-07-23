@@ -3,13 +3,19 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, ChevronRight, CheckCircle2 } from "lucide-react";
+import { ROUTES as PRICING_ROUTES } from "@/lib/pricing";
 
 const BASE = "https://www.elitebcn.info";
+
+// Base airport→city Economy price from the single source of truth
+const airportCityPrice = PRICING_ROUTES.find(
+  (r) => r.from === "airport" && r.to === "barcelona_city"
+)?.economy ?? 45;
 
 export const metadata: Metadata = {
   title: { absolute: "Hotel Transfers Barcelona — Private Airport to Hotel | Élite BCN" },
   description:
-    "Luxury hotel transfers in Barcelona: airport to hotel, hotel to hotel, hotel to cruise port. Fixed prices from €45. Meet & greet, flight tracking, free waiting. All 5-star hotels covered.",
+    `Luxury hotel transfers in Barcelona: airport to hotel, hotel to hotel, hotel to cruise port. Fixed prices from €${airportCityPrice}. Meet & greet, flight tracking, free waiting. All 5-star hotels covered.`,
   alternates: { canonical: `${BASE}/hotel-transfers` },
   openGraph: {
     title: "Hotel Transfers Barcelona — Élite BCN Private Chauffeur",
@@ -38,15 +44,15 @@ const SCHEMA = {
   },
 };
 
-const ROUTES = [
-  { from: "BCN Airport", to: "Hotels — Eixample, Gràcia", price: "€45", duration: "20–25 min" },
-  { from: "BCN Airport", to: "Hotels — Barceloneta / Port", price: "€45", duration: "20–30 min" },
-  { from: "BCN Airport", to: "Hotels — Diagonal Mar / Forum", price: "€50", duration: "25–30 min" },
-  { from: "BCN Airport", to: "W Barcelona, Hotel Arts", price: "€45", duration: "20–25 min" },
-  { from: "BCN Airport", to: "Mandarin Oriental, El Palace, Majestic", price: "€45", duration: "20 min" },
-  { from: "Hotel", to: "Cruise Port (Terminals A–F)", price: "€45", duration: "15–25 min" },
-  { from: "Hotel", to: "Hotel (any area)", price: "from €35", duration: "Varies" },
-  { from: "Hotel", to: "Train station (Sants, Passeig de Gràcia)", price: "from €35", duration: "10–20 min" },
+const HOTEL_ROUTES = [
+  { from: "BCN Airport", to: "Hotels — Eixample, Gràcia",                    price: `€${airportCityPrice}`, duration: "20–25 min" },
+  { from: "BCN Airport", to: "Hotels — Barceloneta / Port",                   price: `€${airportCityPrice}`, duration: "20–30 min" },
+  { from: "BCN Airport", to: "Hotels — Diagonal Mar / Forum",                 price: `€${airportCityPrice + 5}`, duration: "25–30 min" },
+  { from: "BCN Airport", to: "W Barcelona, Hotel Arts",                       price: `€${airportCityPrice}`, duration: "20–25 min" },
+  { from: "BCN Airport", to: "Mandarin Oriental, El Palace, Majestic",        price: `€${airportCityPrice}`, duration: "20 min" },
+  { from: "Hotel",       to: "Cruise Port (Terminals A–F)",                   price: `€${airportCityPrice}`, duration: "15–25 min" },
+  { from: "Hotel",       to: "Hotel (any area)",                              price: "from €35",              duration: "Varies" },
+  { from: "Hotel",       to: "Train station (Sants, Passeig de Gràcia)",      price: "from €35",              duration: "10–20 min" },
 ];
 
 const HOTELS = [
@@ -85,10 +91,10 @@ export default function HotelTransfersPage() {
             </h1>
             <p className="text-dark-400 text-lg max-w-xl mx-auto mb-10">
               Private luxury transfers between Barcelona Airport and every major hotel in the city.
-              From €45 — fixed price, no meter, no surge.
+              From €{airportCityPrice} — fixed price, no meter, no surge.
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm text-dark-300 mb-10">
-              <span className="flex items-center gap-2"><Star size={14} className="text-gold-500" /> Fixed price from €45</span>
+              <span className="flex items-center gap-2"><Star size={14} className="text-gold-500" /> Fixed price from €{airportCityPrice}</span>
               <span className="flex items-center gap-2"><Shield size={14} className="text-gold-500" /> 60 min free waiting</span>
               <span className="flex items-center gap-2"><Clock size={14} className="text-gold-500" /> Flight monitoring included</span>
             </div>
@@ -115,7 +121,7 @@ export default function HotelTransfersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {ROUTES.map((r) => (
+                  {HOTEL_ROUTES.map((r) => (
                     <tr key={`${r.from}-${r.to}`} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
                       <td className="p-4 text-dark-300">{r.from}</td>
                       <td className="p-4 text-white">{r.to}</td>

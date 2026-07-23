@@ -25,7 +25,7 @@ export default function AdminSettingsPage() {
   const CONFIG_ITEMS = [
     { icon: Globe,      label: "Domain",          value: "www.elitebcn.info",               ok: true },
     { icon: Mail,       label: "Email FROM",       value: "noreply@elitebcntransfers.com",   ok: true },
-    { icon: Mail,       label: "Admin Email",      value: "vtcbcn2025@gmail.com",             ok: true },
+    { icon: Mail,       label: "Admin Email",      value: process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com", ok: true },
     { icon: CreditCard, label: "SumUp Payments",   value: "Merchant: MC9KDVYQ",              ok: true },
     { icon: Phone,      label: "WhatsApp",         value: "+34 635 383 712",                 ok: true },
     { icon: Key,        label: "Google OAuth",     value: "Configured in Vercel",            ok: true },

@@ -3,22 +3,27 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
+import { ROUTES } from "@/lib/pricing";
+
+const airportPrice = ROUTES.find((r) => r.from === "airport" && r.to === "montserrat")?.economy ?? 85;
+const cityPrice    = ROUTES.find((r) => r.from === "barcelona_city" && r.to === "montserrat")?.economy ?? 115;
+const mpvPrice     = ROUTES.find((r) => r.from === "airport" && r.to === "montserrat")?.minivan ?? 105;
 
 export const metadata: Metadata = {
-  title: "Barcelona Airport to Montserrat Transfer — from €85 | Fixed Price",
+  title: `Barcelona Airport to Montserrat Transfer — from €${airportPrice} | Fixed Price`,
   description:
-    "Luxury private transfer from Barcelona Airport (BCN) to Montserrat monastery. Fixed price from €85. 50-minute journey. Meet & greet, no surge pricing. Book instantly.",
+    `Luxury private transfer from Barcelona Airport (BCN) to Montserrat monastery. Fixed price from €${airportPrice}. 50-minute journey. Meet & greet, no surge pricing. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/montserrat" },
   openGraph: {
-    title: "Barcelona Airport to Montserrat Transfer — from €85 | Fixed Price",
-    description: "Luxury private transfer Barcelona Airport to Montserrat monastery from €85. Fixed price, no surge pricing.",
+    title: `Barcelona Airport to Montserrat Transfer — from €${airportPrice} | Fixed Price`,
+    description: `Luxury private transfer Barcelona Airport to Montserrat monastery from €${airportPrice}. Fixed price, no surge pricing.`,
     url: "https://www.elitebcn.info/transfers/montserrat",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Airport to Montserrat Transfer — from €85 | Fixed Price",
-    description: "Luxury private transfer Barcelona Airport to Montserrat monastery from €85. Fixed price, no surge pricing.",
+    title: `Barcelona Airport to Montserrat Transfer — from €${airportPrice} | Fixed Price`,
+    description: `Luxury private transfer Barcelona Airport to Montserrat monastery from €${airportPrice}. Fixed price, no surge pricing.`,
     images: ["/opengraph-image"],
   },
 };
@@ -44,15 +49,15 @@ export default function MontserratTransferPage() {
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Private luxury transfer from BCN El Prat Airport direct to Montserrat monastery.
-              Fixed price from €85, no surge pricing, no stress.
+              Fixed price from €{airportPrice}, no surge pricing, no stress.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 50 minutes</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 50 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €85 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €{airportPrice} fixed</div>
             </div>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Montserrat Transfer — €85
+              Book Montserrat Transfer — €{airportPrice}
             </Link>
           </div>
         </section>
@@ -64,7 +69,7 @@ export default function MontserratTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed price €85", body: "Price includes the mountain roads, no meter, no surprises. Drop at the monastery parking or Aeri cable car station." },
+                { icon: Shield, title: `Fixed price €${airportPrice}`, body: `Price includes the mountain roads, no meter, no surprises. Drop at the monastery parking or Aeri cable car station.` },
                 { icon: Clock, title: "Day-trip return included", body: "Book a return transfer for your chosen time. We wait while you explore — hourly waiting rate applies after 60 min." },
                 { icon: Star, title: "Direct from airport", body: "Start your Montserrat visit directly from the airport without going into Barcelona first." },
                 { icon: CheckCircle2, title: "Monastery access points", body: "Drop at the main monastery plaza, Aeri cable car base, or rack railway (Cremallera) station at Monistrol." },
@@ -116,10 +121,10 @@ export default function MontserratTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { route: "BCN Airport → Montserrat (sedan)", price: "€85" },
-                    { route: "BCN Airport → Montserrat (MPV, 7 seats)", price: "€105" },
-                    { route: "Barcelona City → Montserrat (sedan)", price: "€75" },
-                    { route: "Montserrat → BCN Airport", price: "€85" },
+                    { route: "BCN Airport → Montserrat (sedan)", price: `€${airportPrice}` },
+                    { route: "BCN Airport → Montserrat (MPV, 7 seats)", price: `€${mpvPrice}` },
+                    { route: "Barcelona City → Montserrat (sedan)", price: `€${cityPrice}` },
+                    { route: "Montserrat → BCN Airport", price: `€${airportPrice}` },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.route}</td>
@@ -138,7 +143,7 @@ export default function MontserratTransferPage() {
             <h2 className="font-display text-3xl text-white mb-4">Ready to book your Montserrat transfer?</h2>
             <p className="text-dark-400 mb-8">Instant confirmation. Free cancellation up to 24 hours before pickup.</p>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Now — from €85
+              Book Now — from €{airportPrice}
             </Link>
           </div>
         </section>

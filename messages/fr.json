@@ -38,7 +38,7 @@
     },
     "badges": {
       "rating": "Note 4.9★",
-      "ratingsSub": "+1 200 avis",
+      "ratingsSub": "avis",
       "vtc": "VTC Agréé",
       "vtcSub": "Entièrement assuré",
       "service": "Service 24h/24",
@@ -66,7 +66,8 @@
     "passengers": "passagers",
     "maxCapacity": "capacité max.",
     "luggage": "bagages",
-    "inclVat": "TVA incl. · prix fixe"
+    "inclVat": "TVA incl. · prix fixe",
+    "pricingNote": "Tous les prix sont définitifs et incluent la TVA, les péages, le chauffeur professionnel et l'accueil. Sièges enfants gratuits."
   },
   "services": {
     "label": "Nos Services",
@@ -216,7 +217,7 @@
     "ctaTitle": "Prêt à réserver votre transfert vers {name} ?",
     "ctaSubtitle": "Confirmation instantanée. Annulation gratuite jusqu'à 24 heures avant la prise en charge.",
     "sedan": "Mercedes EQE 300 Electric",
-    "tesla": "Mercedes EQE 300",
+    "eqe": "Mercedes EQE 300 Electric",
     "mpv": "Mercedes V-Class (MPV)",
     "paxLabel": "passagers",
     "allInclusive": "Tous les prix incluent péages, accueil et 60 min d'attente gratuite. Sans frais cachés."

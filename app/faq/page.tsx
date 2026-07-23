@@ -49,7 +49,7 @@ const FAQ_GROUPS = [
       },
       {
         q: "Do you cover Girona Airport?",
-        a: "Yes. We provide transfers to and from Girona–Costa Brava Airport (GRO). The fixed price from Barcelona city is €140 for an Economy sedan. Booking in advance is recommended.",
+        a: "Yes. We provide transfers to and from Girona–Costa Brava Airport (GRO). The fixed price from Barcelona city is €135 for an Economy sedan. Booking in advance is recommended.",
       },
     ],
   },

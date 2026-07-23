@@ -8,15 +8,18 @@ import FleetSection from "@/components/sections/FleetSection";
 import PricingSection from "@/components/sections/PricingSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import FAQSection from "@/components/sections/FAQSection";
+import { ROUTES } from "@/lib/pricing";
+
+const fromPrice = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona_city")?.economy ?? 45;
 
 export const metadata: Metadata = {
-  title: { absolute: "Élite BCN | Barcelona Airport Transfers — From €45" },
+  title: { absolute: `Élite BCN | Barcelona Airport Transfers — From €${fromPrice}` },
   description:
-    "Barcelona's #1 luxury private transfer. Fixed prices from €45, no surge pricing. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class & EQE 300 Electric. 24/7.",
+    `Barcelona's #1 luxury private transfer. Fixed prices from €${fromPrice}, no surge pricing. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class & EQE 300 Electric. 24/7.`,
   alternates: { canonical: "https://www.elitebcn.info" },
   openGraph: {
-    title: "Élite BCN | Barcelona Airport Transfers — From €45",
-    description: "Barcelona's #1 luxury private transfer. Fixed prices from €45, no surge pricing. BCN El Prat T1/T2. Mercedes V-Class & EQE 300 Electric. Book 24/7.",
+    title: `Élite BCN | Barcelona Airport Transfers — From €${fromPrice}`,
+    description: `Barcelona's #1 luxury private transfer. Fixed prices from €${fromPrice}, no surge pricing. BCN El Prat T1/T2. Mercedes V-Class & EQE 300 Electric. Book 24/7.`,
     url: "https://www.elitebcn.info",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Luxury Private Transfer Barcelona Airport" }],
   },

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { COMPANY } from "@/lib/company-facts";
 
 // One-time admin seed endpoint — disable after first use by removing the route or
 // checking process.env.ADMIN_SEED_SECRET.
@@ -13,7 +14,7 @@ export async function POST(req: Request) {
     }
   }
 
-  const email = process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com";
+  const email = process.env.ADMIN_EMAIL ?? COMPANY.email;
   const password = process.env.ADMIN_SEED_PASSWORD ?? "EliteBCN2025!";
 
   const existing = await prisma.user.findUnique({ where: { email } });

@@ -6,16 +6,40 @@
     "area": "Barceloneta",
     "distance_km": 18,
     "duration_min": 25,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3786, "lng": 2.1900 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3786,
+      "lng": 2.19
+    },
     "description": "The iconic W Barcelona Hotel stands at the tip of Barceloneta beach, its sail-shaped silhouette instantly recognisable from the sea. A direct private transfer from BCN El Prat Airport takes approximately 25 minutes, avoiding the 90-minute public transport alternative with heavy luggage.",
-    "highlights": ["Barceloneta beachfront location", "25-minute airport transfer", "Meet & greet in arrivals", "No surge pricing ever"],
-    "faqs": [
-      { "q": "How long is the transfer from Barcelona Airport to W Barcelona Hotel?", "a": "The door-to-door transfer from BCN El Prat Airport to the W Barcelona Hotel in Barceloneta takes approximately 25 minutes under normal traffic conditions, covering around 18 km. Your driver monitors live traffic and adjusts the route if needed." },
-      { "q": "How much does a private transfer from Barcelona Airport to W Barcelona Hotel cost?", "a": "A fixed-price private transfer from Barcelona Airport to the W Barcelona Hotel starts from €45 for a Mercedes EQE 300 Electric (up to 3 passengers). A EQE 300 Electric is €55 and a Mercedes V-Class for groups up to 7 costs €65. All prices include tolls, meet & greet, and 60 minutes free waiting." },
-      { "q": "Can Élite BCN transfer us to the W Barcelona Hotel with surf or sports equipment?", "a": "Absolutely. The Mercedes V-Class has generous boot space and can accommodate surfboards, golf bags, skis, and oversized luggage. Simply note your equipment in the booking form and we will confirm the right vehicle for you." }
+    "highlights": [
+      "Barceloneta beachfront location",
+      "25-minute airport transfer",
+      "Meet & greet in arrivals",
+      "No surge pricing ever"
     ],
-    "nearby": ["hotel-arts-barcelona", "pullman-barcelona-skipper", "the-serras-hotel"]
+    "faqs": [
+      {
+        "q": "How long is the transfer from Barcelona Airport to W Barcelona Hotel?",
+        "a": "The door-to-door transfer from BCN El Prat Airport to the W Barcelona Hotel in Barceloneta takes approximately 25 minutes under normal traffic conditions, covering around 18 km. Your driver monitors live traffic and adjusts the route if needed."
+      },
+      {
+        "q": "How much does a private transfer from Barcelona Airport to W Barcelona Hotel cost?",
+        "a": "A fixed-price private transfer from Barcelona Airport to the W Barcelona Hotel starts from €45 for a Mercedes EQE 300 Electric (up to 3 passengers). A EQE 300 Electric is €55 and a Mercedes V-Class for groups up to 7 costs €65. All prices include tolls, meet & greet, and 60 minutes free waiting."
+      },
+      {
+        "q": "Can Élite BCN transfer us to the W Barcelona Hotel with surf or sports equipment?",
+        "a": "Absolutely. The Mercedes V-Class has generous boot space and can accommodate surfboards, golf bags, skis, and oversized luggage. Simply note your equipment in the booking form and we will confirm the right vehicle for you."
+      }
+    ],
+    "nearby": [
+      "hotel-arts-barcelona",
+      "pullman-barcelona-skipper",
+      "the-serras-hotel"
+    ]
   },
   {
     "slug": "hotel-arts-barcelona",
@@ -24,16 +48,40 @@
     "area": "Vila Olímpica",
     "distance_km": 17,
     "duration_min": 22,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3910, "lng": 2.1963 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.391,
+      "lng": 2.1963
+    },
     "description": "Hotel Arts Barcelona is a 44-storey tower overlooking the Olympic port, one of the most architecturally striking five-star hotels in the city. Your Élite BCN chauffeur will have you checked in at the Arts within 22 minutes of clearing BCN Airport arrivals.",
-    "highlights": ["Olympic Port waterfront", "22-minute airport transfer", "44-storey landmark tower", "Flight tracking included"],
-    "faqs": [
-      { "q": "How long does the transfer from BCN Airport to Hotel Arts Barcelona take?", "a": "The private transfer from Barcelona El Prat Airport to Hotel Arts Barcelona in the Vila Olímpica district takes around 22 minutes (17 km). Traffic is typically lighter on the coastal access road, making this one of the fastest city-centre hotel transfers." },
-      { "q": "What vehicles are available for the Hotel Arts Barcelona airport transfer?", "a": "You can choose from a Mercedes EQE 300 Electric (1–4 pax, €45) or Mercedes V-Class MPV (1–7 pax, €65). All vehicles are less than 3 years old and air-conditioned with complimentary water on board." },
-      { "q": "Does the Hotel Arts Barcelona transfer include meet & greet service?", "a": "Yes. Your chauffeur will be waiting in the BCN Airport arrivals hall with a personalised name board. We track your flight in real time and provide 60 minutes of free waiting from your actual landing time, at no extra charge." }
+    "highlights": [
+      "Olympic Port waterfront",
+      "22-minute airport transfer",
+      "44-storey landmark tower",
+      "Flight tracking included"
     ],
-    "nearby": ["w-barcelona-hotel", "pullman-barcelona-skipper", "salon-nautico-barcelona"]
+    "faqs": [
+      {
+        "q": "How long does the transfer from BCN Airport to Hotel Arts Barcelona take?",
+        "a": "The private transfer from Barcelona El Prat Airport to Hotel Arts Barcelona in the Vila Olímpica district takes around 22 minutes (17 km). Traffic is typically lighter on the coastal access road, making this one of the fastest city-centre hotel transfers."
+      },
+      {
+        "q": "What vehicles are available for the Hotel Arts Barcelona airport transfer?",
+        "a": "You can choose from a Mercedes EQE 300 Electric (1–4 pax, €45) or Mercedes V-Class MPV (1–7 pax, €65). All vehicles are less than 3 years old and air-conditioned with complimentary water on board."
+      },
+      {
+        "q": "Does the Hotel Arts Barcelona transfer include meet & greet service?",
+        "a": "Yes. Your chauffeur will be waiting in the BCN Airport arrivals hall with a personalised name board. We track your flight in real time and provide 60 minutes of free waiting from your actual landing time, at no extra charge."
+      }
+    ],
+    "nearby": [
+      "w-barcelona-hotel",
+      "pullman-barcelona-skipper",
+      "salon-nautico-barcelona"
+    ]
   },
   {
     "slug": "mandarin-oriental-barcelona",
@@ -42,16 +90,40 @@
     "area": "Passeig de Gràcia",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3916, "lng": 2.1668 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3916,
+      "lng": 2.1668
+    },
     "description": "The Mandarin Oriental Barcelona occupies a converted 1950s bank on the most prestigious stretch of Passeig de Gràcia, surrounded by Gaudí's Manzana de la Discordia. The 26-minute transfer from BCN Airport delivers you directly to one of Barcelona's most sought-after five-star addresses.",
-    "highlights": ["Passeig de Gràcia address", "Gaudí buildings 2-minute walk", "Michelin-starred Blanc restaurant", "26-minute airport transfer"],
-    "faqs": [
-      { "q": "How long does the airport transfer to the Mandarin Oriental Barcelona take?", "a": "The private transfer from Barcelona Airport to the Mandarin Oriental on Passeig de Gràcia takes approximately 26 minutes (16 km). Traffic on the Diagonal and Gran Via can be heavier during morning rush hour (08:00–09:30), which we plan for accordingly." },
-      { "q": "Is the Mandarin Oriental Barcelona easy to reach by public transport?", "a": "The hotel is well served by metro (Passeig de Gràcia L2/L3/L4), but from the airport this involves two changes, 40+ minutes of travel and is impractical with luggage. A private transfer is significantly more comfortable and costs from €45 fixed." },
-      { "q": "What is the distance from Barcelona Airport to the Mandarin Oriental?", "a": "The distance from BCN El Prat Airport to the Mandarin Oriental Barcelona is approximately 16 km, primarily on the B-23/Ronda Litoral motorways before reaching central Eixample. The journey takes around 26 minutes in a private vehicle." }
+    "highlights": [
+      "Passeig de Gràcia address",
+      "Gaudí buildings 2-minute walk",
+      "Michelin-starred Blanc restaurant",
+      "26-minute airport transfer"
     ],
-    "nearby": ["majestic-hotel-barcelona", "hotel-el-palace-barcelona", "cotton-house-hotel-barcelona"]
+    "faqs": [
+      {
+        "q": "How long does the airport transfer to the Mandarin Oriental Barcelona take?",
+        "a": "The private transfer from Barcelona Airport to the Mandarin Oriental on Passeig de Gràcia takes approximately 26 minutes (16 km). Traffic on the Diagonal and Gran Via can be heavier during morning rush hour (08:00–09:30), which we plan for accordingly."
+      },
+      {
+        "q": "Is the Mandarin Oriental Barcelona easy to reach by public transport?",
+        "a": "The hotel is well served by metro (Passeig de Gràcia L2/L3/L4), but from the airport this involves two changes, 40+ minutes of travel and is impractical with luggage. A private transfer is significantly more comfortable and costs from €45 fixed."
+      },
+      {
+        "q": "What is the distance from Barcelona Airport to the Mandarin Oriental?",
+        "a": "The distance from BCN El Prat Airport to the Mandarin Oriental Barcelona is approximately 16 km, primarily on the B-23/Ronda Litoral motorways before reaching central Eixample. The journey takes around 26 minutes in a private vehicle."
+      }
+    ],
+    "nearby": [
+      "majestic-hotel-barcelona",
+      "hotel-el-palace-barcelona",
+      "cotton-house-hotel-barcelona"
+    ]
   },
   {
     "slug": "hotel-el-palace-barcelona",
@@ -60,16 +132,40 @@
     "area": "Eixample",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3896, "lng": 2.1678 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3896,
+      "lng": 2.1678
+    },
     "description": "Hotel El Palace Barcelona has presided over the corner of Gran Via and Pau Claris since 1919, a belle-époque grand hotel that has hosted royalty, artists, and heads of state. Your Élite BCN chauffeur collects you from BCN Airport arrivals and delivers you to this historic address in approximately 26 minutes.",
-    "highlights": ["Historic grand hotel since 1919", "Gran Via & Pau Claris corner", "Rooftop pool and terrace", "26-minute airport transfer"],
-    "faqs": [
-      { "q": "How far is Hotel El Palace from Barcelona Airport?", "a": "Hotel El Palace Barcelona is 16 km from BCN El Prat Airport. By private transfer the journey takes around 26 minutes; by taxi it is similar in time but the metered fare including the €4.50 airport supplement will be approximately €25–€32 depending on time of day." },
-      { "q": "What luxury vehicles are available for the transfer to Hotel El Palace?", "a": "Élite BCN operates Mercedes EQE 300 Electric, Mercedes Vito, and Mercedes V-Class MPVs. All vehicles are presented in immaculate condition, less than 3 years old. Prices start from €45 fixed — no meters, no surprises." },
-      { "q": "Does Élite BCN offer return transfers from Hotel El Palace to Barcelona Airport?", "a": "Yes. We operate 24/7 outbound transfers from Hotel El Palace to BCN Airport. Your driver will be at the hotel entrance at your confirmed pickup time. We recommend a pickup 2.5 hours before departure for international flights, 2 hours for domestic." }
+    "highlights": [
+      "Historic grand hotel since 1919",
+      "Gran Via & Pau Claris corner",
+      "Rooftop pool and terrace",
+      "26-minute airport transfer"
     ],
-    "nearby": ["mandarin-oriental-barcelona", "majestic-hotel-barcelona", "cotton-house-hotel-barcelona"]
+    "faqs": [
+      {
+        "q": "How far is Hotel El Palace from Barcelona Airport?",
+        "a": "Hotel El Palace Barcelona is 16 km from BCN El Prat Airport. By private transfer the journey takes around 26 minutes; by taxi it is similar in time but the metered fare including the €4.50 airport supplement will be approximately €25–€32 depending on time of day."
+      },
+      {
+        "q": "What luxury vehicles are available for the transfer to Hotel El Palace?",
+        "a": "Élite BCN operates Mercedes EQE 300 Electric, Mercedes Vito, and Mercedes V-Class MPVs. All vehicles are presented in immaculate condition, less than 3 years old. Prices start from €45 fixed — no meters, no surprises."
+      },
+      {
+        "q": "Does Élite BCN offer return transfers from Hotel El Palace to Barcelona Airport?",
+        "a": "Yes. We operate 24/7 outbound transfers from Hotel El Palace to BCN Airport. Your driver will be at the hotel entrance at your confirmed pickup time. We recommend a pickup 2.5 hours before departure for international flights, 2 hours for domestic."
+      }
+    ],
+    "nearby": [
+      "mandarin-oriental-barcelona",
+      "majestic-hotel-barcelona",
+      "cotton-house-hotel-barcelona"
+    ]
   },
   {
     "slug": "majestic-hotel-barcelona",
@@ -78,16 +174,40 @@
     "area": "Passeig de Gràcia",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3921, "lng": 2.1675 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3921,
+      "lng": 2.1675
+    },
     "description": "The Majestic Hotel & Spa Barcelona has defined luxury on Passeig de Gràcia since 1918, offering front-row views of Gaudí's Casa Batlló from its renowned terrace restaurant. Élite BCN transfers guests from the airport to this landmark address in a fixed 26-minute private journey.",
-    "highlights": ["Views of Casa Batlló", "100+ years of luxury hospitality", "Rooftop terrace restaurant", "26-minute airport transfer"],
-    "faqs": [
-      { "q": "How do I get from Barcelona Airport to the Majestic Hotel?", "a": "The most comfortable option is a private transfer with Élite BCN. Your chauffeur meets you in the arrivals hall with a name board, takes your luggage, and drives you directly to the Majestic Hotel in approximately 26 minutes. The fixed price is €45 for a sedan, no matter what the traffic is like." },
-      { "q": "Is there parking at the Majestic Hotel for a transfer drop-off?", "a": "Yes, the Majestic Hotel has a dedicated drop-off zone on Passeig de Gràcia. Our drivers are experienced in city-centre hotel protocols and will manage the drop-off efficiently, including helping with all luggage to the hotel entrance." },
-      { "q": "Can I book a transfer from the Majestic Hotel to a cruise terminal?", "a": "Absolutely. Élite BCN offers point-to-point transfers between any hotel and Barcelona's cruise terminals (Moll Adossat, World Trade Centre). The Majestic to cruise port transfer takes approximately 20 minutes and costs from €45." }
+    "highlights": [
+      "Views of Casa Batlló",
+      "100+ years of luxury hospitality",
+      "Rooftop terrace restaurant",
+      "26-minute airport transfer"
     ],
-    "nearby": ["mandarin-oriental-barcelona", "hotel-el-palace-barcelona", "hotel-condes-barcelona"]
+    "faqs": [
+      {
+        "q": "How do I get from Barcelona Airport to the Majestic Hotel?",
+        "a": "The most comfortable option is a private transfer with Élite BCN. Your chauffeur meets you in the arrivals hall with a name board, takes your luggage, and drives you directly to the Majestic Hotel in approximately 26 minutes. The fixed price is €45 for a sedan, no matter what the traffic is like."
+      },
+      {
+        "q": "Is there parking at the Majestic Hotel for a transfer drop-off?",
+        "a": "Yes, the Majestic Hotel has a dedicated drop-off zone on Passeig de Gràcia. Our drivers are experienced in city-centre hotel protocols and will manage the drop-off efficiently, including helping with all luggage to the hotel entrance."
+      },
+      {
+        "q": "Can I book a transfer from the Majestic Hotel to a cruise terminal?",
+        "a": "Absolutely. Élite BCN offers point-to-point transfers between any hotel and Barcelona's cruise terminals (Moll Adossat, World Trade Centre). The Majestic to cruise port transfer takes approximately 20 minutes and costs from €45."
+      }
+    ],
+    "nearby": [
+      "mandarin-oriental-barcelona",
+      "hotel-el-palace-barcelona",
+      "hotel-condes-barcelona"
+    ]
   },
   {
     "slug": "cotton-house-hotel-barcelona",
@@ -96,16 +216,40 @@
     "area": "Eixample",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3896, "lng": 2.1632 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3896,
+      "lng": 2.1632
+    },
     "description": "The Cotton House Hotel inhabits the neoclassical former headquarters of the Cotton Manufacturers Guild, a beautifully restored 19th-century building on Gran Via with stunning interior courtyards and a rooftop pool. Your private transfer from BCN Airport to this Eixample gem takes just 26 minutes.",
-    "highlights": ["19th-century Cotton Guild building", "Rooftop pool and terrace", "Gran Via central location", "26-minute airport transfer"],
-    "faqs": [
-      { "q": "What is the best way to get from Barcelona Airport to Cotton House Hotel?", "a": "A private transfer with Élite BCN is the most comfortable option: fixed price from €45, door-to-door service, 26-minute journey. The Aerobus drops at Plaça de Catalunya (a 10-minute walk away) for €6.75, but with luggage a private transfer is far more practical." },
-      { "q": "How much does a taxi from Barcelona Airport to Cotton House Hotel cost?", "a": "A metered taxi from BCN Airport to the Cotton House on Gran Via typically costs €25–€32 including the mandatory €4.50 airport supplement. With Élite BCN the fixed price is €45 and includes meet & greet in arrivals, 60 min free waiting, and help with luggage — significantly more value." },
-      { "q": "Do you offer child seats for transfers to the Cotton House Hotel?", "a": "Yes, Élite BCN provides child seats and booster seats on request at no extra charge. Please specify the child's age and weight in the booking form and we will fit the appropriate seat before collection." }
+    "highlights": [
+      "19th-century Cotton Guild building",
+      "Rooftop pool and terrace",
+      "Gran Via central location",
+      "26-minute airport transfer"
     ],
-    "nearby": ["hotel-el-palace-barcelona", "almanac-barcelona", "majestic-hotel-barcelona"]
+    "faqs": [
+      {
+        "q": "What is the best way to get from Barcelona Airport to Cotton House Hotel?",
+        "a": "A private transfer with Élite BCN is the most comfortable option: fixed price from €45, door-to-door service, 26-minute journey. The Aerobus drops at Plaça de Catalunya (a 10-minute walk away) for €6.75, but with luggage a private transfer is far more practical."
+      },
+      {
+        "q": "How much does a taxi from Barcelona Airport to Cotton House Hotel cost?",
+        "a": "A metered taxi from BCN Airport to the Cotton House on Gran Via typically costs €25–€32 including the mandatory €4.50 airport supplement. With Élite BCN the fixed price is €45 and includes meet & greet in arrivals, 60 min free waiting, and help with luggage — significantly more value."
+      },
+      {
+        "q": "Do you offer child seats for transfers to the Cotton House Hotel?",
+        "a": "Yes, Élite BCN provides child seats and booster seats on request at no extra charge. Please specify the child's age and weight in the booking form and we will fit the appropriate seat before collection."
+      }
+    ],
+    "nearby": [
+      "hotel-el-palace-barcelona",
+      "almanac-barcelona",
+      "majestic-hotel-barcelona"
+    ]
   },
   {
     "slug": "ohla-barcelona",
@@ -114,16 +258,40 @@
     "area": "Gothic Quarter",
     "distance_km": 16,
     "duration_min": 23,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3834, "lng": 2.1766 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3834,
+      "lng": 2.1766
+    },
     "description": "Ohla Barcelona is a five-star boutique hotel in the Gothic Quarter with a landmark façade of protruding eyeball sculptures by Frederic Amat, moments from the Cathedral and Las Ramblas. The private transfer from BCN Airport to this celebrated design hotel takes approximately 23 minutes.",
-    "highlights": ["Gothic Quarter location", "Iconic eyeball sculpture façade", "Rooftop pool with city views", "23-minute airport transfer"],
-    "faqs": [
-      { "q": "How long does the transfer from the airport to Ohla Barcelona take?", "a": "The private transfer from Barcelona El Prat Airport to Ohla Barcelona in the Gothic Quarter takes approximately 23 minutes (16 km). The Gothic Quarter has limited vehicle access, but your driver knows all approved drop-off zones closest to the hotel entrance." },
-      { "q": "Is the Gothic Quarter difficult to navigate by private car?", "a": "The historic Gothic Quarter has restricted traffic zones, but Ohla Barcelona is positioned on Via Laietana which allows direct vehicle access. Élite BCN drivers are fully familiar with the city's ZBE (low-emission zone) regulations and Gothic Quarter drop-off protocols." },
-      { "q": "Can I be picked up from Ohla Barcelona for an early morning flight?", "a": "Yes. Élite BCN operates 24 hours a day, 365 days a year. For early morning international flights we recommend booking a pickup 2.5 hours before departure. Your driver will be at the hotel entrance at the confirmed time, regardless of the hour." }
+    "highlights": [
+      "Gothic Quarter location",
+      "Iconic eyeball sculpture façade",
+      "Rooftop pool with city views",
+      "23-minute airport transfer"
     ],
-    "nearby": ["the-serras-hotel", "hotel-1898-barcelona", "four-seasons-barcelona"]
+    "faqs": [
+      {
+        "q": "How long does the transfer from the airport to Ohla Barcelona take?",
+        "a": "The private transfer from Barcelona El Prat Airport to Ohla Barcelona in the Gothic Quarter takes approximately 23 minutes (16 km). The Gothic Quarter has limited vehicle access, but your driver knows all approved drop-off zones closest to the hotel entrance."
+      },
+      {
+        "q": "Is the Gothic Quarter difficult to navigate by private car?",
+        "a": "The historic Gothic Quarter has restricted traffic zones, but Ohla Barcelona is positioned on Via Laietana which allows direct vehicle access. Élite BCN drivers are fully familiar with the city's ZBE (low-emission zone) regulations and Gothic Quarter drop-off protocols."
+      },
+      {
+        "q": "Can I be picked up from Ohla Barcelona for an early morning flight?",
+        "a": "Yes. Élite BCN operates 24 hours a day, 365 days a year. For early morning international flights we recommend booking a pickup 2.5 hours before departure. Your driver will be at the hotel entrance at the confirmed time, regardless of the hour."
+      }
+    ],
+    "nearby": [
+      "the-serras-hotel",
+      "hotel-1898-barcelona",
+      "four-seasons-barcelona"
+    ]
   },
   {
     "slug": "grand-hyatt-barcelona",
@@ -132,16 +300,40 @@
     "area": "Eixample",
     "distance_km": 15,
     "duration_min": 22,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3931, "lng": 2.1645 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3931,
+      "lng": 2.1645
+    },
     "description": "The Grand Hyatt Barcelona opened in the historic 1902 Lleó Morera building on Passeig de Gràcia, blending century-old modernista architecture with ultra-modern luxury interiors. The 22-minute private transfer from BCN Airport is the effortless way to arrive at this architectural masterpiece.",
-    "highlights": ["Lleó Morera modernista building", "Passeig de Gràcia address", "Casa Batlló & La Pedrera nearby", "22-minute airport transfer"],
-    "faqs": [
-      { "q": "How far is Grand Hyatt Barcelona from the airport?", "a": "The Grand Hyatt Barcelona is approximately 15 km from BCN El Prat Airport. A private transfer takes around 22 minutes, making it one of the quicker Eixample hotel transfers thanks to the direct motorway connection from the airport to the Ronda Litoral." },
-      { "q": "What is Passeig de Gràcia and why is the Grand Hyatt located there?", "a": "Passeig de Gràcia is Barcelona's grandest boulevard, lined with UNESCO-listed modernista buildings including Gaudí's Casa Batlló and La Pedrera, both within a short walk of the hotel. It is also the city's premium shopping street, home to Hermès, Chanel, and Louis Vuitton." },
-      { "q": "Can Élite BCN arrange an hourly chauffeur service during our stay near the Grand Hyatt?", "a": "Yes. Our hourly chauffeur service starts from €65/hour with a 2-hour minimum. This is ideal for business meetings, shopping runs, day trips to Montserrat or Sitges, or touring the city in comfort. Book via our website or WhatsApp." }
+    "highlights": [
+      "Lleó Morera modernista building",
+      "Passeig de Gràcia address",
+      "Casa Batlló & La Pedrera nearby",
+      "22-minute airport transfer"
     ],
-    "nearby": ["mandarin-oriental-barcelona", "majestic-hotel-barcelona", "hotel-condes-barcelona"]
+    "faqs": [
+      {
+        "q": "How far is Grand Hyatt Barcelona from the airport?",
+        "a": "The Grand Hyatt Barcelona is approximately 15 km from BCN El Prat Airport. A private transfer takes around 22 minutes, making it one of the quicker Eixample hotel transfers thanks to the direct motorway connection from the airport to the Ronda Litoral."
+      },
+      {
+        "q": "What is Passeig de Gràcia and why is the Grand Hyatt located there?",
+        "a": "Passeig de Gràcia is Barcelona's grandest boulevard, lined with UNESCO-listed modernista buildings including Gaudí's Casa Batlló and La Pedrera, both within a short walk of the hotel. It is also the city's premium shopping street, home to Hermès, Chanel, and Louis Vuitton."
+      },
+      {
+        "q": "Can Élite BCN arrange an hourly chauffeur service during our stay near the Grand Hyatt?",
+        "a": "Yes. Our hourly chauffeur service starts from €65/hour with a 2-hour minimum. This is ideal for business meetings, shopping runs, day trips to Montserrat or Sitges, or touring the city in comfort. Book via our website or WhatsApp."
+      }
+    ],
+    "nearby": [
+      "mandarin-oriental-barcelona",
+      "majestic-hotel-barcelona",
+      "hotel-condes-barcelona"
+    ]
   },
   {
     "slug": "four-seasons-barcelona",
@@ -150,16 +342,40 @@
     "area": "Gothic Quarter",
     "distance_km": 16,
     "duration_min": 23,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3836, "lng": 2.1756 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3836,
+      "lng": 2.1756
+    },
     "description": "Four Seasons Hotel Barcelona anchors the luxury El Triangle retail complex at the top of Las Ramblas, offering sweeping views over the Gothic Quarter and the city's roofscape from its rooftop terrace and pool. Élite BCN delivers guests from BCN Airport directly to this premier address in 23 minutes.",
-    "highlights": ["Top of Las Ramblas location", "Rooftop pool with Gothic Quarter views", "Steps from the Cathedral", "23-minute airport transfer"],
-    "faqs": [
-      { "q": "How do I travel from Barcelona Airport to the Four Seasons Hotel Barcelona?", "a": "The simplest way is a private transfer with Élite BCN: your driver meets you in arrivals with a name board, handles your luggage, and drives you directly to the Four Seasons at Passeig de Gràcia 2 in approximately 23 minutes. Fixed price from €45." },
-      { "q": "Is Las Ramblas pedestrianised? Can a car reach the Four Seasons?", "a": "Las Ramblas itself is pedestrianised, but the Four Seasons is actually located at the junction of Passeig de Gràcia and Plaça de Catalunya, which is fully accessible by vehicle. Our driver drops you at the hotel entrance with no walking required." },
-      { "q": "Does the Four Seasons Barcelona transfer include luggage assistance?", "a": "Yes. All Élite BCN transfers include complimentary luggage assistance. Your driver loads and unloads your bags and escorts you to the hotel entrance. This is included in the fixed price — no additional tipping expected." }
+    "highlights": [
+      "Top of Las Ramblas location",
+      "Rooftop pool with Gothic Quarter views",
+      "Steps from the Cathedral",
+      "23-minute airport transfer"
     ],
-    "nearby": ["ohla-barcelona", "hotel-1898-barcelona", "the-serras-hotel"]
+    "faqs": [
+      {
+        "q": "How do I travel from Barcelona Airport to the Four Seasons Hotel Barcelona?",
+        "a": "The simplest way is a private transfer with Élite BCN: your driver meets you in arrivals with a name board, handles your luggage, and drives you directly to the Four Seasons at Passeig de Gràcia 2 in approximately 23 minutes. Fixed price from €45."
+      },
+      {
+        "q": "Is Las Ramblas pedestrianised? Can a car reach the Four Seasons?",
+        "a": "Las Ramblas itself is pedestrianised, but the Four Seasons is actually located at the junction of Passeig de Gràcia and Plaça de Catalunya, which is fully accessible by vehicle. Our driver drops you at the hotel entrance with no walking required."
+      },
+      {
+        "q": "Does the Four Seasons Barcelona transfer include luggage assistance?",
+        "a": "Yes. All Élite BCN transfers include complimentary luggage assistance. Your driver loads and unloads your bags and escorts you to the hotel entrance. This is included in the fixed price — no additional tipping expected."
+      }
+    ],
+    "nearby": [
+      "ohla-barcelona",
+      "hotel-1898-barcelona",
+      "the-serras-hotel"
+    ]
   },
   {
     "slug": "fairmont-rey-juan-carlos",
@@ -168,16 +384,40 @@
     "area": "Diagonal",
     "distance_km": 12,
     "duration_min": 18,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3912, "lng": 2.1388 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3912,
+      "lng": 2.1388
+    },
     "description": "The Fairmont Rey Juan Carlos I is a Barcelona landmark on Avinguda Diagonal, the preferred hotel for Formula 1 teams, tennis players visiting the Real Club de Tenis de la Salut, and business delegations. At just 12 km from BCN Airport, it is one of the fastest city hotel transfers at only 18 minutes.",
-    "highlights": ["Closest 5-star to the airport", "18-minute airport transfer", "Diagonal business district", "Adjacent to Real Club de Tenis"],
-    "faqs": [
-      { "q": "How close is the Fairmont Rey Juan Carlos I to Barcelona Airport?", "a": "The Fairmont Rey Juan Carlos I is one of the closest luxury hotels to BCN Airport at just 12 km. The private transfer takes approximately 18 minutes — the shortest transfer time of any central Barcelona five-star hotel. Fixed price €45." },
-      { "q": "Is the Fairmont Rey Juan Carlos I near the Fira Gran Via convention centre?", "a": "Yes. The hotel is approximately 8 km from the Fira Gran Via, home to Mobile World Congress (MWC) and ISE. During major congresses the hotel is very popular with delegates; Élite BCN can arrange congress transfers with advance booking." },
-      { "q": "Does Élite BCN offer corporate account transfers for the Fairmont Rey Juan Carlos I?", "a": "Yes. Élite BCN has corporate account arrangements for companies regularly transferring staff to and from the Fairmont. Corporate accounts include monthly invoicing, priority booking, and dedicated account management. Contact us via email or WhatsApp to discuss terms." }
+    "highlights": [
+      "Closest 5-star to the airport",
+      "18-minute airport transfer",
+      "Diagonal business district",
+      "Adjacent to Real Club de Tenis"
     ],
-    "nearby": ["sofia-hotel-barcelona", "hilton-diagonal-mar", "mwc-2027-barcelona"]
+    "faqs": [
+      {
+        "q": "How close is the Fairmont Rey Juan Carlos I to Barcelona Airport?",
+        "a": "The Fairmont Rey Juan Carlos I is one of the closest luxury hotels to BCN Airport at just 12 km. The private transfer takes approximately 18 minutes — the shortest transfer time of any central Barcelona five-star hotel. Fixed price €45."
+      },
+      {
+        "q": "Is the Fairmont Rey Juan Carlos I near the Fira Gran Via convention centre?",
+        "a": "Yes. The hotel is approximately 8 km from the Fira Gran Via, home to Mobile World Congress (MWC) and ISE. During major congresses the hotel is very popular with delegates; Élite BCN can arrange congress transfers with advance booking."
+      },
+      {
+        "q": "Does Élite BCN offer corporate account transfers for the Fairmont Rey Juan Carlos I?",
+        "a": "Yes. Élite BCN has corporate account arrangements for companies regularly transferring staff to and from the Fairmont. Corporate accounts include monthly invoicing, priority booking, and dedicated account management. Contact us via email or WhatsApp to discuss terms."
+      }
+    ],
+    "nearby": [
+      "sofia-hotel-barcelona",
+      "hilton-diagonal-mar",
+      "mwc-2027-barcelona"
+    ]
   },
   {
     "slug": "hilton-diagonal-mar",
@@ -186,16 +426,40 @@
     "area": "Diagonal Mar",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.4057, "lng": 2.2127 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.4057,
+      "lng": 2.2127
+    },
     "description": "The Hilton Diagonal Mar overlooks the Fòrum beach and the Mediterranean from the north-east corner of Barcelona's coastline, ideal for delegates attending Primavera Sound at the adjacent Parc del Fòrum or events at the Fira del Mediterrani. A private transfer from the airport takes just 20 minutes.",
-    "highlights": ["Fòrum beach and seafront location", "Adjacent to Parc del Fòrum", "20-minute airport transfer", "Near Primavera Sound venue"],
-    "faqs": [
-      { "q": "How far is Hilton Diagonal Mar from Barcelona Airport?", "a": "Hilton Diagonal Mar is approximately 14 km from BCN El Prat Airport, taking around 20 minutes by private transfer via the Ronda Litoral coastal motorway. It is one of the most directly accessible hotels from the airport thanks to the straight coastal route." },
-      { "q": "Is the Hilton Diagonal Mar close to the Primavera Sound festival?", "a": "Yes — the Hilton Diagonal Mar is directly adjacent to the Parc del Fòrum, the main outdoor venue for Primavera Sound. If you are attending the festival, this is one of the most convenient accommodation options. Élite BCN offers transfers from the airport for festival-goers, and we can also transfer between venues." },
-      { "q": "What public transport is available from the Hilton Diagonal Mar to Barcelona centre?", "a": "The hotel is served by the T4 tram to Ciutadella/Vila Olímpica, connecting with the L4 metro. Journey time to the Gothic Quarter is around 25 minutes. However, for airport connections and late-night returns from the city, a private transfer from €45 is far more practical." }
+    "highlights": [
+      "Fòrum beach and seafront location",
+      "Adjacent to Parc del Fòrum",
+      "20-minute airport transfer",
+      "Near Primavera Sound venue"
     ],
-    "nearby": ["primavera-sound-2026", "pullman-barcelona-skipper", "hotel-arts-barcelona"]
+    "faqs": [
+      {
+        "q": "How far is Hilton Diagonal Mar from Barcelona Airport?",
+        "a": "Hilton Diagonal Mar is approximately 14 km from BCN El Prat Airport, taking around 20 minutes by private transfer via the Ronda Litoral coastal motorway. It is one of the most directly accessible hotels from the airport thanks to the straight coastal route."
+      },
+      {
+        "q": "Is the Hilton Diagonal Mar close to the Primavera Sound festival?",
+        "a": "Yes — the Hilton Diagonal Mar is directly adjacent to the Parc del Fòrum, the main outdoor venue for Primavera Sound. If you are attending the festival, this is one of the most convenient accommodation options. Élite BCN offers transfers from the airport for festival-goers, and we can also transfer between venues."
+      },
+      {
+        "q": "What public transport is available from the Hilton Diagonal Mar to Barcelona centre?",
+        "a": "The hotel is served by the T4 tram to Ciutadella/Vila Olímpica, connecting with the L4 metro. Journey time to the Gothic Quarter is around 25 minutes. However, for airport connections and late-night returns from the city, a private transfer from €45 is far more practical."
+      }
+    ],
+    "nearby": [
+      "primavera-sound-2026",
+      "pullman-barcelona-skipper",
+      "hotel-arts-barcelona"
+    ]
   },
   {
     "slug": "sofia-hotel-barcelona",
@@ -204,16 +468,40 @@
     "area": "Diagonal",
     "distance_km": 12,
     "duration_min": 18,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3940, "lng": 2.1362 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.394,
+      "lng": 2.1362
+    },
     "description": "Sofia Hotel Barcelona is a striking glass tower on Avinguda Diagonal, home to the Michelin-starred VIA restaurant and offering panoramic views from the infinity pool terrace. At 12 km from BCN Airport, the 18-minute transfer makes it one of the most accessible luxury hotels in the city.",
-    "highlights": ["Infinity pool terrace", "Michelin-starred VIA restaurant", "18-minute airport transfer", "Diagonal business district"],
-    "faqs": [
-      { "q": "What is the transfer time from Barcelona Airport to Sofia Hotel?", "a": "The Sofia Hotel Barcelona is 12 km from the airport, one of the shortest airport-to-hotel distances of any five-star property in Barcelona. The private transfer takes around 18 minutes, making it an excellent choice for business travellers with tight schedules." },
-      { "q": "Is the Sofia Hotel Barcelona convenient for the Fira Gran Via?", "a": "Yes. The Fira Gran Via is approximately 6 km from the Sofia Hotel, around 12 minutes by car. During MWC and ISE congresses, Élite BCN provides dedicated shuttle-style transfers between the hotel and the Fira. Contact us for group booking rates." },
-      { "q": "Can Élite BCN arrange a transfer from Sofia Hotel to the cruise port?", "a": "Yes. The transfer from Sofia Hotel to Barcelona's Moll Adossat cruise terminals takes approximately 25 minutes (16 km). We recommend booking this transfer the day before embarkation. Fixed price from €45 regardless of luggage volume." }
+    "highlights": [
+      "Infinity pool terrace",
+      "Michelin-starred VIA restaurant",
+      "18-minute airport transfer",
+      "Diagonal business district"
     ],
-    "nearby": ["fairmont-rey-juan-carlos", "grand-hyatt-barcelona", "mwc-2027-barcelona"]
+    "faqs": [
+      {
+        "q": "What is the transfer time from Barcelona Airport to Sofia Hotel?",
+        "a": "The Sofia Hotel Barcelona is 12 km from the airport, one of the shortest airport-to-hotel distances of any five-star property in Barcelona. The private transfer takes around 18 minutes, making it an excellent choice for business travellers with tight schedules."
+      },
+      {
+        "q": "Is the Sofia Hotel Barcelona convenient for the Fira Gran Via?",
+        "a": "Yes. The Fira Gran Via is approximately 6 km from the Sofia Hotel, around 12 minutes by car. During MWC and ISE congresses, Élite BCN provides dedicated shuttle-style transfers between the hotel and the Fira. Contact us for group booking rates."
+      },
+      {
+        "q": "Can Élite BCN arrange a transfer from Sofia Hotel to the cruise port?",
+        "a": "Yes. The transfer from Sofia Hotel to Barcelona's Moll Adossat cruise terminals takes approximately 25 minutes (16 km). We recommend booking this transfer the day before embarkation. Fixed price from €45 regardless of luggage volume."
+      }
+    ],
+    "nearby": [
+      "fairmont-rey-juan-carlos",
+      "grand-hyatt-barcelona",
+      "mwc-2027-barcelona"
+    ]
   },
   {
     "slug": "almanac-barcelona",
@@ -222,16 +510,40 @@
     "area": "Eixample",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3896, "lng": 2.1622 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3896,
+      "lng": 2.1622
+    },
     "description": "Almanac Barcelona is a contemporary five-star hotel on Gran Via near Passeig de Gràcia, celebrated for its Rooftop Pool Bar, the Michelin-starred Angle restaurant, and a design aesthetic that blends Barcelona's modernista heritage with cutting-edge interiors. Transfer time from BCN Airport is approximately 26 minutes.",
-    "highlights": ["Rooftop pool bar", "Michelin-starred Angle restaurant", "Gran Via central location", "26-minute airport transfer"],
-    "faqs": [
-      { "q": "How do I reach Almanac Barcelona from the airport?", "a": "The easiest way is a private transfer with Élite BCN. Your driver meets you in the arrivals hall with a name board and takes you directly to the Almanac on Gran Via in approximately 26 minutes. Fixed from €45, including toll, meet & greet, and 60 min free waiting." },
-      { "q": "Is Almanac Barcelona walking distance from Gaudí's architecture?", "a": "Yes. Casa Batlló and La Pedrera are a 5-minute walk from the Almanac. The Sagrada Família is a 20-minute walk or 10-minute taxi ride. The hotel's Eixample location makes it one of the best bases for exploring Barcelona's UNESCO World Heritage modernista buildings." },
-      { "q": "Does Élite BCN charge extra for night-time transfers to Almanac Barcelona?", "a": "No. Élite BCN's prices are fixed and do not change based on time of day, day of week, or traffic conditions. A 3 AM transfer to the Almanac costs exactly the same as a midday one. The fixed price from the airport is €45 for a sedan." }
+    "highlights": [
+      "Rooftop pool bar",
+      "Michelin-starred Angle restaurant",
+      "Gran Via central location",
+      "26-minute airport transfer"
     ],
-    "nearby": ["cotton-house-hotel-barcelona", "hotel-el-palace-barcelona", "hotel-condes-barcelona"]
+    "faqs": [
+      {
+        "q": "How do I reach Almanac Barcelona from the airport?",
+        "a": "The easiest way is a private transfer with Élite BCN. Your driver meets you in the arrivals hall with a name board and takes you directly to the Almanac on Gran Via in approximately 26 minutes. Fixed from €45, including toll, meet & greet, and 60 min free waiting."
+      },
+      {
+        "q": "Is Almanac Barcelona walking distance from Gaudí's architecture?",
+        "a": "Yes. Casa Batlló and La Pedrera are a 5-minute walk from the Almanac. The Sagrada Família is a 20-minute walk or 10-minute taxi ride. The hotel's Eixample location makes it one of the best bases for exploring Barcelona's UNESCO World Heritage modernista buildings."
+      },
+      {
+        "q": "Does Élite BCN charge extra for night-time transfers to Almanac Barcelona?",
+        "a": "No. Élite BCN's prices are fixed and do not change based on time of day, day of week, or traffic conditions. A 3 AM transfer to the Almanac costs exactly the same as a midday one. The fixed price from the airport is €45 for a sedan."
+      }
+    ],
+    "nearby": [
+      "cotton-house-hotel-barcelona",
+      "hotel-el-palace-barcelona",
+      "hotel-condes-barcelona"
+    ]
   },
   {
     "slug": "the-serras-hotel",
@@ -240,16 +552,40 @@
     "area": "Gothic Waterfront",
     "distance_km": 16,
     "duration_min": 23,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3795, "lng": 2.1808 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3795,
+      "lng": 2.1808
+    },
     "description": "The Serras Hotel Barcelona occupies a stunning 19th-century building on Passeig de Colom where Picasso once kept his studio, with a rooftop pool offering some of the best views of the Mediterranean and the Columbus Monument. The 23-minute private transfer from the airport delivers you to one of the Gothic Quarter's most memorable addresses.",
-    "highlights": ["Picasso's former studio building", "Rooftop pool with sea views", "Steps from the harbour", "23-minute airport transfer"],
-    "faqs": [
-      { "q": "How long is the airport transfer to The Serras Hotel Barcelona?", "a": "The Serras Hotel is 16 km from BCN El Prat Airport, with a private transfer taking approximately 23 minutes via the coastal motorway and Passeig Colom. The Gothic waterfront location has good vehicle access, making arrivals smooth even during busy tourist season." },
-      { "q": "What makes The Serras Hotel special compared to other Barcelona five-star hotels?", "a": "The Serras is arguably Barcelona's most romantically located boutique hotel, on the waterfront between the Columbus Monument and the Born district. Its rooftop pool looks directly over the harbour and Barceloneta beach. With only 28 rooms it offers exceptional levels of personalised service." },
-      { "q": "Can Élite BCN pick us up from The Serras for a day trip to Montserrat?", "a": "Absolutely. Élite BCN offers day-trip transfers from any Barcelona hotel to Montserrat, returning the same day. The journey from The Serras to Montserrat takes approximately 50 minutes. We can wait at the monastery while you explore and return you at your preferred time." }
+    "highlights": [
+      "Picasso's former studio building",
+      "Rooftop pool with sea views",
+      "Steps from the harbour",
+      "23-minute airport transfer"
     ],
-    "nearby": ["ohla-barcelona", "hotel-1898-barcelona", "w-barcelona-hotel"]
+    "faqs": [
+      {
+        "q": "How long is the airport transfer to The Serras Hotel Barcelona?",
+        "a": "The Serras Hotel is 16 km from BCN El Prat Airport, with a private transfer taking approximately 23 minutes via the coastal motorway and Passeig Colom. The Gothic waterfront location has good vehicle access, making arrivals smooth even during busy tourist season."
+      },
+      {
+        "q": "What makes The Serras Hotel special compared to other Barcelona five-star hotels?",
+        "a": "The Serras is arguably Barcelona's most romantically located boutique hotel, on the waterfront between the Columbus Monument and the Born district. Its rooftop pool looks directly over the harbour and Barceloneta beach. With only 28 rooms it offers exceptional levels of personalised service."
+      },
+      {
+        "q": "Can Élite BCN pick us up from The Serras for a day trip to Montserrat?",
+        "a": "Absolutely. Élite BCN offers day-trip transfers from any Barcelona hotel to Montserrat, returning the same day. The journey from The Serras to Montserrat takes approximately 50 minutes. We can wait at the monastery while you explore and return you at your preferred time."
+      }
+    ],
+    "nearby": [
+      "ohla-barcelona",
+      "hotel-1898-barcelona",
+      "w-barcelona-hotel"
+    ]
   },
   {
     "slug": "hotel-1898-barcelona",
@@ -258,16 +594,40 @@
     "area": "Las Ramblas",
     "distance_km": 16,
     "duration_min": 23,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3806, "lng": 2.1734 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3806,
+      "lng": 2.1734
+    },
     "description": "Hotel 1898 Barcelona is a magnificent five-star property in a restored 1898 colonial-era building on La Rambla, offering a rooftop pool with panoramic city views and one of the most central locations in Barcelona. The 23-minute airport transfer brings you to the heart of the city in style.",
-    "highlights": ["La Rambla landmark building", "Rooftop pool with city panorama", "Steps from Gothic Quarter", "23-minute airport transfer"],
-    "faqs": [
-      { "q": "Is Hotel 1898 Barcelona safe in its La Rambla location?", "a": "Hotel 1898 is very secure. La Rambla has a heavy police and security presence. The hotel itself is a gated property with 24/7 security. For your airport transfer, your Élite BCN driver will take you directly to the hotel entrance, minimising any interaction with the busy street." },
-      { "q": "What is the most convenient way to reach Hotel 1898 from BCN Airport?", "a": "A private transfer with Élite BCN is the most direct option — 23 minutes, fixed price from €45. The Aerobus also stops at Plaça de Catalunya (5 minutes' walk away) for €6.75 per person, but with luggage a private transfer is far more comfortable and only marginally more expensive per person for groups of 3+." },
-      { "q": "Can I book a transfer from Hotel 1898 to Sitges for a day trip?", "a": "Yes. Élite BCN offers point-to-point transfers from any Barcelona hotel to Sitges. The journey from Hotel 1898 on La Rambla to Sitges takes approximately 35 minutes and costs from €65 fixed. We can arrange a return transfer at any time you prefer." }
+    "highlights": [
+      "La Rambla landmark building",
+      "Rooftop pool with city panorama",
+      "Steps from Gothic Quarter",
+      "23-minute airport transfer"
     ],
-    "nearby": ["four-seasons-barcelona", "ohla-barcelona", "the-serras-hotel"]
+    "faqs": [
+      {
+        "q": "Is Hotel 1898 Barcelona safe in its La Rambla location?",
+        "a": "Hotel 1898 is very secure. La Rambla has a heavy police and security presence. The hotel itself is a gated property with 24/7 security. For your airport transfer, your Élite BCN driver will take you directly to the hotel entrance, minimising any interaction with the busy street."
+      },
+      {
+        "q": "What is the most convenient way to reach Hotel 1898 from BCN Airport?",
+        "a": "A private transfer with Élite BCN is the most direct option — 23 minutes, fixed price from €45. The Aerobus also stops at Plaça de Catalunya (5 minutes' walk away) for €6.75 per person, but with luggage a private transfer is far more comfortable and only marginally more expensive per person for groups of 3+."
+      },
+      {
+        "q": "Can I book a transfer from Hotel 1898 to Sitges for a day trip?",
+        "a": "Yes. Élite BCN offers point-to-point transfers from any Barcelona hotel to Sitges. The journey from Hotel 1898 on La Rambla to Sitges takes approximately 35 minutes and costs from €65 fixed. We can arrange a return transfer at any time you prefer."
+      }
+    ],
+    "nearby": [
+      "four-seasons-barcelona",
+      "ohla-barcelona",
+      "the-serras-hotel"
+    ]
   },
   {
     "slug": "barcelo-raval",
@@ -276,16 +636,40 @@
     "area": "El Raval",
     "distance_km": 16,
     "duration_min": 24,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3797, "lng": 2.1673 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3797,
+      "lng": 2.1673
+    },
     "description": "The Barceló Raval is a striking cylindrical tower rising from the multicultural El Raval neighbourhood, with a 360° rooftop bar offering unmatched views of Barcelona's skyline, the sea, and Montjuïc. Private transfer from BCN Airport to this design hotel takes 24 minutes.",
-    "highlights": ["Cylindrical tower architecture", "360° rooftop bar views", "El Raval neighbourhood", "24-minute airport transfer"],
-    "faqs": [
-      { "q": "What is El Raval and is it a good area to stay in Barcelona?", "a": "El Raval is Barcelona's most diverse and creative neighbourhood, home to the MACBA contemporary art museum, the CCCB cultural centre, excellent restaurants, and a vibrant nightlife scene. While formerly rough around the edges, it has transformed into a sought-after address for design-conscious travellers." },
-      { "q": "How do I get from the airport to Barceló Raval?", "a": "A private transfer with Élite BCN collects you from BCN Airport arrivals and delivers you to the Barceló Raval in approximately 24 minutes. Fixed price from €45. The El Raval location is fully accessible by vehicle via the Ronda de Sant Antoni." },
-      { "q": "Is the MACBA museum walking distance from Barceló Raval?", "a": "Yes. The MACBA (Museu d'Art Contemporani de Barcelona) is a 3-minute walk from the hotel. The CCCB (Centre de Cultura Contemporània) is directly adjacent to MACBA. For museum visits, Élite BCN can also arrange collection from the hotel and transfers to other Barcelona attractions." }
+    "highlights": [
+      "Cylindrical tower architecture",
+      "360° rooftop bar views",
+      "El Raval neighbourhood",
+      "24-minute airport transfer"
     ],
-    "nearby": ["hotel-1898-barcelona", "ohla-barcelona", "cotton-house-hotel-barcelona"]
+    "faqs": [
+      {
+        "q": "What is El Raval and is it a good area to stay in Barcelona?",
+        "a": "El Raval is Barcelona's most diverse and creative neighbourhood, home to the MACBA contemporary art museum, the CCCB cultural centre, excellent restaurants, and a vibrant nightlife scene. While formerly rough around the edges, it has transformed into a sought-after address for design-conscious travellers."
+      },
+      {
+        "q": "How do I get from the airport to Barceló Raval?",
+        "a": "A private transfer with Élite BCN collects you from BCN Airport arrivals and delivers you to the Barceló Raval in approximately 24 minutes. Fixed price from €45. The El Raval location is fully accessible by vehicle via the Ronda de Sant Antoni."
+      },
+      {
+        "q": "Is the MACBA museum walking distance from Barceló Raval?",
+        "a": "Yes. The MACBA (Museu d'Art Contemporani de Barcelona) is a 3-minute walk from the hotel. The CCCB (Centre de Cultura Contemporània) is directly adjacent to MACBA. For museum visits, Élite BCN can also arrange collection from the hotel and transfers to other Barcelona attractions."
+      }
+    ],
+    "nearby": [
+      "hotel-1898-barcelona",
+      "ohla-barcelona",
+      "cotton-house-hotel-barcelona"
+    ]
   },
   {
     "slug": "hotel-condes-barcelona",
@@ -294,16 +678,40 @@
     "area": "Passeig de Gràcia",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3921, "lng": 2.1672 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3921,
+      "lng": 2.1672
+    },
     "description": "Hotel Condes de Barcelona occupies two stunning modernista buildings on Passeig de Gràcia, directly facing Casa Batlló. Its rooftop pool, with Casa Batlló as a backdrop, is one of the most photographed spots in Barcelona. Private transfer from BCN Airport takes approximately 26 minutes.",
-    "highlights": ["Directly opposite Casa Batlló", "Modernista façade buildings", "Rooftop pool with Gaudí views", "26-minute airport transfer"],
-    "faqs": [
-      { "q": "How do I get from Barcelona Airport to Hotel Condes de Barcelona?", "a": "A private transfer with Élite BCN takes approximately 26 minutes from BCN Airport arrivals to the Hotel Condes on Passeig de Gràcia. Your driver meets you with a name board, handles luggage, and drops you directly at the hotel entrance. Fixed from €45." },
-      { "q": "Is Casa Batlló visible from the Hotel Condes de Barcelona?", "a": "Yes — the Hotel Condes de Barcelona is directly opposite Casa Batlló on Passeig de Gràcia. You can see Gaudí's masterpiece from the hotel's rooftop pool and from rooms on the upper floors. This is one of the most privileged positions on the entire boulevard." },
-      { "q": "Can Élite BCN arrange a transfer from Hotel Condes to the F1 Spanish Grand Prix?", "a": "Yes. The Circuit de Barcelona-Catalunya in Montmeló is approximately 30 minutes from the Hotel Condes de Barcelona. Élite BCN offers race weekend transfers with advance booking. We also offer shared group transfers on race days — contact us for current Grand Prix rates." }
+    "highlights": [
+      "Directly opposite Casa Batlló",
+      "Modernista façade buildings",
+      "Rooftop pool with Gaudí views",
+      "26-minute airport transfer"
     ],
-    "nearby": ["majestic-hotel-barcelona", "mandarin-oriental-barcelona", "grand-hyatt-barcelona"]
+    "faqs": [
+      {
+        "q": "How do I get from Barcelona Airport to Hotel Condes de Barcelona?",
+        "a": "A private transfer with Élite BCN takes approximately 26 minutes from BCN Airport arrivals to the Hotel Condes on Passeig de Gràcia. Your driver meets you with a name board, handles luggage, and drops you directly at the hotel entrance. Fixed from €45."
+      },
+      {
+        "q": "Is Casa Batlló visible from the Hotel Condes de Barcelona?",
+        "a": "Yes — the Hotel Condes de Barcelona is directly opposite Casa Batlló on Passeig de Gràcia. You can see Gaudí's masterpiece from the hotel's rooftop pool and from rooms on the upper floors. This is one of the most privileged positions on the entire boulevard."
+      },
+      {
+        "q": "Can Élite BCN arrange a transfer from Hotel Condes to the F1 Spanish Grand Prix?",
+        "a": "Yes. The Circuit de Barcelona-Catalunya in Montmeló is approximately 30 minutes from the Hotel Condes de Barcelona. Élite BCN offers race weekend transfers with advance booking. We also offer shared group transfers on race days — contact us for current Grand Prix rates."
+      }
+    ],
+    "nearby": [
+      "majestic-hotel-barcelona",
+      "mandarin-oriental-barcelona",
+      "grand-hyatt-barcelona"
+    ]
   },
   {
     "slug": "pullman-barcelona-skipper",
@@ -312,16 +720,40 @@
     "area": "Vila Olímpica",
     "distance_km": 17,
     "duration_min": 22,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3888, "lng": 2.2003 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3888,
+      "lng": 2.2003
+    },
     "description": "Pullman Barcelona Skipper is a modern five-star hotel on the beachfront at Vila Olímpica, with the Olympic Port marina at its doorstep and outstanding sea views from its infinity pool and terrace. The 22-minute private transfer from BCN Airport makes this one of the fastest beach hotel arrivals in the city.",
-    "highlights": ["Olympic Port marina views", "Infinity pool and beach access", "22-minute airport transfer", "Adjacent to Hotel Arts"],
-    "faqs": [
-      { "q": "How long is the transfer from Barcelona Airport to Pullman Barcelona Skipper?", "a": "The Pullman Skipper is 17 km from BCN Airport, with a private transfer taking approximately 22 minutes via the coastal Ronda Litoral motorway. The Vila Olímpica location has excellent motorway access and a clear drop-off zone at the hotel entrance." },
-      { "q": "Is there a beach near the Pullman Barcelona Skipper?", "a": "Yes. Barceloneta beach begins a 5-minute walk to the south-west of the hotel, and the hotel itself has direct access to the Vila Olímpica promenade. The Olympic Port marina with its restaurants and bars is directly adjacent." },
-      { "q": "Can I book a transfer from Pullman Skipper to Barcelona Cruise Port?", "a": "Yes. The Moll Adossat cruise terminals are approximately 6 km from the Pullman Skipper, a journey of around 12 minutes by private car. This is one of the most convenient hotels for cruise passengers needing a short transfer to the port." }
+    "highlights": [
+      "Olympic Port marina views",
+      "Infinity pool and beach access",
+      "22-minute airport transfer",
+      "Adjacent to Hotel Arts"
     ],
-    "nearby": ["hotel-arts-barcelona", "w-barcelona-hotel", "salon-nautico-barcelona"]
+    "faqs": [
+      {
+        "q": "How long is the transfer from Barcelona Airport to Pullman Barcelona Skipper?",
+        "a": "The Pullman Skipper is 17 km from BCN Airport, with a private transfer taking approximately 22 minutes via the coastal Ronda Litoral motorway. The Vila Olímpica location has excellent motorway access and a clear drop-off zone at the hotel entrance."
+      },
+      {
+        "q": "Is there a beach near the Pullman Barcelona Skipper?",
+        "a": "Yes. Barceloneta beach begins a 5-minute walk to the south-west of the hotel, and the hotel itself has direct access to the Vila Olímpica promenade. The Olympic Port marina with its restaurants and bars is directly adjacent."
+      },
+      {
+        "q": "Can I book a transfer from Pullman Skipper to Barcelona Cruise Port?",
+        "a": "Yes. The Moll Adossat cruise terminals are approximately 6 km from the Pullman Skipper, a journey of around 12 minutes by private car. This is one of the most convenient hotels for cruise passengers needing a short transfer to the port."
+      }
+    ],
+    "nearby": [
+      "hotel-arts-barcelona",
+      "w-barcelona-hotel",
+      "salon-nautico-barcelona"
+    ]
   },
   {
     "slug": "ayre-hotel-rosellon",
@@ -330,16 +762,40 @@
     "area": "Eixample",
     "distance_km": 16,
     "duration_min": 25,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3921, "lng": 2.1611 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3921,
+      "lng": 2.1611
+    },
     "description": "Ayre Hotel Rosellón is a contemporary four-star superior hotel in upper Eixample Dreta, within walking distance of Gaudí's Sagrada Família and the trendy restaurants of the Esquerra de l'Eixample. The 25-minute private transfer from the airport is a calm and direct way to start your Barcelona stay.",
-    "highlights": ["Upper Eixample location", "Sagrada Família 15 min walk", "Trendy Eixample dining scene", "25-minute airport transfer"],
-    "faqs": [
-      { "q": "How far is the Ayre Hotel Rosellón from Sagrada Família?", "a": "The Ayre Hotel Rosellón is approximately 1.2 km from the Sagrada Família Basilica, around a 15-minute walk or 5-minute taxi ride. The hotel's Eixample Dreta location makes it one of the best bases for exploring both Gaudí's architecture and the city's culinary scene." },
-      { "q": "What is the cost of the airport transfer to Ayre Hotel Rosellón?", "a": "A private transfer from BCN Airport to the Ayre Hotel Rosellón costs from €45 fixed for a Mercedes EQE 300 Electric (up to 3 passengers). A Mercedes V-Class for groups up to 7 is €65. All prices include meet & greet, luggage handling, and 60 minutes free waiting." },
-      { "q": "Is the Ayre Hotel Rosellón good for the LGBT district (Gayxample)?", "a": "Yes — the hotel is within the Eixample neighbourhood, and the Gayxample district (centred on Carrer del Consell de Cent) is approximately 10 minutes' walk away. Barcelona's Pride festival (also known as Diversity Barcelona) takes place every June within easy reach of the hotel." }
+    "highlights": [
+      "Upper Eixample location",
+      "Sagrada Família 15 min walk",
+      "Trendy Eixample dining scene",
+      "25-minute airport transfer"
     ],
-    "nearby": ["grand-hyatt-barcelona", "hotel-condes-barcelona", "mandarin-oriental-barcelona"]
+    "faqs": [
+      {
+        "q": "How far is the Ayre Hotel Rosellón from Sagrada Família?",
+        "a": "The Ayre Hotel Rosellón is approximately 1.2 km from the Sagrada Família Basilica, around a 15-minute walk or 5-minute taxi ride. The hotel's Eixample Dreta location makes it one of the best bases for exploring both Gaudí's architecture and the city's culinary scene."
+      },
+      {
+        "q": "What is the cost of the airport transfer to Ayre Hotel Rosellón?",
+        "a": "A private transfer from BCN Airport to the Ayre Hotel Rosellón costs from €45 fixed for a Mercedes EQE 300 Electric (up to 3 passengers). A Mercedes V-Class for groups up to 7 is €65. All prices include meet & greet, luggage handling, and 60 minutes free waiting."
+      },
+      {
+        "q": "Is the Ayre Hotel Rosellón good for the LGBT district (Gayxample)?",
+        "a": "Yes — the hotel is within the Eixample neighbourhood, and the Gayxample district (centred on Carrer del Consell de Cent) is approximately 10 minutes' walk away. Barcelona's Pride festival (also known as Diversity Barcelona) takes place every June within easy reach of the hotel."
+      }
+    ],
+    "nearby": [
+      "grand-hyatt-barcelona",
+      "hotel-condes-barcelona",
+      "mandarin-oriental-barcelona"
+    ]
   },
   {
     "slug": "nobu-hotel-barcelona",
@@ -348,16 +804,40 @@
     "area": "Eixample",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3912, "lng": 2.1619 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3912,
+      "lng": 2.1619
+    },
     "description": "Nobu Hotel Barcelona brings the legendary Japanese-Peruvian hospitality brand to Avinguda Diagonal, offering a vertically stratified spa, the iconic Nobu Restaurant, and slick contemporary design in the heart of Barcelona's commercial and cultural axis. The 26-minute transfer from BCN Airport is the ideal prelude to the Nobu experience.",
-    "highlights": ["Nobu Restaurant on-site", "Rooftop bar and pool", "Avinguda Diagonal address", "26-minute airport transfer"],
-    "faqs": [
-      { "q": "How do I get from the airport to Nobu Hotel Barcelona?", "a": "A private transfer with Élite BCN collects you from BCN Airport arrivals (terminal T1 or T2) and delivers you to the Nobu Hotel on Avinguda Diagonal in approximately 26 minutes. Fixed price from €45. Your driver is pre-briefed on hotel drop-off protocols and will handle all luggage." },
-      { "q": "Is Nobu Hotel Barcelona near the Passeig de Gràcia restaurants?", "a": "Yes. The hotel is a short walk or taxi ride from Passeig de Gràcia, and the Nobu Restaurant itself is one of the most coveted dining experiences in Barcelona. The surrounding Eixample neighbourhood has hundreds of restaurants at every price point, making it an excellent base for food tourism." },
-      { "q": "Can Élite BCN arrange a return transfer from Nobu Hotel to the airport the next morning?", "a": "Absolutely. Return transfers from Nobu Hotel Barcelona to BCN Airport are available 24/7 at the same fixed price. For international flights we recommend a pickup 2.5 hours before your scheduled departure time. You can book online or via WhatsApp." }
+    "highlights": [
+      "Nobu Restaurant on-site",
+      "Rooftop bar and pool",
+      "Avinguda Diagonal address",
+      "26-minute airport transfer"
     ],
-    "nearby": ["grand-hyatt-barcelona", "sofia-hotel-barcelona", "cotton-house-hotel-barcelona"]
+    "faqs": [
+      {
+        "q": "How do I get from the airport to Nobu Hotel Barcelona?",
+        "a": "A private transfer with Élite BCN collects you from BCN Airport arrivals (terminal T1 or T2) and delivers you to the Nobu Hotel on Avinguda Diagonal in approximately 26 minutes. Fixed price from €45. Your driver is pre-briefed on hotel drop-off protocols and will handle all luggage."
+      },
+      {
+        "q": "Is Nobu Hotel Barcelona near the Passeig de Gràcia restaurants?",
+        "a": "Yes. The hotel is a short walk or taxi ride from Passeig de Gràcia, and the Nobu Restaurant itself is one of the most coveted dining experiences in Barcelona. The surrounding Eixample neighbourhood has hundreds of restaurants at every price point, making it an excellent base for food tourism."
+      },
+      {
+        "q": "Can Élite BCN arrange a return transfer from Nobu Hotel to the airport the next morning?",
+        "a": "Absolutely. Return transfers from Nobu Hotel Barcelona to BCN Airport are available 24/7 at the same fixed price. For international flights we recommend a pickup 2.5 hours before your scheduled departure time. You can book online or via WhatsApp."
+      }
+    ],
+    "nearby": [
+      "grand-hyatt-barcelona",
+      "sofia-hotel-barcelona",
+      "cotton-house-hotel-barcelona"
+    ]
   },
   {
     "slug": "msc-cruises-barcelona",
@@ -366,16 +846,40 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3522, "lng": 2.1681 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3522,
+      "lng": 2.1681
+    },
     "description": "MSC Cruises operates from the Moll Adossat cruise terminals at Barcelona Port, the largest cruise port in the Mediterranean. Élite BCN provides meet & greet transfers from BCN Airport to the MSC embarkation terminal, ensuring you board stress-free with all your luggage handled.",
-    "highlights": ["Moll Adossat terminal transfer", "20-minute airport connection", "Luggage handling included", "Flight monitoring for delays"],
-    "faqs": [
-      { "q": "How long does the transfer from Barcelona Airport to the MSC Cruises terminal take?", "a": "The private transfer from BCN El Prat Airport to the MSC Cruises embarkation terminal at Moll Adossat takes approximately 20 minutes (14 km). We recommend arriving at the terminal at least 3 hours before your scheduled departure time as MSC check-in queues can be substantial." },
-      { "q": "Which terminal does MSC Cruises use at Barcelona Port?", "a": "MSC Cruises typically uses Terminals A and B at Moll Adossat, Barcelona's main cruise passenger area. Terminal assignments can change ship by ship, so we recommend confirming your terminal in your MSC boarding documents. Our drivers know all terminal locations and will take you to the correct gate." },
-      { "q": "Does Élite BCN offer disembarkation transfers from the MSC terminal?", "a": "Yes. We provide disembarkation transfers from all Barcelona cruise terminals to BCN Airport, city hotels, and onward destinations. For disembarkation, we monitor the ship's arrival and berth assignment to ensure your driver is at the correct terminal when you disembark." }
+    "highlights": [
+      "Moll Adossat terminal transfer",
+      "20-minute airport connection",
+      "Luggage handling included",
+      "Flight monitoring for delays"
     ],
-    "nearby": ["royal-caribbean-barcelona", "celebrity-cruises-barcelona", "carnival-cruises-barcelona"]
+    "faqs": [
+      {
+        "q": "How long does the transfer from Barcelona Airport to the MSC Cruises terminal take?",
+        "a": "The private transfer from BCN El Prat Airport to the MSC Cruises embarkation terminal at Moll Adossat takes approximately 20 minutes (14 km). We recommend arriving at the terminal at least 3 hours before your scheduled departure time as MSC check-in queues can be substantial."
+      },
+      {
+        "q": "Which terminal does MSC Cruises use at Barcelona Port?",
+        "a": "MSC Cruises typically uses Terminals A and B at Moll Adossat, Barcelona's main cruise passenger area. Terminal assignments can change ship by ship, so we recommend confirming your terminal in your MSC boarding documents. Our drivers know all terminal locations and will take you to the correct gate."
+      },
+      {
+        "q": "Does Élite BCN offer disembarkation transfers from the MSC terminal?",
+        "a": "Yes. We provide disembarkation transfers from all Barcelona cruise terminals to BCN Airport, city hotels, and onward destinations. For disembarkation, we monitor the ship's arrival and berth assignment to ensure your driver is at the correct terminal when you disembark."
+      }
+    ],
+    "nearby": [
+      "royal-caribbean-barcelona",
+      "celebrity-cruises-barcelona",
+      "carnival-cruises-barcelona"
+    ]
   },
   {
     "slug": "royal-caribbean-barcelona",
@@ -384,16 +888,40 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3535, "lng": 2.1700 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3535,
+      "lng": 2.17
+    },
     "description": "Royal Caribbean's flagship ships including Harmony of the Seas and Wonder of the Seas regularly sail from Barcelona's Moll Adossat terminal. Élite BCN's private transfer service connects you from BCN Airport to the Royal Caribbean terminal in 20 minutes, with full luggage assistance to the ship's check-in desk.",
-    "highlights": ["Harmony of the Seas homeport", "20-minute airport connection", "Group vehicles for families", "Cruise itinerary starting Barcelona"],
-    "faqs": [
-      { "q": "What time should I arrive at the Royal Caribbean terminal in Barcelona?", "a": "Royal Caribbean typically opens check-in 4–5 hours before sailing. We recommend arriving at the terminal 3–4 hours before departure for larger ships. Your Élite BCN driver will time your airport pickup to match your preferred terminal arrival time." },
-      { "q": "Do Royal Caribbean ships sail from Barcelona all year?", "a": "Royal Caribbean typically operates Mediterranean sailings from Barcelona from April through November. The main peak season is June–September when the largest ships like Wonder of the Seas and Harmony of the Seas use Barcelona as their homeport. Always confirm your terminal with Royal Caribbean before travel." },
-      { "q": "Can Élite BCN accommodate a family of 7 with cruise luggage for the Royal Caribbean terminal?", "a": "Yes. The Mercedes V-Class MPV seats up to 7 passengers and has a large boot suitable for cruise-sized luggage. For larger groups or excessive luggage, we can arrange multiple vehicles at a combined rate. Contact us with your group size and luggage details for a custom quote." }
+    "highlights": [
+      "Harmony of the Seas homeport",
+      "20-minute airport connection",
+      "Group vehicles for families",
+      "Cruise itinerary starting Barcelona"
     ],
-    "nearby": ["msc-cruises-barcelona", "norwegian-cruise-barcelona", "princess-cruises-barcelona"]
+    "faqs": [
+      {
+        "q": "What time should I arrive at the Royal Caribbean terminal in Barcelona?",
+        "a": "Royal Caribbean typically opens check-in 4–5 hours before sailing. We recommend arriving at the terminal 3–4 hours before departure for larger ships. Your Élite BCN driver will time your airport pickup to match your preferred terminal arrival time."
+      },
+      {
+        "q": "Do Royal Caribbean ships sail from Barcelona all year?",
+        "a": "Royal Caribbean typically operates Mediterranean sailings from Barcelona from April through November. The main peak season is June–September when the largest ships like Wonder of the Seas and Harmony of the Seas use Barcelona as their homeport. Always confirm your terminal with Royal Caribbean before travel."
+      },
+      {
+        "q": "Can Élite BCN accommodate a family of 7 with cruise luggage for the Royal Caribbean terminal?",
+        "a": "Yes. The Mercedes V-Class MPV seats up to 7 passengers and has a large boot suitable for cruise-sized luggage. For larger groups or excessive luggage, we can arrange multiple vehicles at a combined rate. Contact us with your group size and luggage details for a custom quote."
+      }
+    ],
+    "nearby": [
+      "msc-cruises-barcelona",
+      "norwegian-cruise-barcelona",
+      "princess-cruises-barcelona"
+    ]
   },
   {
     "slug": "celebrity-cruises-barcelona",
@@ -402,16 +930,40 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3540, "lng": 2.1690 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.354,
+      "lng": 2.169
+    },
     "description": "Celebrity Cruises offers premium Mediterranean voyages departing from Barcelona, with ships like Celebrity Reflection and Celebrity Silhouette calling the city their homeport. Élite BCN's transfer service from BCN Airport matches Celebrity's premium brand experience, delivering guests to the Moll Adossat terminal in 20 minutes.",
-    "highlights": ["Celebrity Reflection homeport", "Premium transfer to match Celebrity standards", "20-minute airport connection", "24/7 availability"],
-    "faqs": [
-      { "q": "How do I get from Barcelona Airport to the Celebrity Cruises terminal?", "a": "Élite BCN offers private transfers from BCN Airport (T1 and T2) to the Celebrity Cruises terminal at Moll Adossat. Your driver meets you in arrivals with a name board and delivers you to the check-in hall in approximately 20 minutes. Fixed from €45 per vehicle." },
-      { "q": "Does Celebrity Cruises have a specific terminal at Barcelona Port?", "a": "Celebrity Cruises typically uses Terminals C and D at Moll Adossat. However, terminal assignments vary by sailing date and ship. We recommend confirming your specific terminal in your Celebrity embarkation documents. Our drivers know all Moll Adossat terminals and will navigate to the correct one." },
-      { "q": "Is a private transfer better than the Celebrity Cruises organised transfer?", "a": "Private transfers with Élite BCN offer significantly more flexibility than cruise line organised coaches: you depart on your schedule, your driver meets you in arrivals (not at a bus stop), and you are not waiting for other passengers. The price is comparable for couples and better value for families and groups." }
+    "highlights": [
+      "Celebrity Reflection homeport",
+      "Premium transfer to match Celebrity standards",
+      "20-minute airport connection",
+      "24/7 availability"
     ],
-    "nearby": ["royal-caribbean-barcelona", "msc-cruises-barcelona", "costa-cruises-barcelona"]
+    "faqs": [
+      {
+        "q": "How do I get from Barcelona Airport to the Celebrity Cruises terminal?",
+        "a": "Élite BCN offers private transfers from BCN Airport (T1 and T2) to the Celebrity Cruises terminal at Moll Adossat. Your driver meets you in arrivals with a name board and delivers you to the check-in hall in approximately 20 minutes. Fixed from €45 per vehicle."
+      },
+      {
+        "q": "Does Celebrity Cruises have a specific terminal at Barcelona Port?",
+        "a": "Celebrity Cruises typically uses Terminals C and D at Moll Adossat. However, terminal assignments vary by sailing date and ship. We recommend confirming your specific terminal in your Celebrity embarkation documents. Our drivers know all Moll Adossat terminals and will navigate to the correct one."
+      },
+      {
+        "q": "Is a private transfer better than the Celebrity Cruises organised transfer?",
+        "a": "Private transfers with Élite BCN offer significantly more flexibility than cruise line organised coaches: you depart on your schedule, your driver meets you in arrivals (not at a bus stop), and you are not waiting for other passengers. The price is comparable for couples and better value for families and groups."
+      }
+    ],
+    "nearby": [
+      "royal-caribbean-barcelona",
+      "msc-cruises-barcelona",
+      "costa-cruises-barcelona"
+    ]
   },
   {
     "slug": "norwegian-cruise-barcelona",
@@ -420,16 +972,40 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3530, "lng": 2.1675 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.353,
+      "lng": 2.1675
+    },
     "description": "Norwegian Cruise Line's Freestyle cruising concept sails from Barcelona on ships including Norwegian Epic, the largest ship ever based in the Mediterranean. Élite BCN offers private airport transfers to the Norwegian terminal at Moll Adossat, with the same no-hassle, fixed-price approach NCL passengers expect from premium travel.",
-    "highlights": ["Norwegian Epic Barcelona homeport", "Freestyle cruising transfers", "20-minute airport connection", "No hidden charges"],
-    "faqs": [
-      { "q": "Where does Norwegian Cruise Line board in Barcelona?", "a": "Norwegian Cruise Line uses the Moll Adossat terminals, primarily Terminal D. The Norwegian Epic, one of the world's largest cruise ships, is regularly based here for Mediterranean cruises. Always verify your terminal letter in your NCL embarkation papers as assignments can change." },
-      { "q": "How early should I plan my transfer to the Norwegian terminal in Barcelona?", "a": "Norwegian recommends arriving at the terminal no later than 3 hours before sailing, and boarding begins approximately 4.5 hours before departure. We recommend a transfer timed to arrive at the terminal 3–3.5 hours before your ship's scheduled departure." },
-      { "q": "Can I book a transfer from a Barcelona hotel to the Norwegian terminal?", "a": "Yes. Élite BCN provides hotel-to-cruise-terminal transfers throughout Barcelona. Whether you are staying the night before at a Passeig de Gràcia hotel or arriving the same day, we will pick you up at your accommodation and deliver you to the Norwegian terminal with all your luggage." }
+    "highlights": [
+      "Norwegian Epic Barcelona homeport",
+      "Freestyle cruising transfers",
+      "20-minute airport connection",
+      "No hidden charges"
     ],
-    "nearby": ["msc-cruises-barcelona", "royal-caribbean-barcelona", "cunard-barcelona"]
+    "faqs": [
+      {
+        "q": "Where does Norwegian Cruise Line board in Barcelona?",
+        "a": "Norwegian Cruise Line uses the Moll Adossat terminals, primarily Terminal D. The Norwegian Epic, one of the world's largest cruise ships, is regularly based here for Mediterranean cruises. Always verify your terminal letter in your NCL embarkation papers as assignments can change."
+      },
+      {
+        "q": "How early should I plan my transfer to the Norwegian terminal in Barcelona?",
+        "a": "Norwegian recommends arriving at the terminal no later than 3 hours before sailing, and boarding begins approximately 4.5 hours before departure. We recommend a transfer timed to arrive at the terminal 3–3.5 hours before your ship's scheduled departure."
+      },
+      {
+        "q": "Can I book a transfer from a Barcelona hotel to the Norwegian terminal?",
+        "a": "Yes. Élite BCN provides hotel-to-cruise-terminal transfers throughout Barcelona. Whether you are staying the night before at a Passeig de Gràcia hotel or arriving the same day, we will pick you up at your accommodation and deliver you to the Norwegian terminal with all your luggage."
+      }
+    ],
+    "nearby": [
+      "msc-cruises-barcelona",
+      "royal-caribbean-barcelona",
+      "cunard-barcelona"
+    ]
   },
   {
     "slug": "princess-cruises-barcelona",
@@ -438,16 +1014,40 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3518, "lng": 2.1695 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3518,
+      "lng": 2.1695
+    },
     "description": "Princess Cruises operates Mediterranean sailings from Barcelona on ships including Crown Princess and Ruby Princess, offering an elegant and relaxed cruising experience. Élite BCN's private transfer service ensures Princess guests arrive at the Moll Adossat terminal refreshed and on time, with every detail handled.",
-    "highlights": ["Crown Princess homeport", "Elegant transfer for Princess guests", "20-minute airport connection", "Luggage from arrivals to terminal"],
-    "faqs": [
-      { "q": "How do I reach the Princess Cruises terminal in Barcelona from the airport?", "a": "The most seamless option is a private transfer with Élite BCN. Your driver meets you in the BCN Airport arrivals hall with a personalised sign, loads your luggage, and delivers you to the Princess Cruises terminal at Moll Adossat in approximately 20 minutes. Fixed from €45." },
-      { "q": "What is the baggage allowance on transfers to the Princess terminal?", "a": "Élite BCN has no luggage limit per se. The Mercedes EQE 300 Electric handles 3 large suitcases plus hand luggage. The Mercedes V-Class comfortably fits 6–7 large cases plus carry-ons. If you have an unusually large volume of luggage, contact us in advance and we will arrange the right vehicle." },
-      { "q": "Does Élite BCN offer post-cruise transfers from the Princess terminal to hotels?", "a": "Yes. Disembarkation transfers from the Princess Cruises terminal to any Barcelona hotel or directly to BCN Airport are available 24/7. We monitor disembarkation schedules and will adjust pickup times based on your actual disembarkation slot, keeping your driver informed." }
+    "highlights": [
+      "Crown Princess homeport",
+      "Elegant transfer for Princess guests",
+      "20-minute airport connection",
+      "Luggage from arrivals to terminal"
     ],
-    "nearby": ["celebrity-cruises-barcelona", "costa-cruises-barcelona", "msc-cruises-barcelona"]
+    "faqs": [
+      {
+        "q": "How do I reach the Princess Cruises terminal in Barcelona from the airport?",
+        "a": "The most seamless option is a private transfer with Élite BCN. Your driver meets you in the BCN Airport arrivals hall with a personalised sign, loads your luggage, and delivers you to the Princess Cruises terminal at Moll Adossat in approximately 20 minutes. Fixed from €45."
+      },
+      {
+        "q": "What is the baggage allowance on transfers to the Princess terminal?",
+        "a": "Élite BCN has no luggage limit per se. The Mercedes EQE 300 Electric handles 3 large suitcases plus hand luggage. The Mercedes V-Class comfortably fits 6–7 large cases plus carry-ons. If you have an unusually large volume of luggage, contact us in advance and we will arrange the right vehicle."
+      },
+      {
+        "q": "Does Élite BCN offer post-cruise transfers from the Princess terminal to hotels?",
+        "a": "Yes. Disembarkation transfers from the Princess Cruises terminal to any Barcelona hotel or directly to BCN Airport are available 24/7. We monitor disembarkation schedules and will adjust pickup times based on your actual disembarkation slot, keeping your driver informed."
+      }
+    ],
+    "nearby": [
+      "celebrity-cruises-barcelona",
+      "costa-cruises-barcelona",
+      "msc-cruises-barcelona"
+    ]
   },
   {
     "slug": "costa-cruises-barcelona",
@@ -456,16 +1056,40 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3545, "lng": 2.1660 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3545,
+      "lng": 2.166
+    },
     "description": "Costa Cruises, Europe's largest cruise line, operates extensively from Barcelona with ships including Costa Smeralda and Costa Firenze sailing the Western and Eastern Mediterranean. Élite BCN offers private transfers from BCN Airport directly to the Costa check-in facilities at Moll Adossat, removing all transfer stress from your holiday.",
-    "highlights": ["Costa Smeralda homeport", "Europe's largest cruise line terminal", "20-minute airport connection", "Spanish-speaking drivers available"],
-    "faqs": [
-      { "q": "How far is the Costa Cruises terminal from Barcelona Airport?", "a": "The Costa Cruises terminal at Moll Adossat is approximately 14 km from BCN El Prat Airport. By private transfer the journey takes around 20 minutes. Costa Cruises also offers organised coach transfers from the airport, but a private vehicle is more flexible and comfortable." },
-      { "q": "Do Costa Cruises ships leave from Terminal A or B in Barcelona?", "a": "Costa Cruises typically uses Terminals A and B at Moll Adossat for their Mediterranean sailings. We recommend checking your specific Costa boarding pass for the confirmed terminal letter. Our drivers know all Moll Adossat terminal locations and will take you directly to the correct entrance." },
-      { "q": "Is there parking at the Barcelona cruise port for private transfers?", "a": "The Moll Adossat terminals have designated drop-off areas for private vehicles. Élite BCN drivers are experienced with the port access procedure and will take you directly to the check-in entrance, unload luggage, and ensure you are handed over to port staff before departing." }
+    "highlights": [
+      "Costa Smeralda homeport",
+      "Europe's largest cruise line terminal",
+      "20-minute airport connection",
+      "Spanish-speaking drivers available"
     ],
-    "nearby": ["msc-cruises-barcelona", "celebrity-cruises-barcelona", "carnival-cruises-barcelona"]
+    "faqs": [
+      {
+        "q": "How far is the Costa Cruises terminal from Barcelona Airport?",
+        "a": "The Costa Cruises terminal at Moll Adossat is approximately 14 km from BCN El Prat Airport. By private transfer the journey takes around 20 minutes. Costa Cruises also offers organised coach transfers from the airport, but a private vehicle is more flexible and comfortable."
+      },
+      {
+        "q": "Do Costa Cruises ships leave from Terminal A or B in Barcelona?",
+        "a": "Costa Cruises typically uses Terminals A and B at Moll Adossat for their Mediterranean sailings. We recommend checking your specific Costa boarding pass for the confirmed terminal letter. Our drivers know all Moll Adossat terminal locations and will take you directly to the correct entrance."
+      },
+      {
+        "q": "Is there parking at the Barcelona cruise port for private transfers?",
+        "a": "The Moll Adossat terminals have designated drop-off areas for private vehicles. Élite BCN drivers are experienced with the port access procedure and will take you directly to the check-in entrance, unload luggage, and ensure you are handed over to port staff before departing."
+      }
+    ],
+    "nearby": [
+      "msc-cruises-barcelona",
+      "celebrity-cruises-barcelona",
+      "carnival-cruises-barcelona"
+    ]
   },
   {
     "slug": "cunard-barcelona",
@@ -474,16 +1098,40 @@
     "area": "Port of Barcelona — World Trade Centre",
     "distance_km": 15,
     "duration_min": 22,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3700, "lng": 2.1800 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.37,
+      "lng": 2.18
+    },
     "description": "When Queen Mary 2 or Queen Victoria calls at Barcelona, Cunard Line typically berths at the World Trade Centre terminal near the Columbus Monument, the most central of Barcelona's cruise terminals. Élite BCN provides seamless transfers from BCN Airport to the Cunard berth in approximately 22 minutes.",
-    "highlights": ["World Trade Centre terminal access", "QM2 and Queen Victoria visits", "22-minute airport transfer", "White-glove service"],
-    "faqs": [
-      { "q": "Which terminal does Cunard use when Queen Mary 2 is in Barcelona?", "a": "Cunard's flagship Queen Mary 2 typically berths at the World Trade Centre (WTC) terminal in Barcelona's inner port, the most central location and approximately 22 minutes from BCN Airport. Some Cunard calls may use Moll Adossat — always verify with Cunard or on your boarding pass." },
-      { "q": "Is Élite BCN's service appropriate for Cunard passengers?", "a": "Absolutely. Élite BCN operates premium Mercedes vehicles (EQE 300, V-Class, Vito) with professional, suited chauffeurs — entirely in keeping with Cunard's world-class standards. We treat every passenger as a VIP regardless of vehicle class. Complimentary water is provided on all journeys." },
-      { "q": "Can Élite BCN provide a day tour of Barcelona for passengers on a Cunard port call?", "a": "Yes. Élite BCN offers bespoke day tours for cruise passengers on port calls. We can create a personalised itinerary covering the Sagrada Família, Gothic Quarter, Park Güell, and Montjuïc in a 4–6 hour tour, returning you to the ship well before departure. Contact us to arrange." }
+    "highlights": [
+      "World Trade Centre terminal access",
+      "QM2 and Queen Victoria visits",
+      "22-minute airport transfer",
+      "White-glove service"
     ],
-    "nearby": ["princess-cruises-barcelona", "norwegian-cruise-barcelona", "royal-caribbean-barcelona"]
+    "faqs": [
+      {
+        "q": "Which terminal does Cunard use when Queen Mary 2 is in Barcelona?",
+        "a": "Cunard's flagship Queen Mary 2 typically berths at the World Trade Centre (WTC) terminal in Barcelona's inner port, the most central location and approximately 22 minutes from BCN Airport. Some Cunard calls may use Moll Adossat — always verify with Cunard or on your boarding pass."
+      },
+      {
+        "q": "Is Élite BCN's service appropriate for Cunard passengers?",
+        "a": "Absolutely. Élite BCN operates premium Mercedes vehicles (EQE 300, V-Class, Vito) with professional, suited chauffeurs — entirely in keeping with Cunard's world-class standards. We treat every passenger as a VIP regardless of vehicle class. Complimentary water is provided on all journeys."
+      },
+      {
+        "q": "Can Élite BCN provide a day tour of Barcelona for passengers on a Cunard port call?",
+        "a": "Yes. Élite BCN offers bespoke day tours for cruise passengers on port calls. We can create a personalised itinerary covering the Sagrada Família, Gothic Quarter, Park Güell, and Montjuïc in a 4–6 hour tour, returning you to the ship well before departure. Contact us to arrange."
+      }
+    ],
+    "nearby": [
+      "princess-cruises-barcelona",
+      "norwegian-cruise-barcelona",
+      "royal-caribbean-barcelona"
+    ]
   },
   {
     "slug": "carnival-cruises-barcelona",
@@ -492,16 +1140,40 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3525, "lng": 2.1688 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.3525,
+      "lng": 2.1688
+    },
     "description": "Carnival Cruise Line offers value-focused Mediterranean sailings from Barcelona with ships including Carnival Firenze and Carnival Venezia. Élite BCN's private transfers from BCN Airport to the Carnival terminal at Moll Adossat are fixed-price, fast, and stress-free — the ideal start to your Carnival Fun Ship holiday.",
-    "highlights": ["Carnival Firenze Barcelona sailings", "Value-friendly fixed transfer price", "20-minute airport connection", "Family vehicles available"],
-    "faqs": [
-      { "q": "How do I get from Barcelona Airport to the Carnival Cruise terminal?", "a": "Book a private transfer with Élite BCN. Your driver meets you in BCN Airport arrivals with a name card, loads all luggage, and drives you directly to the Carnival terminal at Moll Adossat in approximately 20 minutes. Fixed from €45 per vehicle, not per person." },
-      { "q": "What is the best vehicle for a family going on a Carnival cruise?", "a": "The Mercedes V-Class MPV is perfect for families: it seats up to 7 passengers and has a generous boot for cruise luggage. At €65 fixed from the airport, it is excellent value for groups of 4–7 compared to multiple taxis or the airport bus." },
-      { "q": "How early should Carnival passengers arrive at the Barcelona terminal?", "a": "Carnival recommends arriving at the terminal at least 2.5–3 hours before sailing. We will help you plan your transfer pickup time from the airport or your hotel accordingly. If your flight arrives less than 3 hours before sailing, contact us immediately and we will work out the fastest possible transfer." }
+    "highlights": [
+      "Carnival Firenze Barcelona sailings",
+      "Value-friendly fixed transfer price",
+      "20-minute airport connection",
+      "Family vehicles available"
     ],
-    "nearby": ["msc-cruises-barcelona", "costa-cruises-barcelona", "royal-caribbean-barcelona"]
+    "faqs": [
+      {
+        "q": "How do I get from Barcelona Airport to the Carnival Cruise terminal?",
+        "a": "Book a private transfer with Élite BCN. Your driver meets you in BCN Airport arrivals with a name card, loads all luggage, and drives you directly to the Carnival terminal at Moll Adossat in approximately 20 minutes. Fixed from €45 per vehicle, not per person."
+      },
+      {
+        "q": "What is the best vehicle for a family going on a Carnival cruise?",
+        "a": "The Mercedes V-Class MPV is perfect for families: it seats up to 7 passengers and has a generous boot for cruise luggage. At €65 fixed from the airport, it is excellent value for groups of 4–7 compared to multiple taxis or the airport bus."
+      },
+      {
+        "q": "How early should Carnival passengers arrive at the Barcelona terminal?",
+        "a": "Carnival recommends arriving at the terminal at least 2.5–3 hours before sailing. We will help you plan your transfer pickup time from the airport or your hotel accordingly. If your flight arrives less than 3 hours before sailing, contact us immediately and we will work out the fastest possible transfer."
+      }
+    ],
+    "nearby": [
+      "msc-cruises-barcelona",
+      "costa-cruises-barcelona",
+      "royal-caribbean-barcelona"
+    ]
   },
   {
     "slug": "mwc-2027-barcelona",
@@ -510,16 +1182,40 @@
     "area": "Fira Gran Via, L'Hospitalet de Llobregat",
     "distance_km": 7,
     "duration_min": 12,
-    "prices": { "sedan": 35, "tesla": 45, "mpv": 55 },
-    "coordinates": { "lat": 41.3545, "lng": 2.1276 },
+    "prices": {
+      "sedan": 35,
+      "mpv": 55
+    },
+    "coordinates": {
+      "lat": 41.3545,
+      "lng": 2.1276
+    },
     "description": "Mobile World Congress is the world's largest telecommunications event, attracting over 100,000 delegates to the Fira Gran Via in L'Hospitalet de Llobregat — just 7 km and 12 minutes from BCN Airport. Élite BCN is the premium transfer choice for MWC delegates, with advance booking essential during congress week.",
-    "highlights": ["7 km from BCN Airport", "12-minute transfer — fastest in Barcelona", "Advance booking essential for MWC week", "Corporate account available"],
-    "faqs": [
-      { "q": "How do I get from Barcelona Airport to Mobile World Congress (Fira Gran Via)?", "a": "Fira Gran Via is the closest major venue to BCN Airport in Barcelona at just 7 km — a 12-minute private transfer. It is by far the fastest connection from the airport of any major Barcelona venue. Fixed price from €35. During MWC week demand is extremely high; book at least 2 weeks in advance." },
-      { "q": "Is public transport available from Barcelona Airport to MWC Fira Gran Via?", "a": "Yes. The L9 Sud metro line connects BCN Airport terminals to the Fira venue (Europa/Fira station) in approximately 20 minutes with no changes. However, during MWC peak hours (08:00–10:00 and 17:00–20:00) the metro and bus options are extremely crowded. A private transfer is far more comfortable for senior delegates." },
-      { "q": "Does Élite BCN offer corporate congress transfers for MWC?", "a": "Yes. We provide dedicated MWC congress transfer packages for corporate clients, including: pre-booked airport arrivals for multiple delegates across different flights, inter-venue transfers between Fira Gran Via and Gran Via hotels, and evening event transfers. Contact us for a corporate congress proposal." }
+    "highlights": [
+      "7 km from BCN Airport",
+      "12-minute transfer — fastest in Barcelona",
+      "Advance booking essential for MWC week",
+      "Corporate account available"
     ],
-    "nearby": ["ise-2027-barcelona", "sonar-festival-barcelona", "fairmont-rey-juan-carlos"]
+    "faqs": [
+      {
+        "q": "How do I get from Barcelona Airport to Mobile World Congress (Fira Gran Via)?",
+        "a": "Fira Gran Via is the closest major venue to BCN Airport in Barcelona at just 7 km — a 12-minute private transfer. It is by far the fastest connection from the airport of any major Barcelona venue. Fixed price from €35. During MWC week demand is extremely high; book at least 2 weeks in advance."
+      },
+      {
+        "q": "Is public transport available from Barcelona Airport to MWC Fira Gran Via?",
+        "a": "Yes. The L9 Sud metro line connects BCN Airport terminals to the Fira venue (Europa/Fira station) in approximately 20 minutes with no changes. However, during MWC peak hours (08:00–10:00 and 17:00–20:00) the metro and bus options are extremely crowded. A private transfer is far more comfortable for senior delegates."
+      },
+      {
+        "q": "Does Élite BCN offer corporate congress transfers for MWC?",
+        "a": "Yes. We provide dedicated MWC congress transfer packages for corporate clients, including: pre-booked airport arrivals for multiple delegates across different flights, inter-venue transfers between Fira Gran Via and Gran Via hotels, and evening event transfers. Contact us for a corporate congress proposal."
+      }
+    ],
+    "nearby": [
+      "ise-2027-barcelona",
+      "sonar-festival-barcelona",
+      "fairmont-rey-juan-carlos"
+    ]
   },
   {
     "slug": "primavera-sound-2026",
@@ -528,16 +1224,40 @@
     "area": "Parc del Fòrum, Diagonal Mar",
     "distance_km": 15,
     "duration_min": 20,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.4095, "lng": 2.2199 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.4095,
+      "lng": 2.2199
+    },
     "description": "Primavera Sound is one of the world's most prestigious music festivals, held at the spectacular Parc del Fòrum on Barcelona's seafront. Élite BCN offers private transfers for festival-goers from BCN Airport to the festival site or nearby hotels, with late-night returns available throughout the festival weekend.",
-    "highlights": ["Seafront festival venue", "Late-night return transfers available", "20-minute airport connection", "Hotel-to-venue transfers"],
-    "faqs": [
-      { "q": "How do I get from Barcelona Airport to Primavera Sound at Parc del Fòrum?", "a": "A private transfer from BCN Airport to the Parc del Fòrum takes approximately 20 minutes (15 km) via the coastal Ronda Litoral. Fixed price from €45. Late-night festival returns (post-midnight) are available at the same price and can be booked in advance via our website or WhatsApp." },
-      { "q": "Can I get a late-night transfer back from Primavera Sound to my Barcelona hotel?", "a": "Yes. Élite BCN operates 24/7 including festival late nights. For Primavera Sound we recommend pre-booking your return transfer with a flexible pickup window — simply WhatsApp your driver when you are ready to leave. The fixed price is the same regardless of what time of night you depart the festival." },
-      { "q": "Is there parking near the Primavera Sound venue?", "a": "The Parc del Fòrum is largely car-free during the festival and surrounding parking is very limited. Taking a private transfer is the most practical solution — your driver drops you at the festival entrance and can collect you at a pre-agreed time or when you message. No parking stress, no taxi queues." }
+    "highlights": [
+      "Seafront festival venue",
+      "Late-night return transfers available",
+      "20-minute airport connection",
+      "Hotel-to-venue transfers"
     ],
-    "nearby": ["hilton-diagonal-mar", "hotel-arts-barcelona", "salon-nautico-barcelona"]
+    "faqs": [
+      {
+        "q": "How do I get from Barcelona Airport to Primavera Sound at Parc del Fòrum?",
+        "a": "A private transfer from BCN Airport to the Parc del Fòrum takes approximately 20 minutes (15 km) via the coastal Ronda Litoral. Fixed price from €45. Late-night festival returns (post-midnight) are available at the same price and can be booked in advance via our website or WhatsApp."
+      },
+      {
+        "q": "Can I get a late-night transfer back from Primavera Sound to my Barcelona hotel?",
+        "a": "Yes. Élite BCN operates 24/7 including festival late nights. For Primavera Sound we recommend pre-booking your return transfer with a flexible pickup window — simply WhatsApp your driver when you are ready to leave. The fixed price is the same regardless of what time of night you depart the festival."
+      },
+      {
+        "q": "Is there parking near the Primavera Sound venue?",
+        "a": "The Parc del Fòrum is largely car-free during the festival and surrounding parking is very limited. Taking a private transfer is the most practical solution — your driver drops you at the festival entrance and can collect you at a pre-agreed time or when you message. No parking stress, no taxi queues."
+      }
+    ],
+    "nearby": [
+      "hilton-diagonal-mar",
+      "hotel-arts-barcelona",
+      "salon-nautico-barcelona"
+    ]
   },
   {
     "slug": "f1-spanish-grand-prix",
@@ -546,16 +1266,40 @@
     "area": "Montmeló",
     "distance_km": 28,
     "duration_min": 32,
-    "prices": { "sedan": 55, "tesla": 65, "mpv": 80 },
-    "coordinates": { "lat": 41.5702, "lng": 2.2611 },
+    "prices": {
+      "sedan": 55,
+      "mpv": 80
+    },
+    "coordinates": {
+      "lat": 41.5702,
+      "lng": 2.2611
+    },
     "description": "The Circuit de Barcelona-Catalunya in Montmeló hosts the Formula 1 Spanish Grand Prix, one of the most iconic rounds on the F1 calendar. Élite BCN provides private transfers from BCN Airport and all Barcelona hotels to the circuit, with race weekend advance booking essential to avoid the severe traffic build-up on race day.",
-    "highlights": ["F1 Spanish Grand Prix venue", "32-minute transfer from airport", "Advance booking essential on race day", "All circuits via motorway"],
-    "faqs": [
-      { "q": "How do I get from Barcelona Airport to the F1 Spanish Grand Prix circuit?", "a": "The Circuit de Barcelona-Catalunya in Montmeló is 28 km from BCN Airport, approximately 32 minutes by private transfer via the AP-7 motorway. On race day, local roads around the circuit become heavily congested 3+ hours before the race; we recommend arriving early. Book your race weekend transfer well in advance." },
-      { "q": "How much does a private transfer to the F1 Spanish Grand Prix cost?", "a": "A private transfer from BCN Airport to the Circuit de Barcelona-Catalunya starts from €55 for a Mercedes EQE 300 Electric (1–4 passengers). The Mercedes V-Class for groups up to 7 is €80. These prices are fixed regardless of race day traffic conditions." },
-      { "q": "Can Élite BCN wait at the circuit and bring us back to Barcelona after the race?", "a": "Yes. We can arrange a 'wait and return' package where your driver parks at a designated waiting area near the circuit and collects you after the race finishes. Alternatively, you can pre-book a return transfer for a specific post-race time. Contact us to arrange during F1 weekend." }
+    "highlights": [
+      "F1 Spanish Grand Prix venue",
+      "32-minute transfer from airport",
+      "Advance booking essential on race day",
+      "All circuits via motorway"
     ],
-    "nearby": ["girona-transfer", "mataro-transfer", "hotel-condes-barcelona"]
+    "faqs": [
+      {
+        "q": "How do I get from Barcelona Airport to the F1 Spanish Grand Prix circuit?",
+        "a": "The Circuit de Barcelona-Catalunya in Montmeló is 28 km from BCN Airport, approximately 32 minutes by private transfer via the AP-7 motorway. On race day, local roads around the circuit become heavily congested 3+ hours before the race; we recommend arriving early. Book your race weekend transfer well in advance."
+      },
+      {
+        "q": "How much does a private transfer to the F1 Spanish Grand Prix cost?",
+        "a": "A private transfer from BCN Airport to the Circuit de Barcelona-Catalunya starts from €55 for a Mercedes EQE 300 Electric (1–4 passengers). The Mercedes V-Class for groups up to 7 is €80. These prices are fixed regardless of race day traffic conditions."
+      },
+      {
+        "q": "Can Élite BCN wait at the circuit and bring us back to Barcelona after the race?",
+        "a": "Yes. We can arrange a 'wait and return' package where your driver parks at a designated waiting area near the circuit and collects you after the race finishes. Alternatively, you can pre-book a return transfer for a specific post-race time. Contact us to arrange during F1 weekend."
+      }
+    ],
+    "nearby": [
+      "girona-transfer",
+      "mataro-transfer",
+      "hotel-condes-barcelona"
+    ]
   },
   {
     "slug": "sonar-festival-barcelona",
@@ -564,16 +1308,40 @@
     "area": "Fira Montjuïc & Fira Gran Via",
     "distance_km": 10,
     "duration_min": 15,
-    "prices": { "sedan": 40, "tesla": 50, "mpv": 60 },
-    "coordinates": { "lat": 41.3711, "lng": 2.1509 },
+    "prices": {
+      "sedan": 40,
+      "mpv": 60
+    },
+    "coordinates": {
+      "lat": 41.3711,
+      "lng": 2.1509
+    },
     "description": "Sónar is Barcelona's legendary electronic music and multimedia arts festival, held across two venues: Sónar by Day at Fira Montjuïc and Sónar by Night at Fira Gran Via. Élite BCN covers both venues with 15-minute transfers from the airport, and offers inter-venue transfers throughout the festival.",
-    "highlights": ["Two-venue festival coverage", "15-minute airport transfer", "Inter-venue transfers available", "Late-night Fira Gran Via service"],
-    "faqs": [
-      { "q": "How do I get from Barcelona Airport to the Sónar Festival?", "a": "Sónar has two venues: Sónar by Day at Fira Montjuïc (10 km, 15 min from airport) and Sónar by Night at Fira Gran Via (7 km, 12 min from airport). Élite BCN covers both. Fixed from €40 to Montjuïc and €35 to Gran Via. Specify which venue when booking." },
-      { "q": "What time does Sónar by Night finish and can I get a transfer home?", "a": "Sónar by Night at Fira Gran Via typically runs until 08:00 the following morning. Élite BCN is available 24/7 including Sónar late nights. Pre-book your return transfer with a flexible pickup window and message your driver when you are ready to leave." },
-      { "q": "Can I get a transfer between Fira Montjuïc and Fira Gran Via during Sónar weekend?", "a": "Yes. Élite BCN offers inter-venue transfers between the two Sónar sites throughout the festival weekend. The journey between Fira Montjuïc and Fira Gran Via takes approximately 12 minutes by private car. Availability is limited during peak hours so we recommend pre-booking." }
+    "highlights": [
+      "Two-venue festival coverage",
+      "15-minute airport transfer",
+      "Inter-venue transfers available",
+      "Late-night Fira Gran Via service"
     ],
-    "nearby": ["mwc-2027-barcelona", "ise-2027-barcelona", "hotel-el-palace-barcelona"]
+    "faqs": [
+      {
+        "q": "How do I get from Barcelona Airport to the Sónar Festival?",
+        "a": "Sónar has two venues: Sónar by Day at Fira Montjuïc (10 km, 15 min from airport) and Sónar by Night at Fira Gran Via (7 km, 12 min from airport). Élite BCN covers both. Fixed from €40 to Montjuïc and €35 to Gran Via. Specify which venue when booking."
+      },
+      {
+        "q": "What time does Sónar by Night finish and can I get a transfer home?",
+        "a": "Sónar by Night at Fira Gran Via typically runs until 08:00 the following morning. Élite BCN is available 24/7 including Sónar late nights. Pre-book your return transfer with a flexible pickup window and message your driver when you are ready to leave."
+      },
+      {
+        "q": "Can I get a transfer between Fira Montjuïc and Fira Gran Via during Sónar weekend?",
+        "a": "Yes. Élite BCN offers inter-venue transfers between the two Sónar sites throughout the festival weekend. The journey between Fira Montjuïc and Fira Gran Via takes approximately 12 minutes by private car. Availability is limited during peak hours so we recommend pre-booking."
+      }
+    ],
+    "nearby": [
+      "mwc-2027-barcelona",
+      "ise-2027-barcelona",
+      "hotel-el-palace-barcelona"
+    ]
   },
   {
     "slug": "ise-2027-barcelona",
@@ -582,16 +1350,40 @@
     "area": "Fira Gran Via, L'Hospitalet de Llobregat",
     "distance_km": 7,
     "duration_min": 12,
-    "prices": { "sedan": 35, "tesla": 45, "mpv": 55 },
-    "coordinates": { "lat": 41.3545, "lng": 2.1276 },
+    "prices": {
+      "sedan": 35,
+      "mpv": 55
+    },
+    "coordinates": {
+      "lat": 41.3545,
+      "lng": 2.1276
+    },
     "description": "Integrated Systems Europe (ISE) is the world's leading audiovisual and systems integration trade show, now permanently based at Fira Gran Via in Barcelona. At only 7 km from BCN Airport, ISE delegates enjoy the fastest airport connection of any major European trade show venue — just 12 minutes by private transfer.",
-    "highlights": ["7 km from BCN Airport — closest major venue", "12-minute transfer", "World's largest AV trade show", "Corporate accounts available"],
-    "faqs": [
-      { "q": "How close is Fira Gran Via to Barcelona Airport for ISE delegates?", "a": "Fira Gran Via is the closest major trade show venue to any major European airport: just 7 km and 12 minutes from BCN El Prat. ISE delegates can land, clear customs, and be at the exhibition halls within 30 minutes of touchdown. Fixed transfer from €35." },
-      { "q": "When does ISE take place in Barcelona?", "a": "ISE typically takes place in late January or early February at Fira Gran Via, Barcelona. Since relocating from Amsterdam to Barcelona in 2022, ISE has become one of the largest annual events in Spain, attracting over 70,000 visitors from 155 countries." },
-      { "q": "Does Élite BCN have experience with ISE congress transfers?", "a": "Yes. Élite BCN provides transfers for ISE delegates each year, covering airport arrivals, hotel-to-Fira connections, and evening event transfers. We offer corporate accounts for exhibitors and large delegations with monthly invoicing and a dedicated booking coordinator." }
+    "highlights": [
+      "7 km from BCN Airport — closest major venue",
+      "12-minute transfer",
+      "World's largest AV trade show",
+      "Corporate accounts available"
     ],
-    "nearby": ["mwc-2027-barcelona", "sonar-festival-barcelona", "fairmont-rey-juan-carlos"]
+    "faqs": [
+      {
+        "q": "How close is Fira Gran Via to Barcelona Airport for ISE delegates?",
+        "a": "Fira Gran Via is the closest major trade show venue to any major European airport: just 7 km and 12 minutes from BCN El Prat. ISE delegates can land, clear customs, and be at the exhibition halls within 30 minutes of touchdown. Fixed transfer from €35."
+      },
+      {
+        "q": "When does ISE take place in Barcelona?",
+        "a": "ISE typically takes place in late January or early February at Fira Gran Via, Barcelona. Since relocating from Amsterdam to Barcelona in 2022, ISE has become one of the largest annual events in Spain, attracting over 70,000 visitors from 155 countries."
+      },
+      {
+        "q": "Does Élite BCN have experience with ISE congress transfers?",
+        "a": "Yes. Élite BCN provides transfers for ISE delegates each year, covering airport arrivals, hotel-to-Fira connections, and evening event transfers. We offer corporate accounts for exhibitors and large delegations with monthly invoicing and a dedicated booking coordinator."
+      }
+    ],
+    "nearby": [
+      "mwc-2027-barcelona",
+      "sonar-festival-barcelona",
+      "fairmont-rey-juan-carlos"
+    ]
   },
   {
     "slug": "salon-nautico-barcelona",
@@ -600,16 +1392,40 @@
     "area": "Port Olímpic",
     "distance_km": 17,
     "duration_min": 22,
-    "prices": { "sedan": 45, "tesla": 55, "mpv": 65 },
-    "coordinates": { "lat": 41.3910, "lng": 2.2009 },
+    "prices": {
+      "sedan": 45,
+      "mpv": 65
+    },
+    "coordinates": {
+      "lat": 41.391,
+      "lng": 2.2009
+    },
     "description": "The Salón Náutico de Barcelona is one of Europe's premier boat shows, held each October at Port Olímpic with hundreds of yachts and marine products on display against the backdrop of the Mediterranean. Élite BCN transfers nautical industry professionals and enthusiasts from BCN Airport to the Port Olímpic venue in 22 minutes.",
-    "highlights": ["Port Olímpic waterfront venue", "Mediterranean boat show", "22-minute airport transfer", "Near Hotel Arts and Pullman Skipper"],
-    "faqs": [
-      { "q": "How far is Port Olímpic from Barcelona Airport for Salón Náutico?", "a": "Port Olímpic is approximately 17 km from BCN El Prat Airport, a 22-minute journey by private transfer along the coastal motorway. The venue is at the Olympic harbour, one of the most scenically spectacular event locations in Barcelona with immediate waterfront access." },
-      { "q": "Is there good hotel accommodation near the Salón Náutico venue?", "a": "The Pullman Barcelona Skipper and Hotel Arts Barcelona are both directly adjacent to Port Olímpic and within a 2-minute walk of the show entrance. The W Barcelona at Barceloneta is also nearby. Élite BCN transfers between all these hotels and the BCN Airport." },
-      { "q": "When does the Salón Náutico take place in Barcelona?", "a": "The Salón Náutico de Barcelona typically takes place in mid-to-late October. It is Spain's most important boat show and one of Europe's top five nautical trade events. Industry professionals from across Europe and Latin America attend, making it a significant event for Barcelona's hospitality sector." }
+    "highlights": [
+      "Port Olímpic waterfront venue",
+      "Mediterranean boat show",
+      "22-minute airport transfer",
+      "Near Hotel Arts and Pullman Skipper"
     ],
-    "nearby": ["hotel-arts-barcelona", "pullman-barcelona-skipper", "w-barcelona-hotel"]
+    "faqs": [
+      {
+        "q": "How far is Port Olímpic from Barcelona Airport for Salón Náutico?",
+        "a": "Port Olímpic is approximately 17 km from BCN El Prat Airport, a 22-minute journey by private transfer along the coastal motorway. The venue is at the Olympic harbour, one of the most scenically spectacular event locations in Barcelona with immediate waterfront access."
+      },
+      {
+        "q": "Is there good hotel accommodation near the Salón Náutico venue?",
+        "a": "The Pullman Barcelona Skipper and Hotel Arts Barcelona are both directly adjacent to Port Olímpic and within a 2-minute walk of the show entrance. The W Barcelona at Barceloneta is also nearby. Élite BCN transfers between all these hotels and the BCN Airport."
+      },
+      {
+        "q": "When does the Salón Náutico take place in Barcelona?",
+        "a": "The Salón Náutico de Barcelona typically takes place in mid-to-late October. It is Spain's most important boat show and one of Europe's top five nautical trade events. Industry professionals from across Europe and Latin America attend, making it a significant event for Barcelona's hospitality sector."
+      }
+    ],
+    "nearby": [
+      "hotel-arts-barcelona",
+      "pullman-barcelona-skipper",
+      "w-barcelona-hotel"
+    ]
   },
   {
     "slug": "valencia-transfer",
@@ -618,16 +1434,40 @@
     "area": "Valencia, Spain",
     "distance_km": 355,
     "duration_min": 215,
-    "prices": { "sedan": 290, "tesla": 320, "mpv": 380 },
-    "coordinates": { "lat": 39.4699, "lng": -0.3763 },
+    "prices": {
+      "sedan": 290,
+      "mpv": 380
+    },
+    "coordinates": {
+      "lat": 39.4699,
+      "lng": -0.3763
+    },
     "description": "A private transfer from Barcelona Airport to Valencia City Centre covers 355 km through the Spanish Levante, a spectacular drive with views of the Mediterranean coast. Élite BCN provides long-distance transfers to Valencia with professional chauffeurs, allowing you to work, sleep, or enjoy the journey in complete comfort.",
-    "highlights": ["3 h 35 min door-to-door", "Direct motorway via AP-7", "Stop en route possible", "Return transfers available"],
-    "faqs": [
-      { "q": "How long does the transfer from Barcelona Airport to Valencia take?", "a": "The private transfer from BCN Airport to Valencia city centre covers approximately 355 km via the AP-7 motorway (the Autopista del Mediterráneo). Journey time is approximately 3 hours 35 minutes under normal traffic conditions. We factor in a comfort stop if required." },
-      { "q": "Is it cheaper to fly or take a private transfer from Barcelona to Valencia?", "a": "For a solo traveller, a Renfe high-speed AVE train (1h 36min, from €18) or a budget flight are cheaper than a private transfer (from €290). However, for groups of 4–7, the per-person cost of a private transfer becomes very competitive, especially when adding luggage fees and airport transfer costs." },
-      { "q": "Does Élite BCN offer a return transfer from Valencia to Barcelona?", "a": "Yes. We arrange return transfers from Valencia city centre, the City of Arts and Sciences, or any Valencia address back to Barcelona Airport or city hotels. Contact us or book online; the fixed price from Valencia to BCN Airport is the same as the reverse direction." }
+    "highlights": [
+      "3 h 35 min door-to-door",
+      "Direct motorway via AP-7",
+      "Stop en route possible",
+      "Return transfers available"
     ],
-    "nearby": ["salou-transfer", "tarragona", "costa-brava"]
+    "faqs": [
+      {
+        "q": "How long does the transfer from Barcelona Airport to Valencia take?",
+        "a": "The private transfer from BCN Airport to Valencia city centre covers approximately 355 km via the AP-7 motorway (the Autopista del Mediterráneo). Journey time is approximately 3 hours 35 minutes under normal traffic conditions. We factor in a comfort stop if required."
+      },
+      {
+        "q": "Is it cheaper to fly or take a private transfer from Barcelona to Valencia?",
+        "a": "For a solo traveller, a Renfe high-speed AVE train (1h 36min, from €18) or a budget flight are cheaper than a private transfer (from €290). However, for groups of 4–7, the per-person cost of a private transfer becomes very competitive, especially when adding luggage fees and airport transfer costs."
+      },
+      {
+        "q": "Does Élite BCN offer a return transfer from Valencia to Barcelona?",
+        "a": "Yes. We arrange return transfers from Valencia city centre, the City of Arts and Sciences, or any Valencia address back to Barcelona Airport or city hotels. Contact us or book online; the fixed price from Valencia to BCN Airport is the same as the reverse direction."
+      }
+    ],
+    "nearby": [
+      "salou-transfer",
+      "tarragona",
+      "costa-brava"
+    ]
   },
   {
     "slug": "madrid-transfer",
@@ -636,16 +1476,40 @@
     "area": "Madrid, Spain",
     "distance_km": 628,
     "duration_min": 335,
-    "prices": { "sedan": 490, "tesla": 540, "mpv": 620 },
-    "coordinates": { "lat": 40.4168, "lng": -3.7038 },
+    "prices": {
+      "sedan": 490,
+      "mpv": 620
+    },
+    "coordinates": {
+      "lat": 40.4168,
+      "lng": -3.7038
+    },
     "description": "A private transfer from Barcelona Airport to Madrid city centre is a 628 km intercity journey — the most popular long-distance transfer Élite BCN operates. Via the AP-2 and AP-7 motorways, the chauffeur-driven journey takes approximately 5 hours 35 minutes, ideal for those with oversized luggage or groups where the per-head cost becomes competitive.",
-    "highlights": ["5 h 35 min door-to-door", "Via AP-2 and AP-7 motorways", "Comfort stop included", "Competitive for groups of 4+"],
-    "faqs": [
-      { "q": "How long does a private transfer from Barcelona Airport to Madrid take?", "a": "The private transfer from BCN El Prat Airport to central Madrid (Puerta del Sol, IFEMA, or any Madrid address) covers approximately 628 km and takes around 5 hours 35 minutes by motorway. A comfort stop for the driver every 2 hours is included." },
-      { "q": "Is a private transfer from Barcelona to Madrid worth it vs flying or the AVE?", "a": "For solo travellers the Renfe AVE (2h 30min, from €30) or a budget flight is cheaper. For a group of 6–7 people, a private transfer at €620 total (€89 per person) becomes competitive when including baggage, airport transfers, and travel time to/from stations. The door-to-door comfort is unmatched." },
-      { "q": "Can the driver stop at Zaragoza or Lleida during a Barcelona-Madrid transfer?", "a": "Yes. We can arrange a stop at Zaragoza, Lleida, or any point along the route for an additional fee (typically €30–€50 per intermediate stop depending on the deviation from the main motorway route). Please specify your stop preferences when booking." }
+    "highlights": [
+      "5 h 35 min door-to-door",
+      "Via AP-2 and AP-7 motorways",
+      "Comfort stop included",
+      "Competitive for groups of 4+"
     ],
-    "nearby": ["lleida-transfer", "valencia-transfer", "perpignan-transfer"]
+    "faqs": [
+      {
+        "q": "How long does a private transfer from Barcelona Airport to Madrid take?",
+        "a": "The private transfer from BCN El Prat Airport to central Madrid (Puerta del Sol, IFEMA, or any Madrid address) covers approximately 628 km and takes around 5 hours 35 minutes by motorway. A comfort stop for the driver every 2 hours is included."
+      },
+      {
+        "q": "Is a private transfer from Barcelona to Madrid worth it vs flying or the AVE?",
+        "a": "For solo travellers the Renfe AVE (2h 30min, from €30) or a budget flight is cheaper. For a group of 6–7 people, a private transfer at €620 total (€89 per person) becomes competitive when including baggage, airport transfers, and travel time to/from stations. The door-to-door comfort is unmatched."
+      },
+      {
+        "q": "Can the driver stop at Zaragoza or Lleida during a Barcelona-Madrid transfer?",
+        "a": "Yes. We can arrange a stop at Zaragoza, Lleida, or any point along the route for an additional fee (typically €30–€50 per intermediate stop depending on the deviation from the main motorway route). Please specify your stop preferences when booking."
+      }
+    ],
+    "nearby": [
+      "lleida-transfer",
+      "valencia-transfer",
+      "perpignan-transfer"
+    ]
   },
   {
     "slug": "perpignan-transfer",
@@ -654,16 +1518,40 @@
     "area": "Perpignan, Occitanie, France",
     "distance_km": 188,
     "duration_min": 125,
-    "prices": { "sedan": 185, "tesla": 210, "mpv": 250 },
-    "coordinates": { "lat": 42.6977, "lng": 2.8954 },
+    "prices": {
+      "sedan": 185,
+      "mpv": 250
+    },
+    "coordinates": {
+      "lat": 42.6977,
+      "lng": 2.8954
+    },
     "description": "Perpignan in southern France is one of the most popular cross-border transfers from Barcelona, covering 188 km through the Pyrenean foothills and across the Spanish-French border at La Jonquera. The 2-hour 5-minute journey through spectacular coastal and mountain scenery is perfectly suited to a private chauffeur transfer.",
-    "highlights": ["Cross-border Spain-France transfer", "2 h 5 min via AP-7", "Through Pyrenean foothills", "No border stop needed (Schengen)"],
-    "faqs": [
-      { "q": "How long is the transfer from Barcelona Airport to Perpignan, France?", "a": "The private transfer from BCN El Prat Airport to Perpignan city centre covers approximately 188 km via the AP-7 motorway through the La Jonquera border crossing. Journey time is approximately 2 hours 5 minutes. No border stop is required as Spain and France are both Schengen countries." },
-      { "q": "Do I need any special documents for a cross-border transfer from Barcelona to Perpignan?", "a": "No special documents are needed for EU/Schengen passport holders — there is no border check at La Jonquera. Non-EU travellers should carry their passport. The transfer vehicle crosses the border as standard; our drivers make this journey regularly and are fully familiar with the crossing procedures." },
-      { "q": "Is a transfer from Barcelona to Perpignan cheaper than the TGV train?", "a": "A Renfe/SNCF train from Barcelona Sants to Perpignan takes around 1 hour 15 minutes and costs from €25 for a solo traveller. For groups of 3–4, a private transfer from €185 becomes competitive when comparing combined ticket costs, luggage, and the door-to-door convenience." }
+    "highlights": [
+      "Cross-border Spain-France transfer",
+      "2 h 5 min via AP-7",
+      "Through Pyrenean foothills",
+      "No border stop needed (Schengen)"
     ],
-    "nearby": ["girona-transfer", "costa-brava", "girona-airport"]
+    "faqs": [
+      {
+        "q": "How long is the transfer from Barcelona Airport to Perpignan, France?",
+        "a": "The private transfer from BCN El Prat Airport to Perpignan city centre covers approximately 188 km via the AP-7 motorway through the La Jonquera border crossing. Journey time is approximately 2 hours 5 minutes. No border stop is required as Spain and France are both Schengen countries."
+      },
+      {
+        "q": "Do I need any special documents for a cross-border transfer from Barcelona to Perpignan?",
+        "a": "No special documents are needed for EU/Schengen passport holders — there is no border check at La Jonquera. Non-EU travellers should carry their passport. The transfer vehicle crosses the border as standard; our drivers make this journey regularly and are fully familiar with the crossing procedures."
+      },
+      {
+        "q": "Is a transfer from Barcelona to Perpignan cheaper than the TGV train?",
+        "a": "A Renfe/SNCF train from Barcelona Sants to Perpignan takes around 1 hour 15 minutes and costs from €25 for a solo traveller. For groups of 3–4, a private transfer from €185 becomes competitive when comparing combined ticket costs, luggage, and the door-to-door convenience."
+      }
+    ],
+    "nearby": [
+      "girona-transfer",
+      "costa-brava",
+      "girona-airport"
+    ]
   },
   {
     "slug": "lleida-transfer",
@@ -672,16 +1560,40 @@
     "area": "Lleida, Catalonia",
     "distance_km": 172,
     "duration_min": 105,
-    "prices": { "sedan": 165, "tesla": 185, "mpv": 220 },
-    "coordinates": { "lat": 41.6176, "lng": 0.6200 },
+    "prices": {
+      "sedan": 165,
+      "mpv": 220
+    },
+    "coordinates": {
+      "lat": 41.6176,
+      "lng": 0.62
+    },
     "description": "Lleida, the westernmost capital of Catalonia, is a university city and agricultural hub 172 km inland from Barcelona, most often requested for business transfers to logistics, agricultural, or wine industry clients in the Ebro valley. Private transfer from BCN Airport takes approximately 1 hour 45 minutes.",
-    "highlights": ["1 h 45 min via A-2 motorway", "Business and logistics hub", "La Seu Vella medieval cathedral", "Wine country access"],
-    "faqs": [
-      { "q": "How long is the transfer from Barcelona Airport to Lleida?", "a": "The private transfer from BCN El Prat Airport to Lleida covers 172 km via the A-2 motorway and takes approximately 1 hour 45 minutes. The route passes through the flat Catalan pre-coastal plain and the Segarra plateau, with views of the Pyrenees on clear days." },
-      { "q": "Is there an alternative to driving from Barcelona Airport to Lleida?", "a": "The Renfe Avant train from Barcelona Sants to Lleida takes around 1 hour 5 minutes and costs from €14. For a solo traveller the train is cheaper and faster. For groups of 3+, or those with significant luggage, a private transfer from €165 is often more practical door-to-door." },
-      { "q": "Does Élite BCN serve the Lleida-Alguaire Airport (ILD)?", "a": "Yes. In addition to Lleida city centre, we also serve Lleida-Alguaire Airport (ILD) for inter-airport transfers and corporate connections. The distance from BCN Airport to Lleida-Alguaire Airport is approximately 160 km; please contact us for specific pricing." }
+    "highlights": [
+      "1 h 45 min via A-2 motorway",
+      "Business and logistics hub",
+      "La Seu Vella medieval cathedral",
+      "Wine country access"
     ],
-    "nearby": ["madrid-transfer", "terrassa-transfer", "f1-spanish-grand-prix"]
+    "faqs": [
+      {
+        "q": "How long is the transfer from Barcelona Airport to Lleida?",
+        "a": "The private transfer from BCN El Prat Airport to Lleida covers 172 km via the A-2 motorway and takes approximately 1 hour 45 minutes. The route passes through the flat Catalan pre-coastal plain and the Segarra plateau, with views of the Pyrenees on clear days."
+      },
+      {
+        "q": "Is there an alternative to driving from Barcelona Airport to Lleida?",
+        "a": "The Renfe Avant train from Barcelona Sants to Lleida takes around 1 hour 5 minutes and costs from €14. For a solo traveller the train is cheaper and faster. For groups of 3+, or those with significant luggage, a private transfer from €165 is often more practical door-to-door."
+      },
+      {
+        "q": "Does Élite BCN serve the Lleida-Alguaire Airport (ILD)?",
+        "a": "Yes. In addition to Lleida city centre, we also serve Lleida-Alguaire Airport (ILD) for inter-airport transfers and corporate connections. The distance from BCN Airport to Lleida-Alguaire Airport is approximately 160 km; please contact us for specific pricing."
+      }
+    ],
+    "nearby": [
+      "madrid-transfer",
+      "terrassa-transfer",
+      "f1-spanish-grand-prix"
+    ]
   },
   {
     "slug": "reus-airport",
@@ -690,16 +1602,40 @@
     "area": "Reus, Tarragona",
     "distance_km": 112,
     "duration_min": 70,
-    "prices": { "sedan": 110, "tesla": 125, "mpv": 145 },
-    "coordinates": { "lat": 41.1474, "lng": 1.1672 },
+    "prices": {
+      "sedan": 110,
+      "mpv": 145
+    },
+    "coordinates": {
+      "lat": 41.1474,
+      "lng": 1.1672
+    },
     "description": "Reus Airport (REU) serves Ryanair's Costa Daurada routes, making inter-airport transfers between BCN and REU a common requirement for connecting passengers. Élite BCN offers direct transfers between Barcelona El Prat Airport and Reus Airport in approximately 70 minutes via the AP-2 and A-7 motorways.",
-    "highlights": ["Inter-airport BCN to REU", "70-minute direct connection", "Via AP-2 motorway", "PortAventura area access"],
-    "faqs": [
-      { "q": "How long does the transfer from Barcelona Airport to Reus Airport take?", "a": "The private transfer from BCN El Prat Airport (T1 or T2) to Reus Airport (REU) covers approximately 112 km via the AP-2 and A-7 motorways. Journey time is approximately 70 minutes under normal traffic conditions. Fixed from €110 per vehicle." },
-      { "q": "Why would I need a transfer from Barcelona Airport to Reus Airport?", "a": "Inter-airport transfers are common when connecting passengers fly into BCN on one airline and depart from Reus (REU) on a Ryanair Costa Daurada route, or vice versa. It is also used by those who prefer to fly into BCN (more international connections) and travel to PortAventura or Salou near Reus." },
-      { "q": "Is Reus Airport close to PortAventura theme park?", "a": "Yes. Reus Airport is approximately 10 km from PortAventura World in Salou. An Élite BCN transfer from BCN Airport to PortAventura/Salou via Reus Airport is approximately 100 km and takes around 65 minutes. This is a popular family transfer option during school holiday periods." }
+    "highlights": [
+      "Inter-airport BCN to REU",
+      "70-minute direct connection",
+      "Via AP-2 motorway",
+      "PortAventura area access"
     ],
-    "nearby": ["salou-transfer", "tarragona", "port-aventura"]
+    "faqs": [
+      {
+        "q": "How long does the transfer from Barcelona Airport to Reus Airport take?",
+        "a": "The private transfer from BCN El Prat Airport (T1 or T2) to Reus Airport (REU) covers approximately 112 km via the AP-2 and A-7 motorways. Journey time is approximately 70 minutes under normal traffic conditions. Fixed from €110 per vehicle."
+      },
+      {
+        "q": "Why would I need a transfer from Barcelona Airport to Reus Airport?",
+        "a": "Inter-airport transfers are common when connecting passengers fly into BCN on one airline and depart from Reus (REU) on a Ryanair Costa Daurada route, or vice versa. It is also used by those who prefer to fly into BCN (more international connections) and travel to PortAventura or Salou near Reus."
+      },
+      {
+        "q": "Is Reus Airport close to PortAventura theme park?",
+        "a": "Yes. Reus Airport is approximately 10 km from PortAventura World in Salou. An Élite BCN transfer from BCN Airport to PortAventura/Salou via Reus Airport is approximately 100 km and takes around 65 minutes. This is a popular family transfer option during school holiday periods."
+      }
+    ],
+    "nearby": [
+      "salou-transfer",
+      "tarragona",
+      "port-aventura"
+    ]
   },
   {
     "slug": "girona-airport",
@@ -708,16 +1644,40 @@
     "area": "Girona, Catalonia",
     "distance_km": 103,
     "duration_min": 68,
-    "prices": { "sedan": 105, "tesla": 120, "mpv": 140 },
-    "coordinates": { "lat": 41.9010, "lng": 2.7606 },
+    "prices": {
+      "sedan": 105,
+      "mpv": 140
+    },
+    "coordinates": {
+      "lat": 41.901,
+      "lng": 2.7606
+    },
     "description": "Girona-Costa Brava Airport (GRO) is a Ryanair hub 103 km north of Barcelona, used by budget travellers who prefer low-cost connections to the Costa Brava. Élite BCN provides inter-airport transfers between BCN and GRO in approximately 68 minutes, perfect for connecting passengers or those picking up a car near the Costa Brava.",
-    "highlights": ["BCN to GRO inter-airport transfer", "68-minute direct connection", "Via AP-7 motorway", "Costa Brava access point"],
-    "faqs": [
-      { "q": "How long is the transfer from Barcelona Airport to Girona Airport (GRO)?", "a": "The private transfer from BCN El Prat Airport to Girona-Costa Brava Airport covers approximately 103 km via the AP-7 motorway. Journey time is approximately 68 minutes. Fixed from €105 per vehicle, not per person." },
-      { "q": "Why fly into Barcelona but transfer to Girona Airport?", "a": "Some travellers fly into BCN on a connecting long-haul flight and then need to pick up a vehicle at Girona Airport for self-drive travel on the Costa Brava, or are meeting Ryanair travellers who land at GRO. The reverse — landing at GRO and transferring to BCN — is equally common for cruise passengers." },
-      { "q": "Is there a direct bus from Barcelona to Girona Airport?", "a": "Sagalés coach service connects Barcelona's Nord Bus Station with Girona Airport. However, this takes 1h 30min–2 hours and involves getting to the bus station first. A private transfer from BCN Airport to GRO is faster (68 min) and direct, making it strongly preferable for those with luggage or time constraints." }
+    "highlights": [
+      "BCN to GRO inter-airport transfer",
+      "68-minute direct connection",
+      "Via AP-7 motorway",
+      "Costa Brava access point"
     ],
-    "nearby": ["girona", "perpignan-transfer", "costa-brava"]
+    "faqs": [
+      {
+        "q": "How long is the transfer from Barcelona Airport to Girona Airport (GRO)?",
+        "a": "The private transfer from BCN El Prat Airport to Girona-Costa Brava Airport covers approximately 103 km via the AP-7 motorway. Journey time is approximately 68 minutes. Fixed from €105 per vehicle, not per person."
+      },
+      {
+        "q": "Why fly into Barcelona but transfer to Girona Airport?",
+        "a": "Some travellers fly into BCN on a connecting long-haul flight and then need to pick up a vehicle at Girona Airport for self-drive travel on the Costa Brava, or are meeting Ryanair travellers who land at GRO. The reverse — landing at GRO and transferring to BCN — is equally common for cruise passengers."
+      },
+      {
+        "q": "Is there a direct bus from Barcelona to Girona Airport?",
+        "a": "Sagalés coach service connects Barcelona's Nord Bus Station with Girona Airport. However, this takes 1h 30min–2 hours and involves getting to the bus station first. A private transfer from BCN Airport to GRO is faster (68 min) and direct, making it strongly preferable for those with luggage or time constraints."
+      }
+    ],
+    "nearby": [
+      "girona",
+      "perpignan-transfer",
+      "costa-brava"
+    ]
   },
   {
     "slug": "castelldefels-transfer",
@@ -726,16 +1686,40 @@
     "area": "Castelldefels, Baix Llobregat",
     "distance_km": 20,
     "duration_min": 22,
-    "prices": { "sedan": 48, "tesla": 58, "mpv": 68 },
-    "coordinates": { "lat": 41.2700, "lng": 1.9748 },
+    "prices": {
+      "sedan": 48,
+      "mpv": 68
+    },
+    "coordinates": {
+      "lat": 41.27,
+      "lng": 1.9748
+    },
     "description": "Castelldefels is a beach town just 20 km south of BCN Airport, home to a long sandy beach, the medieval castle, and increasingly popular with tech professionals working in the nearby tech campus area. It is one of the closest beach destinations to the airport, making it a quick 22-minute transfer.",
-    "highlights": ["Closest beach town to BCN Airport", "22-minute transfer", "Medieval castle and beach", "Tech campus area"],
-    "faqs": [
-      { "q": "How far is Castelldefels from Barcelona Airport?", "a": "Castelldefels is just 20 km from BCN El Prat Airport — closer than central Barcelona itself. A private transfer takes approximately 22 minutes, making it one of the quickest airport-to-destination journeys in the region. Fixed from €48." },
-      { "q": "Is Castelldefels a good alternative to staying in Barcelona city?", "a": "Absolutely. Castelldefels offers a relaxed beach town atmosphere with easy RENFE train connections to Barcelona city (30 min). It is popular with professionals at the nearby tech campus (home to Rakuten, IESE, and other companies) and families who prefer a quieter base than central Barcelona." },
-      { "q": "Can Élite BCN transfer me from Castelldefels to central Barcelona?", "a": "Yes. Point-to-point transfers between Castelldefels and any Barcelona city address are available on request. The journey from Castelldefels to, for example, Las Ramblas takes approximately 35–40 minutes depending on traffic. Contact us for a quote." }
+    "highlights": [
+      "Closest beach town to BCN Airport",
+      "22-minute transfer",
+      "Medieval castle and beach",
+      "Tech campus area"
     ],
-    "nearby": ["sitges", "reus-airport", "mwc-2027-barcelona"]
+    "faqs": [
+      {
+        "q": "How far is Castelldefels from Barcelona Airport?",
+        "a": "Castelldefels is just 20 km from BCN El Prat Airport — closer than central Barcelona itself. A private transfer takes approximately 22 minutes, making it one of the quickest airport-to-destination journeys in the region. Fixed from €48."
+      },
+      {
+        "q": "Is Castelldefels a good alternative to staying in Barcelona city?",
+        "a": "Absolutely. Castelldefels offers a relaxed beach town atmosphere with easy RENFE train connections to Barcelona city (30 min). It is popular with professionals at the nearby tech campus (home to Rakuten, IESE, and other companies) and families who prefer a quieter base than central Barcelona."
+      },
+      {
+        "q": "Can Élite BCN transfer me from Castelldefels to central Barcelona?",
+        "a": "Yes. Point-to-point transfers between Castelldefels and any Barcelona city address are available on request. The journey from Castelldefels to, for example, Las Ramblas takes approximately 35–40 minutes depending on traffic. Contact us for a quote."
+      }
+    ],
+    "nearby": [
+      "sitges",
+      "reus-airport",
+      "mwc-2027-barcelona"
+    ]
   },
   {
     "slug": "salou-transfer",
@@ -744,16 +1728,40 @@
     "area": "Salou, Tarragona",
     "distance_km": 101,
     "duration_min": 70,
-    "prices": { "sedan": 100, "tesla": 115, "mpv": 135 },
-    "coordinates": { "lat": 41.0751, "lng": 1.1461 },
+    "prices": {
+      "sedan": 100,
+      "mpv": 135
+    },
+    "coordinates": {
+      "lat": 41.0751,
+      "lng": 1.1461
+    },
     "description": "Salou is the Costa Daurada's most popular resort town, adjacent to PortAventura World (Spain's largest theme park) and Ferrari Land. A private transfer from BCN Airport to Salou takes approximately 70 minutes, making it far more comfortable than the train or coach connections which take 2+ hours with luggage.",
-    "highlights": ["PortAventura World access", "Ferrari Land adjacent", "70-minute direct transfer", "Family vehicles available"],
-    "faqs": [
-      { "q": "How long is the transfer from Barcelona Airport to Salou and PortAventura?", "a": "The private transfer from BCN El Prat Airport to Salou/PortAventura covers approximately 101 km via the AP-2 and A-7 motorways. Journey time is approximately 70 minutes. Fixed from €100 per vehicle." },
-      { "q": "Is a private transfer the best way to reach PortAventura from Barcelona Airport?", "a": "For families with children and luggage, yes. The train option involves a connection at Tarragona or Camp de Tarragona and takes 1h 30min–2h total. A private transfer is direct, door-to-park, significantly faster, and for families of 4 the per-person cost is similar to train tickets." },
-      { "q": "Can Élite BCN pick us up from the PortAventura hotel at the end of our stay?", "a": "Yes. We offer return transfers from all PortAventura hotels (PortAventura Hotel, Hotel Caribe, Hotel Gold River, Hotel Colorado Creek, Hotel Mansión de Lucy, and Hotel Aqüa) to BCN Airport. Book in advance to guarantee your return transfer." }
+    "highlights": [
+      "PortAventura World access",
+      "Ferrari Land adjacent",
+      "70-minute direct transfer",
+      "Family vehicles available"
     ],
-    "nearby": ["reus-airport", "tarragona", "port-aventura"]
+    "faqs": [
+      {
+        "q": "How long is the transfer from Barcelona Airport to Salou and PortAventura?",
+        "a": "The private transfer from BCN El Prat Airport to Salou/PortAventura covers approximately 101 km via the AP-2 and A-7 motorways. Journey time is approximately 70 minutes. Fixed from €100 per vehicle."
+      },
+      {
+        "q": "Is a private transfer the best way to reach PortAventura from Barcelona Airport?",
+        "a": "For families with children and luggage, yes. The train option involves a connection at Tarragona or Camp de Tarragona and takes 1h 30min–2h total. A private transfer is direct, door-to-park, significantly faster, and for families of 4 the per-person cost is similar to train tickets."
+      },
+      {
+        "q": "Can Élite BCN pick us up from the PortAventura hotel at the end of our stay?",
+        "a": "Yes. We offer return transfers from all PortAventura hotels (PortAventura Hotel, Hotel Caribe, Hotel Gold River, Hotel Colorado Creek, Hotel Mansión de Lucy, and Hotel Aqüa) to BCN Airport. Book in advance to guarantee your return transfer."
+      }
+    ],
+    "nearby": [
+      "reus-airport",
+      "tarragona",
+      "port-aventura"
+    ]
   },
   {
     "slug": "mataro-transfer",
@@ -762,16 +1770,40 @@
     "area": "Mataró, Maresme",
     "distance_km": 36,
     "duration_min": 38,
-    "prices": { "sedan": 55, "tesla": 65, "mpv": 75 },
-    "coordinates": { "lat": 41.5382, "lng": 2.4445 },
+    "prices": {
+      "sedan": 55,
+      "mpv": 75
+    },
+    "coordinates": {
+      "lat": 41.5382,
+      "lng": 2.4445
+    },
     "description": "Mataró is the capital of the Maresme comarca, a coastal city 36 km north-east of Barcelona known for its textile industry heritage, vibrant market, and easy access to the golden beaches of the Costa del Maresme. A private transfer from BCN Airport to Mataró takes approximately 38 minutes via the C-32.",
-    "highlights": ["Maresme coast access", "38-minute airport transfer", "via C-32 coastal motorway", "Good train links back to Barcelona"],
-    "faqs": [
-      { "q": "How long does the transfer from Barcelona Airport to Mataró take?", "a": "The private transfer from BCN El Prat Airport to Mataró covers approximately 36 km and takes around 38 minutes via the C-31 coastal motorway and the C-32. Traffic towards Mataró is generally light except during coastal holiday peak periods in summer." },
-      { "q": "What is Mataró famous for?", "a": "Mataró is historically significant as the destination of Spain's first railway line (Barcelona–Mataró, 1848). Today it is a medium-sized city with a thriving textile and industrial heritage, a large weekly market, good local restaurants, and easy access to the beaches of the Maresme coast." },
-      { "q": "Can I take a taxi or train from Mataró back to Barcelona?", "a": "Yes. RENFE's R1 line connects Mataró to Barcelona Sants and Passeig de Gràcia in approximately 45 minutes and is a convenient option for the return journey. Taxis are also available at Mataró station. Élite BCN of course also provides return transfers at fixed prices." }
+    "highlights": [
+      "Maresme coast access",
+      "38-minute airport transfer",
+      "via C-32 coastal motorway",
+      "Good train links back to Barcelona"
     ],
-    "nearby": ["f1-spanish-grand-prix", "girona", "terrassa-transfer"]
+    "faqs": [
+      {
+        "q": "How long does the transfer from Barcelona Airport to Mataró take?",
+        "a": "The private transfer from BCN El Prat Airport to Mataró covers approximately 36 km and takes around 38 minutes via the C-31 coastal motorway and the C-32. Traffic towards Mataró is generally light except during coastal holiday peak periods in summer."
+      },
+      {
+        "q": "What is Mataró famous for?",
+        "a": "Mataró is historically significant as the destination of Spain's first railway line (Barcelona–Mataró, 1848). Today it is a medium-sized city with a thriving textile and industrial heritage, a large weekly market, good local restaurants, and easy access to the beaches of the Maresme coast."
+      },
+      {
+        "q": "Can I take a taxi or train from Mataró back to Barcelona?",
+        "a": "Yes. RENFE's R1 line connects Mataró to Barcelona Sants and Passeig de Gràcia in approximately 45 minutes and is a convenient option for the return journey. Taxis are also available at Mataró station. Élite BCN of course also provides return transfers at fixed prices."
+      }
+    ],
+    "nearby": [
+      "f1-spanish-grand-prix",
+      "girona",
+      "terrassa-transfer"
+    ]
   },
   {
     "slug": "terrassa-transfer",
@@ -780,15 +1812,39 @@
     "area": "Terrassa, Vallès Occidental",
     "distance_km": 40,
     "duration_min": 42,
-    "prices": { "sedan": 60, "tesla": 70, "mpv": 85 },
-    "coordinates": { "lat": 41.5633, "lng": 2.0097 },
+    "prices": {
+      "sedan": 60,
+      "mpv": 85
+    },
+    "coordinates": {
+      "lat": 41.5633,
+      "lng": 2.0097
+    },
     "description": "Terrassa is a major industrial and cultural city in the Vallès Occidental, home to a remarkable ensemble of Romanesque and Visigothic churches and the renowned Museu de la Ciència i de la Tècnica de Catalunya. A private transfer from BCN Airport to Terrassa takes approximately 42 minutes via the B-23 and C-58.",
-    "highlights": ["42-minute airport transfer", "UNESCO Romanesque churches", "Museu de la Ciència i de la Tècnica", "Vallès Occidental business hub"],
-    "faqs": [
-      { "q": "How long is the transfer from Barcelona Airport to Terrassa?", "a": "The private transfer from BCN El Prat Airport to Terrassa covers approximately 40 km and takes around 42 minutes via the B-23 motorway and C-58. The route passes through the satellite towns of Sant Boi and Esparreguera before climbing into the Vallès plain." },
-      { "q": "Is Terrassa good for business travel?", "a": "Yes. Terrassa is a significant business centre in the Barcelona metropolitan area, with strong textile, chemical, and manufacturing sectors. The city has excellent conference facilities and is approximately 25 minutes from central Barcelona by FGC train, making it a viable base for business travellers." },
-      { "q": "What are the must-see attractions in Terrassa?", "a": "Terrassa's most unique attraction is its extraordinary ensemble of early-Christian churches (Sant Pere, Sant Miquel, and Santa Maria), dating from the 4th–12th centuries and among the finest examples of pre-Romanesque architecture in Spain. The Museu de la Ciència i de la Tècnica is also world-class." }
+    "highlights": [
+      "42-minute airport transfer",
+      "UNESCO Romanesque churches",
+      "Museu de la Ciència i de la Tècnica",
+      "Vallès Occidental business hub"
     ],
-    "nearby": ["mataro-transfer", "lleida-transfer", "mwc-2027-barcelona"]
+    "faqs": [
+      {
+        "q": "How long is the transfer from Barcelona Airport to Terrassa?",
+        "a": "The private transfer from BCN El Prat Airport to Terrassa covers approximately 40 km and takes around 42 minutes via the B-23 motorway and C-58. The route passes through the satellite towns of Sant Boi and Esparreguera before climbing into the Vallès plain."
+      },
+      {
+        "q": "Is Terrassa good for business travel?",
+        "a": "Yes. Terrassa is a significant business centre in the Barcelona metropolitan area, with strong textile, chemical, and manufacturing sectors. The city has excellent conference facilities and is approximately 25 minutes from central Barcelona by FGC train, making it a viable base for business travellers."
+      },
+      {
+        "q": "What are the must-see attractions in Terrassa?",
+        "a": "Terrassa's most unique attraction is its extraordinary ensemble of early-Christian churches (Sant Pere, Sant Miquel, and Santa Maria), dating from the 4th–12th centuries and among the finest examples of pre-Romanesque architecture in Spain. The Museu de la Ciència i de la Tècnica is also world-class."
+      }
+    ],
+    "nearby": [
+      "mataro-transfer",
+      "lleida-transfer",
+      "mwc-2027-barcelona"
+    ]
   }
 ]

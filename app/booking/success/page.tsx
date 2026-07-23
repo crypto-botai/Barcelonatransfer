@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { COMPANY } from "@/lib/company-facts";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -369,7 +370,7 @@ function SuccessInner() {
           </>
         )}
         <p className="text-dark-500 text-xs mt-6">
-          Élite BCN Transfers · +34 635 383 712 · vtcbcn2025@gmail.com
+          Élite BCN Transfers · +34 635 383 712 · {COMPANY.email}
         </p>
       </motion.div>
     </main>

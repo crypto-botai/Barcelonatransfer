@@ -1,5 +1,7 @@
 import { Resend } from "resend";
 import { logEmail } from "@/lib/marketing";
+import { COMPANY } from "@/lib/company-facts";
+import { notifyAdminWhatsApp } from "@/lib/whatsapp";
 
 let _resend: Resend | undefined;
 function getResend(): Resend {
@@ -12,10 +14,15 @@ export const resend = new Proxy({} as Resend, { get: (_, p) => (getResend() as a
 // Set RESEND_FROM in Vercel env once your domain is verified.
 // Until verified, only onboarding@resend.dev works (but only to your Resend account email).
 const FROM = process.env.RESEND_FROM ?? "Élite BCN Transfers <noreply@elitebcn.info>";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? COMPANY.email;
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
 
 async function sendEmail(payload: Parameters<Resend["emails"]["send"]>[0]): Promise<string | undefined> {
+  // Default reply-to so customer replies reach the working inbox.
+  // Callers that need a different reply-to (e.g. admin alerts that should reply to the guest) set it explicitly.
+  if (!payload.replyTo) {
+    (payload as unknown as Record<string, unknown>).replyTo = COMPANY.email;
+  }
   const result = await resend.emails.send(payload);
   if (result?.error) {
     const errMsg = (result.error as { message?: string }).message ?? JSON.stringify(result.error);
@@ -31,7 +38,7 @@ const VEHICLE_NAMES: Record<string, string> = {
   BUSINESS:      "Business Sedan",
   LUXURY:        "Luxury Sedan",
   FIRST_CLASS:   "First Class Sedan",
-  ELECTRIC_VIP:  "Electric Vehicle (Tesla)",
+  ELECTRIC_VIP:  "Mercedes EQE 300 Electric",
   SUV:           "SUV",
   LUXURY_SUV:    "Luxury SUV",
   MINIVAN:       "Executive Minivan",
@@ -746,7 +753,7 @@ function emailLayout(body: string): string {
   </div>
   <div class="body">${body}</div>
   <div class="footer">
-    <p>© ${new Date().getFullYear()} Élite BCN Transfers · <a href="tel:+34635383712">+34 635 383 712</a> · <a href="mailto:vtcbcn2025@gmail.com">vtcbcn2025@gmail.com</a></p>
+    <p>© ${new Date().getFullYear()} Élite BCN Transfers · <a href="tel:+34635383712">+34 635 383 712</a> · <a href="mailto:${COMPANY.email}">${COMPANY.email}</a></p>
     <p style="margin-top:6px;">Barcelona, Spain · Licensed VTC Operator · <a href="${SITE_URL}/privacy">Privacy Policy</a> · <a href="${SITE_URL}/terms">Terms</a></p>
   </div>
 </div>
@@ -808,6 +815,11 @@ export async function sendAdminNewBookingAlert({
     subject: `New Booking — ${confirmationCode} · €${totalAmount.toFixed(2)}`,
     html,
   });
+
+  // WhatsApp fallback — fires if WA_PHONE_ID + WA_TOKEN + WA_ADMIN_NUMBER are set.
+  void notifyAdminWhatsApp(
+    `🚗 New Booking ${confirmationCode}\n${guestName} · €${totalAmount.toFixed(2)}\n${pickupAddress} → ${dropoffAddress}\n${pickupDatetime}`
+  );
 }
 
 // ─── Welcome Email ───────────────────────────────────────────

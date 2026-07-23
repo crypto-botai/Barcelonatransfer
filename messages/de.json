@@ -38,7 +38,7 @@
     },
     "badges": {
       "rating": "Bewertung 4.9★",
-      "ratingsSub": "+1.200 Bewertungen",
+      "ratingsSub": "Bewertungen",
       "vtc": "Lizenzierter VTC",
       "vtcSub": "Vollständig versichert",
       "service": "24/7 Service",
@@ -66,7 +66,8 @@
     "passengers": "Passagiere",
     "maxCapacity": "Maximalkapazität",
     "luggage": "Gepäck",
-    "inclVat": "inkl. MwSt. · Festpreis"
+    "inclVat": "inkl. MwSt. · Festpreis",
+    "pricingNote": "Alle Preise sind Endpreise und enthalten MwSt., Maut, professionellen Fahrer und Empfangsservice. Kindersitze kostenlos."
   },
   "services": {
     "label": "Unsere Leistungen",
@@ -216,7 +217,7 @@
     "ctaTitle": "Bereit, Ihren Transfer nach {name} zu buchen?",
     "ctaSubtitle": "Sofortbestätigung. Kostenlose Stornierung bis 24 Stunden vor Abholung.",
     "sedan": "Mercedes EQE 300 Electric",
-    "tesla": "Mercedes EQE 300",
+    "eqe": "Mercedes EQE 300 Electric",
     "mpv": "Mercedes V-Klasse (Großraumlimousine)",
     "paxLabel": "Passagiere",
     "allInclusive": "Alle Preise inkl. Maut, Abholung und 60 Min. kostenloser Wartezeit. Keine versteckten Gebühren."

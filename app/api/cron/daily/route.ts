@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPickupReminder, sendReviewRequestEmail, resend } from "@/lib/resend";
+import { COMPANY } from "@/lib/company-facts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -159,7 +160,7 @@ async function runReviewRequest(): Promise<number> {
 // Runs after the 06:00 orchestrator cron so agents have already completed.
 // Sends one email to admin with everything that happened + pending approvals.
 async function runAiExecutiveSummary(): Promise<void> {
-  const adminEmail = process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com";
+  const adminEmail = process.env.ADMIN_EMAIL ?? COMPANY.email;
   const since24h   = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
   const dateStr    = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });

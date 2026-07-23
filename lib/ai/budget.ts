@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { COMPANY } from "@/lib/company-facts";
 
 function startOfMonth(): Date {
   const d = new Date();
@@ -19,7 +20,7 @@ export async function getOrCreateBudgetConfig() {
       alertAt100: true,
       quietHoursStart: 23,
       quietHoursEnd: 8,
-      alertEmail: process.env.ADMIN_EMAIL ?? "vtcbcn2025@gmail.com",
+      alertEmail: process.env.ADMIN_EMAIL ?? COMPANY.email,
     },
   });
 }

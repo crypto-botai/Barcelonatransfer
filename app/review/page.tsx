@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { COMPANY } from "@/lib/company-facts";
 import { Star, CheckCircle2, Loader2, MessageSquare } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Link from "next/link";
@@ -153,7 +154,7 @@ function ReviewInner() {
         </button>
 
         <p className="text-center text-xs text-dark-500 mt-4">
-          Élite BCN Transfers · vtcbcn2025@gmail.com
+          Élite BCN Transfers · {COMPANY.email}
         </p>
       </motion.div>
     </main>
