@@ -19,7 +19,6 @@ const HOURLY = [
   { label: "Business (1–3 pax)",     price: HOURLY_RATES.BUSINESS,       min: MIN_HOURLY_HOURS.BUSINESS       },
   { label: "Minivan Vito (4–8 pax)", price: HOURLY_RATES.MINIVAN,        min: MIN_HOURLY_HOURS.MINIVAN        },
   { label: "V-Class Luxury (7 pax)", price: HOURLY_RATES.LUXURY_MINIVAN, min: MIN_HOURLY_HOURS.LUXURY_MINIVAN },
-  { label: "Minibus (9+ pax)",       price: HOURLY_RATES.MINIBUS,        min: MIN_HOURLY_HOURS.MINIBUS        },
 ];
 
 
@@ -175,7 +174,7 @@ export default function PricingSection() {
           {/* Footer note */}
           <div className="p-5 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-dark-500 text-xs">
-              All prices are final and include VAT, tolls, professional chauffeur, and meet &amp; greet. Child seats free. Airport &amp; City routes include a limited-time promotional discount (struck price shows full rate).
+              All prices include 10% VAT, tolls, professional chauffeur, and meet &amp; greet. Child seats free. Airport &amp; City: struck prices are previous pre-tax rates.
             </p>
             <Link href="/book" className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">
               Get Custom Quote <ArrowRight size={12} />

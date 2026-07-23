@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: "%s | Élite BCN Transfers",
   },
   description:
-    "Barcelona's #1 luxury private transfer. Fixed prices from €45 — no surge pricing, ever. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class, EQE 300 & Vito. Book 24/7.",
+    "Barcelona's #1 luxury private transfer. Fixed prices from €50 — no surge pricing, ever. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class, EQE 300 & Vito. Book 24/7.",
   authors: [{ name: "Élite BCN Transfers" }],
   creator: "Élite BCN Transfers",
   publisher: "Élite BCN Transfers",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     locale: "en_GB",
     url: "https://www.elitebcn.info",
     siteName: "Élite BCN Transfers",
-    title: "Élite BCN | Luxury Airport Transfers Barcelona — Fixed Prices from €45",
+    title: "Élite BCN | Luxury Airport Transfers Barcelona — Fixed Prices from €50",
     description:
       "Barcelona's premier luxury chauffeur service. Fixed-price airport transfers, VIP travel, executive transport. Mercedes V-Class & EQE 300 Electric. No surge pricing, ever.",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Luxury Private Transfer Barcelona Airport" }],
@@ -121,7 +121,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   "@id": "https://www.elitebcn.info/#business",
                   name: "Élite BCN Transfers",
                   alternateName: ["Elite BCN", "Élite BCN", "Elite Barcelona Transfers", "VTC Barcelona"],
-                  description: "Luxury private airport transfers in Barcelona. Fixed prices from €45. Mercedes V-Class & EQE 300 Electric. No surge pricing. Available 24/7. BCN El Prat T1/T2, cruise port, hotels, all Costa Daurada destinations.",
+                  description: "Luxury private airport transfers in Barcelona. Fixed prices from €50. Mercedes V-Class & EQE 300 Electric. No surge pricing. Available 24/7. BCN El Prat T1/T2, cruise port, hotels, all Costa Daurada destinations.",
                   url: "https://www.elitebcn.info",
                   telephone: "+34635383712",
                   email: COMPANY.email,
@@ -154,12 +154,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     "@type": "OfferCatalog",
                     name: "Barcelona Private Transfer Services",
                     itemListElement: [
-                      { "@type": "Offer", name: "BCN Airport to Barcelona City Centre", price: "45", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "El Prat Airport to Barcelona City Transfer", description: "Fixed-price luxury private transfer from Barcelona El Prat Airport to city centre hotels. Mercedes V-Class & EQE 300 Electric." } },
+                      { "@type": "Offer", name: "BCN Airport to Barcelona City Centre", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "El Prat Airport to Barcelona City Transfer", description: "Fixed-price luxury private transfer from Barcelona El Prat Airport to city centre hotels. Mercedes V-Class & EQE 300 Electric." } },
                       { "@type": "Offer", name: "Barcelona to Sitges Transfer", price: "65", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Sitges Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Sitges. No surge pricing." } },
                       { "@type": "Offer", name: "Barcelona to Tarragona Transfer", price: "95", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Tarragona Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Tarragona and PortAventura." } },
                       { "@type": "Offer", name: "Barcelona to Girona Transfer", price: "110", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Girona Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Girona city or Girona Costa Brava Airport." } },
-                      { "@type": "Offer", name: "Barcelona Cruise Port Transfer", price: "45", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Cruise Port Private Transfer", description: "Meet-and-greet luxury transfer to and from Barcelona World Trade Centre cruise terminal." } },
-                      { "@type": "Offer", name: "Barcelona to Andorra Transfer", price: "220", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Andorra la Vella Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Andorra. 3-hour journey in premium vehicle." } },
+                      { "@type": "Offer", name: "Barcelona Cruise Port Transfer", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Cruise Port Private Transfer", description: "Meet-and-greet luxury transfer to and from Barcelona World Trade Centre cruise terminal." } },
+                      { "@type": "Offer", name: "Barcelona to Andorra Transfer", price: "285", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Andorra la Vella Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Andorra. 3-hour journey in premium vehicle." } },
                       { "@type": "Offer", name: "Executive Hourly Chauffeur Barcelona", price: "65", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Hourly Chauffeur Service Barcelona", description: "By-the-hour luxury chauffeur hire in Barcelona for meetings, events, city tours." } },
                     ],
                   },
@@ -194,12 +194,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {
                   "@type": "Question",
                   name: "How much does a transfer from Barcelona Airport to city centre cost?",
-                  acceptedAnswer: { "@type": "Answer", text: "A private transfer from Barcelona El Prat Airport (BCN) to Barcelona city centre costs from €45 with Élite BCN Transfers. This is a fixed price with no surge pricing, regardless of traffic or time of day. The price includes all tolls, meet-and-greet service, and up to 60 minutes of free waiting time." },
+                  acceptedAnswer: { "@type": "Answer", text: "A private transfer from Barcelona El Prat Airport (BCN) to Barcelona city centre costs from €50 with Élite BCN Transfers (VAT included). This is a fixed price with no surge pricing, regardless of traffic or time of day. The price includes all tolls, meet-and-greet service, and up to 60 minutes of free waiting time." },
                 },
                 {
                   "@type": "Question",
                   name: "What is the best way to get from Barcelona Airport to the city?",
-                  acceptedAnswer: { "@type": "Answer", text: "The best way to get from Barcelona Airport to the city centre is by private transfer. Élite BCN Transfers offers fixed-price luxury transfers from €45 in Mercedes V-Class, EQE 300 Electric, and Vito vehicles. Unlike taxis, prices are fixed and confirmed at booking. Unlike the Aerobus (€6.75), you get door-to-door service with your luggage handled. The journey takes 20–40 minutes depending on traffic." },
+                  acceptedAnswer: { "@type": "Answer", text: "The best way to get from Barcelona Airport to the city centre is by private transfer. Élite BCN Transfers offers fixed-price luxury transfers from €50 in Mercedes V-Class, EQE 300 Electric, Tesla Model 3, and Vito vehicles. Unlike taxis, prices are fixed and confirmed at booking. Unlike the Aerobus (€6.75), you get door-to-door service with your luggage handled. The journey takes 20–40 minutes depending on traffic." },
                 },
                 {
                   "@type": "Question",
@@ -209,12 +209,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {
                   "@type": "Question",
                   name: "Which destinations does Élite BCN Transfers cover?",
-                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers covers all of Catalonia and beyond: Barcelona city centre, Sitges (from €65), Tarragona and PortAventura (from €95), Girona and Costa Brava (from €110), Montserrat (from €85), Andorra la Vella (from €220), Barcelona Cruise Port (from €45), and all Costa Daurada resorts. We also serve long-distance routes to Madrid, Valencia, and the French border." },
+                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers covers all of Catalonia and beyond: Barcelona city centre, Sitges (from €80), Tarragona and PortAventura (from €150), Girona and Costa Brava (from €140), Montserrat (from €95), Andorra (from €285), Barcelona Cruise Port (from €50), and all Costa Daurada resorts. We also serve long-distance routes to Madrid, Valencia, and the French border." },
                 },
                 {
                   "@type": "Question",
                   name: "Does Élite BCN Transfers serve Barcelona cruise port?",
-                  acceptedAnswer: { "@type": "Answer", text: "Yes. Élite BCN Transfers provides meet-and-greet transfers to and from Barcelona's cruise terminals at the World Trade Centre and Moll Adossat. We monitor vessel arrival times and adjust for delays. A transfer from the cruise port to Barcelona Airport costs from €45." },
+                  acceptedAnswer: { "@type": "Answer", text: "Yes. Élite BCN Transfers provides meet-and-greet transfers to and from Barcelona's cruise terminals at the World Trade Centre and Moll Adossat. We monitor vessel arrival times and adjust for delays. A transfer from the cruise port to Barcelona Airport costs from €50." },
                 },
                 {
                   "@type": "Question",

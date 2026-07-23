@@ -6,7 +6,7 @@ import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-
 import { ROUTES } from "@/lib/pricing";
 
 const andorraPrice =
-  ROUTES.find((r) => r.from === "airport" && r.to === "andorra")?.economy ?? 220;
+  ROUTES.find((r) => r.from === "barcelona_city" && r.to === "andorra")?.economy ?? 285;
 
 export const metadata: Metadata = {
   title: `Barcelona Airport to Andorra Transfer — from €${andorraPrice} | Fixed Price`,

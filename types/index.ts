@@ -217,6 +217,17 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     description: "Premium group transfers for corporate events, airport runs, and tours for up to 16 passengers.",
   },
   {
+    class: "ELECTRIC_VIP",
+    label: "Electric Vehicle",
+    models: ["Tesla Model 3"],
+    maxPassengers: 4,
+    maxLuggage: 2,
+    features: ["100% Electric", "Autopilot", "Panoramic Roof", "WiFi", "USB Charging"],
+    image: "/fleet/tesla-model-3.png",
+    description: "Fully electric premium sedan with advanced autopilot. Zero emissions, high performance, and a minimalist interior for eco-conscious travellers.",
+    badge: "Electric",
+  },
+  {
     class: "BUSINESS",
     label: "Business Sedan",
     models: ["Toyota Camry", "Toyota Prius"],

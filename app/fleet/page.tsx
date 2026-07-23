@@ -51,7 +51,7 @@ const fleetSchema = {
         description: "Premium all-electric executive saloon for airport transfers in Barcelona. Up to 4 passengers. Zero emissions.",
         image: "https://www.elitebcn.info/fleet/eqe-300.png",
         brand: { "@type": "Brand", name: "Mercedes-Benz" },
-        offers: { "@type": "Offer", price: "45", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
+        offers: { "@type": "Offer", price: "50", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
         aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
       },
     },

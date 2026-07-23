@@ -38,7 +38,7 @@ const SCHEMA = {
   url: `${BASE}/hotel-transfers`,
   offers: {
     "@type": "AggregateOffer",
-    lowPrice: "45",
+    lowPrice: "50",
     highPrice: "150",
     priceCurrency: "EUR",
   },
