@@ -1,13 +1,18 @@
-import { VehicleClass, QuoteResponse } from "@/types";
-import { isAirportLocation, isNightTime, haversineDistance } from "@/lib/utils";
+import { VehicleClass } from "@/types";
 
+// ─── Per-vehicle pricing constants ────────────────────────────────────────────
+//
+// DEFAULT_PRICING.pricePerKm and .pricePerMinute are for ADMIN USE ONLY
+// (price integrity estimates in lib/ai/priceCheck.ts).
+// They must NEVER be used to calculate a price shown to a customer.
+// All customer prices come from the fixed ROUTES matrix via lookupFixedPrice().
+//
 export const DEFAULT_PRICING: Record<VehicleClass, {
-  baseFare: number;
-  pricePerKm: number;
-  pricePerMinute: number;
-  minimumFare: number;
+  baseFare:       number;
+  pricePerKm:     number;   // admin estimate only — not for customer quotes
+  pricePerMinute: number;   // admin estimate only — not for customer quotes
+  minimumFare:    number;
 }> = {
-  // minimumFare = cheapest fixed route price for each class
   ECONOMY:        { baseFare: 15,  pricePerKm: 1.30, pricePerMinute: 0.18, minimumFare: 50  },
   BUSINESS:       { baseFare: 20,  pricePerKm: 1.55, pricePerMinute: 0.22, minimumFare: 60  },
   LUXURY:         { baseFare: 28,  pricePerKm: 1.80, pricePerMinute: 0.28, minimumFare: 60  },
@@ -23,10 +28,9 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
 export const AIRPORT_SURCHARGE = 8;
 export const NIGHT_SURCHARGE_RATE = 0.20;
 
-// Last-minute booking policy
-export const LAST_MINUTE_SURCHARGE_RATE = 0.15; // +15% if pickup < 4h away
-export const LAST_MINUTE_HOURS = 4;             // hours threshold for surcharge
-export const MIN_BOOKING_HOURS = 1;             // minimum advance notice
+export const LAST_MINUTE_SURCHARGE_RATE = 0.15;
+export const LAST_MINUTE_HOURS = 4;
+export const MIN_BOOKING_HOURS = 1;
 
 export function hoursUntilPickup(pickupDatetime: Date): number {
   return (pickupDatetime.getTime() - Date.now()) / 3_600_000;
@@ -39,7 +43,6 @@ export function calculateLastMinuteSurcharge(totalBefore: number, pickupDatetime
   return 0;
 }
 
-// Hourly rates (VAT-inclusive) — aligned with /hourly page rate cards
 export const HOURLY_RATES: Record<VehicleClass, number> = {
   ECONOMY:        45,
   BUSINESS:       45,
@@ -53,7 +56,6 @@ export const HOURLY_RATES: Record<VehicleClass, number> = {
   MINIBUS:       160,
 };
 
-// Minimum hours for hourly bookings
 export const MIN_HOURLY_HOURS: Record<VehicleClass, number> = {
   ECONOMY:        4,
   BUSINESS:       4,
@@ -67,7 +69,118 @@ export const MIN_HOURLY_HOURS: Record<VehicleClass, number> = {
   MINIBUS:        4,
 };
 
-// ─── Fixed-route pricing ─────────────────────────────────────
+// ─── Zone keys and labels ─────────────────────────────────────────────────────
+
+export const ZONE_LABELS: Record<string, string> = {
+  airport:        "El Prat Airport",
+  barcelona_city: "Barcelona City",
+  cruise:         "Cruise Terminal",
+  sants:          "Sants Station",
+  la_roca:        "La Roca Village",
+  montserrat:     "Montserrat",
+  girona_airport: "Girona Airport",
+  andorra:        "Andorra",
+  castelldefels:  "Castelldefels",
+  sitges:         "Sitges",
+  cubelles:       "Cubelles",
+  calafell:       "Calafell",
+  vendrell:       "Vendrell",
+  tarragona:      "Tarragona",
+  la_pineda:      "La Pineda",
+  salou:          "Salou",
+  portaventura:   "PortAventura",
+  cambrils:       "Cambrils",
+  mataro:         "Mataró",
+  calella:        "Calella",
+  pineda_de_mar:  "Pineda de Mar",
+  santa_susanna:  "Santa Susanna",
+  malgrat:        "Malgrat de Mar",
+  blanes:         "Blanes",
+  lloret:         "Lloret de Mar",
+  tossa:          "Tossa de Mar",
+  sagaro:         "S'Agaró",
+  platja_daro:    "Platja d'Aro",
+  palamos:        "Palamós",
+  roses:          "Roses",
+  empuriabrava:   "Empuriabrava",
+  figueres:       "Figueres",
+  cadaques:       "Cadaqués",
+};
+
+// ─── Zone resolution from free text ──────────────────────────────────────────
+//
+// resolveZone() maps a free-text address or place name to a pricing zone key.
+// Accent-insensitive, case-insensitive. Supports EN/ES/CA/FR/DE spellings.
+// Returns null if the text doesn't identify a known zone.
+//
+// Called server-side as a fallback when lat/lng circle detection fails.
+// Output is a zone key from ZONE_LABELS above.
+//
+export function resolveZone(input: string): string | null {
+  const s = input
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")  // strip diacritics
+    .replace(/['']/g, "'");
+
+  // Girona airport — must check before generic barcelona rule
+  if (/\b(girona|gro airport|gro\b|vilobi|costa brava airport|aeropuerto de girona)\b/.test(s)) return "girona_airport";
+
+  // El Prat airport
+  if (/\b(prat|el prat|t1\b|t2\b|terminal\s*1|terminal\s*2|terminal one|terminal two|terminal 1a|terminal 1b|terminal 2a|terminal 2b|bcn airport|barcelona airport|aeropuerto de barcelona|aeroport de barcelona|aeroport barcelona)\b/.test(s)) return "airport";
+
+  // Cruise / port
+  if (/\b(cruise|port de barcelona|moll adossat|moll de la fusta|adossat|terminal [a-e]\b|world trade center|wtc\b|crucero|terminal creuers)\b/.test(s)) return "cruise";
+
+  // Sants station
+  if (/\b(sants|estacion sants|estacio sants|barcelona sants|sants estacio)\b/.test(s)) return "sants";
+
+  // Andorra (before barcelona — "andorra la vella" doesn't contain barcelona)
+  if (/\bandorra\b/.test(s)) return "andorra";
+
+  // Montserrat
+  if (/\bmontserrat\b/.test(s)) return "montserrat";
+
+  // La Roca / La Roca Village outlet
+  if (/\b(la roca|laroca|roca del valles|la roca village|outlet)\b/.test(s)) return "la_roca";
+
+  // Barcelona city — broad match, after all specific-barcelona checks above
+  if (/\bbarcelona\b/.test(s)) return "barcelona_city";
+
+  // Costa Dorada
+  if (/\bcastelldefels\b/.test(s)) return "castelldefels";
+  if (/\bsitges\b/.test(s)) return "sitges";
+  if (/\bcubelles\b/.test(s)) return "cubelles";
+  if (/\bcalafell\b/.test(s)) return "calafell";
+  if (/\bvendrell\b|el vendrell/.test(s)) return "vendrell";
+  if (/\btarragona\b/.test(s)) return "tarragona";
+  if (/\b(la pineda|pineda playa|platja la pineda)\b/.test(s)) return "la_pineda";
+  if (/\b(portaventura|port aventura)\b/.test(s)) return "portaventura";
+  if (/\bsalou\b/.test(s)) return "salou";
+  if (/\bcambrils\b/.test(s)) return "cambrils";
+
+  // Costa Brava — pineda_de_mar before mataro/calella
+  if (/\b(pineda de mar|pineda mar)\b/.test(s)) return "pineda_de_mar";
+  if (/\b(mataro|mataron)\b/.test(s)) return "mataro";
+  if (/\bcalella\b/.test(s)) return "calella";
+  if (/\b(santa susanna|santa susana)\b/.test(s)) return "santa_susanna";
+  if (/\b(malgrat de mar|malgrat mar|malgrat)\b/.test(s)) return "malgrat";
+  if (/\bblanes\b/.test(s)) return "blanes";
+  if (/\b(lloret de mar|lloret mar|lloret)\b/.test(s)) return "lloret";
+  if (/\b(tossa de mar|tossa mar|tossa)\b/.test(s)) return "tossa";
+  if (/\b(s'agaro|s agaro|sagaro|sant feliu de guixols)\b/.test(s)) return "sagaro";
+  if (/\b(platja d'aro|platja daro|playa de aro|s'agaro|platjadaro)\b/.test(s)) return "platja_daro";
+  if (/\b(palamos|la fosca)\b/.test(s)) return "palamos";
+  if (/\b(roses|rosas)\b/.test(s)) return "roses";
+  if (/\b(empuriabrava|ampuriabrava|empuries)\b/.test(s)) return "empuriabrava";
+  if (/\bfigueres\b/.test(s)) return "figueres";
+  if (/\bcadaques\b/.test(s)) return "cadaques";
+
+  return null;
+}
+
+// ─── Fixed-route pricing matrix ───────────────────────────────────────────────
+
 interface GeoPoint { lat: number; lng: number; radiusKm: number; }
 
 const KNOWN_LOCATIONS: Record<string, GeoPoint> = {
@@ -150,102 +263,6 @@ const ROUTE_PRICES: Array<[string, string, FixedPrices]> = [
   ["barcelona_city", "cadaques",      { ECONOMY: 240, BUSINESS: 260, MINIVAN: 285, VCLASS: 310, MINIBUS: 360 }],
 ];
 
-function nearLocation(lat: number, lng: number, loc: GeoPoint): boolean {
-  return haversineDistance(lat, lng, loc.lat, loc.lng) <= loc.radiusKm;
-}
-
-function detectLocation(lat: number, lng: number): string | null {
-  for (const [name, geo] of Object.entries(KNOWN_LOCATIONS)) {
-    if (nearLocation(lat, lng, geo)) return name;
-  }
-  return null;
-}
-
-function lookupFixedPrice(
-  fromLat: number, fromLng: number,
-  toLat: number, toLng: number,
-  vc: VehicleClass,
-): number | null {
-  const from = detectLocation(fromLat, fromLng);
-  const to   = detectLocation(toLat, toLng);
-  if (!from || !to || from === to) return null;
-
-  for (const [a, b, prices] of ROUTE_PRICES) {
-    if ((a === from && b === to) || (a === to && b === from)) {
-      if (vc === "ECONOMY" || vc === "ELECTRIC_VIP")     return prices.ECONOMY;
-      if (vc === "BUSINESS" || vc === "SUV")             return prices.BUSINESS;
-      if (vc === "LUXURY" || vc === "FIRST_CLASS")       return prices.BUSINESS;
-      if (vc === "LUXURY_SUV")                           return Math.round((prices.BUSINESS + prices.VCLASS) / 2);
-      if (vc === "LUXURY_MINIVAN")                       return prices.VCLASS;
-      if (vc === "MINIVAN")                              return prices.MINIVAN;
-      if (vc === "MINIBUS")                              return prices.MINIBUS;
-    }
-  }
-  return null;
-}
-
-export function calculateQuote(
-  vehicleClass: VehicleClass,
-  distanceKm: number,
-  durationMin: number,
-  pickupLat: number,
-  pickupLng: number,
-  dropoffLat: number,
-  dropoffLng: number,
-  pickupDatetime: Date,
-  pricing = DEFAULT_PRICING
-): Omit<QuoteResponse, "vehicleClass"> {
-  const p = pricing[vehicleClass];
-
-  // Check for a fixed route price first.
-  // Fixed prices are VAT-inclusive final amounts — no additional tax is added.
-  const fixedPrice = lookupFixedPrice(pickupLat, pickupLng, dropoffLat, dropoffLng, vehicleClass);
-  if (fixedPrice !== null) {
-    const lastMinuteSurcharge = calculateLastMinuteSurcharge(fixedPrice, pickupDatetime);
-    return {
-      distanceKm:          Math.round(distanceKm * 10) / 10,
-      durationMin,
-      baseFare:            fixedPrice,
-      distanceFare:        0,
-      airportSurcharge:    0,
-      nightSurcharge:      0,
-      lastMinuteSurcharge,
-      vatAmount:           0,
-      totalAmount:         Math.round((fixedPrice + lastMinuteSurcharge) * 100) / 100,
-      currency:            "EUR",
-    };
-  }
-
-  // Dynamic pricing for custom routes
-  const distanceFare = distanceKm * p.pricePerKm;
-  const subtotal     = p.baseFare + distanceFare;
-
-  const hasAirport = isAirportLocation(pickupLat, pickupLng) || isAirportLocation(dropoffLat, dropoffLng);
-  const airportSurcharge = hasAirport ? AIRPORT_SURCHARGE : 0;
-
-  const isNight = isNightTime(pickupDatetime);
-  const nightSurcharge = isNight ? subtotal * NIGHT_SURCHARGE_RATE : 0;
-
-  const baseTotal = Math.max(subtotal + airportSurcharge + nightSurcharge, p.minimumFare);
-  const lastMinuteSurcharge = calculateLastMinuteSurcharge(baseTotal, pickupDatetime);
-
-  return {
-    distanceKm:         Math.round(distanceKm * 10) / 10,
-    durationMin,
-    baseFare:           p.baseFare,
-    distanceFare:       Math.round(distanceFare * 100) / 100,
-    airportSurcharge,
-    nightSurcharge:     Math.round(nightSurcharge * 100) / 100,
-    lastMinuteSurcharge,
-    vatAmount:          0,
-    totalAmount:        Math.round((baseTotal + lastMinuteSurcharge) * 100) / 100,
-    currency:           "EUR",
-  };
-}
-
-// ─── Public pricing exports for UI components ─────────────────
-// All prices are VAT-inclusive final amounts.
-
 export type RouteCategory = "airport" | "costa-dorada" | "costa-brava";
 
 export interface RoutePrice {
@@ -253,6 +270,7 @@ export interface RoutePrice {
   to: string;
   label: string;
   category: RouteCategory;
+  note?: string;
   economy: number;
   business: number;
   minivan: number;
@@ -264,7 +282,7 @@ export const ROUTES: RoutePrice[] = [
   // ── Airport & City ──
   { from: "airport",        to: "barcelona_city", label: "El Prat Airport ⇄ Barcelona City",  category: "airport",       economy: 50,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180 },
   { from: "airport",        to: "cruise",         label: "El Prat Airport ⇄ Cruise Terminal", category: "airport",       economy: 50,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180 },
-  { from: "cruise",         to: "barcelona_city", label: "Cruise Terminal ⇄ Barcelona City",  category: "airport",       economy: 60,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180 },
+  { from: "cruise",         to: "barcelona_city", label: "Cruise Terminal ⇄ Barcelona City",  category: "airport",       economy: 60,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180, note: "City-centre traffic route" },
   { from: "airport",        to: "sants",          label: "El Prat Airport ⇄ Sants Station",   category: "airport",       economy: 50,  business: 60,  minivan: 65,  vclass: 85,  minibus: 155 },
   { from: "barcelona_city", to: "la_roca",        label: "Barcelona ⇄ La Roca Village",        category: "airport",       economy: 80,  business: 100, minivan: 110, vclass: 130, minibus: 200 },
   { from: "airport",        to: "montserrat",     label: "El Prat Airport ⇄ Montserrat",       category: "airport",       economy: 95,  business: 110, minivan: 115, vclass: 140, minibus: 200 },
@@ -299,7 +317,64 @@ export const ROUTES: RoutePrice[] = [
   { from: "barcelona_city", to: "cadaques",       label: "Barcelona ⇄ Cadaqués",               category: "costa-brava",   economy: 240, business: 260, minivan: 285, vclass: 310, minibus: 360 },
 ];
 
-// Minimum "from" price per fleet vehicle slug — used in fleet cards and marketing pages.
+// ─── Coordinate-based zone detection ─────────────────────────────────────────
+
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+export function detectZoneFromCoords(lat: number, lng: number): string | null {
+  for (const [name, geo] of Object.entries(KNOWN_LOCATIONS)) {
+    if (haversineKm(lat, lng, geo.lat, geo.lng) <= geo.radiusKm) return name;
+  }
+  return null;
+}
+
+// ─── Matrix lookup ────────────────────────────────────────────────────────────
+
+// Maps VehicleClass → the 5-column code in ROUTE_PRICES.
+// LUXURY (EQE) → BUSINESS; ELECTRIC_VIP (Tesla) → ECONOMY
+// LUXURY_SUV → midpoint of BUSINESS + VCLASS (handled separately)
+export function vehicleCodeForClass(vc: VehicleClass): "ECONOMY" | "BUSINESS" | "MINIVAN" | "VCLASS" | "MINIBUS" | "LUXURY_SUV_MID" | null {
+  if (vc === "ECONOMY" || vc === "ELECTRIC_VIP")          return "ECONOMY";
+  if (vc === "BUSINESS" || vc === "SUV" || vc === "LUXURY" || vc === "FIRST_CLASS") return "BUSINESS";
+  if (vc === "LUXURY_MINIVAN")                            return "VCLASS";
+  if (vc === "MINIVAN")                                   return "MINIVAN";
+  if (vc === "MINIBUS")                                   return "MINIBUS";
+  if (vc === "LUXURY_SUV")                                return "LUXURY_SUV_MID";
+  return null;
+}
+
+/**
+ * The only place fixed prices are read from the static matrix.
+ * Returns null when the pair is not in the table — caller must handle this.
+ * Bidirectional: (A,B) === (B,A).
+ */
+export function lookupFixedPriceByZone(
+  fromZone: string,
+  toZone: string,
+  vc: VehicleClass,
+): number | null {
+  if (!fromZone || !toZone || fromZone === toZone) return null;
+
+  for (const [a, b, prices] of ROUTE_PRICES) {
+    if ((a === fromZone && b === toZone) || (a === toZone && b === fromZone)) {
+      const code = vehicleCodeForClass(vc);
+      if (!code) return null;
+      if (code === "LUXURY_SUV_MID") return Math.round((prices.BUSINESS + prices.VCLASS) / 2);
+      return prices[code];
+    }
+  }
+  return null;
+}
+
 export const FLEET_FROM_PRICE = {
   "eqe-300-electric": 60,
   "tesla-model-3":    50,

@@ -6,22 +6,22 @@
  *  2. Geocode pickup + dropoff (known-location lookup → Google Geocoding → BCN fallback)
  *  3. Fetch OSRM route distance/duration (haversine × 1.35 fallback)
  *  4. Select vehicle class from passenger count
- *  5. calculateQuote() with live DB PricingRule
+ *  5. getQuote() — DB-backed single source of truth (lib/pricing-service.ts)
  *  6. checkPriceIntegrity() — flags discrepancies to admin, never blocks
  *  7. Create Booking in DB (status: PENDING, paymentStatus: PENDING)
  *  8. Create SumUp checkout → return payment URL
  *
  * SECURITY:
  *  - NEVER asks for card/CVV/bank details — only generates a SumUp payment link
- *  - NEVER changes live prices — only calls calculateQuote(), flags discrepancies
+ *  - NEVER changes live prices — only calls getQuote(), logs audit trail
  *  - NEVER invents coords — falls back to BCN city centre + creates admin flag
  */
 
 import { prisma } from "@/lib/prisma";
-import { calculateQuote, DEFAULT_PRICING } from "@/lib/pricing";
+import { DEFAULT_PRICING } from "@/lib/pricing";
+import { getQuote } from "@/lib/pricing-service";
 import { haversineDistance } from "@/lib/utils";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
-import { checkPriceIntegrity } from "@/lib/ai/priceCheck";
 import type { VehicleClass } from "@/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -221,43 +221,34 @@ export async function createBookingFromChat(
     return { success: false, error: "Invalid pickup date or time." };
   }
 
-  // ── 5. Vehicle class + live pricing rule ─────────────────────────────────────
+  // ── 5. Vehicle class ──────────────────────────────────────────────────────────
   const vehicleClass = vehicleClassFromPax(draft.passengers);
-  const pricingRule = await prisma.pricingRule.findUnique({
-    where: { vehicleClass },
-  }).catch(() => null);
 
-  // ── 6. Build pricing map, overriding the relevant class with DB rule ──────────
-  const pricing = { ...DEFAULT_PRICING };
-  if (pricingRule) {
-    pricing[vehicleClass] = {
-      baseFare:      pricingRule.baseFare,
-      pricePerKm:    pricingRule.pricePerKm,
-      pricePerMinute: pricingRule.pricePerMinute,
-      minimumFare:   pricingRule.minimumFare,
+  // ── 6–7. Get quote via single authoritative path ──────────────────────────────
+  const quote = await getQuote({
+    pickupLat:      pickupGeo.lat,
+    pickupLng:      pickupGeo.lng,
+    dropoffLat:     dropoffGeo.lat,
+    dropoffLng:     dropoffGeo.lng,
+    vehicleClass,
+    pickupDatetime,
+    distanceKm,
+    durationMin,
+    pickupAddress:  draft.pickup,
+    dropoffAddress: draft.dropoff,
+  });
+
+  if (quote.isCustomRoute) {
+    return {
+      success: false,
+      error: "Custom route — price not confirmed. Please contact us via WhatsApp for a fixed quote.",
     };
   }
 
-  // ── 7. Calculate quote ───────────────────────────────────────────────────────
-  const quote = calculateQuote(
-    vehicleClass,
-    distanceKm,
-    durationMin,
-    pickupGeo.lat,
-    pickupGeo.lng,
-    dropoffGeo.lat,
-    dropoffGeo.lng,
-    pickupDatetime,
-    pricing,
+  // ── 8. Audit log (non-blocking) ───────────────────────────────────────────────
+  console.info(
+    `[booking-audit] Chat quote: ${vehicleClass} ${draft.pickup}→${draft.dropoff} = €${quote.totalAmount} (fixed:${quote.isFixed}) at ${new Date().toISOString()}`
   );
-
-  // ── 8. Price integrity check (non-blocking) ───────────────────────────────────
-  checkPriceIntegrity({
-    vehicleClass,
-    calculatedTotal: quote.totalAmount,
-    distanceKm,
-    expectedNote: `Chat booking: ${draft.pickup} → ${draft.dropoff}`,
-  }).catch(() => {});
 
   // ── 9. Create Booking ────────────────────────────────────────────────────────
   let booking: { id: string; confirmationCode: string; totalAmount: number; currency: string };

@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
 import { sendAdminNewBookingAlert, sendBookingConfirmation, sendWelcomeEmail } from "@/lib/resend";
 import { redeemCoupon, validateCoupon } from "@/lib/marketing";
-import { calculateQuote, calculateLastMinuteSurcharge, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, MIN_BOOKING_HOURS } from "@/lib/pricing";
+import { calculateLastMinuteSurcharge, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, MIN_BOOKING_HOURS } from "@/lib/pricing";
+import { getQuote } from "@/lib/pricing-service";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -121,16 +122,29 @@ export async function POST(req: NextRequest) {
       const airportSurcharge = isAirportLocation(body.pickupLat, body.pickupLng) ? AIRPORT_SURCHARGE : 0;
       serverBaseTotal = Math.round((subtotal + nightSurcharge + airportSurcharge) * 100) / 100;
     } else {
-      const sq = calculateQuote(
-        vc, body.quote.distanceKm, Math.round(body.quote.durationMin),
-        body.pickupLat, body.pickupLng, body.dropoffLat, body.dropoffLng,
-        pickupDatetime
-      );
-      // sq.totalAmount already includes last-minute surcharge from calculateQuote
+      const sq = await getQuote({
+        pickupLat:      body.pickupLat,
+        pickupLng:      body.pickupLng,
+        dropoffLat:     body.dropoffLat,
+        dropoffLng:     body.dropoffLng,
+        vehicleClass:   vc,
+        pickupDatetime,
+        distanceKm:     body.quote.distanceKm,
+        durationMin:    Math.round(body.quote.durationMin),
+        pickupAddress:  body.pickupAddress || undefined,
+        dropoffAddress: body.dropoffAddress || undefined,
+      });
+      if (sq.isCustomRoute) {
+        return NextResponse.json(
+          { error: "This route requires a custom quote. Please contact us via WhatsApp." },
+          { status: 422 }
+        );
+      }
+      // sq.totalAmount already includes last-minute surcharge from getQuote
       serverBaseTotal = sq.totalAmount;
     }
 
-    // Apply last-minute surcharge for HOURLY/DAY_HIRE (TRANSFER already has it from calculateQuote)
+    // Apply last-minute surcharge for HOURLY/DAY_HIRE (TRANSFER already has it from getQuote)
     const lmSurcharge = (body.bookingType === "HOURLY" || body.bookingType === "DAY_HIRE")
       ? calculateLastMinuteSurcharge(serverBaseTotal, pickupDatetime)
       : 0;

@@ -83,6 +83,10 @@ export interface QuoteResponse {
   vatAmount:           number;
   totalAmount:         number;
   currency:            string;
+  isFixed?:            boolean;
+  isCustomRoute?:      boolean;  // true = not in table, show "request a quote"
+  fromLabel?:          string;   // e.g. "El Prat Airport"
+  toLabel?:            string;   // e.g. "Barcelona City"
   hourlyRate?:         number;
   hours?:              number;
 }

@@ -769,3 +769,44 @@ model AdminApiKey {
   @@index([assignedAgent, status])
   @@map("admin_api_keys")
 }
+
+// ── Pricing tables (admin-editable, DB-backed) ──────────────────────────────
+model Route {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  fromKey   String
+  toKey     String
+  label     String
+  category  String   // "airport" | "costa-dorada" | "costa-brava"
+  note      String?
+  sortOrder Int      @default(0)
+  active    Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+  prices    RoutePrice[]
+
+  @@index([category, active])
+  @@map("routes")
+}
+
+model RoutePrice {
+  id          String   @id @default(cuid())
+  routeId     String
+  vehicleCode String   // ECONOMY | BUSINESS | MINIVAN | VCLASS | MINIBUS
+  price       Int      // VAT-inclusive, whole EUR
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+  route       Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@unique([routeId, vehicleCode])
+  @@map("route_prices")
+}
+
+model PricingSetting {
+  key       String   @id
+  value     String
+  label     String
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+
+  @@map("pricing_settings")
+}

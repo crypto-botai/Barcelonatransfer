@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Clock, Users, Zap, ArrowRight, Loader2, ChevronDown } from "lucide-react";
+import { Calendar, Clock, Users, Zap, ArrowRight, Loader2, ChevronDown, MessageCircle, MapPin } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import { VEHICLE_CATALOG, type VehicleClass, type QuoteResponse } from "@/types";
 import AddressAutocomplete from "./AddressAutocomplete";
@@ -37,6 +37,8 @@ export default function BookingForm({ compact = false }: Props) {
           vehicleClass: vehicle,
           pickupDatetime: `${date}T${time}`,
           passengers: pax,
+          pickupAddress: pickup.address,
+          dropoffAddress: dropoff.address,
         }),
       });
       if (res.ok) setQuote(await res.json());
@@ -59,6 +61,8 @@ export default function BookingForm({ compact = false }: Props) {
     });
     router.push(`/book?${params}`);
   };
+
+  const isCustomRoute = quote?.isCustomRoute === true;
 
   return (
     <div className={cn("glass-card rounded-2xl overflow-hidden", compact ? "p-6" : "p-8")}>
@@ -124,16 +128,22 @@ export default function BookingForm({ compact = false }: Props) {
         </div>
 
         <AnimatePresence>
-          {quote && (
+          {quote && !isCustomRoute && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
               <div className="bg-gold-500/5 border border-gold-500/20 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Zap size={14} className="text-gold-500" />
-                    <span className="text-xs text-gold-400 tracking-wider uppercase font-medium">Instant Quote</span>
+                    <span className="text-xs text-gold-400 tracking-wider uppercase font-medium">Fixed Price</span>
                   </div>
                   <span className="font-display text-2xl text-gold-400">{formatCurrency(quote.totalAmount)}</span>
                 </div>
+                {(quote.fromLabel || quote.toLabel) && (
+                  <p className="text-xs text-dark-400 mb-2 flex items-center gap-1">
+                    <MapPin size={10} className="text-gold-500/50 flex-shrink-0" />
+                    {quote.fromLabel} → {quote.toLabel}
+                  </p>
+                )}
                 <div className="grid grid-cols-3 gap-3 text-center">
                   <div><p className="text-dark-400 text-xs">Distance</p><p className="text-white text-sm font-medium">{quote.distanceKm} km</p></div>
                   <div><p className="text-dark-400 text-xs">Duration</p><p className="text-white text-sm font-medium">{quote.durationMin} min</p></div>
@@ -142,13 +152,33 @@ export default function BookingForm({ compact = false }: Props) {
               </div>
             </motion.div>
           )}
+
+          {isCustomRoute && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+              <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4">
+                <p className="text-amber-400 font-medium text-sm mb-1">Custom route — we&apos;ll confirm your fixed price within 15 minutes.</p>
+                <p className="text-dark-400 text-xs">This route isn&apos;t in our standard table. Send us your details and we&apos;ll quote you a fixed price by WhatsApp or email.</p>
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
 
-        <button onClick={handleBook} disabled={!pickup.address || !dropoff.address || !date || !time}
-          className="btn-gold w-full py-4 rounded-xl text-sm font-semibold tracking-wide flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
-          {quote ? `Book for ${formatCurrency(quote.totalAmount)}` : "Check Availability"}
-          <ArrowRight size={16} />
-        </button>
+        {isCustomRoute ? (
+          <a
+            href="https://wa.me/34635383712"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-gold w-full py-4 rounded-xl text-sm font-semibold tracking-wide flex items-center justify-center gap-2"
+          >
+            <MessageCircle size={16} /> WhatsApp us for a quote
+          </a>
+        ) : (
+          <button onClick={handleBook} disabled={!pickup.address || !dropoff.address || !date || !time}
+            className="btn-gold w-full py-4 rounded-xl text-sm font-semibold tracking-wide flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+            {quote ? `Book for ${formatCurrency(quote.totalAmount)}` : "Check Availability"}
+            <ArrowRight size={16} />
+          </button>
+        )}
 
         <p className="text-center text-xs text-dark-500">Free cancellation up to 24h before pickup</p>
       </div>

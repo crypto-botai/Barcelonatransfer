@@ -8,8 +8,8 @@ import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
 import {
   ArrowRight, ArrowLeft, MapPin, Calendar, Clock, Users,
   User, Mail, Phone, MessageSquare, Plane, Zap, Loader2,
-  CheckCircle2, Briefcase, Car, Timer, Building2, Plus, Minus,
-  Shield, CreditCard, Tag, X, AlertCircle,
+  CheckCircle2, Briefcase, Timer, Building2, Plus, Minus,
+  Shield, CreditCard, Tag, X, AlertCircle, MessageCircle,
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
@@ -174,6 +174,8 @@ export default function BookFormClient() {
         vehicleClass,
         pickupDatetime: `${data.date}T${data.time}`,
         passengers:     data.passengers,
+        pickupAddress:  data.pickupAddress,
+        dropoffAddress: data.dropoffAddress,
       };
       if (type === "TRANSFER" || type === "CORPORATE") {
         body.dropoffLat = data.dropoffLat;
@@ -499,7 +501,8 @@ export default function BookFormClient() {
                   .filter((v) => v.maxPassengers >= (data.passengers ?? 1))
                   .map((v) => {
                     const sel = data.vehicleClass === v.class;
-                    const pricing = quote && sel ? quote : null;
+                    const isCustomRoute = quote?.isCustomRoute === true;
+                    const pricing = quote && sel && !isCustomRoute ? quote : null;
                     const minFare = DEFAULT_PRICING[v.class].minimumFare;
                     const minHours = MIN_HOURLY_HOURS[v.class] ?? 4;
                     const selectedHours = bookingType === "DAY_HIRE" ? 8 : Math.max(data.durationHours ?? 4, minHours);
@@ -547,7 +550,9 @@ export default function BookFormClient() {
                                 <p className="text-dark-500 text-xs ml-5">{v.models[0]} · {v.maxPassengers} pax</p>
                               </div>
                               <div className="text-right flex-shrink-0">
-                                {pricing ? (
+                                {sel && isCustomRoute ? (
+                                  <p className="text-amber-400 text-xs font-medium">Custom quote</p>
+                                ) : pricing ? (
                                   <>
                                     <p className="font-display text-lg text-gold-400">{formatCurrency(pricing.totalAmount)}</p>
                                     <p className="text-dark-500 text-[10px]">
@@ -578,12 +583,27 @@ export default function BookFormClient() {
                   })
                 }
 
+                {quote?.isCustomRoute && (
+                  <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4">
+                    <p className="text-amber-400 font-medium text-sm mb-1">Custom route — fixed price confirmed within 15 minutes.</p>
+                    <p className="text-dark-400 text-xs mb-3">This route isn&apos;t in our standard table. Contact us and we&apos;ll provide a fixed price with no surprises.</p>
+                    <a
+                      href={`https://wa.me/34635383712?text=${encodeURIComponent(`Hi, I need a quote for a transfer from ${data.pickupAddress ?? ""} to ${data.dropoffAddress ?? ""}.`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-gold inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold"
+                    >
+                      <MessageCircle size={14} /> WhatsApp for quote
+                    </a>
+                  </div>
+                )}
+
                 <div className="flex gap-3">
                   <button onClick={() => setStep(1)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
                     <ArrowLeft size={16} /> Back
                   </button>
-                  <button onClick={() => setStep(3)} disabled={!data.vehicleClass}
-                    className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
+                  <button onClick={() => setStep(3)} disabled={!data.vehicleClass || !!quote?.isCustomRoute}
+                    className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
                     Continue <ArrowRight size={16} />
                   </button>
                 </div>
@@ -719,9 +739,15 @@ export default function BookFormClient() {
                 </div>
 
                 {/* Price summary — shown inline once a quote is loaded */}
-                {quote && (
+                {quote && !quote.isCustomRoute && (
                   <div className="glass-card rounded-2xl p-6">
                     <h2 className="font-display text-xl text-white mb-4">Price Summary</h2>
+                    {(quote.fromLabel || quote.toLabel) && (
+                      <p className="text-xs text-dark-400 mb-3 flex items-center gap-1">
+                        <MapPin size={10} className="text-gold-500/50 flex-shrink-0" />
+                        {quote.fromLabel} → {quote.toLabel} · Fixed fare
+                      </p>
+                    )}
                     <div className="bg-black/30 rounded-xl p-4 space-y-2 text-sm">
                       <div className="flex justify-between text-dark-400">
                         <span>Transfer price</span><span>{formatCurrency(quote.totalAmount)}</span>
@@ -796,11 +822,22 @@ export default function BookFormClient() {
                   <button onClick={() => setStep(2)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
                     <ArrowLeft size={16} /> Back
                   </button>
-                  <button onClick={handlePay} disabled={!step3Valid || submitting}
-                    className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40">
-                    {submitting ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
-                    {submitting ? "Processing…" : quote ? `Pay ${formatCurrency(grandTotal)}` : "Confirm Booking"}
-                  </button>
+                  {quote?.isCustomRoute ? (
+                    <a
+                      href={`https://wa.me/34635383712?text=${encodeURIComponent(`Hi, I need a quote for a transfer from ${data.pickupAddress ?? ""} to ${data.dropoffAddress ?? ""}.`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2"
+                    >
+                      <MessageCircle size={16} /> WhatsApp for quote
+                    </a>
+                  ) : (
+                    <button onClick={handlePay} disabled={!step3Valid || submitting}
+                      className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40">
+                      {submitting ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
+                      {submitting ? "Processing…" : quote ? `Pay ${formatCurrency(grandTotal)}` : "Confirm Booking"}
+                    </button>
+                  )}
                 </div>
 
                 <p className="text-center text-xs text-dark-500 pb-4">

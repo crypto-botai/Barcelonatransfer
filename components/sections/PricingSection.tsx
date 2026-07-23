@@ -1,28 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Search, ArrowRight } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { ROUTES, HOURLY_RATES, MIN_HOURLY_HOURS, type RoutePrice } from "@/lib/pricing";
+import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import PriceCell from "@/components/pricing/PriceCell";
+import type { PublicRoute } from "@/lib/pricing-service";
 
 const TABS = ["Airport & City", "Costa Dorada", "Costa Brava", "Hourly"];
 
-const AIRPORT  = ROUTES.filter((r) => r.category === "airport");
-const DORADA   = ROUTES.filter((r) => r.category === "costa-dorada");
-const BRAVA    = ROUTES.filter((r) => r.category === "costa-brava");
-
-const HOURLY = [
+const HOURLY_CARDS = [
   { label: "Economy (1–3 pax)",      price: HOURLY_RATES.ECONOMY,        min: MIN_HOURLY_HOURS.ECONOMY        },
   { label: "Business (1–3 pax)",     price: HOURLY_RATES.BUSINESS,       min: MIN_HOURLY_HOURS.BUSINESS       },
   { label: "Minivan Vito (4–8 pax)", price: HOURLY_RATES.MINIVAN,        min: MIN_HOURLY_HOURS.MINIVAN        },
   { label: "V-Class Luxury (7 pax)", price: HOURLY_RATES.LUXURY_MINIVAN, min: MIN_HOURLY_HOURS.LUXURY_MINIVAN },
 ];
 
-
-function PriceTable({ data, search }: { data: RoutePrice[]; search: string }) {
+function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
   const filtered = data.filter((r) =>
     r.label.toLowerCase().includes(search.toLowerCase())
   );
@@ -42,8 +37,11 @@ function PriceTable({ data, search }: { data: RoutePrice[]; search: string }) {
         </thead>
         <tbody>
           {filtered.map((r) => (
-            <tr key={r.label} className="price-row border-b border-white/[0.04]">
-              <td className="py-3.5 px-4 text-sm text-dark-200">{r.label}</td>
+            <tr key={r.slug} className="price-row border-b border-white/[0.04]">
+              <td className="py-3.5 px-4 text-sm text-dark-200">
+                {r.label}
+                {r.note && <span className="ml-2 text-xs text-dark-500">({r.note})</span>}
+              </td>
               <PriceCell amount={r.economy}  />
               <PriceCell amount={r.business} />
               <PriceCell amount={r.minivan} />
@@ -73,40 +71,31 @@ function PriceTable({ data, search }: { data: RoutePrice[]; search: string }) {
   );
 }
 
-export default function PricingSection() {
+interface Props {
+  routes: PublicRoute[];
+}
+
+export default function PricingSection({ routes }: Props) {
   const [tab,    setTab]    = useState(0);
   const [search, setSearch] = useState("");
+
+  const airport = routes.filter((r) => r.category === "airport");
+  const dorada  = routes.filter((r) => r.category === "costa-dorada");
+  const brava   = routes.filter((r) => r.category === "costa-brava");
 
   return (
     <section className="py-24 bg-[#070707]" id="pricing">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4"
-          >
+          <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">
             Fixed Pricing
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="font-display text-4xl sm:text-5xl text-white mb-4"
-          >
+          </span>
+          <h2 className="font-display text-4xl sm:text-5xl text-white mb-4">
             Transparent <span className="text-gold-gradient">Luxury Pricing</span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-dark-400 max-w-xl mx-auto mb-6"
-          >
+          </h2>
+          <p className="text-dark-400 max-w-xl mx-auto mb-6">
             All prices are fixed and all-inclusive. No hidden fees. No surge pricing. Ever.
-          </motion.p>
+          </p>
           <div className="flex flex-wrap justify-center gap-4 text-xs text-dark-400">
             {["No surge pricing", "Fixed fare guaranteed", "Free cancellation 24h", "Instant confirmation"].map((g) => (
               <span key={g} className="flex items-center gap-1.5">
@@ -151,12 +140,12 @@ export default function PricingSection() {
 
           {/* Table */}
           <div className="p-2">
-            {tab === 0 && <PriceTable data={AIRPORT} search={search} />}
-            {tab === 1 && <PriceTable data={DORADA}  search={search} />}
-            {tab === 2 && <PriceTable data={BRAVA}   search={search} />}
+            {tab === 0 && <PriceTable data={airport} search={search} />}
+            {tab === 1 && <PriceTable data={dorada}  search={search} />}
+            {tab === 2 && <PriceTable data={brava}   search={search} />}
             {tab === 3 && (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 p-4">
-                {HOURLY.map((h) => (
+                {HOURLY_CARDS.map((h) => (
                   <div key={h.label} className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 text-center">
                     <h3 className="text-white text-sm font-medium mb-3">{h.label}</h3>
                     <p className="font-display text-3xl text-gold-400">{formatCurrency(h.price)}</p>

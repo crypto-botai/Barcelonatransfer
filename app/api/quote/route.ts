@@ -1,20 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { calculateQuote, DEFAULT_PRICING, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, calculateLastMinuteSurcharge } from "@/lib/pricing";
+import { HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, calculateLastMinuteSurcharge, LAST_MINUTE_HOURS } from "@/lib/pricing";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
-import { prisma } from "@/lib/prisma";
+import { getQuote } from "@/lib/pricing-service";
 import { type VehicleClass } from "@/types";
 
 const schema = z.object({
-  bookingType:    z.enum(["TRANSFER", "HOURLY", "DAY_HIRE", "CORPORATE"]).default("TRANSFER"),
-  pickupLat:      z.number(),
-  pickupLng:      z.number(),
-  dropoffLat:     z.number().optional(),
-  dropoffLng:     z.number().optional(),
-  vehicleClass:   z.string(),
-  pickupDatetime: z.string(),
-  passengers:     z.number().int().min(1).max(20).optional(),
-  durationHours:  z.number().min(1).max(24).optional(),
+  bookingType:     z.enum(["TRANSFER", "HOURLY", "DAY_HIRE", "CORPORATE"]).default("TRANSFER"),
+  pickupLat:       z.number(),
+  pickupLng:       z.number(),
+  dropoffLat:      z.number().optional(),
+  dropoffLng:      z.number().optional(),
+  vehicleClass:    z.string(),
+  pickupDatetime:  z.string(),
+  passengers:      z.number().int().min(1).max(20).optional(),
+  durationHours:   z.number().min(1).max(24).optional(),
+  // Address text for text-based zone resolution (more reliable than coords alone)
+  pickupAddress:   z.string().optional(),
+  dropoffAddress:  z.string().optional(),
 });
 
 async function getOsrmDistance(
@@ -54,36 +57,27 @@ export async function POST(req: NextRequest) {
     const vc = vehicleClass as VehicleClass;
 
     if (bookingType === "HOURLY" || bookingType === "DAY_HIRE") {
-      const minH  = MIN_HOURLY_HOURS[vc] ?? 4;
-      const hours = bookingType === "DAY_HIRE" ? 8 : Math.max(body.durationHours ?? 4, minH);
+      const minH      = MIN_HOURLY_HOURS[vc] ?? 4;
+      const hours     = bookingType === "DAY_HIRE" ? 8 : Math.max(body.durationHours ?? 4, minH);
       const hourlyRate = HOURLY_RATES[vc] ?? 50;
-      const subtotal = hourlyRate * hours;
-      const isNight = isNightTime(pickupDate);
-      const nightSurcharge = isNight ? Math.round(subtotal * NIGHT_SURCHARGE_RATE * 100) / 100 : 0;
-      const hasAirport = isAirportLocation(pickupLat, pickupLng);
+      const subtotal   = hourlyRate * hours;
+      const isNight    = isNightTime(pickupDate);
+      const nightSurcharge   = isNight ? Math.round(subtotal * NIGHT_SURCHARGE_RATE * 100) / 100 : 0;
+      const hasAirport       = isAirportLocation(pickupLat, pickupLng);
       const airportSurcharge = hasAirport ? AIRPORT_SURCHARGE : 0;
-      const baseTotal = Math.round((subtotal + nightSurcharge + airportSurcharge) * 100) / 100;
+      const baseTotal        = Math.round((subtotal + nightSurcharge + airportSurcharge) * 100) / 100;
       const lastMinuteSurcharge = calculateLastMinuteSurcharge(baseTotal, pickupDate);
-      const totalAmount = Math.round((baseTotal + lastMinuteSurcharge) * 100) / 100;
+      const totalAmount      = Math.round((baseTotal + lastMinuteSurcharge) * 100) / 100;
 
       return NextResponse.json({
-        vehicleClass: vc,
-        distanceKm:   0,
-        durationMin:  hours * 60,
-        baseFare:     subtotal,
-        distanceFare: 0,
-        airportSurcharge,
-        nightSurcharge,
-        lastMinuteSurcharge,
-        vatAmount:    0,
-        totalAmount,
-        currency:     "EUR",
-        hourlyRate,
-        hours,
+        vehicleClass: vc, distanceKm: 0, durationMin: hours * 60,
+        baseFare: subtotal, distanceFare: 0, airportSurcharge, nightSurcharge,
+        lastMinuteSurcharge, vatAmount: 0, totalAmount, currency: "EUR",
+        hourlyRate, hours, isFixed: false, isCustomRoute: false,
       });
     }
 
-    // TRANSFER / CORPORATE — distance-based quote
+    // TRANSFER / CORPORATE — fixed-price lookup via getQuote()
     const dropoffLat = body.dropoffLat ?? 0;
     const dropoffLng = body.dropoffLng ?? 0;
 
@@ -104,27 +98,22 @@ export async function POST(req: NextRequest) {
       durationMin = 0;
     }
 
-    // Merge DB pricing rule (if admin has customised this class) over the defaults
-    const dbRule = await prisma.pricingRule.findUnique({ where: { vehicleClass: vc } }).catch(() => null);
-    const pricingMap = { ...DEFAULT_PRICING };
-    if (dbRule) {
-      pricingMap[vc] = {
-        baseFare:       dbRule.baseFare,
-        pricePerKm:     dbRule.pricePerKm,
-        pricePerMinute: dbRule.pricePerMinute,
-        minimumFare:    dbRule.minimumFare,
-      };
+    const quote = await getQuote({
+      pickupLat, pickupLng, dropoffLat, dropoffLng,
+      vehicleClass: vc, pickupDatetime: pickupDate,
+      distanceKm, durationMin,
+      pickupAddress:  body.pickupAddress,
+      dropoffAddress: body.dropoffAddress,
+    });
+
+    // Log every custom-route lookup so the admin knows which routes to add next
+    if (quote.isCustomRoute) {
+      console.info(
+        `[pricing-backlog] custom-route pickup="${body.pickupAddress ?? `${pickupLat},${pickupLng}`}" dropoff="${body.dropoffAddress ?? `${dropoffLat},${dropoffLng}`}" vehicle=${vc} at ${new Date().toISOString()}`
+      );
     }
 
-    const quote = calculateQuote(
-      vc, distanceKm, durationMin,
-      pickupLat, pickupLng,
-      dropoffLat, dropoffLng,
-      pickupDate,
-      pricingMap
-    );
-
-    return NextResponse.json({ vehicleClass: vc, ...quote });
+    return NextResponse.json(quote);
   } catch (err) {
     if (err instanceof z.ZodError)
       return NextResponse.json({ error: err.errors[0].message }, { status: 422 });

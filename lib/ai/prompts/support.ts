@@ -1,5 +1,5 @@
 import { SUPPORT_GUARDRAILS } from "@/lib/ai/guardrails";
-import { prisma } from "@/lib/prisma";
+import { getPublicRoutes } from "@/lib/pricing-service";
 import { COMPANY } from "@/lib/company-facts";
 
 const LANG_MAP: Record<string, string> = {
@@ -14,30 +14,18 @@ const LANG_MAP: Record<string, string> = {
   pt: "Always reply in Portuguese (Português).",
 };
 
-// Vehicle class label for the pricing section
-const CLASS_LABEL: Record<string, string> = {
-  ECONOMY:         "Economy",
-  BUSINESS:        "Business",
-  LUXURY:          "Luxury",
-  FIRST_CLASS:     "First Class",
-  ELECTRIC_VIP:    "Electric VIP",
-  SUV:             "SUV",
-  LUXURY_SUV:      "Luxury SUV",
-  MINIVAN:         "Minivan (up to 8 pax)",
-  LUXURY_MINIVAN:  "Luxury Minivan",
-  MINIBUS:         "Minibus (up to 16 pax)",
-};
 
 async function buildLivePricingSection(): Promise<string> {
   try {
-    const rules = await prisma.pricingRule.findMany({ where: { isActive: true }, orderBy: { vehicleClass: "asc" } });
-    if (!rules.length) return buildFallbackPricing();
+    const routes = await getPublicRoutes();
+    if (!routes.length) return buildFallbackPricing();
 
-    const lines = rules.map(
+    const airport = routes.filter((r) => r.category === "airport").slice(0, 5);
+    const lines = airport.map(
       (r) =>
-        `- **${CLASS_LABEL[r.vehicleClass] ?? r.vehicleClass}**: from €${r.minimumFare.toFixed(0)} (base €${r.baseFare.toFixed(0)} + €${r.pricePerKm.toFixed(2)}/km)`,
+        `- **${r.label}**: Economy €${r.economy} | Business €${r.business} | Minivan €${r.minivan} | V-Class €${r.vclass} | Minibus €${r.minibus}`,
     );
-    return `## LIVE PRICING (per vehicle — fixed, no surge)\n${lines.join("\n")}\n\nAirport surcharge: €${rules[0]?.airportSurcharge?.toFixed(0) ?? "10"} | Night surcharge (22:00–06:00): ${((rules[0]?.nightSurcharge ?? 0.25) * 100).toFixed(0)}%`;
+    return `## LIVE PRICING (fixed, VAT-inclusive — no surge)\n${lines.join("\n")}\n\nNight surcharge (22:00–06:00): +20% | Last-minute (<4h): +15%`;
   } catch {
     return buildFallbackPricing();
   }
