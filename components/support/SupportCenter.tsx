@@ -173,7 +173,7 @@ export default function SupportCenter() {
         type="button"
         onClick={open ? closePanel : openPanel}
         aria-label={open ? "Close support" : "Open support center"}
-        className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-2.5 px-3 sm:px-4 rounded-full focus:outline-none transition-all duration-200 hover:scale-105 active:scale-95"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 rounded-full focus:outline-none transition-all duration-200 hover:scale-105 active:scale-95"
         style={{
           height: "3.25rem",
           background: open ? "#1a1a1a" : "linear-gradient(135deg,#c9a84c,#d4af5a)",
@@ -184,7 +184,7 @@ export default function SupportCenter() {
       >
         {open
           ? <X size={18} />
-          : <><LifeBuoy size={18} /><span className="hidden sm:inline text-sm font-semibold tracking-wide">Need Help?</span></>
+          : <><LifeBuoy size={18} /><span className="text-sm font-semibold tracking-wide">Need Help?</span></>
         }
         {!open && unread > 0 && (
           <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-white text-[10px] font-bold flex items-center justify-center border-2 border-[#0a0a0a]">

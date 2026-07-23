@@ -90,19 +90,19 @@ export default function BookingForm({ compact = false }: Props) {
           placeholder="Drop-off destination…"
         />
 
-        <div className="grid grid-cols-3 gap-2">
-          <div className="relative col-span-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div className="relative">
             <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60" />
             <input type="date" value={date} min={new Date().toISOString().split("T")[0]}
               onChange={(e) => setDate(e.target.value)}
               className="input-luxury w-full pl-8 pr-2 py-3.5 rounded-xl text-sm" />
           </div>
-          <div className="relative col-span-1">
+          <div className="relative">
             <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60" />
             <input type="time" value={time} onChange={(e) => setTime(e.target.value)}
               className="input-luxury w-full pl-8 pr-2 py-3.5 rounded-xl text-sm" />
           </div>
-          <div className="relative col-span-1">
+          <div className="relative col-span-2 sm:col-span-1">
             <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60" />
             <select value={pax} onChange={(e) => setPax(Number(e.target.value))}
               className="input-luxury w-full pl-8 pr-2 py-3.5 rounded-xl text-sm appearance-none">
