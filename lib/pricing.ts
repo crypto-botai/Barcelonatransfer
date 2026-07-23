@@ -9,7 +9,7 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
 }> = {
   // minimumFare = cheapest fixed route price for each class
   ECONOMY:        { baseFare: 15,  pricePerKm: 1.30, pricePerMinute: 0.18, minimumFare: 60  },
-  BUSINESS:       { baseFare: 20,  pricePerKm: 1.55, pricePerMinute: 0.22, minimumFare: 65  },
+  BUSINESS:       { baseFare: 20,  pricePerKm: 1.55, pricePerMinute: 0.22, minimumFare: 60  },
   LUXURY:         { baseFare: 28,  pricePerKm: 1.80, pricePerMinute: 0.28, minimumFare: 60  },
   FIRST_CLASS:    { baseFare: 45,  pricePerKm: 2.80, pricePerMinute: 0.45, minimumFare: 120 },
   ELECTRIC_VIP:   { baseFare: 38,  pricePerKm: 2.20, pricePerMinute: 0.35, minimumFare: 60  },
@@ -111,10 +111,10 @@ type FixedPrices = { ECONOMY: number; BUSINESS: number; MINIVAN: number; VCLASS:
 
 const ROUTE_PRICES: Array<[string, string, FixedPrices]> = [
   // ── Airport & City ──
-  ["airport", "barcelona_city", { ECONOMY: 60,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
-  ["airport", "cruise",         { ECONOMY: 60,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
-  ["cruise",  "barcelona_city", { ECONOMY: 60,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
-  ["airport", "sants",          { ECONOMY: 60,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 85,  MINIBUS: 155 }],
+  ["airport", "barcelona_city", { ECONOMY: 60,  BUSINESS: 60,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
+  ["airport", "cruise",         { ECONOMY: 60,  BUSINESS: 60,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
+  ["cruise",  "barcelona_city", { ECONOMY: 60,  BUSINESS: 60,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
+  ["airport", "sants",          { ECONOMY: 60,  BUSINESS: 60,  MINIVAN: 65,  VCLASS: 85,  MINIBUS: 155 }],
   ["airport", "montserrat",     { ECONOMY: 95,  BUSINESS: 110, MINIVAN: 115, VCLASS: 140, MINIBUS: 200 }],
   ["airport", "andorra",        { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 630 }],
   ["barcelona_city", "la_roca",        { ECONOMY: 80,  BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 }],
@@ -262,10 +262,10 @@ export interface RoutePrice {
 
 export const ROUTES: RoutePrice[] = [
   // ── Airport & City ──
-  { from: "airport",        to: "barcelona_city", label: "El Prat Airport ⇄ Barcelona City",  category: "airport",       economy: 60,  business: 65,  minivan: 65,  vclass: 75,  minibus: 180 },
-  { from: "airport",        to: "cruise",         label: "El Prat Airport ⇄ Cruise Terminal", category: "airport",       economy: 60,  business: 65,  minivan: 65,  vclass: 75,  minibus: 180 },
-  { from: "cruise",         to: "barcelona_city", label: "Cruise Terminal ⇄ Barcelona City",  category: "airport",       economy: 60,  business: 65,  minivan: 65,  vclass: 75,  minibus: 180 },
-  { from: "airport",        to: "sants",          label: "El Prat Airport ⇄ Sants Station",   category: "airport",       economy: 60,  business: 65,  minivan: 65,  vclass: 85,  minibus: 155 },
+  { from: "airport",        to: "barcelona_city", label: "El Prat Airport ⇄ Barcelona City",  category: "airport",       economy: 60,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180 },
+  { from: "airport",        to: "cruise",         label: "El Prat Airport ⇄ Cruise Terminal", category: "airport",       economy: 60,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180 },
+  { from: "cruise",         to: "barcelona_city", label: "Cruise Terminal ⇄ Barcelona City",  category: "airport",       economy: 60,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180 },
+  { from: "airport",        to: "sants",          label: "El Prat Airport ⇄ Sants Station",   category: "airport",       economy: 60,  business: 60,  minivan: 65,  vclass: 85,  minibus: 155 },
   { from: "barcelona_city", to: "la_roca",        label: "Barcelona ⇄ La Roca Village",        category: "airport",       economy: 80,  business: 100, minivan: 110, vclass: 130, minibus: 200 },
   { from: "airport",        to: "montserrat",     label: "El Prat Airport ⇄ Montserrat",       category: "airport",       economy: 95,  business: 110, minivan: 115, vclass: 140, minibus: 200 },
   { from: "barcelona_city", to: "girona_airport", label: "Barcelona ⇄ Girona Airport",         category: "airport",       economy: 140, business: 155, minivan: 170, vclass: 195, minibus: 255 },
