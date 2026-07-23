@@ -5,20 +5,20 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Barcelona Airport to Sitges Transfer — from €65 | Fixed Price",
+  title: "Barcelona to Sitges Transfer — from €80 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona Airport (BCN) to Sitges. Fixed price from €65. 35-minute journey in Mercedes V-Class & EQE 300 Electric. Meet & greet, no surge pricing. Book instantly.",
+    "Luxury private transfer from Barcelona to Sitges. Fixed price from €80. 35-minute journey in Mercedes V-Class & EQE 300 Electric. Meet & greet, no surge pricing. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/sitges" },
   openGraph: {
-    title: "Barcelona Airport to Sitges Transfer — from €65 | Fixed Price",
-    description: "Luxury private transfer from Barcelona Airport to Sitges from €65. Fixed price, meet & greet, no surge pricing. 35 minutes.",
+    title: "Barcelona to Sitges Transfer — from €80 | Fixed Price",
+    description: "Luxury private transfer from Barcelona to Sitges from €80. Fixed price, meet & greet, no surge pricing. 35 minutes.",
     url: "https://www.elitebcn.info/transfers/sitges",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Airport to Sitges Transfer — from €65 | Fixed Price",
-    description: "Luxury private transfer from Barcelona Airport to Sitges from €65. Fixed price, meet & greet, no surge pricing. 35 minutes.",
+    title: "Barcelona to Sitges Transfer — from €80 | Fixed Price",
+    description: "Luxury private transfer from Barcelona to Sitges from €80. Fixed price, meet & greet, no surge pricing. 35 minutes.",
     images: ["/opengraph-image"],
   },
 };
@@ -50,9 +50,9 @@ const SCHEMA = {
   ],
   offers: {
     "@type": "Offer",
-    price: "65",
+    price: "80",
     priceCurrency: "EUR",
-    priceSpecification: { "@type": "UnitPriceSpecification", price: "65", priceCurrency: "EUR", unitText: "per vehicle" },
+    priceSpecification: { "@type": "UnitPriceSpecification", price: "80", priceCurrency: "EUR", unitText: "per vehicle" },
   },
 };
 
@@ -75,25 +75,25 @@ export default function SitgesTransferPage() {
               <span className="text-gold-400 text-sm">Sitges</span>
             </div>
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold-500/30 bg-gold-500/5 text-gold-400 text-xs tracking-[0.2em] uppercase font-medium mb-6">
-              <MapPin size={12} /> Barcelona → Sitges
+              <MapPin size={12} /> Barcelona ⇄ Sitges
             </span>
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-6">
-              Barcelona Airport to <br /><span className="text-gold-gradient">Sitges Transfer</span>
+              Barcelona to <br /><span className="text-gold-gradient">Sitges Transfer</span>
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
-              Private luxury transfer from BCN El Prat Airport direct to Sitges. Fixed price, no surge pricing.
-              Your driver meets you in arrivals with a name board.
+              Private luxury transfer between Barcelona city and Sitges. Fixed price, no surge pricing.
+              For airport pickups, contact us for a custom quote.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 35 minutes</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 35 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €65 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €80 fixed</div>
             </div>
             <Link
               href="/book"
               className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors"
             >
-              Book Sitges Transfer — €65
+              Book Sitges Transfer — €80
             </Link>
           </div>
         </section>
@@ -106,7 +106,7 @@ export default function SitgesTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed price €65", body: "The price you see is the price you pay. No meter, no traffic surcharges, no airport fees added at drop-off." },
+                { icon: Shield, title: "Fixed price €80", body: "The price you see is the price you pay. No meter, no traffic surcharges, no hidden fees." },
                 { icon: Clock, title: "Meet & greet included", body: "Your driver waits in the arrivals hall with your name on a board. 60 minutes free waiting from your flight landing." },
                 { icon: Star, title: "Real-time flight tracking", body: "We monitor your flight live. If it's delayed, your driver adjusts automatically — no extra charge." },
                 { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, bottled water, WiFi on request." },
@@ -169,9 +169,10 @@ export default function SitgesTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { vehicle: "Mercedes EQE 300 Electric", pax: "1–4", price: "€65" },
-                    { vehicle: "Mercedes V-Class (7 pax)", pax: "1–7", price: "€85" },
-                    { vehicle: "Mercedes Vito (8 pax)", pax: "1–8", price: "€80" },
+                    { vehicle: "Economy / Business sedan", pax: "1–3", price: "€80" },
+                    { vehicle: "Minivan (4–8 pax)",        pax: "1–8", price: "€110" },
+                    { vehicle: "V-Class (7 pax)",          pax: "1–7", price: "€130" },
+                    { vehicle: "Minibus (9+ pax)",         pax: "9–16", price: "€200" },
                   ].map((row) => (
                     <tr key={row.vehicle} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.vehicle}</td>
@@ -195,7 +196,7 @@ export default function SitgesTransferPage() {
               href="/book"
               className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors"
             >
-              Book Now — from €65
+              Book Now — from €80
             </Link>
           </div>
         </section>

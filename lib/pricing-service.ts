@@ -17,8 +17,6 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import {
   ROUTES as FALLBACK_ROUTES,
-  LAST_MINUTE_SURCHARGE_RATE,
-  LAST_MINUTE_HOURS,
   ZONE_LABELS,
   resolveZone,
   detectZoneFromCoords,
@@ -226,10 +224,6 @@ export async function getQuote(input: QuoteInput): Promise<Quote> {
     return customRouteQuote(vehicleClass, distanceKm, durationMin);
   }
 
-  const lmSurcharge = hoursUntilPickup(pickupDatetime) < LAST_MINUTE_HOURS
-    ? Math.round(fixedPrice * LAST_MINUTE_SURCHARGE_RATE * 100) / 100
-    : 0;
-
   return {
     vehicleClass,
     distanceKm:          Math.round(distanceKm * 10) / 10,
@@ -238,9 +232,9 @@ export async function getQuote(input: QuoteInput): Promise<Quote> {
     distanceFare:        0,
     airportSurcharge:    0,
     nightSurcharge:      0,
-    lastMinuteSurcharge: lmSurcharge,
+    lastMinuteSurcharge: 0,
     vatAmount:           0,
-    totalAmount:         Math.round((fixedPrice + lmSurcharge) * 100) / 100,
+    totalAmount:         fixedPrice,
     currency:            "EUR",
     isFixed:             true,
     isCustomRoute:       false,

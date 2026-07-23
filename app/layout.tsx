@@ -154,11 +154,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     name: "Barcelona Private Transfer Services",
                     itemListElement: [
                       { "@type": "Offer", name: "BCN Airport to Barcelona City Centre", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "El Prat Airport to Barcelona City Transfer", description: "Fixed-price luxury private transfer from Barcelona El Prat Airport to city centre hotels. Mercedes V-Class & EQE 300 Electric." } },
-                      { "@type": "Offer", name: "Barcelona to Sitges Transfer", price: "65", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Sitges Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Sitges. No surge pricing." } },
-                      { "@type": "Offer", name: "Barcelona to Tarragona Transfer", price: "95", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Tarragona Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Tarragona and PortAventura." } },
-                      { "@type": "Offer", name: "Barcelona to Girona Transfer", price: "110", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Girona Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Girona city or Girona Costa Brava Airport." } },
+                      { "@type": "Offer", name: "Barcelona to Sitges Transfer", price: "80", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona to Sitges Private Transfer", description: "Fixed-price luxury transfer from Barcelona to Sitges. No surge pricing." } },
+                      { "@type": "Offer", name: "Barcelona to Tarragona Transfer", price: "150", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona to Tarragona Private Transfer", description: "Fixed-price luxury transfer from Barcelona to Tarragona and PortAventura." } },
+                      { "@type": "Offer", name: "Barcelona to Girona Airport Transfer", price: "140", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona to Girona Costa Brava Airport Private Transfer", description: "Fixed-price luxury transfer from Barcelona city to Girona city or Girona Costa Brava Airport." } },
                       { "@type": "Offer", name: "Barcelona Cruise Port Transfer", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Cruise Port Private Transfer", description: "Meet-and-greet luxury transfer to and from Barcelona World Trade Centre cruise terminal." } },
-                      { "@type": "Offer", name: "Barcelona to Andorra Transfer", price: "285", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Andorra la Vella Private Transfer", description: "Fixed-price luxury transfer from BCN airport to Andorra. 3-hour journey in premium vehicle." } },
+                      { "@type": "Offer", name: "Barcelona to Andorra Transfer", price: "300", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona to Andorra la Vella Private Transfer", description: "Fixed-price luxury transfer from Barcelona or BCN airport to Andorra. 3-hour journey in premium vehicle." } },
                       { "@type": "Offer", name: "Executive Hourly Chauffeur Barcelona", price: "65", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Hourly Chauffeur Service Barcelona", description: "By-the-hour luxury chauffeur hire in Barcelona for meetings, events, city tours." } },
                     ],
                   },
@@ -208,7 +208,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {
                   "@type": "Question",
                   name: "Which destinations does Élite BCN Transfers cover?",
-                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers covers all of Catalonia and beyond: Barcelona city centre, Sitges (from €80), Tarragona and PortAventura (from €150), Girona and Costa Brava (from €140), Montserrat (from €95), Andorra (from €285), Barcelona Cruise Port (from €50), and all Costa Daurada resorts. We also serve long-distance routes to Madrid, Valencia, and the French border." },
+                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers covers all of Catalonia and beyond: Barcelona city centre, Sitges (from €80), Tarragona and PortAventura (from €150), Girona and Costa Brava (from €140), Montserrat (from €95), Andorra (from €300), Barcelona Cruise Port (from €50), and all Costa Daurada resorts. We also serve long-distance routes to Madrid, Valencia, and the French border." },
                 },
                 {
                   "@type": "Question",

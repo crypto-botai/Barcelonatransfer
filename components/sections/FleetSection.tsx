@@ -7,7 +7,7 @@ import { Users, Briefcase, ChevronRight, Zap, Star } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
 import { VEHICLE_CATALOG } from "@/types";
 import { formatCurrency } from "@/lib/utils";
-import { DEFAULT_PRICING } from "@/lib/pricing";
+import { getFleetFromPrice } from "@/lib/pricing";
 
 function badgeClass(badge: string) {
   if (badge === "VIP")          return "bg-[#c9a84c] text-black";
@@ -103,7 +103,7 @@ function MarqueeCloneSet() {
           <FleetCardInner
             vehicle={vehicle}
             t={t}
-            price={DEFAULT_PRICING[vehicle.class].minimumFare}
+            price={getFleetFromPrice(vehicle.class)}
             asHeading={false}
           />
         </div>
@@ -122,7 +122,7 @@ function FleetCard({
   mobile?: boolean;
 }) {
   const t = useTranslations("fleet");
-  const price = DEFAULT_PRICING[vehicle.class].minimumFare;
+  const price = getFleetFromPrice(vehicle.class);
 
   return (
     <motion.div

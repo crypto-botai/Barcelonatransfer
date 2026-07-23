@@ -5,20 +5,20 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Barcelona Airport to Tarragona Transfer — from €95 | Fixed Price",
+  title: "Barcelona to Tarragona Transfer — from €150 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona Airport (BCN) to Tarragona or PortAventura World. Fixed price from €95. 1-hour journey in Mercedes V-Class & EQE 300 Electric. Meet & greet included.",
+    "Luxury private transfer from Barcelona to Tarragona or PortAventura World. Fixed price from €150. 1-hour journey in Mercedes V-Class & EQE 300 Electric. Meet & greet included.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/tarragona" },
   openGraph: {
-    title: "Barcelona Airport to Tarragona Transfer — from €95 | Fixed Price",
-    description: "Luxury private transfer Barcelona Airport to Tarragona or PortAventura from €95. Fixed price, no surge pricing.",
+    title: "Barcelona to Tarragona Transfer — from €150 | Fixed Price",
+    description: "Luxury private transfer Barcelona to Tarragona or PortAventura from €150. Fixed price, no surge pricing.",
     url: "https://www.elitebcn.info/transfers/tarragona",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Airport to Tarragona Transfer — from €95 | Fixed Price",
-    description: "Luxury private transfer Barcelona Airport to Tarragona or PortAventura from €95. Fixed price, no surge pricing.",
+    title: "Barcelona to Tarragona Transfer — from €150 | Fixed Price",
+    description: "Luxury private transfer Barcelona to Tarragona or PortAventura from €150. Fixed price, no surge pricing.",
     images: ["/opengraph-image"],
   },
 };
@@ -60,10 +60,10 @@ export default function TarragonaTransferPage() {
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> ~1 hour</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 90 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €95 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €150 fixed</div>
             </div>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Tarragona Transfer — €95
+              Book Tarragona Transfer — €150
             </Link>
           </div>
         </section>
@@ -75,7 +75,7 @@ export default function TarragonaTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed price €95", body: "One price covers the full journey including all AP-7 motorway tolls. No hidden charges." },
+                { icon: Shield, title: "Fixed price €150", body: "One price covers the full journey including all AP-7 motorway tolls. No hidden charges." },
                 { icon: Clock, title: "PortAventura door delivery", body: "Drop-off directly at your PortAventura World hotel or theme park entrance. No stress with luggage on buses." },
                 { icon: Star, title: "Costa Daurada hotels", body: "We serve all resort hotels along the Costa Daurada — Cambrils, Salou, La Pineda, and Vila-seca." },
                 { icon: CheckCircle2, title: "7-seat MPV available", body: "The Mercedes V-Class seats 7 passengers and handles large luggage — ideal for family groups." },
@@ -126,11 +126,11 @@ export default function TarragonaTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { route: "BCN Airport → Tarragona City (sedan)", price: "€95" },
-                    { route: "BCN Airport → Tarragona City (MPV, 7 seats)", price: "€115" },
-                    { route: "BCN Airport → PortAventura World", price: "€99" },
-                    { route: "BCN Airport → Salou / La Pineda", price: "€99" },
-                    { route: "Tarragona City → BCN Airport", price: "€95" },
+                    { route: "Barcelona → Tarragona (Economy sedan)",     price: "€150" },
+                    { route: "Barcelona → Tarragona (Business sedan)",    price: "€170" },
+                    { route: "Barcelona → Tarragona (Minivan, 4–8 pax)", price: "€190" },
+                    { route: "Barcelona → PortAventura / Salou",          price: "€155" },
+                    { route: "Tarragona → Barcelona (same fixed price)",  price: "€150" },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.route}</td>
@@ -149,7 +149,7 @@ export default function TarragonaTransferPage() {
             <h2 className="font-display text-3xl text-white mb-4">Ready to book your Tarragona transfer?</h2>
             <p className="text-dark-400 mb-8">Instant confirmation. Free cancellation up to 24 hours before pickup.</p>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Now — from €95
+              Book Now — from €150
             </Link>
           </div>
         </section>

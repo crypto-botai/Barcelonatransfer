@@ -25,18 +25,19 @@ async function buildLivePricingSection(): Promise<string> {
       (r) =>
         `- **${r.label}**: Economy €${r.economy} | Business €${r.business} | Minivan €${r.minivan} | V-Class €${r.vclass} | Minibus €${r.minibus}`,
     );
-    return `## LIVE PRICING (fixed, VAT-inclusive — no surge)\n${lines.join("\n")}\n\nNight surcharge (22:00–06:00): +20% | Last-minute (<4h): +15%`;
+    return `## LIVE PRICING (fixed, VAT-inclusive — no surcharges on transfers)\n${lines.join("\n")}\n\nHourly hire: night surcharge (22:00–06:00) +20% applies to hourly rates only, not to fixed-price transfers.`;
   } catch {
     return buildFallbackPricing();
   }
 }
 
 function buildFallbackPricing(): string {
-  return `## PRICING (indicative — exact quote provided on confirmation)
-- **Business** (1–3 pax): from €45
-- **Minivan** (4–8 pax): from €60
+  return `## PRICING (fixed, VAT-inclusive — no surcharges on transfers)
+- **Economy / Business** (1–3 pax): from €50
+- **Minivan** (4–8 pax): from €65
+- **V-Class** (7 pax): from €75
 - **Minibus** (9–16 pax): from €180
-Airport surcharge applies | Night surcharge (22:00–06:00): 25%`;
+All transfer prices are fixed. No night surcharge, no surge pricing, no airport fees.`;
 }
 
 export async function buildSupportSystemPrompt(kbText: string, language: string): Promise<string> {

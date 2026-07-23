@@ -49,7 +49,7 @@ const FAQ_GROUPS = [
       },
       {
         q: "Do you cover Girona Airport?",
-        a: "Yes. We provide transfers to and from Girona–Costa Brava Airport (GRO). The fixed price from Barcelona city is €135 for an Economy sedan. Booking in advance is recommended.",
+        a: "Yes. We provide transfers to and from Girona–Costa Brava Airport (GRO). The fixed price from Barcelona city is €140 for an Economy sedan. Booking in advance is recommended.",
       },
     ],
   },
@@ -83,7 +83,7 @@ const FAQ_GROUPS = [
       },
       {
         q: "What is included in the price?",
-        a: "All prices include the professional chauffeur, vehicle, fuel, tolls, parking, and standard waiting time. Airport transfers include flight tracking and 60 minutes free waiting. Night and early morning journeys may incur a 20% surcharge.",
+        a: "All prices include the professional chauffeur, vehicle, fuel, tolls, parking, and standard waiting time. Airport transfers include flight tracking and 60 minutes free waiting. Fixed-price transfers are not subject to any surcharges.",
       },
       {
         q: "What payment methods do you accept?",
@@ -91,7 +91,7 @@ const FAQ_GROUPS = [
       },
       {
         q: "Is there a night surcharge?",
-        a: "A 20% night surcharge applies to journeys starting between 22:00 and 06:00. This is automatically calculated and displayed transparently during the booking process.",
+        a: "Fixed-price transfers have no night surcharge — the price you see is always fixed. A 20% night surcharge applies only to hourly chauffeur hire (22:00–06:00).",
       },
     ],
   },

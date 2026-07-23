@@ -1,4 +1,11 @@
 import { VehicleClass } from "@/types";
+import {
+  FIXED_ROUTES,
+  lookupFixedPrice as lookupFixedPriceFn,
+  VEHICLE_CLASS_TO_CODE,
+  type VehicleCode,
+  type ZoneCode,
+} from "@/lib/fixed-prices";
 
 // ─── Per-vehicle pricing constants ────────────────────────────────────────────
 //
@@ -22,7 +29,7 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
   LUXURY_SUV:     { baseFare: 55,  pricePerKm: 2.50, pricePerMinute: 0.45, minimumFare: 100 },
   MINIVAN:        { baseFare: 30,  pricePerKm: 1.65, pricePerMinute: 0.28, minimumFare: 65  },
   LUXURY_MINIVAN: { baseFare: 50,  pricePerKm: 2.20, pricePerMinute: 0.40, minimumFare: 75  },
-  MINIBUS:        { baseFare: 70,  pricePerKm: 2.40, pricePerMinute: 0.50, minimumFare: 155 },
+  MINIBUS:        { baseFare: 70,  pricePerKm: 2.40, pricePerMinute: 0.50, minimumFare: 180 },
 };
 
 export const AIRPORT_SURCHARGE = 8;
@@ -106,6 +113,48 @@ export const ZONE_LABELS: Record<string, string> = {
   figueres:       "Figueres",
   cadaques:       "Cadaqués",
 };
+
+// ─── Zone key ↔ ZoneCode bidirectional maps ───────────────────────────────────
+
+export const ZONE_CODE_TO_KEY: Record<ZoneCode, string> = {
+  BCN_AIRPORT:    "airport",
+  BARCELONA_CITY: "barcelona_city",
+  CRUISE_TERMINAL:"cruise",
+  SANTS_STATION:  "sants",
+  MONTSERRAT:     "montserrat",
+  ANDORRA:        "andorra",
+  LA_ROCA:        "la_roca",
+  GIRONA_AIRPORT: "girona_airport",
+  CASTELLDEFELS:  "castelldefels",
+  SITGES:         "sitges",
+  CUBELLES:       "cubelles",
+  CALAFELL:       "calafell",
+  VENDRELL:       "vendrell",
+  TARRAGONA:      "tarragona",
+  LA_PINEDA:      "la_pineda",
+  SALOU:          "salou",
+  PORTAVENTURA:   "portaventura",
+  CAMBRILS:       "cambrils",
+  MATARO:         "mataro",
+  CALELLA:        "calella",
+  PINEDA_DE_MAR:  "pineda_de_mar",
+  SANTA_SUSANNA:  "santa_susanna",
+  MALGRAT:        "malgrat",
+  BLANES:         "blanes",
+  LLORET:         "lloret",
+  TOSSA:          "tossa",
+  SAGARO:         "sagaro",
+  PLATJA_DARO:    "platja_daro",
+  PALAMOS:        "palamos",
+  ROSES:          "roses",
+  EMPURIABRAVA:   "empuriabrava",
+  FIGUERES:       "figueres",
+  CADAQUES:       "cadaques",
+};
+
+export const KEY_TO_ZONE_CODE: Record<string, ZoneCode> = Object.fromEntries(
+  Object.entries(ZONE_CODE_TO_KEY).map(([code, key]) => [key, code as ZoneCode])
+);
 
 // ─── Zone resolution from free text ──────────────────────────────────────────
 //
@@ -219,104 +268,6 @@ const KNOWN_LOCATIONS: Record<string, GeoPoint> = {
   cadaques:       { lat: 42.2882, lng: 3.2787,  radiusKm: 3   },
 };
 
-// 5-column fixed prices: Economy | Business | Minivan (4-6 pax) | V-Class (7-8 pax) | Minibus
-type FixedPrices = { ECONOMY: number; BUSINESS: number; MINIVAN: number; VCLASS: number; MINIBUS: number };
-
-const ROUTE_PRICES: Array<[string, string, FixedPrices]> = [
-  // ── Airport & City ──
-  ["airport", "barcelona_city", { ECONOMY: 50,  BUSINESS: 60,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
-  ["airport", "cruise",         { ECONOMY: 50,  BUSINESS: 60,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
-  ["cruise",  "barcelona_city", { ECONOMY: 60,  BUSINESS: 60,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
-  ["airport", "sants",          { ECONOMY: 50,  BUSINESS: 60,  MINIVAN: 65,  VCLASS: 85,  MINIBUS: 155 }],
-  ["airport", "montserrat",     { ECONOMY: 95,  BUSINESS: 110, MINIVAN: 115, VCLASS: 140, MINIBUS: 200 }],
-  ["airport", "andorra",        { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 630 }],
-  ["barcelona_city", "la_roca",        { ECONOMY: 80,  BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 }],
-  ["barcelona_city", "montserrat",     { ECONOMY: 115, BUSINESS: 130, MINIVAN: 155, VCLASS: 175, MINIBUS: 240 }],
-  ["barcelona_city", "girona_airport", { ECONOMY: 140, BUSINESS: 155, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 }],
-  ["barcelona_city", "andorra",        { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 630 }],
-  // ── Costa Daurada ────────────────────────────────────────────────────────────────
-  ["barcelona_city", "castelldefels", { ECONOMY: 50,  BUSINESS: 60,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
-  ["barcelona_city", "sitges",        { ECONOMY: 80,  BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 }],
-  ["barcelona_city", "cubelles",      { ECONOMY: 90,  BUSINESS: 110, MINIVAN: 120, VCLASS: 145, MINIBUS: 210 }],
-  ["barcelona_city", "calafell",      { ECONOMY: 100, BUSINESS: 120, MINIVAN: 130, VCLASS: 155, MINIBUS: 220 }],
-  ["barcelona_city", "vendrell",      { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 165, MINIBUS: 230 }],
-  ["barcelona_city", "tarragona",     { ECONOMY: 150, BUSINESS: 170, MINIVAN: 190, VCLASS: 210, MINIBUS: 270 }],
-  ["barcelona_city", "la_pineda",     { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 }],
-  ["barcelona_city", "salou",         { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 }],
-  ["barcelona_city", "portaventura",  { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 }],
-  ["barcelona_city", "cambrils",      { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 280 }],
-  // ── Costa Brava ──────────────────────────────────────────────────────────────────
-  ["barcelona_city", "mataro",        { ECONOMY: 90,  BUSINESS: 110, MINIVAN: 120, VCLASS: 145, MINIBUS: 210 }],
-  ["barcelona_city", "calella",       { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 165, MINIBUS: 230 }],
-  ["barcelona_city", "pineda_de_mar", { ECONOMY: 115, BUSINESS: 135, MINIVAN: 150, VCLASS: 170, MINIBUS: 235 }],
-  ["barcelona_city", "santa_susanna", { ECONOMY: 120, BUSINESS: 140, MINIVAN: 155, VCLASS: 175, MINIBUS: 240 }],
-  ["barcelona_city", "malgrat",       { ECONOMY: 125, BUSINESS: 145, MINIVAN: 160, VCLASS: 180, MINIBUS: 245 }],
-  ["barcelona_city", "blanes",        { ECONOMY: 135, BUSINESS: 155, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 }],
-  ["barcelona_city", "lloret",        { ECONOMY: 145, BUSINESS: 165, MINIVAN: 180, VCLASS: 205, MINIBUS: 265 }],
-  ["barcelona_city", "tossa",         { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 }],
-  ["barcelona_city", "sagaro",        { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 }],
-  ["barcelona_city", "platja_daro",   { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 280 }],
-  ["barcelona_city", "palamos",       { ECONOMY: 185, BUSINESS: 205, MINIVAN: 225, VCLASS: 250, MINIBUS: 305 }],
-  ["barcelona_city", "roses",         { ECONOMY: 205, BUSINESS: 225, MINIVAN: 250, VCLASS: 270, MINIBUS: 325 }],
-  ["barcelona_city", "empuriabrava",  { ECONOMY: 210, BUSINESS: 230, MINIVAN: 255, VCLASS: 275, MINIBUS: 330 }],
-  ["barcelona_city", "figueres",      { ECONOMY: 200, BUSINESS: 220, MINIVAN: 240, VCLASS: 265, MINIBUS: 320 }],
-  ["barcelona_city", "cadaques",      { ECONOMY: 240, BUSINESS: 260, MINIVAN: 285, VCLASS: 310, MINIBUS: 360 }],
-];
-
-export type RouteCategory = "airport" | "costa-dorada" | "costa-brava";
-
-export interface RoutePrice {
-  from: string;
-  to: string;
-  label: string;
-  category: RouteCategory;
-  note?: string;
-  economy: number;
-  business: number;
-  minivan: number;
-  vclass: number;
-  minibus: number;
-}
-
-export const ROUTES: RoutePrice[] = [
-  // ── Airport & City ──
-  { from: "airport",        to: "barcelona_city", label: "El Prat Airport ⇄ Barcelona City",  category: "airport",       economy: 50,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180 },
-  { from: "airport",        to: "cruise",         label: "El Prat Airport ⇄ Cruise Terminal", category: "airport",       economy: 50,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180 },
-  { from: "cruise",         to: "barcelona_city", label: "Cruise Terminal ⇄ Barcelona City",  category: "airport",       economy: 60,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180, note: "City-centre traffic route" },
-  { from: "airport",        to: "sants",          label: "El Prat Airport ⇄ Sants Station",   category: "airport",       economy: 50,  business: 60,  minivan: 65,  vclass: 85,  minibus: 155 },
-  { from: "barcelona_city", to: "la_roca",        label: "Barcelona ⇄ La Roca Village",        category: "airport",       economy: 80,  business: 100, minivan: 110, vclass: 130, minibus: 200 },
-  { from: "airport",        to: "montserrat",     label: "El Prat Airport ⇄ Montserrat",       category: "airport",       economy: 95,  business: 110, minivan: 115, vclass: 140, minibus: 200 },
-  { from: "barcelona_city", to: "girona_airport", label: "Barcelona ⇄ Girona Airport",         category: "airport",       economy: 140, business: 155, minivan: 170, vclass: 195, minibus: 255 },
-  { from: "barcelona_city", to: "andorra",        label: "Barcelona ⇄ Andorra",                category: "airport",       economy: 300, business: 350, minivan: 370, vclass: 450, minibus: 630 },
-  // ── Costa Dorada ──
-  { from: "barcelona_city", to: "castelldefels",  label: "Barcelona ⇄ Castelldefels",          category: "costa-dorada",  economy: 50,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180 },
-  { from: "barcelona_city", to: "sitges",         label: "Barcelona ⇄ Sitges",                 category: "costa-dorada",  economy: 80,  business: 100, minivan: 110, vclass: 130, minibus: 200 },
-  { from: "barcelona_city", to: "cubelles",       label: "Barcelona ⇄ Cubelles",               category: "costa-dorada",  economy: 90,  business: 110, minivan: 120, vclass: 145, minibus: 210 },
-  { from: "barcelona_city", to: "calafell",       label: "Barcelona ⇄ Calafell",               category: "costa-dorada",  economy: 100, business: 120, minivan: 130, vclass: 155, minibus: 220 },
-  { from: "barcelona_city", to: "vendrell",       label: "Barcelona ⇄ Vendrell",               category: "costa-dorada",  economy: 110, business: 130, minivan: 145, vclass: 165, minibus: 230 },
-  { from: "barcelona_city", to: "tarragona",      label: "Barcelona ⇄ Tarragona",              category: "costa-dorada",  economy: 150, business: 170, minivan: 190, vclass: 210, minibus: 270 },
-  { from: "barcelona_city", to: "la_pineda",      label: "Barcelona ⇄ La Pineda",              category: "costa-dorada",  economy: 155, business: 175, minivan: 195, vclass: 215, minibus: 275 },
-  { from: "barcelona_city", to: "salou",          label: "Barcelona ⇄ Salou",                  category: "costa-dorada",  economy: 155, business: 175, minivan: 195, vclass: 215, minibus: 275 },
-  { from: "barcelona_city", to: "portaventura",   label: "Barcelona ⇄ PortAventura",           category: "costa-dorada",  economy: 155, business: 175, minivan: 195, vclass: 215, minibus: 275 },
-  { from: "barcelona_city", to: "cambrils",       label: "Barcelona ⇄ Cambrils",               category: "costa-dorada",  economy: 160, business: 180, minivan: 200, vclass: 220, minibus: 280 },
-  // ── Costa Brava ──
-  { from: "barcelona_city", to: "mataro",         label: "Barcelona ⇄ Mataró",                 category: "costa-brava",   economy: 90,  business: 110, minivan: 120, vclass: 145, minibus: 210 },
-  { from: "barcelona_city", to: "calella",        label: "Barcelona ⇄ Calella",                category: "costa-brava",   economy: 110, business: 130, minivan: 145, vclass: 165, minibus: 230 },
-  { from: "barcelona_city", to: "pineda_de_mar",  label: "Barcelona ⇄ Pineda de Mar",          category: "costa-brava",   economy: 115, business: 135, minivan: 150, vclass: 170, minibus: 235 },
-  { from: "barcelona_city", to: "santa_susanna",  label: "Barcelona ⇄ Santa Susanna",          category: "costa-brava",   economy: 120, business: 140, minivan: 155, vclass: 175, minibus: 240 },
-  { from: "barcelona_city", to: "malgrat",        label: "Barcelona ⇄ Malgrat de Mar",         category: "costa-brava",   economy: 125, business: 145, minivan: 160, vclass: 180, minibus: 245 },
-  { from: "barcelona_city", to: "blanes",         label: "Barcelona ⇄ Blanes",                 category: "costa-brava",   economy: 135, business: 155, minivan: 170, vclass: 195, minibus: 255 },
-  { from: "barcelona_city", to: "lloret",         label: "Barcelona ⇄ Lloret de Mar",          category: "costa-brava",   economy: 145, business: 165, minivan: 180, vclass: 205, minibus: 265 },
-  { from: "barcelona_city", to: "tossa",          label: "Barcelona ⇄ Tossa de Mar",           category: "costa-brava",   economy: 155, business: 175, minivan: 195, vclass: 215, minibus: 275 },
-  { from: "barcelona_city", to: "sagaro",         label: "Barcelona ⇄ S'Agaró",                category: "costa-brava",   economy: 155, business: 175, minivan: 195, vclass: 215, minibus: 275 },
-  { from: "barcelona_city", to: "platja_daro",    label: "Barcelona ⇄ Platja d'Aro",           category: "costa-brava",   economy: 160, business: 180, minivan: 200, vclass: 220, minibus: 280 },
-  { from: "barcelona_city", to: "palamos",        label: "Barcelona ⇄ Palamós",                category: "costa-brava",   economy: 185, business: 205, minivan: 225, vclass: 250, minibus: 305 },
-  { from: "barcelona_city", to: "roses",          label: "Barcelona ⇄ Roses",                  category: "costa-brava",   economy: 205, business: 225, minivan: 250, vclass: 270, minibus: 325 },
-  { from: "barcelona_city", to: "empuriabrava",   label: "Barcelona ⇄ Empuriabrava",           category: "costa-brava",   economy: 210, business: 230, minivan: 255, vclass: 275, minibus: 330 },
-  { from: "barcelona_city", to: "figueres",       label: "Barcelona ⇄ Figueres",               category: "costa-brava",   economy: 200, business: 220, minivan: 240, vclass: 265, minibus: 320 },
-  { from: "barcelona_city", to: "cadaques",       label: "Barcelona ⇄ Cadaqués",               category: "costa-brava",   economy: 240, business: 260, minivan: 285, vclass: 310, minibus: 360 },
-];
-
 // ─── Coordinate-based zone detection ─────────────────────────────────────────
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -337,48 +288,85 @@ export function detectZoneFromCoords(lat: number, lng: number): string | null {
   return null;
 }
 
-// ─── Matrix lookup ────────────────────────────────────────────────────────────
+// ─── Route type (backward compat — derived from FIXED_ROUTES) ────────────────
 
-// Maps VehicleClass → the 5-column code in ROUTE_PRICES.
-// LUXURY (EQE) → BUSINESS; ELECTRIC_VIP (Tesla) → ECONOMY
-// LUXURY_SUV → midpoint of BUSINESS + VCLASS (handled separately)
-export function vehicleCodeForClass(vc: VehicleClass): "ECONOMY" | "BUSINESS" | "MINIVAN" | "VCLASS" | "MINIBUS" | "LUXURY_SUV_MID" | null {
-  if (vc === "ECONOMY" || vc === "ELECTRIC_VIP")          return "ECONOMY";
-  if (vc === "BUSINESS" || vc === "SUV" || vc === "LUXURY" || vc === "FIRST_CLASS") return "BUSINESS";
-  if (vc === "LUXURY_MINIVAN")                            return "VCLASS";
-  if (vc === "MINIVAN")                                   return "MINIVAN";
-  if (vc === "MINIBUS")                                   return "MINIBUS";
-  if (vc === "LUXURY_SUV")                                return "LUXURY_SUV_MID";
-  return null;
+export type RouteCategory = "airport" | "costa-dorada" | "costa-brava";
+
+export interface RoutePrice {
+  from:      string;
+  to:        string;
+  label:     string;
+  category:  RouteCategory;
+  note?:     string;
+  economy:   number;
+  business:  number;
+  minivan:   number;
+  vclass:    number;
+  minibus:   number;
 }
+
+// Derived from FIXED_ROUTES — single source of truth.
+// "airport-city" category maps to "airport" for backward compat with DB / PricingSection.
+export const ROUTES: RoutePrice[] = FIXED_ROUTES.map((r) => ({
+  from:     ZONE_CODE_TO_KEY[r.from]  ?? r.from.toLowerCase(),
+  to:       ZONE_CODE_TO_KEY[r.to]    ?? r.to.toLowerCase(),
+  label:    `${r.fromLabel} ⇄ ${r.toLabel}`,
+  category: (r.category === "airport-city" ? "airport" : r.category) as RouteCategory,
+  note:     r.note,
+  economy:  r.prices.ECONOMY,
+  business: r.prices.BUSINESS,
+  minivan:  r.prices.MINIVAN,
+  vclass:   r.prices.VCLASS,
+  minibus:  r.prices.MINIBUS,
+}));
+
+// ─── Vehicle class → price column ────────────────────────────────────────────
+
+// Maps VehicleClass → the 5-column code (or LUXURY_SUV_MID for midpoint).
+export function vehicleCodeForClass(vc: VehicleClass): VehicleCode | "LUXURY_SUV_MID" | null {
+  const code = VEHICLE_CLASS_TO_CODE[vc];
+  if (!code) return null;
+  return code as VehicleCode | "LUXURY_SUV_MID";
+}
+
+// ─── Matrix lookup ────────────────────────────────────────────────────────────
 
 /**
  * The only place fixed prices are read from the static matrix.
+ * Accepts old lowercase zone keys; converts to ZoneCode then delegates to
+ * the canonical lookupFixedPrice() in lib/fixed-prices.ts.
  * Returns null when the pair is not in the table — caller must handle this.
  * Bidirectional: (A,B) === (B,A).
  */
 export function lookupFixedPriceByZone(
   fromZone: string,
-  toZone: string,
-  vc: VehicleClass,
+  toZone:   string,
+  vc:       VehicleClass,
 ): number | null {
   if (!fromZone || !toZone || fromZone === toZone) return null;
 
-  for (const [a, b, prices] of ROUTE_PRICES) {
-    if ((a === fromZone && b === toZone) || (a === toZone && b === fromZone)) {
-      const code = vehicleCodeForClass(vc);
-      if (!code) return null;
-      if (code === "LUXURY_SUV_MID") return Math.round((prices.BUSINESS + prices.VCLASS) / 2);
-      return prices[code];
-    }
+  const fromCode = KEY_TO_ZONE_CODE[fromZone];
+  const toCode   = KEY_TO_ZONE_CODE[toZone];
+  if (!fromCode || !toCode) return null;
+
+  const code = vehicleCodeForClass(vc);
+  if (!code) return null;
+
+  if (code === "LUXURY_SUV_MID") {
+    const b = lookupFixedPriceFn(fromCode, toCode, "BUSINESS");
+    const v = lookupFixedPriceFn(fromCode, toCode, "VCLASS");
+    return b !== null && v !== null ? Math.round((b + v) / 2) : null;
   }
-  return null;
+
+  return lookupFixedPriceFn(fromCode, toCode, code);
 }
 
-export const FLEET_FROM_PRICE = {
-  "eqe-300-electric": 60,
-  "tesla-model-3":    50,
-  "v-class-vip":      75,
-  "vito":             65,
-  "minibus":          155,
-} as const;
+/**
+ * Returns the fixed price for El Prat Airport → Barcelona City for the given
+ * vehicle class. Used on the fleet listing pages as "from" price.
+ * Falls back to DEFAULT_PRICING.minimumFare if the zone pair isn't in the table.
+ */
+export function getFleetFromPrice(vc: VehicleClass): number {
+  const price = lookupFixedPriceByZone("airport", "barcelona_city", vc);
+  return price ?? DEFAULT_PRICING[vc]?.minimumFare ?? 0;
+}

@@ -17,7 +17,7 @@ import {
   type VehicleClass, type BookingFormData, type QuoteResponse,
   type BookingType,
 } from "@/types";
-import { DEFAULT_PRICING, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+import { getFleetFromPrice, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import toast from "react-hot-toast";
 
 function getOrCreateSessionId(): string {
@@ -434,10 +434,11 @@ export default function BookFormClient() {
                         <span>Bookings require at least 1 hour notice. For urgent transfers, call <a href="tel:+34635383712" className="underline font-medium">+34 635 383 712</a>.</span>
                       </div>
                     )}
-                    {data.date && data.time && hoursUntilPickup >= 1 && hoursUntilPickup < 4 && (
+                    {data.date && data.time && hoursUntilPickup >= 1 && hoursUntilPickup < 4 &&
+                      (bookingType === "HOURLY" || bookingType === "DAY_HIRE") && (
                       <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-400">
                         <Zap size={13} className="mt-0.5 flex-shrink-0" />
-                        <span><strong>Last-minute booking</strong> — a 15% priority dispatch fee will be added to the fare.</span>
+                        <span><strong>Last-minute booking</strong> — a 15% priority dispatch fee will be added to the hourly rate.</span>
                       </div>
                     )}
                   </div>
@@ -503,7 +504,7 @@ export default function BookFormClient() {
                     const sel = data.vehicleClass === v.class;
                     const isCustomRoute = quote?.isCustomRoute === true;
                     const pricing = quote && sel && !isCustomRoute ? quote : null;
-                    const minFare = DEFAULT_PRICING[v.class].minimumFare;
+                    const minFare = getFleetFromPrice(v.class);
                     const minHours = MIN_HOURLY_HOURS[v.class] ?? 4;
                     const selectedHours = bookingType === "DAY_HIRE" ? 8 : Math.max(data.durationHours ?? 4, minHours);
                     const hourlyRate = bookingType === "HOURLY" || bookingType === "DAY_HIRE"
@@ -595,6 +596,14 @@ export default function BookFormClient() {
                     >
                       <MessageCircle size={14} /> WhatsApp for quote
                     </a>
+                  </div>
+                )}
+
+                {quote && !quote.isCustomRoute && quote.fromLabel && (
+                  <div className="text-center py-3 border-t border-gold-500/10">
+                    <p className="font-display text-xl text-gold-400 tabular-nums">
+                      {quote.fromLabel} → {quote.toLabel} · €{quote.totalAmount} fixed · VAT included
+                    </p>
                   </div>
                 )}
 

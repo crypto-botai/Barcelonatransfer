@@ -6,7 +6,7 @@ import { CheckCircle2, Users, Briefcase, Star, Shield, Clock, ChevronRight, Zap 
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { VEHICLE_CATALOG, type VehicleClass } from "@/types";
-import { DEFAULT_PRICING } from "@/lib/pricing";
+import { getFleetFromPrice, lookupFixedPriceByZone } from "@/lib/pricing";
 
 const SLUG_TO_CLASS: Record<string, VehicleClass> = {
   "standard-sedan":    "ECONOMY",
@@ -32,7 +32,7 @@ export async function generateMetadata(
   if (!vehicleClass) return {};
   const vehicle = VEHICLE_CATALOG.find((v) => v.class === vehicleClass);
   if (!vehicle) return {};
-  const minFare = DEFAULT_PRICING[vehicleClass].minimumFare;
+  const minFare = getFleetFromPrice(vehicleClass);
 
   return {
     title: `${vehicle.label} — Barcelona Private Transfer | Élite BCN`,
@@ -56,8 +56,7 @@ export default async function FleetVehiclePage(
   const vehicle = VEHICLE_CATALOG.find((v) => v.class === vehicleClass);
   if (!vehicle) return notFound();
 
-  const pricing  = DEFAULT_PRICING[vehicleClass];
-  const minFare  = pricing.minimumFare;
+  const minFare  = getFleetFromPrice(vehicleClass);
 
   const schema = {
     "@context": "https://schema.org",
@@ -222,17 +221,17 @@ export default async function FleetVehiclePage(
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    { route: "BCN Airport → Barcelona City", price: minFare },
-                    { route: "BCN Airport → Sitges",         price: Math.round(minFare * 1.4) },
-                    { route: "BCN Airport → Tarragona",      price: Math.round(minFare * 2.1) },
-                    { route: "BCN Airport → Girona",         price: Math.round(minFare * 2.4) },
-                    { route: "BCN Airport → Andorra",        price: Math.round(minFare * 4.8) },
-                  ].map((row) => (
+                  {((): Array<{ route: string; price: number | null }> => [
+                    { route: "BCN Airport → Barcelona City",  price: lookupFixedPriceByZone("airport",        "barcelona_city", vehicleClass) },
+                    { route: "BCN Airport → Montserrat",      price: lookupFixedPriceByZone("airport",        "montserrat",     vehicleClass) },
+                    { route: "BCN Airport → Andorra",         price: lookupFixedPriceByZone("airport",        "andorra",        vehicleClass) },
+                    { route: "Barcelona → Girona Airport",    price: lookupFixedPriceByZone("barcelona_city", "girona_airport", vehicleClass) },
+                    { route: "Barcelona → Sitges",            price: lookupFixedPriceByZone("barcelona_city", "sitges",         vehicleClass) },
+                  ])().filter((r) => r.price !== null).map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
                       <td className="p-4 text-white">{row.route}</td>
                       <td className="p-4 text-right">
-                        <span className="text-gold-400 font-semibold">from €{row.price}</span>
+                        <span className="text-gold-400 font-semibold">from €{row.price!}</span>
                       </td>
                     </tr>
                   ))}
