@@ -723,38 +723,21 @@ export default function BookFormClient() {
                   <div className="glass-card rounded-2xl p-6">
                     <h2 className="font-display text-xl text-white mb-4">Price Summary</h2>
                     <div className="bg-black/30 rounded-xl p-4 space-y-2 text-sm">
-                      <>
-                        <div className="flex justify-between text-dark-400">
-                          <span>Base fare</span><span>{formatCurrency(quote.baseFare)}</span>
-                        </div>
-                        {quote.distanceFare > 0 && (
-                          <div className="flex justify-between text-dark-400">
-                            <span>Distance ({quote.distanceKm} km)</span><span>{formatCurrency(quote.distanceFare)}</span>
-                          </div>
-                        )}
-                        {quote.airportSurcharge > 0 && (
-                          <div className="flex justify-between text-dark-400">
-                            <span>Airport surcharge</span><span>{formatCurrency(quote.airportSurcharge)}</span>
-                          </div>
-                        )}
-                        {quote.nightSurcharge > 0 && (
-                          <div className="flex justify-between text-dark-400">
-                            <span>Night surcharge</span><span>{formatCurrency(quote.nightSurcharge)}</span>
-                          </div>
-                        )}
-                        {(quote.lastMinuteSurcharge ?? 0) > 0 && (
-                          <div className="flex justify-between text-amber-400">
-                            <span className="flex items-center gap-1"><Zap size={11} /> Last-minute fee (+15%)</span>
-                            <span>{formatCurrency(quote.lastMinuteSurcharge!)}</span>
-                          </div>
-                        )}
-                      </>
+                      <div className="flex justify-between text-dark-400">
+                        <span>Transfer price</span><span>{formatCurrency(quote.totalAmount)}</span>
+                      </div>
                       {(data.extras ?? []).filter((e) => e.price > 0).map((e) => (
                         <div key={e.id} className="flex justify-between text-dark-400">
                           <span>{e.label} {e.quantity > 1 ? `×${e.quantity}` : ""}</span>
                           <span>{formatCurrency(e.price * e.quantity)}</span>
                         </div>
                       ))}
+                      {(quote.lastMinuteSurcharge ?? 0) > 0 && (
+                        <div className="flex justify-between text-amber-400">
+                          <span className="flex items-center gap-1"><Zap size={11} /> Last-minute fee (+15%)</span>
+                          <span>{formatCurrency(quote.lastMinuteSurcharge!)}</span>
+                        </div>
+                      )}
                       {couponSaving > 0 && (
                         <div className="flex justify-between text-green-400">
                           <span className="flex items-center gap-1.5"><Tag size={11} /> Coupon {couponCode}</span>
@@ -762,7 +745,7 @@ export default function BookFormClient() {
                         </div>
                       )}
                       <div className="border-t border-white/10 pt-3 flex justify-between items-end">
-                        <span className="text-white font-semibold">Total <span className="text-dark-500 text-xs font-normal">(VAT incl.)</span></span>
+                        <span className="text-white font-semibold">Total</span>
                         <span className="font-display text-xl text-gold-400">{formatCurrency(grandTotal)}</span>
                       </div>
                     </div>

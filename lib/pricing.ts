@@ -8,11 +8,11 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
   minimumFare: number;
 }> = {
   // minimumFare = cheapest fixed route price for each class
-  ECONOMY:        { baseFare: 15,  pricePerKm: 1.30, pricePerMinute: 0.18, minimumFare: 55  },
+  ECONOMY:        { baseFare: 15,  pricePerKm: 1.30, pricePerMinute: 0.18, minimumFare: 60  },
   BUSINESS:       { baseFare: 20,  pricePerKm: 1.55, pricePerMinute: 0.22, minimumFare: 65  },
-  LUXURY:         { baseFare: 28,  pricePerKm: 1.80, pricePerMinute: 0.28, minimumFare: 55  },
+  LUXURY:         { baseFare: 28,  pricePerKm: 1.80, pricePerMinute: 0.28, minimumFare: 60  },
   FIRST_CLASS:    { baseFare: 45,  pricePerKm: 2.80, pricePerMinute: 0.45, minimumFare: 120 },
-  ELECTRIC_VIP:   { baseFare: 38,  pricePerKm: 2.20, pricePerMinute: 0.35, minimumFare: 55  },
+  ELECTRIC_VIP:   { baseFare: 38,  pricePerKm: 2.20, pricePerMinute: 0.35, minimumFare: 60  },
   SUV:            { baseFare: 32,  pricePerKm: 1.90, pricePerMinute: 0.32, minimumFare: 65  },
   LUXURY_SUV:     { baseFare: 55,  pricePerKm: 2.50, pricePerMinute: 0.45, minimumFare: 100 },
   MINIVAN:        { baseFare: 30,  pricePerKm: 1.65, pricePerMinute: 0.28, minimumFare: 65  },
@@ -111,16 +111,16 @@ type FixedPrices = { ECONOMY: number; BUSINESS: number; MINIVAN: number; VCLASS:
 
 const ROUTE_PRICES: Array<[string, string, FixedPrices]> = [
   // ── Airport & City ──
-  ["airport", "barcelona_city", { ECONOMY: 55,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
-  ["airport", "cruise",         { ECONOMY: 55,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
-  ["cruise",  "barcelona_city", { ECONOMY: 55,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
-  ["airport", "sants",          { ECONOMY: 55,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 85,  MINIBUS: 155 }],
+  ["airport", "barcelona_city", { ECONOMY: 60,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
+  ["airport", "cruise",         { ECONOMY: 60,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
+  ["cruise",  "barcelona_city", { ECONOMY: 60,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
+  ["airport", "sants",          { ECONOMY: 60,  BUSINESS: 65,  MINIVAN: 65,  VCLASS: 85,  MINIBUS: 155 }],
   ["airport", "montserrat",     { ECONOMY: 95,  BUSINESS: 110, MINIVAN: 115, VCLASS: 140, MINIBUS: 200 }],
-  ["airport", "andorra",        { ECONOMY: 285, BUSINESS: 350, MINIVAN: 495, VCLASS: 605, MINIBUS: 630 }],
+  ["airport", "andorra",        { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 630 }],
   ["barcelona_city", "la_roca",        { ECONOMY: 80,  BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 }],
   ["barcelona_city", "montserrat",     { ECONOMY: 115, BUSINESS: 130, MINIVAN: 155, VCLASS: 175, MINIBUS: 240 }],
   ["barcelona_city", "girona_airport", { ECONOMY: 140, BUSINESS: 155, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 }],
-  ["barcelona_city", "andorra",        { ECONOMY: 285, BUSINESS: 350, MINIVAN: 495, VCLASS: 605, MINIBUS: 630 }],
+  ["barcelona_city", "andorra",        { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 630 }],
   // ── Costa Daurada ────────────────────────────────────────────────────────────────
   ["barcelona_city", "castelldefels", { ECONOMY: 50,  BUSINESS: 60,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 }],
   ["barcelona_city", "sitges",        { ECONOMY: 80,  BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 }],
@@ -262,14 +262,14 @@ export interface RoutePrice {
 
 export const ROUTES: RoutePrice[] = [
   // ── Airport & City ──
-  { from: "airport",        to: "barcelona_city", label: "El Prat Airport ⇄ Barcelona City",  category: "airport",       economy: 55,  business: 65,  minivan: 65,  vclass: 75,  minibus: 180 },
-  { from: "airport",        to: "cruise",         label: "El Prat Airport ⇄ Cruise Terminal", category: "airport",       economy: 55,  business: 65,  minivan: 65,  vclass: 75,  minibus: 180 },
-  { from: "cruise",         to: "barcelona_city", label: "Cruise Terminal ⇄ Barcelona City",  category: "airport",       economy: 55,  business: 65,  minivan: 65,  vclass: 75,  minibus: 180 },
-  { from: "airport",        to: "sants",          label: "El Prat Airport ⇄ Sants Station",   category: "airport",       economy: 55,  business: 65,  minivan: 65,  vclass: 85,  minibus: 155 },
+  { from: "airport",        to: "barcelona_city", label: "El Prat Airport ⇄ Barcelona City",  category: "airport",       economy: 60,  business: 65,  minivan: 65,  vclass: 75,  minibus: 180 },
+  { from: "airport",        to: "cruise",         label: "El Prat Airport ⇄ Cruise Terminal", category: "airport",       economy: 60,  business: 65,  minivan: 65,  vclass: 75,  minibus: 180 },
+  { from: "cruise",         to: "barcelona_city", label: "Cruise Terminal ⇄ Barcelona City",  category: "airport",       economy: 60,  business: 65,  minivan: 65,  vclass: 75,  minibus: 180 },
+  { from: "airport",        to: "sants",          label: "El Prat Airport ⇄ Sants Station",   category: "airport",       economy: 60,  business: 65,  minivan: 65,  vclass: 85,  minibus: 155 },
   { from: "barcelona_city", to: "la_roca",        label: "Barcelona ⇄ La Roca Village",        category: "airport",       economy: 80,  business: 100, minivan: 110, vclass: 130, minibus: 200 },
   { from: "airport",        to: "montserrat",     label: "El Prat Airport ⇄ Montserrat",       category: "airport",       economy: 95,  business: 110, minivan: 115, vclass: 140, minibus: 200 },
   { from: "barcelona_city", to: "girona_airport", label: "Barcelona ⇄ Girona Airport",         category: "airport",       economy: 140, business: 155, minivan: 170, vclass: 195, minibus: 255 },
-  { from: "barcelona_city", to: "andorra",        label: "Barcelona ⇄ Andorra",                category: "airport",       economy: 285, business: 350, minivan: 495, vclass: 605, minibus: 630 },
+  { from: "barcelona_city", to: "andorra",        label: "Barcelona ⇄ Andorra",                category: "airport",       economy: 300, business: 350, minivan: 370, vclass: 450, minibus: 630 },
   // ── Costa Dorada ──
   { from: "barcelona_city", to: "castelldefels",  label: "Barcelona ⇄ Castelldefels",          category: "costa-dorada",  economy: 50,  business: 60,  minivan: 65,  vclass: 75,  minibus: 180 },
   { from: "barcelona_city", to: "sitges",         label: "Barcelona ⇄ Sitges",                 category: "costa-dorada",  economy: 80,  business: 100, minivan: 110, vclass: 130, minibus: 200 },
@@ -301,8 +301,8 @@ export const ROUTES: RoutePrice[] = [
 
 // Minimum "from" price per fleet vehicle slug — used in fleet cards and marketing pages.
 export const FLEET_FROM_PRICE = {
-  "eqe-300-electric": 55,
-  "tesla-model-3":    55,
+  "eqe-300-electric": 60,
+  "tesla-model-3":    60,
   "v-class-vip":      75,
   "vito":             65,
   "minibus":          155,
