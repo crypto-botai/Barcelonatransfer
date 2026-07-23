@@ -14,7 +14,8 @@ const SLUG_TO_CLASS: Record<string, VehicleClass> = {
   "executive-minivan": "MINIVAN",
   "luxury-minivan":    "LUXURY_MINIVAN",
   "group-minibus":     "MINIBUS",
-  "electric-vehicle":  "ELECTRIC_VIP",
+  "tesla-model-3":     "ELECTRIC_VIP",
+  "business-sedan":    "BUSINESS",
 };
 
 const BASE = "https://www.elitebcn.info";

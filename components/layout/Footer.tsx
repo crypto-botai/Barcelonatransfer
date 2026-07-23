@@ -25,7 +25,7 @@ export default function Footer() {
     { key: "executiveMinivan", href: "/fleet/executive-minivan" },
     { key: "luxuryMinivan",    href: "/fleet/luxury-minivan" },
     { key: "groupMinibus",     href: "/fleet/group-minibus" },
-    { key: "electricVehicle",  href: "/fleet/electric-vehicle" },
+    { key: "electricVehicle",  href: "/fleet/tesla-model-3" },
   ];
 
   const DESTINATIONS = [

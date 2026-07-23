@@ -38,7 +38,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/fleet/executive-minivan`, priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
     { url: `${BASE}/fleet/luxury-minivan`,    priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
     { url: `${BASE}/fleet/group-minibus`,     priority: 0.8,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/fleet/electric-vehicle`,  priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+    { url: `${BASE}/fleet/tesla-model-3`,     priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+    { url: `${BASE}/fleet/business-sedan`,    priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
 
     // ── Tools ─────────────────────────────────────────
     { url: `${BASE}/tools/transfer-cost-calculator`, priority: 0.85, changeFrequency: "monthly", lastModified: NOW },

@@ -9,7 +9,7 @@ const SERVICE_ICONS = [Plane, Anchor, Briefcase, Building2, Theater, Clock, Wave
 const SERVICE_KEYS = ["airport", "cruise", "executive", "corporate", "vipEvents", "hourly", "costaBrava", "costaDorada", "andorra", "hotel", "vip", "tours"] as const;
 const SERVICE_HREFS = [
   "/airport-transfers", "/transfers/cruise-port", "/corporate", "/corporate",
-  "/fleet", "/hourly", "/transfers/costa-brava", "/transfers/tarragona", "/transfers/andorra", "/book", "/fleet", "/about",
+  "/vip-transportation", "/hourly", "/transfers/costa-brava", "/transfers/tarragona", "/transfers/andorra", "/hotel-transfers", "/vip-transportation", "/day-tours",
 ];
 
 export default function ServicesSection() {

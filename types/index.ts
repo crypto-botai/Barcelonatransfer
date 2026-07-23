@@ -163,6 +163,7 @@ export const EXTRAS_CATALOG: ExtraOption[] = [
 ];
 
 // ─── Vehicle Catalog ────────────────────────────────────────
+// Ordered by starting price for booking dropdowns (both widget and wizard use this array).
 export const VEHICLE_CATALOG: VehicleInfo[] = [
   {
     class: "ECONOMY",
@@ -174,6 +175,27 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     image: "/fleet/sedan-corolla.png",
     description: "Reliable and comfortable for everyday city transfers and airport runs. Ideal for solo travellers and small groups.",
     badge: "Popular",
+  },
+  {
+    class: "ELECTRIC_VIP",
+    label: "Tesla Model 3",
+    models: ["Tesla Model 3"],
+    maxPassengers: 4,
+    maxLuggage: 2,
+    features: ["100% Electric", "Autopilot", "Panoramic Roof", "WiFi", "USB Charging"],
+    image: "/fleet/tesla-model-3.png",
+    description: "Affordable all-electric sedan with autopilot and panoramic roof. Zero emissions, tech-forward interior — the eco-conscious choice for city and airport transfers.",
+    badge: "Electric Sedan",
+  },
+  {
+    class: "BUSINESS",
+    label: "Business Sedan",
+    models: ["Toyota Camry", "Toyota Prius"],
+    maxPassengers: 4,
+    maxLuggage: 3,
+    features: ["Air Conditioning", "USB Charging", "WiFi", "Professional Driver", "Comfortable Seating"],
+    image: "/fleet/sedan-camry.png",
+    description: "A step above standard — the Camry offers a smooth, quiet ride perfect for business and leisure travel.",
   },
   {
     class: "LUXURY",
@@ -216,27 +238,6 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     features: ["Large Group", "Air Conditioning", "PA System", "Luggage Hold", "Reclining Seats"],
     image: "/fleet/minibus.png",
     description: "Premium group transfers for corporate events, airport runs, and tours for up to 16 passengers.",
-  },
-  {
-    class: "ELECTRIC_VIP",
-    label: "Electric Vehicle",
-    models: ["Tesla Model 3"],
-    maxPassengers: 4,
-    maxLuggage: 2,
-    features: ["100% Electric", "Autopilot", "Panoramic Roof", "WiFi", "USB Charging"],
-    image: "/fleet/tesla-model-3.png",
-    description: "Fully electric premium sedan with advanced autopilot. Zero emissions, high performance, and a minimalist interior for eco-conscious travellers.",
-    badge: "Electric",
-  },
-  {
-    class: "BUSINESS",
-    label: "Business Sedan",
-    models: ["Toyota Camry", "Toyota Prius"],
-    maxPassengers: 4,
-    maxLuggage: 3,
-    features: ["Air Conditioning", "USB Charging", "WiFi", "Professional Driver", "Comfortable Seating"],
-    image: "/fleet/sedan-camry.png",
-    description: "A step above standard — the Camry offers a smooth, quiet ride perfect for business and leisure travel.",
   },
 ];
 

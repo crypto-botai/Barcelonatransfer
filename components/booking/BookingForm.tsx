@@ -24,8 +24,6 @@ export default function BookingForm({ compact = false }: Props) {
   const [quote,   setQuote]   = useState<QuoteResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const VEHICLES_COMPACT = VEHICLE_CATALOG.slice(0, 6);
-
   const fetchQuote = useCallback(async () => {
     if (!pickup.lat || !dropoff.lat || !date || !time) return;
     setLoading(true);
@@ -116,7 +114,7 @@ export default function BookingForm({ compact = false }: Props) {
         <div className="relative">
           <select value={vehicle} onChange={(e) => setVehicle(e.target.value as VehicleClass)}
             className="input-luxury w-full px-4 py-3.5 rounded-xl text-sm appearance-none">
-            {VEHICLES_COMPACT.map((v) => (
+            {VEHICLE_CATALOG.map((v) => (
               <option key={v.class} value={v.class} className="bg-[#111]">
                 {v.label} — up to {v.maxPassengers} pax
               </option>
