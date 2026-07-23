@@ -5,22 +5,22 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 
-const COSTA_BRAVA = ROUTES.filter((r) => r.category === "costa-brava");
+const COSTA_DORADA = ROUTES.filter((r) => r.category === "costa-dorada");
 
 export const metadata: Metadata = {
-  title: "Barcelona to Costa Brava Transfer — from €90 | All Vehicles",
+  title: "Barcelona to Costa Dorada Transfer — from €50 | All Vehicles",
   description:
-    "Private transfer from Barcelona to Costa Brava. Lloret, Tossa, Cadaqués, Roses, Palamós. VAT-inclusive fixed prices from €90. All vehicle classes. Book instantly.",
-  alternates: { canonical: "https://www.elitebcn.info/transfers/costa-brava" },
+    "Private transfer from Barcelona to Costa Dorada. Sitges, Tarragona, Salou, PortAventura, Cambrils. VAT-inclusive fixed prices from €50. All vehicle classes. Book instantly.",
+  alternates: { canonical: "https://www.elitebcn.info/transfers/costa-dorada" },
   openGraph: {
-    title: "Barcelona to Costa Brava Transfer — from €90 | Fixed Price",
-    description: "Private transfer from Barcelona to Costa Brava from €90. Lloret, Tossa, Cadaqués, Roses. Fixed price, all vehicles.",
-    url: "https://www.elitebcn.info/transfers/costa-brava",
+    title: "Barcelona to Costa Dorada Transfer — from €50 | Fixed Price",
+    description: "Private transfer from Barcelona to Costa Dorada from €50. Sitges, Tarragona, Salou, PortAventura. Fixed price, all vehicles.",
+    url: "https://www.elitebcn.info/transfers/costa-dorada",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
 };
 
-export default function CostaBravaTransferPage() {
+export default function CostaDoradaTransferPage() {
   return (
     <>
       <Navbar />
@@ -32,25 +32,25 @@ export default function CostaBravaTransferPage() {
             <div className="flex justify-center mb-4">
               <Link href="/transfers" className="text-dark-400 text-sm hover:text-gold-400 transition-colors">All Destinations</Link>
               <ChevronRight size={14} className="text-dark-600 mx-2 mt-0.5" />
-              <span className="text-gold-400 text-sm">Costa Brava</span>
+              <span className="text-gold-400 text-sm">Costa Dorada</span>
             </div>
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold-500/30 bg-gold-500/5 text-gold-400 text-xs tracking-[0.2em] uppercase font-medium mb-6">
-              <MapPin size={12} /> Barcelona → Costa Brava
+              <MapPin size={12} /> Barcelona → Costa Dorada
             </span>
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-6">
-              Barcelona to <br /><span className="text-gold-gradient">Costa Brava Transfer</span>
+              Barcelona to <br /><span className="text-gold-gradient">Costa Dorada Transfer</span>
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
-              Private luxury transfers from Barcelona to the entire Costa Brava coastline.
-              Lloret de Mar, Tossa de Mar, Cadaqués, Roses and beyond — VAT-inclusive fixed prices, all vehicle classes.
+              Private luxury transfers from Barcelona to the Costa Dorada.
+              Castelldefels, Sitges, Tarragona, Salou, PortAventura, Cambrils — VAT-inclusive fixed prices, all vehicle classes.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
-              <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 1–3 hrs</div>
-              <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 60–200 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €90 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 20 min – 2 hrs</div>
+              <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 20–170 km</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €50 fixed</div>
             </div>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Costa Brava Transfer
+              Book Costa Dorada Transfer
             </Link>
           </div>
         </section>
@@ -59,7 +59,7 @@ export default function CostaBravaTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-8">
-              Costa Brava <span className="text-gold-gradient">Transfer Prices</span>
+              Costa Dorada <span className="text-gold-gradient">Transfer Prices</span>
             </h2>
             <div className="bg-dark-900 border border-white/[0.08] rounded-xl overflow-hidden overflow-x-auto">
               <table className="w-full text-sm min-w-[640px]">
@@ -74,7 +74,7 @@ export default function CostaBravaTransferPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {COSTA_BRAVA.map((r) => (
+                  {COSTA_DORADA.map((r) => (
                     <tr key={r.to} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
                       <td className="p-4 text-white font-medium">{r.label.replace("Barcelona ⇄ ", "")}</td>
                       <td className="p-3 text-center text-white">€{r.economy}</td>
@@ -96,21 +96,20 @@ export default function CostaBravaTransferPage() {
         {/* About */}
         <section className="py-16 bg-[#050505] border-y border-white/[0.06]">
           <div className="container mx-auto px-4 max-w-3xl">
-            <h2 className="font-display text-3xl text-white mb-6">About the <span className="text-gold-gradient">Costa Brava</span></h2>
+            <h2 className="font-display text-3xl text-white mb-6">About <span className="text-gold-gradient">Costa Dorada</span></h2>
             <div className="space-y-4 text-dark-300 leading-relaxed">
               <p>
-                The Costa Brava ("Wild Coast") stretches 214 km from Blanes north to the French border —
-                a dramatic landscape of rugged cliffs, hidden coves, pine forests, and charming fishing villages.
+                The Costa Dorada ("Golden Coast") stretches south of Barcelona from Castelldefels to Cambrils,
+                named for its long sandy beaches with golden sand. It&apos;s one of Catalonia&apos;s most popular holiday regions.
               </p>
               <p>
-                Key highlights include <strong className="text-white">Tossa de Mar</strong> (medieval walled town),
-                <strong className="text-white"> Cadaqués</strong> (Salvador Dalí&apos;s home and Cap de Creus National Park),
-                <strong className="text-white"> Lloret de Mar</strong> (beaches and nightlife), and
-                the <strong className="text-white">Dalí Theatre-Museum</strong> in Figueres.
+                Key destinations include <strong className="text-white">Sitges</strong> (glamorous seaside town, 35 km from Barcelona),
+                <strong className="text-white"> Tarragona</strong> (UNESCO Roman ruins and medieval cathedral),
+                <strong className="text-white"> Salou &amp; La Pineda</strong> (resort beaches), and
+                <strong className="text-white"> PortAventura World</strong> (Spain&apos;s #1 theme park).
               </p>
               <p>
-                There is no practical direct public transport from Barcelona to most Costa Brava destinations.
-                A private transfer is the fastest, most comfortable option.
+                A private transfer is the most convenient way to reach these destinations from Barcelona, especially for families with luggage.
               </p>
             </div>
           </div>
@@ -120,16 +119,16 @@ export default function CostaBravaTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">Costa Brava transfer</span>
+              Why choose Élite BCN for your <span className="text-gold-gradient">Costa Dorada transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed VAT-inclusive prices", body: "The price you see is the price you pay. Tolls, fuel, and driver included." },
-                { icon: Clock, title: "Direct door-to-door", body: "Straight to your villa, hotel, or port — no bus stops, no changes, no shared rides." },
+                { icon: Shield, title: "Fixed VAT-inclusive prices", body: "The price you see is the price you pay. Tolls, fuel, and driver included. No surprises." },
+                { icon: Clock, title: "Direct door-to-door", body: "Straight to your hotel, resort, or theme park entrance — no stops, no shared rides." },
                 { icon: Star, title: "All vehicle classes", body: "Sedan, Business, Minivan (Vito), V-Class VIP, or Minibus — choose what fits your group." },
-                { icon: CheckCircle2, title: "Child seats available", body: "Baby seats and boosters free on request. Perfect for family holidays." },
-                { icon: MapPin, title: "Return transfers", body: "Book outbound and return together. We arrive at your villa exactly when you need." },
-                { icon: Shield, title: "24/7 availability", body: "Early morning flights, late-night arrivals — we operate every hour of every day." },
+                { icon: CheckCircle2, title: "Family-friendly", body: "Free child seats and baby seats on request. Ideal for families flying in with young children." },
+                { icon: MapPin, title: "PortAventura specialists", body: "Drop at any PortAventura entrance, Ferrari Land, or resort hotel on the Costa Dorada." },
+                { icon: Shield, title: "24/7 availability", body: "Early morning flights, late-night arrivals — we operate every hour of every day, 365 days." },
               ].map(({ icon: Icon, title, body }) => (
                 <div key={title} className="bg-dark-900 border border-white/[0.08] rounded-xl p-6">
                   <Icon size={24} className="text-gold-500 mb-3" />
@@ -141,13 +140,27 @@ export default function CostaBravaTransferPage() {
           </div>
         </section>
 
+        {/* Related destinations */}
+        <section className="py-12 bg-[#050505] border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl text-center">
+            <p className="text-dark-500 text-xs mb-4">Popular Costa Dorada destinations</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {["Sitges", "Tarragona", "Salou", "PortAventura", "Cambrils", "La Pineda", "Castelldefels"].map((d) => (
+                <span key={d} className="text-sm px-4 py-2 rounded-full border border-white/[0.08] bg-dark-900 text-dark-300">
+                  {d}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
-        <section className="py-16 bg-[#050505] border-t border-white/[0.06] text-center">
+        <section className="py-16 bg-dark-950 border-t border-white/[0.06] text-center">
           <div className="container mx-auto px-4">
-            <h2 className="font-display text-3xl text-white mb-4">Ready to book your Costa Brava transfer?</h2>
+            <h2 className="font-display text-3xl text-white mb-4">Ready to book your Costa Dorada transfer?</h2>
             <p className="text-dark-400 mb-8">Instant confirmation. Free cancellation up to 24 hours before pickup.</p>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Now — from €90
+              Book Now — from €50
             </Link>
           </div>
         </section>

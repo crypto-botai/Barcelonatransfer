@@ -173,6 +173,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     features: ["Air Conditioning", "USB Charging", "WiFi", "Professional Driver"],
     image: "/fleet/sedan-corolla.png",
     description: "Reliable and comfortable for everyday city transfers and airport runs. Ideal for solo travellers and small groups.",
+    badge: "Popular",
   },
   {
     class: "LUXURY",
@@ -183,7 +184,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     features: ["100% Electric", "Leather Seats", "Climate Control", "WiFi", "Water & Mints", "USB-C Charging"],
     image: "/fleet/eqe-300.png",
     description: "Premium all-electric Mercedes EQE 300 — zero emissions, whisper-quiet ride, and executive comfort for business and airport transfers.",
-    badge: "Electric",
+    badge: "EQE Electric",
   },
   {
     class: "MINIVAN",

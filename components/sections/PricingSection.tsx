@@ -44,8 +44,8 @@ function PriceTable({ data, search }: { data: RoutePrice[]; search: string }) {
           {filtered.map((r) => (
             <tr key={r.label} className="price-row border-b border-white/[0.04]">
               <td className="py-3.5 px-4 text-sm text-dark-200">{r.label}</td>
-              <PriceCell amount={r.economy}  wasAmount={r.wasEconomy}  />
-              <PriceCell amount={r.business} wasAmount={r.wasBusiness} />
+              <PriceCell amount={r.economy}  />
+              <PriceCell amount={r.business} />
               <PriceCell amount={r.minivan} />
               <PriceCell amount={r.vclass} gold />
               <PriceCell amount={r.minibus} />
@@ -174,7 +174,7 @@ export default function PricingSection() {
           {/* Footer note */}
           <div className="p-5 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-dark-500 text-xs">
-              All prices include 10% VAT, tolls, professional chauffeur, and meet &amp; greet. Child seats free. Airport &amp; City: struck prices are previous pre-tax rates.
+              All prices are VAT-inclusive and fixed. Tolls, professional chauffeur, and meet &amp; greet included. Child seats free on request.
             </p>
             <Link href="/book" className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">
               Get Custom Quote <ArrowRight size={12} />

@@ -3,18 +3,26 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Users, Briefcase, ChevronRight } from "lucide-react";
+import { Users, Briefcase, ChevronRight, Zap, Star } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
 import { VEHICLE_CATALOG } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { DEFAULT_PRICING } from "@/lib/pricing";
 
 function badgeClass(badge: string) {
-  if (badge === "VIP")         return "bg-[#c9a84c] text-black";
-  if (badge === "Eco")         return "bg-emerald-600/90 text-white";
-  if (badge === "Popular")     return "bg-blue-600/80 text-white";
-  if (badge === "Large Group") return "bg-violet-600/80 text-white";
+  if (badge === "VIP")          return "bg-[#c9a84c] text-black";
+  if (badge === "EQE Electric") return "bg-emerald-500 text-white";
+  if (badge === "Electric")     return "bg-emerald-700/90 text-white";
+  if (badge === "Popular")      return "bg-blue-600/80 text-white";
+  if (badge === "Large Group")  return "bg-violet-600/80 text-white";
+  if (badge === "Eco")          return "bg-emerald-600/90 text-white";
   return "bg-white/10 text-white";
+}
+
+function BadgeIcon({ badge }: { badge: string }) {
+  if (badge === "EQE Electric" || badge === "Electric") return <Zap size={9} className="flex-shrink-0" />;
+  if (badge === "Popular") return <Star size={9} className="flex-shrink-0" />;
+  return null;
 }
 
 function FleetCardInner({
@@ -33,7 +41,8 @@ function FleetCardInner({
     <div className="group flex flex-col h-full rounded-2xl overflow-hidden border border-white/[0.07] bg-[#0b0b0b] hover:border-[#c9a84c]/30 transition-colors duration-300">
       <div className="relative h-44 bg-[#080808] overflow-hidden">
         {vehicle.badge && (
-          <span className={`absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide ${badgeClass(vehicle.badge)}`}>
+          <span className={`absolute top-3 right-3 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide ${badgeClass(vehicle.badge)}`}>
+            <BadgeIcon badge={vehicle.badge} />
             {vehicle.badge}
           </span>
         )}

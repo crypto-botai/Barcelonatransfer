@@ -3,22 +3,25 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
+import { ROUTES } from "@/lib/pricing";
+
+const PA = ROUTES.find((r) => r.to === "portaventura")!;
 
 export const metadata: Metadata = {
-  title: "Barcelona Airport to PortAventura Transfer — from €99 | Fixed Price",
+  title: "Barcelona to PortAventura Transfer — from €155 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona Airport (BCN) to PortAventura World theme park. Fixed price from €99. 70-minute journey. Families welcome, luggage included. Book instantly.",
+    "Private transfer from Barcelona to PortAventura World. VAT-inclusive fixed price from €155 (sedan) to €275 (minibus). Family-friendly. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/port-aventura" },
   openGraph: {
-    title: "Barcelona Airport to PortAventura Transfer — from €99 | Fixed Price",
-    description: "Luxury private transfer from Barcelona Airport to PortAventura World from €99. Fixed price, family-friendly, no surge pricing.",
+    title: "Barcelona to PortAventura Transfer — from €155 | Fixed Price",
+    description: "Private transfer from Barcelona to PortAventura World from €155. Fixed price, family-friendly, all vehicle classes.",
     url: "https://www.elitebcn.info/transfers/port-aventura",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Airport to PortAventura Transfer — from €99 | Fixed Price",
-    description: "Luxury private transfer from Barcelona Airport to PortAventura World from €99. Fixed price, family-friendly, no surge pricing.",
+    title: "Barcelona to PortAventura Transfer — from €155 | Fixed Price",
+    description: "Private transfer from Barcelona to PortAventura World from €155. Fixed price, family-friendly.",
     images: ["/opengraph-image"],
   },
 };
@@ -43,16 +46,16 @@ export default function PortAventuraTransferPage() {
               Barcelona Airport to <br /><span className="text-gold-gradient">PortAventura Transfer</span>
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
-              Private luxury transfer from BCN El Prat Airport directly to PortAventura World, Ferrari Land, or your Costa Daurada hotel.
-              Fixed price from €99 — ideal for families.
+              Private luxury transfer from Barcelona directly to PortAventura World, Ferrari Land, or your Costa Daurada hotel.
+              VAT-inclusive fixed price from €{PA.economy} — ideal for families.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 70 minutes</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 95 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €99 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €{PA.economy} fixed</div>
             </div>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book PortAventura Transfer — €99
+              Book PortAventura Transfer — €{PA.economy}
             </Link>
           </div>
         </section>
@@ -64,7 +67,7 @@ export default function PortAventuraTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed price €99", body: "Single all-inclusive price. No meter running, no toll surprises, no extra charge for luggage." },
+                { icon: Shield, title: "Fixed price from €155", body: "Single VAT-inclusive price. No meter running, no toll surprises, no extra charge for luggage." },
                 { icon: CheckCircle2, title: "Child seats available", body: "Free baby seats and booster seats on request — essential for families flying in with young children." },
                 { icon: Star, title: "Direct to theme park gate", body: "Drop-off at PortAventura main entrance, Ferrari Land entrance, or your on-site hotel lobby." },
                 { icon: Clock, title: "Meet & greet in arrivals", body: "Driver waits with your name board in the arrivals hall. 60 minutes free waiting from your flight landing." },
@@ -104,31 +107,33 @@ export default function PortAventuraTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4 max-w-2xl">
             <h2 className="font-display text-3xl text-white text-center mb-8">PortAventura Transfer <span className="text-gold-gradient">Prices</span></h2>
-            <div className="bg-dark-900 border border-white/[0.08] rounded-xl overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="bg-dark-900 border border-white/[0.08] rounded-xl overflow-hidden overflow-x-auto">
+              <table className="w-full text-sm min-w-[520px]">
                 <thead>
                   <tr className="border-b border-white/[0.08] bg-dark-800">
-                    <th className="text-left text-dark-400 font-medium p-4">Route</th>
-                    <th className="text-right text-dark-400 font-medium p-4">Price</th>
+                    <th className="text-left text-dark-400 font-medium p-4">Vehicle</th>
+                    <th className="text-left text-dark-400 font-medium p-4">Capacity</th>
+                    <th className="text-right text-dark-400 font-medium p-4">Price (VAT incl.)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[
-                    { route: "BCN Airport → PortAventura World (sedan)", price: "€99" },
-                    { route: "BCN Airport → PortAventura World (MPV, 7 seats)", price: "€120" },
-                    { route: "BCN Airport → Ferrari Land entrance", price: "€99" },
-                    { route: "BCN Airport → Salou / La Pineda resort hotels", price: "€99" },
-                    { route: "PortAventura World → BCN Airport", price: "€99" },
+                    { label: "Sedan (Economy)",    pax: "1–3 pax", price: PA.economy  },
+                    { label: "Business Sedan",     pax: "1–3 pax", price: PA.business },
+                    { label: "Minivan (Vito)",     pax: "4–8 pax", price: PA.minivan  },
+                    { label: "V-Class VIP",        pax: "7 pax",   price: PA.vclass   },
+                    { label: "Minibus",            pax: "9+ pax",  price: PA.minibus  },
                   ].map((row) => (
-                    <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
-                      <td className="p-4 text-white">{row.route}</td>
-                      <td className="p-4 text-gold-400 font-semibold text-right">{row.price}</td>
+                    <tr key={row.label} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02]">
+                      <td className="p-4 text-white">{row.label}</td>
+                      <td className="p-4 text-dark-400">{row.pax}</td>
+                      <td className="p-4 text-gold-400 font-semibold text-right">€{row.price}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">All prices include all tolls, meet & greet, and 60 min free waiting. No hidden fees.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">All prices are VAT-inclusive fixed fares. Tolls, meet &amp; greet, and 60 min free waiting included. No hidden fees.</p>
           </div>
         </section>
 
@@ -137,7 +142,7 @@ export default function PortAventuraTransferPage() {
             <h2 className="font-display text-3xl text-white mb-4">Ready to book your PortAventura transfer?</h2>
             <p className="text-dark-400 mb-8">Instant confirmation. Free cancellation up to 24 hours before pickup.</p>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Now — from €99
+              Book Now — from €{PA.economy}
             </Link>
           </div>
         </section>
