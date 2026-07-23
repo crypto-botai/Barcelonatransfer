@@ -4,7 +4,6 @@ import "./globals.css";
 import { COMPANY } from "@/lib/company-facts";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
-import ExitIntentPopup from "@/components/marketing/ExitIntentPopup";
 import I18nProvider from "@/components/language/I18nProvider";
 import SupportCenter from "@/components/support/SupportCenter";
 import { GoogleAnalytics } from "@next/third-parties/google";
@@ -236,8 +235,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <I18nProvider>
           {children}
           <SupportCenter />
-          <ExitIntentPopup />
-          <Toaster
+<Toaster
             position="top-right"
             toastOptions={{
               style: {
