@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { type DriverStatus } from "@/types";
+import { z } from "zod";
+
+const patchSchema = z.object({
+  status: z.enum(["PENDING_APPROVAL", "APPROVED", "SUSPENDED", "OFFLINE", "ONLINE", "ON_RIDE"]),
+});
 
 export async function PATCH(
   req: NextRequest,
@@ -15,11 +19,13 @@ export async function PATCH(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { status } = await req.json() as { status: DriverStatus };
-  const driver = await prisma.driver.update({
-    where: { id },
-    data: { status },
-  });
-
-  return NextResponse.json(driver);
+  try {
+    const { status } = patchSchema.parse(await req.json());
+    const driver = await prisma.driver.update({ where: { id }, data: { status } });
+    return NextResponse.json(driver);
+  } catch (err) {
+    if (err instanceof z.ZodError) return NextResponse.json({ error: err.errors[0].message }, { status: 422 });
+    const msg = err instanceof Error ? err.message : "Update failed";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }

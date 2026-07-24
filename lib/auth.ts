@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
           clientId:     process.env.GOOGLE_CLIENT_ID,
           clientSecret: process.env.GOOGLE_CLIENT_SECRET,
           authorization: { params: { prompt: "select_account" } },
-          allowDangerousEmailAccountLinking: true,
+          // allowDangerousEmailAccountLinking removed — prevents OAuth account takeover
         })]
       : []),
     CredentialsProvider({
@@ -57,9 +57,9 @@ export const authOptions: NextAuthOptions = {
         token.role              = (user as { role?: string }).role;
         token.mustChangePassword = (user as { mustChangePassword?: boolean }).mustChangePassword;
       }
-      // For OAuth sign-ins (Google), role is not in the OAuth profile —
-      // fetch it from the database so role-based routing works correctly.
-      if (account?.provider === "google" && token.id && !token.role) {
+      // For OAuth sign-ins (Google), always re-fetch role from DB so role
+      // changes (e.g. promote to ADMIN) are reflected immediately.
+      if (account?.provider === "google" && token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
           select: { role: true, mustChangePassword: true },

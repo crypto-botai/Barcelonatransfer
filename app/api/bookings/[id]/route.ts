@@ -10,10 +10,15 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
+    // Auth check: either a logged-in session or a confirmationCode query param
+    const session     = await getServerSession(authOptions);
+    const sessionUser = session?.user as { id?: string; role?: string } | undefined;
+    const codeParam   = new URL(req.url).searchParams.get("code");
+
     const booking = await prisma.booking.findUnique({
       where: { id },
       select: {
-        id: true,
+        id: true, userId: true,
         confirmationCode: true,
         pickupAddress: true,
         dropoffAddress: true,
@@ -43,6 +48,15 @@ export async function GET(
       },
     });
     if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    // Access control: admin, owner, or valid confirmation code
+    const isAdmin = sessionUser?.role === "ADMIN";
+    const isOwner = !!sessionUser?.id && booking.userId === sessionUser.id;
+    const hasCode = !!codeParam && codeParam === booking.confirmationCode;
+    if (!isAdmin && !isOwner && !hasCode) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     return NextResponse.json(booking);
   } catch {
     return NextResponse.json({ error: "Failed" }, { status: 500 });
@@ -80,8 +94,12 @@ export async function PATCH(
       }
       return NextResponse.json(updated);
     }
+    const VALID_STATUSES = ["PENDING","CONFIRMED","DRIVER_ASSIGNED","IN_PROGRESS","COMPLETED","CANCELLED","REFUNDED"];
     const data: Record<string, unknown> = {};
-    if (body.status) data.status = body.status;
+    if (body.status) {
+      if (!VALID_STATUSES.includes(body.status)) return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+      data.status = body.status;
+    }
     if (body.adminNotes !== undefined) data.adminNotes = body.adminNotes;
     if (body.totalAmount !== undefined) data.totalAmount = parseFloat(body.totalAmount);
     if (body.driverAmount !== undefined) data.driverAmount = body.driverAmount === null ? null : parseFloat(body.driverAmount);

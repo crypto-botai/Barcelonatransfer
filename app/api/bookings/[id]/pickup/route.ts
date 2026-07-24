@@ -63,7 +63,7 @@ export async function PATCH(
   const customerEmail = booking.guestEmail ?? (session.user as { email?: string }).email;
   if (customerEmail) {
     const name = booking.guestName ?? "Valued Client";
-    Promise.allSettled([
+    await Promise.allSettled([
       sendPickupChangedEmail({
         to:               customerEmail,
         name,
@@ -79,7 +79,7 @@ export async function PATCH(
         newPickupAddress:  body.pickupAddress,
         pickupDatetime:    booking.pickupDatetime.toLocaleString("en-GB"),
       }),
-    ]).catch(() => {});
+    ]);
   }
 
   return NextResponse.json({

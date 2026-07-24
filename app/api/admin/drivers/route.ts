@@ -43,8 +43,9 @@ export async function POST(req: NextRequest) {
     const existing = await prisma.user.findUnique({ where: { email: body.email } });
     if (existing) return NextResponse.json({ error: "Email already in use" }, { status: 400 });
 
-    // Generate a temporary password the admin can share with the driver
-    const tempPassword = Math.random().toString(36).slice(2, 8).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+    // Generate a cryptographically secure temporary password
+    const { randomBytes } = await import("crypto");
+    const tempPassword = randomBytes(5).toString("hex").toUpperCase() + randomBytes(2).readUInt16BE().toString().slice(0, 4);
     const passwordHash = await bcrypt.hash(tempPassword, 12);
 
     const classToCapacity: Record<string, { max: number; luggage: number }> = {

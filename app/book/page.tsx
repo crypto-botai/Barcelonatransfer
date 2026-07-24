@@ -99,7 +99,11 @@ export default function BookPage() {
       </div>
 
       {/* Booking form (client component) */}
-      <Suspense>
+      <Suspense fallback={
+        <div className="flex items-center justify-center py-24">
+          <div className="w-8 h-8 rounded-full border-2 border-[#c9a84c] border-t-transparent animate-spin" />
+        </div>
+      }>
         <BookFormClient />
       </Suspense>
 

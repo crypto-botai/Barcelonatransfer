@@ -227,7 +227,7 @@ export default function BookFormClient() {
   const extrasTotal  = (data.extras ?? []).reduce((s, e) => s + e.price * e.quantity, 0);
   const subtotal     = (quote?.totalAmount ?? 0) + extrasTotal;
   const couponSaving = couponPct > 0 ? Math.round((subtotal * couponPct / 100) * 100) / 100 : 0;
-  const grandTotal   = Math.max(0, subtotal - couponSaving);
+  const grandTotal   = Math.round(Math.max(0, subtotal - couponSaving) * 100) / 100;
 
   const toggleExtra = (id: string) => {
     const catalog = EXTRAS_CATALOG.find((e) => e.id === id)!;

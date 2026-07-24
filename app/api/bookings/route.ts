@@ -71,7 +71,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const user = session.user as { id: string };
   const bookings = await prisma.booking.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, isDeleted: false },
     orderBy: { pickupDatetime: "desc" },
     select: {
       id: true, confirmationCode: true, status: true, paymentStatus: true,

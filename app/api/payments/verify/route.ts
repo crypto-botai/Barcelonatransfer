@@ -68,9 +68,9 @@ export async function GET(req: NextRequest) {
             data:  { converted: true },
           }).catch(() => {});
 
-          // Dedup: skip if payment confirmation already sent for this booking
+          // Dedup: skip if customer OR admin email already sent for this booking
           const alreadySent = await prisma.emailLog.findFirst({
-            where: { bookingId, type: "PAYMENT_CONFIRMATION" },
+            where: { bookingId, type: { in: ["PAYMENT_CONFIRMATION", "ADMIN_BOOKING_ALERT"] } },
           }).catch(() => null);
 
           if (!alreadySent) {

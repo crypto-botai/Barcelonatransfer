@@ -7,23 +7,29 @@ import crypto from "crypto";
 // SumUp sends HMAC-SHA256 signature in X-Payload-Signature header
 function verifySumUpSignature(payload: string, signature: string): boolean {
   const secret = process.env.SUMUP_WEBHOOK_SECRET;
-  if (!secret) return true; // skip in dev if not configured
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(payload)
-    .digest("hex");
-  return crypto.timingSafeEqual(
-    Buffer.from(expected, "hex"),
-    Buffer.from(signature.replace("sha256=", ""), "hex")
-  );
+  // Reject unsigned requests when secret is configured; allow in dev only
+  if (!secret) return process.env.NODE_ENV !== "production";
+  // Missing signature is always rejected
+  if (!signature) return false;
+  try {
+    const expected    = crypto.createHmac("sha256", secret).update(payload).digest("hex");
+    const expectedBuf = Buffer.from(expected, "hex");
+    const sigBuf      = Buffer.from(signature.replace("sha256=", ""), "hex");
+    // timingSafeEqual throws on length mismatch — guard explicitly
+    if (expectedBuf.length !== sigBuf.length) return false;
+    return crypto.timingSafeEqual(expectedBuf, sigBuf);
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(req: NextRequest) {
   const payload   = await req.text();
   const signature = req.headers.get("x-payload-signature") ?? "";
 
-  if (signature && !verifySumUpSignature(payload, signature)) {
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  // Always verify — reject if missing or invalid (was: `if (signature && ...` which allowed bypass)
+  if (!verifySumUpSignature(payload, signature)) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
   let event: Record<string, unknown>;
@@ -84,9 +90,9 @@ export async function POST(req: NextRequest) {
           data:  { converted: true },
         }).catch(() => {});
 
-        // Dedup: skip if payment confirmation already sent for this booking
+        // Dedup: skip if customer OR admin email already sent for this booking
         const alreadySent = await prisma.emailLog.findFirst({
-          where: { bookingId: booking.id, type: "PAYMENT_CONFIRMATION" },
+          where: { bookingId: booking.id, type: { in: ["PAYMENT_CONFIRMATION", "ADMIN_BOOKING_ALERT"] } },
         }).catch(() => null);
 
         if (!alreadySent) {

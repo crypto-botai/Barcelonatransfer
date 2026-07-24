@@ -62,7 +62,7 @@ export async function POST(
   const customerEmail = booking.guestEmail ?? (session.user as { email?: string }).email;
   if (customerEmail) {
     const name = booking.guestName ?? "Valued Client";
-    Promise.allSettled([
+    await Promise.allSettled([
       sendCancellationEmail({
         to:               customerEmail,
         name,
@@ -79,7 +79,7 @@ export async function POST(
         pickupDatetime:   booking.pickupDatetime.toLocaleString("en-GB"),
         pickupAddress:    booking.pickupAddress,
       }),
-    ]).catch(() => {});
+    ]);
   }
 
   return NextResponse.json({
