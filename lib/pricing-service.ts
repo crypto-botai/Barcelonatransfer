@@ -125,23 +125,25 @@ async function lookupFixedPrice(
 ): Promise<number | null> {
   if (!fromZone || !toZone || fromZone === toZone) return null;
 
+  // Try DB first — if it has rows and the route is found there, use it
   const rows = await getDBRoutes();
-
-  if (!rows) {
-    // Fallback to hardcoded ROUTES
-    return lookupFixedPriceByZone(fromZone, toZone, vc);
+  if (rows && rows.length > 0) {
+    const route = rows.find(
+      (r) => (r.fromKey === fromZone && r.toKey === toZone) ||
+             (r.fromKey === toZone   && r.toKey === fromZone)
+    );
+    if (route) {
+      const code = vehicleCodeForClass(vc);
+      if (code) {
+        const price = route.prices.find((p) => p.vehicleCode === code)?.price;
+        if (price !== undefined) return price;
+      }
+    }
   }
 
-  const route = rows.find(
-    (r) => (r.fromKey === fromZone && r.toKey === toZone) ||
-           (r.fromKey === toZone   && r.toKey === fromZone)
-  );
-  if (!route) return null;
-
-  const code = vehicleCodeForClass(vc);
-  if (!code) return null;
-
-  return route.prices.find((p) => p.vehicleCode === code)?.price ?? null;
+  // Always fall back to hardcoded routes when DB is empty, unreachable,
+  // or the specific route pair isn't stored there yet
+  return lookupFixedPriceByZone(fromZone, toZone, vc);
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
