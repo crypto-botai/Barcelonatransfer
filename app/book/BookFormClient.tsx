@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
+import AddressAutocomplete, { type QuickZone } from "@/components/booking/AddressAutocomplete";
 import {
   ArrowRight, ArrowLeft, MapPin, Calendar, Clock, Users,
   User, Mail, Phone, MessageSquare, Plane, Zap, Loader2,
@@ -19,6 +19,21 @@ import {
 } from "@/types";
 import { getFleetFromPrice, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import toast from "react-hot-toast";
+
+const PICKUP_QUICK_ZONES: QuickZone[] = [
+  { label: "Barcelona Airport — T1", sublabel: "Terminal 1 · El Prat de Llobregat", address: "Terminal 1, Barcelona El Prat Airport, El Prat de Llobregat", lat: 41.2971, lng: 2.0785, icon: "airport" },
+  { label: "Barcelona Airport — T2", sublabel: "Terminal 2 · El Prat de Llobregat", address: "Terminal 2, Barcelona El Prat Airport, El Prat de Llobregat", lat: 41.2894, lng: 2.0718, icon: "airport" },
+  { label: "Barcelona City Centre",  sublabel: "Passeig de Gràcia / Eixample",       address: "Passeig de Gràcia, Barcelona, Catalonia, Spain",           lat: 41.3916, lng: 2.1649, icon: "city" },
+  { label: "Barcelona Cruise Port",  sublabel: "Moll Adossat · World Trade Centre",   address: "Moll Adossat, Port de Barcelona, Barcelona",             lat: 41.3611, lng: 2.1761, icon: "port" },
+  { label: "Barcelona Sants Station",sublabel: "AVE · Long-distance trains",          address: "Estació de Sants, Barcelona, Catalonia, Spain",           lat: 41.3794, lng: 2.1401, icon: "train" },
+  { label: "Girona Airport",         sublabel: "Costa Brava Airport (GRO)",           address: "Girona Costa Brava Airport, Vilobí d'Onyar, Girona",     lat: 41.9011, lng: 2.7604, icon: "airport" },
+  { label: "Andorra la Vella",       sublabel: "Principality of Andorra",             address: "Andorra la Vella, Andorra",                              lat: 42.5063, lng: 1.5218, icon: "landmark" },
+  { label: "Sitges",                 sublabel: "Costa Dorada · 35 min from BCN",      address: "Sitges, Barcelona, Catalonia, Spain",                    lat: 41.2369, lng: 1.8109, icon: "landmark" },
+  { label: "Tarragona",              sublabel: "Costa Dorada · 1h from BCN",          address: "Tarragona, Catalonia, Spain",                            lat: 41.1189, lng: 1.2445, icon: "landmark" },
+  { label: "PortAventura World",     sublabel: "Salou, Tarragona",                    address: "PortAventura World, Salou, Tarragona, Spain",            lat: 41.0864, lng: 1.1546, icon: "landmark" },
+  { label: "Lloret de Mar",          sublabel: "Costa Brava · 1h from BCN",           address: "Lloret de Mar, Girona, Catalonia, Spain",               lat: 41.6993, lng: 2.8469, icon: "landmark" },
+  { label: "Montserrat",             sublabel: "Monastery · 1h from BCN",             address: "Montserrat Monastery, Monistrol de Montserrat, Barcelona", lat: 41.5928, lng: 1.8363, icon: "landmark" },
+];
 
 function getOrCreateSessionId(): string {
   if (typeof window === "undefined") return "";
@@ -354,8 +369,9 @@ export default function BookFormClient() {
                     <AddressAutocomplete
                       value={data.pickupAddress ?? ""}
                       onChange={(v) => setData((d) => ({ ...d, pickupAddress: v.address, pickupLat: v.lat, pickupLng: v.lng }))}
-                      placeholder="Airport, hotel, address…"
+                      placeholder="Airport, hotel, or type any Barcelona address…"
                       icon={<div className="w-5 h-5 rounded-full bg-gold-500 flex items-center justify-center"><div className="w-2 h-2 rounded-full bg-black" /></div>}
+                      quickZones={PICKUP_QUICK_ZONES}
                     />
                   </div>
 

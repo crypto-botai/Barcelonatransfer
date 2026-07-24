@@ -51,7 +51,7 @@ export function calculateLastMinuteSurcharge(totalBefore: number, pickupDatetime
 
 export const HOURLY_RATES: Record<VehicleClass, number> = {
   ECONOMY:        45,
-  BUSINESS:       45,
+  BUSINESS:       50,
   LUXURY:         65,
   ELECTRIC_VIP:   65,
   MINIVAN:        60,
