@@ -182,55 +182,41 @@ export default function BookingForm({ compact = false }: Props) {
         )}
 
         {/* Drop-off (hidden for hourly) */}
-        <AnimatePresence>
-          {!isHourly && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-            >
-              <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Drop-off</label>
-              <AddressAutocomplete
-                value={dropoff.address}
-                onChange={setDropoff}
-                placeholder="Pick a zone or type a destination"
-                icon={<div className="w-4 h-4 rounded-full border-2 border-[#c9a84c] flex items-center justify-center flex-shrink-0"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a84c]" /></div>}
-                quickZones={PICKUP_QUICK_ZONES}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {!isHourly && (
+          <div>
+            <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Drop-off</label>
+            <AddressAutocomplete
+              value={dropoff.address}
+              onChange={setDropoff}
+              placeholder="Pick a zone or type a destination"
+              icon={<div className="w-4 h-4 rounded-full border-2 border-[#c9a84c] flex items-center justify-center flex-shrink-0"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a84c]" /></div>}
+              quickZones={PICKUP_QUICK_ZONES}
+            />
+          </div>
+        )}
 
         {/* Hours selector (hourly only) */}
-        <AnimatePresence>
-          {isHourly && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-            >
-              <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-2">Duration</label>
-              <div className="flex flex-wrap gap-2">
-                {HOURS_OPTIONS.map((h) => (
-                  <button
-                    key={h}
-                    onClick={() => setHours(h)}
-                    className={cn(
-                      "px-3.5 py-1.5 rounded-lg border text-sm font-medium transition-all",
-                      hours === h
-                        ? "border-[#c9a84c] bg-[#c9a84c]/10 text-[#c9a84c]"
-                        : "border-white/10 text-white/40 hover:border-[#c9a84c]/30 hover:text-white/70"
-                    )}
-                  >
-                    {h}h
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {isHourly && (
+          <div>
+            <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-2">Duration</label>
+            <div className="flex flex-wrap gap-2">
+              {HOURS_OPTIONS.map((h) => (
+                <button
+                  key={h}
+                  onClick={() => setHours(h)}
+                  className={cn(
+                    "px-3.5 py-1.5 rounded-lg border text-sm font-medium transition-all",
+                    hours === h
+                      ? "border-[#c9a84c] bg-[#c9a84c]/10 text-[#c9a84c]"
+                      : "border-white/10 text-white/40 hover:border-[#c9a84c]/30 hover:text-white/70"
+                  )}
+                >
+                  {h}h
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Date & Time */}
         <div className="grid grid-cols-2 gap-3">
