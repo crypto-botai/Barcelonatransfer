@@ -141,12 +141,6 @@ async function lookupFixedPrice(
   const code = vehicleCodeForClass(vc);
   if (!code) return null;
 
-  if (code === "LUXURY_SUV_MID") {
-    const b = route.prices.find((p) => p.vehicleCode === "BUSINESS")?.price ?? 0;
-    const v = route.prices.find((p) => p.vehicleCode === "VCLASS")?.price  ?? 0;
-    return b && v ? Math.round((b + v) / 2) : null;
-  }
-
   return route.prices.find((p) => p.vehicleCode === code)?.price ?? null;
 }
 

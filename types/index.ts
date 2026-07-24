@@ -26,14 +26,33 @@ export type DriverStatus =
   | "ONLINE"
   | "ON_RIDE";
 
+// The 7 real physical vehicles in the fleet (display / catalog identifier)
+export type FleetVehicle =
+  | "COROLLA"
+  | "CAMRY"
+  | "TESLA_M3"
+  | "EQE_300"
+  | "VITO"
+  | "V_CLASS"
+  | "SPRINTER";
+
+// Converts a FleetVehicle to its Prisma-compatible VehicleClass for API / DB writes
+export const FLEET_TO_DB_CLASS: Record<FleetVehicle, VehicleClass> = {
+  COROLLA:  "ECONOMY",
+  CAMRY:    "BUSINESS",
+  TESLA_M3: "ELECTRIC_VIP",
+  EQE_300:  "LUXURY",
+  VITO:     "MINIVAN",
+  V_CLASS:  "LUXURY_MINIVAN",
+  SPRINTER: "MINIBUS",
+};
+
+// DB-compatible vehicle class (matches the Prisma VehicleClass enum values we actually use)
 export type VehicleClass =
   | "ECONOMY"
   | "BUSINESS"
   | "LUXURY"
-  | "FIRST_CLASS"
   | "ELECTRIC_VIP"
-  | "SUV"
-  | "LUXURY_SUV"
   | "MINIVAN"
   | "LUXURY_MINIVAN"
   | "MINIBUS";
@@ -46,7 +65,7 @@ export interface BookingExtra {
 }
 
 export interface VehicleInfo {
-  class:         VehicleClass;
+  class:         FleetVehicle;
   label:         string;
   models:        string[];
   maxPassengers: number;
@@ -167,55 +186,57 @@ export const EXTRAS_CATALOG: ExtraOption[] = [
 ];
 
 // ─── Vehicle Catalog ────────────────────────────────────────
-// Ordered by starting price for booking dropdowns (both widget and wizard use this array).
+// Exactly the 7 vehicles we operate. Ordered by price column (Economy → Minibus).
+// Both the quote widget and booking wizard derive their vehicle list from this array.
 export const VEHICLE_CATALOG: VehicleInfo[] = [
   {
-    class: "ECONOMY",
-    label: "Standard Sedan",
-    models: ["Toyota Corolla", "Toyota Camry", "Toyota Prius"],
-    maxPassengers: 4,
+    class: "COROLLA",
+    label: "Toyota Corolla",
+    models: ["Toyota Corolla"],
+    maxPassengers: 3,
     maxLuggage: 3,
     features: ["Air Conditioning", "USB Charging", "WiFi", "Professional Driver"],
     image: "/fleet/sedan-corolla.png",
-    description: "Reliable and comfortable for everyday city transfers and airport runs. Ideal for solo travellers and small groups.",
-    badge: "Popular",
+    description: "Reliable and comfortable for city transfers and airport runs. Ideal for solo travellers and small groups.",
+    badge: "Economy",
   },
   {
-    class: "ELECTRIC_VIP",
+    class: "CAMRY",
+    label: "Toyota Camry",
+    models: ["Toyota Camry"],
+    maxPassengers: 3,
+    maxLuggage: 3,
+    features: ["Air Conditioning", "USB Charging", "WiFi", "Professional Driver", "Comfortable Seating"],
+    image: "/fleet/sedan-camry.png",
+    description: "A step above standard — the Camry delivers a smooth, quiet ride perfect for business and leisure travel.",
+    badge: "Business",
+  },
+  {
+    class: "TESLA_M3",
     label: "Tesla Model 3",
     models: ["Tesla Model 3"],
     maxPassengers: 4,
     maxLuggage: 2,
     features: ["100% Electric", "Autopilot", "Panoramic Roof", "WiFi", "USB Charging"],
     image: "/fleet/tesla-model-3.png",
-    description: "Affordable all-electric sedan with autopilot and panoramic roof. Zero emissions, tech-forward interior — the eco-conscious choice for city and airport transfers.",
-    badge: "Electric Sedan",
+    description: "All-electric executive sedan with autopilot and panoramic roof. Zero emissions for a tech-forward transfer.",
+    badge: "Electric",
   },
   {
-    class: "BUSINESS",
-    label: "Business Sedan",
-    models: ["Toyota Camry", "Toyota Prius"],
-    maxPassengers: 4,
-    maxLuggage: 3,
-    features: ["Air Conditioning", "USB Charging", "WiFi", "Professional Driver", "Comfortable Seating"],
-    image: "/fleet/sedan-camry.png",
-    description: "A step above standard — the Camry offers a smooth, quiet ride perfect for business and leisure travel.",
-  },
-  {
-    class: "LUXURY",
-    label: "EQE 300 Electric Mercedes",
+    class: "EQE_300",
+    label: "Mercedes EQE 300",
     models: ["Mercedes EQE 300"],
     maxPassengers: 4,
     maxLuggage: 3,
     features: ["100% Electric", "Leather Seats", "Climate Control", "WiFi", "Water & Mints", "USB-C Charging"],
     image: "/fleet/eqe-300.png",
-    description: "Premium all-electric Mercedes EQE 300 — zero emissions, whisper-quiet ride, and executive comfort for business and airport transfers.",
+    description: "Premium all-electric Mercedes EQE 300 — zero emissions, whisper-quiet, executive comfort for any transfer.",
     badge: "EQE Electric",
   },
   {
-    class: "MINIVAN",
-    label: "Executive Minivan",
-    models: ["Mercedes Vito", "Ford Tourneo Custom"],
+    class: "VITO",
+    label: "Mercedes Vito",
+    models: ["Mercedes Vito"],
     maxPassengers: 8,
     maxLuggage: 8,
     features: ["Spacious Cabin", "Climate Control", "WiFi", "USB Charging", "Sliding Doors"],
@@ -223,9 +244,9 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     description: "Spacious and practical for families, groups, and travellers with ample luggage — up to 8 passengers.",
   },
   {
-    class: "LUXURY_MINIVAN",
-    label: "Luxury Minivan",
-    models: ["Mercedes V-Class VIP", "Mercedes EQV"],
+    class: "V_CLASS",
+    label: "Mercedes V-Class",
+    models: ["Mercedes V-Class"],
     maxPassengers: 7,
     maxLuggage: 7,
     features: ["Captain Seats", "Conference Layout", "Champagne Bar", "4K Screen", "Privacy Glass"],
@@ -234,9 +255,9 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     badge: "VIP",
   },
   {
-    class: "MINIBUS",
-    label: "Group Minibus",
-    models: ["Mercedes Sprinter", "Mercedes V-Class"],
+    class: "SPRINTER",
+    label: "Mercedes Sprinter",
+    models: ["Mercedes Sprinter"],
     maxPassengers: 16,
     maxLuggage: 16,
     features: ["Large Group", "Air Conditioning", "PA System", "Luggage Hold", "Reclining Seats"],

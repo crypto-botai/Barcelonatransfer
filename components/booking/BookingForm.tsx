@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Clock, Users, Zap, ArrowRight, Loader2, ChevronDown, MessageCircle, MapPin } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
-import { VEHICLE_CATALOG, type VehicleClass, type QuoteResponse } from "@/types";
+import { VEHICLE_CATALOG, FLEET_TO_DB_CLASS, type FleetVehicle, type VehicleClass, type QuoteResponse } from "@/types";
 import AddressAutocomplete from "./AddressAutocomplete";
 
 interface Props {
@@ -20,7 +20,7 @@ export default function BookingForm({ compact = false }: Props) {
   const [date,    setDate]    = useState("");
   const [time,    setTime]    = useState("");
   const [pax,     setPax]     = useState(2);
-  const [vehicle, setVehicle] = useState<VehicleClass>("LUXURY");
+  const [vehicle, setVehicle] = useState<FleetVehicle>("EQE_300");
   const [quote,   setQuote]   = useState<QuoteResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +34,7 @@ export default function BookingForm({ compact = false }: Props) {
         body: JSON.stringify({
           pickupLat: pickup.lat, pickupLng: pickup.lng,
           dropoffLat: dropoff.lat, dropoffLng: dropoff.lng,
-          vehicleClass: vehicle,
+          vehicleClass: FLEET_TO_DB_CLASS[vehicle],
           pickupDatetime: `${date}T${time}`,
           passengers: pax,
           pickupAddress: pickup.address,
@@ -57,7 +57,7 @@ export default function BookingForm({ compact = false }: Props) {
     const params = new URLSearchParams({
       pickup: pickup.address, pLat: String(pickup.lat), pLng: String(pickup.lng),
       dropoff: dropoff.address, dLat: String(dropoff.lat), dLng: String(dropoff.lng),
-      date, time, pax: String(pax), vehicle,
+      date, time, pax: String(pax), vehicle: FLEET_TO_DB_CLASS[vehicle],
     });
     router.push(`/book?${params}`);
   };
@@ -116,7 +116,7 @@ export default function BookingForm({ compact = false }: Props) {
         </div>
 
         <div className="relative">
-          <select value={vehicle} onChange={(e) => setVehicle(e.target.value as VehicleClass)}
+          <select value={vehicle} onChange={(e) => setVehicle(e.target.value as FleetVehicle)}
             className="input-luxury w-full px-4 py-3.5 rounded-xl text-sm appearance-none">
             {VEHICLE_CATALOG.map((v) => (
               <option key={v.class} value={v.class} className="bg-[#111]">

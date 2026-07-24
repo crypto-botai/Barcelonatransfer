@@ -5,17 +5,17 @@ import Link from "next/link";
 import { CheckCircle2, Users, Briefcase, Star, Shield, Clock, ChevronRight, Zap } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { VEHICLE_CATALOG, type VehicleClass } from "@/types";
+import { VEHICLE_CATALOG, type FleetVehicle } from "@/types";
 import { getFleetFromPrice, lookupFixedPriceByZone } from "@/lib/pricing";
 
-const SLUG_TO_CLASS: Record<string, VehicleClass> = {
-  "standard-sedan":    "ECONOMY",
-  "eqe-300-electric":  "LUXURY",
-  "executive-minivan": "MINIVAN",
-  "luxury-minivan":    "LUXURY_MINIVAN",
-  "group-minibus":     "MINIBUS",
-  "tesla-model-3":     "ELECTRIC_VIP",
-  "business-sedan":    "BUSINESS",
+const SLUG_TO_CLASS: Record<string, FleetVehicle> = {
+  "standard-sedan":    "COROLLA",
+  "business-sedan":    "CAMRY",
+  "tesla-model-3":     "TESLA_M3",
+  "eqe-300-electric":  "EQE_300",
+  "executive-minivan": "VITO",
+  "luxury-minivan":    "V_CLASS",
+  "group-minibus":     "SPRINTER",
 };
 
 const BASE = "https://www.elitebcn.info";
@@ -32,7 +32,7 @@ export async function generateMetadata(
   if (!vehicleClass) return {};
   const vehicle = VEHICLE_CATALOG.find((v) => v.class === vehicleClass);
   if (!vehicle) return {};
-  const minFare = getFleetFromPrice(vehicleClass);
+  const minFare = getFleetFromPrice(vehicleClass as FleetVehicle);
 
   return {
     title: `${vehicle.label} — Barcelona Private Transfer | Élite BCN`,

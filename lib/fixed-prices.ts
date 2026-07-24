@@ -297,16 +297,27 @@ export function findRoute(from: ZoneCode, to: ZoneCode): FixedRoute | null {
   ) ?? null;
 }
 
-// VehicleClass → VehicleCode alias map. Edit this to reclassify any vehicle.
-export const VEHICLE_CLASS_TO_CODE: Record<string, VehicleCode | "LUXURY_SUV_MID"> = {
+import type { FleetVehicle, VehicleClass } from "@/types";
+
+// FleetVehicle → price column. The single source that maps each physical vehicle
+// to one of the 5 fixed-price columns. No arithmetic — every value is a literal code.
+export const VEHICLE_TO_PRICE_CLASS: Record<FleetVehicle, VehicleCode> = {
+  COROLLA:  "ECONOMY",
+  CAMRY:    "BUSINESS",
+  TESLA_M3: "BUSINESS",
+  EQE_300:  "BUSINESS",
+  VITO:     "MINIVAN",
+  V_CLASS:  "VCLASS",
+  SPRINTER: "MINIBUS",
+};
+
+// DB VehicleClass → price column (for API / service layer that receives Prisma enum values).
+export const DB_CLASS_TO_CODE: Record<VehicleClass, VehicleCode> = {
   ECONOMY:        "ECONOMY",
-  ELECTRIC_VIP:   "ECONOMY",       // Tesla Model 3 — 1–3 pax sedan
   BUSINESS:       "BUSINESS",
-  LUXURY:         "BUSINESS",      // Mercedes EQE 300 — 1–3 pax sedan
-  SUV:            "BUSINESS",
-  FIRST_CLASS:    "BUSINESS",
+  ELECTRIC_VIP:   "BUSINESS",
+  LUXURY:         "BUSINESS",
   MINIVAN:        "MINIVAN",
   LUXURY_MINIVAN: "VCLASS",
-  LUXURY_SUV:     "LUXURY_SUV_MID",
   MINIBUS:        "MINIBUS",
 };

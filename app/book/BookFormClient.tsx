@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
-  VEHICLE_CATALOG, EXTRAS_CATALOG, BOOKING_TYPE_LABELS,
-  type VehicleClass, type BookingFormData, type QuoteResponse,
+  VEHICLE_CATALOG, EXTRAS_CATALOG, BOOKING_TYPE_LABELS, FLEET_TO_DB_CLASS,
+  type FleetVehicle, type VehicleClass, type BookingFormData, type QuoteResponse,
   type BookingType,
 } from "@/types";
 import { getFleetFromPrice, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
@@ -54,6 +54,14 @@ const HOURS_OPTIONS = [4, 5, 6, 8, 10, 12];
 function todayStr()    { return new Date().toISOString().split("T")[0]; }
 function tomorrowStr() { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split("T")[0]; }
 
+// Converts any vehicle identifier (FleetVehicle or VehicleClass) from URL params
+// to the DB-compatible VehicleClass used in data.vehicleClass.
+function normalizeVehicleClass(v: string | null): VehicleClass {
+  if (!v) return "BUSINESS";
+  if (v in FLEET_TO_DB_CLASS) return FLEET_TO_DB_CLASS[v as FleetVehicle];
+  return v as VehicleClass;
+}
+
 function roundUpToNext30(): string {
   const now = new Date();
   now.setMinutes(now.getMinutes() + 90);
@@ -85,7 +93,7 @@ export default function BookFormClient() {
     passengers:      parseInt(params.get("pax") ?? "2"),
     luggage:         0,
     durationHours:   4,
-    vehicleClass:    (params.get("vehicle") as VehicleClass) ?? "BUSINESS",
+    vehicleClass:    normalizeVehicleClass(params.get("vehicle")),
     guestName:       "",
     guestEmail:      "",
     guestPhone:      "",
@@ -498,22 +506,22 @@ export default function BookFormClient() {
                 </div>
 
                 {VEHICLE_CATALOG
-                  .filter((v) => v.class !== "FIRST_CLASS")
                   .filter((v) => v.maxPassengers >= (data.passengers ?? 1))
                   .map((v) => {
-                    const sel = data.vehicleClass === v.class;
+                    const dbClass = FLEET_TO_DB_CLASS[v.class];
+                    const sel = data.vehicleClass === dbClass;
                     const isCustomRoute = quote?.isCustomRoute === true;
                     const pricing = quote && sel && !isCustomRoute ? quote : null;
                     const minFare = getFleetFromPrice(v.class);
-                    const minHours = MIN_HOURLY_HOURS[v.class] ?? 4;
+                    const minHours = MIN_HOURLY_HOURS[dbClass] ?? 4;
                     const selectedHours = bookingType === "DAY_HIRE" ? 8 : Math.max(data.durationHours ?? 4, minHours);
                     const hourlyRate = bookingType === "HOURLY" || bookingType === "DAY_HIRE"
-                      ? HOURLY_RATES[v.class] * selectedHours
+                      ? HOURLY_RATES[dbClass] * selectedHours
                       : null;
 
                     return (
                       <motion.button key={v.class}
-                        onClick={() => { setData((d) => ({ ...d, vehicleClass: v.class })); fetchQuote(v.class); }}
+                        onClick={() => { setData((d) => ({ ...d, vehicleClass: dbClass })); fetchQuote(dbClass); }}
                         className={cn(
                           "w-full text-left rounded-xl border overflow-hidden transition-all duration-200",
                           sel ? "border-gold-500/60 bg-gold-500/5 shadow-lg shadow-gold-500/10"
@@ -563,7 +571,7 @@ export default function BookFormClient() {
                                 ) : hourlyRate !== null ? (
                                   <>
                                     <p className="font-display text-lg text-gold-400">{formatCurrency(hourlyRate)}</p>
-                                    <p className="text-dark-500 text-[10px]">{formatCurrency(HOURLY_RATES[v.class])}/h · {selectedHours}h</p>
+                                    <p className="text-dark-500 text-[10px]">{formatCurrency(HOURLY_RATES[dbClass])}/h · {selectedHours}h</p>
                                   </>
                                 ) : (
                                   <p className="text-dark-500 text-xs">from {formatCurrency(minFare)}</p>
@@ -864,7 +872,7 @@ export default function BookFormClient() {
         <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0d0d0d]/95 backdrop-blur border-t border-gold-500/20 px-4 py-3 flex items-center gap-3 safe-area-pb">
           <div className="flex-1 min-w-0">
             <p className="text-xs text-dark-400 truncate">
-              {VEHICLE_CATALOG.find((v) => v.class === data.vehicleClass)?.label}
+              {VEHICLE_CATALOG.find((v) => FLEET_TO_DB_CLASS[v.class] === data.vehicleClass)?.label}
             </p>
             <p className="font-display text-lg text-gold-400 leading-tight">{formatCurrency(grandTotal)}</p>
           </div>

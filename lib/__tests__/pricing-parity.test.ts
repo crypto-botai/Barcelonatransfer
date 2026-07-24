@@ -5,16 +5,18 @@
  *  1. FIXED_ROUTES.length === 35
  *  2. For every route × vehicle: lookupFixedPrice() returns the table value
  *  3. Bidirectionality: lookup(A,B,v) === lookup(B,A,v) for all 35 routes
- *  4. VEHICLE_CLASS_TO_CODE aliases resolve to the correct column
- *  5. ROUTES (derived) stays in sync with FIXED_ROUTES
- *  6. resolveZone() text matching
+ *  4. VEHICLE_TO_PRICE_CLASS has exactly 7 fleet vehicles, all mapping to real codes
+ *  5. Exactly 5 VehicleCode members — no arithmetic, no LUXURY_SUV_MID
+ *  6. ROUTES (derived) stays in sync with FIXED_ROUTES
+ *  7. resolveZone() text matching
  */
 
 import { describe, it, expect } from "vitest";
 import {
   FIXED_ROUTES,
   lookupFixedPrice,
-  VEHICLE_CLASS_TO_CODE,
+  VEHICLE_TO_PRICE_CLASS,
+  DB_CLASS_TO_CODE,
   type VehicleCode,
 } from "../fixed-prices";
 import {
@@ -54,49 +56,69 @@ describe("Pricing parity: FIXED_ROUTES × vehicle", () => {
   });
 });
 
-// ── 4. VEHICLE_CLASS_TO_CODE aliases ─────────────────────────────────────────
+// ── 4. VEHICLE_TO_PRICE_CLASS — fleet vehicles, no arithmetic ────────────────
 
-describe("VEHICLE_CLASS_TO_CODE aliases", () => {
-  const pivot = FIXED_ROUTES[0]; // airport → barcelona_city
+describe("VEHICLE_TO_PRICE_CLASS", () => {
+  const VALID_CODES: VehicleCode[] = ["ECONOMY", "BUSINESS", "MINIVAN", "VCLASS", "MINIBUS"];
 
-  const cases: Array<[string, VehicleCode]> = [
-    ["ELECTRIC_VIP", "ECONOMY"],   // Tesla → ECONOMY column
-    ["LUXURY",       "BUSINESS"],  // EQE 300 → BUSINESS column
-    ["SUV",          "BUSINESS"],
-    ["FIRST_CLASS",  "BUSINESS"],
-    ["LUXURY_MINIVAN", "VCLASS"],
-  ];
+  it("has exactly 7 fleet vehicle entries", () => {
+    expect(Object.keys(VEHICLE_TO_PRICE_CLASS).length).toBe(7);
+  });
 
-  cases.forEach(([alias, canonical]) => {
-    it(`${alias} resolves same price as ${canonical}`, () => {
-      const aliasPrice     = lookupFixedPriceByZone(
-        ZONE_CODE_TO_KEY[pivot.from],
-        ZONE_CODE_TO_KEY[pivot.to],
-        alias as Parameters<typeof lookupFixedPriceByZone>[2]
-      );
-      const canonicalPrice = lookupFixedPrice(pivot.from, pivot.to, canonical);
-      expect(aliasPrice).toBe(canonicalPrice);
+  it("all values are one of the 5 valid VehicleCodes (no arithmetic, no LUXURY_SUV_MID)", () => {
+    Object.entries(VEHICLE_TO_PRICE_CLASS).forEach(([fleet, code]) => {
+      expect(VALID_CODES).toContain(code);
     });
   });
 
-  it("LUXURY_SUV returns midpoint of BUSINESS and VCLASS", () => {
-    const b   = lookupFixedPrice(pivot.from, pivot.to, "BUSINESS")!;
-    const v   = lookupFixedPrice(pivot.from, pivot.to, "VCLASS")!;
-    const mid = lookupFixedPriceByZone(
-      ZONE_CODE_TO_KEY[pivot.from],
-      ZONE_CODE_TO_KEY[pivot.to],
-      "LUXURY_SUV"
-    );
-    expect(mid).toBe(Math.round((b + v) / 2));
+  it("Tesla Model 3 (TESLA_M3) maps to BUSINESS — not ECONOMY", () => {
+    expect(VEHICLE_TO_PRICE_CLASS["TESLA_M3"]).toBe("BUSINESS");
   });
 
-  it("all alias mappings exist in VEHICLE_CLASS_TO_CODE", () => {
-    const allClasses = [
-      "ECONOMY", "ELECTRIC_VIP", "BUSINESS", "LUXURY", "SUV",
-      "FIRST_CLASS", "MINIVAN", "LUXURY_MINIVAN", "LUXURY_SUV", "MINIBUS",
-    ];
-    allClasses.forEach((cls) => {
-      expect(VEHICLE_CLASS_TO_CODE[cls]).toBeDefined();
+  it("Mercedes EQE 300 (EQE_300) maps to BUSINESS", () => {
+    expect(VEHICLE_TO_PRICE_CLASS["EQE_300"]).toBe("BUSINESS");
+  });
+
+  it("Mercedes V-Class (V_CLASS) maps to VCLASS", () => {
+    expect(VEHICLE_TO_PRICE_CLASS["V_CLASS"]).toBe("VCLASS");
+  });
+
+  it("Mercedes Sprinter (SPRINTER) maps to MINIBUS", () => {
+    expect(VEHICLE_TO_PRICE_CLASS["SPRINTER"]).toBe("MINIBUS");
+  });
+});
+
+// ── 4b. Exactly 5 VehicleCode members ────────────────────────────────────────
+
+describe("VehicleCode completeness", () => {
+  it("exactly 5 distinct codes used across all fleet mappings", () => {
+    const used = new Set(Object.values(VEHICLE_TO_PRICE_CLASS));
+    expect(used.size).toBe(5);
+    expect([...used].sort()).toEqual(["BUSINESS", "ECONOMY", "MINIBUS", "MINIVAN", "VCLASS"]);
+  });
+});
+
+// ── 4c. FleetVehicle and DB VehicleClass lookups resolve same price ───────────
+
+describe("Fleet and DB class price parity", () => {
+  const pivot = FIXED_ROUTES[0]; // airport → barcelona_city
+  const from  = ZONE_CODE_TO_KEY[pivot.from];
+  const to    = ZONE_CODE_TO_KEY[pivot.to];
+
+  const cases: Array<[string, string]> = [
+    ["TESLA_M3",      "BUSINESS"],       // FleetVehicle → same as BUSINESS column
+    ["EQE_300",       "BUSINESS"],
+    ["V_CLASS",       "VCLASS"],
+    ["ELECTRIC_VIP",  "BUSINESS"],       // DB class: Tesla → BUSINESS
+    ["LUXURY",        "BUSINESS"],       // DB class: EQE 300 → BUSINESS
+    ["LUXURY_MINIVAN","VCLASS"],         // DB class: V-Class → VCLASS
+  ];
+
+  cases.forEach(([alias, canonical]) => {
+    it(`${alias} resolves same price as ${canonical} column`, () => {
+      const aliasPrice     = lookupFixedPriceByZone(from, to, alias);
+      const canonicalPrice = lookupFixedPrice(pivot.from, pivot.to, canonical as VehicleCode);
+      expect(aliasPrice).toBe(canonicalPrice);
     });
   });
 });

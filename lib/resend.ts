@@ -34,16 +34,22 @@ async function sendEmail(payload: Parameters<Resend["emails"]["send"]>[0]): Prom
 
 // ─── Vehicle class → display name ────────────────────────────
 const VEHICLE_NAMES: Record<string, string> = {
-  ECONOMY:       "Standard Sedan",
-  BUSINESS:      "Business Sedan",
-  LUXURY:        "Luxury Sedan",
-  FIRST_CLASS:   "First Class Sedan",
-  ELECTRIC_VIP:  "Mercedes EQE 300 Electric",
-  SUV:           "SUV",
-  LUXURY_SUV:    "Luxury SUV",
-  MINIVAN:       "Executive Minivan",
-  LUXURY_MINIVAN:"Luxury Minivan",
-  MINIBUS:       "Group Minibus",
+  // FleetVehicle keys
+  COROLLA:  "Toyota Corolla",
+  CAMRY:    "Toyota Camry",
+  TESLA_M3: "Tesla Model 3",
+  EQE_300:  "Mercedes EQE 300",
+  VITO:     "Mercedes Vito",
+  V_CLASS:  "Mercedes V-Class",
+  SPRINTER: "Mercedes Sprinter",
+  // DB VehicleClass keys (for legacy booking records)
+  ECONOMY:        "Standard Sedan (Toyota Corolla)",
+  BUSINESS:       "Business Sedan (Toyota Camry)",
+  LUXURY:         "Mercedes EQE 300 Electric",
+  ELECTRIC_VIP:   "Tesla Model 3",
+  MINIVAN:        "Mercedes Vito",
+  LUXURY_MINIVAN: "Mercedes V-Class",
+  MINIBUS:        "Mercedes Sprinter",
 };
 function vehicleName(cls: string): string {
   return VEHICLE_NAMES[cls] ?? cls.replace(/_/g, " ");

@@ -27,12 +27,10 @@ export const metadata: Metadata = {
 };
 
 const RATE_CARDS = [
-  { class: "Economy / Business",       rate: HOURLY_RATES.ECONOMY,        pax: "1–3",  min: MIN_HOURLY_HOURS.ECONOMY        },
-  { class: "Luxury Sedan",             rate: HOURLY_RATES.LUXURY,         pax: "1–3",  min: MIN_HOURLY_HOURS.LUXURY         },
-  { class: "First Class",              rate: HOURLY_RATES.FIRST_CLASS,    pax: "1–3",  min: MIN_HOURLY_HOURS.FIRST_CLASS    },
-  { class: "Executive SUV",            rate: HOURLY_RATES.SUV,            pax: "1–5",  min: MIN_HOURLY_HOURS.SUV            },
-  { class: "Minivan (Vito)",           rate: HOURLY_RATES.MINIVAN,        pax: "1–8", min: MIN_HOURLY_HOURS.MINIVAN        },
-  { class: "Luxury Minivan (V-Class)", rate: HOURLY_RATES.LUXURY_MINIVAN, pax: "1–7", min: MIN_HOURLY_HOURS.LUXURY_MINIVAN },
+  { class: "Economy (Toyota Corolla / Camry)", rate: HOURLY_RATES.ECONOMY,        pax: "1–3",  min: MIN_HOURLY_HOURS.ECONOMY        },
+  { class: "Business / Electric Sedan",        rate: HOURLY_RATES.LUXURY,         pax: "1–4",  min: MIN_HOURLY_HOURS.LUXURY         },
+  { class: "Minivan (Mercedes Vito)",          rate: HOURLY_RATES.MINIVAN,        pax: "1–8",  min: MIN_HOURLY_HOURS.MINIVAN        },
+  { class: "Luxury Minivan (Mercedes V-Class)",rate: HOURLY_RATES.LUXURY_MINIVAN, pax: "1–7",  min: MIN_HOURLY_HOURS.LUXURY_MINIVAN },
 ];
 
 export default function HourlyPage() {

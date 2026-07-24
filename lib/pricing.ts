@@ -1,8 +1,10 @@
-import { VehicleClass } from "@/types";
+import type { VehicleClass, FleetVehicle } from "@/types";
+import { FLEET_TO_DB_CLASS } from "@/types";
 import {
   FIXED_ROUTES,
   lookupFixedPrice as lookupFixedPriceFn,
-  VEHICLE_CLASS_TO_CODE,
+  VEHICLE_TO_PRICE_CLASS,
+  DB_CLASS_TO_CODE,
   type VehicleCode,
   type ZoneCode,
 } from "@/lib/fixed-prices";
@@ -23,10 +25,7 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
   ECONOMY:        { baseFare: 15,  pricePerKm: 1.30, pricePerMinute: 0.18, minimumFare: 50  },
   BUSINESS:       { baseFare: 20,  pricePerKm: 1.55, pricePerMinute: 0.22, minimumFare: 60  },
   LUXURY:         { baseFare: 28,  pricePerKm: 1.80, pricePerMinute: 0.28, minimumFare: 60  },
-  FIRST_CLASS:    { baseFare: 45,  pricePerKm: 2.80, pricePerMinute: 0.45, minimumFare: 120 },
-  ELECTRIC_VIP:   { baseFare: 38,  pricePerKm: 2.20, pricePerMinute: 0.35, minimumFare: 50  },
-  SUV:            { baseFare: 32,  pricePerKm: 1.90, pricePerMinute: 0.32, minimumFare: 65  },
-  LUXURY_SUV:     { baseFare: 55,  pricePerKm: 2.50, pricePerMinute: 0.45, minimumFare: 100 },
+  ELECTRIC_VIP:   { baseFare: 28,  pricePerKm: 1.80, pricePerMinute: 0.28, minimumFare: 60  },
   MINIVAN:        { baseFare: 30,  pricePerKm: 1.65, pricePerMinute: 0.28, minimumFare: 65  },
   LUXURY_MINIVAN: { baseFare: 50,  pricePerKm: 2.20, pricePerMinute: 0.40, minimumFare: 75  },
   MINIBUS:        { baseFare: 70,  pricePerKm: 2.40, pricePerMinute: 0.50, minimumFare: 180 },
@@ -54,10 +53,7 @@ export const HOURLY_RATES: Record<VehicleClass, number> = {
   ECONOMY:        45,
   BUSINESS:       45,
   LUXURY:         65,
-  FIRST_CLASS:   110,
-  ELECTRIC_VIP:   45,
-  SUV:            75,
-  LUXURY_SUV:     75,
+  ELECTRIC_VIP:   65,
   MINIVAN:        60,
   LUXURY_MINIVAN: 70,
   MINIBUS:       160,
@@ -67,10 +63,7 @@ export const MIN_HOURLY_HOURS: Record<VehicleClass, number> = {
   ECONOMY:        4,
   BUSINESS:       4,
   LUXURY:         4,
-  FIRST_CLASS:    4,
   ELECTRIC_VIP:   4,
-  SUV:            4,
-  LUXURY_SUV:     4,
   MINIVAN:        4,
   LUXURY_MINIVAN: 4,
   MINIBUS:        4,
@@ -320,13 +313,20 @@ export const ROUTES: RoutePrice[] = FIXED_ROUTES.map((r) => ({
   minibus:  r.prices.MINIBUS,
 }));
 
-// ─── Vehicle class → price column ────────────────────────────────────────────
+// ─── Vehicle identifier → price column ────────────────────────────────────────
 
-// Maps VehicleClass → the 5-column code (or LUXURY_SUV_MID for midpoint).
-export function vehicleCodeForClass(vc: VehicleClass): VehicleCode | "LUXURY_SUV_MID" | null {
-  const code = VEHICLE_CLASS_TO_CODE[vc];
-  if (!code) return null;
-  return code as VehicleCode | "LUXURY_SUV_MID";
+// Resolves any fleet or DB vehicle identifier string to a VehicleCode.
+// Handles both FleetVehicle keys (COROLLA, EQE_300 …) and VehicleClass DB values
+// (ECONOMY, LUXURY …) so both the display layer and the API layer can use one path.
+function resolveVehicleCode(vc: string): VehicleCode | null {
+  if (vc in VEHICLE_TO_PRICE_CLASS) return VEHICLE_TO_PRICE_CLASS[vc as FleetVehicle];
+  if (vc in DB_CLASS_TO_CODE)       return DB_CLASS_TO_CODE[vc as VehicleClass];
+  return null;
+}
+
+// Service-layer helper: DB VehicleClass → price column.
+export function vehicleCodeForClass(vc: VehicleClass): VehicleCode | null {
+  return DB_CLASS_TO_CODE[vc] ?? null;
 }
 
 // ─── Matrix lookup ────────────────────────────────────────────────────────────
@@ -337,11 +337,12 @@ export function vehicleCodeForClass(vc: VehicleClass): VehicleCode | "LUXURY_SUV
  * the canonical lookupFixedPrice() in lib/fixed-prices.ts.
  * Returns null when the pair is not in the table — caller must handle this.
  * Bidirectional: (A,B) === (B,A).
+ * Accepts FleetVehicle, VehicleClass, or VehicleCode strings interchangeably.
  */
 export function lookupFixedPriceByZone(
   fromZone: string,
   toZone:   string,
-  vc:       VehicleClass,
+  vc:       string,
 ): number | null {
   if (!fromZone || !toZone || fromZone === toZone) return null;
 
@@ -349,24 +350,18 @@ export function lookupFixedPriceByZone(
   const toCode   = KEY_TO_ZONE_CODE[toZone];
   if (!fromCode || !toCode) return null;
 
-  const code = vehicleCodeForClass(vc);
+  const code = resolveVehicleCode(vc);
   if (!code) return null;
-
-  if (code === "LUXURY_SUV_MID") {
-    const b = lookupFixedPriceFn(fromCode, toCode, "BUSINESS");
-    const v = lookupFixedPriceFn(fromCode, toCode, "VCLASS");
-    return b !== null && v !== null ? Math.round((b + v) / 2) : null;
-  }
 
   return lookupFixedPriceFn(fromCode, toCode, code);
 }
 
 /**
  * Returns the fixed price for El Prat Airport → Barcelona City for the given
- * vehicle class. Used on the fleet listing pages as "from" price.
- * Falls back to DEFAULT_PRICING.minimumFare if the zone pair isn't in the table.
+ * fleet vehicle. Used on fleet listing pages as "from" price.
  */
-export function getFleetFromPrice(vc: VehicleClass): number {
-  const price = lookupFixedPriceByZone("airport", "barcelona_city", vc);
-  return price ?? DEFAULT_PRICING[vc]?.minimumFare ?? 0;
+export function getFleetFromPrice(fv: FleetVehicle): number {
+  const code  = VEHICLE_TO_PRICE_CLASS[fv];
+  const price = lookupFixedPriceFn("BCN_AIRPORT", "BARCELONA_CITY", code);
+  return price ?? DEFAULT_PRICING[FLEET_TO_DB_CLASS[fv]]?.minimumFare ?? 0;
 }
