@@ -5,7 +5,7 @@ import {
   CheckCircle2, XCircle, User, Loader2,
   FileText, Image as ImageIcon, Shield,
   MessageCircle, ExternalLink, ChevronDown, ChevronUp,
-  CreditCard, Smartphone
+  CreditCard, Smartphone, Plus, X, Car, Copy,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -33,8 +33,140 @@ type Driver = {
   insuranceUrl: string | null;
   user: { name: string | null; email: string; phone: string | null };
   withdrawals: Withdrawal[];
+  vehicles: { make: string; model: string; licensePlate: string }[];
   createdAt: string;
 };
+
+const VEHICLE_CLASS_OPTIONS = [
+  { value: "ECONOMY",        label: "Economy Sedan" },
+  { value: "BUSINESS",       label: "Business Sedan" },
+  { value: "LUXURY",         label: "Luxury Sedan" },
+  { value: "ELECTRIC_VIP",   label: "Electric VIP" },
+  { value: "MINIVAN",        label: "Minivan" },
+  { value: "LUXURY_MINIVAN", label: "Luxury Minivan" },
+  { value: "MINIBUS",        label: "Minibus" },
+];
+
+function AddDriverModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const [name,         setName]         = useState("");
+  const [phone,        setPhone]        = useState("");
+  const [email,        setEmail]        = useState("");
+  const [vehiclePlate, setVehiclePlate] = useState("");
+  const [vehicleClass, setVehicleClass] = useState("BUSINESS");
+  const [saving,       setSaving]       = useState(false);
+  const [tempPassword, setTempPassword] = useState<string | null>(null);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/drivers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, email, vehiclePlate, vehicleClass }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error ?? "Failed to create driver"); return; }
+      setTempPassword(data.tempPassword);
+      onCreated();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const copyPassword = () => {
+    if (tempPassword) { navigator.clipboard.writeText(tempPassword); toast.success("Copied!"); }
+  };
+
+  const inputCls = "w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-gold-500/50 transition-colors";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <div className="w-full max-w-md bg-[#111] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] bg-gradient-to-r from-gold-500/10 to-transparent">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gold-500/15 flex items-center justify-center">
+              <User size={15} className="text-gold-400" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-white">Add Driver Manually</h2>
+              <p className="text-[11px] text-white/30">Driver will be auto-approved</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/[0.05] text-white/30 hover:text-white transition-colors">
+            <X size={15} />
+          </button>
+        </div>
+
+        {tempPassword ? (
+          /* Success state — show temp password */
+          <div className="px-6 py-8 text-center space-y-4">
+            <div className="w-14 h-14 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
+              <CheckCircle2 size={28} className="text-green-400" />
+            </div>
+            <div>
+              <p className="text-white font-semibold mb-1">Driver created!</p>
+              <p className="text-white/40 text-xs">Share this temporary password with the driver. They must change it on first login.</p>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl">
+              <span className="flex-1 text-gold-400 font-mono font-semibold tracking-wider">{tempPassword}</span>
+              <button onClick={copyPassword} className="p-1.5 rounded-lg hover:bg-white/[0.05] text-white/30 hover:text-white transition-colors">
+                <Copy size={14} />
+              </button>
+            </div>
+            <button onClick={onClose} className="w-full py-2.5 rounded-xl bg-gold-500 text-black text-sm font-semibold hover:bg-gold-400 transition-colors">
+              Done
+            </button>
+          </div>
+        ) : (
+          /* Form */
+          <form onSubmit={submit} className="px-6 py-5 space-y-4">
+            <div>
+              <label className="block text-[10px] text-gold-400/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Driver Name</label>
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="Full name" required className={inputCls} />
+            </div>
+            <div>
+              <label className="block text-[10px] text-gold-400/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Phone / WhatsApp</label>
+              <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+34 6XX XXX XXX" required className={inputCls} />
+            </div>
+            <div>
+              <label className="block text-[10px] text-gold-400/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Email (for login)</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="driver@example.com" required className={inputCls} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] text-gold-400/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Vehicle Plate</label>
+                <div className="relative">
+                  <Car size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400/40" />
+                  <input value={vehiclePlate} onChange={e => setVehiclePlate(e.target.value)} placeholder="0000 AAA" required className={`${inputCls} pl-8 uppercase`} />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10px] text-gold-400/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Vehicle Class</label>
+                <select value={vehicleClass} onChange={e => setVehicleClass(e.target.value)} className={`${inputCls} appearance-none`}>
+                  {VEHICLE_CLASS_OPTIONS.map(o => (
+                    <option key={o.value} value={o.value} className="bg-[#111]">{o.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-3 pt-1">
+              <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-white/[0.08] text-white/40 text-sm hover:text-white hover:border-white/20 transition-colors">
+                Cancel
+              </button>
+              <button type="submit" disabled={saving} className="flex-1 py-2.5 rounded-xl bg-gold-500 text-black text-sm font-semibold hover:bg-gold-400 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                {saving ? "Creating…" : "Add Driver"}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
 
 const STATUS_STYLE: Record<string, string> = {
   PENDING_APPROVAL: "bg-yellow-500/20 text-yellow-400",
@@ -141,6 +273,12 @@ function DriverRow({ d, onUpdate }: { d: Driver; onUpdate: () => void }) {
         <td className="hidden md:table-cell py-3 px-4">
           <p className="text-xs text-dark-300">{d.user.email}</p>
           <p className="text-xs text-dark-500">{d.user.phone ?? "—"}</p>
+          {d.vehicles?.[0] && (
+            <p className="text-xs text-gold-500/70 font-mono mt-0.5 flex items-center gap-1">
+              <Car size={10} className="text-gold-500/50" />
+              {d.vehicles[0].licensePlate}
+            </p>
+          )}
         </td>
         <td className="py-3 px-4">
           <span className={`status-badge ${STATUS_STYLE[d.status] ?? "bg-gray-500/20 text-gray-400"}`}>
@@ -251,9 +389,10 @@ function DriverRow({ d, onUpdate }: { d: Driver; onUpdate: () => void }) {
 }
 
 export default function AdminDriversPage() {
-  const [drivers,  setDrivers]  = useState<Driver[]>([]);
-  const [loading,  setLoading]  = useState(true);
-  const [filter,   setFilter]   = useState<"ALL" | "PENDING_APPROVAL" | "APPROVED" | "SUSPENDED">("ALL");
+  const [drivers,    setDrivers]    = useState<Driver[]>([]);
+  const [loading,    setLoading]    = useState(true);
+  const [filter,     setFilter]     = useState<"ALL" | "PENDING_APPROVAL" | "APPROVED" | "SUSPENDED">("ALL");
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -269,9 +408,23 @@ export default function AdminDriversPage() {
 
   return (
     <div className="p-4 pt-16 lg:pt-6 lg:p-8">
-      <div className="mb-6">
-        <h1 className="font-display text-3xl text-white">Drivers</h1>
-        <p className="text-dark-400 mt-1">{drivers.length} registered drivers</p>
+      {showAddModal && (
+        <AddDriverModal
+          onClose={() => setShowAddModal(false)}
+          onCreated={() => { load(); }}
+        />
+      )}
+      <div className="flex items-start justify-between mb-6">
+        <div>
+          <h1 className="font-display text-3xl text-white">Drivers</h1>
+          <p className="text-dark-400 mt-1">{drivers.length} registered drivers</p>
+        </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gold-500 text-black text-sm font-semibold hover:bg-gold-400 transition-colors"
+        >
+          <Plus size={15} /> Add Driver
+        </button>
       </div>
 
       {/* Filter tabs */}
