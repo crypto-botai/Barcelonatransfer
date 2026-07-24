@@ -165,58 +165,67 @@ export function resolveZone(input: string): string | null {
     .replace(/[̀-ͯ]/g, "")  // strip diacritics
     .replace(/['']/g, "'");
 
-  // Girona airport — must check before generic barcelona rule
-  if (/\b(girona|gro airport|gro\b|vilobi|costa brava airport|aeropuerto de girona)\b/.test(s)) return "girona_airport";
+  // ── IMPORTANT: All specific cities are checked BEFORE their province names. ──
+  // Nominatim display_names include province: "Cubelles, Garraf, Barcelona, Catalunya"
+  // or "Lloret de Mar, Selva, Girona, Catalunya". If we checked "barcelona" or "girona"
+  // first, every city in those provinces would resolve to the wrong zone.
 
-  // El Prat airport
+  // Girona Airport — match ONLY specific airport terms, NOT bare "girona" which
+  // appears in every Girona-province address (Lloret, Blanes, Roses, Figueres…).
+  if (/\b(gro\b|gro airport|vilobi|costa brava airport|aeropuerto de girona|girona.*airport|airport.*girona)\b/.test(s)) return "girona_airport";
+
+  // El Prat Airport — before generic "barcelona" check
   if (/\b(prat|el prat|t1\b|t2\b|terminal\s*1|terminal\s*2|terminal one|terminal two|terminal 1a|terminal 1b|terminal 2a|terminal 2b|bcn airport|barcelona airport|aeropuerto de barcelona|aeroport de barcelona|aeroport barcelona)\b/.test(s)) return "airport";
 
-  // Cruise / port
+  // Cruise / Port — before "barcelona" check
   if (/\b(cruise|port de barcelona|moll adossat|moll de la fusta|adossat|terminal [a-e]\b|world trade center|wtc\b|crucero|terminal creuers)\b/.test(s)) return "cruise";
 
-  // Sants station
+  // Sants Station — before "barcelona" check
   if (/\b(sants|estacion sants|estacio sants|barcelona sants|sants estacio)\b/.test(s)) return "sants";
 
-  // Andorra (before barcelona — "andorra la vella" doesn't contain barcelona)
+  // Andorra
   if (/\bandorra\b/.test(s)) return "andorra";
 
-  // Montserrat
+  // Montserrat — before "barcelona" (address includes "Barcelona" as province)
   if (/\bmontserrat\b/.test(s)) return "montserrat";
 
-  // La Roca / La Roca Village outlet
+  // La Roca Village — before "barcelona"
   if (/\b(la roca|laroca|roca del valles|la roca village|outlet)\b/.test(s)) return "la_roca";
 
-  // Barcelona city — broad match, after all specific-barcelona checks above
-  if (/\bbarcelona\b/.test(s)) return "barcelona_city";
+  // ── Costa Dorada cities — ALL before "tarragona" (province) and "barcelona" (province) ──
+  if (/\bcastelldefels\b/.test(s)) return "castelldefels";  // Barcelona province
+  if (/\bsitges\b/.test(s))        return "sitges";          // Barcelona province
+  if (/\bcubelles\b/.test(s))      return "cubelles";        // Barcelona province
+  if (/\bcalafell\b/.test(s))      return "calafell";        // Tarragona province
+  if (/\bvendrell\b|el vendrell/.test(s)) return "vendrell"; // Tarragona province
+  if (/\b(la pineda|pineda playa|platja la pineda)\b/.test(s)) return "la_pineda";    // Tarragona province
+  if (/\b(portaventura|port aventura)\b/.test(s)) return "portaventura";              // Tarragona province
+  if (/\bsalou\b/.test(s))         return "salou";           // Tarragona province
+  if (/\bcambrils\b/.test(s))      return "cambrils";        // Tarragona province
 
-  // Costa Dorada
-  if (/\bcastelldefels\b/.test(s)) return "castelldefels";
-  if (/\bsitges\b/.test(s)) return "sitges";
-  if (/\bcubelles\b/.test(s)) return "cubelles";
-  if (/\bcalafell\b/.test(s)) return "calafell";
-  if (/\bvendrell\b|el vendrell/.test(s)) return "vendrell";
+  // ── Costa Brava cities — ALL before "girona" (province) and "barcelona" (province) ──
+  if (/\b(pineda de mar|pineda mar)\b/.test(s)) return "pineda_de_mar"; // Barcelona province
+  if (/\b(mataro|mataron)\b/.test(s))  return "mataro";       // Barcelona province
+  if (/\bcalella\b/.test(s))           return "calella";      // Barcelona province
+  if (/\b(santa susanna|santa susana)\b/.test(s)) return "santa_susanna"; // Barcelona province
+  if (/\b(malgrat de mar|malgrat mar|malgrat)\b/.test(s)) return "malgrat"; // Barcelona/Girona border
+  if (/\bblanes\b/.test(s))            return "blanes";       // Girona province
+  if (/\b(lloret de mar|lloret mar|lloret)\b/.test(s)) return "lloret"; // Girona province
+  if (/\b(tossa de mar|tossa mar|tossa)\b/.test(s)) return "tossa";    // Girona province
+  if (/\b(s'agaro|s agaro|sagaro|sant feliu de guixols)\b/.test(s)) return "sagaro";     // Girona province
+  if (/\b(platja d'aro|platja daro|playa de aro|platjadaro)\b/.test(s)) return "platja_daro"; // Girona province
+  if (/\b(palamos|la fosca)\b/.test(s)) return "palamos";     // Girona province
+  if (/\b(roses|rosas)\b/.test(s))      return "roses";       // Girona province
+  if (/\b(empuriabrava|ampuriabrava|empuries)\b/.test(s)) return "empuriabrava"; // Girona province
+  if (/\bfigueres\b/.test(s))           return "figueres";    // Girona province
+  if (/\bcadaques\b/.test(s))           return "cadaques";    // Girona province
+
+  // ── Broad province / capital names — only reach here if no specific city matched ──
+  // "Tarragona" as a city (all Tarragona-province sub-cities already matched above)
   if (/\btarragona\b/.test(s)) return "tarragona";
-  if (/\b(la pineda|pineda playa|platja la pineda)\b/.test(s)) return "la_pineda";
-  if (/\b(portaventura|port aventura)\b/.test(s)) return "portaventura";
-  if (/\bsalou\b/.test(s)) return "salou";
-  if (/\bcambrils\b/.test(s)) return "cambrils";
-
-  // Costa Brava — pineda_de_mar before mataro/calella
-  if (/\b(pineda de mar|pineda mar)\b/.test(s)) return "pineda_de_mar";
-  if (/\b(mataro|mataron)\b/.test(s)) return "mataro";
-  if (/\bcalella\b/.test(s)) return "calella";
-  if (/\b(santa susanna|santa susana)\b/.test(s)) return "santa_susanna";
-  if (/\b(malgrat de mar|malgrat mar|malgrat)\b/.test(s)) return "malgrat";
-  if (/\bblanes\b/.test(s)) return "blanes";
-  if (/\b(lloret de mar|lloret mar|lloret)\b/.test(s)) return "lloret";
-  if (/\b(tossa de mar|tossa mar|tossa)\b/.test(s)) return "tossa";
-  if (/\b(s'agaro|s agaro|sagaro|sant feliu de guixols)\b/.test(s)) return "sagaro";
-  if (/\b(platja d'aro|platja daro|playa de aro|s'agaro|platjadaro)\b/.test(s)) return "platja_daro";
-  if (/\b(palamos|la fosca)\b/.test(s)) return "palamos";
-  if (/\b(roses|rosas)\b/.test(s)) return "roses";
-  if (/\b(empuriabrava|ampuriabrava|empuries)\b/.test(s)) return "empuriabrava";
-  if (/\bfigueres\b/.test(s)) return "figueres";
-  if (/\bcadaques\b/.test(s)) return "cadaques";
+  // "Barcelona" as a city (all Barcelona-province sub-cities already matched above)
+  if (/\bbarcelona\b/.test(s)) return "barcelona_city";
+  // Note: bare "girona" (Girona city) has no fixed route → returns null → custom quote
 
   return null;
 }

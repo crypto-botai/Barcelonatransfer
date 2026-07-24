@@ -20,19 +20,44 @@ import {
 import { getFleetFromPrice, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import toast from "react-hot-toast";
 
+// Addresses use short non-ambiguous strings so resolveZone() always identifies
+// the correct zone — no province names that could shadow the city name.
 const PICKUP_QUICK_ZONES: QuickZone[] = [
-  { label: "Barcelona Airport — T1", sublabel: "Terminal 1 · El Prat de Llobregat", address: "Terminal 1, Barcelona El Prat Airport, El Prat de Llobregat", lat: 41.2971, lng: 2.0785, icon: "airport" },
-  { label: "Barcelona Airport — T2", sublabel: "Terminal 2 · El Prat de Llobregat", address: "Terminal 2, Barcelona El Prat Airport, El Prat de Llobregat", lat: 41.2894, lng: 2.0718, icon: "airport" },
-  { label: "Barcelona City Centre",  sublabel: "Passeig de Gràcia / Eixample",       address: "Passeig de Gràcia, Barcelona, Catalonia, Spain",           lat: 41.3916, lng: 2.1649, icon: "city" },
-  { label: "Barcelona Cruise Port",  sublabel: "Moll Adossat · World Trade Centre",   address: "Moll Adossat, Port de Barcelona, Barcelona",             lat: 41.3611, lng: 2.1761, icon: "port" },
-  { label: "Barcelona Sants Station",sublabel: "AVE · Long-distance trains",          address: "Estació de Sants, Barcelona, Catalonia, Spain",           lat: 41.3794, lng: 2.1401, icon: "train" },
-  { label: "Girona Airport",         sublabel: "Costa Brava Airport (GRO)",           address: "Girona Costa Brava Airport, Vilobí d'Onyar, Girona",     lat: 41.9011, lng: 2.7604, icon: "airport" },
-  { label: "Andorra la Vella",       sublabel: "Principality of Andorra",             address: "Andorra la Vella, Andorra",                              lat: 42.5063, lng: 1.5218, icon: "landmark" },
-  { label: "Sitges",                 sublabel: "Costa Dorada · 35 min from BCN",      address: "Sitges, Barcelona, Catalonia, Spain",                    lat: 41.2369, lng: 1.8109, icon: "landmark" },
-  { label: "Tarragona",              sublabel: "Costa Dorada · 1h from BCN",          address: "Tarragona, Catalonia, Spain",                            lat: 41.1189, lng: 1.2445, icon: "landmark" },
-  { label: "PortAventura World",     sublabel: "Salou, Tarragona",                    address: "PortAventura World, Salou, Tarragona, Spain",            lat: 41.0864, lng: 1.1546, icon: "landmark" },
-  { label: "Lloret de Mar",          sublabel: "Costa Brava · 1h from BCN",           address: "Lloret de Mar, Girona, Catalonia, Spain",               lat: 41.6993, lng: 2.8469, icon: "landmark" },
-  { label: "Montserrat",             sublabel: "Monastery · 1h from BCN",             address: "Montserrat Monastery, Monistrol de Montserrat, Barcelona", lat: 41.5928, lng: 1.8363, icon: "landmark" },
+  // ── Airports / Hubs ───────────────────────────────────────────────────────
+  { label: "Barcelona Airport — T1", sublabel: "Terminal 1 · El Prat de Llobregat", address: "Terminal 1, El Prat Airport BCN",              lat: 41.2971, lng: 2.0785, icon: "airport"  },
+  { label: "Barcelona Airport — T2", sublabel: "Terminal 2 · El Prat de Llobregat", address: "Terminal 2, El Prat Airport BCN",              lat: 41.2894, lng: 2.0718, icon: "airport"  },
+  { label: "Barcelona City Centre",  sublabel: "Passeig de Gràcia / Eixample",      address: "Passeig de Gràcia, Barcelona city centre",    lat: 41.3916, lng: 2.1649, icon: "city"     },
+  { label: "Barcelona Cruise Port",  sublabel: "Moll Adossat · World Trade Centre",  address: "Moll Adossat, cruise terminal port Barcelona", lat: 41.3611, lng: 2.1761, icon: "port"    },
+  { label: "Barcelona Sants Station",sublabel: "AVE · Long-distance trains",         address: "Estació de Sants, Barcelona sants station",   lat: 41.3794, lng: 2.1401, icon: "train"   },
+  { label: "Girona Airport (GRO)",   sublabel: "Costa Brava Airport (GRO)",          address: "Girona Costa Brava Airport, Vilobi",          lat: 41.9011, lng: 2.7604, icon: "airport"  },
+  { label: "Andorra la Vella",       sublabel: "Principality of Andorra",            address: "Andorra la Vella, Andorra",                   lat: 42.5063, lng: 1.5218, icon: "landmark" },
+  { label: "Montserrat",             sublabel: "Monastery · 1h from BCN",            address: "Montserrat Monastery, Monistrol de Montserrat",lat: 41.5928, lng: 1.8363, icon: "landmark" },
+  // ── Costa Dorada ─────────────────────────────────────────────────────────
+  { label: "Castelldefels",     sublabel: "Costa Dorada · 25 min",  address: "Castelldefels, Baix Llobregat",              lat: 41.2800, lng: 1.9780, icon: "landmark" },
+  { label: "Sitges",            sublabel: "Costa Dorada · 35 min",  address: "Sitges, Garraf",                             lat: 41.2369, lng: 1.8109, icon: "landmark" },
+  { label: "Cubelles",          sublabel: "Costa Dorada · 45 min",  address: "Cubelles, Garraf",                           lat: 41.2134, lng: 1.6764, icon: "landmark" },
+  { label: "Calafell",          sublabel: "Costa Dorada · 50 min",  address: "Calafell, Baix Penedes",                     lat: 41.1977, lng: 1.5675, icon: "landmark" },
+  { label: "Vendrell",          sublabel: "Costa Dorada · 55 min",  address: "El Vendrell, Baix Penedes",                  lat: 41.2172, lng: 1.5374, icon: "landmark" },
+  { label: "Tarragona",         sublabel: "Costa Dorada · 1h",      address: "Tarragona city centre",                      lat: 41.1189, lng: 1.2445, icon: "landmark" },
+  { label: "La Pineda",         sublabel: "Costa Dorada · 1h05",    address: "La Pineda, Vila-seca",                       lat: 41.0750, lng: 1.1540, icon: "landmark" },
+  { label: "Salou",             sublabel: "Costa Dorada · 1h05",    address: "Salou, Vila-seca",                           lat: 41.0765, lng: 1.1426, icon: "landmark" },
+  { label: "PortAventura World",sublabel: "Salou · 1h05",           address: "PortAventura World, Salou",                  lat: 41.0864, lng: 1.1546, icon: "landmark" },
+  { label: "Cambrils",          sublabel: "Costa Dorada · 1h10",    address: "Cambrils, Baix Camp",                        lat: 41.0652, lng: 1.0594, icon: "landmark" },
+  // ── Costa Brava ──────────────────────────────────────────────────────────
+  { label: "Mataró",            sublabel: "Costa Brava · 30 min",   address: "Mataro, Maresme",                            lat: 41.5388, lng: 2.4450, icon: "landmark" },
+  { label: "Calella",           sublabel: "Costa Brava · 45 min",   address: "Calella, Maresme",                           lat: 41.6175, lng: 2.6575, icon: "landmark" },
+  { label: "Pineda de Mar",     sublabel: "Costa Brava · 50 min",   address: "Pineda de Mar, Maresme",                     lat: 41.6249, lng: 2.6835, icon: "landmark" },
+  { label: "Santa Susanna",     sublabel: "Costa Brava · 55 min",   address: "Santa Susanna, Maresme",                     lat: 41.6736, lng: 2.7139, icon: "landmark" },
+  { label: "Malgrat de Mar",    sublabel: "Costa Brava · 55 min",   address: "Malgrat de Mar, Maresme",                    lat: 41.6475, lng: 2.7477, icon: "landmark" },
+  { label: "Blanes",            sublabel: "Costa Brava · 1h",       address: "Blanes, Selva",                              lat: 41.6747, lng: 2.7897, icon: "landmark" },
+  { label: "Lloret de Mar",     sublabel: "Costa Brava · 1h",       address: "Lloret de Mar, Selva",                       lat: 41.6993, lng: 2.8469, icon: "landmark" },
+  { label: "Tossa de Mar",      sublabel: "Costa Brava · 1h10",     address: "Tossa de Mar, Selva",                        lat: 41.7218, lng: 2.9330, icon: "landmark" },
+  { label: "Platja d'Aro",      sublabel: "Costa Brava · 1h20",     address: "Platja d'Aro, Baix Emporda",                 lat: 41.8174, lng: 3.0648, icon: "landmark" },
+  { label: "Palamós",           sublabel: "Costa Brava · 1h25",     address: "Palamos, Baix Emporda",                      lat: 41.8449, lng: 3.1304, icon: "landmark" },
+  { label: "Roses",             sublabel: "Costa Brava · 1h45",     address: "Roses, Alt Emporda",                         lat: 42.2688, lng: 3.1760, icon: "landmark" },
+  { label: "Empuriabrava",      sublabel: "Costa Brava · 1h50",     address: "Empuriabrava, Alt Emporda",                  lat: 42.2494, lng: 3.1166, icon: "landmark" },
+  { label: "Figueres",          sublabel: "Costa Brava · 1h45",     address: "Figueres, Alt Emporda",                      lat: 42.2676, lng: 2.9624, icon: "landmark" },
+  { label: "Cadaqués",          sublabel: "Costa Brava · 2h",       address: "Cadaques, Alt Emporda",                      lat: 42.2882, lng: 3.2787, icon: "landmark" },
 ];
 
 function getOrCreateSessionId(): string {
