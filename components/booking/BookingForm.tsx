@@ -195,6 +195,8 @@ export default function BookingForm({ compact = false }: Props) {
                 value={dropoff.address}
                 onChange={setDropoff}
                 placeholder="Pick a zone or type a destination"
+                icon={<div className="w-4 h-4 rounded-full border-2 border-[#c9a84c] flex items-center justify-center flex-shrink-0"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a84c]" /></div>}
+                quickZones={PICKUP_QUICK_ZONES}
               />
             </motion.div>
           )}
