@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Barcelona to PortAventura Transfer — from €155 | Fixed Price",
     description: "Private transfer from Barcelona to PortAventura World from €155. Fixed price, family-friendly, all vehicle classes.",
     url: "https://www.elitebcn.info/transfers/port-aventura",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to PortAventura Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",

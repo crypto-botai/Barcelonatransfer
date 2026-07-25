@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   description:
     "Contact Élite BCN Transfers for bookings, support, or enquiries. Available 24/7 by phone, WhatsApp, or email. Barcelona's premier private chauffeur service.",
   alternates: { canonical: "https://www.elitebcn.info/contact" },
+  keywords: ["contact elite bcn", "barcelona transfer contact", "chauffeur barcelona phone", "barcelona transfer whatsapp"],
   openGraph: {
     title: "Contact Élite BCN — 24/7 Support",
     description:
@@ -26,15 +27,44 @@ export const metadata: Metadata = {
 };
 
 const CONTACT_ITEMS = [
-  { icon: Phone,         label: "Phone",    value: "+34 635 383 712",      href: "tel:+34635383712",               external: false },
-  { icon: Mail,          label: "Email",    value: COMPANY.email, href: `mailto:${COMPANY.email}`, external: false },
-  { icon: MessageCircle, label: "WhatsApp", value: "Chat with us now",     href: "https://wa.me/34635383712",      external: true },
-  { icon: MapPin,        label: "Location", value: "Barcelona, Spain",     href: "https://maps.google.com/?q=Barcelona,Spain", external: true },
+  { icon: Phone,         label: "Phone",    value: "+34 635 383 712",  href: "tel:+34635383712",               external: false },
+  { icon: Mail,          label: "Email",    value: COMPANY.email,      href: `mailto:${COMPANY.email}`,        external: false },
+  { icon: MessageCircle, label: "WhatsApp", value: "Chat with us now", href: "https://wa.me/34635383712",      external: true },
+  { icon: MapPin,        label: "Location", value: "Barcelona, Spain", href: "https://maps.google.com/?q=Barcelona,Spain", external: true },
 ];
+
+const CONTACT_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: "Contact Élite BCN Transfers",
+  url: "https://www.elitebcn.info/contact",
+  description: "Contact Élite BCN Transfers 24/7 for bookings, enquiries and corporate accounts.",
+  mainEntity: {
+    "@type": "Organization",
+    name: "Élite BCN Transfers",
+    telephone: "+34635383712",
+    email: "vtcbcn2025@gmail.com",
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+34635383712",
+      contactType: "customer service",
+      availableLanguage: ["English", "Spanish", "Catalan"],
+      hoursAvailable: { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], opens: "00:00", closes: "23:59" },
+    },
+  },
+  breadcrumb: {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",    item: "https://www.elitebcn.info" },
+      { "@type": "ListItem", position: 2, name: "Contact", item: "https://www.elitebcn.info/contact" },
+    ],
+  },
+};
 
 export default function ContactPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(CONTACT_SCHEMA) }} />
       <Navbar />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">

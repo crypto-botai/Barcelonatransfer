@@ -12,11 +12,18 @@ export const metadata: Metadata = {
   description:
     "Private transfer from Barcelona to Costa Dorada. Sitges, Tarragona, Salou, PortAventura, Cambrils. VAT-inclusive fixed prices from €50. All vehicle classes. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/costa-dorada" },
+  keywords: ["barcelona costa dorada transfer", "airport salou transfer", "barcelona portaventura transfer", "barcelona sitges transfer"],
   openGraph: {
     title: "Barcelona to Costa Dorada Transfer — from €50 | Fixed Price",
     description: "Private transfer from Barcelona to Costa Dorada from €50. Sitges, Tarragona, Salou, PortAventura. Fixed price, all vehicles.",
     url: "https://www.elitebcn.info/transfers/costa-dorada",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Costa Dorada Private Transfer" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Barcelona to Costa Dorada Transfer — from €50 | Élite BCN",
+    description: "Private transfer from Barcelona to Costa Dorada from €50. Sitges, Salou, PortAventura. Fixed price, all vehicles.",
+    images: ["/opengraph-image"],
   },
 };
 

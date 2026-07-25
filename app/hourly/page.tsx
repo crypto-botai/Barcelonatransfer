@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Élite BCN`,
     description: `Book a private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr. Flexible disposal for meetings, shopping, events, or sightseeing.`,
     url: "https://www.elitebcn.info/hourly",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Hourly Chauffeur Barcelona" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -33,9 +33,29 @@ const RATE_CARDS = [
   { class: "Luxury Minivan (Mercedes V-Class)",rate: HOURLY_RATES.LUXURY_MINIVAN, pax: "1–7",  min: MIN_HOURLY_HOURS.LUXURY_MINIVAN },
 ];
 
+const HOURLY_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Hourly Chauffeur Service Barcelona",
+  serviceType: "Hourly Chauffeur Hire",
+  provider: { "@type": "Organization", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: { "@type": "City", name: "Barcelona", sameAs: "https://www.wikidata.org/wiki/Q1492" },
+  description: "By-the-hour private chauffeur hire in Barcelona. Minimum 4 hours. Ideal for meetings, events, shopping, airport standby.",
+  url: "https://www.elitebcn.info/hourly",
+  offers: { "@type": "Offer", price: `${MIN_RATE}`, priceCurrency: "EUR", unitCode: "HUR", priceValidUntil: "2027-12-31" },
+  breadcrumb: {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",   item: "https://www.elitebcn.info" },
+      { "@type": "ListItem", position: 2, name: "Hourly", item: "https://www.elitebcn.info/hourly" },
+    ],
+  },
+};
+
 export default function HourlyPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HOURLY_SCHEMA) }} />
       <Navbar />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">

@@ -10,20 +10,20 @@ const cityPrice    = ROUTES.find((r) => r.from === "barcelona_city" && r.to === 
 const mpvPrice     = ROUTES.find((r) => r.from === "airport" && r.to === "montserrat")?.minivan ?? 105;
 
 export const metadata: Metadata = {
-  title: `Barcelona Airport to Montserrat Transfer — from €${airportPrice} | Fixed Price`,
-  description:
-    `Luxury private transfer from Barcelona Airport (BCN) to Montserrat monastery. Fixed price from €${airportPrice}. 50-minute journey. Meet & greet, no surge pricing. Book instantly.`,
+  title: `Barcelona Airport to Montserrat — from €${airportPrice} | Élite BCN`,
+  description: `Private transfer from Barcelona Airport (BCN) to Montserrat monastery. Fixed price from €${airportPrice}. 50-min journey. Meet & greet, child seats available, no surge pricing.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/montserrat" },
+  keywords: ["barcelona airport montserrat transfer", "montserrat private transfer", "montserrat day trip barcelona"],
   openGraph: {
     title: `Barcelona Airport to Montserrat Transfer — from €${airportPrice} | Fixed Price`,
-    description: `Luxury private transfer Barcelona Airport to Montserrat monastery from €${airportPrice}. Fixed price, no surge pricing.`,
+    description: `Private transfer Barcelona Airport to Montserrat from €${airportPrice}. Fixed price, no surge pricing. 50-minute journey.`,
     url: "https://www.elitebcn.info/transfers/montserrat",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Montserrat Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Barcelona Airport to Montserrat Transfer — from €${airportPrice} | Fixed Price`,
-    description: `Luxury private transfer Barcelona Airport to Montserrat monastery from €${airportPrice}. Fixed price, no surge pricing.`,
+    title: `Barcelona Airport to Montserrat — from €${airportPrice} | Élite BCN`,
+    description: `Private transfer Barcelona Airport to Montserrat monastery from €${airportPrice}. Fixed price, no surge pricing.`,
     images: ["/opengraph-image"],
   },
 };

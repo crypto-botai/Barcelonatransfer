@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: "Corporate Chauffeur Barcelona | Élite BCN",
     description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, events. Monthly invoicing, account manager.",
     url: "https://www.elitebcn.info/corporate",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Corporate Chauffeur Barcelona" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -21,9 +21,28 @@ export const metadata: Metadata = {
   },
 };
 
+const CORPORATE_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Corporate Chauffeur Barcelona",
+  serviceType: "Corporate Chauffeur Service",
+  provider: { "@type": "Organization", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: { "@type": "City", name: "Barcelona", sameAs: "https://www.wikidata.org/wiki/Q1492" },
+  description: "Dedicated corporate chauffeur accounts in Barcelona for executive airport transfers, roadshows, board meetings and MICE events. Monthly invoicing available.",
+  url: "https://www.elitebcn.info/corporate",
+  breadcrumb: {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",      item: "https://www.elitebcn.info" },
+      { "@type": "ListItem", position: 2, name: "Corporate", item: "https://www.elitebcn.info/corporate" },
+    ],
+  },
+};
+
 export default function CorporatePage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(CORPORATE_SCHEMA) }} />
       <Navbar />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">

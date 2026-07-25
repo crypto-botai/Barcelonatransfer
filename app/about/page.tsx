@@ -5,18 +5,19 @@ import Link from "next/link";
 import { COMPANY } from "@/lib/company-facts";
 
 export const metadata: Metadata = {
-  title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
-  description: "Élite BCN is Barcelona's premier licensed VTC transfer company. 4.9★ rated, 595+ five-star reviews. Professional multilingual drivers, premium Mercedes V-Class & EQE 300 Electric fleet, impeccable service since 2018.",
+  title: "About Élite BCN — Barcelona's Luxury Transfer Company",
+  description: "4.9★ rated, 595+ reviews. Licensed VTC chauffeur service in Barcelona since 2018. Professional drivers, Mercedes V-Class, EQE 300 Electric & Tesla Model 3.",
   alternates: { canonical: "https://www.elitebcn.info/about" },
+  keywords: ["about elite bcn", "barcelona vtc company", "luxury chauffeur barcelona", "licensed vtc barcelona"],
   openGraph: {
-    title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
+    title: "About Élite BCN — Barcelona's Luxury Transfer Company",
     description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet. 595+ five-star reviews.",
     url: "https://www.elitebcn.info/about",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN Transfers — About Our Company" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "About Élite BCN — Barcelona's Premier Luxury Transfer Company",
+    title: "About Élite BCN — Barcelona's Luxury Transfer Company",
     description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet.",
     images: ["/opengraph-image"],
   },

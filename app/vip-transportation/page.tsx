@@ -9,14 +9,21 @@ const BASE = "https://www.elitebcn.info";
 export const metadata: Metadata = {
   title: { absolute: "VIP Transportation Barcelona — Élite BCN Private Chauffeur" },
   description:
-    "VIP private transportation in Barcelona: red-carpet arrivals, private jet meets, gala events, executive roadshows. Discreet, punctual, fully licensed chauffeur service 24/7.",
+    "VIP chauffeur service in Barcelona: private jet meets, gala events, executive roadshows, red-carpet arrivals. Discreet, punctual, fully licensed. Available 24/7.",
   alternates: { canonical: `${BASE}/vip-transportation` },
+  keywords: ["vip transportation barcelona", "celebrity chauffeur barcelona", "private jet transfer barcelona", "executive transport barcelona"],
   openGraph: {
     title: "VIP Transportation Barcelona — Élite BCN Private Chauffeur",
     description:
       "Discreet VIP chauffeur service for celebrities, executives and dignitaries. Private jet meets, gala event transport, red-carpet arrivals.",
     url: `${BASE}/vip-transportation`,
-    images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630 }],
+    images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: "Élite BCN — VIP Transportation Barcelona" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VIP Transportation Barcelona — Élite BCN",
+    description: "Discreet VIP chauffeur for celebrities, executives, private jet meets and gala events in Barcelona.",
+    images: [`${BASE}/opengraph-image`],
   },
 };
 

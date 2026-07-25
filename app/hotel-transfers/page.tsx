@@ -13,16 +13,23 @@ const airportCityPrice = PRICING_ROUTES.find(
 )?.economy ?? 45;
 
 export const metadata: Metadata = {
-  title: { absolute: "Hotel Transfers Barcelona — Private Airport to Hotel | Élite BCN" },
+  title: { absolute: "Hotel Transfers Barcelona — Airport to Hotel | Élite BCN" },
   description:
-    `Luxury hotel transfers in Barcelona: airport to hotel, hotel to hotel, hotel to cruise port. Fixed prices from €${airportCityPrice}. Meet & greet, flight tracking, free waiting. All 5-star hotels covered.`,
+    `Private hotel transfers in Barcelona from €${airportCityPrice}. Airport to hotel, hotel to cruise port. Meet & greet, flight tracking, free waiting. All 5-star hotels covered.`,
   alternates: { canonical: `${BASE}/hotel-transfers` },
+  keywords: ["hotel transfer barcelona", "airport hotel transfer barcelona", "barcelona hotel chauffeur"],
   openGraph: {
     title: "Hotel Transfers Barcelona — Élite BCN Private Chauffeur",
     description:
-      "Private transfers between Barcelona Airport and all major hotels. Fixed price, flight tracking, meet & greet in arrivals hall.",
+      "Private transfers between Barcelona Airport and all major hotels. Fixed price, flight tracking, meet & greet.",
     url: `${BASE}/hotel-transfers`,
-    images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630 }],
+    images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: "Élite BCN — Hotel Transfer Barcelona" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Hotel Transfers Barcelona — Élite BCN",
+    description: `Private airport to hotel transfers in Barcelona from €${airportCityPrice}. Fixed price, flight tracking, meet & greet.`,
+    images: [`${BASE}/opengraph-image`],
   },
 };
 

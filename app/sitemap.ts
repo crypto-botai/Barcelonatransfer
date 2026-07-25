@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 import destinations from "@/data/destinations.json";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400; // regenerate sitemap daily
 
 const BASE = "https://www.elitebcn.info";
 
@@ -54,6 +54,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/transfers/andorra`,         priority: 0.8,  changeFrequency: "monthly", lastModified: NOW },
     { url: `${BASE}/transfers/cruise-port`,     priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
     { url: `${BASE}/transfers/port-aventura`,   priority: 0.75, changeFrequency: "monthly", lastModified: NOW },
+    { url: `${BASE}/transfers/costa-dorada`,    priority: 0.80, changeFrequency: "monthly", lastModified: NOW },
 
     // ── Dynamic programmatic SEO pages (44 destinations) ─
     ...dynamicPages,

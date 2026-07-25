@@ -1,172 +1,56 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { ChevronDown, MessageCircle } from "lucide-react";
+import FAQAccordion, { FAQ_GROUPS } from "@/components/faq/FAQAccordion";
 import Link from "next/link";
+import { MessageCircle } from "lucide-react";
 
-const FAQ_GROUPS = [
-  {
-    group: "Booking & Reservations",
-    items: [
-      {
-        q: "How do I book a transfer?",
-        a: "You can book instantly online via our booking page — select your service type, enter pick-up and drop-off locations, choose your vehicle, and confirm. You'll receive an email confirmation immediately. You can also book via WhatsApp or phone.",
-      },
-      {
-        q: "How far in advance should I book?",
-        a: "We recommend booking at least 24 hours in advance to guarantee vehicle availability. For peak periods, weekends, or special events in Barcelona, booking 48–72 hours ahead is advisable. Last-minute bookings may be accommodated — contact us directly.",
-      },
-      {
-        q: "Can I book for someone else?",
-        a: "Absolutely. When booking you can enter the passenger's name, phone, and email separately. The driver will be briefed with the passenger's details and will greet them by name.",
-      },
-      {
-        q: "Is there a cancellation fee?",
-        a: "Cancellations made more than 24 hours before the scheduled pickup are fully refunded. Cancellations within 24 hours may incur a 50% charge. No-shows are charged in full. Please contact us as early as possible if your plans change.",
-      },
-      {
-        q: "Can I modify my booking after confirmation?",
-        a: "Yes — contact us by WhatsApp or email as soon as possible with the changes. We'll do our best to accommodate modifications to date, time, or destination. Changes are subject to availability.",
-      },
-    ],
+export const metadata: Metadata = {
+  title: "FAQ — Barcelona Transfer Questions Answered | Élite BCN",
+  description: "Answers to the most common questions about booking a luxury private transfer in Barcelona — pricing, fleet, airport pickups, cancellation, child seats and more.",
+  alternates: { canonical: "https://www.elitebcn.info/faq" },
+  keywords: ["barcelona transfer faq", "airport transfer questions", "vtc barcelona faq", "private transfer barcelona help"],
+  openGraph: {
+    title: "FAQ — Barcelona Transfer Questions Answered | Élite BCN",
+    description: "Everything you need to know about booking a luxury private transfer in Barcelona. Fixed prices, fleet, airport pickups, cancellation policy.",
+    url: "https://www.elitebcn.info/faq",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN Transfers — Frequently Asked Questions" }],
   },
-  {
-    group: "Airport Transfers",
-    items: [
-      {
-        q: "Do you track my flight for delays?",
-        a: "Yes. We monitor your flight in real time using your flight number. If your flight is delayed, your driver will adjust their arrival time automatically — you will never be charged for flight delays.",
-      },
-      {
-        q: "Where will the driver meet me at the airport?",
-        a: "Your driver will be waiting in the arrivals hall at El Prat Airport (Terminal 1 or Terminal 2) holding a personalised name board. For Meet & Greet bookings, the driver will assist you from the baggage reclaim area.",
-      },
-      {
-        q: "How much free waiting time do I get at the airport?",
-        a: "We offer 60 minutes of complimentary waiting time for all airport pickups, counted from the actual flight landing time. Additional waiting time can be added as an extra at €25 per 30 minutes.",
-      },
-      {
-        q: "Do you cover Girona Airport?",
-        a: "Yes. We provide transfers to and from Girona–Costa Brava Airport (GRO). The fixed price from Barcelona city is €140 for an Economy sedan. Booking in advance is recommended.",
-      },
-    ],
+  twitter: {
+    card: "summary_large_image",
+    title: "FAQ — Barcelona Transfer Questions | Élite BCN",
+    description: "Everything you need to know about booking a luxury private transfer in Barcelona.",
+    images: ["/opengraph-image"],
   },
-  {
-    group: "Vehicles & Fleet",
-    items: [
-      {
-        q: "What vehicles do you offer?",
-        a: "Our fleet includes: Mercedes EQE 300 Electric (executive saloon, up to 4 pax), Mercedes Vito (executive minivan, up to 8 pax), Mercedes V-Class (luxury 7-seat MPV, ideal for families), and Group Minibuses (up to 16 pax). All are less than 3 years old, air-conditioned, with complimentary water and WiFi.",
-      },
-      {
-        q: "Are the vehicles clean and well-maintained?",
-        a: "All vehicles are professionally cleaned and sanitised before every trip. Our fleet is maintained to the highest standards and all drivers carry fresh water, phone chargers, and sanitiser as standard.",
-      },
-      {
-        q: "Can I request a specific vehicle model?",
-        a: "We'll do our best to accommodate specific model requests. Please add a note in the Special Requests field when booking, or contact us directly to confirm availability.",
-      },
-      {
-        q: "Do your vehicles have WiFi?",
-        a: "Yes. All vehicles in our fleet are equipped with complimentary 4G WiFi. Luxury and VIP vehicles additionally feature premium sound systems and USB-C charging points.",
-      },
-    ],
-  },
-  {
-    group: "Pricing & Payment",
-    items: [
-      {
-        q: "Are your prices fixed or do they use surge pricing?",
-        a: "All our prices are fixed and all-inclusive. We never apply surge pricing, peak-hour multipliers, or hidden fees. The price you see when you book is the price you pay — always.",
-      },
-      {
-        q: "What is included in the price?",
-        a: "All prices include the professional chauffeur, vehicle, fuel, tolls, parking, and standard waiting time. Airport transfers include flight tracking and 60 minutes free waiting. Fixed-price transfers are not subject to any surcharges.",
-      },
-      {
-        q: "What payment methods do you accept?",
-        a: "We accept all major credit and debit cards (Visa, Mastercard, Amex) through our secure online payment system. You can also pay via bank transfer or cash on request. Online payments are processed securely.",
-      },
-      {
-        q: "Is there a night surcharge?",
-        a: "Fixed-price transfers have no night surcharge — the price you see is always fixed. A 20% night surcharge applies only to hourly chauffeur hire (22:00–06:00).",
-      },
-    ],
-  },
-  {
-    group: "Extras & Add-ons",
-    items: [
-      {
-        q: "Can I add child seats to my booking?",
-        a: "Yes. We offer Baby Seats (0–13 kg), Child Seats (9–18 kg), and Booster Seats (15–36 kg) at €5 each. Simply add them during the booking process. Please specify your child's weight so we can provide the correct seat.",
-      },
-      {
-        q: "Can I bring my pet?",
-        a: "Pets are welcome with prior notice. Add the Pet Transport extra (€20) when booking. Please ensure your pet is in a carrier or on a lead. Our drivers are pet-friendly and the vehicle will be cleaned appropriately.",
-      },
-      {
-        q: "What is the Meet & Greet service?",
-        a: "For €5, your driver will meet you inside the arrivals hall at the airport, assist with your luggage from baggage reclaim, and escort you to the vehicle. This is especially recommended for first-time visitors or those with heavy luggage.",
-      },
-      {
-        q: "Can the driver make multiple stops?",
-        a: "Yes — add the Multiple Stops extra (€25 per stop) to your booking. This is ideal for hotel-to-meeting-to-restaurant itineraries or multi-destination tours.",
-      },
-    ],
-  },
-  {
-    group: "Drivers & Safety",
-    items: [
-      {
-        q: "Are your drivers licensed and insured?",
-        a: "All our chauffeurs hold valid VTC (Vehículo de Turismo con Conductor) licences issued by the Barcelona Metropolitan Authority. All vehicles carry full professional passenger liability insurance.",
-      },
-      {
-        q: "Do you provide English-speaking drivers?",
-        a: "Yes. All our drivers speak English and Spanish. Many also speak French, Italian, German, or Arabic. If you have a specific language requirement, please note it when booking.",
-      },
-      {
-        q: "Is it safe to book online?",
-        a: "Absolutely. Our website uses industry-standard SSL encryption. Payment is processed by SumUp, a regulated European payment provider. We never store your card details.",
-      },
-      {
-        q: "What if my driver doesn't arrive?",
-        a: "This is extremely rare, but in the unlikely event of an issue, our operations team is available 24/7 by phone and WhatsApp. We will resolve the situation or arrange an alternative vehicle as quickly as possible.",
-      },
-    ],
-  },
-];
+};
 
-function FAQItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-white/[0.06] last:border-0">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between py-5 px-0 text-left group"
-      >
-        <span className="text-white text-sm font-medium pr-4 group-hover:text-gold-400 transition-colors">
-          {q}
-        </span>
-        <ChevronDown
-          size={16}
-          className={`flex-shrink-0 text-gold-500 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-      {open && (
-        <p className="text-dark-400 text-sm leading-relaxed pb-5">
-          {a}
-        </p>
-      )}
-    </div>
-  );
-}
+// Build FAQPage JSON-LD from the same source-of-truth data
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ_GROUPS.flatMap((g) =>
+    g.items.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    }))
+  ),
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",  item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "FAQ",   item: "https://www.elitebcn.info/faq" },
+  ],
+};
 
 export default function FAQPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <Navbar />
       <main className="pt-20">
         {/* Hero */}
@@ -186,25 +70,12 @@ export default function FAQPage() {
         {/* FAQ Content */}
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4 max-w-3xl">
-            <div className="space-y-10">
-              {FAQ_GROUPS.map((group) => (
-                <div key={group.group}>
-                  <h2 className="text-gold-500 text-xs tracking-[0.25em] uppercase font-medium mb-4">
-                    {group.group}
-                  </h2>
-                  <div className="glass-card rounded-2xl px-6">
-                    {group.items.map((item) => (
-                      <FAQItem key={item.q} q={item.q} a={item.a} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <FAQAccordion />
 
             {/* Still have questions CTA */}
             <div className="mt-14 glass-card rounded-2xl p-8 text-center gold-hover-border">
-              <h3 className="font-display text-2xl text-white mb-2">Still have questions?</h3>
-              <p className="text-dark-400 text-sm mb-6">Our team is available 24 / 7 — reply within minutes.</p>
+              <h2 className="font-display text-2xl text-white mb-2">Still have questions?</h2>
+              <p className="text-dark-400 text-sm mb-6">Our team is available 24/7 — reply within minutes.</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <a
                   href="https://wa.me/34635383712"

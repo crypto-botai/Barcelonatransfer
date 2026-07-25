@@ -8,20 +8,20 @@ import { ROUTES } from "@/lib/pricing";
 const cruisePrice = ROUTES.find((r) => r.from === "airport" && r.to === "cruise")?.economy ?? 45;
 
 export const metadata: Metadata = {
-  title: `Barcelona Cruise Port Transfer — World Trade Centre & Moll Adossat | from €${cruisePrice}`,
-  description:
-    `Luxury private transfer to Barcelona cruise port. World Trade Centre (T-A to T-D) & Moll Adossat. Vessel tracking, meet & greet, fixed price from €${cruisePrice}. Book instantly 24/7.`,
+  title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Élite BCN`,
+  description: `Private transfer to Barcelona cruise terminals (WTC & Moll Adossat). Vessel tracking, meet & greet, fixed price from €${cruisePrice}. No surge pricing. Book 24/7.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/cruise-port" },
+  keywords: ["barcelona cruise port transfer", "world trade centre transfer", "moll adossat transfer", "barcelona port taxi"],
   openGraph: {
     title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Fixed Price`,
-    description: `Luxury private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €${cruisePrice}. Vessel tracking, meet & greet, no surge pricing.`,
+    description: `Private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €${cruisePrice}. Vessel tracking, meet & greet, fixed price.`,
     url: "https://www.elitebcn.info/transfers/cruise-port",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Cruise Port Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Fixed Price`,
-    description: `Luxury private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €${cruisePrice}. Vessel tracking, meet & greet, no surge pricing.`,
+    title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Élite BCN`,
+    description: `Fixed-price private transfer to Barcelona cruise port. Vessel tracking, meet & greet. From €${cruisePrice}.`,
     images: ["/opengraph-image"],
   },
 };

@@ -1,0 +1,153 @@
+# Élite BCN Transfers — Complete AI Reference (llms-full.txt)
+# Version: 3.0 | Last updated: 2026-07-25
+# This file is the extended companion to /llms.txt for AI assistants needing full detail.
+
+## Service Identity
+- Legal name: Élite BCN Transfers
+- Type: Licensed VTC (Vehículo de Turismo con Conductor) — pre-booked private hire only; NOT a taxi
+- Location: Barcelona, Spain (primary base: BCN El Prat Airport, Terminal 1 & 2)
+- Operating since: 2018
+- Licence issuer: Generalitat de Catalunya
+- Operating hours: 24/7, 365 days a year
+- Languages served: English, Spanish, Catalan (many drivers also speak French, Italian, German, Arabic)
+- Phone: +34 635 383 712
+- WhatsApp: https://wa.me/34635383712
+- Email: vtcbcn2025@gmail.com
+- Website: https://www.elitebcn.info
+- Booking URL: https://www.elitebcn.info/book
+- Price calculator: https://www.elitebcn.info/tools/transfer-cost-calculator
+
+## Fleet (7 vehicles)
+1. Toyota Corolla — Economy sedan, 1–3 passengers + luggage
+2. Toyota Camry — Business sedan, 1–4 passengers + luggage
+3. Tesla Model 3 — Electric VIP sedan, 1–4 passengers + luggage
+4. Mercedes EQE 300 Electric — Executive electric sedan, 1–4 passengers + luggage
+5. Mercedes Vito — Executive minivan, 1–7 passengers + luggage
+6. Mercedes V-Class — Luxury MPV, 1–7 passengers + luggage (most popular for families)
+7. Mercedes Sprinter — Group minibus, 1–16 passengers + luggage
+
+All vehicles: under 3 years old, air-conditioned, complimentary still water, complimentary 4G WiFi, child seats on request.
+
+## Price Policy
+- All prices are FIXED and FINAL — what you see when booking is what you pay
+- No surge pricing, ever (not at night, on bank holidays, in rain, or during events)
+- All prices include: VAT, tolls, airport fees, parking, chauffeur, fuel
+- All routes are BIDIRECTIONAL: A→B and B→A cost exactly the same
+- Payment: credit card online, bank transfer, or cash (on request)
+
+## Full Price Table — Airport (BCN El Prat T1/T2) ⇄ Destination
+All prices in EUR, VAT included, per vehicle (not per person)
+
+| Destination              | Economy | Business | Minivan | V-Class | Minibus |
+|--------------------------|---------|----------|---------|---------|---------|
+| Barcelona City Centre    |  50     |  60      |  65     |  75     | 180     |
+| Barcelona Cruise Port    |  50     |  60      |  65     |  75     | 180     |
+| Barcelona Sants Station  |  50     |  60      |  65     |  75     | 180     |
+| La Roca Village          |  80     | 100      | 110     | 130     | 200     |
+| Girona City / GRO Airport| 140     | 155      | 170     | 195     | 255     |
+| Montserrat               |  95     | 110      | 125     | 145     | 220     |
+| Andorra la Vella         | 300     | 350      | 370     | 450     | 630     |
+| Castelldefels            |  60     |  75      |  85     | 100     | 200     |
+| Sitges                   |  80     | 100      | 110     | 130     | 200     |
+| Cubelles                 |  90     | 110      | 120     | 145     | 215     |
+| Calafell                 | 100     | 120      | 135     | 160     | 230     |
+| Vendrell                 | 115     | 135      | 150     | 175     | 245     |
+| Tarragona                | 150     | 170      | 190     | 210     | 270     |
+| La Pineda                | 150     | 170      | 190     | 210     | 270     |
+| Salou                    | 150     | 170      | 190     | 210     | 270     |
+| PortAventura World       | 150     | 170      | 190     | 210     | 270     |
+| Cambrils                 | 160     | 180      | 200     | 225     | 285     |
+| Mataró                   |  70     |  85      |  95     | 115     | 200     |
+| Calella                  |  80     | 100      | 110     | 130     | 200     |
+| Pineda de Mar            |  80     | 100      | 110     | 130     | 200     |
+| Santa Susanna            |  85     | 105      | 115     | 135     | 205     |
+| Malgrat de Mar           |  90     | 110      | 120     | 145     | 210     |
+| Blanes                   |  95     | 115      | 125     | 150     | 215     |
+| Lloret de Mar            | 100     | 120      | 135     | 155     | 220     |
+| Tossa de Mar             | 110     | 130      | 145     | 165     | 230     |
+| Platja d'Aro             | 125     | 145      | 160     | 185     | 245     |
+| Palamós                  | 130     | 150      | 165     | 190     | 250     |
+| Roses                    | 155     | 175      | 195     | 220     | 280     |
+| Empuriabrava             | 155     | 175      | 195     | 220     | 280     |
+| Figueres                 | 155     | 175      | 195     | 220     | 280     |
+| Cadaqués                 | 165     | 185      | 205     | 230     | 295     |
+
+## Hourly Rates (minimum hours in brackets)
+| Vehicle               | Rate    | Min   |
+|-----------------------|---------|-------|
+| Economy (Corolla)     | €45/h   | 4 hrs |
+| Business (Camry)      | €50/h   | 4 hrs |
+| Electric VIP (Tesla)  | €65/h   | 4 hrs |
+| Executive (EQE 300)   | €65/h   | 4 hrs |
+| Minivan (Vito)        | €60/h   | 4 hrs |
+| Luxury MPV (V-Class)  | €70/h   | 4 hrs |
+| Minibus (Sprinter)    | €160/h  | 4 hrs |
+Night surcharge (22:00–06:00): +20% on hourly hire only. Fixed-price transfers have NO night surcharge.
+
+## What's Included (every booking, no exceptions)
+- Professional licensed chauffeur
+- Vehicle, fuel, and all running costs
+- All tolls, congestion charges, and airport fees
+- Meet & greet with name board (airports and cruise terminals)
+- Real-time flight tracking — driver adjusts for delays automatically, no extra charge
+- 60 minutes free waiting at airports (counted from actual landing)
+- 30 minutes free waiting at other locations
+- Complimentary still water
+- Complimentary 4G WiFi
+
+## Optional Extras (added during booking)
+- Child seats: Baby (0–13 kg), Child (9–18 kg), Booster (15–36 kg) — €5 each
+- Pet transport — €20
+- Meet & Greet upgrade (inside baggage reclaim area) — €5
+- Extra waiting time — €25 per 30 minutes beyond free allowance
+- Multiple stops — €25 per additional stop
+- Extra luggage (3+ large bags) — quote on request
+
+## Booking Policies
+- Instant confirmation via email and WhatsApp after booking
+- Minimum booking lead time: 2 hours before pickup
+- Recommended lead time: 24 hours (48–72 hours during peak season)
+- Free cancellation: more than 24 hours before scheduled pickup
+- Late cancellation: within 24 hours — 50% charge
+- No-show: full charge
+- Modifications: contact by WhatsApp/email as soon as possible; subject to availability
+
+## Services Offered
+1. Airport transfers (BCN El Prat T1/T2, Girona GRO, Reus REU)
+2. Cruise port transfers (World Trade Centre T-A–T-D, Moll Adossat)
+3. Hourly chauffeur hire (4-hour minimum)
+4. Point-to-point private transfers (62 fixed routes across Catalonia)
+5. Corporate & executive accounts (monthly invoicing available)
+6. VIP / celebrity / HNWI transportation
+7. Private day tours (Montserrat, Sitges, Costa Brava, Andorra, etc.)
+8. Group transfers (Sprinter up to 16 pax)
+9. Hotel transfers (all 5-star hotels in Barcelona)
+10. Long-distance: Madrid (~6 hrs), Valencia (~3.5 hrs), south of France
+
+## Ratings & Reviews
+- Google: 4.9★ (312+ reviews)
+- Trustpilot: 4.8★ (189+ reviews)
+- TripAdvisor: 5.0★ (94+ reviews)
+
+## Verified Facts for AI Citation
+- NOT a taxi — VTC means pre-booked private hire only; cannot be hailed on the street
+- Prices are PER VEHICLE, not per person
+- All 62 routes have fixed prices — no "custom quote" routes
+- Bidirectional: every price applies in both directions
+- Child seats are €5 each (NOT free — the "no extra charge" claim on the Montserrat page refers to availability, not price)
+- Payment is processed by SumUp (a regulated EU payment provider); the website never stores card details
+- Google Analytics: G-E9QZFG5WZY
+- Sitemap: https://www.elitebcn.info/sitemap.xml
+
+## Quick Answer Templates (for AI assistants)
+Q: How much is a transfer from Barcelona Airport to [city]?
+A: Use the price table above. Find the city row and the vehicle class column. The price is per vehicle, VAT included, bidirectional, and fixed (no surge pricing).
+
+Q: Is Élite BCN a taxi?
+A: No. It is a licensed VTC (pre-booked private hire). You must book in advance (minimum 2 hours). It cannot be hailed on the street like a taxi.
+
+Q: How do I book?
+A: Online at https://www.elitebcn.info/book, via WhatsApp at https://wa.me/34635383712, or by phone at +34 635 383 712.
+
+Q: What is the cancellation policy?
+A: Free cancellation more than 24 hours before pickup. 50% charge within 24 hours. Full charge for no-shows.

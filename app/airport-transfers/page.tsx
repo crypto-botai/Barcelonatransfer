@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: "Barcelona Airport Transfer — BCN El Prat | Élite BCN",
     description: `Private luxury transfer from Barcelona Airport from €${airportCityEco}. Meet & greet, flight tracking, 60 min free wait. Mercedes V-Class & EQE 300 Electric. No surge pricing.`,
     url: "https://www.elitebcn.info/airport-transfers",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Airport Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -25,9 +25,29 @@ export const metadata: Metadata = {
   },
 };
 
+const AIRPORT_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Barcelona Airport Transfer — BCN El Prat",
+  serviceType: "Airport Transfer",
+  provider: { "@type": "Organization", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: { "@type": "Airport", name: "Barcelona El Prat Airport", iataCode: "BCN" },
+  description: "Fixed-price luxury private transfers from Barcelona El Prat Airport (T1 & T2). Meet & greet, flight tracking, 60 min free waiting.",
+  url: "https://www.elitebcn.info/airport-transfers",
+  offers: { "@type": "Offer", price: `${airportCityEco}`, priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
+  breadcrumb: {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",              item: "https://www.elitebcn.info" },
+      { "@type": "ListItem", position: 2, name: "Airport Transfers", item: "https://www.elitebcn.info/airport-transfers" },
+    ],
+  },
+};
+
 export default function AirportTransfersPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(AIRPORT_SCHEMA) }} />
       <Navbar />
       <main className="pt-20">
         {/* Hero */}

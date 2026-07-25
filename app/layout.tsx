@@ -72,11 +72,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        {/* Geo meta tags for local SEO */}
+        {/* Geo meta tags for local SEO — BCN El Prat Airport is primary service location */}
         <meta name="geo.region" content="ES-CT" />
-        <meta name="geo.placename" content="Barcelona, Catalonia, Spain" />
-        <meta name="geo.position" content="41.3851;2.1734" />
-        <meta name="ICBM" content="41.3851, 2.1734" />
+        <meta name="geo.placename" content="Barcelona El Prat Airport, Catalonia, Spain" />
+        <meta name="geo.position" content="41.2974;2.0833" />
+        <meta name="ICBM" content="41.2974, 2.0833" />
         {/* Primary @graph schema — Organization + TaxiService + WebSite */}
         <script
           type="application/ld+json"
@@ -89,7 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   "@id": "https://www.elitebcn.info/#organization",
                   name: "Élite BCN Transfers",
                   url: "https://www.elitebcn.info",
-                  logo: { "@type": "ImageObject", url: "https://www.elitebcn.info/opengraph-image", width: 1200, height: 630 },
+                  logo: { "@type": "ImageObject", url: "https://www.elitebcn.info/favicon.svg", width: 512, height: 512 },
                   telephone: "+34635383712",
                   email: COMPANY.email,
                   foundingDate: "2018",
@@ -138,7 +138,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     postalCode: "08820",
                     addressCountry: "ES",
                   },
-                  geo: { "@type": "GeoCoordinates", latitude: 41.3851, longitude: 2.1734 },
+                  geo: { "@type": "GeoCoordinates", latitude: 41.2974, longitude: 2.0833 },
                   areaServed: [
                     // Core cities
                     { "@type": "City", name: "Barcelona",       sameAs: "https://www.wikidata.org/wiki/Q1492"   },
@@ -226,78 +226,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }),
           }}
         />
-        {/* FAQPage schema — powers AI Overviews, Featured Snippets, People Also Ask */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              mainEntity: [
-                {
-                  "@type": "Question",
-                  name: "How much does a transfer from Barcelona Airport to city centre cost?",
-                  acceptedAnswer: { "@type": "Answer", text: "A private transfer from Barcelona El Prat Airport (BCN) to Barcelona city centre costs from €50 with Élite BCN Transfers (VAT included). This is a fixed price with no surge pricing, regardless of traffic or time of day. The price includes all tolls, meet-and-greet service, and up to 60 minutes of free waiting time." },
-                },
-                {
-                  "@type": "Question",
-                  name: "What is the best way to get from Barcelona Airport to the city?",
-                  acceptedAnswer: { "@type": "Answer", text: "The best way to get from Barcelona Airport to the city centre is by private transfer. Élite BCN Transfers offers fixed-price luxury transfers from €50 in Mercedes V-Class, EQE 300 Electric, Tesla Model 3, and Vito vehicles. Unlike taxis, prices are fixed and confirmed at booking. Unlike the Aerobus (€6.75), you get door-to-door service with your luggage handled. The journey takes 20–40 minutes depending on traffic." },
-                },
-                {
-                  "@type": "Question",
-                  name: "Is Élite BCN Transfers a licensed VTC service?",
-                  acceptedAnswer: { "@type": "Answer", text: "Yes. Élite BCN Transfers is a fully licensed VTC (Vehículo de Turismo con Conductor) operator registered with the Generalitat de Catalunya. All our drivers hold professional VTC licences and are fully insured. We comply with all Spanish transport regulations." },
-                },
-                {
-                  "@type": "Question",
-                  name: "Which destinations does Élite BCN Transfers cover?",
-                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers covers all of Catalonia and beyond: Barcelona city centre, Sitges (from €80), Tarragona, Salou, La Pineda and PortAventura (from €150), Girona and Girona Airport (from €140), Montserrat (from €95), Andorra (from €300), Barcelona Cruise Port (from €50), and all Costa Daurada resorts including Castelldefels, Cubelles, Calafell, Vendrell, Cambrils. Costa Brava resorts: Lloret de Mar, Tossa de Mar, Blanes, Platja d'Aro, Palamós, Roses, Figueres, Cadaqués, Empuriabrava. We cover 62 fixed-price routes in total — no custom quotes needed." },
-                },
-                {
-                  "@type": "Question",
-                  name: "Does Élite BCN Transfers serve Barcelona cruise port?",
-                  acceptedAnswer: { "@type": "Answer", text: "Yes. Élite BCN Transfers provides meet-and-greet transfers to and from Barcelona's cruise terminals at the World Trade Centre and Moll Adossat. We monitor vessel arrival times and adjust for delays. A transfer from the cruise port to Barcelona Airport costs from €50." },
-                },
-                {
-                  "@type": "Question",
-                  name: "How far in advance do I need to book a Barcelona airport transfer?",
-                  acceptedAnswer: { "@type": "Answer", text: "You can book an Élite BCN transfer instantly online up to 2 hours before your pickup time. For guaranteed availability, especially for early-morning or late-night flights, we recommend booking at least 24 hours in advance. All bookings receive instant email confirmation." },
-                },
-                {
-                  "@type": "Question",
-                  name: "What vehicles does Élite BCN Transfers use?",
-                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers operates a fleet of 7 premium vehicles: Toyota Corolla (economy sedan), Toyota Camry (business sedan), Tesla Model 3 (electric VIP), Mercedes EQE 300 Electric (executive sedan), Mercedes Vito (executive minivan, up to 7 pax), Mercedes V-Class VIP (luxury MPV, up to 7 pax), and Mercedes Sprinter (group minibus, up to 16 pax). All vehicles are less than 3 years old, air-conditioned, and equipped with complimentary water and WiFi." },
-                },
-                {
-                  "@type": "Question",
-                  name: "How much does a transfer from Barcelona Airport to Lloret de Mar cost?",
-                  acceptedAnswer: { "@type": "Answer", text: "A private transfer from Barcelona El Prat Airport to Lloret de Mar costs from €100 (economy sedan) to €220 (minibus) with Élite BCN Transfers. The price is fixed — no surge pricing, all tolls and fees included. The journey takes approximately 1 hour. Transfers from Lloret de Mar back to the airport cost the same price." },
-                },
-                {
-                  "@type": "Question",
-                  name: "How much is a transfer from Barcelona Airport to Salou or PortAventura?",
-                  acceptedAnswer: { "@type": "Answer", text: "A fixed-price private transfer from Barcelona El Prat Airport to Salou, La Pineda, or PortAventura World costs from €150 (economy) to €270 (minibus) with Élite BCN Transfers. No surge pricing. All tolls, airport fees, and meet-and-greet included. The journey takes approximately 1 hour 15 minutes. The return trip (Salou/PortAventura to Barcelona Airport) costs the same." },
-                },
-                {
-                  "@type": "Question",
-                  name: "How much is a transfer from Barcelona Airport to Sitges?",
-                  acceptedAnswer: { "@type": "Answer", text: "A private transfer from Barcelona El Prat Airport to Sitges costs from €80 (economy sedan) to €200 (minibus) with Élite BCN Transfers. The price is fully fixed — no hidden fees. The journey takes 30–40 minutes. The return trip from Sitges to Barcelona Airport costs the same price." },
-                },
-                {
-                  "@type": "Question",
-                  name: "Do you offer transfers from Barcelona Airport to Costa Brava resorts?",
-                  acceptedAnswer: { "@type": "Answer", text: "Yes. Élite BCN Transfers offers direct fixed-price airport transfers from Barcelona El Prat Airport to all major Costa Brava resorts: Lloret de Mar (from €100), Tossa de Mar (from €110), Blanes (from €95), Platja d'Aro (from €125), Palamós (from €130), Roses and Empuriabrava (from €155), Figueres (from €155), and Cadaqués (from €165). All prices are per vehicle, VAT included, fully bidirectional." },
-                },
-                {
-                  "@type": "Question",
-                  name: "Is the transfer price the same both ways (airport to hotel and hotel to airport)?",
-                  acceptedAnswer: { "@type": "Answer", text: "Yes. All Élite BCN Transfers prices are fully bidirectional — the price from Barcelona Airport to your destination is exactly the same as the return trip. For example, Barcelona Airport to PortAventura and PortAventura to Barcelona Airport are both €150 (economy). Prices never change based on direction of travel." },
-                },
-              ],
-            }),
-          }}
-        />
+        {/* FAQPage schema is injected by app/faq/page.tsx only — not globally */}
       </head>
       <body className="min-h-screen bg-dark-950 antialiased">
         <AuthProvider>

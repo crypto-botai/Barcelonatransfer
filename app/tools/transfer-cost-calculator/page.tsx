@@ -6,9 +6,9 @@ import CostCalculatorClient from "./CostCalculatorClient";
 const BASE = "https://www.elitebcn.info";
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona Airport Transfer Cost Calculator — Private vs Taxi vs Aerobus | Élite BCN" },
+  title: { absolute: "Barcelona Transfer Cost Calculator — Private vs Taxi | Élite BCN" },
   description:
-    "Compare the real cost of Barcelona airport transfers: private chauffeur, metered taxi (T-1/T-2 rates + €4.50 supplement), Aerobus (€6.75/pax), and metro (€5.15/pax). Instant comparison by destination and group size.",
+    "Compare Barcelona airport transfer costs: private chauffeur vs taxi vs Aerobus vs metro. Real prices by destination and group size. Instant comparison.",
   alternates: { canonical: `${BASE}/tools/transfer-cost-calculator` },
   openGraph: {
     title: "Barcelona Airport Transfer Cost Calculator",

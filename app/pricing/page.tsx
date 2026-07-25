@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Barcelona Transfer Prices — Fixed Rates | Élite BCN",
     description: "Fixed prices for luxury private transfers from Barcelona Airport. From €50. No hidden fees. Book online instantly.",
     url: "https://www.elitebcn.info/pricing",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Transfer Fixed Prices" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -22,11 +22,39 @@ export const metadata: Metadata = {
   },
 };
 
+const PRICING_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Barcelona Private Transfer Prices — Fixed Rates",
+  url: "https://www.elitebcn.info/pricing",
+  description: "Fixed prices for private transfers from Barcelona Airport to all Catalonia destinations. All-inclusive, no surge pricing.",
+  breadcrumb: {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",    item: "https://www.elitebcn.info" },
+      { "@type": "ListItem", position: 2, name: "Pricing", item: "https://www.elitebcn.info/pricing" },
+    ],
+  },
+  mainEntity: {
+    "@type": "OfferCatalog",
+    name: "Barcelona Private Transfer Fixed Prices",
+    itemListElement: [
+      { "@type": "Offer", name: "BCN Airport → Barcelona City Centre", price: "50",  priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
+      { "@type": "Offer", name: "BCN Airport → Sitges",                price: "80",  priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
+      { "@type": "Offer", name: "BCN Airport → Tarragona / PortAventura", price: "150", priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
+      { "@type": "Offer", name: "BCN Airport → Lloret de Mar",         price: "100", priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
+      { "@type": "Offer", name: "BCN Airport → Girona Airport",        price: "140", priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
+      { "@type": "Offer", name: "BCN Airport → Andorra la Vella",      price: "300", priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
+    ],
+  },
+};
+
 export default async function PricingPage() {
   const routes = await getPublicRoutes();
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(PRICING_SCHEMA) }} />
       <Navbar />
       <main className="pt-20">
         <section className="py-16 bg-[#050505] border-b border-white/[0.06] relative overflow-hidden">
