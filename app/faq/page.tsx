@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import FAQAccordion, { FAQ_GROUPS } from "@/components/faq/FAQAccordion";
+import FAQAccordion from "@/components/faq/FAQAccordion";
+import { FAQ_GROUPS } from "@/lib/faq-data";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 
