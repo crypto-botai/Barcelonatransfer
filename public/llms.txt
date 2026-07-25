@@ -27,10 +27,15 @@ All vehicles: under 3 years old, air-conditioned, complimentary still water and 
 ## Pricing (all-inclusive, VAT included, fixed prices — bidirectional, e.g. A→B = B→A)
 
 ### Airport Transfers (BCN El Prat Airport T1/T2 ⇄ Destination)
-| Destination              | Economy | Business | Minivan | V-Class | Minibus |
-|--------------------------|---------|----------|---------|---------|---------|
-| Barcelona City Centre    |  €50    |  €60     |  €65    |  €75    |  €180   |
-| Barcelona Cruise Port    |  €50    |  €60     |  €65    |  €75    |  €180   |
+Note: For BCN Airport ↔ Barcelona City Centre only, per-vehicle prices differ within the Business class:
+- Toyota Camry (Business sedan) = €50
+- Tesla Model 3 (Electric VIP) = €55
+- Mercedes EQE 300 Electric (Executive sedan) = €60
+
+| Destination              | Economy | Business* | Minivan | V-Class | Minibus |
+|--------------------------|---------|-----------|---------|---------|---------|
+| Barcelona City Centre    |  €50    |  €50–€60* |  €65    |  €75    |  €180   |
+| Barcelona Cruise Port    |  €50    |  €60      |  €65    |  €75    |  €180   |
 | Barcelona Sants Station  |  €50    |  €60     |  €65    |  €75    |  €180   |
 | La Roca Village          |  €80    | €100     | €110    | €130    |  €200   |
 | Girona / Girona Airport  | €140    | €155     | €170    | €195    |  €255   |

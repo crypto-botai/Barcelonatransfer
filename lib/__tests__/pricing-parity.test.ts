@@ -15,6 +15,7 @@ import { describe, it, expect } from "vitest";
 import {
   FIXED_ROUTES,
   lookupFixedPrice,
+  lookupPriceByClass,
   VEHICLE_TO_PRICE_CLASS,
   DB_CLASS_TO_CODE,
   type VehicleCode,
@@ -29,8 +30,8 @@ import {
 // ── 1. Route count ────────────────────────────────────────────────────────────
 
 describe("FIXED_ROUTES count", () => {
-  it("has exactly 35 routes", () => {
-    expect(FIXED_ROUTES.length).toBe(35);
+  it("has exactly 62 routes", () => {
+    expect(FIXED_ROUTES.length).toBe(62);
   });
 });
 
@@ -105,21 +106,52 @@ describe("Fleet and DB class price parity", () => {
   const from  = ZONE_CODE_TO_KEY[pivot.from];
   const to    = ZONE_CODE_TO_KEY[pivot.to];
 
-  const cases: Array<[string, string]> = [
-    ["TESLA_M3",      "BUSINESS"],       // FleetVehicle → same as BUSINESS column
-    ["EQE_300",       "BUSINESS"],
+  // Vehicles that share the BUSINESS price column AND have no per-route override
+  const sameCases: Array<[string, string]> = [
+    ["EQE_300",       "BUSINESS"],       // FleetVehicle EQE 300 → BUSINESS column, no override
     ["V_CLASS",       "VCLASS"],
-    ["ELECTRIC_VIP",  "BUSINESS"],       // DB class: Tesla → BUSINESS
-    ["LUXURY",        "BUSINESS"],       // DB class: EQE 300 → BUSINESS
+    ["LUXURY",        "BUSINESS"],       // DB class: EQE 300 → BUSINESS, no override
     ["LUXURY_MINIVAN","VCLASS"],         // DB class: V-Class → VCLASS
   ];
 
-  cases.forEach(([alias, canonical]) => {
+  sameCases.forEach(([alias, canonical]) => {
     it(`${alias} resolves same price as ${canonical} column`, () => {
       const aliasPrice     = lookupFixedPriceByZone(from, to, alias);
       const canonicalPrice = lookupFixedPrice(pivot.from, pivot.to, canonical as VehicleCode);
       expect(aliasPrice).toBe(canonicalPrice);
     });
+  });
+});
+
+// ── 4d. Per-route vehicle class overrides (airport → city only) ───────────────
+
+describe("Per-route vehicle class overrides (BCN Airport → Barcelona City)", () => {
+  it("Camry (BUSINESS class) is €50 — cheaper than the default BUSINESS column (€60)", () => {
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(50);
+    expect(lookupFixedPrice("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(60); // column unchanged
+  });
+
+  it("Tesla Model 3 (ELECTRIC_VIP class) is €55 for airport→city", () => {
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "ELECTRIC_VIP")).toBe(55);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "TESLA_M3")).toBe(55);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "ELECTRIC_VIP")).toBe(55);
+  });
+
+  it("EQE 300 (LUXURY class) keeps the BUSINESS column price €60 — no override", () => {
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "LUXURY")).toBe(60);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "EQE_300")).toBe(60);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "LUXURY")).toBe(60);
+  });
+
+  it("overrides are bidirectional (city → airport same as airport → city)", () => {
+    expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "BUSINESS")).toBe(50);
+    expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "ELECTRIC_VIP")).toBe(55);
+    expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "LUXURY")).toBe(60);
+  });
+
+  it("overrides do NOT affect other routes (e.g. airport → Montserrat stays at BUSINESS column)", () => {
+    expect(lookupPriceByClass("BCN_AIRPORT", "MONTSERRAT", "BUSINESS")).toBe(110);
+    expect(lookupPriceByClass("BCN_AIRPORT", "MONTSERRAT", "ELECTRIC_VIP")).toBe(110);
   });
 });
 
@@ -175,12 +207,12 @@ describe("Intentional price asymmetries", () => {
 // ── Null for unknown routes ────────────────────────────────────────────────────
 
 describe("Null for unknown routes", () => {
-  it("Airport→Sitges is NOT in table (custom quote)", () => {
-    expect(lookupFixedPrice("BCN_AIRPORT", "SITGES", "ECONOMY")).toBeNull();
+  it("Airport→Sitges has a fixed price (was added as a direct route)", () => {
+    expect(lookupFixedPrice("BCN_AIRPORT", "SITGES", "ECONOMY")).not.toBeNull();
   });
 
-  it("Airport→Tarragona is NOT in table (custom quote)", () => {
-    expect(lookupFixedPrice("BCN_AIRPORT", "TARRAGONA", "ECONOMY")).toBeNull();
+  it("Airport→Tarragona has a fixed price (was added as a direct route)", () => {
+    expect(lookupFixedPrice("BCN_AIRPORT", "TARRAGONA", "ECONOMY")).not.toBeNull();
   });
 
   it("unknown zone returns null from lookupFixedPriceByZone", () => {
@@ -232,19 +264,19 @@ describe("resolveZone text matching", () => {
 
 // ── Costa routes without airport origin (mandatory report) ───────────────────
 
-describe("25 costa routes: no BCN_AIRPORT origin (custom quote for airport pickup)", () => {
+describe("Costa routes", () => {
   const costaRoutes = FIXED_ROUTES.filter(
     (r) => r.category === "costa-dorada" || r.category === "costa-brava"
   );
 
-  it("has 25 costa routes total (10 dorada + 15 brava)", () => {
-    expect(costaRoutes.length).toBe(25);
+  it("has 50 costa routes total (25 airport + 25 city-origin)", () => {
+    expect(costaRoutes.length).toBe(50);
   });
 
-  it("none of the 25 costa routes have BCN_AIRPORT as from or to", () => {
+  it("25 of the costa routes have BCN_AIRPORT as origin (direct airport pickups added)", () => {
     const airportCosta = costaRoutes.filter(
       (r) => r.from === "BCN_AIRPORT" || r.to === "BCN_AIRPORT"
     );
-    expect(airportCosta.length).toBe(0);
+    expect(airportCosta.length).toBe(25);
   });
 });

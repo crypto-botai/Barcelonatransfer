@@ -30,6 +30,10 @@ export interface FixedRoute {
   category:  Category;
   note?:     string;
   prices:    Record<VehicleCode, number>;
+  // Per-VehicleClass price overrides for this specific route.
+  // Takes priority over the generic prices[] column lookup.
+  // Used to differentiate vehicles that share a price column (e.g. Camry vs Tesla vs EQE).
+  vehicleClassOverrides?: Partial<Record<import("@/types").VehicleClass, number>>;
 }
 
 export const FIXED_ROUTES: FixedRoute[] = [
@@ -40,6 +44,9 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "El Prat Airport", toLabel: "Barcelona City",
     category: "airport-city",
     prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Camry (BUSINESS) → €50, Tesla M3 (ELECTRIC_VIP) → €55 for this route only.
+    // EQE 300 (LUXURY) is not overridden and keeps the BUSINESS column price (€60).
+    vehicleClassOverrides: { BUSINESS: 50, ELECTRIC_VIP: 55 },
   },
   {
     slug: "bcn-airport-cruise-terminal",
@@ -512,3 +519,23 @@ export const DB_CLASS_TO_CODE: Record<VehicleClass, VehicleCode> = {
   LUXURY_MINIVAN: "VCLASS",
   MINIBUS:        "MINIBUS",
 };
+
+/**
+ * Class-aware fixed price lookup. Checks vehicleClassOverrides on the route first,
+ * then falls back to the generic price column via DB_CLASS_TO_CODE.
+ * Use this instead of lookupFixedPrice when you have a VehicleClass (not a VehicleCode),
+ * so per-vehicle overrides (e.g. Camry vs Tesla for airport→city) are applied.
+ */
+export function lookupPriceByClass(
+  from: ZoneCode,
+  to:   ZoneCode,
+  cls:  VehicleClass,
+): number | null {
+  const route = FIXED_ROUTES.find(
+    (r) => (r.from === from && r.to === to) || (r.from === to && r.to === from)
+  );
+  if (!route) return null;
+  const override = route.vehicleClassOverrides?.[cls];
+  if (override !== undefined) return override;
+  return route.prices[DB_CLASS_TO_CODE[cls]];
+}

@@ -3,6 +3,7 @@ import { FLEET_TO_DB_CLASS } from "@/types";
 import {
   FIXED_ROUTES,
   lookupFixedPrice as lookupFixedPriceFn,
+  lookupPriceByClass,
   VEHICLE_TO_PRICE_CLASS,
   DB_CLASS_TO_CODE,
   type VehicleCode,
@@ -359,9 +360,18 @@ export function lookupFixedPriceByZone(
   const toCode   = KEY_TO_ZONE_CODE[toZone];
   if (!fromCode || !toCode) return null;
 
+  // FleetVehicle → convert to DB VehicleClass → class-aware lookup (respects overrides)
+  if (vc in VEHICLE_TO_PRICE_CLASS) {
+    const dbClass = FLEET_TO_DB_CLASS[vc as FleetVehicle];
+    return lookupPriceByClass(fromCode, toCode, dbClass);
+  }
+  // DB VehicleClass → class-aware lookup (respects overrides)
+  if (vc in DB_CLASS_TO_CODE) {
+    return lookupPriceByClass(fromCode, toCode, vc as VehicleClass);
+  }
+  // VehicleCode direct lookup (no override support — legacy path)
   const code = resolveVehicleCode(vc);
   if (!code) return null;
-
   return lookupFixedPriceFn(fromCode, toCode, code);
 }
 
@@ -370,7 +380,7 @@ export function lookupFixedPriceByZone(
  * fleet vehicle. Used on fleet listing pages as "from" price.
  */
 export function getFleetFromPrice(fv: FleetVehicle): number {
-  const code  = VEHICLE_TO_PRICE_CLASS[fv];
-  const price = lookupFixedPriceFn("BCN_AIRPORT", "BARCELONA_CITY", code);
-  return price ?? DEFAULT_PRICING[FLEET_TO_DB_CLASS[fv]]?.minimumFare ?? 0;
+  const dbClass = FLEET_TO_DB_CLASS[fv];
+  const price   = lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", dbClass);
+  return price ?? DEFAULT_PRICING[dbClass]?.minimumFare ?? 0;
 }

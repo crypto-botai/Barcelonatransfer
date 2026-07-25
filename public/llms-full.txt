@@ -38,10 +38,16 @@ All vehicles: under 3 years old, air-conditioned, complimentary still water, com
 ## Full Price Table — Airport (BCN El Prat T1/T2) ⇄ Destination
 All prices in EUR, VAT included, per vehicle (not per person)
 
-| Destination              | Economy | Business | Minivan | V-Class | Minibus |
-|--------------------------|---------|----------|---------|---------|---------|
-| Barcelona City Centre    |  50     |  60      |  65     |  75     | 180     |
-| Barcelona Cruise Port    |  50     |  60      |  65     |  75     | 180     |
+IMPORTANT — BCN Airport ↔ Barcelona City Centre only: individual vehicle prices differ within Business class:
+- Toyota Camry (Business sedan): €50
+- Tesla Model 3 (Electric VIP): €55
+- Mercedes EQE 300 Electric (Executive sedan): €60
+All other airport routes: Business column = €60 for all three vehicles.
+
+| Destination              | Economy | Camry | Tesla M3 | EQE 300 | Minivan | V-Class | Minibus |
+|--------------------------|---------|-------|----------|---------|---------|---------|---------|
+| Barcelona City Centre    |  50     |  50   |  55      |  60     |  65     |  75     | 180     |
+| Barcelona Cruise Port    |  50     |  60   |  60      |  60     |  65     |  75     | 180     |
 | Barcelona Sants Station  |  50     |  60      |  65     |  75     | 180     |
 | La Roca Village          |  80     | 100      | 110     | 130     | 200     |
 | Girona City / GRO Airport| 140     | 155      | 170     | 195     | 255     |
