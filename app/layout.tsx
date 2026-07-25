@@ -140,11 +140,40 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   },
                   geo: { "@type": "GeoCoordinates", latitude: 41.3851, longitude: 2.1734 },
                   areaServed: [
-                    { "@type": "City", name: "Barcelona", sameAs: "https://www.wikidata.org/wiki/Q1492" },
-                    { "@type": "City", name: "Sitges", sameAs: "https://www.wikidata.org/wiki/Q181033" },
-                    { "@type": "City", name: "Tarragona", sameAs: "https://www.wikidata.org/wiki/Q15614" },
-                    { "@type": "City", name: "Girona", sameAs: "https://www.wikidata.org/wiki/Q15627" },
-                    { "@type": "City", name: "Andorra la Vella", sameAs: "https://www.wikidata.org/wiki/Q1863" },
+                    // Core cities
+                    { "@type": "City", name: "Barcelona",       sameAs: "https://www.wikidata.org/wiki/Q1492"   },
+                    { "@type": "City", name: "Girona",          sameAs: "https://www.wikidata.org/wiki/Q15627"  },
+                    { "@type": "City", name: "Tarragona",       sameAs: "https://www.wikidata.org/wiki/Q15614"  },
+                    { "@type": "City", name: "Andorra la Vella",sameAs: "https://www.wikidata.org/wiki/Q1863"   },
+                    { "@type": "City", name: "Figueres",        sameAs: "https://www.wikidata.org/wiki/Q184419" },
+                    // Costa Daurada destinations
+                    { "@type": "City", name: "Sitges",          sameAs: "https://www.wikidata.org/wiki/Q181033" },
+                    { "@type": "City", name: "Castelldefels",   sameAs: "https://www.wikidata.org/wiki/Q494816" },
+                    { "@type": "City", name: "Cubelles",        sameAs: "https://www.wikidata.org/wiki/Q1101706"},
+                    { "@type": "City", name: "Calafell",        sameAs: "https://www.wikidata.org/wiki/Q942012" },
+                    { "@type": "City", name: "El Vendrell",     sameAs: "https://www.wikidata.org/wiki/Q1035285"},
+                    { "@type": "City", name: "Salou",           sameAs: "https://www.wikidata.org/wiki/Q829882" },
+                    { "@type": "City", name: "Cambrils",        sameAs: "https://www.wikidata.org/wiki/Q946699" },
+                    { "@type": "TouristAttraction", name: "PortAventura World", sameAs: "https://www.wikidata.org/wiki/Q858059" },
+                    { "@type": "City", name: "La Pineda" },
+                    // Costa Brava destinations
+                    { "@type": "City", name: "Mataró",          sameAs: "https://www.wikidata.org/wiki/Q215695" },
+                    { "@type": "City", name: "Calella",         sameAs: "https://www.wikidata.org/wiki/Q1030827"},
+                    { "@type": "City", name: "Pineda de Mar",   sameAs: "https://www.wikidata.org/wiki/Q1027249"},
+                    { "@type": "City", name: "Santa Susanna",   sameAs: "https://www.wikidata.org/wiki/Q1000116"},
+                    { "@type": "City", name: "Malgrat de Mar",  sameAs: "https://www.wikidata.org/wiki/Q991990" },
+                    { "@type": "City", name: "Blanes",          sameAs: "https://www.wikidata.org/wiki/Q948006" },
+                    { "@type": "City", name: "Lloret de Mar",   sameAs: "https://www.wikidata.org/wiki/Q962226" },
+                    { "@type": "City", name: "Tossa de Mar",    sameAs: "https://www.wikidata.org/wiki/Q1002590"},
+                    { "@type": "City", name: "Platja d'Aro",    sameAs: "https://www.wikidata.org/wiki/Q1019266"},
+                    { "@type": "City", name: "Palamós",         sameAs: "https://www.wikidata.org/wiki/Q943888" },
+                    { "@type": "City", name: "Roses",           sameAs: "https://www.wikidata.org/wiki/Q956568" },
+                    { "@type": "City", name: "Empuriabrava",    sameAs: "https://www.wikidata.org/wiki/Q1337893"},
+                    { "@type": "City", name: "Cadaqués",        sameAs: "https://www.wikidata.org/wiki/Q1001020"},
+                    // Other destinations
+                    { "@type": "TouristAttraction", name: "Montserrat" },
+                    { "@type": "ShoppingCenter",    name: "La Roca Village" },
+                    // Regions
                     { "@type": "AdministrativeArea", name: "Costa Brava" },
                     { "@type": "AdministrativeArea", name: "Costa Daurada" },
                     { "@type": "AdministrativeArea", name: "Catalonia" },
@@ -153,13 +182,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     "@type": "OfferCatalog",
                     name: "Barcelona Private Transfer Services",
                     itemListElement: [
-                      { "@type": "Offer", name: "BCN Airport to Barcelona City Centre", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "El Prat Airport to Barcelona City Transfer", description: "Fixed-price luxury private transfer from Barcelona El Prat Airport to city centre hotels. Mercedes V-Class & EQE 300 Electric." } },
-                      { "@type": "Offer", name: "Barcelona to Sitges Transfer", price: "80", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona to Sitges Private Transfer", description: "Fixed-price luxury transfer from Barcelona to Sitges. No surge pricing." } },
-                      { "@type": "Offer", name: "Barcelona to Tarragona Transfer", price: "150", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona to Tarragona Private Transfer", description: "Fixed-price luxury transfer from Barcelona to Tarragona and PortAventura." } },
-                      { "@type": "Offer", name: "Barcelona to Girona Airport Transfer", price: "140", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona to Girona Costa Brava Airport Private Transfer", description: "Fixed-price luxury transfer from Barcelona city to Girona city or Girona Costa Brava Airport." } },
-                      { "@type": "Offer", name: "Barcelona Cruise Port Transfer", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Cruise Port Private Transfer", description: "Meet-and-greet luxury transfer to and from Barcelona World Trade Centre cruise terminal." } },
-                      { "@type": "Offer", name: "Barcelona to Andorra Transfer", price: "300", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona to Andorra la Vella Private Transfer", description: "Fixed-price luxury transfer from Barcelona or BCN airport to Andorra. 3-hour journey in premium vehicle." } },
-                      { "@type": "Offer", name: "Executive Hourly Chauffeur Barcelona", price: "65", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Hourly Chauffeur Service Barcelona", description: "By-the-hour luxury chauffeur hire in Barcelona for meetings, events, city tours." } },
+                      // Airport ⇄ Barcelona
+                      { "@type": "Offer", name: "BCN Airport to Barcelona City Centre", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "El Prat Airport to Barcelona City Transfer", description: "Fixed-price luxury private transfer from Barcelona El Prat Airport (T1/T2) to city centre hotels. From €50 economy to €75 V-Class." } },
+                      // Airport ⇄ Cruise Port
+                      { "@type": "Offer", name: "BCN Airport to Cruise Port Transfer", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Cruise Port Private Transfer", description: "Fixed-price transfer from El Prat Airport to Barcelona World Trade Centre or Moll Adossat cruise terminals." } },
+                      // Airport ⇄ Andorra
+                      { "@type": "Offer", name: "BCN Airport to Andorra Transfer", price: "300", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Andorra la Vella Private Transfer", description: "Fixed-price luxury transfer from BCN Airport to Andorra la Vella. From €300 economy to €630 minibus." } },
+                      // Airport ⇄ Girona Airport
+                      { "@type": "Offer", name: "BCN Airport to Girona Airport Transfer", price: "140", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona El Prat Airport to Girona Costa Brava Airport Transfer", description: "Inter-airport private transfer between BCN (El Prat) and GRO (Girona). From €140 economy." } },
+                      // Airport ⇄ Costa Daurada
+                      { "@type": "Offer", name: "BCN Airport to Sitges Transfer", price: "80", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Sitges Private Transfer", description: "Fixed-price private transfer from Barcelona El Prat Airport to Sitges. From €80 economy." } },
+                      { "@type": "Offer", name: "BCN Airport to Tarragona / PortAventura", price: "150", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Tarragona and PortAventura Transfer", description: "Fixed-price transfer from BCN Airport to Tarragona, Salou, La Pineda, and PortAventura World. From €150." } },
+                      { "@type": "Offer", name: "BCN Airport to Salou Transfer", price: "150", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Salou Private Transfer", description: "Direct fixed-price transfer from BCN Airport to Salou resort. From €150 economy." } },
+                      { "@type": "Offer", name: "BCN Airport to Cambrils Transfer", price: "160", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Cambrils Private Transfer", description: "Direct fixed-price transfer from BCN Airport to Cambrils. From €160 economy." } },
+                      // Airport ⇄ Costa Brava
+                      { "@type": "Offer", name: "BCN Airport to Lloret de Mar Transfer", price: "100", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Lloret de Mar Private Transfer", description: "Fixed-price transfer from BCN El Prat Airport to Lloret de Mar, Costa Brava. From €100 economy." } },
+                      { "@type": "Offer", name: "BCN Airport to Tossa de Mar Transfer", price: "110", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Tossa de Mar Private Transfer", description: "Fixed-price transfer from BCN Airport to Tossa de Mar, Costa Brava. From €110 economy." } },
+                      { "@type": "Offer", name: "BCN Airport to Roses / Empuriabrava", price: "155", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Roses and Empuriabrava Transfer", description: "Fixed-price transfer from BCN Airport to Roses and Empuriabrava, northern Costa Brava. From €155 economy." } },
+                      // City routes
+                      { "@type": "Offer", name: "Barcelona to Sitges Transfer", price: "75", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona City to Sitges Private Transfer", description: "Fixed-price luxury transfer from Barcelona city centre to Sitges. No surge pricing." } },
+                      { "@type": "Offer", name: "Barcelona to Tarragona Transfer", price: "145", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona City to Tarragona Private Transfer", description: "Fixed-price luxury transfer from Barcelona to Tarragona and PortAventura." } },
+                      // Hourly
+                      { "@type": "Offer", name: "Executive Hourly Chauffeur Barcelona", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Hourly Chauffeur Service Barcelona", description: "By-the-hour luxury chauffeur hire in Barcelona. From €45/h economy, €50/h business, €65/h luxury. Minimum 4 hours." } },
                     ],
                   },
                   parentOrganization: { "@id": "https://www.elitebcn.info/#organization" },
@@ -208,7 +252,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {
                   "@type": "Question",
                   name: "Which destinations does Élite BCN Transfers cover?",
-                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers covers all of Catalonia and beyond: Barcelona city centre, Sitges (from €80), Tarragona and PortAventura (from €150), Girona and Costa Brava (from €140), Montserrat (from €95), Andorra (from €300), Barcelona Cruise Port (from €50), and all Costa Daurada resorts. We also serve long-distance routes to Madrid, Valencia, and the French border." },
+                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers covers all of Catalonia and beyond: Barcelona city centre, Sitges (from €80), Tarragona, Salou, La Pineda and PortAventura (from €150), Girona and Girona Airport (from €140), Montserrat (from €95), Andorra (from €300), Barcelona Cruise Port (from €50), and all Costa Daurada resorts including Castelldefels, Cubelles, Calafell, Vendrell, Cambrils. Costa Brava resorts: Lloret de Mar, Tossa de Mar, Blanes, Platja d'Aro, Palamós, Roses, Figueres, Cadaqués, Empuriabrava. We cover 62 fixed-price routes in total — no custom quotes needed." },
                 },
                 {
                   "@type": "Question",
@@ -223,7 +267,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {
                   "@type": "Question",
                   name: "What vehicles does Élite BCN Transfers use?",
-                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers operates a fleet of premium vehicles: Mercedes EQE 300 Electric (executive sedan, up to 4 pax), Mercedes V-Class VIP (luxury 7-seat MPV), Mercedes Vito (executive minivan, up to 8 pax), and Mercedes Sprinter (group minibus, up to 16 pax). All vehicles are less than 3 years old, air-conditioned, and equipped with complimentary water and WiFi." },
+                  acceptedAnswer: { "@type": "Answer", text: "Élite BCN Transfers operates a fleet of 7 premium vehicles: Toyota Corolla (economy sedan), Toyota Camry (business sedan), Tesla Model 3 (electric VIP), Mercedes EQE 300 Electric (executive sedan), Mercedes Vito (executive minivan, up to 7 pax), Mercedes V-Class VIP (luxury MPV, up to 7 pax), and Mercedes Sprinter (group minibus, up to 16 pax). All vehicles are less than 3 years old, air-conditioned, and equipped with complimentary water and WiFi." },
+                },
+                {
+                  "@type": "Question",
+                  name: "How much does a transfer from Barcelona Airport to Lloret de Mar cost?",
+                  acceptedAnswer: { "@type": "Answer", text: "A private transfer from Barcelona El Prat Airport to Lloret de Mar costs from €100 (economy sedan) to €220 (minibus) with Élite BCN Transfers. The price is fixed — no surge pricing, all tolls and fees included. The journey takes approximately 1 hour. Transfers from Lloret de Mar back to the airport cost the same price." },
+                },
+                {
+                  "@type": "Question",
+                  name: "How much is a transfer from Barcelona Airport to Salou or PortAventura?",
+                  acceptedAnswer: { "@type": "Answer", text: "A fixed-price private transfer from Barcelona El Prat Airport to Salou, La Pineda, or PortAventura World costs from €150 (economy) to €270 (minibus) with Élite BCN Transfers. No surge pricing. All tolls, airport fees, and meet-and-greet included. The journey takes approximately 1 hour 15 minutes. The return trip (Salou/PortAventura to Barcelona Airport) costs the same." },
+                },
+                {
+                  "@type": "Question",
+                  name: "How much is a transfer from Barcelona Airport to Sitges?",
+                  acceptedAnswer: { "@type": "Answer", text: "A private transfer from Barcelona El Prat Airport to Sitges costs from €80 (economy sedan) to €200 (minibus) with Élite BCN Transfers. The price is fully fixed — no hidden fees. The journey takes 30–40 minutes. The return trip from Sitges to Barcelona Airport costs the same price." },
+                },
+                {
+                  "@type": "Question",
+                  name: "Do you offer transfers from Barcelona Airport to Costa Brava resorts?",
+                  acceptedAnswer: { "@type": "Answer", text: "Yes. Élite BCN Transfers offers direct fixed-price airport transfers from Barcelona El Prat Airport to all major Costa Brava resorts: Lloret de Mar (from €100), Tossa de Mar (from €110), Blanes (from €95), Platja d'Aro (from €125), Palamós (from €130), Roses and Empuriabrava (from €155), Figueres (from €155), and Cadaqués (from €165). All prices are per vehicle, VAT included, fully bidirectional." },
+                },
+                {
+                  "@type": "Question",
+                  name: "Is the transfer price the same both ways (airport to hotel and hotel to airport)?",
+                  acceptedAnswer: { "@type": "Answer", text: "Yes. All Élite BCN Transfers prices are fully bidirectional — the price from Barcelona Airport to your destination is exactly the same as the return trip. For example, Barcelona Airport to PortAventura and PortAventura to Barcelona Airport are both €150 (economy). Prices never change based on direction of travel." },
                 },
               ],
             }),

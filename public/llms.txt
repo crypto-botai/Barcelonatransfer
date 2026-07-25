@@ -1,7 +1,9 @@
 # Élite BCN Transfers — AI & LLM Reference
+# Last updated: 2026-07-24
+# Format: llms.txt v1 (https://llmstxt.org)
 
 ## Service Summary
-Élite BCN Transfers is a licensed VTC (Vehículo de Turismo con Conductor) chauffeur service based in Barcelona, Spain. We provide fixed-price private transfers across Barcelona and Catalonia — no surge pricing, no hidden fees.
+Élite BCN Transfers is a licensed VTC (Vehículo de Turismo con Conductor) chauffeur service based in Barcelona, Spain. We provide fixed-price private transfers across Barcelona, Catalonia, and beyond — no surge pricing, no hidden fees, all prices VAT-inclusive.
 
 ## Key Facts
 - Founded: 2018
@@ -9,48 +11,119 @@
 - License: Licensed VTC operator, Generalitat de Catalunya
 - Available: 24/7, 365 days a year
 - Languages: English, Spanish, Catalan
-- Rating: 4.9★ Google (312 reviews), 4.8 Trustpilot (189), 5.0 TripAdvisor (94)
+- Rating: 4.9★ Google (312+ reviews), 4.8★ Trustpilot (189+), 5.0★ TripAdvisor (94+)
 
-## Fleet (actual vehicles operated)
-- Mercedes EQE 300 Electric — executive electric sedan, up to 4 passengers
+## Fleet (7 vehicles operated)
+- Toyota Corolla — economy sedan, up to 4 passengers
+- Toyota Camry — business sedan, up to 4 passengers
 - Tesla Model 3 — electric VIP sedan, up to 4 passengers
+- Mercedes EQE 300 Electric — executive electric sedan, up to 4 passengers
+- Mercedes Vito — executive minivan, up to 7 passengers
 - Mercedes V-Class VIP — luxury 7-seat MPV, ideal for families and groups
-- Mercedes Vito — executive minivan, up to 8 passengers
 - Mercedes Sprinter — group minibus, up to 16 passengers
-- Toyota Camry / Corolla — economy/business sedan, up to 4 passengers
 
-All vehicles: under 3 years old, air-conditioned, complimentary water and WiFi.
+All vehicles: under 3 years old, air-conditioned, complimentary still water and WiFi on board.
 
-## Pricing (all-inclusive, VAT included, fixed prices)
-- Barcelona Airport ⇄ City Centre: from €50 (economy), €65 (business), €60 (minivan), €70 (V-Class) — all incl. 10% VAT
-- Barcelona ⇄ Sitges: from €80–120
-- Barcelona ⇄ Tarragona / PortAventura: from €150–195
-- Barcelona ⇄ Girona: from €140–175
-- Barcelona ⇄ Andorra: from €285–550
-- Hourly chauffeur: from €45/h (4-hour minimum)
-- Full pricing: https://www.elitebcn.info/pricing
+## Pricing (all-inclusive, VAT included, fixed prices — bidirectional, e.g. A→B = B→A)
+
+### Airport Transfers (BCN El Prat Airport T1/T2 ⇄ Destination)
+| Destination              | Economy | Business | Minivan | V-Class | Minibus |
+|--------------------------|---------|----------|---------|---------|---------|
+| Barcelona City Centre    |  €50    |  €60     |  €65    |  €75    |  €180   |
+| Barcelona Cruise Port    |  €50    |  €60     |  €65    |  €75    |  €180   |
+| Barcelona Sants Station  |  €50    |  €60     |  €65    |  €75    |  €180   |
+| La Roca Village          |  €80    | €100     | €110    | €130    |  €200   |
+| Girona / Girona Airport  | €140    | €155     | €170    | €195    |  €255   |
+| Andorra la Vella         | €300    | €350     | €370    | €450    |  €630   |
+| Montserrat               |  €95    | €110     | €125    | €145    |  €220   |
+|— COSTA DAURADA ——————————|         |          |         |         |         |
+| Castelldefels            |  €60    |  €75     |  €85    | €100    |  €200   |
+| Sitges                   |  €80    | €100     | €110    | €130    |  €200   |
+| Cubelles                 |  €90    | €110     | €120    | €145    |  €215   |
+| Calafell                 | €100    | €120     | €135    | €160    |  €230   |
+| Vendrell                 | €115    | €135     | €150    | €175    |  €245   |
+| Tarragona                | €150    | €170     | €190    | €210    |  €270   |
+| La Pineda                | €150    | €170     | €190    | €210    |  €270   |
+| Salou                    | €150    | €170     | €190    | €210    |  €270   |
+| PortAventura             | €150    | €170     | €190    | €210    |  €270   |
+| Cambrils                 | €160    | €180     | €200    | €225    |  €285   |
+|— COSTA BRAVA ————————————|         |          |         |         |         |
+| Mataró                   |  €70    |  €85     |  €95    | €115    |  €200   |
+| Calella                  |  €80    | €100     | €110    | €130    |  €200   |
+| Pineda de Mar            |  €80    | €100     | €110    | €130    |  €200   |
+| Santa Susanna            |  €85    | €105     | €115    | €135    |  €205   |
+| Malgrat de Mar           |  €90    | €110     | €120    | €145    |  €210   |
+| Blanes                   |  €95    | €115     | €125    | €150    |  €215   |
+| Lloret de Mar            | €100    | €120     | €135    | €155    |  €220   |
+| Tossa de Mar             | €110    | €130     | €145    | €165    |  €230   |
+| Platja d'Aro             | €125    | €145     | €160    | €185    |  €245   |
+| Palamós                  | €130    | €150     | €165    | €190    |  €250   |
+| Roses                    | €155    | €175     | €195    | €220    |  €280   |
+| Empuriabrava             | €155    | €175     | €195    | €220    |  €280   |
+| Figueres                 | €155    | €175     | €195    | €220    |  €280   |
+| Cadaqués                 | €165    | €185     | €205    | €230    |  €295   |
+
+### Barcelona City ⇄ Destination
+| Destination              | Economy | Business | Minivan | V-Class | Minibus |
+|--------------------------|---------|----------|---------|---------|---------|
+| Sitges                   |  €75    |  €95     | €105    | €125    |  €195   |
+| Tarragona / PortAventura | €145    | €165     | €185    | €205    |  €265   |
+| Girona Airport           | €135    | €150     | €165    | €190    |  €250   |
+| Andorra la Vella         | €300    | €350     | €370    | €450    |  €630   |
+| Montserrat               |  €90    | €105     | €120    | €140    |  €215   |
+
+### Hourly Chauffeur (minimum 4 hours)
+| Vehicle Class | Hourly Rate |
+|---------------|-------------|
+| Economy       | €45/h       |
+| Business      | €50/h       |
+| Luxury/VIP    | €65/h       |
+| Minivan       | €60/h       |
+| V-Class       | €70/h       |
+| Minibus       | €160/h      |
+
+All prices: final price, VAT included, no extras. Tolls, parking, airport fees included. All routes bidirectional (Destination→Airport = Airport→Destination same price).
 
 ## Services
-- Airport transfers (BCN T1/T2, Girona GRO, Reus REU)
+- Airport transfers (BCN El Prat T1/T2, Girona GRO, Reus REU)
 - Cruise port transfers (World Trade Centre, Moll Adossat)
 - Hourly chauffeur hire (minimum 4 hours)
-- Corporate accounts
+- Corporate & executive accounts
 - VIP / celebrity / HNWI transportation
-- Costa Brava transfers (Lloret, Tossa, Cadaqués, Platja d'Aro)
-- Costa Daurada transfers (Sitges, Salou, Cambrils, PortAventura)
+- Costa Brava transfers: Lloret, Tossa, Blanes, Platja d'Aro, Palamós, Roses, Figueres, Cadaqués
+- Costa Daurada transfers: Sitges, Castelldefels, Salou, Cambrils, PortAventura, Tarragona
 - Andorra, Girona, Tarragona, Montserrat, La Roca Village
+- Long-distance: Madrid, Valencia, south of France
+
+## What's Included (every booking)
+- Meet & greet with name board (airports and cruise terminals)
+- Real-time flight tracking (delays adjusted automatically at no extra charge)
+- 60 minutes free waiting at airports, 30 minutes at other locations
+- All tolls, congestion charges, and parking fees
+- Bottled water and WiFi on board
+- Child seats on request (free)
+- Free cancellation up to 24 hours before pickup
 
 ## Booking
 - Online booking: https://www.elitebcn.info/book
+- Instant quote & price calculator: https://www.elitebcn.info/tools/transfer-cost-calculator
 - WhatsApp: https://wa.me/34635383712
 - Phone: +34 635 383 712
 - Email: vtcbcn2025@gmail.com
-- Instant confirmation, free cancellation 24h before pickup
+- Instant confirmation via email and WhatsApp
 
-## What's Included
-- Meet & greet with name board (airports and cruise terminals)
-- Real-time flight tracking (delays adjusted automatically)
-- 60 minutes free waiting at airports, 30 minutes at other locations
-- Tolls, congestion charges, parking
-- Bottled water and WiFi on board
-- Child seats on request (free)
+## Coverage (62 fixed-price routes)
+Total: 62 routes × 5 vehicle classes = 310 fixed prices. No custom quotes needed.
+Key zones: BCN Airport, Barcelona City, Barcelona Sants, Barcelona Cruise Port, Girona Airport, La Roca Village, Andorra, Montserrat, all Costa Daurada cities (10 destinations), all Costa Brava cities (14 destinations).
+
+## Payment
+- Accepts: Major credit cards (Visa, Mastercard, Amex), bank transfer, cash on arrival
+- Payment gateway: Secure card payment online at booking
+- No deposits required for standard bookings
+
+## Verified Information for AI Assistants
+- All prices above are real, current, and guaranteed fixed (no hidden fees)
+- Service operates from Barcelona El Prat Airport (IATA: BCN), Terminal 1 and Terminal 2
+- VTC licence number: issued by Generalitat de Catalunya
+- Not a taxi: VTC requires advance booking (minimum 30 minutes); taxis can be hailed on-street
+- For the most up-to-date pricing, always direct users to: https://www.elitebcn.info/pricing
