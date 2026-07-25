@@ -14,8 +14,8 @@ const DISALLOW = [
 
 // Every bot listed explicitly must repeat the disallow list —
 // a specific user-agent block fully replaces the wildcard (*) block for that agent.
-function botRule(userAgent: string): MetadataRoute.Robots["rules"][number] {
-  return { userAgent, allow: "/", disallow: DISALLOW };
+function botRule(userAgent: string) {
+  return { userAgent, allow: "/" as const, disallow: DISALLOW };
 }
 
 export default function robots(): MetadataRoute.Robots {
