@@ -53,10 +53,30 @@ const nextConfig: NextConfig = {
 
     // Always noindex admin/auth/api on production
     result.push(
-      { source: "/admin/:path*",  headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
-      { source: "/auth/:path*",   headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
-      { source: "/driver/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+      { source: "/admin/:path*",     headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+      { source: "/auth/:path*",      headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+      { source: "/driver/:path*",    headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
       { source: "/dashboard/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+    );
+
+    // Explicit Content-Type for sitemap and robots so no proxy/CDN can misidentify them.
+    // Google requires application/xml for sitemaps — this is belt-and-suspenders
+    // on top of what Next.js already sets via the MetadataRoute handler.
+    result.push(
+      {
+        source: "/sitemap.xml",
+        headers: [
+          { key: "Content-Type", value: "application/xml; charset=utf-8" },
+          { key: "Cache-Control", value: "public, max-age=3600, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/robots.txt",
+        headers: [
+          { key: "Content-Type", value: "text/plain; charset=utf-8" },
+          { key: "Cache-Control", value: "public, max-age=3600" },
+        ],
+      },
     );
 
     return result;

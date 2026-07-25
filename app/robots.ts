@@ -83,6 +83,5 @@ export default function robots(): MetadataRoute.Robots {
       botRule("Brave"),
     ],
     sitemap: "https://www.elitebcn.info/sitemap.xml",
-    host:    "https://www.elitebcn.info",
   };
 }

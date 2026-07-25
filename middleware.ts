@@ -85,8 +85,18 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    // Run on all page routes — needed to inject X-Robots-Tag on non-production hosts.
-    // Excludes static assets, Next.js internals, and image optimization endpoints.
-    "/((?!_next/static|_next/image|favicon\\.svg|opengraph-image|.*\\.(?:png|jpg|jpeg|gif|ico|webp|svg|woff2?|ttf)).*)",
+    /*
+     * Match all request paths EXCEPT:
+     *  - _next/static  (Next.js static chunks)
+     *  - _next/image   (image optimiser)
+     *  - _vercel       (Vercel internals)
+     *  - sitemap.xml   (Googlebot MUST receive raw XML — never intercept)
+     *  - robots.txt    (same reason)
+     *  - Any file with an extension: .png .jpg .svg .ico .xml .txt .webp etc.
+     *    This blanket file-extension exclusion covers sitemap.xml, robots.txt,
+     *    llms.txt, llms-full.txt, all images, fonts, manifests, and any
+     *    IndexNow key files — ensuring middleware never wraps them.
+     */
+    "/((?!_next/static|_next/image|_vercel|.*\\.(?:xml|txt|svg|png|jpg|jpeg|gif|ico|webp|woff2?|ttf|otf|eot|map|json)).*)",
   ],
 };

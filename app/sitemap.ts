@@ -1,67 +1,76 @@
 import { MetadataRoute } from "next";
 import destinations from "@/data/destinations.json";
 
-export const revalidate = 86400; // regenerate sitemap daily
+// force-dynamic: regenerate on every request so Google always receives fresh XML.
+// Never use revalidate/ISR for sitemaps — ISR can serve stale or empty responses
+// on the first Vercel cold-start, causing "Sitemap could not be read" in Search Console.
+export const dynamic = "force-dynamic";
 
 const BASE = "https://www.elitebcn.info";
 
+// Use a stable date so the sitemap XML is byte-identical on repeated crawls.
+// Googlebot treats rapidly-changing lastModified as a signal to crawl more aggressively —
+// a stable date avoids unnecessary crawl budget waste.
+const LAST_UPDATED = new Date("2026-07-25T00:00:00.000Z");
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const NOW = new Date();
   const dynamicPages: MetadataRoute.Sitemap = destinations.map((d) => ({
     url: `${BASE}/transfers/${d.slug}`,
-    priority: d.type === "hotel" ? 0.75 : d.type === "cruise" ? 0.8 : d.type === "event" ? 0.8 : 0.85,
+    lastModified: LAST_UPDATED,
     changeFrequency: d.type === "event" ? ("yearly" as const) : ("monthly" as const),
-    lastModified: NOW,
+    priority: d.type === "hotel" ? 0.75 : d.type === "cruise" ? 0.8 : d.type === "event" ? 0.8 : 0.85,
   }));
 
   return [
-    // ── Core pages ─────────────────────────────────────
-    { url: BASE,                                priority: 1.0,  changeFrequency: "weekly",  lastModified: NOW },
-    { url: `${BASE}/book`,                      priority: 0.95, changeFrequency: "weekly",  lastModified: NOW },
-    { url: `${BASE}/pricing`,                   priority: 0.9,  changeFrequency: "weekly",  lastModified: NOW },
-    { url: `${BASE}/fleet`,                     priority: 0.9,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/airport-transfers`,         priority: 0.9,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/corporate`,                 priority: 0.8,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/hourly`,                    priority: 0.8,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/faq`,                       priority: 0.8,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/about`,                     priority: 0.7,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/contact`,                   priority: 0.7,  changeFrequency: "monthly", lastModified: NOW },
+    // ── Core pages (highest priority) ─────────────────────────────
+    { url: BASE,                        lastModified: LAST_UPDATED, changeFrequency: "weekly",  priority: 1.0  },
+    { url: `${BASE}/book`,              lastModified: LAST_UPDATED, changeFrequency: "weekly",  priority: 0.95 },
+    { url: `${BASE}/pricing`,           lastModified: LAST_UPDATED, changeFrequency: "weekly",  priority: 0.9  },
+    { url: `${BASE}/fleet`,             lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.9  },
+    { url: `${BASE}/airport-transfers`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.9  },
 
-    // ── Service pages ─────────────────────────────────
-    { url: `${BASE}/vip-transportation`,             priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/day-tours`,                      priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/hotel-transfers`,                priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+    // ── Secondary core pages ───────────────────────────────────────
+    { url: `${BASE}/corporate`,         lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/hourly`,            lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/faq`,               lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/about`,             lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.7  },
+    { url: `${BASE}/contact`,           lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.7  },
 
-    // ── Fleet detail pages ────────────────────────────
-    { url: `${BASE}/fleet/standard-sedan`,    priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/fleet/eqe-300-electric`,  priority: 0.9,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/fleet/executive-minivan`, priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/fleet/luxury-minivan`,    priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/fleet/group-minibus`,     priority: 0.8,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/fleet/tesla-model-3`,     priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/fleet/business-sedan`,    priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+    // ── Service pages ──────────────────────────────────────────────
+    { url: `${BASE}/vip-transportation`,  lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/day-tours`,           lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/hotel-transfers`,     lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
 
-    // ── Tools ─────────────────────────────────────────
-    { url: `${BASE}/tools/transfer-cost-calculator`, priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
+    // ── Fleet detail pages ─────────────────────────────────────────
+    { url: `${BASE}/fleet/standard-sedan`,    lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/fleet/eqe-300-electric`,  lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.9  },
+    { url: `${BASE}/fleet/executive-minivan`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/fleet/luxury-minivan`,    lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/fleet/group-minibus`,     lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/fleet/tesla-model-3`,     lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/fleet/business-sedan`,    lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
 
-    // ── Static destination landing pages ───────────────
-    { url: `${BASE}/transfers`,                 priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/transfers/sitges`,          priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/transfers/girona`,          priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/transfers/montserrat`,      priority: 0.8,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/transfers/costa-brava`,     priority: 0.8,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/transfers/tarragona`,       priority: 0.8,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/transfers/andorra`,         priority: 0.8,  changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/transfers/cruise-port`,     priority: 0.85, changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/transfers/port-aventura`,   priority: 0.75, changeFrequency: "monthly", lastModified: NOW },
-    { url: `${BASE}/transfers/costa-dorada`,    priority: 0.80, changeFrequency: "monthly", lastModified: NOW },
+    // ── Tools ──────────────────────────────────────────────────────
+    { url: `${BASE}/tools/transfer-cost-calculator`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
 
-    // ── Dynamic programmatic SEO pages (44 destinations) ─
+    // ── Destination hub + static landing pages ─────────────────────
+    { url: `${BASE}/transfers`,               lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/transfers/sitges`,        lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/transfers/girona`,        lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/transfers/montserrat`,    lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/transfers/costa-brava`,   lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/transfers/costa-dorada`,  lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/transfers/tarragona`,     lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/transfers/andorra`,       lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/transfers/cruise-port`,   lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/transfers/port-aventura`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.75 },
+
+    // ── Dynamic programmatic SEO pages (44 destinations) ──────────
     ...dynamicPages,
 
-    // ── Legal ─────────────────────────────────────────
-    { url: `${BASE}/privacy`,                   priority: 0.3,  changeFrequency: "yearly",  lastModified: NOW },
-    { url: `${BASE}/terms`,                     priority: 0.3,  changeFrequency: "yearly",  lastModified: NOW },
-    { url: `${BASE}/cookies`,                   priority: 0.3,  changeFrequency: "yearly",  lastModified: NOW },
+    // ── Legal (low priority) ───────────────────────────────────────
+    { url: `${BASE}/privacy`, lastModified: LAST_UPDATED, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE}/terms`,   lastModified: LAST_UPDATED, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE}/cookies`, lastModified: LAST_UPDATED, changeFrequency: "yearly", priority: 0.3 },
   ];
 }
