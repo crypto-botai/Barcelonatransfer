@@ -126,7 +126,7 @@ export default async function FleetVehiclePage(
               {/* Copy */}
               <div>
                 {vehicle.badge && (
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 ${vehicleBadgeClass(vehicle.badge)}`}>{vehicle.badge}</span>
+                  <span className={`inline-block px-3 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-black/30 mb-4 ${vehicleBadgeClass(vehicle.badge)}`}>{vehicle.badge}</span>
                 )}
                 <h1 className="font-display text-4xl sm:text-5xl text-white mb-4">
                   {vehicle.label}

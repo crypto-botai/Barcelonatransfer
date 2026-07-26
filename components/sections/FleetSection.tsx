@@ -10,8 +10,8 @@ import { formatCurrency } from "@/lib/utils";
 import { getFleetFromPrice } from "@/lib/pricing";
 
 function BadgeIcon({ badge }: { badge: string }) {
-  if (badge === "Electric VIP") return <Zap size={9} className="flex-shrink-0" />;
-  if (badge === "Luxury") return <Star size={9} className="flex-shrink-0" />;
+  if (badge === "Electric VIP") return <Zap size={12} className="flex-shrink-0" />;
+  if (badge === "Luxury") return <Star size={12} className="flex-shrink-0" />;
   return null;
 }
 
@@ -31,7 +31,7 @@ function FleetCardInner({
     <div className="group flex flex-col h-full rounded-2xl overflow-hidden border border-white/[0.07] bg-[#0b0b0b] hover:border-[#c9a84c]/30 transition-colors duration-300">
       <div className="relative h-44 bg-[#080808] overflow-hidden">
         {vehicle.badge && (
-          <span className={`absolute top-3 right-3 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide ${vehicleBadgeClass(vehicle.badge)}`}>
+          <span className={`absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-lg shadow-black/40 ${vehicleBadgeClass(vehicle.badge)}`}>
             <BadgeIcon badge={vehicle.badge} />
             {vehicle.badge}
           </span>
