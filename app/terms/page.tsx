@@ -2,20 +2,24 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { COMPANY } from "@/lib/company-facts";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions | Élite BCN Transfers",
-  description: "Terms and Conditions for Élite BCN Transfers luxury chauffeur service.",
+  title: "Terms & Conditions — Élite BCN Barcelona Private Transfers",
+  description: "Terms and Conditions for Élite BCN Transfers — the Barcelona luxury private chauffeur and airport transfer service.",
   alternates: { canonical: "https://www.elitebcn.info/terms" },
   openGraph: {
-    title: "Terms & Conditions | Élite BCN Transfers",
-    description: "Terms and Conditions for Élite BCN Transfers luxury chauffeur service.",
+    ...SHARED_OG,
+    title: "Terms & Conditions — Élite BCN Barcelona Private Transfers",
+    description: "Terms and Conditions for Élite BCN Transfers — Barcelona luxury private chauffeur service.",
     url: "https://www.elitebcn.info/terms",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN Transfers — Terms & Conditions" }],
   },
   twitter: {
-    card: "summary",
-    title: "Terms & Conditions | Élite BCN Transfers",
-    description: "Terms and Conditions for Élite BCN Transfers luxury chauffeur service.",
+    card: "summary_large_image",
+    title: "Terms & Conditions — Élite BCN Barcelona Private Transfers",
+    description: "Terms and Conditions for Élite BCN Transfers — Barcelona luxury private chauffeur service.",
+    images: ["/opengraph-image"],
   },
 };
 

@@ -3,24 +3,36 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import FleetSection from "@/components/sections/FleetSection";
 import Link from "next/link";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: { absolute: "Luxury Fleet Barcelona — Mercedes V-Class & EQE 300 Electric | Élite BCN" },
+  title: { absolute: "Barcelona Fleet — Mercedes V-Class & Tesla | Élite BCN" },
   description:
-    "Barcelona transfer fleet: Mercedes V-Class (7-seat luxury), Mercedes EQE 300 Electric & Mercedes Vito (8-seat minivan). All vehicles under 3 years old, air-conditioned, WiFi & water.",
+    "Barcelona private transfer fleet: Mercedes V-Class, EQE 300 Electric, Tesla Model 3 & Vito. All under 3 years old, WiFi, water. Fixed prices.",
   alternates: { canonical: "https://www.elitebcn.info/fleet" },
+  keywords: ["barcelona transfer fleet", "mercedes v-class barcelona", "tesla model 3 barcelona transfer", "luxury chauffeur barcelona fleet"],
   openGraph: {
-    title: "Luxury Fleet Barcelona — Mercedes V-Class & EQE 300 Electric | Élite BCN",
-    description: "Mercedes V-Class, EQE 300 Electric & Vito. Premium private hire vehicles for Barcelona airport transfers and chauffeur services.",
+    ...SHARED_OG,
+    title: "Barcelona Fleet — Mercedes V-Class & Tesla | Élite BCN",
+    description: "Mercedes V-Class, EQE 300 Electric & Tesla Model 3. Premium private hire fleet for Barcelona airport transfers.",
     url: "https://www.elitebcn.info/fleet",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Luxury Fleet Barcelona Transfers" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Luxury Fleet Barcelona — Mercedes V-Class & EQE 300 Electric | Élite BCN",
-    description: "Mercedes V-Class, EQE 300 Electric & Vito. Premium private hire vehicles for Barcelona airport transfers.",
+    title: "Barcelona Fleet — Mercedes V-Class & Tesla | Élite BCN",
+    description: "Mercedes V-Class, EQE 300 Electric & Tesla Model 3. Premium private hire fleet for Barcelona airport transfers.",
     images: ["/opengraph-image"],
   },
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type":    "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",  item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "Fleet", item: "https://www.elitebcn.info/fleet" },
+  ],
 };
 
 const fleetSchema = {
@@ -75,6 +87,7 @@ export default function FleetPage() {
   return (
     <>
       <Navbar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(fleetSchema) }} />
       <main className="pt-20">
         {/* Page header */}
@@ -83,7 +96,7 @@ export default function FleetPage() {
           <div className="container mx-auto px-4 text-center relative z-10">
             <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">Our Fleet</span>
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-4">
-              Luxury Vehicle <span className="text-gold-gradient">Fleet</span>
+              Luxury Vehicle <span className="text-gold-gradient">Fleet Barcelona</span>
             </h1>
             <p className="text-dark-400 max-w-2xl mx-auto">
               From executive sedans to VIP minivans — every vehicle in our fleet is professionally maintained, less than 3 years old, and equipped with premium amenities.

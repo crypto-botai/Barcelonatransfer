@@ -3,24 +3,53 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, ChevronRight, Clock, Star } from "lucide-react";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona Transfer Destinations | Élite BCN" },
+  title: { absolute: "Barcelona Private Transfer Destinations | Élite BCN" },
   description:
     "Luxury transfers from Barcelona to Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat, cruise port & more. Fixed prices, no surge pricing.",
   alternates: { canonical: "https://www.elitebcn.info/transfers" },
+  keywords: ["barcelona transfer destinations", "barcelona to sitges transfer", "barcelona to girona transfer", "barcelona andorra transfer", "barcelona costa brava transfer"],
   openGraph: {
-    title: "Barcelona Transfer Destinations | Élite BCN",
+    ...SHARED_OG,
+    title: "Barcelona Private Transfer Destinations | Élite BCN",
     description: "Fixed-price luxury private transfers from Barcelona Airport to Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat and more.",
     url: "https://www.elitebcn.info/transfers",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Transfer Routes & Destinations" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Transfer Destinations | Élite BCN",
-    description: "Fixed-price luxury private transfers from Barcelona Airport to Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat and more.",
+    title: "Barcelona Private Transfer Destinations | Élite BCN",
+    description: "Fixed-price luxury private transfers from Barcelona Airport to Sitges, Girona, Tarragona, Andorra, Costa Brava and more.",
     images: ["/opengraph-image"],
   },
+};
+
+const transfersHubSchema = {
+  "@context": "https://schema.org",
+  "@type":    "CollectionPage",
+  "@id":      "https://www.elitebcn.info/transfers",
+  url:        "https://www.elitebcn.info/transfers",
+  name:       "Barcelona Private Transfer Destinations",
+  description: "Fixed-price luxury private transfers from Barcelona to all major destinations in Catalonia and beyond.",
+  breadcrumb: {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",         item: "https://www.elitebcn.info" },
+      { "@type": "ListItem", position: 2, name: "Destinations", item: "https://www.elitebcn.info/transfers" },
+    ],
+  },
+  hasPart: [
+    { "@type": "WebPage", name: "Barcelona to Sitges Transfer",      url: "https://www.elitebcn.info/transfers/sitges" },
+    { "@type": "WebPage", name: "Barcelona to Girona Transfer",      url: "https://www.elitebcn.info/transfers/girona" },
+    { "@type": "WebPage", name: "Barcelona to Tarragona Transfer",   url: "https://www.elitebcn.info/transfers/tarragona" },
+    { "@type": "WebPage", name: "Barcelona to Andorra Transfer",     url: "https://www.elitebcn.info/transfers/andorra" },
+    { "@type": "WebPage", name: "Barcelona Costa Brava Transfers",   url: "https://www.elitebcn.info/transfers/costa-brava" },
+    { "@type": "WebPage", name: "Barcelona Cruise Port Transfer",    url: "https://www.elitebcn.info/transfers/cruise-port" },
+    { "@type": "WebPage", name: "Barcelona to Montserrat Transfer",  url: "https://www.elitebcn.info/transfers/montserrat" },
+    { "@type": "WebPage", name: "Barcelona PortAventura Transfer",   url: "https://www.elitebcn.info/transfers/port-aventura" },
+  ],
 };
 
 const DESTINATIONS = [
@@ -109,6 +138,7 @@ const DESTINATIONS = [
 export default function TransfersHubPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(transfersHubSchema) }} />
       <Navbar />
       <main className="pt-20">
         {/* Hero */}

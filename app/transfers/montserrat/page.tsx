@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
+import { SHARED_OG } from "@/lib/seo";
 
 const airportPrice = ROUTES.find((r) => r.from === "airport" && r.to === "montserrat")?.economy ?? 85;
 const cityPrice    = ROUTES.find((r) => r.from === "barcelona_city" && r.to === "montserrat")?.economy ?? 115;
@@ -11,10 +12,11 @@ const mpvPrice     = ROUTES.find((r) => r.from === "airport" && r.to === "montse
 
 export const metadata: Metadata = {
   title: `Barcelona Airport to Montserrat — from €${airportPrice} | Élite BCN`,
-  description: `Private transfer from Barcelona Airport (BCN) to Montserrat monastery. Fixed price from €${airportPrice}. 50-min journey. Meet & greet, child seats available, no surge pricing.`,
+  description: `Private transfer from Barcelona Airport to Montserrat monastery. Fixed price from €${airportPrice}. 50-minute journey. Meet & greet, no surge pricing. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/montserrat" },
-  keywords: ["barcelona airport montserrat transfer", "montserrat private transfer", "montserrat day trip barcelona"],
+  keywords: ["barcelona airport montserrat transfer", "montserrat private transfer", "montserrat day trip barcelona", "barcelona montserrat tour transfer"],
   openGraph: {
+    ...SHARED_OG,
     title: `Barcelona Airport to Montserrat Transfer — from €${airportPrice} | Fixed Price`,
     description: `Private transfer Barcelona Airport to Montserrat from €${airportPrice}. Fixed price, no surge pricing. 50-minute journey.`,
     url: "https://www.elitebcn.info/transfers/montserrat",
@@ -28,9 +30,32 @@ export const metadata: Metadata = {
   },
 };
 
+const montserratSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Barcelona Airport to Montserrat Transfer",
+  description: `Fixed-price private transfer from Barcelona Airport (BCN El Prat) to Montserrat monastery. From €${airportPrice}. 50-minute journey.`,
+  url: "https://www.elitebcn.info/transfers/montserrat",
+  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: "Montserrat, Catalonia, Spain",
+  offers: { "@type": "Offer", price: String(airportPrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+};
+
+const montserratBreadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",         item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "Destinations", item: "https://www.elitebcn.info/transfers" },
+    { "@type": "ListItem", position: 3, name: "Montserrat",   item: "https://www.elitebcn.info/transfers/montserrat" },
+  ],
+};
+
 export default function MontserratTransferPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(montserratSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(montserratBreadcrumb) }} />
       <Navbar />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">

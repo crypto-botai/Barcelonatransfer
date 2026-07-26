@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import { Mail, Phone, MessageCircle, MapPin } from "lucide-react";
 import ContactFormClient from "./ContactFormClient";
 import { COMPANY } from "@/lib/company-facts";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: { absolute: "Contact Élite BCN | 24/7 Transfer Support Barcelona" },
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.elitebcn.info/contact" },
   keywords: ["contact elite bcn", "barcelona transfer contact", "chauffeur barcelona phone", "barcelona transfer whatsapp"],
   openGraph: {
+    ...SHARED_OG,
     title: "Contact Élite BCN — 24/7 Support",
     description:
       "Reach our team 24/7 by phone, WhatsApp, or email. Barcelona luxury private transfer specialists.",
@@ -72,7 +74,7 @@ export default function ContactPage() {
           <div className="container mx-auto px-4 text-center relative z-10">
             <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">Contact</span>
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-4">
-              Get in <span className="text-gold-gradient">Touch</span>
+              Contact Élite BCN — <span className="text-gold-gradient">Barcelona Transfers</span>
             </h1>
             <p className="text-dark-400 max-w-xl mx-auto">
               Available 24/7 for bookings, inquiries, and corporate accounts.

@@ -3,24 +3,38 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Barcelona to Tarragona Transfer — from €150 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona to Tarragona or PortAventura World. Fixed price from €150. 1-hour journey in Mercedes V-Class & EQE 300 Electric. Meet & greet included.",
+    "Private transfer from Barcelona to Tarragona or PortAventura. Fixed price from €150. 1-hour journey. Meet & greet, no surge pricing. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/tarragona" },
+  keywords: ["barcelona tarragona transfer", "barcelona portaventura transfer", "tarragona private car barcelona", "barcelona roman ruins transfer"],
   openGraph: {
+    ...SHARED_OG,
     title: "Barcelona to Tarragona Transfer — from €150 | Fixed Price",
-    description: "Luxury private transfer Barcelona to Tarragona or PortAventura from €150. Fixed price, no surge pricing.",
+    description: "Private transfer Barcelona to Tarragona or PortAventura from €150. Fixed price, no surge pricing.",
     url: "https://www.elitebcn.info/transfers/tarragona",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Tarragona Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Barcelona to Tarragona Transfer — from €150 | Fixed Price",
-    description: "Luxury private transfer Barcelona to Tarragona or PortAventura from €150. Fixed price, no surge pricing.",
+    description: "Private transfer Barcelona to Tarragona or PortAventura from €150. Fixed price, no surge pricing.",
     images: ["/opengraph-image"],
   },
+};
+
+const tarragonaServiceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Barcelona to Tarragona Private Transfer",
+  description: "Fixed-price private transfer from Barcelona Airport or City to Tarragona, PortAventura World and Salou. From €150.",
+  url: "https://www.elitebcn.info/transfers/tarragona",
+  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: "Tarragona, Catalonia, Spain",
+  offers: { "@type": "Offer", price: "150", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const BREADCRUMB = {
@@ -36,8 +50,9 @@ const BREADCRUMB = {
 export default function TarragonaTransferPage() {
   return (
     <>
-      <Navbar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(tarragonaServiceSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
+      <Navbar />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,rgba(201,168,76,0.07),transparent)]" />

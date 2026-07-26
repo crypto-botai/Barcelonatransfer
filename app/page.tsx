@@ -9,13 +9,16 @@ import PricingSection from "@/components/sections/PricingSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import FAQSection from "@/components/sections/FAQSection";
 import { getPublicRoutes } from "@/lib/pricing-service";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: { absolute: "Élite BCN | Barcelona Airport Transfers — From €50" },
   description:
-    "Barcelona's #1 luxury private transfer. Fixed prices from €50, no surge pricing. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class & EQE 300 Electric. 24/7.",
+    "Barcelona's #1 luxury private transfer. Fixed prices from €50, no surge. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class & EQE 300 Electric. 24/7.",
   alternates: { canonical: "https://www.elitebcn.info" },
+  keywords: ["barcelona airport transfer", "barcelona private transfer", "bcn el prat transfer", "luxury chauffeur barcelona", "mercedes v class barcelona"],
   openGraph: {
+    ...SHARED_OG,
     title: "Élite BCN | Barcelona Airport Transfers — From €50",
     description: "Barcelona's #1 luxury private transfer. Fixed prices from €50, no surge pricing. BCN El Prat T1/T2. Mercedes V-Class & EQE 300 Electric. Book 24/7.",
     url: "https://www.elitebcn.info",

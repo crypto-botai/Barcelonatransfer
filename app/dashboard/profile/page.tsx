@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, Lock, Shield, Bell, Globe, Save, Check } from "lucide-react";
 import toast from "react-hot-toast";
@@ -61,7 +62,7 @@ export default function ProfilePage() {
         <div className="relative">
           <div className="w-16 h-16 rounded-2xl bg-gold-500/20 border border-gold-500/30 flex items-center justify-center text-gold-400 text-2xl font-bold overflow-hidden">
             {user?.image ? (
-              <img src={user.image} alt="" className="w-full h-full object-cover" />
+              <Image src={user.image} alt="" width={64} height={64} className="w-full h-full object-cover" />
             ) : (
               user?.name?.[0]?.toUpperCase() ?? "U"
             )}

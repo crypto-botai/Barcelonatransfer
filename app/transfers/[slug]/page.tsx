@@ -4,6 +4,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import destinations from "@/data/destinations.json";
+import { SHARED_OG } from "@/lib/seo";
 
 type Destination = (typeof destinations)[number];
 
@@ -23,16 +24,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!dest) return { title: "Transfer | Élite BCN" };
 
   return {
-    title: { absolute: `Barcelona Airport to ${dest.name} Transfer — From €${dest.prices.sedan} | Élite BCN` },
+    title: { absolute: `${dest.name} — Barcelona Airport Transfer | Élite BCN` },
     description: dest.description,
     alternates: {
       canonical: `${BASE}/transfers/${slug}`,
     },
+    keywords: [`${dest.name.toLowerCase()} barcelona transfer`, `barcelona airport ${dest.name.toLowerCase()} transfer`, "private transfer barcelona"],
     openGraph: {
-      title: `Barcelona Airport to ${dest.name} Transfer — Fixed Price from €${dest.prices.sedan}`,
+      ...SHARED_OG,
+      title: `${dest.name} — Barcelona Airport Transfer | Élite BCN`,
       description: dest.description,
       url: `${BASE}/transfers/${slug}`,
-      images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: `Transfer to ${dest.name}` }],
+      images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: `Élite BCN — Transfer to ${dest.name}` }],
     },
     twitter: {
       card: "summary_large_image",
@@ -124,10 +127,10 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
 
   return (
     <>
-      <Navbar />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <Navbar />
 
       <main className="pt-20">
         {/* ── Hero ─────────────────────────────────────────── */}

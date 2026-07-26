@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, ChevronRight, CheckCircle2 } from "lucide-react";
 import { ROUTES as PRICING_ROUTES } from "@/lib/pricing";
+import { SHARED_OG } from "@/lib/seo";
 
 const BASE = "https://www.elitebcn.info";
 
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${BASE}/hotel-transfers` },
   keywords: ["hotel transfer barcelona", "airport hotel transfer barcelona", "barcelona hotel chauffeur"],
   openGraph: {
+    ...SHARED_OG,
     title: "Hotel Transfers Barcelona — Élite BCN Private Chauffeur",
     description:
       "Private transfers between Barcelona Airport and all major hotels. Fixed price, flight tracking, meet & greet.",
@@ -31,6 +33,15 @@ export const metadata: Metadata = {
     description: `Private airport to hotel transfers in Barcelona from €${airportCityPrice}. Fixed price, flight tracking, meet & greet.`,
     images: [`${BASE}/opengraph-image`],
   },
+};
+
+const BREADCRUMB = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",            item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "Hotel Transfers", item: "https://www.elitebcn.info/hotel-transfers" },
+  ],
 };
 
 const SCHEMA = {
@@ -73,11 +84,9 @@ const HOTELS = [
 export default function HotelTransfersPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
       <Navbar />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }}
-      />
 
       <main className="pt-20">
         {/* Hero */}

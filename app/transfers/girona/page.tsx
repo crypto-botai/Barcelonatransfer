@@ -3,24 +3,38 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Barcelona to Girona Transfer — from €140 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona to Girona city or Girona Costa Brava Airport (GRO). Fixed price from €140. 1 hr 10 min. Mercedes V-Class & EQE 300 Electric. Book instantly.",
+    "Private transfer from Barcelona to Girona or Girona Airport (GRO). Fixed price from €140. 1 hr 10 min, no surge pricing. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/girona" },
+  keywords: ["barcelona girona transfer", "barcelona girona airport transfer", "gro airport transfer", "girona costa brava transfer barcelona"],
   openGraph: {
+    ...SHARED_OG,
     title: "Barcelona to Girona Transfer — from €140 | Fixed Price",
-    description: "Luxury private transfer Barcelona to Girona from €140. Fixed price, meet & greet, no surge pricing.",
+    description: "Private transfer Barcelona to Girona or Girona Airport (GRO) from €140. Fixed price, meet & greet, no surge pricing.",
     url: "https://www.elitebcn.info/transfers/girona",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Girona Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Barcelona to Girona Transfer — from €140 | Fixed Price",
-    description: "Luxury private transfer Barcelona to Girona from €140. Fixed price, meet & greet, no surge pricing.",
+    description: "Private transfer Barcelona to Girona from €140. Fixed price, meet & greet, no surge pricing.",
     images: ["/opengraph-image"],
   },
+};
+
+const gironaServiceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Barcelona to Girona Private Transfer",
+  description: "Fixed-price private transfer from Barcelona Airport or City to Girona city or Girona Costa Brava Airport (GRO). From €140.",
+  url: "https://www.elitebcn.info/transfers/girona",
+  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: "Girona, Costa Brava, Catalonia, Spain",
+  offers: { "@type": "Offer", price: "140", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const BREADCRUMB = {
@@ -36,8 +50,9 @@ const BREADCRUMB = {
 export default function GironaTransferPage() {
   return (
     <>
-      <Navbar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(gironaServiceSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
+      <Navbar />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,rgba(201,168,76,0.07),transparent)]" />

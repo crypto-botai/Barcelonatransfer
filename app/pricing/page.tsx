@@ -3,12 +3,15 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PricingSection from "@/components/sections/PricingSection";
 import { getPublicRoutes } from "@/lib/pricing-service";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Transfer Prices — Fixed Rates | Élite BCN" },
   description: "Fixed prices for Barcelona airport, cruise port, Sitges, Andorra & more. Rates from €50 — chauffeur, tolls, meet & greet included. No surge pricing.",
   alternates: { canonical: "https://www.elitebcn.info/pricing" },
+  keywords: ["barcelona transfer prices", "barcelona airport transfer cost", "fixed price transfer barcelona", "private transfer rates barcelona"],
   openGraph: {
+    ...SHARED_OG,
     title: "Barcelona Transfer Prices — Fixed Rates | Élite BCN",
     description: "Fixed prices for luxury private transfers from Barcelona Airport. From €50. No hidden fees. Book online instantly.",
     url: "https://www.elitebcn.info/pricing",
@@ -62,7 +65,7 @@ export default async function PricingPage() {
           <div className="container mx-auto px-4 text-center relative z-10">
             <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">Pricing</span>
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-4">
-              Fixed <span className="text-gold-gradient">Transfer Prices</span>
+              Barcelona Fixed <span className="text-gold-gradient">Transfer Prices</span>
             </h1>
             <p className="text-dark-400 max-w-2xl mx-auto">
               All prices are fixed and all-inclusive. No hidden fees, no surge pricing, no surprises.

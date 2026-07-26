@@ -2,15 +2,18 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CostCalculatorClient from "./CostCalculatorClient";
+import { SHARED_OG } from "@/lib/seo";
 
 const BASE = "https://www.elitebcn.info";
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona Transfer Cost Calculator — Private vs Taxi | Élite BCN" },
+  title: { absolute: "Barcelona Airport Transfer Cost Calculator | Élite BCN" },
   description:
     "Compare Barcelona airport transfer costs: private chauffeur vs taxi vs Aerobus vs metro. Real prices by destination and group size. Instant comparison.",
   alternates: { canonical: `${BASE}/tools/transfer-cost-calculator` },
+  keywords: ["barcelona airport transfer cost", "barcelona taxi vs private transfer", "aerobus vs private transfer barcelona", "barcelona transfer comparison"],
   openGraph: {
+    ...SHARED_OG,
     title: "Barcelona Airport Transfer Cost Calculator",
     description: "Find the cheapest and best way to get from Barcelona Airport to your hotel, cruise port, or event venue. Compare private transfer, taxi, Aerobus and metro.",
     url: `${BASE}/tools/transfer-cost-calculator`,
@@ -40,8 +43,8 @@ const SCHEMA = {
 export default function TransferCostCalculatorPage() {
   return (
     <>
-      <Navbar />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+      <Navbar />
 
       <main className="pt-20">
         {/* Hero */}

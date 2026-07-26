@@ -165,20 +165,30 @@ async function runAiExecutiveSummary(): Promise<void> {
   const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
   const dateStr    = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
-  const [agents, recentTasks, pendingApprovals, activeAlerts, bookingsToday, revenueAgg] = await Promise.all([
+  const [agents, recentTasks, pendingApprovals, activeAlerts, bookingsToday, revenueAgg, abandonedCount, sessionsTotal, sessionsConverted, topRoutes, aiSpendAgg] = await Promise.all([
     prisma.aiAgent.findMany({ orderBy: { name: "asc" } }),
     prisma.aiTask.findMany({ where: { createdAt: { gte: since24h } }, orderBy: { createdAt: "desc" }, take: 60 }),
     prisma.approvalItem.findMany({ where: { status: "PENDING" }, orderBy: { createdAt: "desc" }, take: 10 }),
     prisma.aiAlert.findMany({ where: { isRead: false, isDismissed: false }, orderBy: { createdAt: "desc" }, take: 5 }),
     prisma.booking.count({ where: { createdAt: { gte: todayStart } } }),
     prisma.booking.aggregate({ where: { createdAt: { gte: todayStart }, paymentStatus: "PAID" }, _sum: { totalAmount: true } }),
+    prisma.abandonedBooking.count({ where: { createdAt: { gte: todayStart }, convertedAt: null } }),
+    prisma.bookingSession.count({ where: { createdAt: { gte: todayStart } } }),
+    prisma.bookingSession.count({ where: { createdAt: { gte: todayStart }, converted: true } }),
+    prisma.booking.groupBy({ by: ["dropoffAddress"], where: { createdAt: { gte: since24h } }, _count: { id: true }, orderBy: { _count: { id: "desc" } }, take: 3 }),
+    prisma.aiTask.aggregate({ where: { createdAt: { gte: todayStart } }, _sum: { costCents: true } }),
   ]);
 
-  const completedTasks = recentTasks.filter(t => t.status === "COMPLETED").length;
-  const failedTasks    = recentTasks.filter(t => t.status === "FAILED").length;
-  const errorAgents    = agents.filter(a => a.status === "ERROR");
-  const healthyAgents  = agents.filter(a => a.status === "IDLE" && a.totalRuns > 0);
-  const revenue        = Number(revenueAgg._sum.totalAmount ?? 0);
+  const completedTasks    = recentTasks.filter(t => t.status === "COMPLETED").length;
+  const failedTasks       = recentTasks.filter(t => t.status === "FAILED").length;
+  const errorAgents       = agents.filter(a => a.status === "ERROR");
+  const healthyAgents     = agents.filter(a => a.status === "IDLE" && a.totalRuns > 0);
+  const revenue           = Number(revenueAgg._sum.totalAmount ?? 0);
+  const conversionRate    = sessionsTotal > 0 ? ((sessionsConverted / sessionsTotal) * 100).toFixed(1) : "0.0";
+  const aiSpend           = Number(aiSpendAgg._sum.costCents ?? 0) / 100;
+  const topRoutesStr      = topRoutes.length > 0
+    ? topRoutes.map((r, i) => `${i + 1}. ${(r.dropoffAddress ?? "Unknown").slice(0, 30)} (${r._count.id}x)`).join(" | ")
+    : "No data";
 
   // Build per-agent summary rows
   const agentRows = agents.map(a => {
@@ -218,7 +228,7 @@ async function runAiExecutiveSummary(): Promise<void> {
     </div>
 
     <!-- KPIs -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
       <div style="background:#111;border:1px solid #333;padding:14px;text-align:center">
         <div style="color:#3b82f6;font-size:24px;font-weight:bold">${bookingsToday}</div>
         <div style="color:#666;font-size:11px;margin-top:4px">BOOKINGS TODAY</div>
@@ -232,6 +242,21 @@ async function runAiExecutiveSummary(): Promise<void> {
         <div style="color:#666;font-size:11px;margin-top:4px">AGENT STATUS</div>
       </div>
     </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+      <div style="background:#111;border:1px solid #333;padding:14px;text-align:center">
+        <div style="color:#a78bfa;font-size:24px;font-weight:bold">${conversionRate}%</div>
+        <div style="color:#666;font-size:11px;margin-top:4px">CONVERSION RATE</div>
+      </div>
+      <div style="background:#111;border:1px solid #333;padding:14px;text-align:center">
+        <div style="color:#f87171;font-size:24px;font-weight:bold">${abandonedCount}</div>
+        <div style="color:#666;font-size:11px;margin-top:4px">ABANDONED TODAY</div>
+      </div>
+      <div style="background:#111;border:1px solid #333;padding:14px;text-align:center">
+        <div style="color:#34d399;font-size:18px;font-weight:bold">$${aiSpend.toFixed(2)}</div>
+        <div style="color:#666;font-size:11px;margin-top:4px">AI SPEND TODAY</div>
+      </div>
+    </div>
+    ${topRoutes.length > 0 ? `<div style="background:#111;border:1px solid #333;padding:12px;margin-bottom:20px;font-size:11px;color:#aaa"><span style="color:#c9a84c">TOP ROUTES (24H):</span> ${topRoutesStr}</div>` : ""}
 
     <!-- Agent run summary -->
     <div style="margin-bottom:20px">

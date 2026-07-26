@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runOrchestrator } from "@/lib/ai/agents/orchestrator";
+import { runAllAgentReviews } from "@/lib/ai/learning";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,6 +15,8 @@ function authorise(req: NextRequest): boolean {
 export async function GET(req: NextRequest) {
   if (!authorise(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const result = await runOrchestrator();
+  // Run learning reviews after agents complete so insights are based on today's data
+  await runAllAgentReviews().catch(() => {});
   return NextResponse.json({ ok: true, ...result });
 }
 

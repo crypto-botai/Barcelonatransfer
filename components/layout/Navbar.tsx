@@ -164,7 +164,7 @@ export default function Navbar() {
               <LanguageSwitcher compact />
               <button
                 onClick={() => setMobile(!mobileOpen)}
-                className="p-2 text-dark-300 hover:text-gold-400 transition-colors"
+                className="p-2.5 text-dark-300 hover:text-gold-400 transition-colors"
                 aria-label="Toggle menu"
               >
                 {mobileOpen ? <X size={22} /> : <Menu size={22} />}

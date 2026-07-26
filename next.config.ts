@@ -64,6 +64,10 @@ const nextConfig: NextConfig = {
     // on top of what Next.js already sets via the MetadataRoute handler.
     result.push(
       {
+        source: "/fleet/:file*.png",
+        headers: [{ key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400, immutable" }],
+      },
+      {
         source: "/sitemap.xml",
         headers: [
           { key: "Content-Type", value: "application/xml; charset=utf-8" },

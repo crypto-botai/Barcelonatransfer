@@ -3,16 +3,18 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { Star, Shield, Phone, Clock, MapPin, ChevronRight } from "lucide-react";
+import { SHARED_OG } from "@/lib/seo";
 
 const BASE = "https://www.elitebcn.info";
 
 export const metadata: Metadata = {
   title: { absolute: "VIP Transportation Barcelona — Élite BCN Private Chauffeur" },
   description:
-    "VIP chauffeur service in Barcelona: private jet meets, gala events, executive roadshows, red-carpet arrivals. Discreet, punctual, fully licensed. Available 24/7.",
+    "VIP chauffeur in Barcelona: private jet meets, gala events, executive roadshows, red-carpet arrivals. Discreet, punctual, fully licensed. Available 24/7.",
   alternates: { canonical: `${BASE}/vip-transportation` },
   keywords: ["vip transportation barcelona", "celebrity chauffeur barcelona", "private jet transfer barcelona", "executive transport barcelona"],
   openGraph: {
+    ...SHARED_OG,
     title: "VIP Transportation Barcelona — Élite BCN Private Chauffeur",
     description:
       "Discreet VIP chauffeur service for celebrities, executives and dignitaries. Private jet meets, gala event transport, red-carpet arrivals.",
@@ -25,6 +27,15 @@ export const metadata: Metadata = {
     description: "Discreet VIP chauffeur for celebrities, executives, private jet meets and gala events in Barcelona.",
     images: [`${BASE}/opengraph-image`],
   },
+};
+
+const BREADCRUMB = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",               item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "VIP Transportation", item: "https://www.elitebcn.info/vip-transportation" },
+  ],
 };
 
 const SCHEMA = {
@@ -75,11 +86,9 @@ const SERVICES = [
 export default function VIPTransportationPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
       <Navbar />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }}
-      />
 
       <main className="pt-20">
         {/* Hero */}

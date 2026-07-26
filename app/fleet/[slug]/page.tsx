@@ -7,6 +7,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { VEHICLE_CATALOG, type FleetVehicle } from "@/types";
 import { getFleetFromPrice, lookupFixedPriceByZone } from "@/lib/pricing";
+import { SHARED_OG } from "@/lib/seo";
 
 const SLUG_TO_CLASS: Record<string, FleetVehicle> = {
   "standard-sedan":    "COROLLA",
@@ -38,11 +39,19 @@ export async function generateMetadata(
     title: `${vehicle.label} — Barcelona Private Transfer | Élite BCN`,
     description: `${vehicle.description} From €${minFare} fixed price. Meet & greet, flight tracking, no surge pricing.`,
     alternates: { canonical: `${BASE}/fleet/${slug}` },
+    keywords: [`barcelona ${vehicle.label.toLowerCase()} transfer`, `${vehicle.label.toLowerCase()} private hire barcelona`, "barcelona airport transfer", "luxury chauffeur barcelona"],
     openGraph: {
+      ...SHARED_OG,
       title: `${vehicle.label} — Barcelona Private Transfer`,
       description: `From €${minFare}. Fixed-price private transfer in ${vehicle.label}. No surge pricing, ever.`,
       url: `${BASE}/fleet/${slug}`,
-      images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `Élite BCN — ${vehicle.label} Barcelona Private Transfer` }],
+    },
+    twitter: {
+      card: "summary_large_image" as const,
+      title: `${vehicle.label} — Barcelona Private Transfer | Élite BCN`,
+      description: `From €${minFare}. Fixed-price private transfer in ${vehicle.label}. Meet & greet, flight tracking, no surge pricing.`,
+      images: ["/opengraph-image"],
     },
   };
 }

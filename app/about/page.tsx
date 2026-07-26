@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { COMPANY } from "@/lib/company-facts";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "About Élite BCN — Barcelona's Luxury Transfer Company",
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.elitebcn.info/about" },
   keywords: ["about elite bcn", "barcelona vtc company", "luxury chauffeur barcelona", "licensed vtc barcelona"],
   openGraph: {
+    ...SHARED_OG,
     title: "About Élite BCN — Barcelona's Luxury Transfer Company",
     description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet. 595+ five-star reviews.",
     url: "https://www.elitebcn.info/about",
@@ -23,9 +25,54 @@ export const metadata: Metadata = {
   },
 };
 
+const aboutSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AboutPage",
+      "@id":   "https://www.elitebcn.info/about",
+      url:     "https://www.elitebcn.info/about",
+      name:    "About Élite BCN Transfers",
+      description: "Licensed VTC chauffeur company in Barcelona since 2018. 4.9★ rated with 595+ five-star reviews.",
+      inLanguage: "en",
+      isPartOf: { "@id": "https://www.elitebcn.info" },
+      breadcrumb: {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home",  item: "https://www.elitebcn.info" },
+          { "@type": "ListItem", position: 2, name: "About", item: "https://www.elitebcn.info/about" },
+        ],
+      },
+    },
+    {
+      "@type":       "Organization",
+      "@id":         "https://www.elitebcn.info/#organization",
+      name:          "Élite BCN Transfers",
+      url:           "https://www.elitebcn.info",
+      foundingDate:  "2018",
+      description:   "Licensed VTC private chauffeur service in Barcelona. Airport transfers, corporate travel, luxury fleet.",
+      logo:          { "@type": "ImageObject", url: "https://www.elitebcn.info/favicon.svg" },
+      contactPoint:  { "@type": "ContactPoint", telephone: "+34-635-383-712", contactType: "customer service", availableLanguage: ["English", "Spanish"] },
+      address: {
+        "@type":           "PostalAddress",
+        addressLocality:   "Barcelona",
+        addressRegion:     "Catalonia",
+        addressCountry:    "ES",
+      },
+      aggregateRating: {
+        "@type":       "AggregateRating",
+        ratingValue:   "4.9",
+        reviewCount:   "595",
+        bestRating:    "5",
+      },
+    },
+  ],
+};
+
 export default function AboutPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }} />
       <Navbar />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">

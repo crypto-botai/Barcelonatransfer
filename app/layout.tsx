@@ -72,6 +72,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.google-analytics.com" />
         {/* Geo meta tags for local SEO — BCN El Prat Airport is primary service location */}
         <meta name="geo.region" content="ES-CT" />
         <meta name="geo.placename" content="Barcelona El Prat Airport, Catalonia, Spain" />
@@ -244,10 +246,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
             }}
           />
+          <GoogleAnalytics gaId="G-E9QZFG5WZY" />
           </I18nProvider>
         </AuthProvider>
       </body>
-      <GoogleAnalytics gaId="G-E9QZFG5WZY" />
     </html>
   );
 }

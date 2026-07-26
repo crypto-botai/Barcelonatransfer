@@ -5,6 +5,7 @@ import FAQAccordion from "@/components/faq/FAQAccordion";
 import { FAQ_GROUPS } from "@/lib/faq-data";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "FAQ — Barcelona Transfer Questions Answered | Élite BCN",
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.elitebcn.info/faq" },
   keywords: ["barcelona transfer faq", "airport transfer questions", "vtc barcelona faq", "private transfer barcelona help"],
   openGraph: {
+    ...SHARED_OG,
     title: "FAQ — Barcelona Transfer Questions Answered | Élite BCN",
     description: "Everything you need to know about booking a luxury private transfer in Barcelona. Fixed prices, fleet, airport pickups, cancellation policy.",
     url: "https://www.elitebcn.info/faq",

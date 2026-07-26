@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight, Anchor } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
+import { SHARED_OG } from "@/lib/seo";
 
 const cruisePrice = ROUTES.find((r) => r.from === "airport" && r.to === "cruise")?.economy ?? 45;
 
@@ -11,8 +12,9 @@ export const metadata: Metadata = {
   title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Élite BCN`,
   description: `Private transfer to Barcelona cruise terminals (WTC & Moll Adossat). Vessel tracking, meet & greet, fixed price from €${cruisePrice}. No surge pricing. Book 24/7.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/cruise-port" },
-  keywords: ["barcelona cruise port transfer", "world trade centre transfer", "moll adossat transfer", "barcelona port taxi"],
+  keywords: ["barcelona cruise port transfer", "world trade centre transfer", "moll adossat transfer", "barcelona port taxi", "cruise ship transfer barcelona"],
   openGraph: {
+    ...SHARED_OG,
     title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Fixed Price`,
     description: `Private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €${cruisePrice}. Vessel tracking, meet & greet, fixed price.`,
     url: "https://www.elitebcn.info/transfers/cruise-port",
@@ -26,9 +28,32 @@ export const metadata: Metadata = {
   },
 };
 
+const cruisePortSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Barcelona Cruise Port Transfer",
+  description: `Fixed-price private transfers to all Barcelona cruise terminals — World Trade Centre (WTC) and Moll Adossat (T-A to T-D). Vessel tracking included.`,
+  url: "https://www.elitebcn.info/transfers/cruise-port",
+  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: "Barcelona, Spain",
+  offers: { "@type": "Offer", price: String(cruisePrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+};
+
+const cruisePortBreadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",         item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "Destinations", item: "https://www.elitebcn.info/transfers" },
+    { "@type": "ListItem", position: 3, name: "Cruise Port",  item: "https://www.elitebcn.info/transfers/cruise-port" },
+  ],
+};
+
 export default function CruisePortTransferPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(cruisePortSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(cruisePortBreadcrumb) }} />
       <Navbar />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">

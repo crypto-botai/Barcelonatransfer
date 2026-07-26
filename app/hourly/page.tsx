@@ -4,24 +4,27 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+import { SHARED_OG } from "@/lib/seo";
 
 const MIN_RATE = HOURLY_RATES.ECONOMY;
 const MIN_HOURS = MIN_HOURLY_HOURS.ECONOMY;
 
 export const metadata: Metadata = {
   title: { absolute: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Élite BCN` },
-  description: `Private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr (${MIN_HOURS}-hr minimum). Flexible disposal for meetings, shopping, city tours & events. Mercedes V-Class & EQE 300 Electric.`,
+  description: `Private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr. Meetings, shopping, events & city tours. Mercedes V-Class & EQE 300 Electric. ${MIN_HOURS}-hr minimum.`,
   alternates: { canonical: "https://www.elitebcn.info/hourly" },
+  keywords: ["hourly chauffeur barcelona", "chauffeur by the hour barcelona", "barcelona disposal chauffeur", "private driver barcelona hourly"],
   openGraph: {
+    ...SHARED_OG,
     title: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Élite BCN`,
-    description: `Book a private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr. Flexible disposal for meetings, shopping, events, or sightseeing.`,
+    description: `Book a private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr. Meetings, shopping, events & city tours. ${MIN_HOURS}-hr minimum.`,
     url: "https://www.elitebcn.info/hourly",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Hourly Chauffeur Barcelona" }],
   },
   twitter: {
     card: "summary_large_image",
     title: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Élite BCN`,
-    description: `Book a private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr. Flexible disposal for meetings, shopping, events, or sightseeing.`,
+    description: `Book a private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr. Meetings, shopping, events & city tours. ${MIN_HOURS}-hr minimum.`,
     images: ["/opengraph-image"],
   },
 };
@@ -63,7 +66,7 @@ export default function HourlyPage() {
           <div className="container mx-auto px-4 text-center relative z-10">
             <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">Hourly Hire</span>
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-6">
-              Private Chauffeur <span className="text-gold-gradient">By the Hour</span>
+              Barcelona Private Chauffeur <span className="text-gold-gradient">By the Hour</span>
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Your professional chauffeur at complete disposal for meetings, shopping, touring, or multi-stop business days. Minimum 4 hours.

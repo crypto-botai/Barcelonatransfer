@@ -2,20 +2,24 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { COMPANY } from "@/lib/company-facts";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Élite BCN Transfers",
-  description: "Privacy Policy for Élite BCN Transfers — how we collect, use and protect your personal data.",
+  title: "Privacy Policy — Élite BCN Barcelona Private Transfers",
+  description: "Privacy Policy for Élite BCN Transfers — how we collect, use and protect your personal data on our Barcelona private transfer booking platform.",
   alternates: { canonical: "https://www.elitebcn.info/privacy" },
   openGraph: {
-    title: "Privacy Policy | Élite BCN Transfers",
+    ...SHARED_OG,
+    title: "Privacy Policy — Élite BCN Barcelona Private Transfers",
     description: "Privacy Policy for Élite BCN Transfers — how we collect, use and protect your personal data.",
     url: "https://www.elitebcn.info/privacy",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN Transfers — Privacy Policy" }],
   },
   twitter: {
-    card: "summary",
-    title: "Privacy Policy | Élite BCN Transfers",
+    card: "summary_large_image",
+    title: "Privacy Policy — Élite BCN Barcelona Private Transfers",
     description: "Privacy Policy for Élite BCN Transfers — how we collect, use and protect your personal data.",
+    images: ["/opengraph-image"],
   },
 };
 

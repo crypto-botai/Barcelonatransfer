@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import {
@@ -201,7 +202,7 @@ export default function TrackingPage({ params }: { params: Promise<{ id: string 
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-xl bg-dark-700 border border-white/[0.1] flex items-center justify-center text-white font-bold text-lg overflow-hidden flex-shrink-0">
                   {booking.driver.user.image ? (
-                    <img src={booking.driver.user.image} alt="" className="w-full h-full object-cover" />
+                    <Image src={booking.driver.user.image} alt="" width={48} height={48} className="w-full h-full object-cover" />
                   ) : (
                     booking.driver.user.name?.[0]?.toUpperCase() ?? "D"
                   )}

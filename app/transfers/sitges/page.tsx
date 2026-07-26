@@ -3,24 +3,38 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Barcelona to Sitges Transfer — from €80 | Fixed Price",
   description:
-    "Luxury private transfer from Barcelona to Sitges. Fixed price from €80. 35-minute journey in Mercedes V-Class & EQE 300 Electric. Meet & greet, no surge pricing. Book instantly.",
+    "Private transfer from Barcelona to Sitges. Fixed price from €80. 35-minute journey. Meet & greet in arrivals, no surge pricing. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/sitges" },
+  keywords: ["barcelona sitges transfer", "sitges private car barcelona", "sitges airport transfer", "barcelona sitges taxi"],
   openGraph: {
+    ...SHARED_OG,
     title: "Barcelona to Sitges Transfer — from €80 | Fixed Price",
-    description: "Luxury private transfer from Barcelona to Sitges from €80. Fixed price, meet & greet, no surge pricing. 35 minutes.",
+    description: "Private transfer from Barcelona to Sitges from €80. Fixed price, meet & greet, no surge pricing. 35 minutes.",
     url: "https://www.elitebcn.info/transfers/sitges",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Sitges Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Barcelona to Sitges Transfer — from €80 | Fixed Price",
-    description: "Luxury private transfer from Barcelona to Sitges from €80. Fixed price, meet & greet, no surge pricing. 35 minutes.",
+    description: "Private transfer from Barcelona to Sitges from €80. Fixed price, meet & greet, no surge pricing. 35 minutes.",
     images: ["/opengraph-image"],
   },
+};
+
+const sitgesServiceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Barcelona to Sitges Private Transfer",
+  description: "Fixed-price private transfer from Barcelona Airport or City to Sitges. From €80. 35-minute journey, meet & greet, no surge pricing.",
+  url: "https://www.elitebcn.info/transfers/sitges",
+  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: "Sitges, Garraf, Catalonia, Spain",
+  offers: { "@type": "Offer", price: "80", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const BREADCRUMB = {
@@ -59,8 +73,9 @@ const SCHEMA = {
 export default function SitgesTransferPage() {
   return (
     <>
-      <Navbar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(sitgesServiceSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
+      <Navbar />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
       <main className="pt-20">
         {/* Hero */}

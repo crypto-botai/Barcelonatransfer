@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   MapPin, Clock, Calendar, Users, Briefcase, Phone,
@@ -155,7 +156,7 @@ export default function UpcomingBookingCard({ booking }: { booking: Booking }) {
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-full bg-dark-700 border border-white/[0.1] flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 overflow-hidden">
                   {driver.user.image ? (
-                    <img src={driver.user.image} alt="" className="w-full h-full object-cover" />
+                    <Image src={driver.user.image} alt="" width={36} height={36} className="w-full h-full object-cover" />
                   ) : (
                     driver.user.name?.[0]?.toUpperCase() ?? "D"
                   )}

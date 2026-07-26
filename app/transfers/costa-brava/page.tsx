@@ -4,31 +4,56 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
+import { SHARED_OG } from "@/lib/seo";
 
 const COSTA_BRAVA = ROUTES.filter((r) => r.category === "costa-brava");
 
 export const metadata: Metadata = {
-  title: "Barcelona to Costa Brava Transfer — from €95 | Élite BCN",
-  description: "Private transfer from Barcelona Airport to Costa Brava. Lloret, Tossa, Blanes, Roses, Palamós, Cadaqués. Fixed price from €95. All vehicles. Book instantly.",
+  title: "Barcelona to Costa Brava Transfer — from €90 | Élite BCN",
+  description: "Private transfer from Barcelona to Costa Brava. Lloret, Tossa, Blanes, Roses, Palamós, Cadaqués. Fixed price from €90. All vehicles. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/costa-brava" },
-  keywords: ["barcelona costa brava transfer", "airport lloret de mar transfer", "barcelona tossa de mar transfer"],
+  keywords: ["barcelona costa brava transfer", "airport lloret de mar transfer", "barcelona tossa de mar transfer", "lloret de mar private transfer"],
   openGraph: {
-    title: "Barcelona to Costa Brava Transfer — from €95 | Fixed Price",
-    description: "Private transfer from Barcelona Airport to Costa Brava from €95. Lloret, Tossa, Blanes, Roses, Cadaqués. Fixed price, all vehicles.",
+    ...SHARED_OG,
+    title: "Barcelona to Costa Brava Transfer — from €90 | Fixed Price",
+    description: "Private transfer from Barcelona to Costa Brava from €90. Lloret, Tossa, Blanes, Roses, Cadaqués. Fixed price, all vehicles.",
     url: "https://www.elitebcn.info/transfers/costa-brava",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Costa Brava Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona to Costa Brava Transfer — from €95 | Élite BCN",
-    description: "Private transfer from Barcelona Airport to Costa Brava from €95. Lloret, Tossa, Blanes, Roses. Fixed price.",
+    title: "Barcelona to Costa Brava Transfer — from €90 | Élite BCN",
+    description: "Private transfer from Barcelona to Costa Brava from €90. Lloret, Tossa, Blanes, Roses. Fixed price.",
     images: ["/opengraph-image"],
   },
+};
+
+const costaBravaSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Barcelona to Costa Brava Private Transfer",
+  description: "Luxury fixed-price private transfers from Barcelona to all Costa Brava resorts — Lloret de Mar, Tossa de Mar, Cadaqués, Roses and beyond.",
+  url: "https://www.elitebcn.info/transfers/costa-brava",
+  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: "Costa Brava, Catalonia, Spain",
+  offers: { "@type": "Offer", price: "90", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+};
+
+const costaBravaBreadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",         item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "Destinations", item: "https://www.elitebcn.info/transfers" },
+    { "@type": "ListItem", position: 3, name: "Costa Brava",  item: "https://www.elitebcn.info/transfers/costa-brava" },
+  ],
 };
 
 export default function CostaBravaTransferPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costaBravaSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costaBravaBreadcrumb) }} />
       <Navbar />
       <main className="pt-20">
         {/* Hero */}

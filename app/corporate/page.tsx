@@ -2,20 +2,23 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: { absolute: "Corporate Chauffeur Barcelona | Élite BCN" },
+  title: { absolute: "Corporate Chauffeur Barcelona — Executive Travel | Élite BCN" },
   description: "Corporate chauffeur in Barcelona. Executive airport transfers, roadshows, board meetings & MICE events. Monthly invoicing, account manager. VTC licensed.",
   alternates: { canonical: "https://www.elitebcn.info/corporate" },
+  keywords: ["corporate chauffeur barcelona", "executive transfer barcelona", "business chauffeur barcelona", "corporate account chauffeur"],
   openGraph: {
-    title: "Corporate Chauffeur Barcelona | Élite BCN",
+    ...SHARED_OG,
+    title: "Corporate Chauffeur Barcelona — Executive Travel | Élite BCN",
     description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, events. Monthly invoicing, account manager.",
     url: "https://www.elitebcn.info/corporate",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Corporate Chauffeur Barcelona" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Corporate Chauffeur Barcelona | Élite BCN",
+    title: "Corporate Chauffeur Barcelona — Executive Travel | Élite BCN",
     description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, events. Monthly invoicing, account manager.",
     images: ["/opengraph-image"],
   },
@@ -50,7 +53,7 @@ export default function CorporatePage() {
           <div className="container mx-auto px-4 text-center relative z-10">
             <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">Corporate</span>
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-6">
-              Executive & <span className="text-gold-gradient">Corporate Travel</span>
+              Barcelona Executive & <span className="text-gold-gradient">Corporate Travel</span>
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Dedicated corporate accounts with priority fleet allocation, consolidated invoicing, and a dedicated account manager available 24/7.

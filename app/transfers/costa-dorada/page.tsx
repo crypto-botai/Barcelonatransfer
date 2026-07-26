@@ -4,16 +4,18 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
+import { SHARED_OG } from "@/lib/seo";
 
 const COSTA_DORADA = ROUTES.filter((r) => r.category === "costa-dorada");
 
 export const metadata: Metadata = {
-  title: "Barcelona to Costa Dorada Transfer — from €50 | All Vehicles",
+  title: "Barcelona to Costa Dorada Transfer — from €50 | Élite BCN",
   description:
-    "Private transfer from Barcelona to Costa Dorada. Sitges, Tarragona, Salou, PortAventura, Cambrils. VAT-inclusive fixed prices from €50. All vehicle classes. Book instantly.",
+    "Private transfer from Barcelona to Costa Dorada. Sitges, Tarragona, Salou, PortAventura, Cambrils. Fixed prices from €50. All vehicle classes. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/costa-dorada" },
-  keywords: ["barcelona costa dorada transfer", "airport salou transfer", "barcelona portaventura transfer", "barcelona sitges transfer"],
+  keywords: ["barcelona costa dorada transfer", "airport salou transfer", "barcelona portaventura transfer", "barcelona sitges transfer", "salou private transfer"],
   openGraph: {
+    ...SHARED_OG,
     title: "Barcelona to Costa Dorada Transfer — from €50 | Fixed Price",
     description: "Private transfer from Barcelona to Costa Dorada from €50. Sitges, Tarragona, Salou, PortAventura. Fixed price, all vehicles.",
     url: "https://www.elitebcn.info/transfers/costa-dorada",
@@ -27,9 +29,32 @@ export const metadata: Metadata = {
   },
 };
 
+const costadoradaSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Barcelona to Costa Dorada Private Transfer",
+  description: "Luxury fixed-price private transfers from Barcelona to all Costa Dorada resorts — Sitges, Tarragona, Salou, PortAventura, Cambrils and beyond.",
+  url: "https://www.elitebcn.info/transfers/costa-dorada",
+  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: "Costa Dorada, Catalonia, Spain",
+  offers: { "@type": "Offer", price: "50", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+};
+
+const costadoradaBreadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",          item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "Destinations",  item: "https://www.elitebcn.info/transfers" },
+    { "@type": "ListItem", position: 3, name: "Costa Dorada",  item: "https://www.elitebcn.info/transfers/costa-dorada" },
+  ],
+};
+
 export default function CostaDoradaTransferPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costadoradaSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costadoradaBreadcrumb) }} />
       <Navbar />
       <main className="pt-20">
         {/* Hero */}

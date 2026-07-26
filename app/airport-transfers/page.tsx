@@ -4,16 +4,19 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { Plane, Anchor, Clock, Shield, Star, CheckCircle2 } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
+import { SHARED_OG } from "@/lib/seo";
 
 const airportCityEco = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona_city")?.economy ?? 45;
 
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Airport Transfer — BCN El Prat | Élite BCN" },
-  description: `Private transfer from Barcelona Airport from €${airportCityEco}. Meet & greet in arrivals, real-time flight tracking, 60 min free waiting. Mercedes V-Class & EQE 300 Electric. Fixed price.`,
+  description: `Private transfer from Barcelona Airport (BCN) from €${airportCityEco}. Meet & greet, real-time flight tracking, 60 min free waiting. Mercedes V-Class & EQE 300 Electric.`,
   alternates: { canonical: "https://www.elitebcn.info/airport-transfers" },
+  keywords: ["barcelona airport transfer", "bcn el prat transfer", "barcelona airport private car", "airport chauffeur barcelona"],
   openGraph: {
+    ...SHARED_OG,
     title: "Barcelona Airport Transfer — BCN El Prat | Élite BCN",
-    description: `Private luxury transfer from Barcelona Airport from €${airportCityEco}. Meet & greet, flight tracking, 60 min free wait. Mercedes V-Class & EQE 300 Electric. No surge pricing.`,
+    description: `Private luxury transfer from Barcelona Airport (BCN) from €${airportCityEco}. Meet & greet, flight tracking, 60 min free wait. Mercedes V-Class & EQE 300 Electric.`,
     url: "https://www.elitebcn.info/airport-transfers",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Airport Private Transfer" }],
   },

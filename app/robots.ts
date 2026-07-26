@@ -7,8 +7,8 @@ const DISALLOW = [
   "/api",
   "/auth/",
   "/booking/pay/",
-  "/book/success",
-  "/book/failed",
+  "/booking/success",
+  "/booking/failed",
   "/review",
 ];
 

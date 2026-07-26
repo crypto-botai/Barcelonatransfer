@@ -4,15 +4,18 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
+import { SHARED_OG } from "@/lib/seo";
 
 const PA = ROUTES.find((r) => r.to === "portaventura")!;
 
 export const metadata: Metadata = {
   title: "Barcelona to PortAventura Transfer — from €155 | Fixed Price",
   description:
-    "Private transfer from Barcelona to PortAventura World. VAT-inclusive fixed price from €155 (sedan) to €275 (minibus). Family-friendly. Book instantly.",
+    "Private transfer from Barcelona to PortAventura World. Fixed price from €155 (sedan) to €275 (minibus). Family-friendly, no surge pricing. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/port-aventura" },
+  keywords: ["barcelona portaventura transfer", "portaventura theme park transfer", "barcelona portaventura world private transfer", "salou portaventura taxi"],
   openGraph: {
+    ...SHARED_OG,
     title: "Barcelona to PortAventura Transfer — from €155 | Fixed Price",
     description: "Private transfer from Barcelona to PortAventura World from €155. Fixed price, family-friendly, all vehicle classes.",
     url: "https://www.elitebcn.info/transfers/port-aventura",
@@ -26,9 +29,32 @@ export const metadata: Metadata = {
   },
 };
 
+const paSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Barcelona to PortAventura World Transfer",
+  description: "Fixed-price private transfer from Barcelona to PortAventura World, Ferrari Land and Caribe Aquatic Park. From €155 economy to €275 minibus.",
+  url: "https://www.elitebcn.info/transfers/port-aventura",
+  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: "PortAventura, Salou, Tarragona, Spain",
+  offers: { "@type": "Offer", price: "155", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+};
+
+const paBreadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",            item: "https://www.elitebcn.info" },
+    { "@type": "ListItem", position: 2, name: "Destinations",    item: "https://www.elitebcn.info/transfers" },
+    { "@type": "ListItem", position: 3, name: "PortAventura",    item: "https://www.elitebcn.info/transfers/port-aventura" },
+  ],
+};
+
 export default function PortAventuraTransferPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(paSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(paBreadcrumb) }} />
       <Navbar />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">

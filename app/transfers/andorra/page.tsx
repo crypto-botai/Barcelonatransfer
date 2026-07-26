@@ -4,27 +4,41 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
+import { SHARED_OG } from "@/lib/seo";
 
 const andorraPrice =
   ROUTES.find((r) => r.from === "barcelona_city" && r.to === "andorra")?.economy ?? 285;
 
 export const metadata: Metadata = {
-  title: `Barcelona Airport to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
+  title: `Barcelona to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
   description:
-    `Luxury private transfer from Barcelona Airport (BCN) to Andorra la Vella. Fixed price from €${andorraPrice}. 3-hour journey in premium Mercedes V-Class & EQE 300 Electric. Ski season & shopping trips. Book instantly.`,
+    `Private transfer Barcelona to Andorra la Vella. Fixed price from €${andorraPrice}. 3-hour Pyrenean journey. Ski season & shopping specialist. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/andorra" },
+  keywords: ["barcelona andorra transfer", "barcelona andorra private car", "andorra ski transfer barcelona", "andorra la vella transfer"],
   openGraph: {
-    title: `Barcelona Airport to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
-    description: `Luxury private transfer from Barcelona Airport to Andorra la Vella from €${andorraPrice}. Fixed price, no surge pricing. Ski season specialist.`,
+    ...SHARED_OG,
+    title: `Barcelona to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
+    description: `Private transfer from Barcelona to Andorra la Vella from €${andorraPrice}. Fixed price, no surge pricing. Ski season specialist.`,
     url: "https://www.elitebcn.info/transfers/andorra",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Andorra Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Barcelona Airport to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
-    description: `Luxury private transfer Barcelona Airport to Andorra la Vella from €${andorraPrice}. Fixed price, no surge pricing. Ski season specialist.`,
+    title: `Barcelona to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
+    description: `Private transfer Barcelona to Andorra la Vella from €${andorraPrice}. Fixed price, no surge pricing. Ski season specialist.`,
     images: ["/opengraph-image"],
   },
+};
+
+const andorraServiceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Barcelona to Andorra Private Transfer",
+  description: `Fixed-price private transfer from Barcelona Airport to Andorra la Vella. From €${andorraPrice}. 3-hour Pyrenean journey. Ski season and shopping specialist.`,
+  url: "https://www.elitebcn.info/transfers/andorra",
+  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  areaServed: "Andorra la Vella, Andorra",
+  offers: { "@type": "Offer", price: String(andorraPrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const BREADCRUMB = {
@@ -40,8 +54,9 @@ const BREADCRUMB = {
 export default function AndorraTransferPage() {
   return (
     <>
-      <Navbar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(andorraServiceSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
+      <Navbar />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,rgba(201,168,76,0.07),transparent)]" />
