@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
-  VEHICLE_CATALOG, EXTRAS_CATALOG, BOOKING_TYPE_LABELS, FLEET_TO_DB_CLASS,
+  VEHICLE_CATALOG, EXTRAS_CATALOG, BOOKING_TYPE_LABELS, FLEET_TO_DB_CLASS, vehicleBadgeClass,
   type FleetVehicle, type VehicleClass, type BookingFormData, type QuoteResponse,
   type BookingType,
 } from "@/types";
@@ -577,11 +577,7 @@ export default function BookFormClient() {
                               style={{ filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.8))" }} />
                             {v.badge && (
                               <div className="absolute top-2 left-2 z-10">
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                                  v.badge === "VIP" ? "bg-gold-500 text-black" :
-                                  v.badge === "Popular" ? "bg-blue-500 text-white" :
-                                  "bg-green-500 text-white"
-                                }`}>{v.badge}</span>
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${vehicleBadgeClass(v.badge)}`}>{v.badge}</span>
                               </div>
                             )}
                           </div>

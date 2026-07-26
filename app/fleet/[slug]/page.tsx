@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CheckCircle2, Users, Briefcase, Star, Shield, Clock, ChevronRight, Zap } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { VEHICLE_CATALOG, type FleetVehicle } from "@/types";
+import { VEHICLE_CATALOG, vehicleBadgeClass, type FleetVehicle } from "@/types";
 import { getFleetFromPrice, lookupFixedPriceByZone } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 
@@ -126,11 +126,7 @@ export default async function FleetVehiclePage(
               {/* Copy */}
               <div>
                 {vehicle.badge && (
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 ${
-                    vehicle.badge === "VIP"      ? "bg-gold-500 text-black" :
-                    vehicle.badge === "Electric" ? "bg-green-500 text-white" :
-                    "bg-blue-500 text-white"
-                  }`}>{vehicle.badge}</span>
+                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 ${vehicleBadgeClass(vehicle.badge)}`}>{vehicle.badge}</span>
                 )}
                 <h1 className="font-display text-4xl sm:text-5xl text-white mb-4">
                   {vehicle.label}

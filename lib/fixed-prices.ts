@@ -90,14 +90,17 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "GIRONA_AIRPORT",
     fromLabel: "El Prat Airport", toLabel: "Girona Airport",
     category: "airport-city",
-    prices: { ECONOMY: 140, BUSINESS: 155, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 },
+    // +€25 vs. the Barcelona-City-origin twin — this pickup starts from the
+    // airport, not the city, per explicit instruction.
+    prices: { ECONOMY: 165, BUSINESS: 180, MINIVAN: 195, VCLASS: 220, MINIBUS: 280 },
   },
   {
     slug: "bcn-airport-la-roca",
     from: "BCN_AIRPORT", to: "LA_ROCA",
     fromLabel: "El Prat Airport", toLabel: "La Roca Village",
     category: "airport-city",
-    prices: { ECONOMY: 80, BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 },
+    // +€25 vs. the Barcelona-City-origin twin — airport pickup, not city.
+    prices: { ECONOMY: 105, BUSINESS: 125, MINIVAN: 135, VCLASS: 155, MINIBUS: 225 },
   },
   // ── Airport → Costa Dorada (same prices as Barcelona City → Costa Dorada) ──
   {

@@ -15,9 +15,9 @@ const ROUTE_SEED = [
   { slug: "bcn-montserrat",      fromKey: "barcelona_city", toKey: "montserrat",     label: "Barcelona ⇄ Montserrat",            category: "airport",       sortOrder: 8,  ECONOMY: 115, BUSINESS: 130, MINIVAN: 155, VCLASS: 175, MINIBUS: 240 },
   { slug: "bcn-girona",          fromKey: "barcelona_city", toKey: "girona_airport", label: "Barcelona ⇄ Girona Airport",        category: "airport",       sortOrder: 9,  ECONOMY: 140, BUSINESS: 155, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 },
   { slug: "bcn-andorra",         fromKey: "barcelona_city", toKey: "andorra",        label: "Barcelona ⇄ Andorra",               category: "airport",       sortOrder: 10, ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 630 },
-  // ── Airport → Girona Airport & La Roca ──
-  { slug: "bcn-airport-girona-airport", fromKey: "airport", toKey: "girona_airport", label: "El Prat Airport ⇄ Girona Airport", category: "airport",      sortOrder: 11, ECONOMY: 140, BUSINESS: 155, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 },
-  { slug: "bcn-airport-la-roca",        fromKey: "airport", toKey: "la_roca",        label: "El Prat Airport ⇄ La Roca Village",category: "airport",      sortOrder: 12, ECONOMY: 80,  BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 },
+  // ── Airport → Girona Airport & La Roca ── +€25 vs. the Barcelona-City twin: airport pickup, not city.
+  { slug: "bcn-airport-girona-airport", fromKey: "airport", toKey: "girona_airport", label: "El Prat Airport ⇄ Girona Airport", category: "airport",      sortOrder: 11, ECONOMY: 165, BUSINESS: 180, MINIVAN: 195, VCLASS: 220, MINIBUS: 280 },
+  { slug: "bcn-airport-la-roca",        fromKey: "airport", toKey: "la_roca",        label: "El Prat Airport ⇄ La Roca Village",category: "airport",      sortOrder: 12, ECONOMY: 105, BUSINESS: 125, MINIVAN: 135, VCLASS: 155, MINIBUS: 225 },
   // ── Airport → Costa Dorada ──
   { slug: "bcn-airport-castelldefels", fromKey: "airport", toKey: "castelldefels", label: "El Prat Airport ⇄ Castelldefels", category: "costa-dorada", sortOrder: 21, ECONOMY: 50,  BUSINESS: 60,  MINIVAN: 65,  VCLASS: 75,  MINIBUS: 180 },
   { slug: "bcn-airport-sitges",        fromKey: "airport", toKey: "sitges",        label: "El Prat Airport ⇄ Sitges",         category: "costa-dorada", sortOrder: 22, ECONOMY: 80,  BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 },

@@ -220,7 +220,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     features: ["100% Electric", "Autopilot", "Panoramic Roof", "WiFi", "USB Charging"],
     image: "/fleet/tesla-model-3.png",
     description: "All-electric executive sedan with autopilot and panoramic roof. Zero emissions for a tech-forward transfer.",
-    badge: "Electric",
+    badge: "Electric VIP",
   },
   {
     class: "EQE_300",
@@ -231,7 +231,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     features: ["100% Electric", "Leather Seats", "Climate Control", "WiFi", "Water & Mints", "USB-C Charging"],
     image: "/fleet/eqe-300.png",
     description: "Premium all-electric Mercedes EQE 300 — zero emissions, whisper-quiet, executive comfort for any transfer.",
-    badge: "EQE Electric",
+    badge: "Luxury",
   },
   {
     class: "VITO",
@@ -242,6 +242,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     features: ["Spacious Cabin", "Climate Control", "WiFi", "USB Charging", "Sliding Doors"],
     image: "/fleet/mercedes-vito.png",
     description: "Spacious and practical for families, groups, and travellers with ample luggage — up to 8 passengers.",
+    badge: "Minivan",
   },
   {
     class: "V_CLASS",
@@ -252,7 +253,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     features: ["Captain Seats", "Conference Layout", "Champagne Bar", "4K Screen", "Privacy Glass"],
     image: "/fleet/v-class-mercedes.png",
     description: "A mobile luxury lounge — the ultimate group experience. Perfect for VIP transfers and corporate events.",
-    badge: "VIP",
+    badge: "Luxury Minivan",
   },
   {
     class: "SPRINTER",
@@ -263,8 +264,27 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     features: ["Large Group", "Air Conditioning", "PA System", "Luggage Hold", "Reclining Seats"],
     image: "/fleet/minibus.png",
     description: "Premium group transfers for corporate events, airport runs, and tours for up to 16 passengers.",
+    badge: "Minibus",
   },
 ];
+
+// Single source of truth for the vehicle-class badge color scheme — every fleet
+// card (homepage, /fleet, /fleet/[slug], the booking-form vehicle picker) reads
+// from this instead of keeping its own copy, which had drifted out of sync
+// across all three call sites (each recognised different badge strings).
+export const VEHICLE_BADGE_STYLES: Record<string, string> = {
+  "Economy":        "bg-white/10 text-white",
+  "Business":       "bg-blue-600/80 text-white",
+  "Electric VIP":   "bg-emerald-500 text-white",
+  "Luxury":         "bg-[#c9a84c] text-black",
+  "Minivan":        "bg-violet-600/80 text-white",
+  "Luxury Minivan": "bg-violet-700/90 text-white",
+  "Minibus":        "bg-slate-600/80 text-white",
+};
+
+export function vehicleBadgeClass(badge?: string): string {
+  return (badge && VEHICLE_BADGE_STYLES[badge]) || "bg-white/10 text-white";
+}
 
 export const STATUS_COLORS: Record<BookingStatus, string> = {
   PENDING:         "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
