@@ -9,9 +9,12 @@ export async function POST(req: NextRequest) {
   if (auth !== `Bearer ${CRON_SECRET}`)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Bookings with pickup between 20h and 28h from now (send ~24h reminder)
-  const from = new Date(Date.now() + 20 * 60 * 60 * 1000);
-  const to   = new Date(Date.now() + 28 * 60 * 60 * 1000);
+  // This cron now runs once daily (Vercel Hobby plan caps crons at once/day), so the window
+  // must be at least as wide as the 24h gap between runs, or bookings whose pickup time falls
+  // outside a narrow band would never be checked on any run and would silently get no reminder.
+  // 6h-36h gives every booking two overlapping chances to be caught, with margin for cron jitter.
+  const from = new Date(Date.now() + 6  * 60 * 60 * 1000);
+  const to   = new Date(Date.now() + 36 * 60 * 60 * 1000);
 
   const bookings = await prisma.booking.findMany({
     where: {
