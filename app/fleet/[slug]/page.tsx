@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CheckCircle2, Users, Briefcase, Star, Shield, Clock, ChevronRight, Zap } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { VEHICLE_CATALOG, vehicleBadgeClass, type FleetVehicle } from "@/types";
+import { VEHICLE_CATALOG, vehicleBadgeClass, BAG_SIZES, type FleetVehicle } from "@/types";
 import { getFleetFromPrice, lookupFixedPriceByZone } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 
@@ -133,14 +133,34 @@ export default async function FleetVehiclePage(
                 </h1>
                 <p className="text-dark-300 text-lg leading-relaxed mb-6">{vehicle.description}</p>
 
-                <div className="flex gap-6 mb-8">
+                <div className="flex gap-6 mb-6">
                   <div className="flex items-center gap-2 text-white">
                     <Users size={16} className="text-gold-500" />
                     <span>Up to {vehicle.maxPassengers} passengers</span>
                   </div>
-                  <div className="flex items-center gap-2 text-white">
+                </div>
+
+                <div className="mb-8">
+                  <div className="flex items-center gap-2 text-white mb-3">
                     <Briefcase size={16} className="text-gold-500" />
-                    <span>Up to {vehicle.maxLuggage} bags · {vehicle.bootLiters}L boot</span>
+                    <span className="text-sm text-dark-400 uppercase tracking-wider">Boot / trunk capacity</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-white/[0.04] border border-white/[0.08] rounded-lg p-3 text-center">
+                      <p className="text-gold-400 font-display text-2xl leading-tight">{vehicle.largeBags}</p>
+                      <p className="text-white text-xs mt-1">Large</p>
+                      <p className="text-dark-500 text-[10px] mt-0.5">{BAG_SIZES.large.cm}</p>
+                    </div>
+                    <div className="bg-white/[0.04] border border-white/[0.08] rounded-lg p-3 text-center">
+                      <p className="text-gold-400 font-display text-2xl leading-tight">{vehicle.mediumBags}</p>
+                      <p className="text-white text-xs mt-1">Medium</p>
+                      <p className="text-dark-500 text-[10px] mt-0.5">{BAG_SIZES.medium.cm}</p>
+                    </div>
+                    <div className="bg-white/[0.04] border border-white/[0.08] rounded-lg p-3 text-center">
+                      <p className="text-gold-400 font-display text-2xl leading-tight">{vehicle.smallBags}</p>
+                      <p className="text-white text-xs mt-1">Small</p>
+                      <p className="text-dark-500 text-[10px] mt-0.5">{BAG_SIZES.small.cm}</p>
+                    </div>
                   </div>
                 </div>
 

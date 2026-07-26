@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Users, Briefcase, ChevronRight, Zap, Star } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
-import { VEHICLE_CATALOG, vehicleBadgeClass } from "@/types";
+import { VEHICLE_CATALOG, vehicleBadgeClass, BAG_SIZES } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { getFleetFromPrice } from "@/lib/pricing";
 
@@ -63,9 +63,12 @@ function FleetCardInner({
             <Users size={11} className="text-[#c9a84c]/60" />
             {vehicle.maxPassengers} {t("pax")}
           </span>
-          <span className="flex items-center gap-1.5 text-xs text-white/35">
+          <span
+            className="flex items-center gap-1.5 text-xs text-white/35"
+            title={`Boot fits: ${vehicle.largeBags} Large (${BAG_SIZES.large.cm}) · ${vehicle.mediumBags} Medium (${BAG_SIZES.medium.cm}) · ${vehicle.smallBags} Small (${BAG_SIZES.small.cm})`}
+          >
             <Briefcase size={11} className="text-[#c9a84c]/60" />
-            {vehicle.maxLuggage} {t("bags")} · {vehicle.bootLiters}L
+            {vehicle.largeBags}L · {vehicle.mediumBags}M · {vehicle.smallBags}S
           </span>
         </div>
         <p className="text-[9px] text-white/15 tracking-wider">{t("inclVat")}</p>
@@ -173,6 +176,11 @@ export default function FleetSection() {
             <FleetCard key={vehicle.class} vehicle={vehicle} index={i} />
           ))}
         </div>
+
+        {/* Bag-size legend — boot/trunk capacity only, never cabin space */}
+        <p className="text-white/20 text-[10px] text-center mt-6 tracking-wide">
+          L = Large ({BAG_SIZES.large.cm}) · M = Medium ({BAG_SIZES.medium.cm}) · S = Small ({BAG_SIZES.small.cm})
+        </p>
 
         {/* CTA row */}
         <motion.div
