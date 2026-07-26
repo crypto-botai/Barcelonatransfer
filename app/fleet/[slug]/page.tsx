@@ -140,7 +140,7 @@ export default async function FleetVehiclePage(
                   </div>
                   <div className="flex items-center gap-2 text-white">
                     <Briefcase size={16} className="text-gold-500" />
-                    <span>Up to {vehicle.maxLuggage} bags</span>
+                    <span>Up to {vehicle.maxLuggage} bags · {vehicle.bootLiters}L boot</span>
                   </div>
                 </div>
 

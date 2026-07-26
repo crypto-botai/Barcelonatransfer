@@ -70,6 +70,7 @@ export interface VehicleInfo {
   models:        string[];
   maxPassengers: number;
   maxLuggage:    number;
+  bootLiters:    number; // Manufacturer-published boot/cargo capacity, seats in place
   features:      string[];
   image:         string;
   description:   string;
@@ -195,6 +196,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     models: ["Toyota Corolla"],
     maxPassengers: 3,
     maxLuggage: 3,
+    bootLiters: 371,
     features: ["Air Conditioning", "USB Charging", "WiFi", "Professional Driver"],
     image: "/fleet/sedan-corolla.png",
     description: "Reliable and comfortable for city transfers and airport runs. Ideal for solo travellers and small groups.",
@@ -206,6 +208,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     models: ["Toyota Camry"],
     maxPassengers: 3,
     maxLuggage: 3,
+    bootLiters: 428,
     features: ["Air Conditioning", "USB Charging", "WiFi", "Professional Driver", "Comfortable Seating"],
     image: "/fleet/sedan-camry.png",
     description: "A step above standard — the Camry delivers a smooth, quiet ride perfect for business and leisure travel.",
@@ -217,6 +220,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     models: ["Tesla Model 3"],
     maxPassengers: 4,
     maxLuggage: 2,
+    bootLiters: 650, // Rear trunk + front trunk ("frunk") combined
     features: ["100% Electric", "Autopilot", "Panoramic Roof", "WiFi", "USB Charging"],
     image: "/fleet/tesla-model-3.png",
     description: "All-electric executive sedan with autopilot and panoramic roof. Zero emissions for a tech-forward transfer.",
@@ -228,6 +232,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     models: ["Mercedes EQE 300"],
     maxPassengers: 4,
     maxLuggage: 3,
+    bootLiters: 430,
     features: ["100% Electric", "Leather Seats", "Climate Control", "WiFi", "Water & Mints", "USB-C Charging"],
     image: "/fleet/eqe-300.png",
     description: "Premium all-electric Mercedes EQE 300 — zero emissions, whisper-quiet, executive comfort for any transfer.",
@@ -239,6 +244,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     models: ["Mercedes Vito"],
     maxPassengers: 8,
     maxLuggage: 8,
+    bootLiters: 1000, // Behind 3rd row, all 8 seats in place (Vito Tourer Long)
     features: ["Spacious Cabin", "Climate Control", "WiFi", "USB Charging", "Sliding Doors"],
     image: "/fleet/mercedes-vito.png",
     description: "Spacious and practical for families, groups, and travellers with ample luggage — up to 8 passengers.",
@@ -250,6 +256,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     models: ["Mercedes V-Class"],
     maxPassengers: 7,
     maxLuggage: 7,
+    bootLiters: 1030, // Behind rearmost row, all seats in place (V-Class Long)
     features: ["Captain Seats", "Conference Layout", "Champagne Bar", "4K Screen", "Privacy Glass"],
     image: "/fleet/v-class-mercedes.png",
     description: "A mobile luxury lounge — the ultimate group experience. Perfect for VIP transfers and corporate events.",
@@ -261,6 +268,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     models: ["Mercedes Sprinter"],
     maxPassengers: 16,
     maxLuggage: 16,
+    bootLiters: 2000, // Rear boot, 16-seat configuration
     features: ["Large Group", "Air Conditioning", "PA System", "Luggage Hold", "Reclining Seats"],
     image: "/fleet/minibus.png",
     description: "Premium group transfers for corporate events, airport runs, and tours for up to 16 passengers.",

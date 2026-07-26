@@ -65,7 +65,7 @@ function FleetCardInner({
           </span>
           <span className="flex items-center gap-1.5 text-xs text-white/35">
             <Briefcase size={11} className="text-[#c9a84c]/60" />
-            {vehicle.maxLuggage} {t("bags")}
+            {vehicle.maxLuggage} {t("bags")} · {vehicle.bootLiters}L
           </span>
         </div>
         <p className="text-[9px] text-white/15 tracking-wider">{t("inclVat")}</p>
