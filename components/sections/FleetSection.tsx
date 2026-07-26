@@ -94,24 +94,6 @@ function FleetCardInner({
   );
 }
 
-function MarqueeCloneSet() {
-  const t = useTranslations("fleet");
-  return (
-    <div aria-hidden="true" className="flex gap-4">
-      {VEHICLE_CATALOG.map((vehicle) => (
-        <div key={`clone-${vehicle.class}`} className="flex-shrink-0 w-[268px]">
-          <FleetCardInner
-            vehicle={vehicle}
-            t={t}
-            price={getFleetFromPrice(vehicle.class)}
-            asHeading={false}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function FleetCard({
   vehicle,
   index,
@@ -130,7 +112,7 @@ function FleetCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: mobile ? 0 : Math.min(index * 0.04, 0.28) }}
-      className={mobile ? "flex-shrink-0 w-[268px]" : ""}
+      className={mobile ? "flex-shrink-0 w-[268px] snap-center" : ""}
     >
       <FleetCardInner vehicle={vehicle} t={t} price={price} asHeading />
     </motion.div>
@@ -182,25 +164,18 @@ export default function FleetSection() {
           </motion.p>
         </div>
 
-        {/* Mobile: infinite CSS marquee */}
+        {/* Mobile: free-swipe carousel — user drags left/right to browse and pick a vehicle */}
         <div
-          className="overflow-hidden lg:hidden"
-          style={{ maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)" }}
+          className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-4 px-4 lg:hidden"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <style>{`
-            @media (prefers-reduced-motion: reduce) { .fleet-marquee-track { animation: none !important; } }
-          `}</style>
-          <div
-            className="fleet-marquee-track flex gap-4 w-max animate-fleet-marquee hover:[animation-play-state:paused]"
-          >
-            {/* Primary set — read by screen readers */}
-            {VEHICLE_CATALOG.map((vehicle, i) => (
-              <FleetCard key={vehicle.class} vehicle={vehicle} index={i} mobile />
-            ))}
-            {/* Clone set — visual loop only, hidden from assistive tech */}
-            <MarqueeCloneSet />
-          </div>
+          {VEHICLE_CATALOG.map((vehicle, i) => (
+            <FleetCard key={vehicle.class} vehicle={vehicle} index={i} mobile />
+          ))}
         </div>
+        <p className="text-white/20 text-[11px] text-center mt-3 mb-1 lg:hidden">
+          ← Swipe to see all {VEHICLE_CATALOG.length} vehicles →
+        </p>
 
         {/* Desktop: grid */}
         <div className="hidden lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-5">

@@ -173,7 +173,7 @@ export default function SupportCenter() {
         type="button"
         onClick={open ? closePanel : openPanel}
         aria-label={open ? "Close support" : "Open support center"}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 rounded-full focus:outline-none transition-all duration-200 hover:scale-105 active:scale-95"
+        className="fixed bottom-20 right-6 lg:bottom-6 z-50 flex items-center gap-2.5 px-4 rounded-full focus:outline-none transition-all duration-200 hover:scale-105 active:scale-95"
         style={{
           height: "3.25rem",
           background: open ? "#1a1a1a" : "linear-gradient(135deg,#c9a84c,#d4af5a)",

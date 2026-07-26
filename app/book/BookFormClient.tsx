@@ -456,15 +456,15 @@ export default function BookFormClient() {
                         </button>
                       ))}
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="relative">
-                        <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
+                        <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none z-10" />
                         <input type="date" value={data.date ?? ""} min={todayStr()}
                           onChange={(e) => setData((d) => ({ ...d, date: e.target.value }))}
-                          className="input-luxury w-full pl-9 pr-3 py-4 rounded-xl text-sm" />
+                          className="input-luxury w-full pl-9 pr-3 py-4 rounded-xl text-sm [color-scheme:dark]" />
                       </div>
                       <div className="relative">
-                        <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
+                        <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none z-10" />
                         <select value={data.time ?? ""}
                           onChange={(e) => setData((d) => ({ ...d, time: e.target.value }))}
                           className="input-luxury w-full pl-9 pr-3 py-4 rounded-xl text-sm appearance-none">

@@ -244,24 +244,24 @@ export default function BookingForm({ compact = false }: Props) {
         )}
 
         {/* Date & Time */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Date</label>
             <div className="relative">
-              <Calendar size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none" />
+              <Calendar size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none z-10" />
               <input
                 type="date"
                 value={date}
                 min={todayStr()}
                 onChange={(e) => setDate(e.target.value)}
-                className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm"
+                className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm [color-scheme:dark]"
               />
             </div>
           </div>
           <div>
             <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Time</label>
             <div className="relative">
-              <Clock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none" />
+              <Clock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none z-10" />
               <select
                 value={time}
                 onChange={(e) => setTime(e.target.value)}

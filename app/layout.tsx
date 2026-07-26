@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
 import I18nProvider from "@/components/language/I18nProvider";
 import SupportCenter from "@/components/support/SupportCenter";
+import MobileBookBar from "@/components/layout/MobileBookBar";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({
@@ -91,7 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   "@id": "https://www.elitebcn.info/#organization",
                   name: "Élite BCN Transfers",
                   url: "https://www.elitebcn.info",
-                  logo: { "@type": "ImageObject", url: "https://www.elitebcn.info/favicon.svg", width: 512, height: 512 },
+                  logo: { "@type": "ImageObject", url: "https://www.elitebcn.info/icon-512.png", width: 512, height: 512 },
                   telephone: "+34635383712",
                   email: COMPANY.email,
                   foundingDate: "2018",
@@ -235,6 +236,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <I18nProvider>
           {children}
           <SupportCenter />
+          <MobileBookBar />
 <Toaster
             position="top-right"
             toastOptions={{
