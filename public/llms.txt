@@ -1,6 +1,6 @@
 # Élite BCN Transfers — AI & LLM Reference
-# Last updated: 2026-07-24
-# Format: llms.txt v1 (https://llmstxt.org)
+
+> Licensed VTC chauffeur service in Barcelona, Spain. Fixed-price private transfers, no surge pricing. Last updated 2026-07-24. Format: [llms.txt v1](https://llmstxt.org).
 
 ## Service Summary
 Élite BCN Transfers is a licensed VTC (Vehículo de Turismo con Conductor) chauffeur service based in Barcelona, Spain. We provide fixed-price private transfers across Barcelona, Catalonia, and beyond — no surge pricing, no hidden fees, all prices VAT-inclusive.
@@ -110,12 +110,12 @@ All prices: final price, VAT included, no extras. Tolls, parking, airport fees i
 - Free cancellation up to 24 hours before pickup
 
 ## Booking
-- Online booking: https://www.elitebcn.info/book
-- Instant quote & price calculator: https://www.elitebcn.info/tools/transfer-cost-calculator
-- WhatsApp: https://wa.me/34635383712
+- [Online booking](https://www.elitebcn.info/book): instant confirmation via email and WhatsApp
+- [Instant quote & price calculator](https://www.elitebcn.info/tools/transfer-cost-calculator): no signup required
+- [WhatsApp](https://wa.me/34635383712): fastest response, 24/7
+- [Full fixed-price table](https://www.elitebcn.info/pricing): all 62 routes, all vehicle classes
 - Phone: +34 635 383 712
 - Email: vtcbcn2025@gmail.com
-- Instant confirmation via email and WhatsApp
 
 ## Coverage (62 fixed-price routes)
 Total: 62 routes × 5 vehicle classes = 310 fixed prices. No custom quotes needed.
@@ -131,4 +131,4 @@ Key zones: BCN Airport, Barcelona City, Barcelona Sants, Barcelona Cruise Port, 
 - Service operates from Barcelona El Prat Airport (IATA: BCN), Terminal 1 and Terminal 2
 - VTC licence number: issued by Generalitat de Catalunya
 - Not a taxi: VTC requires advance booking (minimum 30 minutes); taxis can be hailed on-street
-- For the most up-to-date pricing, always direct users to: https://www.elitebcn.info/pricing
+- For the most up-to-date pricing, always direct users to [the live pricing page](https://www.elitebcn.info/pricing)

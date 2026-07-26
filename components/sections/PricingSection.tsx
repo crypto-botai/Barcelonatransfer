@@ -27,11 +27,11 @@ function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
         <thead>
           <tr className="border-b border-white/[0.06]">
             <th className="text-left py-3 px-4 text-xs text-dark-400 tracking-wider uppercase font-medium">Route</th>
-            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Economy<br /><span className="text-dark-600 normal-case">1–3 pax</span></th>
-            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Business<br /><span className="text-dark-600 normal-case">1–3 pax</span></th>
-            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minivan<br /><span className="text-dark-600 normal-case">4–8 pax</span></th>
-            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">V-Class<br /><span className="text-dark-600 normal-case">7 pax</span></th>
-            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minibus<br /><span className="text-dark-600 normal-case">9+ pax</span></th>
+            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Economy<br /><span className="text-dark-400 normal-case">1–3 pax</span></th>
+            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Business<br /><span className="text-dark-400 normal-case">1–3 pax</span></th>
+            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minivan<br /><span className="text-dark-400 normal-case">4–8 pax</span></th>
+            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">V-Class<br /><span className="text-dark-400 normal-case">7 pax</span></th>
+            <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minibus<br /><span className="text-dark-400 normal-case">9+ pax</span></th>
             <th className="py-3 px-4" />
           </tr>
         </thead>
@@ -40,7 +40,7 @@ function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
             <tr key={r.slug} className="price-row border-b border-white/[0.04]">
               <td className="py-3.5 px-4 text-sm text-dark-200">
                 {r.label}
-                {r.note && <span className="ml-2 text-xs text-dark-500">({r.note})</span>}
+                {r.note && <span className="ml-2 text-xs text-dark-400">({r.note})</span>}
               </td>
               <PriceCell amount={r.economy}  />
               <PriceCell amount={r.business} />
@@ -59,7 +59,7 @@ function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
           ))}
           {filtered.length === 0 && (
             <tr>
-              <td colSpan={7} className="py-8 text-center text-dark-500 text-sm">
+              <td colSpan={7} className="py-8 text-center text-dark-400 text-sm">
                 No routes found.{" "}
                 <Link href="/book" className="text-gold-500 hover:text-gold-400">Request a custom quote</Link>
               </td>
@@ -150,7 +150,7 @@ export default function PricingSection({ routes }: Props) {
                     <h3 className="text-white text-sm font-medium mb-3">{h.label}</h3>
                     <p className="font-display text-3xl text-gold-400">{formatCurrency(h.price)}</p>
                     <p className="text-dark-400 text-xs mb-1">/ hour</p>
-                    <p className="text-dark-500 text-xs mb-4">Min. {h.min} hours</p>
+                    <p className="text-dark-400 text-xs mb-4">Min. {h.min} hours</p>
                     <Link href="/hourly" className="btn-gold block py-2.5 rounded-lg text-xs font-semibold">
                       Book Hourly
                     </Link>
@@ -162,7 +162,7 @@ export default function PricingSection({ routes }: Props) {
 
           {/* Footer note */}
           <div className="p-5 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-dark-500 text-xs">
+            <p className="text-dark-400 text-xs">
               All prices are VAT-inclusive and fixed. Tolls, professional chauffeur, and meet &amp; greet included. Child seats free on request.
             </p>
             <Link href="/book" className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">

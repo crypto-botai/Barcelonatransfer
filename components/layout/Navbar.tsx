@@ -194,7 +194,7 @@ export default function Navbar() {
                 >
                   {link.children ? (
                     <div>
-                      <p className="text-dark-500 text-xs tracking-[0.2em] uppercase px-2 pt-4 pb-2">
+                      <p className="text-dark-400 text-xs tracking-[0.2em] uppercase px-2 pt-4 pb-2">
                         {link.label}
                       </p>
                       {link.children.map((c) => (

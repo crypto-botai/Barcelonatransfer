@@ -158,7 +158,7 @@ export default function BookingForm({ compact = false }: Props) {
       {/* ── Gold header ─────────────────────────────────────────────────────── */}
       <div className="bg-gradient-to-br from-[#c9a84c] via-[#b8913d] to-[#a07828] px-6 pt-5 pb-4">
         <p className="text-black/50 text-[10px] font-semibold uppercase tracking-[0.2em] mb-1">Reservation</p>
-        <h3 className="font-display text-xl text-black leading-tight">Plan your transfer</h3>
+        <h2 className="font-display text-xl text-black leading-tight">Plan your transfer</h2>
         <p className="text-black/40 text-xs mt-0.5">Instant quote · Fixed pricing · 24/7</p>
 
         {/* Trip type tabs */}
@@ -246,10 +246,11 @@ export default function BookingForm({ compact = false }: Props) {
         {/* Date & Time */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Date</label>
+            <label htmlFor="hero-booking-date" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Date</label>
             <div className="relative">
               <Calendar size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none z-10" />
               <input
+                id="hero-booking-date"
                 type="date"
                 value={date}
                 min={todayStr()}
@@ -259,10 +260,11 @@ export default function BookingForm({ compact = false }: Props) {
             </div>
           </div>
           <div>
-            <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Time</label>
+            <label htmlFor="hero-booking-time" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Time</label>
             <div className="relative">
               <Clock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none z-10" />
               <select
+                id="hero-booking-time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
                 className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm appearance-none"
@@ -279,10 +281,11 @@ export default function BookingForm({ compact = false }: Props) {
         {/* Passengers + Vehicle */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Passengers</label>
+            <label htmlFor="hero-booking-pax" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Passengers</label>
             <div className="relative">
               <Users size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none" />
               <select
+                id="hero-booking-pax"
                 value={pax}
                 onChange={(e) => setPax(Number(e.target.value))}
                 className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm appearance-none"
@@ -294,9 +297,10 @@ export default function BookingForm({ compact = false }: Props) {
             </div>
           </div>
           <div>
-            <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Vehicle</label>
+            <label htmlFor="hero-booking-vehicle" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Vehicle</label>
             <div className="relative">
               <select
+                id="hero-booking-vehicle"
                 value={vehicle}
                 onChange={(e) => setVehicle(e.target.value as FleetVehicle)}
                 className="input-luxury w-full px-3 py-3 rounded-xl text-sm appearance-none"
@@ -378,7 +382,7 @@ export default function BookingForm({ compact = false }: Props) {
         {/* Footer trust bar */}
         <div className="flex items-center justify-center gap-4 pt-1">
           {["Mercedes-Benz Fleet", "24/7 Availability", "English & Español"].map((t) => (
-            <span key={t} className="text-[10px] text-white/20 uppercase tracking-wider">{t}</span>
+            <span key={t} className="text-[10px] text-white/50 uppercase tracking-wider">{t}</span>
           ))}
         </div>
       </div>

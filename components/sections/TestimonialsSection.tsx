@@ -119,7 +119,7 @@ export default function TestimonialsSection() {
                 ))}
               </div>
               <p className="text-white text-lg font-display font-semibold">{r.rating}</p>
-              <p className="text-dark-500 text-xs">{r.platform} · {r.count} reviews</p>
+              <p className="text-dark-400 text-xs">{r.platform} · {r.count} reviews</p>
             </div>
           ))}
         </motion.div>

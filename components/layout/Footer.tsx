@@ -173,15 +173,15 @@ export default function Footer() {
       {/* Bottom */}
       <div className="border-t border-white/[0.06]">
         <div className="container mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-dark-500 text-xs">
+          <p className="text-dark-400 text-xs">
             © {new Date().getFullYear()} Élite BCN Transfers. {t("copyright")}
           </p>
           <div className="flex gap-5">
-            <Link href="/faq"          className="text-xs text-dark-500 hover:text-gold-400 transition-colors">{t("legal.faq")}</Link>
-            <Link href="/privacy"      className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.privacy")}</Link>
-            <Link href="/terms"        className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.terms")}</Link>
-            <Link href="/cookies"      className="text-xs text-dark-500 hover:text-dark-300 transition-colors">{t("legal.cookies")}</Link>
-            <Link href="/auth/login"   className="text-xs text-dark-600 hover:text-dark-400 transition-colors">Driver & Partner Login</Link>
+            <Link href="/faq"          className="text-xs text-dark-400 hover:text-gold-400 transition-colors">{t("legal.faq")}</Link>
+            <Link href="/privacy"      className="text-xs text-dark-400 hover:text-dark-300 transition-colors">{t("legal.privacy")}</Link>
+            <Link href="/terms"        className="text-xs text-dark-400 hover:text-dark-300 transition-colors">{t("legal.terms")}</Link>
+            <Link href="/cookies"      className="text-xs text-dark-400 hover:text-dark-300 transition-colors">{t("legal.cookies")}</Link>
+            <Link href="/auth/login"   className="text-xs text-dark-400 hover:text-dark-300 transition-colors">Driver & Partner Login</Link>
           </div>
         </div>
       </div>

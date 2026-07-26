@@ -54,7 +54,7 @@ function FleetCardInner({
             <p className="text-white/25 text-xs mt-0.5 truncate">{vehicle.models[0]}</p>
           </div>
           <div className="text-right shrink-0">
-            <p className="text-[9px] text-white/20 uppercase tracking-widest">{t("from")}</p>
+            <p className="text-[9px] text-white/50 uppercase tracking-widest">{t("from")}</p>
             <p className="font-display text-xl text-[#c9a84c] leading-tight">{formatCurrency(price)}</p>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function FleetSection() {
             <FleetCard key={vehicle.class} vehicle={vehicle} index={i} mobile />
           ))}
         </div>
-        <p className="text-white/20 text-[11px] text-center mt-3 mb-1 lg:hidden">
+        <p className="text-white/50 text-[11px] text-center mt-3 mb-1 lg:hidden">
           ← Swipe to see all {VEHICLE_CATALOG.length} vehicles →
         </p>
 
@@ -178,7 +178,7 @@ export default function FleetSection() {
         </div>
 
         {/* Bag-size legend — boot/trunk capacity only, never cabin space */}
-        <p className="text-white/20 text-[10px] text-center mt-6 tracking-wide">
+        <p className="text-white/50 text-[10px] text-center mt-6 tracking-wide">
           L = Large ({BAG_SIZES.large.cm}) · M = Medium ({BAG_SIZES.medium.cm}) · S = Small ({BAG_SIZES.small.cm})
         </p>
 

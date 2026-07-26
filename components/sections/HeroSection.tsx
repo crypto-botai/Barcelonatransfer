@@ -1,17 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Star, Shield, Clock, Award } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
 import BookingForm from "@/components/booking/BookingForm";
 import { COMPANY_FACTS } from "@/lib/company-facts";
-
-const fade = (delay = 0) => ({
-  initial:    { opacity: 0, y: 14 },
-  animate:    { opacity: 1, y: 0 },
-  transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] as [number,number,number,number] },
-});
 
 export default function HeroSection() {
   const t = useTranslations("hero");
@@ -54,33 +47,34 @@ export default function HeroSection() {
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
           {/* Left — Copy */}
+          {/* Above-the-fold: no mount animation here. This content (including the H1,
+              which Lighthouse measures as the LCP element) previously sat at opacity:0
+              until framer-motion hydrated and animated it in — on a throttled mobile
+              connection that added ~2.7s of pure "element render delay" to LCP for a
+              one-time fade the user never perceives as an "animation" anyway, since
+              it's the very first thing they see. Rendered immediately instead. */}
           <div>
-            <motion.div {...fade(0)} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9a84c]/25 bg-[#c9a84c]/[0.05] mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9a84c]/25 bg-[#c9a84c]/[0.05] mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-[#c9a84c]" />
               <span className="text-[#c9a84c] text-[11px] tracking-[0.22em] uppercase font-medium">
                 {t("badge")}
               </span>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.08 }}
-              className="font-display text-[2.8rem] sm:text-[3.5rem] xl:text-[4.2rem] leading-[1.05] mb-6"
-            >
+            <h1 className="font-display text-[2.8rem] sm:text-[3.5rem] xl:text-[4.2rem] leading-[1.05] mb-6">
               <span className="text-white">{t("title1")}</span>
               <br />
               <span className="text-gold-gradient">{t("title2")}</span>
               <br />
               <span className="text-white">{t("title3")}</span>
-            </motion.h1>
+            </h1>
 
-            <motion.p {...fade(0.14)} className="text-white/45 text-base sm:text-lg leading-relaxed mb-8 max-w-md">
+            <p className="text-white/45 text-base sm:text-lg leading-relaxed mb-8 max-w-md">
               {t("description")}
-            </motion.p>
+            </p>
 
             {/* Trust pills */}
-            <motion.div {...fade(0.2)} className="flex flex-wrap gap-2 mb-9">
+            <div className="flex flex-wrap gap-2 mb-9">
               {TRUST_PILLS.map((pill) => (
                 <span
                   key={pill}
@@ -89,10 +83,10 @@ export default function HeroSection() {
                   ✦ {pill}
                 </span>
               ))}
-            </motion.div>
+            </div>
 
             {/* CTAs */}
-            <motion.div {...fade(0.25)} className="flex flex-wrap gap-3 mb-12">
+            <div className="flex flex-wrap gap-3 mb-12">
               <Link
                 href="/book"
                 className="btn-gold inline-flex items-center gap-2 px-7 py-4 rounded-xl text-sm font-semibold tracking-wide"
@@ -106,15 +100,10 @@ export default function HeroSection() {
               >
                 {t("cta.fleet")}
               </Link>
-            </motion.div>
+            </div>
 
             {/* Stats */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.35 }}
-              className="flex gap-8 border-t border-white/[0.06] pt-8"
-            >
+            <div className="flex gap-8 border-t border-white/[0.06] pt-8">
               {[
                 { value: COMPANY_FACTS.transfersDisplay,   label: t("stats.clients") },
                 { value: COMPANY_FACTS.ratingDisplay,      label: t("stats.rating") },
@@ -128,27 +117,18 @@ export default function HeroSection() {
                   </div>
                 </div>
               ))}
-            </motion.div>
+            </div>
           </div>
 
           {/* Right — Booking Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.65, delay: 0.2 }}
-          >
+          <div>
             <BookingForm compact />
-          </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Trust badges strip */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-        className="relative z-10 border-t border-white/[0.05] bg-black/30 backdrop-blur-sm"
-      >
+      <div className="relative z-10 border-t border-white/[0.05] bg-black/30 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             {TRUST_BADGES.map(({ icon: Icon, label, sub }) => (
@@ -164,7 +144,7 @@ export default function HeroSection() {
             ))}
           </div>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

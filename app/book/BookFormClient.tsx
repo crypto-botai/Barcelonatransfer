@@ -459,13 +459,13 @@ export default function BookFormClient() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="relative">
                         <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none z-10" />
-                        <input type="date" value={data.date ?? ""} min={todayStr()}
+                        <input type="date" aria-label="Date" value={data.date ?? ""} min={todayStr()}
                           onChange={(e) => setData((d) => ({ ...d, date: e.target.value }))}
                           className="input-luxury w-full pl-9 pr-3 py-4 rounded-xl text-sm [color-scheme:dark]" />
                       </div>
                       <div className="relative">
                         <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none z-10" />
-                        <select value={data.time ?? ""}
+                        <select aria-label="Time" value={data.time ?? ""}
                           onChange={(e) => setData((d) => ({ ...d, time: e.target.value }))}
                           className="input-luxury w-full pl-9 pr-3 py-4 rounded-xl text-sm appearance-none">
                           <option value="" className="bg-[#111]">Select time…</option>
@@ -494,10 +494,10 @@ export default function BookFormClient() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Passengers</label>
+                      <label htmlFor="book-passengers" className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Passengers</label>
                       <div className="relative">
                         <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
-                        <select value={data.passengers}
+                        <select id="book-passengers" value={data.passengers}
                           onChange={(e) => setData((d) => ({ ...d, passengers: Number(e.target.value) }))}
                           className="input-luxury w-full pl-9 pr-3 py-4 rounded-xl text-sm appearance-none">
                           {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (
@@ -507,10 +507,10 @@ export default function BookFormClient() {
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Luggage</label>
+                      <label htmlFor="book-luggage" className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Luggage</label>
                       <div className="relative">
                         <Briefcase size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
-                        <select value={data.luggage}
+                        <select id="book-luggage" value={data.luggage}
                           onChange={(e) => setData((d) => ({ ...d, luggage: Number(e.target.value) }))}
                           className="input-luxury w-full pl-9 pr-3 py-4 rounded-xl text-sm appearance-none">
                           {Array.from({ length: 17 }, (_, i) => i).map((n) => (

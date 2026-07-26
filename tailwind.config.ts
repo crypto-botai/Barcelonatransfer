@@ -79,7 +79,6 @@ const config: Config = {
       },
       backgroundImage: {
         "gold-gradient": "linear-gradient(135deg, #c9a84c 0%, #f5e0a9 50%, #c9a84c 100%)",
-        "gold-shimmer": "linear-gradient(90deg, transparent 0%, #c9a84c40 50%, transparent 100%)",
         "dark-gradient": "linear-gradient(180deg, #0a0a0a 0%, #111111 100%)",
         "hero-gradient": "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.85) 100%)",
       },
@@ -92,7 +91,6 @@ const config: Config = {
       animation: {
         "fade-in": "fadeIn 0.6s ease-out",
         "slide-up": "slideUp 0.6s ease-out",
-        "gold-shimmer": "goldShimmer 3s ease-in-out infinite",
         "float": "float 6s ease-in-out infinite",
         "spin-slow": "spin 8s linear infinite",
         "pulse-gold": "pulseGold 2s ease-in-out infinite",
@@ -102,10 +100,6 @@ const config: Config = {
       keyframes: {
         fadeIn: { from: { opacity: "0" }, to: { opacity: "1" } },
         slideUp: { from: { opacity: "0", transform: "translateY(24px)" }, to: { opacity: "1", transform: "translateY(0)" } },
-        goldShimmer: {
-          "0%, 100%": { backgroundPosition: "200% center" },
-          "50%": { backgroundPosition: "-200% center" },
-        },
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-12px)" },
