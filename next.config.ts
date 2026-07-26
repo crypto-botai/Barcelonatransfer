@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "*.googleusercontent.com" },
     ],
+    // No image on the site is ever displayed above ~900px even at 2x DPR inside
+    // the capped content container — Next's default deviceSizes goes up to 3840,
+    // which was the source of every fleet card requesting a 3840px image for a
+    // ~400px card. Trimmed to the range this site actually uses.
+    deviceSizes: [384, 640, 750, 828, 1080, 1200, 1920],
+    formats: ["image/avif", "image/webp"],
   },
   serverExternalPackages: ["@prisma/client", "prisma"],
 

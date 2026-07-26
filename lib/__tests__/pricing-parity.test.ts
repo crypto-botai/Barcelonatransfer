@@ -131,10 +131,10 @@ describe("Per-route vehicle class overrides (BCN Airport → Barcelona City)", (
     expect(lookupFixedPrice("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(60); // column unchanged
   });
 
-  it("Tesla Model 3 (ELECTRIC_VIP class) is €55 for airport→city", () => {
-    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "ELECTRIC_VIP")).toBe(55);
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "TESLA_M3")).toBe(55);
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "ELECTRIC_VIP")).toBe(55);
+  it("Tesla Model 3 (ELECTRIC_VIP class) keeps the BUSINESS column price €60 — no override", () => {
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "ELECTRIC_VIP")).toBe(60);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "TESLA_M3")).toBe(60);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "ELECTRIC_VIP")).toBe(60);
   });
 
   it("EQE 300 (LUXURY class) keeps the BUSINESS column price €60 — no override", () => {
@@ -145,7 +145,7 @@ describe("Per-route vehicle class overrides (BCN Airport → Barcelona City)", (
 
   it("overrides are bidirectional (city → airport same as airport → city)", () => {
     expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "BUSINESS")).toBe(50);
-    expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "ELECTRIC_VIP")).toBe(55);
+    expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "ELECTRIC_VIP")).toBe(60);
     expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "LUXURY")).toBe(60);
   });
 

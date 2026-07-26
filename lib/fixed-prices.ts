@@ -44,9 +44,10 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "El Prat Airport", toLabel: "Barcelona City",
     category: "airport-city",
     prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
-    // Camry (BUSINESS) → €50, Tesla M3 (ELECTRIC_VIP) → €55 for this route only.
-    // EQE 300 (LUXURY) is not overridden and keeps the BUSINESS column price (€60).
-    vehicleClassOverrides: { BUSINESS: 50, ELECTRIC_VIP: 55 },
+    // Camry (BUSINESS) → €50 for this route only, by explicit instruction.
+    // Tesla M3 and EQE 300 (LUXURY) are not overridden — both keep the
+    // BUSINESS column price (€60), which is the only matrix-legal value.
+    vehicleClassOverrides: { BUSINESS: 50 },
   },
   {
     slug: "bcn-airport-cruise-terminal",

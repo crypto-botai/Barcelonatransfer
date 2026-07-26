@@ -21,9 +21,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
           className={`flex-shrink-0 text-gold-500 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
         />
       </button>
-      {open && (
-        <p className="text-dark-400 text-sm leading-relaxed pb-5">{a}</p>
-      )}
+      <p className={`text-dark-400 text-sm leading-relaxed pb-5 ${open ? "block" : "hidden"}`}>{a}</p>
     </div>
   );
 }

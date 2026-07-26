@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 
@@ -119,21 +119,16 @@ export default function FAQSection() {
                     className={`text-dark-400 flex-shrink-0 ml-4 transition-transform duration-300 ${open === i ? "rotate-180 text-gold-400" : ""}`}
                   />
                 </button>
-                <AnimatePresence>
-                  {open === i && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
-                      className="overflow-hidden"
-                    >
-                      <p className="px-5 pb-5 text-sm text-dark-300 leading-relaxed">
-                        {faq.a}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <motion.div
+                  initial={false}
+                  animate={{ height: open === i ? "auto" : 0, opacity: open === i ? 1 : 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="overflow-hidden"
+                >
+                  <p className="px-5 pb-5 text-sm text-dark-300 leading-relaxed">
+                    {faq.a}
+                  </p>
+                </motion.div>
               </motion.div>
             ))}
           </div>

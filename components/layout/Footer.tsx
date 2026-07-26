@@ -31,12 +31,12 @@ export default function Footer() {
   const DESTINATIONS = [
     { key: "barcelonaAirport", href: "/airport-transfers" },
     { key: "sitges",           href: "/transfers/sitges" },
-    { key: "lloretDeMar",      href: "/transfers/costa-brava" },
+    { key: "lloretDeMar",      href: "/transfers/lloret-de-mar" },
     { key: "portAventura",     href: "/transfers/port-aventura" },
     { key: "andorra",          href: "/transfers/andorra" },
     { key: "gironaAirport",    href: "/transfers/girona" },
     { key: "tarragona",        href: "/transfers/tarragona" },
-    { key: "cadaques",         href: "/transfers/costa-brava" },
+    { key: "cadaques",         href: "/transfers/cadaques" },
   ] as const;
 
   return (
