@@ -297,18 +297,22 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
 // card (homepage, /fleet, /fleet/[slug], the booking-form vehicle picker) reads
 // from this instead of keeping its own copy, which had drifted out of sync
 // across all three call sites (each recognised different badge strings).
+// Solid, fully-opaque fills — badges sit on top of a vehicle photo, so a
+// semi-transparent background (the old "Economy" was white/10, nearly
+// invisible) washes out depending on what's underneath. Every class gets
+// its own distinct, vivid color so they're identifiable at a glance.
 export const VEHICLE_BADGE_STYLES: Record<string, string> = {
-  "Economy":        "bg-white/10 text-white",
-  "Business":       "bg-blue-600/80 text-white",
+  "Economy":        "bg-sky-500 text-white",
+  "Business":       "bg-blue-600 text-white",
   "Electric VIP":   "bg-emerald-500 text-white",
   "Luxury":         "bg-[#c9a84c] text-black",
-  "Minivan":        "bg-violet-600/80 text-white",
-  "Luxury Minivan": "bg-violet-700/90 text-white",
-  "Minibus":        "bg-slate-600/80 text-white",
+  "Minivan":        "bg-orange-500 text-white",
+  "Luxury Minivan": "bg-purple-600 text-white",
+  "Minibus":        "bg-rose-500 text-white",
 };
 
 export function vehicleBadgeClass(badge?: string): string {
-  return (badge && VEHICLE_BADGE_STYLES[badge]) || "bg-white/10 text-white";
+  return (badge && VEHICLE_BADGE_STYLES[badge]) || "bg-sky-500 text-white";
 }
 
 export const STATUS_COLORS: Record<BookingStatus, string> = {
