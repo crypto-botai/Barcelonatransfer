@@ -49,6 +49,7 @@ const transfersHubSchema = {
     { "@type": "WebPage", name: "Barcelona Cruise Port Transfer",    url: "https://www.elitebcn.info/transfers/cruise-port" },
     { "@type": "WebPage", name: "Barcelona to Montserrat Transfer",  url: "https://www.elitebcn.info/transfers/montserrat" },
     { "@type": "WebPage", name: "Barcelona PortAventura Transfer",   url: "https://www.elitebcn.info/transfers/port-aventura" },
+    { "@type": "WebPage", name: "Barcelona Costa Dorada Transfers",  url: "https://www.elitebcn.info/transfers/costa-dorada" },
   ],
 };
 
@@ -132,6 +133,16 @@ const DESTINATIONS = [
     distance: "95 km",
     description: "Direct private transfers to Spain's most-visited theme park resort — PortAventura, Ferrari Land & Caribe Aquatic Park.",
     highlights: ["PortAventura Theme Park", "Ferrari Land", "Caribe Aquatic Park", "Port Aventura Hotels"],
+  },
+  {
+    slug: "costa-dorada",
+    name: "Costa Dorada",
+    tagline: "Golden beaches south of Barcelona",
+    price: 50,
+    duration: "1 hr",
+    distance: "90 km",
+    description: "The 'Golden Coast' — Sitges, Tarragona, Salou, PortAventura and Cambrils, all covered by one fixed-price transfer service.",
+    highlights: ["Sitges & Tarragona", "Salou & Cambrils", "PortAventura access", "Costa Dorada beaches"],
   },
 ];
 

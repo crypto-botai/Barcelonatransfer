@@ -1,0 +1,24 @@
+// Metadata for the hand-built destination pages under app/transfers/<slug>/page.tsx —
+// these are NOT part of data/destinations.json (which only covers the 41 programmatic
+// hotel/cruise/event/route pages), so "nearby" lookups in app/transfers/[slug]/page.tsx
+// need this list too, or any nearby reference to e.g. "girona" or "sitges" silently
+// disappears from the related-destinations grid instead of resolving.
+export interface StaticTransferPage {
+  slug: string;
+  name: string;
+  type: "hotel" | "cruise" | "event" | "route";
+  distance_km: number;
+  prices: { sedan: number };
+}
+
+export const STATIC_TRANSFER_PAGES: StaticTransferPage[] = [
+  { slug: "sitges",       name: "Sitges",                    type: "route", distance_km: 35,  prices: { sedan: 65 } },
+  { slug: "girona",       name: "Girona",                    type: "route", distance_km: 100, prices: { sedan: 110 } },
+  { slug: "tarragona",    name: "Tarragona",                 type: "route", distance_km: 90,  prices: { sedan: 95 } },
+  { slug: "montserrat",   name: "Montserrat",                type: "route", distance_km: 50,  prices: { sedan: 85 } },
+  { slug: "costa-brava",  name: "Costa Brava",               type: "route", distance_km: 130, prices: { sedan: 130 } },
+  { slug: "andorra",      name: "Andorra",                   type: "route", distance_km: 210, prices: { sedan: 220 } },
+  { slug: "cruise-port",  name: "Barcelona Cruise Port",      type: "cruise", distance_km: 10, prices: { sedan: 45 } },
+  { slug: "port-aventura", name: "PortAventura World",        type: "event", distance_km: 95,  prices: { sedan: 99 } },
+  { slug: "costa-dorada", name: "Costa Dorada",               type: "route", distance_km: 90,  prices: { sedan: 50 } },
+];

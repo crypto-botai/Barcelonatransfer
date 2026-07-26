@@ -4,6 +4,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import destinations from "@/data/destinations.json";
+import { STATIC_TRANSFER_PAGES } from "@/data/static-transfer-pages";
 import { SHARED_OG } from "@/lib/seo";
 
 type Destination = (typeof destinations)[number];
@@ -121,9 +122,12 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
   }
 
   const { serviceSchema, breadcrumbSchema, faqSchema } = buildSchema(dest);
+  // "nearby" slugs can point either at a programmatic destinations.json entry or at one
+  // of the hand-built static pages (girona, sitges, costa-brava, ...) — check both so a
+  // valid reference never silently disappears from the related-destinations grid.
   const nearbyDests = dest.nearby
-    .map((s) => destinations.find((d) => d.slug === s))
-    .filter(Boolean) as Destination[];
+    .map((s) => destinations.find((d) => d.slug === s) ?? STATIC_TRANSFER_PAGES.find((d) => d.slug === s))
+    .filter((d): d is Destination | (typeof STATIC_TRANSFER_PAGES)[number] => Boolean(d));
 
   return (
     <>
