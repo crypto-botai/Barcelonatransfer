@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clock, Mail, Tag, TrendingUp, RefreshCw } from "lucide-react";
+import { Clock, Mail, Tag, TrendingUp, RefreshCw, MessageCircle } from "lucide-react";
 
 type AbandonedBooking = {
   id:          string;
@@ -74,16 +74,16 @@ export default function AbandonedBookingsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/[0.06]">
-                {["Email", "Name", "Coupon", "Discount", "Sent At", "Converted", "Expires"].map((h) => (
+                {["Email", "Name", "Phone", "Coupon", "Discount", "Sent At", "Converted", "Expires"].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs text-dark-400 uppercase tracking-wider font-normal">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-dark-400">Loading…</td></tr>
+                <tr><td colSpan={8} className="px-4 py-8 text-center text-dark-400">Loading…</td></tr>
               ) : items.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-dark-400">No abandoned bookings yet</td></tr>
+                <tr><td colSpan={8} className="px-4 py-8 text-center text-dark-400">No abandoned bookings yet</td></tr>
               ) : items.map((item) => {
                 const isConverted = !!item.convertedAt;
                 const isUsed      = !!item.coupon?.usedAt;
@@ -93,6 +93,21 @@ export default function AbandonedBookingsPage() {
                   <tr key={item.id} className="border-b border-white/[0.04] hover:bg-white/[0.02]">
                     <td className="px-4 py-3 text-white">{item.email}</td>
                     <td className="px-4 py-3 text-dark-300">{item.name ?? "—"}</td>
+                    <td className="px-4 py-3">
+                      {item.phone ? (
+                        <a
+                          href={`https://wa.me/${item.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+                            `Hi${item.name ? ` ${item.name}` : ""}! I noticed you started a booking with Élite BCN Transfers but didn't finish.${item.coupon && !item.coupon.usedAt ? ` Here's your ${item.coupon.discountPct}% discount code to complete it: ${item.coupon.code}` : " Can I help you complete it or answer any questions?"}`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-[#25D366] hover:text-[#2fe378] text-xs font-medium transition-colors"
+                          title="Start WhatsApp conversation"
+                        >
+                          <MessageCircle size={13} /> {item.phone}
+                        </a>
+                      ) : <span className="text-dark-500 text-xs">—</span>}
+                    </td>
                     <td className="px-4 py-3">
                       {item.coupon ? (
                         <code className="text-gold-400 text-xs font-mono">{item.coupon.code}</code>
