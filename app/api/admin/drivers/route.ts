@@ -20,7 +20,7 @@ export async function GET(_req: NextRequest) {
     include: {
       user: { select: { name: true, email: true, phone: true } },
       withdrawals: { orderBy: { createdAt: "desc" }, take: 5 },
-      vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } },
+      vehicles: { take: 1, select: { make: true, model: true, licensePlate: true, class: true } },
     },
   });
   return NextResponse.json(drivers);

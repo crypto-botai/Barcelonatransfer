@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   CheckCircle2, XCircle, User, Loader2,
   FileText, Image as ImageIcon, Shield,
   MessageCircle, ExternalLink, ChevronDown, ChevronUp,
   CreditCard, Smartphone, Plus, X, Car, Copy,
+  Pencil, Trash2, AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -33,7 +35,7 @@ type Driver = {
   insuranceUrl: string | null;
   user: { name: string | null; email: string; phone: string | null };
   withdrawals: Withdrawal[];
-  vehicles: { make: string; model: string; licensePlate: string }[];
+  vehicles: { make: string; model: string; licensePlate: string; class: string }[];
   createdAt: string;
 };
 
@@ -168,6 +170,161 @@ function AddDriverModal({ onClose, onCreated }: { onClose: () => void; onCreated
   );
 }
 
+function EditDriverModal({
+  driver, onClose, onSaved,
+}: {
+  driver: Driver;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [name,         setName]         = useState(driver.user.name ?? "");
+  const [phone,        setPhone]        = useState(driver.user.phone ?? "");
+  const [email,        setEmail]        = useState(driver.user.email);
+  const [vehiclePlate, setVehiclePlate] = useState(driver.vehicles?.[0]?.licensePlate ?? "");
+  const [vehicleClass, setVehicleClass] = useState<string>(driver.vehicles?.[0]?.class ?? "BUSINESS");
+  const [saving, setSaving] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/drivers/${driver.id}`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ name, phone, email, vehiclePlate, vehicleClass }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error ?? "Failed to update driver"); return; }
+      toast.success("Driver updated");
+      onSaved();
+      onClose();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputCls = "w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-gold-500/50 transition-colors";
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <div className="w-full max-w-md bg-[#111] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden">
+
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] bg-gradient-to-r from-gold-500/10 to-transparent">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gold-500/15 flex items-center justify-center">
+              <Pencil size={13} className="text-gold-400" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-white">Edit Driver</h2>
+              <p className="text-[11px] text-white/30">{driver.user.name ?? driver.user.email}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/[0.05] text-white/30 hover:text-white transition-colors">
+            <X size={15} />
+          </button>
+        </div>
+
+        <form onSubmit={submit} className="px-6 py-5 space-y-4">
+          <div>
+            <label className="block text-[10px] text-gold-400/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Driver Name</label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Full name" required className={inputCls} />
+          </div>
+          <div>
+            <label className="block text-[10px] text-gold-400/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Phone / WhatsApp</label>
+            <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+34 6XX XXX XXX" required className={inputCls} />
+          </div>
+          <div>
+            <label className="block text-[10px] text-gold-400/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Email (for login)</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="driver@example.com" required className={inputCls} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[10px] text-gold-400/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Vehicle Plate</label>
+              <div className="relative">
+                <Car size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400/40" />
+                <input value={vehiclePlate} onChange={e => setVehiclePlate(e.target.value)} placeholder="0000 AAA" required className={`${inputCls} pl-8 uppercase`} />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] text-gold-400/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Vehicle Class</label>
+              <select value={vehicleClass} onChange={e => setVehicleClass(e.target.value)} className={`${inputCls} appearance-none`}>
+                {VEHICLE_CLASS_OPTIONS.map(o => (
+                  <option key={o.value} value={o.value} className="bg-[#111]">{o.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex gap-3 pt-1">
+            <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-white/[0.08] text-white/40 text-sm hover:text-white hover:border-white/20 transition-colors">
+              Cancel
+            </button>
+            <button type="submit" disabled={saving} className="flex-1 py-2.5 rounded-xl bg-gold-500 text-black text-sm font-semibold hover:bg-gold-400 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+              {saving ? <Loader2 size={14} className="animate-spin" /> : <Pencil size={14} />}
+              {saving ? "Saving…" : "Save Changes"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+function DeleteDriverModal({
+  driver, onClose, onDeleted,
+}: {
+  driver: Driver;
+  onClose: () => void;
+  onDeleted: () => void;
+}) {
+  const [deleting, setDeleting] = useState(false);
+
+  const confirmDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/drivers/${driver.id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data.error ?? "Failed to delete driver", { duration: 6000 });
+        return;
+      }
+      toast.success("Driver deleted");
+      onDeleted();
+      onClose();
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <div className="w-full max-w-sm bg-[#111] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden">
+        <div className="px-6 py-6 text-center space-y-4">
+          <div className="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mx-auto">
+            <AlertTriangle size={26} className="text-red-400" />
+          </div>
+          <div>
+            <p className="text-white font-semibold mb-1">Delete {driver.user.name ?? "this driver"}?</p>
+            <p className="text-white/40 text-xs leading-relaxed">
+              This permanently removes their account and login. If they have any ride or payment history, deletion will be blocked — suspend them instead in that case.
+            </p>
+          </div>
+          <div className="flex gap-3 pt-1">
+            <button onClick={onClose} disabled={deleting} className="flex-1 py-2.5 rounded-xl border border-white/[0.08] text-white/40 text-sm hover:text-white hover:border-white/20 transition-colors disabled:opacity-50">
+              Cancel
+            </button>
+            <button onClick={confirmDelete} disabled={deleting} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-400 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+              {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+              {deleting ? "Deleting…" : "Delete Driver"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 const STATUS_STYLE: Record<string, string> = {
   PENDING_APPROVAL: "bg-yellow-500/20 text-yellow-400",
   APPROVED:         "bg-green-500/20 text-green-400",
@@ -223,6 +380,8 @@ function DocLink({ url, label, icon: Icon }: { url: string | null; label: string
 function DriverRow({ d, onUpdate }: { d: Driver; onUpdate: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const [updatingWithdrawal, setUpdatingWithdrawal] = useState<string | null>(null);
+  const [showEdit, setShowEdit] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
   const approve = () => updateDriver(d.id, "APPROVED");
   const suspend = () => updateDriver(d.id, "SUSPENDED");
@@ -304,6 +463,14 @@ function DriverRow({ d, onUpdate }: { d: Driver; onUpdate: () => void }) {
                 <XCircle size={14} />
               </button>
             )}
+            <button onClick={() => setShowEdit(true)}
+              className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors" title="Edit driver">
+              <Pencil size={14} />
+            </button>
+            <button onClick={() => setShowDelete(true)}
+              className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors" title="Delete driver">
+              <Trash2 size={14} />
+            </button>
             {(hasDocs || d.withdrawals.length > 0) && (
               <button onClick={() => setExpanded(!expanded)}
                 className="p-1.5 rounded-lg bg-white/[0.04] text-dark-400 hover:text-white transition-colors"
@@ -319,6 +486,13 @@ function DriverRow({ d, onUpdate }: { d: Driver; onUpdate: () => void }) {
           </div>
         </td>
       </tr>
+
+      {showEdit && (
+        <EditDriverModal driver={d} onClose={() => setShowEdit(false)} onSaved={onUpdate} />
+      )}
+      {showDelete && (
+        <DeleteDriverModal driver={d} onClose={() => setShowDelete(false)} onDeleted={onUpdate} />
+      )}
 
       {expanded && (hasDocs || d.withdrawals.length > 0) && (
         <tr className="border-b border-white/[0.04] bg-white/[0.01]">
