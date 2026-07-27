@@ -334,6 +334,18 @@ const STATUS_STYLE: Record<string, string> = {
   ON_RIDE:          "bg-blue-500/20 text-blue-400",
 };
 
+// Display-only label overrides — APPROVED is the underlying DriverStatus enum
+// value (unchanged in the DB), but "Active" is the clearer term for admins
+// toggling a driver between working and suspended.
+const STATUS_LABEL: Record<string, string> = {
+  APPROVED:         "Active",
+  PENDING_APPROVAL: "Pending Approval",
+  SUSPENDED:        "Suspended",
+  ONLINE:           "Online",
+  OFFLINE:          "Offline",
+  ON_RIDE:          "On Ride",
+};
+
 const WITHDRAWAL_STATUS_STYLE: Record<string, string> = {
   PENDING:     "bg-yellow-500/20 text-yellow-400",
   COMPLETED:   "bg-blue-500/20 text-blue-400",
@@ -441,7 +453,7 @@ function DriverRow({ d, onUpdate }: { d: Driver; onUpdate: () => void }) {
         </td>
         <td className="py-3 px-4">
           <span className={`status-badge ${STATUS_STYLE[d.status] ?? "bg-gray-500/20 text-gray-400"}`}>
-            {d.status.replace(/_/g, " ")}
+            {STATUS_LABEL[d.status] ?? d.status.replace(/_/g, " ")}
           </span>
         </td>
         <td className="hidden lg:table-cell py-3 px-4 text-sm text-gold-400">{d.rating > 0 ? `${d.rating.toFixed(1)}★` : "—"}</td>
@@ -451,9 +463,10 @@ function DriverRow({ d, onUpdate }: { d: Driver; onUpdate: () => void }) {
         </td>
         <td className="py-3 px-4">
           <div className="flex gap-2 items-center">
-            {d.status === "PENDING_APPROVAL" && (
+            {(d.status === "PENDING_APPROVAL" || d.status === "SUSPENDED") && (
               <button onClick={approve}
-                className="p-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors" title="Approve">
+                className="p-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors"
+                title={d.status === "SUSPENDED" ? "Reactivate (set Active)" : "Approve"}>
                 <CheckCircle2 size={14} />
               </button>
             )}
@@ -613,7 +626,7 @@ export default function AdminDriversPage() {
                 : "border border-white/[0.08] text-dark-400 hover:text-white"
             }`}
           >
-            {f.replace(/_/g, " ")}
+            {f === "ALL" ? "All" : (STATUS_LABEL[f] ?? f.replace(/_/g, " "))}
             {f === "PENDING_APPROVAL" && pendingCount > 0 && (
               <span className="ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] bg-yellow-500 text-black font-bold">
                 {pendingCount}
