@@ -49,10 +49,11 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.nav
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
+      {/* No mount fade here. The navbar is above the fold on every page, and a
+          framer-motion opacity:0 -> 1 leaves it invisible in the SSR HTML until
+          hydration runs — the same JS-gated-first-paint problem that was costing
+          the hero its LCP. The scroll background still transitions via CSS. */}
+      <nav
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
           scrolled
@@ -173,7 +174,7 @@ export default function Navbar() {
             </div>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Mobile Menu */}
       <AnimatePresence>
