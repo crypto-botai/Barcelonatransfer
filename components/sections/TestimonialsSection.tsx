@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { SOCIAL_PROOF } from "@/lib/company-facts";
 
@@ -34,23 +33,12 @@ export default function TestimonialsSection() {
     <section className="py-24 bg-dark-950 overflow-hidden" id="testimonials">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4"
-          >
+          <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">
             Client Reviews
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="font-display text-4xl sm:text-5xl text-white"
-          >
+          </span>
+          <h2 className="font-display text-4xl sm:text-5xl text-white">
             What Our <span className="text-gold-gradient">Clients Say</span>
-          </motion.h2>
+          </h2>
           <div className="gold-divider mt-6" />
         </div>
 
@@ -105,12 +93,7 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Platform ratings — numbers from SOCIAL_PROOF, not hardcoded */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex justify-center gap-8 mt-10"
-        >
+        <div className="flex justify-center gap-8 mt-10">
           {PLATFORMS.map((r) => (
             <div key={r.platform} className="text-center">
               <div className="flex justify-center gap-0.5 mb-1">
@@ -122,7 +105,7 @@ export default function TestimonialsSection() {
               <p className="text-dark-400 text-xs">{r.platform} · {r.count} reviews</p>
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

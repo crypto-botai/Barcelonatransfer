@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Users, Briefcase, ChevronRight, Zap, Star } from "lucide-react";
@@ -99,19 +98,13 @@ function FleetCard({
   const t = useTranslations("fleet");
   const price = getFleetFromPrice(vehicle.class);
 
+  // One card set serves both layouts: a snap-scroll item on mobile, a normal
+  // grid cell from lg up. Rendering two separate sets doubled the fleet DOM
+  // and emitted every vehicle heading twice.
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.5, delay: mobile ? 0 : Math.min(index * 0.04, 0.28) }}
-      // One card set for both layouts: a snap-scroll item on mobile, a normal
-      // grid cell from lg up. Rendering two separate sets doubled the fleet DOM
-      // and emitted every vehicle heading twice.
-      className="flex-shrink-0 w-[268px] snap-center lg:flex-shrink lg:w-auto lg:snap-align-none"
-    >
+    <div className="flex-shrink-0 w-[268px] snap-center lg:flex-shrink lg:w-auto lg:snap-align-none">
       <FleetCardInner vehicle={vehicle} t={t} price={price} asHeading />
-    </motion.div>
+    </div>
   );
 }
 
@@ -124,40 +117,22 @@ export default function FleetSection() {
 
         {/* Header */}
         <div className="text-center mb-14 sm:mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55 }}
-            className="inline-flex items-center gap-4 mb-5"
-          >
+          <div className="inline-flex items-center gap-4 mb-5">
             <div className="h-px w-8 bg-[#c9a84c]/40" />
             <span className="text-[#c9a84c] text-[11px] tracking-[0.4em] uppercase font-medium">
               {t("sectionLabel")}
             </span>
             <div className="h-px w-8 bg-[#c9a84c]/40" />
-          </motion.div>
+          </div>
 
-          <motion.h2
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-display text-4xl sm:text-5xl lg:text-6xl text-white leading-tight mb-4"
-          >
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl text-white leading-tight mb-4">
             {t("title")}{" "}
             <span className="text-gold-gradient">{t("titleAccent")}</span>
-          </motion.h2>
+          </h2>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.18 }}
-            className="text-white/35 max-w-md mx-auto text-sm sm:text-base leading-relaxed"
-          >
+          <p className="text-white/35 max-w-md mx-auto text-sm sm:text-base leading-relaxed">
             {t("subtitle")}
-          </motion.p>
+          </p>
         </div>
 
         {/* One card set, two layouts: free-swipe carousel below lg, grid from lg up.
@@ -182,13 +157,7 @@ export default function FleetSection() {
         </p>
 
         {/* CTA row */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.55, delay: 0.2 }}
-          className="flex justify-center mt-12 sm:mt-16"
-        >
+        <div className="flex justify-center mt-12 sm:mt-16">
           <Link
             href="/fleet"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl border border-[#c9a84c]/30 text-[#c9a84c] text-sm font-semibold tracking-wide hover:bg-[#c9a84c]/[0.06] hover:border-[#c9a84c]/50 transition-all duration-300"
@@ -196,7 +165,7 @@ export default function FleetSection() {
             {t("allVehicles")}
             <ChevronRight size={14} />
           </Link>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 
@@ -49,32 +48,15 @@ export default function FAQSection() {
         <div className="grid lg:grid-cols-2 gap-16 items-start">
           {/* Left */}
           <div>
-            <motion.span
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4"
-            >
+            <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">
               FAQ
-            </motion.span>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="font-display text-4xl sm:text-5xl text-white mb-6"
-            >
+            </span>
+            <h2 className="font-display text-4xl sm:text-5xl text-white mb-6">
               Frequently Asked <span className="text-gold-gradient">Questions</span>
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-dark-400 leading-relaxed mb-8"
-            >
+            </h2>
+            <p className="text-dark-400 leading-relaxed mb-8">
               Everything you need to know about our luxury transfer service. Can&apos;t find the answer you&apos;re looking for?
-            </motion.p>
+            </p>
             <div className="flex flex-col gap-3">
               <Link
                 href="/contact"
@@ -97,16 +79,7 @@ export default function FAQSection() {
           {/* Right — Accordion */}
           <div className="space-y-3">
             {FAQS.map((faq, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className={`rounded-xl border transition-colors ${
-                  open === i ? "border-gold-500/30 bg-gold-500/5" : "border-white/[0.06] bg-white/[0.02]"
-                }`}
-              >
+              <div key={i} className={`rounded-xl border transition-colors ${ open === i ? "border-gold-500/30 bg-gold-500/5" : "border-white/[0.06] bg-white/[0.02]" }`}>
                 <button
                   onClick={() => setOpen(open === i ? null : i)}
                   className="w-full flex items-center justify-between p-5 text-left"
@@ -119,17 +92,12 @@ export default function FAQSection() {
                     className={`text-dark-400 flex-shrink-0 ml-4 transition-transform duration-300 ${open === i ? "rotate-180 text-gold-400" : ""}`}
                   />
                 </button>
-                <motion.div
-                  initial={false}
-                  animate={{ height: open === i ? "auto" : 0, opacity: open === i ? 1 : 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="overflow-hidden"
-                >
+                <div className="overflow-hidden">
                   <p className="px-5 pb-5 text-sm text-dark-300 leading-relaxed">
                     {faq.a}
                   </p>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             ))}
           </div>
         </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Plane, Anchor, Briefcase, Building2, Theater, Clock, Waves, Sunset, Mountain, Hotel, Crown, Map, ArrowRight } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
@@ -26,32 +25,15 @@ export default function ServicesSection() {
     <section className="py-24 bg-dark-950" id="services">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4"
-          >
+          <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">
             {t("label")}
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="font-display text-4xl sm:text-5xl text-white mb-4"
-          >
+          </span>
+          <h2 className="font-display text-4xl sm:text-5xl text-white mb-4">
             {t("title")} <span className="text-gold-gradient">{t("titleAccent")}</span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-dark-400 max-w-xl mx-auto"
-          >
+          </h2>
+          <p className="text-dark-400 max-w-xl mx-auto">
             {t("subtitle")}
-          </motion.p>
+          </p>
           <div className="gold-divider mt-6" />
         </div>
 
@@ -59,13 +41,7 @@ export default function ServicesSection() {
           {SERVICE_KEYS.map((key, i) => {
             const Icon = SERVICE_ICONS[i];
             return (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-              >
+              <div key={key}>
                 <Link
                   href={SERVICE_HREFS[i]}
                   className="group glass-card gold-hover-border rounded-xl p-5 flex flex-col h-full hover:bg-white/[0.04] transition-colors"
@@ -84,19 +60,13 @@ export default function ServicesSection() {
                     <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             );
           })}
         </div>
 
         {/* Feature pills */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3 }}
-          className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-4"
-        >
+        <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {FEATURES.map((p) => (
             <div
               key={p.title}
@@ -109,7 +79,7 @@ export default function ServicesSection() {
               </div>
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
