@@ -7,7 +7,7 @@ import AuthProvider from "@/components/layout/AuthProvider";
 import I18nProvider from "@/components/language/I18nProvider";
 import SupportCenter from "@/components/support/SupportCenter";
 import MobileBookBar from "@/components/layout/MobileBookBar";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import DeferredAnalytics from "@/components/layout/DeferredAnalytics";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -73,9 +73,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://www.google-analytics.com" />
-        <link rel="preconnect" href="https://region1.google-analytics.com" />
+        {/* Analytics is deferred to idle/first-interaction (see DeferredAnalytics),
+            so these origins are no longer requested during the initial load.
+            Lighthouse flagged all three as "Unused preconnect" — a preconnect to
+            an origin the page does not request early wastes a connection slot.
+            dns-prefetch is the cheap equivalent for a later, deferred request. */}
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         {/* Geo meta tags for local SEO — BCN El Prat Airport is primary service location */}
         <meta name="geo.region" content="ES-CT" />
         <meta name="geo.placename" content="Barcelona El Prat Airport, Catalonia, Spain" />
@@ -249,7 +252,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
             }}
           />
-          <GoogleAnalytics gaId="G-E9QZFG5WZY" />
+          <DeferredAnalytics gaId="G-E9QZFG5WZY" />
           </I18nProvider>
         </AuthProvider>
       </body>

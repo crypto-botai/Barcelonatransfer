@@ -2,10 +2,17 @@ import { MetadataRoute } from "next";
 import destinations from "@/data/destinations.json";
 import { BLOG_ARTICLES } from "@/lib/blog";
 
-// force-dynamic: regenerate on every request so Google always receives fresh XML.
-// Never use revalidate/ISR for sitemaps — ISR can serve stale or empty responses
-// on the first Vercel cold-start, causing "Sitemap could not be read" in Search Console.
-export const dynamic = "force-dynamic";
+// Statically generated at build time and served straight from the CDN.
+//
+// This was previously force-dynamic, which meant every Googlebot fetch invoked a
+// serverless function — and a cold start there is exactly what produces
+// "Sitemap could not be read" in Search Console. ISR was tried before that and
+// had the opposite failure (a stale/empty first response on cold start).
+//
+// Static is the right answer for this route: every URL comes from data that is
+// fixed at build time (destinations.json, the blog registry, hard-coded pages),
+// so there is nothing to regenerate per request, and a deploy refreshes it.
+export const dynamic = "force-static";
 
 const BASE = "https://www.elitebcn.info";
 

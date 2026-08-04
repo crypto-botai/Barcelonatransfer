@@ -105,7 +105,10 @@ function FleetCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: mobile ? 0 : Math.min(index * 0.04, 0.28) }}
-      className={mobile ? "flex-shrink-0 w-[268px] snap-center" : ""}
+      // One card set for both layouts: a snap-scroll item on mobile, a normal
+      // grid cell from lg up. Rendering two separate sets doubled the fleet DOM
+      // and emitted every vehicle heading twice.
+      className="flex-shrink-0 w-[268px] snap-center lg:flex-shrink lg:w-auto lg:snap-align-none"
     >
       <FleetCardInner vehicle={vehicle} t={t} price={price} asHeading />
     </motion.div>
@@ -157,9 +160,12 @@ export default function FleetSection() {
           </motion.p>
         </div>
 
-        {/* Mobile: free-swipe carousel — user drags left/right to browse and pick a vehicle */}
+        {/* One card set, two layouts: free-swipe carousel below lg, grid from lg up.
+            Previously this rendered the whole catalogue twice — 14 cards and 14
+            duplicate vehicle headings in the DOM for 7 vehicles. */}
         <div
-          className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-4 px-4 lg:hidden"
+          className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-4 px-4
+                     lg:grid lg:grid-cols-3 xl:grid-cols-4 lg:gap-5 lg:overflow-visible lg:mx-0 lg:px-0 lg:pb-0"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {VEHICLE_CATALOG.map((vehicle, i) => (
@@ -169,13 +175,6 @@ export default function FleetSection() {
         <p className="text-white/50 text-[11px] text-center mt-3 mb-1 lg:hidden">
           ← Swipe to see all {VEHICLE_CATALOG.length} vehicles →
         </p>
-
-        {/* Desktop: grid */}
-        <div className="hidden lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {VEHICLE_CATALOG.map((vehicle, i) => (
-            <FleetCard key={vehicle.class} vehicle={vehicle} index={i} />
-          ))}
-        </div>
 
         {/* Bag-size legend — boot/trunk capacity only, never cabin space */}
         <p className="text-white/50 text-[10px] text-center mt-6 tracking-wide">
