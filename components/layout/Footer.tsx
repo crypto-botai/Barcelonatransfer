@@ -177,6 +177,7 @@ export default function Footer() {
             © {new Date().getFullYear()} Élite BCN Transfers. {t("copyright")}
           </p>
           <div className="flex gap-5">
+            <Link href="/blog"         className="text-xs text-dark-400 hover:text-gold-400 transition-colors">Travel Guides</Link>
             <Link href="/faq"          className="text-xs text-dark-400 hover:text-gold-400 transition-colors">{t("legal.faq")}</Link>
             <Link href="/privacy"      className="text-xs text-dark-400 hover:text-dark-300 transition-colors">{t("legal.privacy")}</Link>
             <Link href="/terms"        className="text-xs text-dark-400 hover:text-dark-300 transition-colors">{t("legal.terms")}</Link>

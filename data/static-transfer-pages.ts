@@ -21,4 +21,10 @@ export const STATIC_TRANSFER_PAGES: StaticTransferPage[] = [
   { slug: "cruise-port",  name: "Barcelona Cruise Port",      type: "cruise", distance_km: 10, prices: { sedan: 45 } },
   { slug: "port-aventura", name: "PortAventura World",        type: "event", distance_km: 95,  prices: { sedan: 99 } },
   { slug: "costa-dorada", name: "Costa Dorada",               type: "route", distance_km: 90,  prices: { sedan: 50 } },
+  { slug: "lloret-de-mar", name: "Lloret de Mar",             type: "route", distance_km: 75,  prices: { sedan: 145 } },
+  { slug: "cadaques",     name: "Cadaqués",                   type: "route", distance_km: 170, prices: { sedan: 240 } },
+  { slug: "figueres",     name: "Figueres",                   type: "route", distance_km: 140, prices: { sedan: 155 } },
+  { slug: "tossa-de-mar", name: "Tossa de Mar",               type: "route", distance_km: 90,  prices: { sedan: 110 } },
+  { slug: "salou",        name: "Salou",                      type: "route", distance_km: 100, prices: { sedan: 150 } },
+  { slug: "castelldefels", name: "Castelldefels",             type: "route", distance_km: 20,  prices: { sedan: 50 } },
 ];

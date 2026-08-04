@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import destinations from "@/data/destinations.json";
+import { BLOG_ARTICLES } from "@/lib/blog";
 
 // force-dynamic: regenerate on every request so Google always receives fresh XML.
 // Never use revalidate/ISR for sitemaps — ISR can serve stale or empty responses
@@ -21,9 +22,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: d.type === "hotel" ? 0.75 : d.type === "cruise" ? 0.8 : d.type === "event" ? 0.8 : 0.85,
   }));
 
+  const blogPages: MetadataRoute.Sitemap = BLOG_ARTICLES.map((a) => ({
+    url: `${BASE}/blog/${a.slug}`,
+    lastModified: new Date(a.updatedAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.75,
+  }));
+
   return [
     // ── Core pages (highest priority) ─────────────────────────────
     { url: BASE,                        lastModified: LAST_UPDATED, changeFrequency: "weekly",  priority: 1.0  },
+    { url: `${BASE}/blog`,              lastModified: LAST_UPDATED, changeFrequency: "weekly",  priority: 0.85 },
     { url: `${BASE}/book`,              lastModified: LAST_UPDATED, changeFrequency: "weekly",  priority: 0.95 },
     { url: `${BASE}/pricing`,           lastModified: LAST_UPDATED, changeFrequency: "weekly",  priority: 0.9  },
     { url: `${BASE}/fleet`,             lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.9  },
@@ -62,12 +71,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/transfers/lloret-de-mar`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/transfers/cadaques`,      lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/transfers/costa-dorada`,  lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/transfers/figueres`,      lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.75 },
+    { url: `${BASE}/transfers/tossa-de-mar`,  lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.75 },
+    { url: `${BASE}/transfers/salou`,         lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.75 },
+    { url: `${BASE}/transfers/castelldefels`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/transfers/tarragona`,     lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
     { url: `${BASE}/transfers/andorra`,       lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
     { url: `${BASE}/transfers/cruise-port`,   lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/transfers/port-aventura`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.75 },
 
     // ── Dynamic programmatic SEO pages (44 destinations) ──────────
+    ...blogPages,
     ...dynamicPages,
 
     // ── Legal (low priority) ───────────────────────────────────────

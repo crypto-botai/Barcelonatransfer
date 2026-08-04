@@ -34,6 +34,7 @@ export default function Navbar() {
         { label: t("hourlyChaufeur"),    href: "/hourly" },
       ],
     },
+    { label: "Guides",     href: "/blog" },
     { label: t("about"),   href: "/about" },
     { label: t("contact"), href: "/contact" },
   ];
