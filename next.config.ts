@@ -47,6 +47,14 @@ const nextConfig: NextConfig = {
         destination: "/fleet/eqe-300-electric",
         permanent:   true,
       },
+      // Castelldefels had two live URLs for the same destination: this
+      // programmatic one and the hand-built /transfers/castelldefels page.
+      // Duplicate content, and the -transfer variant had no inbound links.
+      {
+        source:      "/transfers/castelldefels-transfer",
+        destination: "/transfers/castelldefels",
+        permanent:   true,
+      },
     ];
   },
 

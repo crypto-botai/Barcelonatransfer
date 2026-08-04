@@ -24,7 +24,7 @@ const DESTINATIONS: Destination[] = [
   { label: "Hilton Diagonal Mar / Parc del Fòrum", slug: "hilton-diagonal-mar", distanceKm: 14, durationMin: 20, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: true },
   { label: "Barcelona Cruise Port (Moll Adossat)", slug: "msc-cruises-barcelona", distanceKm: 14, durationMin: 20, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: false },
   { label: "Fira Gran Via (MWC / ISE)", slug: "mwc-2027-barcelona", distanceKm: 7, durationMin: 12, privateSedan: 35, privateMpv: 55, aerobusAvailable: false, metroAvailable: true },
-  { label: "Castelldefels", slug: "castelldefels-transfer", distanceKm: 20, durationMin: 22, privateSedan: 48, privateMpv: 68, aerobusAvailable: false, metroAvailable: false },
+  { label: "Castelldefels", slug: "castelldefels", distanceKm: 20, durationMin: 22, privateSedan: 48, privateMpv: 68, aerobusAvailable: false, metroAvailable: false },
   { label: "Sitges", distanceKm: 35, durationMin: 35, privateSedan: 65, privateMpv: 85, aerobusAvailable: false, metroAvailable: false },
   { label: "Mataró", slug: "mataro-transfer", distanceKm: 36, durationMin: 38, privateSedan: 55, privateMpv: 75, aerobusAvailable: false, metroAvailable: false },
   { label: "Terrassa", slug: "terrassa-transfer", distanceKm: 40, durationMin: 42, privateSedan: 60, privateMpv: 85, aerobusAvailable: false, metroAvailable: false },

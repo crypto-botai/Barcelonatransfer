@@ -1680,48 +1680,6 @@
     ]
   },
   {
-    "slug": "castelldefels-transfer",
-    "name": "Castelldefels",
-    "type": "route",
-    "area": "Castelldefels, Baix Llobregat",
-    "distance_km": 20,
-    "duration_min": 22,
-    "prices": {
-      "sedan": 48,
-      "mpv": 68
-    },
-    "coordinates": {
-      "lat": 41.27,
-      "lng": 1.9748
-    },
-    "description": "Castelldefels is a beach town just 20 km south of BCN Airport, home to a long sandy beach, the medieval castle, and increasingly popular with tech professionals working in the nearby tech campus area. It is one of the closest beach destinations to the airport, making it a quick 22-minute transfer.",
-    "highlights": [
-      "Closest beach town to BCN Airport",
-      "22-minute transfer",
-      "Medieval castle and beach",
-      "Tech campus area"
-    ],
-    "faqs": [
-      {
-        "q": "How far is Castelldefels from Barcelona Airport?",
-        "a": "Castelldefels is just 20 km from BCN El Prat Airport — closer than central Barcelona itself. A private transfer takes approximately 22 minutes, making it one of the quickest airport-to-destination journeys in the region. Fixed from €48."
-      },
-      {
-        "q": "Is Castelldefels a good alternative to staying in Barcelona city?",
-        "a": "Absolutely. Castelldefels offers a relaxed beach town atmosphere with easy RENFE train connections to Barcelona city (30 min). It is popular with professionals at the nearby tech campus (home to Rakuten, IESE, and other companies) and families who prefer a quieter base than central Barcelona."
-      },
-      {
-        "q": "Can Élite BCN transfer me from Castelldefels to central Barcelona?",
-        "a": "Yes. Point-to-point transfers between Castelldefels and any Barcelona city address are available on request. The journey from Castelldefels to, for example, Las Ramblas takes approximately 35–40 minutes depending on traffic. Contact us for a quote."
-      }
-    ],
-    "nearby": [
-      "sitges",
-      "reus-airport",
-      "mwc-2027-barcelona"
-    ]
-  },
-  {
     "slug": "salou-transfer",
     "name": "Salou & PortAventura",
     "type": "route",

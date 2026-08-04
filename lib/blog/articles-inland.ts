@@ -12,7 +12,7 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     metaTitle: "Montserrat Day Trip Guide — Monastery & Trails | Élite BCN",
     metaDescription:
       "How to visit Montserrat from Barcelona: the monastery, the Black Madonna, the Escolania choir, the best walking routes and when to go.",
-    keywords: ["montserrat day trip", "montserrat monastery", "black madonna montserrat", "montserrat from barcelona", "montserrat hiking"],
+    keywords: ["things to do in montserrat", "montserrat day trip", "montserrat monastery", "black madonna montserrat", "montserrat from barcelona", "montserrat hiking"],
     category: "Destination",
     season: "All year",
     publishedAt: "2026-07-27",
@@ -27,6 +27,17 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     body: [
       { type: "p", text: "Montserrat means 'serrated mountain', and the name is a plain description. The massif rises abruptly out of the plain about fifty kilometres northwest of Barcelona, and its upper section has eroded into hundreds of rounded stone columns packed together like organ pipes. Wedged into a ledge halfway up is a Benedictine monastery that has been continuously occupied since the eleventh century." },
       { type: "p", text: "It is the most visited day trip from Barcelona, and unlike some things that carry that title, it earns it. The setting is genuinely extraordinary and no photograph prepares you for the scale." },
+
+      { type: "h2", text: "Things to do in Montserrat" },
+      { type: "ul", items: [
+        "See La Moreneta, the Black Madonna, in the basilica",
+        "Hear the Escolania boys' choir sing at midday",
+        "Ride the Sant Joan funicular and walk to the Sant Jeroni summit",
+        "Visit the museum's Caravaggio, Monet and Picasso holdings",
+        "Descend the sculpture-lined path to Santa Cova",
+        "Buy the monks' cheese and honey at the farmers' market",
+      ]},
+      { type: "p", text: "Each is covered in detail below." },
 
       { type: "h2", text: "The monastery and the basilica" },
       { type: "p", text: "The monastic community here dates to 1025. What you see today is largely nineteenth and twentieth century, because Napoleonic troops destroyed much of the complex in 1811 and it was rebuilt afterwards, but the site itself has been a place of pilgrimage for a thousand years." },
@@ -96,7 +107,7 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     metaTitle: "Girona Guide — Old Town, Cathedral & El Call | Élite BCN",
     metaDescription:
       "A guide to Girona: the Jewish quarter, the cathedral steps, walking the city walls, the Onyar houses, and how to get there from Barcelona.",
-    keywords: ["girona old town", "girona jewish quarter", "girona cathedral", "things to do in girona", "barcelona to girona"],
+    keywords: ["things to do in girona", "girona old town", "girona jewish quarter", "girona cathedral", "barcelona to girona"],
     category: "Destination",
     season: "All year",
     publishedAt: "2026-07-27",
@@ -111,6 +122,17 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     body: [
       { type: "p", text: "Girona is a hundred kilometres north of Barcelona, built where four rivers meet, and it has been fortified, besieged and rebuilt so many times that its old town is effectively a cross-section of two thousand years of construction. Roman walls underpin medieval ones. A Gothic cathedral sits on a Romanesque church that sat on a mosque that sat on a Roman temple." },
       { type: "p", text: "It is compact enough to see properly in a day and dense enough that you could spend three." },
+
+      { type: "h2", text: "Things to do in Girona" },
+      { type: "ul", items: [
+        "Get lost in El Call, one of Europe's best-preserved Jewish quarters",
+        "Climb the ninety steps to the cathedral and its record-breaking nave",
+        "Walk the Passeig de la Muralla along the old city walls",
+        "Photograph the coloured Onyar houses from the iron footbridge",
+        "See the twelfth-century Arab Baths",
+        "Try xuixo, the cream-filled pastry invented in the city",
+      ]},
+      { type: "p", text: "The rest of this guide takes each in turn." },
 
       { type: "h2", text: "El Call, the Jewish quarter" },
       { type: "p", text: "Girona had one of the most important Jewish communities in medieval Iberia, and its quarter — El Call — is among the best preserved anywhere in Europe. The community lived here for roughly six hundred years until the expulsion of 1492." },
@@ -182,7 +204,7 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     metaTitle: "Tarragona Guide — Roman Ruins & Amphitheatre | Élite BCN",
     metaDescription:
       "Visiting Tarragona: the seafront amphitheatre, the Roman circus and walls, Les Ferreres aqueduct, the cathedral and the best time to go.",
-    keywords: ["tarragona roman ruins", "tarragona amphitheatre", "tarraco", "tarragona from barcelona", "tarragona aqueduct"],
+    keywords: ["things to do in tarragona", "tarragona roman ruins", "tarragona amphitheatre", "tarraco", "tarragona from barcelona", "tarragona aqueduct"],
     category: "Destination",
     season: "All year",
     publishedAt: "2026-07-27",
@@ -196,6 +218,17 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     durationMin: 65,
     body: [
       { type: "p", text: "Tarragona was Tarraco, capital of Hispania Citerior, and for a period one of the most important cities in the western Roman Empire. Roughly two thousand years later a remarkable amount of it is still standing, scattered through a working modern city of 140,000 people — which is what makes it interesting. This is not an archaeological park you visit and leave. People live among it." },
+
+      { type: "h2", text: "Things to do in Tarragona" },
+      { type: "ul", items: [
+        "Stand in the amphitheatre with the sea behind the arena",
+        "Walk the vaulted passages of the Roman circus under the modern city",
+        "Cross the top of the Les Ferreres aqueduct outside town",
+        "Follow the Passeig Arqueològic along the ancient walls",
+        "See the rat-funeral capital in the cathedral cloister",
+        "Eat romesco de peix at the Serrallo fishing quarter",
+      ]},
+      { type: "p", text: "Each is expanded on below." },
 
       { type: "h2", text: "The Roman city" },
 
@@ -264,7 +297,7 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     metaTitle: "Andorra Winter Guide — Ski, Spa & Shopping | Élite BCN",
     metaDescription:
       "Visiting Andorra in winter: Grandvalira and Pal Arinsal ski areas, the Caldea spa, duty-free shopping, and the transfer from Barcelona.",
-    keywords: ["andorra skiing", "grandvalira", "caldea spa andorra", "andorra duty free", "barcelona to andorra transfer"],
+    keywords: ["things to do in andorra", "andorra skiing", "grandvalira", "caldea spa andorra", "andorra duty free", "barcelona to andorra transfer"],
     category: "Destination",
     season: "Winter",
     publishedAt: "2026-07-27",
@@ -278,6 +311,17 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     durationMin: 180,
     body: [
       { type: "p", text: "Andorra is a sovereign microstate of 468 square kilometres wedged into the eastern Pyrenees between Spain and France, jointly headed by the President of France and a Spanish bishop, and almost entirely composed of mountains. It has no airport and no railway. Everyone arrives by road, and for most visitors from Barcelona that means a three-hour drive north through increasingly dramatic country." },
+
+      { type: "h2", text: "Things to do in Andorra in winter" },
+      { type: "ul", items: [
+        "Ski Grandvalira, the largest linked area in the Pyrenees",
+        "Soak in the outdoor lagoons at Caldea with snow on the peaks",
+        "Shop the duty-free avenue through Andorra la Vella",
+        "Take a beginners' day at quieter Pal Arinsal",
+        "See the Romanesque church of Santa Coloma",
+        "Snowshoe into the Madriu UNESCO valley",
+      ]},
+      { type: "p", text: "The sections below cover each in detail." },
 
       { type: "h2", text: "Skiing" },
       { type: "p", text: "Andorra's ski areas are the reason most winter visitors come, and they are substantially larger and better equipped than their reputation among skiers who have never been." },

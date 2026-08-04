@@ -9,7 +9,7 @@ export const COAST_ARTICLES: BlogArticle[] = [
     title: "Sitges: Beaches, Carnival and the Garraf Coast",
     excerpt:
       "Seventeen beaches, a whitewashed old town built around a sea-facing church, and the most theatrical carnival in Catalonia — all 35 km from Barcelona.",
-    metaTitle: "Things to Do in Sitges — Beaches & Old Town Guide | Élite BCN",
+    metaTitle: "Things to Do in Sitges — Beaches & Old Town | Élite BCN",
     metaDescription:
       "What to see and do in Sitges: the old town, 17 beaches, Cau Ferrat museum, Carnival and the Film Festival. Plus how to get there from Barcelona.",
     keywords: ["things to do in sitges", "sitges beaches", "sitges carnival", "sitges day trip from barcelona", "sitges old town"],
@@ -91,7 +91,7 @@ export const COAST_ARTICLES: BlogArticle[] = [
     metaTitle: "Tossa de Mar Guide — Castle, Beaches & Coves | Élite BCN",
     metaDescription:
       "A guide to Tossa de Mar: the walled Vila Vella, the main beach and hidden coves, coastal walks, and how to reach it from Barcelona.",
-    keywords: ["tossa de mar", "tossa de mar beaches", "vila vella tossa", "costa brava towns", "barcelona to tossa de mar"],
+    keywords: ["things to do in tossa de mar", "tossa de mar", "tossa de mar beaches", "vila vella tossa", "costa brava towns", "barcelona to tossa de mar"],
     category: "Destination",
     season: "Summer",
     publishedAt: "2026-07-27",
@@ -106,6 +106,17 @@ export const COAST_ARTICLES: BlogArticle[] = [
     body: [
       { type: "p", text: "Most of the Costa Brava's medieval architecture sits inland, safely back from a coast that spent centuries being raided. Tossa de Mar is the exception. Its fortified old town, the Vila Vella, was built on a headland that drops straight into the water, and it is the only fully walled medieval settlement still standing on the entire Catalan coast." },
       { type: "p", text: "That single fact is why Tossa looks different from every other resort on this stretch. You approach along the coast road, come around a bend, and there are stone towers rising out of the sea above a curved beach." },
+
+      { type: "h2", text: "Things to do in Tossa de Mar" },
+      { type: "ul", items: [
+        "Climb through the walled Vila Vella to the lighthouse",
+        "Swim at Platja Gran beneath the medieval towers",
+        "Snorkel the rocks off Mar Menuda",
+        "Walk a stretch of the GR 92 coast path toward Sant Feliu",
+        "Take a glass-bottomed boat to the roadless coves",
+        "Eat cim i tomba, the local fishermen's stew, in the old town",
+      ]},
+      { type: "p", text: "Each of these is covered in detail below." },
 
       { type: "h2", text: "The Vila Vella" },
       { type: "p", text: "The walls date from the twelfth century and were built against pirate raids from North Africa, which were a genuine and recurring threat on this coast well into the sixteenth century. Three of the original towers survive, along with most of the curtain wall." },
@@ -168,7 +179,7 @@ export const COAST_ARTICLES: BlogArticle[] = [
     metaTitle: "Lloret de Mar Guide — Gardens, Beaches & Coves | Élite BCN",
     metaDescription:
       "What to do in Lloret de Mar besides the nightlife: Santa Clotilde gardens, Sant Joan castle, the quieter coves, and how to get there from Barcelona.",
-    keywords: ["lloret de mar", "things to do lloret de mar", "santa clotilde gardens", "lloret beaches", "barcelona to lloret de mar"],
+    keywords: ["things to do in lloret de mar", "lloret de mar", "santa clotilde gardens", "lloret beaches", "barcelona to lloret de mar"],
     category: "Destination",
     season: "Summer",
     publishedAt: "2026-07-27",
@@ -183,6 +194,17 @@ export const COAST_ARTICLES: BlogArticle[] = [
     body: [
       { type: "p", text: "Lloret de Mar has a reputation, and the reputation is not entirely unearned — the town has one of the densest concentrations of clubs and late bars anywhere on the Spanish coast, and in July and August a specific kind of visitor comes specifically for that." },
       { type: "p", text: "What gets lost is that Lloret was a serious maritime town long before it was a resort, that it has one of the finest gardens in Catalonia, and that within a twenty-minute walk of the main beach there are coves where you can swim more or less alone. The nightlife is concentrated in a few streets. Everything else is somewhere else." },
+
+      { type: "h2", text: "Things to do in Lloret de Mar" },
+      { type: "ul", items: [
+        "Walk the clifftop Santa Clotilde Gardens in the morning light",
+        "Follow the Camí de Ronda coast path to Cala Banys",
+        "Climb to the Castell de Sant Joan between the two bays",
+        "Spend the beach day at Fenals or Santa Cristina rather than the main strip",
+        "Visit the Museu del Mar for the town's Cuba-trade history",
+        "Kayak south along the cliffs from the main beach",
+      ]},
+      { type: "p", text: "The sections below take each of these in turn." },
 
       { type: "h2", text: "The Santa Clotilde Gardens" },
       { type: "p", text: "This is the single best reason to come to Lloret. The Jardins de Santa Clotilde were laid out in 1919 in the Italian Renaissance style, on a cliff about sixty metres above the sea, and they are one of the most complete examples of *noucentista* landscape design in Catalonia." },
@@ -245,7 +267,7 @@ export const COAST_ARTICLES: BlogArticle[] = [
     metaTitle: "Cadaqués & Dalí Guide — Portlligat, Cap de Creus | Élite BCN",
     metaDescription:
       "Visiting Cadaqués: Dalí's house at Portlligat, the old town, Cap de Creus natural park, and how to reach this remote Costa Brava village.",
-    keywords: ["cadaques", "dali house portlligat", "cap de creus", "cadaques from barcelona", "costa brava dali"],
+    keywords: ["things to do in cadaques", "cadaques", "dali house portlligat", "cap de creus", "cadaques from barcelona", "costa brava dali"],
     category: "Destination",
     season: "All year",
     publishedAt: "2026-07-27",

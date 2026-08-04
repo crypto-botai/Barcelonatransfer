@@ -4,6 +4,22 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, ChevronRight, Clock, Star } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
+import destinations from "@/data/destinations.json";
+
+/**
+ * Full index of the programmatic destination pages, grouped by type.
+ *
+ * Without this, those pages were only reachable through the "nearby" links on
+ * other destination pages — so any destination that no other entry happened to
+ * list as nearby (Barceló Raval, Ayre Rosellón, Nobu) had zero inbound links
+ * and was effectively invisible to crawlers despite sitting in the sitemap.
+ */
+const TYPE_GROUPS: { type: string; heading: string }[] = [
+  { type: "hotel",  heading: "Hotel transfers" },
+  { type: "cruise", heading: "Cruise line transfers" },
+  { type: "event",  heading: "Event & venue transfers" },
+  { type: "route",  heading: "Long-distance routes" },
+];
 
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Private Transfer Destinations | Élite BCN" },
@@ -245,8 +261,49 @@ export default function TransfersHubPage() {
           </div>
         </section>
 
-        {/* CTA */}
+        {/* Full A–Z index of every destination page */}
         <section className="py-16 bg-[#050505] border-t border-white/[0.06]">
+          <div className="container mx-auto px-4">
+            <h2 className="font-display text-3xl text-white text-center mb-3">
+              Every <span className="text-gold-gradient">destination we serve</span>
+            </h2>
+            <p className="text-dark-400 text-sm text-center mb-10 max-w-2xl mx-auto">
+              Fixed-price private transfers to {destinations.length} more hotels, cruise terminals,
+              venues and long-distance routes — each with its own prices and journey times.
+            </p>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+              {TYPE_GROUPS.map(({ type, heading }) => {
+                const items = destinations
+                  .filter((d) => d.type === type)
+                  .sort((a, b) => a.name.localeCompare(b.name));
+                if (items.length === 0) return null;
+                return (
+                  <div key={type}>
+                    <h3 className="text-white text-xs tracking-[0.2em] uppercase mb-4 font-medium">
+                      {heading}
+                    </h3>
+                    <ul className="flex flex-col gap-2">
+                      {items.map((d) => (
+                        <li key={d.slug}>
+                          <Link
+                            href={`/transfers/${d.slug}`}
+                            className="text-sm text-dark-400 hover:text-gold-400 transition-colors"
+                          >
+                            {d.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="py-16 bg-dark-950 border-t border-white/[0.06]">
           <div className="container mx-auto px-4 text-center">
             <h2 className="font-display text-3xl sm:text-4xl text-white mb-4">
               Don&apos;t see your destination?

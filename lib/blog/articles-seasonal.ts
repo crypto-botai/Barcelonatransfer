@@ -122,6 +122,17 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
       { type: "p", text: "Barcelona's winter is mild by any northern European standard — daytime highs usually between 13 and 17 degrees, plenty of sun, and rain that arrives in short bursts rather than settling in for a week. What changes is not really the weather. It is that the crowds disappear." },
       { type: "p", text: "Between January and early March you can walk into places that require timed tickets booked weeks ahead in summer. For anyone whose interest in Barcelona is the architecture, the art and the food rather than the beach, this is unambiguously the best time to come." },
 
+      { type: "h2", text: "Things to do in Barcelona in winter" },
+      { type: "ul", items: [
+        "See the Sagrada Família's nave in low winter sun, without the summer queue",
+        "Book a calçotada at a farmhouse restaurant outside the city",
+        "Take the Palau de la Música tour on a wet afternoon",
+        "Ski La Molina or Andorra and be back on the coast the next day",
+        "Catch the Three Kings parade on 5 January or Santa Eulàlia in February",
+        "Walk the Camí de Ronda between empty Costa Brava coves",
+      ]},
+      { type: "p", text: "The sections below cover each in turn." },
+
       { type: "h2", text: "The city without the queues" },
 
       { type: "h3", text: "Gaudí, properly" },
@@ -207,6 +218,17 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
     body: [
       { type: "p", text: "Catalonia keeps Christmas differently from most of Europe, and differently from the rest of Spain. The season runs from the first week of December to 6 January, the main gift-giving day is not the 25th, and two of the central traditions involve a log and a figurine that visitors tend to find difficult to believe until they see them." },
 
+      { type: "h2", text: "Things to do in Barcelona at Christmas and New Year" },
+      { type: "ul", items: [
+        "Browse the Fira de Santa Llúcia nativity market outside the cathedral",
+        "Buy a caganer and a Tió de Nadal log, the two Catalan oddities",
+        "Walk the Passeig de Gràcia illuminations on a weekday evening",
+        "Eat the twelve grapes at midnight at Plaça Espanya",
+        "Watch the Three Kings arrive by sea on 5 January",
+        "Order escudella on the 25th and canelons on Sant Esteve",
+      ]},
+      { type: "p", text: "Each of these is covered in detail below." },
+
       { type: "h2", text: "The Christmas markets" },
 
       { type: "h3", text: "Fira de Santa Llúcia" },
@@ -278,7 +300,7 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
     metaTitle: "PortAventura World Guide — Rides, Tickets & Tips | Élite BCN",
     metaDescription:
       "Planning a day at PortAventura World: the six themed worlds, Ferrari Land, Caribe Aquatic Park, the best rides and how to get there from Barcelona.",
-    keywords: ["portaventura world", "ferrari land", "portaventura from barcelona", "portaventura tips", "salou theme park"],
+    keywords: ["things to do at portaventura", "portaventura world", "ferrari land", "portaventura from barcelona", "portaventura tips", "salou theme park"],
     category: "Destination",
     season: "Summer",
     publishedAt: "2026-07-27",
@@ -293,6 +315,17 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
     body: [
       { type: "p", text: "PortAventura World, on the Costa Daurada just outside Salou, is the largest theme park resort in Spain and one of the most visited in Europe. It opened in 1995 and has grown into three separate parks on one site — the original theme park, Ferrari Land, and the Caribe Aquatic Park — plus a cluster of themed hotels." },
       { type: "p", text: "It is roughly seventy minutes south of Barcelona, which makes it a realistic day trip, though the resort is designed around people staying two or three nights." },
+
+      { type: "h2", text: "Things to do at PortAventura" },
+      { type: "ul", items: [
+        "Ride Shambhala and Dragon Khan before the queues build",
+        "Add Ferrari Land for Red Force, Europe's tallest coaster",
+        "Cool off at the Caribe Aquatic Park in high summer",
+        "Catch the Far West saloon show in the hottest hour",
+        "Base younger children in SésamoAventura and Polynesia",
+        "Finish with an evening on the sand at Salou, ten minutes away",
+      ]},
+      { type: "p", text: "The rest of this guide covers each in detail." },
 
       { type: "h2", text: "The main park" },
       { type: "p", text: "PortAventura Park is organised into six themed areas, and the theming is genuinely thorough — architecture, planting, staff costume and food all change as you cross between them." },
@@ -374,7 +407,7 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
     metaTitle: "Figueres & the Dalí Theatre-Museum Guide | Élite BCN",
     metaDescription:
       "Visiting the Dalí Theatre-Museum in Figueres: what to see, booking tickets, the Dalí triangle, and how to get there from Barcelona.",
-    keywords: ["dali theatre museum figueres", "figueres", "dali museum from barcelona", "dali triangle", "salvador dali museum spain"],
+    keywords: ["things to do in figueres", "dali theatre museum figueres", "figueres", "dali museum from barcelona", "dali triangle", "salvador dali museum spain"],
     category: "Destination",
     season: "All year",
     publishedAt: "2026-07-27",
@@ -388,6 +421,17 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
     body: [
       { type: "p", text: "Salvador Dalí was born in Figueres in 1904, held his first exhibition in the town theatre as a teenager, and in the 1960s persuaded the authorities to let him rebuild that theatre — which had burned during the Spanish Civil War and stood as a ruin for decades — as a museum of his own work." },
       { type: "p", text: "He described it not as a museum but as a single surrealist object, and that is the correct way to approach it. The building is the exhibit as much as anything hanging in it." },
+
+      { type: "h2", text: "Things to do in Figueres" },
+      { type: "ul", items: [
+        "Tour the Dalí Theatre-Museum, from the Rainy Taxi courtyard to his crypt",
+        "Climb the viewing lens in the Mae West room",
+        "See the ruby heart that beats in the Dalí·Jewels annexe",
+        "Walk the ramparts of the vast Castell de Sant Ferran",
+        "Browse the covered market for Empordà anchovies and wine",
+        "Eat where Dalí ate, at Hotel Duran on the Rambla",
+      ]},
+      { type: "p", text: "Each is covered below." },
 
       { type: "h2", text: "The building" },
       { type: "p", text: "You recognise it from a distance: dark red walls studded with what appear to be bread rolls, topped by a line of enormous white eggs and gold figures, with a geodesic glass dome over the old auditorium. None of it is subtle and none of it is accidental." },

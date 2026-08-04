@@ -19,13 +19,16 @@ export default function Footer() {
     { key: "privateTours",      href: "/day-tours" },
   ];
 
+  // All 7 fleet vehicles. business-sedan (Camry) was previously missing here,
+  // which left /fleet/business-sedan with no inbound link anywhere on the site.
   const FLEET_LINKS = [
-    { key: "standardSedan",    href: "/fleet/standard-sedan" },
-    { key: "luxurySedan",      href: "/fleet/eqe-300-electric" },
-    { key: "executiveMinivan", href: "/fleet/executive-minivan" },
-    { key: "luxuryMinivan",    href: "/fleet/luxury-minivan" },
-    { key: "groupMinibus",     href: "/fleet/group-minibus" },
-    { key: "electricVehicle",  href: "/fleet/tesla-model-3" },
+    { key: "standardSedan",    href: "/fleet/standard-sedan",    label: "Toyota Corolla" },
+    { key: "businessSedan",    href: "/fleet/business-sedan",    label: "Toyota Camry" },
+    { key: "electricVehicle",  href: "/fleet/tesla-model-3",     label: "Tesla Model 3" },
+    { key: "luxurySedan",      href: "/fleet/eqe-300-electric",  label: null },
+    { key: "executiveMinivan", href: "/fleet/executive-minivan", label: null },
+    { key: "luxuryMinivan",    href: "/fleet/luxury-minivan",    label: null },
+    { key: "groupMinibus",     href: "/fleet/group-minibus",     label: null },
   ];
 
   const DESTINATIONS = [
@@ -147,7 +150,9 @@ export default function Footer() {
               {FLEET_LINKS.map((f) => (
                 <li key={f.key}>
                   <Link href={f.href} className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
-                    {t(`links.${f.key}`)}
+                    {/* Vehicle names are proper nouns and identical in every
+                        locale, so they bypass the translation table. */}
+                    {f.label ?? t(`links.${f.key}`)}
                   </Link>
                 </li>
               ))}
@@ -165,6 +170,17 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link href="/transfers" className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
+                  All destinations
+                </Link>
+              </li>
+              {/* The cost calculator had no inbound link anywhere on the site. */}
+              <li>
+                <Link href="/tools/transfer-cost-calculator" className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
+                  Transfer cost calculator
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
