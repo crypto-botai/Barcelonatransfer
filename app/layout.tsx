@@ -5,7 +5,7 @@ import { COMPANY } from "@/lib/company-facts";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
 import I18nProvider from "@/components/language/I18nProvider";
-import SupportCenter from "@/components/support/SupportCenter";
+import SupportCenter from "@/components/support/LazySupportCenter";
 import MobileBookBar from "@/components/layout/MobileBookBar";
 import DeferredAnalytics from "@/components/layout/DeferredAnalytics";
 
