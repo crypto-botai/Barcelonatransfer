@@ -55,7 +55,10 @@ export default function ServicesSection() {
                   <p className="text-dark-400 text-sm leading-relaxed flex-1">
                     {t(`list.${key}.desc`)}
                   </p>
-                  <div className="flex items-center gap-1 mt-4 text-gold-500/60 group-hover:text-gold-400 transition-colors text-xs">
+                  {/* gold-500/60 measured 3.68:1 on the card background — a WCAG
+                      failure repeated across all 12 service cards. Full-opacity
+                      gold-400 clears 4.5:1 while keeping the same hover accent. */}
+                  <div className="flex items-center gap-1 mt-4 text-gold-400 group-hover:text-gold-300 transition-colors text-xs">
                     <span>{t("learnMore")}</span>
                     <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
                   </div>

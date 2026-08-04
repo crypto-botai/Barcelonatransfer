@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Inline the page CSS into <style> tags instead of a render-blocking
+  // <link rel="stylesheet"> request. The stylesheet is ~15 KiB — small enough
+  // that inlining costs little HTML weight, and it was the only remaining
+  // render-blocking resource on the critical path (Lighthouse: ~160 ms of
+  // FCP/LCP delay waiting on the CSS round-trip before anything could paint).
+  experimental: {
+    inlineCss: true,
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

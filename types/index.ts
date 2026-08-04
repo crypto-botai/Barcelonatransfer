@@ -301,18 +301,23 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
 // semi-transparent background (the old "Economy" was white/10, nearly
 // invisible) washes out depending on what's underneath. Every class gets
 // its own distinct, vivid color so they're identifiable at a glance.
+//
+// Shades are chosen so white 12px-bold text clears WCAG AA (≥4.5:1): the
+// brighter 500-level fills (sky/emerald/orange/rose) measured 2.5–3.7:1 in
+// the Lighthouse audit, so those four use their 700-level shade instead —
+// still saturated and clearly distinct, but dark enough behind white text.
 export const VEHICLE_BADGE_STYLES: Record<string, string> = {
-  "Economy":        "bg-sky-500 text-white",
+  "Economy":        "bg-sky-700 text-white",
   "Business":       "bg-blue-600 text-white",
-  "Electric VIP":   "bg-emerald-500 text-white",
+  "Electric VIP":   "bg-emerald-700 text-white",
   "Luxury":         "bg-[#c9a84c] text-black",
-  "Minivan":        "bg-orange-500 text-white",
+  "Minivan":        "bg-orange-700 text-white",
   "Luxury Minivan": "bg-purple-600 text-white",
-  "Minibus":        "bg-rose-500 text-white",
+  "Minibus":        "bg-rose-700 text-white",
 };
 
 export function vehicleBadgeClass(badge?: string): string {
-  return (badge && VEHICLE_BADGE_STYLES[badge]) || "bg-sky-500 text-white";
+  return (badge && VEHICLE_BADGE_STYLES[badge]) || "bg-sky-700 text-white";
 }
 
 export const STATUS_COLORS: Record<BookingStatus, string> = {

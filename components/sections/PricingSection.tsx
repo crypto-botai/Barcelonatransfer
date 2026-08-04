@@ -32,7 +32,9 @@ function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minivan<br /><span className="text-dark-400 normal-case">4–8 pax</span></th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">V-Class<br /><span className="text-dark-400 normal-case">7 pax</span></th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minibus<br /><span className="text-dark-400 normal-case">9+ pax</span></th>
-            <th className="py-3 px-4" />
+            {/* Screen-reader-only header: an empty <th> leaves every cell in the
+                Book column headerless, which fails the td-has-header audit. */}
+            <th className="py-3 px-4"><span className="sr-only">Book</span></th>
           </tr>
         </thead>
         <tbody>

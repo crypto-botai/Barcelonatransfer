@@ -50,7 +50,7 @@ function FleetCardInner({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <Name className="font-display text-[1.1rem] text-white leading-snug">{vehicle.label}</Name>
-            <p className="text-white/25 text-xs mt-0.5 truncate">{vehicle.models[0]}</p>
+            <p className="text-white/60 text-xs mt-0.5 truncate">{vehicle.models[0]}</p>
           </div>
           <div className="text-right shrink-0">
             <p className="text-[9px] text-white/50 uppercase tracking-widest">{t("from")}</p>
@@ -58,19 +58,19 @@ function FleetCardInner({
           </div>
         </div>
         <div className="flex items-center gap-5">
-          <span className="flex items-center gap-1.5 text-xs text-white/35">
+          <span className="flex items-center gap-1.5 text-xs text-white/60">
             <Users size={11} className="text-[#c9a84c]/60" />
             {vehicle.maxPassengers} {t("pax")}
           </span>
           <span
-            className="flex items-center gap-1.5 text-xs text-white/35"
+            className="flex items-center gap-1.5 text-xs text-white/60"
             title={`Boot fits: ${vehicle.largeBags} Large (${BAG_SIZES.large.cm}) · ${vehicle.mediumBags} Medium (${BAG_SIZES.medium.cm}) · ${vehicle.smallBags} Small (${BAG_SIZES.small.cm})`}
           >
             <Briefcase size={11} className="text-[#c9a84c]/60" />
             {vehicle.largeBags}L · {vehicle.mediumBags}M · {vehicle.smallBags}S
           </span>
         </div>
-        <p className="text-[9px] text-white/15 tracking-wider">{t("inclVat")}</p>
+        <p className="text-[10px] text-white/60 tracking-wider">{t("inclVat")}</p>
         <div className="mt-auto">
           <Link
             href={`/book?vehicle=${vehicle.class}`}
@@ -130,7 +130,7 @@ export default function FleetSection() {
             <span className="text-gold-gradient">{t("titleAccent")}</span>
           </h2>
 
-          <p className="text-white/35 max-w-md mx-auto text-sm sm:text-base leading-relaxed">
+          <p className="text-white/60 max-w-md mx-auto text-sm sm:text-base leading-relaxed">
             {t("subtitle")}
           </p>
         </div>

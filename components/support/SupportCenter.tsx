@@ -172,7 +172,9 @@ export default function SupportCenter() {
       <button
         type="button"
         onClick={open ? closePanel : openPanel}
-        aria-label={open ? "Close support" : "Open support center"}
+        // The accessible name must contain the visible label ("Need Help?") or
+        // voice-control users saying the on-screen text cannot activate it.
+        aria-label={open ? "Close support" : "Need help? Open support centre"}
         className="fixed bottom-20 right-6 lg:bottom-6 z-50 flex items-center gap-2.5 px-4 rounded-full focus:outline-none transition-all duration-200 hover:scale-105 active:scale-95"
         style={{
           height: "3.25rem",
