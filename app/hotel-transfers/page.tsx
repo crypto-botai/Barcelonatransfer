@@ -149,7 +149,7 @@ export default function HotelTransfersPage() {
               </table>
             </div>
             <p className="text-dark-500 text-xs text-center">
-              Prices shown for sedan (1–3 pax). MPV/minivan available for larger groups. All prices include tolls, meet & greet, and 60 min free waiting.
+              Prices shown for sedan (1–3 pax). MPV/minivan available for larger groups. Prices exclude VAT and tolls; meet & greet and 60 min free waiting are included.
             </p>
           </div>
         </section>
@@ -166,7 +166,7 @@ export default function HotelTransfersPage() {
                 "Real-time flight tracking",
                 "60 minutes free waiting (airport)",
                 "15 minutes free waiting (hotels)",
-                "All tolls and airport fees",
+                "Meet & greet at arrivals",
                 "Bottled water on board",
                 "WiFi available on request",
                 "Child seats available free",

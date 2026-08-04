@@ -206,7 +206,7 @@ function bookingConfirmationHtml({
           </td>
           <td style="padding:20px 24px; text-align:right;">
             <span style="font-family:Georgia,'Times New Roman',serif; font-size:24px; color:#c9a96e;">€${totalAmount.toFixed(2)}</span>
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#8a8a8a;">&nbsp; incl. VAT</span>
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#8a8a8a;">&nbsp; excl. VAT &amp; tolls</span>
           </td>
         </tr>
       </table>

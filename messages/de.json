@@ -66,8 +66,8 @@
     "passengers": "Passagiere",
     "maxCapacity": "Maximalkapazität",
     "luggage": "Gepäck",
-    "inclVat": "inkl. MwSt. · Festpreis",
-    "pricingNote": "Alle Preise sind Endpreise und enthalten MwSt., Maut, professionellen Fahrer und Empfangsservice. Kindersitze kostenlos."
+    "inclVat": "Festpreis · zzgl. MwSt. & Maut",
+    "pricingNote": "Festpreis pro Fahrzeug, ohne MwSt. und Maut. 10% MwSt. werden nur bei Rechnungsstellung berechnet; Mautgebühren werden separat berechnet. Fahrer, Fahrzeug, Kraftstoff und Empfangsservice inklusive. Kindersitze kostenlos."
   },
   "services": {
     "label": "Unsere Leistungen",

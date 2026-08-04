@@ -62,7 +62,7 @@ export default function TermsPage() {
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">3. Pricing & Payment</h2>
                   <ul className="list-disc pl-5 space-y-1">
-                    <li>All prices are fixed and inclusive of VAT, tolls, fuel, and parking unless stated otherwise.</li>
+                    <li>All prices are fixed per vehicle and <strong>exclude VAT and motorway tolls</strong>. Quoted fares include the chauffeur, vehicle, fuel and parking. Spanish VAT at 10% is added to the fare only where the client requests an invoice; motorway tolls are charged separately on routes that use them.</li>
                     <li>A 20% night surcharge applies to journeys commencing between 22:00 and 06:00.</li>
                     <li>Payment is accepted by credit/debit card via SumUp, bank transfer, or cash by prior arrangement.</li>
                     <li>Payment must be completed before or at the time of travel unless a corporate account has been established.</li>

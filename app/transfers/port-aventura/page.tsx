@@ -73,7 +73,7 @@ export default function PortAventuraTransferPage() {
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Private luxury transfer from Barcelona directly to PortAventura World, Ferrari Land, or your Costa Daurada hotel.
-              VAT-inclusive fixed price from €{PA.economy} — ideal for families.
+              fixed price (excl. VAT & tolls) from €{PA.economy} — ideal for families.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 70 minutes</div>
@@ -93,7 +93,7 @@ export default function PortAventuraTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed price from €155", body: "Single VAT-inclusive price. No meter running, no toll surprises, no extra charge for luggage." },
+                { icon: Shield, title: "Fixed price from €155", body: "Single fixed price per vehicle, excluding VAT and tolls. No meter running, no extra charge for luggage." },
                 { icon: CheckCircle2, title: "Child seats available", body: "Free baby seats and booster seats on request — essential for families flying in with young children." },
                 { icon: Star, title: "Direct to theme park gate", body: "Drop-off at PortAventura main entrance, Ferrari Land entrance, or your on-site hotel lobby." },
                 { icon: Clock, title: "Meet & greet in arrivals", body: "Driver waits with your name board in the arrivals hall. 60 minutes free waiting from your flight landing." },
@@ -159,7 +159,7 @@ export default function PortAventuraTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">All prices are VAT-inclusive fixed fares. Tolls, meet &amp; greet, and 60 min free waiting included. No hidden fees.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet and 60 min free waiting.</p>
           </div>
         </section>
 

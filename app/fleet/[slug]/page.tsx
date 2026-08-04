@@ -174,7 +174,7 @@ export default async function FleetVehiclePage(
 
                 <div className="flex items-baseline gap-2 mb-6">
                   <span className="font-display text-4xl text-gold-400">from €{minFare}</span>
-                  <span className="text-dark-400 text-sm">incl. VAT · fixed price</span>
+                  <span className="text-dark-400 text-sm">fixed price · excl. VAT &amp; tolls</span>
                 </div>
 
                 <div className="flex gap-3">
@@ -263,7 +263,7 @@ export default async function FleetVehiclePage(
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-3">All prices are fixed and include tolls, meet & greet, and up to 60 min free waiting.</p>
+            <p className="text-dark-400 text-xs text-center mt-3">Fixed price per vehicle, excluding VAT and tolls. 10% VAT is added only if you request an invoice; tolls are charged separately. Includes meet &amp; greet and up to 60 min free waiting.</p>
           </div>
         </section>
 

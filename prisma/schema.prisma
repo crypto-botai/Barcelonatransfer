@@ -792,7 +792,7 @@ model RoutePrice {
   id          String   @id @default(cuid())
   routeId     String
   vehicleCode String   // ECONOMY | BUSINESS | MINIVAN | VCLASS | MINIBUS
-  price       Int      // VAT-inclusive, whole EUR
+  price       Int      // Fare excluding VAT and tolls, whole EUR
   updatedAt   DateTime @updatedAt
   updatedBy   String?
   route       Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)

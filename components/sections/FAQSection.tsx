@@ -15,8 +15,8 @@ const FAQS = [
     a: "Yes. For all airport pickups, we track your flight in real time. If your flight is delayed, your chauffeur adjusts their arrival accordingly at no extra charge. You get 60 minutes of complimentary waiting time after landing.",
   },
   {
-    q: "Are your prices all-inclusive? Any hidden fees?",
-    a: "All prices are completely fixed and all-inclusive. They cover the professional chauffeur, premium vehicle, tolls, congestion charges, and airport/cruise terminal fees. There is zero surge pricing, ever. What you see is what you pay.",
+    q: "Is VAT included? What about tolls?",
+    a: "The price you see is fixed per vehicle and does NOT include VAT or tolls. If you need an invoice (for business or expenses), 10% Spanish VAT is added to the fare. Motorway tolls, where the route uses them, are charged separately. Everything else is included: the professional chauffeur, the vehicle, fuel, meet & greet, and 60 minutes of free waiting at the airport. There is zero surge pricing, ever.",
   },
   {
     q: "What vehicles do you offer?",

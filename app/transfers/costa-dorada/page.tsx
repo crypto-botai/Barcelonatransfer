@@ -74,7 +74,7 @@ export default function CostaDoradaTransferPage() {
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Private luxury transfers from Barcelona to the Costa Dorada.
-              Castelldefels, Sitges, Tarragona, Salou, PortAventura, Cambrils — VAT-inclusive fixed prices, all vehicle classes.
+              Castelldefels, Sitges, Tarragona, Salou, PortAventura, Cambrils — fixed prices per vehicle, excl. VAT and tolls, all vehicle classes.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 20 min – 2 hrs</div>
@@ -120,7 +120,7 @@ export default function CostaDoradaTransferPage() {
               </table>
             </div>
             <p className="text-dark-500 text-xs text-center mt-4">
-              All prices are VAT-inclusive fixed fares. Tolls, meet &amp; greet, and 60 min free waiting included. Child seats free.
+              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet and 60 min free waiting. Child seats free.
             </p>
           </div>
         </section>
@@ -155,7 +155,7 @@ export default function CostaDoradaTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed VAT-inclusive prices", body: "The price you see is the price you pay. Tolls, fuel, and driver included. No surprises." },
+                { icon: Shield, title: "Fixed transparent prices", body: "Fixed price per vehicle, excluding VAT and tolls. Fuel and driver included; 10% VAT applies only if you need an invoice." },
                 { icon: Clock, title: "Direct door-to-door", body: "Straight to your hotel, resort, or theme park entrance — no stops, no shared rides." },
                 { icon: Star, title: "All vehicle classes", body: "Sedan, Business, Minivan (Vito), V-Class VIP, or Minibus — choose what fits your group." },
                 { icon: CheckCircle2, title: "Family-friendly", body: "Free child seats and baby seats on request. Ideal for families flying in with young children." },

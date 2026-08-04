@@ -123,7 +123,10 @@ async function lookupFixedPrice(
   toZone: string,
   vc: VehicleClass,
 ): Promise<number | null> {
-  if (!fromZone || !toZone || fromZone === toZone) return null;
+  // Same-zone lookups are allowed: the route table is the authority, so a
+  // defined same-zone route (e.g. within Barcelona city) resolves normally,
+  // and an undefined one still falls through to null → custom quote.
+  if (!fromZone || !toZone) return null;
 
   // Try DB first — if it has rows and the route is found there, use it
   const rows = await getDBRoutes();

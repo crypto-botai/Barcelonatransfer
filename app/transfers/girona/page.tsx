@@ -90,7 +90,7 @@ export default function GironaTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed price €140", body: "The price includes the full motorway journey, all tolls, and no surprise surcharges at destination." },
+                { icon: Shield, title: "Fixed price €140", body: "One fixed price for the full motorway journey. Tolls and VAT are charged separately; no surprise surcharges at destination." },
                 { icon: Clock, title: "Meet & greet included", body: "Driver meets you in arrivals with your name board. 60 minutes free waiting from your flight landing." },
                 { icon: Star, title: "Girona Airport (GRO) transfers", body: "We also transfer between Girona Airport and Barcelona city — useful for Ryanair passengers flying into GRO." },
                 { icon: CheckCircle2, title: "Medieval city drop-off", body: "Direct to your Girona hotel, apartment, or the historic quarter without navigating public transport." },
@@ -150,7 +150,7 @@ export default function GironaTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">All prices include tolls, meet & greet, and 60 min free waiting. No hidden fees.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet and 60 min free waiting.</p>
           </div>
         </section>
 

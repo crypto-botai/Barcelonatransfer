@@ -94,7 +94,7 @@ export default function AndorraTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: `All-inclusive €${andorraPrice}`, body: `One fixed price covers the full 210 km journey including all tolls and mountain road sections. No surprises.` },
+                { icon: Shield, title: `Fixed price €${andorraPrice}`, body: `One fixed price covers the full 210 km journey and mountain road sections. VAT and tolls are charged separately.` },
                 { icon: Clock, title: "Ski equipment transport", body: "Large boot space for ski bags, boot bags, and suitcases. The V-Class handles full ski kit for 4+ people." },
                 { icon: Star, title: "Winter mountain driving", body: "Our drivers are experienced in Pyrenean mountain routes year-round, including winter conditions." },
                 { icon: CheckCircle2, title: "Grandvalira ski station", body: "Direct drop-off at Grandvalira (Europe's largest ski area), Vallnord, or your Andorran hotel." },
@@ -161,7 +161,7 @@ export default function AndorraTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">All prices include all tolls, meet & greet, and 60 min free waiting. No hidden fees.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet and 60 min free waiting.</p>
           </div>
         </section>
 

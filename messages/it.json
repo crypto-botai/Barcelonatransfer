@@ -66,8 +66,8 @@
     "passengers": "passeggeri",
     "maxCapacity": "capacità massima",
     "luggage": "bagaglio",
-    "inclVat": "IVA incl. · prezzo fisso",
-    "pricingNote": "Tutti i prezzi sono definitivi e comprendono IVA, pedaggi, autista professionista e servizio di accoglienza. Seggiolini gratuiti."
+    "inclVat": "prezzo fisso · IVA e pedaggi esclusi",
+    "pricingNote": "Prezzo fisso per veicolo, IVA e pedaggi esclusi. L'IVA del 10% viene aggiunta solo se richiede fattura; i pedaggi sono addebitati separatamente. Autista, veicolo, carburante e servizio di accoglienza inclusi. Seggiolini gratuiti."
   },
   "services": {
     "label": "I Nostri Servizi",

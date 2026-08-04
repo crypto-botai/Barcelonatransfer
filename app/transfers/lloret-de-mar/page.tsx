@@ -59,7 +59,7 @@ const FAQS = [
   },
   {
     q: "How much does a private transfer from Barcelona to Lloret de Mar cost?",
-    a: "A fixed-price private transfer from Barcelona to Lloret de Mar starts from €145 for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €165, and a Mercedes V-Class for groups up to 7 is €205. All prices include tolls, meet & greet, and 60 minutes of free waiting time.",
+    a: "A fixed-price private transfer from Barcelona to Lloret de Mar starts from €145 for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €165, and a Mercedes V-Class for groups up to 7 is €205. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and AP-7 motorway tolls are charged separately. Meet & greet and 60 minutes of free waiting are included.",
   },
   {
     q: "Can Élite BCN pick us up from our Lloret de Mar hotel for the return to Barcelona?",
@@ -222,7 +222,7 @@ export default function LloretDeMarTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">All prices include tolls, meet & greet, and 60 min free waiting. No hidden fees.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet and 60 min free waiting.</p>
           </div>
         </section>
 

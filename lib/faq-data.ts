@@ -16,7 +16,7 @@ export const FAQ_GROUPS = [
       { q: "Where will the driver meet me at the airport?", a: "Your driver will be waiting in the arrivals hall at El Prat Airport (Terminal 1 or Terminal 2) holding a personalised name board. For Meet & Greet bookings, the driver will assist you from the baggage reclaim area." },
       { q: "How much free waiting time do I get at the airport?", a: "We offer 60 minutes of complimentary waiting time for all airport pickups, counted from the actual flight landing time. Additional waiting time can be added as an extra at €25 per 30 minutes." },
       { q: "Do you cover Girona Airport?", a: "Yes. We provide transfers to and from Girona–Costa Brava Airport (GRO). Fixed price from Barcelona El Prat Airport is €140 for an Economy sedan. From Barcelona city, the price starts at €135. Booking in advance is recommended." },
-      { q: "Do you serve all Costa Brava and Costa Daurada resorts?", a: "Yes. We cover all major resorts with fixed prices from Barcelona Airport: Lloret de Mar from €100, Tossa de Mar from €110, Salou from €150, PortAventura from €150, Cambrils from €160, Sitges from €80. All 62 routes are fixed-price, all-inclusive." },
+      { q: "Do you serve all Costa Brava and Costa Daurada resorts?", a: "Yes. We cover all major resorts with fixed prices from Barcelona Airport: Lloret de Mar from €100, Tossa de Mar from €110, Salou from €150, PortAventura from €150, Cambrils from €160, Sitges from €80. All routes are fixed-price per vehicle, excluding VAT and tolls." },
     ],
   },
   {
@@ -31,8 +31,11 @@ export const FAQ_GROUPS = [
   {
     group: "Pricing & Payment",
     items: [
-      { q: "Are your prices fixed or do they use surge pricing?", a: "All our prices are fixed and all-inclusive. We never apply surge pricing, peak-hour multipliers, or hidden fees. The price you see when you book is the price you pay — always." },
-      { q: "What is included in the price?", a: "All prices include the professional chauffeur, vehicle, fuel, tolls, parking, and standard waiting time. Airport transfers include flight tracking and 60 minutes free waiting. Fixed-price transfers are not subject to any surcharges." },
+      { q: "Are your prices fixed or do they use surge pricing?", a: "All our prices are fixed per vehicle. We never apply surge pricing, peak-hour multipliers, or hidden fees. Note that quoted prices exclude VAT and tolls — see the questions below for details." },
+      { q: "How much is a transfer within Barcelona city?", a: "A point-to-point transfer inside Barcelona city is charged at the same fixed rate as an airport transfer: from €50 for an Economy sedan (1–3 passengers), €65 for a Minivan (up to 8) and €75 for a V-Class. That is the same price whether you travel airport to city, city to airport, or between two addresses within the city. Prices exclude VAT and tolls." },
+      { q: "Is VAT included in the price?", a: "No. Quoted prices exclude VAT. If you require an invoice — for a company, business travel, or expense claims — 10% Spanish VAT is added to the fare. If you do not need an invoice, you simply pay the quoted price. Let us know when booking so we can issue the invoice correctly." },
+      { q: "Are motorway tolls included?", a: "No. Tolls are not included in the quoted price and are charged separately where the route uses a toll motorway. Longer routes — Costa Brava, Costa Daurada, Tarragona, Girona, Andorra and similar — normally involve tolls; short city and airport transfers usually do not. Your driver can confirm the exact toll amount for your route." },
+      { q: "What is included in the price?", a: "The quoted price includes the professional chauffeur, the vehicle, fuel, parking and standard waiting time. Airport transfers also include flight tracking and 60 minutes of free waiting. VAT and tolls are NOT included — see the two questions above." },
       { q: "What payment methods do you accept?", a: "We accept all major credit and debit cards (Visa, Mastercard, Amex) through our secure online payment system. You can also pay via bank transfer or cash on request. Online payments are processed securely." },
       { q: "Is there a night surcharge?", a: "Fixed-price transfers have no night surcharge — the price you see is always fixed. A 20% night surcharge applies only to hourly chauffeur hire (22:00–06:00)." },
     ],

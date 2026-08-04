@@ -647,8 +647,9 @@ export default function BookFormClient() {
                 {quote && !quote.isCustomRoute && quote.fromLabel && (
                   <div className="text-center py-3 border-t border-gold-500/10">
                     <p className="font-display text-xl text-gold-400 tabular-nums">
-                      {quote.fromLabel} → {quote.toLabel} · €{quote.totalAmount} fixed · VAT included
+                      {quote.fromLabel} → {quote.toLabel} · €{quote.totalAmount} fixed
                     </p>
+                    <p className="text-dark-400 text-xs mt-1">excl. VAT &amp; tolls · 10% VAT added only if you need an invoice</p>
                   </div>
                 )}
 

@@ -94,7 +94,7 @@ export default function PricingSection({ routes }: Props) {
             Transparent <span className="text-gold-gradient">Luxury Pricing</span>
           </h2>
           <p className="text-dark-400 max-w-xl mx-auto mb-6">
-            All prices are fixed and all-inclusive. No hidden fees. No surge pricing. Ever.
+            All prices are fixed per vehicle and exclude VAT and tolls. No surge pricing. Ever.
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-xs text-dark-400">
             {["No surge pricing", "Fixed fare guaranteed", "Free cancellation 24h", "Instant confirmation"].map((g) => (
@@ -163,7 +163,7 @@ export default function PricingSection({ routes }: Props) {
           {/* Footer note */}
           <div className="p-5 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-dark-400 text-xs">
-              All prices are VAT-inclusive and fixed. Tolls, professional chauffeur, and meet &amp; greet included. Child seats free on request.
+              All prices are fixed per vehicle and <strong className="text-white">exclude VAT and tolls</strong>. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Professional chauffeur, vehicle, fuel and meet &amp; greet are included. Child seats free on request.
             </p>
             <Link href="/book" className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">
               Get Custom Quote <ArrowRight size={12} />

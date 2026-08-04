@@ -50,6 +50,18 @@ export const FIXED_ROUTES: FixedRoute[] = [
     vehicleClassOverrides: { BUSINESS: 50 },
   },
   {
+    // Point-to-point within Barcelona city. Priced identically to the
+    // airport ⇄ city route (including the Camry override) so a city-centre
+    // hop never falls through to "custom quote".
+    slug: "barcelona-city-barcelona-city",
+    from: "BARCELONA_CITY", to: "BARCELONA_CITY",
+    fromLabel: "Barcelona City", toLabel: "Barcelona City",
+    category: "airport-city",
+    note: "Within Barcelona city",
+    prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    vehicleClassOverrides: { BUSINESS: 50 },
+  },
+  {
     slug: "bcn-airport-cruise-terminal",
     from: "BCN_AIRPORT", to: "CRUISE_TERMINAL",
     fromLabel: "El Prat Airport", toLabel: "Cruise Terminal",

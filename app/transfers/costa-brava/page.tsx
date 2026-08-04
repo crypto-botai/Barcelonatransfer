@@ -73,7 +73,7 @@ export default function CostaBravaTransferPage() {
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Private luxury transfers from Barcelona to the entire Costa Brava coastline.
-              Lloret de Mar, Tossa de Mar, Cadaqués, Roses and beyond — VAT-inclusive fixed prices, all vehicle classes.
+              Lloret de Mar, Tossa de Mar, Cadaqués, Roses and beyond — fixed prices per vehicle, excl. VAT and tolls, all vehicle classes.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 1–3 hrs</div>
@@ -119,7 +119,7 @@ export default function CostaBravaTransferPage() {
               </table>
             </div>
             <p className="text-dark-500 text-xs text-center mt-4">
-              All prices are VAT-inclusive fixed fares. Tolls, meet &amp; greet, and 60 min free waiting included. Child seats free.
+              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet and 60 min free waiting. Child seats free.
             </p>
           </div>
         </section>
@@ -155,7 +155,7 @@ export default function CostaBravaTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed VAT-inclusive prices", body: "The price you see is the price you pay. Tolls, fuel, and driver included." },
+                { icon: Shield, title: "Fixed transparent prices", body: "Fixed price per vehicle, excluding VAT and tolls. Fuel and driver included; 10% VAT applies only if you need an invoice." },
                 { icon: Clock, title: "Direct door-to-door", body: "Straight to your villa, hotel, or port — no bus stops, no changes, no shared rides." },
                 { icon: Star, title: "All vehicle classes", body: "Sedan, Business, Minivan (Vito), V-Class VIP, or Minibus — choose what fits your group." },
                 { icon: CheckCircle2, title: "Child seats available", body: "Baby seats and boosters free on request. Perfect for family holidays." },

@@ -30,8 +30,33 @@ import {
 // ── 1. Route count ────────────────────────────────────────────────────────────
 
 describe("FIXED_ROUTES count", () => {
-  it("has exactly 62 routes", () => {
-    expect(FIXED_ROUTES.length).toBe(62);
+  it("has exactly 63 routes", () => {
+    expect(FIXED_ROUTES.length).toBe(63);
+  });
+});
+
+// ── 1b. Same-zone route (within Barcelona city) ──────────────────────────────
+
+describe("Barcelona city → Barcelona city (same-zone route)", () => {
+  it("resolves instead of falling through to a custom quote", () => {
+    expect(lookupFixedPriceByZone("barcelona_city", "barcelona_city", "ECONOMY")).toBe(50);
+    expect(lookupFixedPriceByZone("barcelona_city", "barcelona_city", "MINIVAN")).toBe(65);
+  });
+
+  it("matches the airport ⇄ city price for every vehicle class", () => {
+    for (const vc of ["ECONOMY", "MINIVAN", "VCLASS", "MINIBUS"] as const) {
+      expect(lookupFixedPriceByZone("barcelona_city", "barcelona_city", vc))
+        .toBe(lookupFixedPriceByZone("airport", "barcelona_city", vc));
+    }
+  });
+
+  it("carries the same Camry (BUSINESS) €50 override as airport ⇄ city", () => {
+    expect(lookupPriceByClass("BARCELONA_CITY", "BARCELONA_CITY", "BUSINESS")).toBe(50);
+    expect(lookupPriceByClass("BARCELONA_CITY", "BARCELONA_CITY", "LUXURY")).toBe(60);
+  });
+
+  it("a same-zone pair with no defined route still returns null (custom quote)", () => {
+    expect(lookupFixedPriceByZone("sitges", "sitges", "ECONOMY")).toBeNull();
   });
 });
 

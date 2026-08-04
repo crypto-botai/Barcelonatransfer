@@ -354,7 +354,8 @@ export function lookupFixedPriceByZone(
   toZone:   string,
   vc:       string,
 ): number | null {
-  if (!fromZone || !toZone || fromZone === toZone) return null;
+  // Same-zone lookups allowed — see lookupFixedPrice in lib/pricing-service.ts.
+  if (!fromZone || !toZone) return null;
 
   const fromCode = KEY_TO_ZONE_CODE[fromZone];
   const toCode   = KEY_TO_ZONE_CODE[toZone];

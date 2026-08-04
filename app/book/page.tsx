@@ -38,7 +38,7 @@ const BOOKING_STEPS = [
 
 const BOOK_FAQ = [
   { q: "How far in advance do I need to book?",       a: "We recommend booking at least 4 hours before your pickup. Bookings under 4 hours carry a 15% last-minute surcharge. We cannot accept bookings with less than 1 hour notice." },
-  { q: "What does the price include?",                a: "All prices are fixed and all-inclusive: professional chauffeur, luxury Mercedes vehicle, tolls, meet & greet, and up to 60 minutes free waiting after landing. No surge pricing, ever. VAT included." },
+  { q: "What does the price include?",                a: "The fixed price covers the professional chauffeur, the vehicle, fuel, meet & greet, and up to 60 minutes free waiting after landing. No surge pricing, ever. VAT and tolls are NOT included: 10% VAT is added only if you request an invoice, and motorway tolls are charged separately where the route uses them." },
   { q: "Can I cancel or change my booking?",          a: "Yes. Free cancellation up to 24 hours before pickup. Pickup address changes are free if made more than 8 hours before departure. Changes within those windows require a WhatsApp message to +34 635 383 712." },
   { q: "What if my flight is delayed?",               a: "We monitor all flights in real time. Your driver automatically adjusts to your actual landing time at no extra cost. The first 60 minutes after landing are always free." },
   { q: "Where do you pick me up at the airport?",     a: "Your driver will be waiting in the Arrivals hall of your terminal (T1 or T2) holding a name board with your name. No need to call — just follow Arrivals signs." },
@@ -111,7 +111,7 @@ export default function BookPage() {
       <section className="bg-[#050505] py-12 border-t border-white/[0.04]">
         <div className="container mx-auto px-4 max-w-3xl">
           <h2 className="text-white text-xl font-display mb-1">Popular Route Prices</h2>
-          <p className="text-dark-500 text-xs mb-6">All-inclusive fixed fares · VAT included · No hidden charges</p>
+          <p className="text-dark-400 text-xs mb-6">Fixed fares per vehicle · excl. VAT &amp; tolls · No surge pricing</p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>

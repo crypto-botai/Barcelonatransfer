@@ -90,7 +90,7 @@ export default function TarragonaTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed price €150", body: "One price covers the full journey including all AP-7 motorway tolls. No hidden charges." },
+                { icon: Shield, title: "Fixed price €150", body: "One fixed price for the full journey. AP-7 motorway tolls and VAT are charged separately." },
                 { icon: Clock, title: "PortAventura door delivery", body: "Drop-off directly at your PortAventura World hotel or theme park entrance. No stress with luggage on buses." },
                 { icon: Star, title: "Costa Daurada hotels", body: "We serve all resort hotels along the Costa Daurada — Cambrils, Salou, La Pineda, and Vila-seca." },
                 { icon: CheckCircle2, title: "7-seat MPV available", body: "The Mercedes V-Class seats 7 passengers and handles large luggage — ideal for family groups." },
@@ -155,7 +155,7 @@ export default function TarragonaTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">All prices include tolls, meet & greet, and 60 min free waiting. No hidden fees.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet and 60 min free waiting.</p>
           </div>
         </section>
 

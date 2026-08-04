@@ -95,7 +95,7 @@ export default function HourlyPage() {
               ))}
             </div>
             <p className="text-center text-dark-500 text-xs mt-8">
-              All hourly rates include the professional chauffeur, vehicle, fuel, and tolls.
+              All hourly rates include the professional chauffeur, vehicle and fuel. VAT and tolls are charged separately.
             </p>
           </div>
         </section>
