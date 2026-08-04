@@ -4,6 +4,8 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "best-places-near-barcelona-in-summer",
+    photo: "/blog/best-places-near-barcelona-in-summer.jpg",
+    credit: { author: "Gabriele Delhey", licence: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Costa_Brava_Calas.JPG" },
     title: "Where to Go Near Barcelona in Summer",
     excerpt:
       "When the city hits 32°C and the beaches fill, these are the coastal towns, mountain valleys and coves within easy reach that are worth the drive.",
@@ -98,6 +100,8 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "barcelona-in-winter-what-to-do",
+    photo: "/blog/barcelona-in-winter-what-to-do.jpg",
+    credit: { author: "M McBey", licence: "CC BY 2.0", source: "https://commons.wikimedia.org/wiki/File:Evening_light_over_Barcelona.jpg" },
     title: "Barcelona in Winter: What to Do When the Beach Closes",
     excerpt:
       "Mild days, empty museums, snow ninety minutes away and the best three months of the year to actually see the city properly.",
@@ -182,6 +186,8 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "barcelona-christmas-and-new-year",
+    photo: "/blog/barcelona-christmas-and-new-year.jpg",
+    credit: { author: "Enric", licence: "CC BY 4.0", source: "https://commons.wikimedia.org/wiki/File:073_Fira_de_Santa_Ll%C3%BAcia,_av._de_la_Catedral_(Barcelona).jpg" },
     title: "Barcelona at Christmas and New Year",
     excerpt:
       "Nativity markets outside the cathedral, twelve grapes at midnight, a parade of kings on 5 January, and one very unusual Catalan Christmas tradition.",
@@ -264,6 +270,8 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "portaventura-family-guide",
+    photo: "/blog/portaventura-family-guide.jpg",
+    credit: { author: "candi...", licence: "CC BY 2.0", source: "https://commons.wikimedia.org/wiki/File:Baixada_del_Shambhala_i_Dragon_Khan.jpg" },
     title: "PortAventura World: A Family Day on the Costa Daurada",
     excerpt:
       "Six themed worlds, one of Europe's tallest roller coasters, a Ferrari-branded park next door and a beach fifteen minutes away.",
@@ -358,6 +366,8 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "figueres-dali-theatre-museum",
+    photo: "/blog/figueres-dali-theatre-museum.jpg",
+    credit: { author: "Andris at English Wikipedia", licence: "Public domain", source: "https://commons.wikimedia.org/wiki/File:Teater_Museu_Gala_Salvador_Dali_building_from_outside.jpg" },
     title: "Figueres and the Dalí Theatre-Museum",
     excerpt:
       "The largest surrealist object in the world, built by Dalí on the ruins of a burned-out theatre, with the artist himself buried under the floor.",

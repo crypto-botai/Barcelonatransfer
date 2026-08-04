@@ -4,6 +4,8 @@ export const COAST_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "things-to-do-in-sitges",
+    photo: "/blog/things-to-do-in-sitges.jpg",
+    credit: { author: "Werner Lang (Wela49)", licence: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Sitges_-_Ansicht_4.jpg" },
     title: "Sitges: Beaches, Carnival and the Garraf Coast",
     excerpt:
       "Seventeen beaches, a whitewashed old town built around a sea-facing church, and the most theatrical carnival in Catalonia — all 35 km from Barcelona.",
@@ -81,6 +83,8 @@ export const COAST_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "tossa-de-mar-guide",
+    photo: "/blog/tossa-de-mar-guide.jpg",
+    credit: { author: "Unknown", licence: "CC BY-SA 2.5", source: "https://commons.wikimedia.org/wiki/File:Tossa_de_Mar_Torre%C3%B3n_JMM.JPG" },
     title: "Tossa de Mar: The Walled Town on the Costa Brava",
     excerpt:
       "A twelfth-century fortress standing directly in the sea, three beaches inside the town, and the cleanest water within easy reach of Barcelona.",
@@ -156,6 +160,8 @@ export const COAST_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "lloret-de-mar-beyond-the-nightlife",
+    photo: "/blog/lloret-de-mar-beyond-the-nightlife.jpg",
+    credit: { author: "Victor Gleim", licence: "CC BY-SA 4.0", source: "https://commons.wikimedia.org/wiki/File:Lloret_de_Mar_-_Panorama_of_main_beach.jpg" },
     title: "Lloret de Mar Beyond the Nightlife",
     excerpt:
       "The Costa Brava's best-known resort has a cliffside modernist garden, a medieval castle and a string of quiet coves that most visitors never find.",
@@ -231,6 +237,8 @@ export const COAST_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "cadaques-and-dali",
+    photo: "/blog/cadaques-and-dali.jpg",
+    credit: { author: "Anthiro 57", licence: "CC BY-SA 3.0 es", source: "https://commons.wikimedia.org/wiki/File:Cadaques_Pueblo_Marinero.JPG" },
     title: "Cadaqués and the Dalí Coast",
     excerpt:
       "A whitewashed village at the end of a mountain road, the surrealist's house at Portlligat, and the raw geology of Cap de Creus.",

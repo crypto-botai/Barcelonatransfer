@@ -177,6 +177,20 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
             <div className="relative aspect-[21/9] rounded-2xl overflow-hidden border border-white/[0.07]">
               <DestinationThumb article={article} priority sizes="(max-width: 1024px) 100vw, 900px" />
             </div>
+            {article.credit && (
+              <p className="text-white/25 text-[11px] mt-2.5 text-right">
+                Photo:{" "}
+                <a
+                  href={article.credit.source}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="hover:text-white/45 underline underline-offset-2 transition-colors"
+                >
+                  {article.credit.author}
+                </a>{" "}
+                · {article.credit.licence} via Wikimedia Commons
+              </p>
+            )}
           </div>
 
           {/* ── Body ───────────────────────────────────────────── */}

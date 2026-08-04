@@ -4,6 +4,8 @@ export const INLAND_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "montserrat-day-trip-guide",
+    photo: "/blog/montserrat-day-trip-guide.jpg",
+    credit: { author: "Bernard Gagnon", licence: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Abbey_of_Montserrat_02.jpg" },
     title: "Montserrat: Catalonia's Sacred Mountain",
     excerpt:
       "A Benedictine monastery wedged into a wall of serrated rock, the Black Madonna, a boys' choir with a thousand-year history, and walking trails above the clouds.",
@@ -86,6 +88,8 @@ export const INLAND_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "girona-medieval-city-guide",
+    photo: "/blog/girona-medieval-city-guide.jpg",
+    credit: { author: "Patronat de Turisme Costa Brava Pirineu de Girona", licence: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Girona_des_de_l_aire_edited.jpg" },
     title: "Girona: Medieval Walls and the Jewish Quarter",
     excerpt:
       "One of Europe's best-preserved Jewish quarters, a cathedral with the widest Gothic nave in the world, and coloured houses reflected in the Onyar.",
@@ -170,6 +174,8 @@ export const INLAND_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "tarragona-roman-guide",
+    photo: "/blog/tarragona-roman-guide.jpg",
+    credit: { author: "Bernard Gagnon", licence: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Roman_circus_of_Tarraco_01.jpg" },
     title: "Tarragona: Roman Capital by the Sea",
     excerpt:
       "An amphitheatre on the beach, a UNESCO-listed Roman city, and the finest surviving aqueduct in Catalonia — an hour south of Barcelona.",
@@ -250,6 +256,8 @@ export const INLAND_ARTICLES: BlogArticle[] = [
   // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "andorra-winter-guide",
+    photo: "/blog/andorra-winter-guide.jpg",
+    credit: { author: "Jorge Franganillo", licence: "CC BY 3.0", source: "https://commons.wikimedia.org/wiki/File:2014-12-13_Vall_d%27Incles.jpg" },
     title: "Andorra in Winter: Skiing, Spas and Duty-Free",
     excerpt:
       "The largest ski area in the Pyrenees, Europe's biggest mountain spa, and tax-free shopping — three hours from Barcelona in a country of 468 square kilometres.",

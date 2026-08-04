@@ -15,6 +15,18 @@ export type Block =
   | { type: "ul";      items: string[] }
   | { type: "callout"; title: string; text: string };
 
+/**
+ * Attribution for a freely-licensed photograph. CC BY and CC BY-SA both
+ * require the author, the licence and a link back to the source, so all three
+ * are mandatory here rather than optional.
+ */
+export interface PhotoCredit {
+  author:  string;
+  licence: string;
+  /** Commons file description page. */
+  source:  string;
+}
+
 export type BlogCategory = "Destination" | "Seasonal" | "Guide";
 export type Season = "Summer" | "Winter" | "New Year" | "All year";
 
@@ -44,12 +56,14 @@ export interface BlogArticle {
   motif: "coast" | "peaks" | "arches" | "city" | "vines" | "snow";
 
   /**
-   * Optional real photograph, served from /public (e.g. "/blog/sitges.jpg").
-   * When present it replaces the generated artwork everywhere. Left undefined
-   * by default: we generate branded artwork rather than ship stock photos we
-   * do not hold a licence for.
+   * Real photograph served from /public (e.g. "/blog/sitges.jpg"). When set it
+   * replaces the generated artwork everywhere. Populated from freely-licensed
+   * Wikimedia Commons photographs of the actual destination — see `credit`,
+   * which must be rendered wherever the photo is, to satisfy the CC BY /
+   * CC BY-SA attribution requirement.
    */
   photo?: string;
+  credit?: PhotoCredit;
 
   /** Free-text place name passed to /book?destination= */
   bookDestination: string;
