@@ -134,7 +134,18 @@ const _getRoutesFromDB = unstable_cache(
       orderBy: { sortOrder: "asc" },
     });
   },
-  ["pricing-routes"],
+  // The version suffix is a manual cache-buster.
+  //
+  // Vercel's Data Cache survives deployments, so shipping new code does not by
+  // itself clear this. Editing prices through the admin panel calls
+  // revalidateTag("pricing") and needs none of this; but a price written
+  // straight to the database — a seed run, or a one-off correction — bypasses
+  // that and leaves stale figures served for up to an hour.
+  //
+  // Bump the suffix when changing prices by direct database write, or call
+  // /api/cron/revalidate-pricing with the cron secret. Last bumped 7 Aug 2026
+  // for the Montserrat reprice.
+  ["pricing-routes-v2"],
   { tags: ["pricing"], revalidate: 3600 }
 );
 
