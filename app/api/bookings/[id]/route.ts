@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendDriverAssignedEmail, sendBookingCancelledEmail, sendDriverBookingDetailsEmail } from "@/lib/resend";
+import { notify } from "@/lib/notifications/service";
 
 export async function GET(
   req: NextRequest,
@@ -164,6 +165,22 @@ export async function PATCH(
           driverAmount:     booking.driverAmount,
         }).catch(e => console.error("[resend] driver booking details:", e));
       }
+
+      // Portal + WhatsApp copy for the customer. Email is omitted because
+      // sendDriverAssignedEmail above already handles it.
+      await notify({
+        event:     "DRIVER_ASSIGNED",
+        channels:  ["inapp", "whatsapp"],
+        userId:    booking.userId,
+        bookingId: booking.id,
+        phone:     booking.guestPhone,
+        vars: {
+          driver: driverName,
+          code:   booking.confirmationCode,
+          when:   new Date(booking.pickupDatetime).toLocaleString("en-GB"),
+          link:   `${process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info"}/track/${booking.confirmationCode}`,
+        },
+      });
     }
 
     return NextResponse.json(booking);

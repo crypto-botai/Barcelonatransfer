@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BookingStatus, DriverStatus } from "@prisma/client";
+import { notify } from "@/lib/notifications/service";
 
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -28,7 +29,10 @@ export async function PATCH(req: NextRequest) {
 
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    select: { id: true, driverId: true, status: true },
+    select: {
+      id: true, driverId: true, status: true,
+      userId: true, guestPhone: true, pickupAddress: true, confirmationCode: true,
+    },
   });
 
   if (!booking || booking.driverId !== driver.id) {
@@ -52,6 +56,27 @@ export async function PATCH(req: NextRequest) {
         data: { status: DriverStatus.ON_RIDE },
       }),
     ]);
+
+    // Hand the customer their live tracking link at the one moment it becomes
+    // useful. notify() never throws, so a messaging failure cannot leave the
+    // ride un-started after the transaction has already committed.
+    const driverRecord = await prisma.driver.findUnique({
+      where:  { id: driver.id },
+      select: { user: { select: { name: true } } },
+    });
+
+    await notify({
+      event:     "DRIVER_EN_ROUTE",
+      userId:    booking.userId,
+      bookingId: booking.id,
+      phone:     booking.guestPhone,
+      vars: {
+        driver: driverRecord?.user.name ?? "Your driver",
+        pickup: booking.pickupAddress,
+        link:   `${process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info"}/track/${booking.confirmationCode}`,
+      },
+    });
+
     return NextResponse.json({ status: updated.status });
   }
 
@@ -76,5 +101,13 @@ export async function PATCH(req: NextRequest) {
       },
     }),
   ]);
+
+  await notify({
+    event:     "RIDE_COMPLETED",
+    userId:    booking.userId,
+    bookingId: booking.id,
+    vars:      { code: booking.confirmationCode },
+  });
+
   return NextResponse.json({ status: updated.status });
 }

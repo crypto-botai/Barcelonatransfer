@@ -50,17 +50,25 @@ export default function AddressAutocomplete({
 
   const showZones = !!(quickZones?.length && query.length < 3);
 
+  // Goes through our own /api/geo/search rather than calling Nominatim
+  // directly. A browser cannot set the User-Agent their usage policy requires,
+  // and hitting them once per keystroke from every visitor's IP is the kind of
+  // load that gets an application blocked — which would silently break this
+  // field. The proxy adds a shared cache and a Spain/Andorra bias.
   const search = useCallback(async (q: string) => {
     if (q.length < 3) { setSuggestions([]); return; }
     setLoading(true);
     try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=6`,
-        { headers: { "Accept-Language": "en" } }
-      );
-      const data: Suggestion[] = await res.json();
-      setSuggestions(data);
-      if (data.length > 0) setOpen(true);
+      const res = await fetch(`/api/geo/search?q=${encodeURIComponent(q)}`);
+      if (!res.ok) throw new Error(String(res.status));
+      const { results } = await res.json() as { results: Array<{ lat: number; lng: number; label: string }> };
+      const mapped: Suggestion[] = results.map((r) => ({
+        display_name: r.label,
+        lat: String(r.lat),
+        lon: String(r.lng),
+      }));
+      setSuggestions(mapped);
+      if (mapped.length > 0) setOpen(true);
     } catch {
       setSuggestions([]);
     } finally {

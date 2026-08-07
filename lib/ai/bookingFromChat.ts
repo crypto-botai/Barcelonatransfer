@@ -3,7 +3,7 @@
  *
  * Flow:
  *  1. Parse the structured draft the support AI embeds in its summary message
- *  2. Geocode pickup + dropoff (known-location lookup → Google Geocoding → BCN fallback)
+ *  2. Geocode pickup + dropoff (known-location lookup → Nominatim/OSM → BCN fallback)
  *  3. Fetch OSRM route distance/duration (haversine × 1.35 fallback)
  *  4. Select vehicle class from passenger count
  *  5. getQuote() — DB-backed single source of truth (lib/pricing-service.ts)
@@ -20,7 +20,7 @@
 import { prisma } from "@/lib/prisma";
 import { DEFAULT_PRICING } from "@/lib/pricing";
 import { getQuote } from "@/lib/pricing-service";
-import { haversineDistance } from "@/lib/utils";
+import { geocode, roadDistance } from "@/lib/geo";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
 import type { VehicleClass } from "@/types";
 
@@ -114,22 +114,16 @@ function matchKnownLocation(address: string): KnownLocation | null {
   return null;
 }
 
-// ─── Google Geocoding ─────────────────────────────────────────────────────────
+// ─── Geocoding (Nominatim / OpenStreetMap) ────────────────────────────────────
 
+// This used the Google Geocoding API, keyed on NEXT_PUBLIC_GOOGLE_MAPS_KEY.
+// That variable holds the literal placeholder text "CONFIGURE_IN_VERCEL" in
+// production, so the function returned null on every call and every unrecognised
+// address silently fell through to the Barcelona city-centre fallback below.
+// The rest of the site already runs on OpenStreetMap; this now does too.
 async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
-  const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
-  if (!key) return null;
-
-  try {
-    const query = `${address}, Spain`;
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&key=${key}&region=es&language=en`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-    const data = await res.json() as { results?: Array<{ geometry: { location: { lat: number; lng: number } } }> };
-    const loc = data.results?.[0]?.geometry?.location;
-    return loc ? { lat: loc.lat, lng: loc.lng } : null;
-  } catch {
-    return null;
-  }
+  const place = await geocode(address);
+  return place ? { lat: place.lat, lng: place.lng } : null;
 }
 
 async function resolveAddress(address: string): Promise<{ lat: number; lng: number; label: string; fallback: boolean }> {
@@ -151,17 +145,15 @@ async function getRouteDuration(
   dropoffLat: number,
   dropoffLng: number,
 ): Promise<{ distanceKm: number; durationMin: number }> {
-  try {
-    const url =
-      `http://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${dropoffLng},${dropoffLat}?overview=false`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-    const data = await res.json() as { routes?: Array<{ distance: number; duration: number }> };
-    const route = data.routes?.[0];
-    if (route) return { distanceKm: route.distance / 1000, durationMin: route.duration / 60 };
-  } catch {}
-
-  const km = haversineDistance(pickupLat, pickupLng, dropoffLat, dropoffLng) * 1.35;
-  return { distanceKm: km, durationMin: (km / 40) * 60 };
+  // Was a second, plain-http copy of the OSRM call with its own fallback speed
+  // (40 km/h here vs 50 in /api/quote), so the same journey could be quoted two
+  // different durations depending on whether it came through chat or the form.
+  // Both now share lib/geo.
+  const { distanceKm, durationMin } = await roadDistance(
+    { lat: pickupLat, lng: pickupLng },
+    { lat: dropoffLat, lng: dropoffLng },
+  );
+  return { distanceKm, durationMin };
 }
 
 // ─── Vehicle class from passenger count ──────────────────────────────────────

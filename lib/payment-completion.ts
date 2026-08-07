@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { sendPaymentConfirmationEmail, sendAdminNewBookingAlert, sendFailedPaymentEmail } from "@/lib/resend";
 import { sendWhatsAppBookingConfirmation } from "@/lib/whatsapp";
+import { notify } from "@/lib/notifications/service";
 import type { SumUpCheckout } from "@/lib/sumup";
 
 // Shared by app/api/payments/webhook, app/api/payments/verify, and app/api/cron/payment-reconcile
@@ -106,6 +107,19 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
         console.error("[payment-completion] whatsapp:", waErr);
       }
     }
+
+    // In-app copy for the customer portal, plus the audit entry. Email and
+    // WhatsApp already went out above through their existing templates, so
+    // this deliberately drives only the inapp channel rather than sending
+    // everything twice. Sits inside the dedup guard so a webhook/verify/cron
+    // race cannot produce duplicate rows.
+    await notify({
+      event:     "PAYMENT_RECEIVED",
+      channels:  ["inapp"],
+      userId:    updated.userId,
+      bookingId: updated.id,
+      vars:      { code: updated.confirmationCode, amount: updated.totalAmount, route },
+    });
   }
 
   return "confirmed";
@@ -137,4 +151,12 @@ export async function markSumUpPaymentFailed(bookingId: string): Promise<void> {
   } catch (e) {
     console.error("[payment-completion] failed-payment email:", e);
   }
+
+  await notify({
+    event:     "PAYMENT_FAILED",
+    channels:  ["inapp"],
+    userId:    failedBooking.userId,
+    bookingId: failedBooking.id,
+    vars:      { code: failedBooking.confirmationCode },
+  });
 }

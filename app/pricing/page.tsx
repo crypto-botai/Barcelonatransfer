@@ -3,6 +3,9 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PricingSection from "@/components/sections/PricingSection";
 import { getPublicRoutes } from "@/lib/pricing-service";
+import { getRates } from "@/lib/currency";
+import { CurrencyProvider } from "@/components/currency/CurrencyProvider";
+import CurrencySwitcher from "@/components/currency/CurrencySwitcher";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -53,7 +56,10 @@ const PRICING_SCHEMA = {
 };
 
 export default async function PricingPage() {
-  const routes = await getPublicRoutes();
+  // Rates are fetched server-side and handed to the client provider, so no
+  // browser ever calls the ECB directly and a feed outage degrades to EUR-only
+  // rather than to a spinner. getRates() returns null on failure by design.
+  const [routes, rateTable] = await Promise.all([getPublicRoutes(), getRates()]);
 
   return (
     <>
@@ -72,7 +78,12 @@ export default async function PricingPage() {
             </p>
           </div>
         </section>
-        <PricingSection routes={routes} />
+        <CurrencyProvider table={rateTable}>
+          <div className="container mx-auto px-4 pt-8 flex justify-center">
+            <CurrencySwitcher />
+          </div>
+          <PricingSection routes={routes} />
+        </CurrencyProvider>
       </main>
       <Footer />
     </>

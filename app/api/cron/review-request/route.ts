@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendReviewRequestEmail } from "@/lib/resend";
+import { notify } from "@/lib/notifications/service";
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "elite-cron-secret";
 
@@ -39,6 +40,17 @@ export async function POST(req: NextRequest) {
         bookingId:       b.id,
       });
       sent++;
+
+      await notify({
+        event:     "REVIEW_REQUEST",
+        channels:  ["inapp"],
+        userId:    b.userId,
+        bookingId: b.id,
+        vars: {
+          code:  b.confirmationCode,
+          route: b.dropoffAddress ? `${b.pickupAddress} → ${b.dropoffAddress}` : b.pickupAddress,
+        },
+      });
     } catch (err) {
       console.error("[cron/review-request]", err);
     }

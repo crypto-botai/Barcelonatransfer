@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPickupReminder } from "@/lib/resend";
+import { notify } from "@/lib/notifications/service";
+import { sweepFlightDelays } from "@/lib/flights/sweep";
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "elite-cron-secret";
 
@@ -44,12 +46,37 @@ export async function POST(req: NextRequest) {
         vehicleClass:    b.vehicleClass,
       });
       sent++;
+
+      // Same reminder to the portal and WhatsApp. Email is excluded from the
+      // channel list because sendPickupReminder above already covers it — and
+      // it is what writes the EmailLog row this loop dedups on.
+      await notify({
+        event:     "PICKUP_REMINDER",
+        channels:  ["inapp", "whatsapp"],
+        userId:    b.userId,
+        bookingId: b.id,
+        phone:     b.guestPhone,
+        vars: {
+          code:  b.confirmationCode,
+          when:  new Date(b.pickupDatetime).toLocaleString("en-GB"),
+          route: b.dropoffAddress ? `${b.pickupAddress} → ${b.dropoffAddress}` : b.pickupAddress,
+        },
+      });
     } catch (err) {
       console.error("[cron/pickup-reminder]", err);
     }
   }
 
-  return NextResponse.json({ ok: true, sent });
+  // Same daily pass, same 36h horizon: check whether any of tomorrow's flights
+  // have slipped and tell the affected customers. Kept inside this cron because
+  // the Hobby plan allows one run per day per entry, so a separate cron would
+  // add deployment risk without adding freshness.
+  const flights = await sweepFlightDelays(36).catch((err) => {
+    console.error("[cron/pickup-reminder] flight sweep:", err);
+    return null;
+  });
+
+  return NextResponse.json({ ok: true, sent, flights });
 }
 
 export async function GET(req: NextRequest) {

@@ -4,6 +4,7 @@ import { HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE
 import { isAirportLocation, isNightTime } from "@/lib/utils";
 import { getQuote } from "@/lib/pricing-service";
 import { type VehicleClass } from "@/types";
+import { roadDistance } from "@/lib/geo";
 
 const schema = z.object({
   bookingType:     z.enum(["TRANSFER", "HOURLY", "DAY_HIRE", "CORPORATE"]).default("TRANSFER"),
@@ -19,35 +20,6 @@ const schema = z.object({
   pickupAddress:   z.string().optional(),
   dropoffAddress:  z.string().optional(),
 });
-
-async function getOsrmDistance(
-  originLat: number, originLng: number,
-  destLat: number, destLng: number
-): Promise<{ distanceKm: number; durationMin: number } | null> {
-  try {
-    const url = `https://router.project-osrm.org/route/v1/driving/${originLng},${originLat};${destLng},${destLat}?overview=false`;
-    const res  = await fetch(url, { next: { revalidate: 0 } });
-    const data = await res.json();
-    const route = data.routes?.[0];
-    if (route) {
-      return {
-        distanceKm:  Math.round(route.distance / 100) / 10,
-        durationMin: Math.ceil(route.duration / 60),
-      };
-    }
-  } catch { /* fallback */ }
-  return null;
-}
-
-function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -85,14 +57,15 @@ export async function POST(req: NextRequest) {
     let durationMin: number;
 
     if (dropoffLat && dropoffLng) {
-      const osrm = await getOsrmDistance(pickupLat, pickupLng, dropoffLat, dropoffLng);
-      if (osrm) {
-        distanceKm  = osrm.distanceKm;
-        durationMin = osrm.durationMin;
-      } else {
-        distanceKm  = Math.round(haversineKm(pickupLat, pickupLng, dropoffLat, dropoffLng) * 1.35 * 10) / 10;
-        durationMin = Math.ceil((distanceKm / 50) * 60);
-      }
+      // roadDistance() handles the OSRM call, the day-long cache, and the
+      // straight-line fallback, so the chat booking path and this one cannot
+      // drift apart on the same journey.
+      const route = await roadDistance(
+        { lat: pickupLat, lng: pickupLng },
+        { lat: dropoffLat, lng: dropoffLng },
+      );
+      distanceKm  = route.distanceKm;
+      durationMin = route.durationMin;
     } else {
       distanceKm  = 0;
       durationMin = 0;
