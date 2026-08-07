@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPickupReminder } from "@/lib/resend";
+import { notify } from "@/lib/notifications/service";
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "elite-cron-secret";
 
@@ -44,6 +45,22 @@ export async function POST(req: NextRequest) {
         vehicleClass:    b.vehicleClass,
       });
       sent++;
+
+      // Same reminder to the portal and WhatsApp. Email is excluded from the
+      // channel list because sendPickupReminder above already covers it — and
+      // it is what writes the EmailLog row this loop dedups on.
+      await notify({
+        event:     "PICKUP_REMINDER",
+        channels:  ["inapp", "whatsapp"],
+        userId:    b.userId,
+        bookingId: b.id,
+        phone:     b.guestPhone,
+        vars: {
+          code:  b.confirmationCode,
+          when:  new Date(b.pickupDatetime).toLocaleString("en-GB"),
+          route: b.dropoffAddress ? `${b.pickupAddress} → ${b.dropoffAddress}` : b.pickupAddress,
+        },
+      });
     } catch (err) {
       console.error("[cron/pickup-reminder]", err);
     }

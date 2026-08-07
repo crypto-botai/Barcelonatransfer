@@ -288,6 +288,12 @@ model Notification {
   data      Json?
   createdAt DateTime @default(now())
 
+  // The portal always queries by user, usually filtered on unread and ordered
+  // by recency. Without these the table is scanned on every dashboard load.
+  // Additive only — no column changes — so the running app is unaffected until
+  // `npx prisma db push` is approved and run.
+  @@index([userId, read])
+  @@index([userId, createdAt])
   @@map("notifications")
 }
 

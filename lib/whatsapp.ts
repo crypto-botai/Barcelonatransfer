@@ -79,6 +79,47 @@ export async function sendWhatsAppBookingConfirmation({
 }
 
 /**
+ * Freeform text message to a customer, used by the shared notification service.
+ *
+ * The WhatsApp Cloud API only allows freeform messages inside the 24-hour
+ * window after the customer's last inbound message. Outside it, Meta rejects
+ * the send with error 131047 / 131026. That is an expected, non-exceptional
+ * outcome — it means "this customer has not messaged us recently", not "the
+ * integration is broken" — so it returns false instead of throwing. Genuine
+ * failures (bad token, malformed request) still throw so they surface.
+ *
+ * Returns true when WhatsApp accepted the message.
+ */
+export async function sendWhatsAppText(phone: string, text: string): Promise<boolean> {
+  const phoneId = process.env.WA_PHONE_ID;
+  const token   = process.env.WA_TOKEN;
+  if (!phoneId || !token) return false;
+
+  const res = await fetch(
+    `https://graph.facebook.com/${WA_API_VERSION}/${phoneId}/messages`,
+    {
+      method:  "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to: toE164(phone),
+        type: "text",
+        text: { body: text.slice(0, 4096) },
+      }),
+    },
+  );
+
+  if (res.ok) return true;
+
+  const raw = await res.text().catch(() => "");
+  const code = Number(raw.match(/"code"\s*:\s*(\d+)/)?.[1] ?? 0);
+  // 131047 / 131026: re-engagement required, i.e. session window closed.
+  if (code === 131047 || code === 131026) return false;
+
+  throw new Error(`WhatsApp API ${res.status}: ${raw}`);
+}
+
+/**
  * Fire-and-forget admin booking alert via WhatsApp text message.
  * Uses the WA Cloud API freeform endpoint (works within 24 h session window).
  * Silently no-ops when WA_PHONE_ID / WA_TOKEN are not configured.
