@@ -177,12 +177,30 @@ export default async function InvoicePage({
             <div className="logo-mark"><div className="logo-dot" /></div>
             <div className="logo-text">ÉLITE<span className="gold">BCN</span></div>
             <div className="issuer">
-              {/* Legal name first — for a sole trader that is the individual,
-                  and it is what makes the document valid. The brand follows. */}
-              <div><strong style={{ color: "#333" }}>{issuer.legalName}</strong></div>
-              {issuer.tradeName && <div>Trading as {issuer.tradeName}</div>}
-              {issuer.taxId   && <div>NIF: {issuer.taxId}</div>}
-              {issuer.address && <div>{issuer.address}</div>}
+              {/*
+                The operator here is a sole trader, so the "company" tax number
+                and registered address are one person's private details.
+                They are legally required on a VAT invoice and on nothing else,
+                so they appear only when an invoice has actually been issued.
+
+                A payment receipt shows the trading name and the contact inbox —
+                everything the customer needs to identify who charged them, and
+                nothing more. Printing a private NIF and home address on every
+                receipt discloses them to every customer who ever books.
+              */}
+              {isVat ? (
+                <>
+                  <div><strong style={{ color: "#333" }}>{issuer.legalName}</strong></div>
+                  {issuer.tradeName && <div>Trading as {issuer.tradeName}</div>}
+                  {issuer.taxId   && <div>NIF: {issuer.taxId}</div>}
+                  {issuer.address && <div>{issuer.address}</div>}
+                </>
+              ) : (
+                <div>
+                  <strong style={{ color: "#333" }}>{issuer.tradeName ?? "Élite BCN Transfers"}</strong>
+                  {" · Luxury Private Transfers, Barcelona"}
+                </div>
+              )}
               <div>{COMPANY.email}</div>
             </div>
           </div>
