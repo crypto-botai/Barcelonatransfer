@@ -153,7 +153,7 @@ export default function AddressAutocomplete({
                 ))}
               </ul>
               <div className="px-4 py-2.5 border-t border-white/[0.06]">
-                <p className="text-[11px] text-white/20">Or type any address below for a custom quote</p>
+                <p className="text-[11px] text-white/20">Or type any address — you get an instant price</p>
               </div>
             </>
           )}

@@ -117,12 +117,14 @@ All prices are per vehicle and EXCLUDE VAT and motorway tolls. Spanish VAT at 10
 - [Online booking](https://www.elitebcn.info/book): instant confirmation via email and WhatsApp
 - [Instant quote & price calculator](https://www.elitebcn.info/tools/transfer-cost-calculator): no signup required
 - [WhatsApp](https://wa.me/34635383712): fastest response, 24/7
-- [Full fixed-price table](https://www.elitebcn.info/pricing): all 62 routes, all vehicle classes
+- [Full fixed-price table](https://www.elitebcn.info/pricing): all 63 routes, all vehicle classes
 - Phone: +34 635 383 712
 - Email: vtcbcn2025@gmail.com
 
 ## Coverage (62 fixed-price routes)
-Total: 62 routes × 5 vehicle classes = 310 fixed prices. No custom quotes needed.
+Total: 63 routes × 5 vehicle classes = 315 fixed prices. Destinations outside this
+table are priced automatically by road distance, so every journey gets an instant
+price online. No custom quotes, ever.
 Key zones: BCN Airport, Barcelona City, Barcelona Sants, Barcelona Cruise Port, Girona Airport, La Roca Village, Andorra, Montserrat, all Costa Daurada cities (10 destinations), all Costa Brava cities (14 destinations).
 
 ## Payment

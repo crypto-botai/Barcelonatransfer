@@ -153,3 +153,46 @@ describe("notify()", () => {
     expect(Object.keys(res.results)).toEqual(["inapp"]);
   });
 });
+
+describe("flight delay reaches everyone who needs it", () => {
+  it("has distinct copy for the customer and the driver", () => {
+    const cust   = copyFor("FLIGHT_DELAYED",        "en", { flight: "VY1875", when: "8 Aug 14:30" });
+    const driver = copyFor("FLIGHT_DELAYED_DRIVER", "en", {
+      flight: "VY1875", when: "8 Aug 14:30", code: "ABC12345",
+      passenger: "J Smith", pickup: "Terminal 1",
+    });
+
+    // The customer is reassured; the driver is instructed. Sending the
+    // customer's "no action needed" to a driver would tell them to ignore a
+    // pickup that has moved.
+    expect(cust.body).toMatch(/no action needed/i);
+    expect(driver.body).not.toMatch(/no action needed/i);
+    expect(driver.body).toMatch(/Collect from Terminal 1/);
+    expect(driver.title).toMatch(/Pickup moved/);
+  });
+
+  it("gives the driver the details needed to act: who, where, when", () => {
+    const d = copyFor("FLIGHT_DELAYED_DRIVER", "en", {
+      flight: "IB3456", when: "9 Aug 07:15", code: "XY99",
+      passenger: "A Garcia", pickup: "Terminal 2 Arrivals",
+    });
+    expect(d.body).toContain("A Garcia");
+    expect(d.body).toContain("Terminal 2 Arrivals");
+    expect(d.body).toContain("9 Aug 07:15");
+    expect(d.body).toContain("XY99");
+  });
+
+  it("does not email the driver — they need it on their phone", () => {
+    // A driver on the road reads WhatsApp and push, not email.
+    expect(EVENT_DEFS.FLIGHT_DELAYED_DRIVER.channels).toEqual(["inapp", "whatsapp", "push"]);
+    expect(EVENT_DEFS.FLIGHT_DELAYED.channels).toContain("email");
+  });
+
+  it("defines driver copy in all four languages", () => {
+    for (const l of ["en", "es", "fr", "de"] as const) {
+      const c = EVENT_DEFS.FLIGHT_DELAYED_DRIVER.copy[l];
+      expect(c?.title, l).toBeTruthy();
+      expect(c?.body, l).toBeTruthy();
+    }
+  });
+});

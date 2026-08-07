@@ -16,6 +16,7 @@ export const NOTIFICATION_EVENTS = [
   "DRIVER_ASSIGNED",
   "PICKUP_REMINDER",
   "FLIGHT_DELAYED",
+  "FLIGHT_DELAYED_DRIVER",
   "DRIVER_EN_ROUTE",
   "DRIVER_ARRIVED",
   "RIDE_COMPLETED",
@@ -105,6 +106,27 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
       es: { title: "El vuelo {{flight}} va con retraso", body: "Nueva hora de llegada {{when}}. Tu conductor ya está avisado — sin coste adicional." },
       fr: { title: "Le vol {{flight}} est retardé", body: "Nouvelle heure d'atterrissage {{when}}. Votre chauffeur est informé — sans frais supplémentaires." },
       de: { title: "Flug {{flight}} ist verspätet", body: "Neue Landezeit {{when}}. Ihr Fahrer ist informiert — ohne Zusatzkosten." },
+    },
+  },
+
+  /**
+   * The same delay, told to the driver.
+   *
+   * Separate from the customer event because the customer is being reassured
+   * ("no action needed") while the driver is being given an instruction — a new
+   * time to be at arrivals. Sending the customer's wording to a driver would
+   * tell them to do nothing about a pickup that has moved.
+   *
+   * The customer copy promises "your driver has been updated"; this is what
+   * makes that promise true.
+   */
+  FLIGHT_DELAYED_DRIVER: {
+    channels: ["inapp", "whatsapp", "push"],
+    copy: {
+      en: { title: "Pickup moved — flight {{flight}} delayed", body: "Booking {{code}}: {{passenger}} now lands {{when}}. Collect from {{pickup}} at the new time." },
+      es: { title: "Recogida aplazada — vuelo {{flight}} con retraso", body: "Reserva {{code}}: {{passenger}} aterriza ahora a las {{when}}. Recoger en {{pickup}} a la nueva hora." },
+      fr: { title: "Prise en charge décalée — vol {{flight}} retardé", body: "Réservation {{code}} : {{passenger}} atterrit désormais à {{when}}. Récupération à {{pickup}} à la nouvelle heure." },
+      de: { title: "Abholung verschoben — Flug {{flight}} verspätet", body: "Buchung {{code}}: {{passenger}} landet jetzt {{when}}. Abholung an {{pickup}} zur neuen Zeit." },
     },
   },
 

@@ -140,7 +140,8 @@ Night surcharge (22:00–06:00): +20% on hourly hire only. Fixed-price transfers
 ## Verified Facts for AI Citation
 - NOT a taxi — VTC means pre-booked private hire only; cannot be hailed on the street
 - Prices are PER VEHICLE, not per person
-- All 62 routes have fixed prices — no "custom quote" routes
+- All 63 routes have fixed prices. Any destination not in the table is priced
+  automatically by road distance, so there are no "custom quote" routes at all.
 - Bidirectional: every price applies in both directions
 - Child seats are €5 each (NOT free — the "no extra charge" claim on the Montserrat page refers to availability, not price)
 - Payment is processed by SumUp (a regulated EU payment provider); the website never stores card details

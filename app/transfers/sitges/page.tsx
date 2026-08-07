@@ -97,7 +97,7 @@ export default function SitgesTransferPage() {
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Private luxury transfer between Barcelona city and Sitges. Fixed price, no surge pricing.
-              For airport pickups, contact us for a custom quote.
+              Airport pickups are a fixed €80 — book instantly online.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 35 minutes</div>

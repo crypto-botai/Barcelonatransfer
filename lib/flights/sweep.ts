@@ -14,6 +14,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { notify } from "@/lib/notifications/service";
+import { notifyAdminWhatsApp } from "@/lib/whatsapp";
 import { lookupFlight, isMaterialDelay, isFlightTrackingEnabled } from "./index";
 
 export interface SweepResult {
@@ -45,8 +46,17 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
       flightNumber:   { not: null },
     },
     select: {
-      id: true, userId: true, guestPhone: true, flightNumber: true,
-      pickupDatetime: true, confirmationCode: true,
+      id: true, userId: true, guestPhone: true, guestName: true, flightNumber: true,
+      pickupDatetime: true, confirmationCode: true, pickupAddress: true,
+      // Needed to alert the driver, who has to physically be somewhere at a
+      // different time than planned.
+      driver: {
+        select: {
+          userId: true,
+          whatsappNumber: true,
+          user: { select: { name: true, phone: true } },
+        },
+      },
     },
   });
 
@@ -91,6 +101,8 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
     const previousWhen = (already?.details as { when?: string } | null)?.when;
     if (previousWhen === when) continue;
 
+    // ── 1. The customer ──────────────────────────────────────────────────────
+    // Reassurance: their driver already knows, nothing for them to do.
     await notify({
       event:     "FLIGHT_DELAYED",
       userId:    b.userId,
@@ -100,6 +112,38 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
       // dedup check above reads on the next run.
       vars: { flight: status.flightNumber, when, code: b.confirmationCode },
     });
+
+    // ── 2. The assigned driver ───────────────────────────────────────────────
+    // The customer's message promises "your driver has been updated". This is
+    // what makes that true. Without it a driver waits at arrivals for a plane
+    // that is ninety minutes away, or leaves before it lands.
+    if (b.driver) {
+      await notify({
+        event:     "FLIGHT_DELAYED_DRIVER",
+        userId:    b.driver.userId,
+        bookingId: b.id,
+        phone:     b.driver.whatsappNumber ?? b.driver.user.phone,
+        vars: {
+          flight:    status.flightNumber,
+          when,
+          code:      b.confirmationCode,
+          passenger: b.guestName ?? "Your passenger",
+          pickup:    b.pickupAddress,
+        },
+      });
+    }
+
+    // ── 3. Operations ────────────────────────────────────────────────────────
+    // A delay can collide with the driver's next job, which only a human can
+    // re-plan. Fire-and-forget: an admin alert must never hold up telling the
+    // customer and driver.
+    void notifyAdminWhatsApp(
+      `Flight delay — booking ${b.confirmationCode.slice(0, 8).toUpperCase()}\n` +
+      `${status.flightNumber} now lands ${when}` +
+      (status.delayMinutes ? ` (${status.delayMinutes} min late)` : "") + `\n` +
+      `Pickup: ${b.pickupAddress}\n` +
+      `Driver: ${b.driver?.user.name ?? "NOT YET ASSIGNED"}`,
+    ).catch(() => {});
     result.notified++;
   }
 

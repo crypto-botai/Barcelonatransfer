@@ -63,7 +63,7 @@ function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
             <tr>
               <td colSpan={7} className="py-8 text-center text-dark-400 text-sm">
                 No routes found.{" "}
-                <Link href="/book" className="text-gold-500 hover:text-gold-400">Request a custom quote</Link>
+                <Link href="/book" className="text-gold-500 hover:text-gold-400">Get an instant price for any destination</Link>
               </td>
             </tr>
           )}
@@ -168,7 +168,7 @@ export default function PricingSection({ routes }: Props) {
               All prices are fixed per vehicle and <strong className="text-white">exclude VAT and tolls</strong>. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Professional chauffeur, vehicle, fuel and meet &amp; greet are included. Child seats free on request.
             </p>
             <Link href="/book" className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">
-              Get Custom Quote <ArrowRight size={12} />
+              Get Instant Price <ArrowRight size={12} />
             </Link>
           </div>
         </div>
