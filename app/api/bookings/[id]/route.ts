@@ -178,6 +178,7 @@ export async function PATCH(
           driver: driverName,
           code:   booking.confirmationCode,
           when:   new Date(booking.pickupDatetime).toLocaleString("en-GB"),
+          link:   `${process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info"}/track/${booking.confirmationCode}`,
         },
       });
     }

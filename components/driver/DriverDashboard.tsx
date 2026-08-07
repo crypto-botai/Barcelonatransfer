@@ -11,6 +11,7 @@ import {
 import { signOut } from "next-auth/react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
+import LocationSharing from "@/components/driver/LocationSharing";
 import toast from "react-hot-toast";
 
 type Booking = {
@@ -370,7 +371,8 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                         </div>
                       )}
                       {b.status === "IN_PROGRESS" && (
-                        <div className="mt-3 pt-3 border-t border-white/[0.04]">
+                        <div className="mt-3 pt-3 border-t border-white/[0.04] space-y-3">
+                          <LocationSharing bookingId={b.id} active />
                           <button
                             onClick={() => handleRideAction(b.id, "COMPLETE")}
                             disabled={rideAction === b.id}
