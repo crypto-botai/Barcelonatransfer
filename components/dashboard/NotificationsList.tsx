@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Bell, Car, CreditCard, Plane, AlertCircle, Star, MapPin, XCircle } from "lucide-react";
 import type { NotificationEvent } from "@/lib/notifications/events";
+import PushToggle from "@/components/notifications/PushToggle";
 
 export interface NotificationItem {
   id: string;
@@ -43,7 +44,13 @@ function timeAgo(iso: string) {
   return `${Math.floor(diff / 86400)}d ago`;
 }
 
-export default function NotificationsList({ initial }: { initial: NotificationItem[] }) {
+export default function NotificationsList({
+  initial,
+  vapidPublicKey = "",
+}: {
+  initial: NotificationItem[];
+  vapidPublicKey?: string;
+}) {
   const [items, setItems] = useState(initial);
   const [busy, setBusy] = useState(false);
   const unread = items.filter((n) => !n.read).length;
@@ -69,10 +76,13 @@ export default function NotificationsList({ initial }: { initial: NotificationIt
 
   return (
     <div className="p-4 sm:p-6 max-w-2xl mx-auto space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-white font-semibold">Notifications</h2>
           {unread > 0 && <p className="text-dark-400 text-sm mt-0.5">{unread} unread</p>}
+          <div className="mt-2">
+            <PushToggle vapidPublicKey={vapidPublicKey} />
+          </div>
         </div>
         {unread > 0 && (
           <button

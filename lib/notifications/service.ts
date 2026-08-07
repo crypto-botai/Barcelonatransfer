@@ -22,6 +22,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { sendWhatsAppText } from "@/lib/whatsapp";
+import { sendPushToUser } from "./push";
 import {
   copyFor,
   resolveLocale,
@@ -127,10 +128,27 @@ export async function notify(input: NotifyInput): Promise<NotifyResult> {
   }
 
   // ---- push ---------------------------------------------------------------
-  // Subscriptions and VAPID keys arrive with the PWA work. Recording the
-  // intent now means enabling push later is configuration, not a rewrite.
   if (channels.includes("push")) {
-    mark("push", "skipped", "web push not yet enabled");
+    if (!input.userId) {
+      mark("push", "skipped", "guest booking — no registered devices");
+    } else {
+      try {
+        const r = await sendPushToUser(input.userId, {
+          title,
+          body,
+          // Deep-links straight to the booking when there is one.
+          url: input.bookingId ? `/dashboard/bookings?id=${input.bookingId}` : "/dashboard/notifications",
+          // Collapses repeat pushes about the same booking into one on the
+          // lock screen rather than stacking them.
+          tag: input.bookingId ? `booking-${input.bookingId}` : input.event,
+        });
+        if (r.skipped) mark("push", "skipped", r.skipped);
+        else if (r.sent > 0) mark("push", "sent");
+        else mark("push", r.failed > 0 ? "failed" : "skipped", r.failed > 0 ? "all devices failed" : "all endpoints expired");
+      } catch (e) {
+        mark("push", "failed", errText(e));
+      }
+    }
   }
 
   await audit(input, results, title);

@@ -23,5 +23,12 @@ export default async function NotificationsPage() {
     bookingId: (n.data as { bookingId?: string } | null)?.bookingId ?? null,
   }));
 
-  return <NotificationsList initial={initial} />;
+  return (
+    <NotificationsList
+      initial={initial}
+      // Empty string when push is not configured; the toggle then renders
+      // nothing rather than offering a button that cannot work.
+      vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""}
+    />
+  );
 }

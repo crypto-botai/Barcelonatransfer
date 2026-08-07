@@ -816,3 +816,20 @@ model PricingSetting {
 
   @@map("pricing_settings")
 }
+
+/// Web push endpoints, one row per browser/device a customer has opted in on.
+/// Endpoints expire and get revoked by the push service; a 404/410 on send is
+/// the signal to delete the row rather than an error worth reporting.
+model PushSubscription {
+  id         String    @id @default(cuid())
+  userId     String
+  endpoint   String    @unique @db.Text
+  p256dh     String
+  auth       String
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+
+  @@index([userId])
+  @@map("push_subscriptions")
+}
