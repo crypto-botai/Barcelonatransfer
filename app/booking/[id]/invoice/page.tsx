@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { COMPANY } from "@/lib/company-facts";
 import { authOptions } from "@/lib/auth";
-import { getIssuer, isIssuerComplete, formatInvoiceNumber, vatBreakdown } from "@/lib/invoices";
+import { getIssuer, isIssuerComplete, missingIssuerFields, formatInvoiceNumber, vatBreakdown } from "@/lib/invoices";
 
 export const dynamic = "force-dynamic";
 
@@ -167,9 +167,8 @@ export default async function InvoicePage({
             invoice. Say so on the document rather than presenting it as final. */}
         {isVat && !isIssuerComplete(issuer) && (
           <p className="warn no-print">
-            <strong>Not yet valid for tax purposes.</strong> This invoice is missing the issuing
-            company&apos;s NIF/CIF and registered address. Set <code>COMPANY_TAX_ID</code> and{" "}
-            <code>COMPANY_ADDRESS</code> and reload to complete it.
+            <strong>Not yet valid for tax purposes.</strong> This invoice is missing:{" "}
+            {missingIssuerFields(issuer).join(", ")}. Everything else on it is correct.
           </p>
         )}
 
@@ -178,8 +177,11 @@ export default async function InvoicePage({
             <div className="logo-mark"><div className="logo-dot" /></div>
             <div className="logo-text">ÉLITE<span className="gold">BCN</span></div>
             <div className="issuer">
-              <div>{issuer.legalName} · Luxury Private Transfers, Barcelona</div>
-              {issuer.taxId   && <div>NIF/CIF: {issuer.taxId}</div>}
+              {/* Legal name first — for a sole trader that is the individual,
+                  and it is what makes the document valid. The brand follows. */}
+              <div><strong style={{ color: "#333" }}>{issuer.legalName}</strong></div>
+              {issuer.tradeName && <div>Trading as {issuer.tradeName}</div>}
+              {issuer.taxId   && <div>NIF: {issuer.taxId}</div>}
               {issuer.address && <div>{issuer.address}</div>}
               <div>{COMPANY.email}</div>
             </div>

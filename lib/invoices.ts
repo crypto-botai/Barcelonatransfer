@@ -17,10 +17,43 @@ import { prisma } from "@/lib/prisma";
 export const VAT_RATE = 10;
 
 export interface IssuerDetails {
+  /**
+   * The legal person issuing the invoice.
+   *
+   * For a sole trader (autónomo) this is the individual's own name, not the
+   * brand — Spanish invoicing rules require "nombre y apellidos" for a persona
+   * física. The trading name goes in tradeName alongside it.
+   */
   legalName: string;
+  /** Nombre comercial. Optional, shown next to the legal name. */
+  tradeName: string | null;
   taxId: string | null;
   address: string | null;
   email: string;
+}
+
+const NIF_LETTERS = "TRWAGMYFPDXBNJZSQVHLCKE";
+
+/**
+ * Validates a Spanish NIF, NIE or CIF check character.
+ *
+ * A tax number with a transposed digit looks completely normal but makes every
+ * invoice issued against it invalid. Checking it costs nothing and catches the
+ * typo at configuration time rather than at an inspection.
+ */
+export function isValidSpanishTaxId(raw: string): boolean {
+  const s = raw.toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/^ES/, "");
+
+  if (/^\d{8}[A-Z]$/.test(s)) {
+    return s[8] === NIF_LETTERS[parseInt(s.slice(0, 8), 10) % 23];
+  }
+  if (/^[XYZ]\d{7}[A-Z]$/.test(s)) {
+    const n = parseInt(String("XYZ".indexOf(s[0])) + s.slice(1, 8), 10);
+    return s[8] === NIF_LETTERS[n % 23];
+  }
+  // CIF check digit varies by entity type; accept a well-formed one rather than
+  // rejecting a valid company number this simplified check cannot verify.
+  return /^[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]$/.test(s);
 }
 
 /**
@@ -48,14 +81,30 @@ function envOrNull(name: string): string | null {
 export function getIssuer(): IssuerDetails {
   return {
     legalName: envOrNull("COMPANY_LEGAL_NAME") ?? "Élite BCN Transfers",
+    tradeName: envOrNull("COMPANY_TRADE_NAME"),
     taxId:     envOrNull("COMPANY_TAX_ID"),
     address:   envOrNull("COMPANY_ADDRESS"),
     email:     envOrNull("NEXT_PUBLIC_CONTACT_EMAIL") ?? "vtcbcn2025@gmail.com",
   };
 }
 
+/**
+ * Whether the issuer block satisfies the minimum a Spanish invoice needs.
+ *
+ * The tax number must also pass its check character — a malformed one is worse
+ * than a missing one, because the invoice looks complete while being invalid.
+ */
 export function isIssuerComplete(issuer = getIssuer()): boolean {
-  return Boolean(issuer.taxId && issuer.address);
+  return Boolean(issuer.taxId && isValidSpanishTaxId(issuer.taxId) && issuer.address);
+}
+
+/** What is still missing, for a precise on-screen warning. */
+export function missingIssuerFields(issuer = getIssuer()): string[] {
+  const missing: string[] = [];
+  if (!issuer.taxId) missing.push("tax number (NIF/CIF)");
+  else if (!isValidSpanishTaxId(issuer.taxId)) missing.push("a valid tax number — the one configured fails its check character");
+  if (!issuer.address) missing.push("registered address");
+  return missing;
 }
 
 /** Splits a VAT-exclusive fare into its invoice lines. */

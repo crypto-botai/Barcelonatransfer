@@ -3,6 +3,8 @@ import {
   vatBreakdown,
   formatInvoiceNumber,
   isIssuerComplete,
+  missingIssuerFields,
+  isValidSpanishTaxId,
   getIssuer,
   VAT_RATE,
 } from "@/lib/invoices";
@@ -46,6 +48,38 @@ describe("invoice numbering", () => {
   });
 });
 
+describe("Spanish tax number validation", () => {
+  it("accepts the configured company NIF", () => {
+    // Nouman Nawaz Nazli, autónomo. 61761066 % 23 = 17 -> "V".
+    expect(isValidSpanishTaxId("ES61761066V")).toBe(true);
+    expect(isValidSpanishTaxId("61761066V")).toBe(true);
+    expect(isValidSpanishTaxId("es-61761066-v")).toBe(true);
+  });
+
+  it("rejects a wrong check letter", () => {
+    // A transposed digit or a mistyped letter looks perfectly normal but makes
+    // every invoice issued against it invalid.
+    expect(isValidSpanishTaxId("ES61761066A")).toBe(false);
+    expect(isValidSpanishTaxId("ES61761065V")).toBe(false);
+    expect(isValidSpanishTaxId("ES61716066V")).toBe(false);
+  });
+
+  it("validates NIE numbers for foreign residents", () => {
+    expect(isValidSpanishTaxId("X1234567L")).toBe(true);
+    expect(isValidSpanishTaxId("X1234567A")).toBe(false);
+  });
+
+  it("accepts a well-formed company CIF", () => {
+    expect(isValidSpanishTaxId("B12345678")).toBe(true);
+  });
+
+  it("rejects nonsense", () => {
+    expect(isValidSpanishTaxId("")).toBe(false);
+    expect(isValidSpanishTaxId("12345")).toBe(false);
+    expect(isValidSpanishTaxId("NOT-A-NIF")).toBe(false);
+  });
+});
+
 describe("issuer details", () => {
   afterEach(() => vi.unstubAllEnvs());
 
@@ -58,9 +92,33 @@ describe("issuer details", () => {
   });
 
   it("is complete once both are configured", () => {
-    vi.stubEnv("COMPANY_TAX_ID", "B12345678");
+    vi.stubEnv("COMPANY_TAX_ID", "ES61761066V");
     vi.stubEnv("COMPANY_ADDRESS", "Carrer Example 1, 08001 Barcelona");
     expect(isIssuerComplete(getIssuer())).toBe(true);
+  });
+
+  it("treats an invalid tax number as incomplete, not merely present", () => {
+    // Worse than missing: the invoice would look finished while being invalid.
+    vi.stubEnv("COMPANY_TAX_ID", "ES61761066A");
+    vi.stubEnv("COMPANY_ADDRESS", "Carrer Example 1, 08001 Barcelona");
+    expect(isIssuerComplete(getIssuer())).toBe(false);
+    expect(missingIssuerFields(getIssuer())[0]).toMatch(/check character/);
+  });
+
+  it("names exactly what is missing", () => {
+    vi.stubEnv("COMPANY_TAX_ID", "ES61761066V");
+    vi.stubEnv("COMPANY_ADDRESS", "");
+    expect(missingIssuerFields(getIssuer())).toEqual(["registered address"]);
+  });
+
+  it("carries a trading name separately from the legal name", () => {
+    // For an autónomo the legal name is the individual; the brand is the
+    // nombre comercial and cannot replace it on the document.
+    vi.stubEnv("COMPANY_LEGAL_NAME", "Nouman Nawaz Nazli");
+    vi.stubEnv("COMPANY_TRADE_NAME", "elitebcn.info");
+    const i = getIssuer();
+    expect(i.legalName).toBe("Nouman Nawaz Nazli");
+    expect(i.tradeName).toBe("elitebcn.info");
   });
 
   it("never fabricates a tax number", () => {

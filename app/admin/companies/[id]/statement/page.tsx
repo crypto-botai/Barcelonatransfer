@@ -81,8 +81,10 @@ export default async function StatementPage({
               <p style={{ fontWeight: 700 }}>{statement.companyName}</p>
               <p className="muted" style={{ marginTop: 4 }}>
                 From {issuer.legalName}
+                {issuer.tradeName ? ` (${issuer.tradeName})` : ""}
                 {issuer.taxId ? ` · NIF ${issuer.taxId}` : ""}
               </p>
+              {issuer.address && <p className="muted">{issuer.address}</p>}
               <p className="muted">{issuer.email}</p>
             </div>
           </div>
