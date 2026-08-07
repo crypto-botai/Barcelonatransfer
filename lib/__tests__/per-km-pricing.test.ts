@@ -5,6 +5,8 @@ import {
   MIN_DISTANCE_FARE,
   ROUTES,
   resolveZone,
+  resolveZoneStrict,
+  resolveZoneBroad,
   lookupFixedPriceByZone,
 } from "@/lib/pricing";
 
@@ -142,5 +144,39 @@ describe("Girona city resolves to the advertised price", () => {
     for (const s of ["Girona Airport", "GRO", "Girona-Costa Brava Airport"]) {
       expect(resolveZone(s), s).toBe("girona_airport");
     }
+  });
+});
+
+describe("province names must not swallow unlisted towns", () => {
+  // Every Catalan address Nominatim returns ends with its province:
+  //   "Sant Andreu de la Barca, Baix Llobregat, Barcelona, Catalonia"
+  // A bare \bbarcelona\b match therefore catches all ~300 towns in the
+  // province. A 28 km run was quoting the €50 Barcelona-city fare.
+  it("does not treat a province suffix as an exact place", () => {
+    expect(resolveZoneStrict("Sant Andreu de la Barca, Baix Llobregat, Barcelona, Catalonia")).toBeNull();
+    expect(resolveZoneStrict("Terrassa, Vallès Occidental, Barcelona, Catalonia")).toBeNull();
+    expect(resolveZoneStrict("Martorell, Baix Llobregat, Barcelona, Catalonia")).toBeNull();
+    expect(resolveZoneStrict("Granollers, Vallès Oriental, Barcelona, Catalonia")).toBeNull();
+    expect(resolveZoneStrict("Reus, Baix Camp, Tarragona, Catalonia")).toBeNull();
+  });
+
+  it("still resolves genuinely listed destinations from text alone", () => {
+    expect(resolveZoneStrict("Sitges, Garraf, Barcelona, Catalonia")).toBe("sitges");
+    expect(resolveZoneStrict("Castelldefels, Baix Llobregat, Barcelona")).toBe("castelldefels");
+    expect(resolveZoneStrict("Terminal 1, El Prat")).toBe("airport");
+    expect(resolveZoneStrict("PortAventura, Salou, Tarragona")).toBe("portaventura");
+    expect(resolveZoneStrict("Lloret de Mar, Selva, Girona")).toBe("lloret");
+  });
+
+  it("keeps the province fallback available for bare capital names", () => {
+    // With no coordinates to check, "Barcelona" alone should still price as the
+    // city rather than failing outright.
+    expect(resolveZoneBroad("Barcelona")).toBe("barcelona_city");
+    expect(resolveZoneBroad("Tarragona")).toBe("tarragona");
+  });
+
+  it("prices an unlisted province town by distance, not as the capital", () => {
+    // 28.5 km by road. The bug quoted €50; per-km is the correct treatment.
+    expect(distanceFare(28.5)).toBe(100);
   });
 });

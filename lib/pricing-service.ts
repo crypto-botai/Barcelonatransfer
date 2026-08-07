@@ -21,7 +21,8 @@ import { prisma } from "@/lib/prisma";
 import {
   ROUTES as FALLBACK_ROUTES,
   ZONE_LABELS,
-  resolveZone,
+  resolveZoneStrict,
+  resolveZoneBroad,
   detectZoneFromCoords,
   vehicleCodeForClass,
   lookupFixedPriceByZone,
@@ -83,14 +84,37 @@ export interface Quote {
 
 // ── Zone resolution ───────────────────────────────────────────────────────────
 
+/**
+ * Resolves one end of a journey to a pricing zone.
+ *
+ * Order matters, and it changed to close a pricing hole:
+ *
+ *  1. A specific named place in the text wins outright. "Sitges", "Terminal 1"
+ *     and "PortAventura" identify a destination exactly, and are more reliable
+ *     than a geocoded pin that may land on the edge of a town.
+ *
+ *  2. Coordinates settle everything else. They place the address precisely.
+ *
+ *  3. Only with no usable coordinates do we fall back to matching a province
+ *     name, which is a guess.
+ *
+ * Previously any text match beat coordinates, including the province fallback.
+ * Every Catalan address carries its province — "Sant Andreu de la Barca, Baix
+ * Llobregat, Barcelona, Catalonia" — so a bare "barcelona" match swallowed all
+ * ~300 unlisted towns in the province and priced them as Barcelona city. A
+ * 28 km run to Sant Andreu de la Barca quoted €50 instead of a distance fare.
+ */
 function resolveEndpointZone(lat: number, lng: number, address?: string): string | null {
-  // 1. Text-based first (more accurate for named places and destinations)
   if (address) {
-    const z = resolveZone(address);
-    if (z) return z;
+    const exact = resolveZoneStrict(address);
+    if (exact) return exact;
   }
-  // 2. Coordinate-based fallback
-  return detectZoneFromCoords(lat, lng);
+
+  // 0,0 means "no coordinates", not the Gulf of Guinea.
+  const hasCoords = Boolean(lat && lng && Number.isFinite(lat) && Number.isFinite(lng));
+  if (hasCoords) return detectZoneFromCoords(lat, lng);
+
+  return address ? resolveZoneBroad(address) : null;
 }
 
 // ── DB-cached route reads ─────────────────────────────────────────────────────

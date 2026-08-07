@@ -187,7 +187,14 @@ export const KEY_TO_ZONE_CODE: Record<string, ZoneCode> = Object.fromEntries(
 // Called server-side as a fallback when lat/lng circle detection fails.
 // Output is a zone key from ZONE_LABELS above.
 //
-export function resolveZone(input: string): string | null {
+/**
+ * Specific, unambiguous places only.
+ *
+ * A hit here identifies an actual destination — an airport terminal, a named
+ * town — and is trusted over coordinates. Returns null when the address only
+ * carries a province name, which the caller should settle with coordinates.
+ */
+export function resolveZoneStrict(input: string): string | null {
   const s = input
     .toLowerCase()
     .normalize("NFD")
@@ -249,27 +256,45 @@ export function resolveZone(input: string): string | null {
   if (/\bfigueres\b/.test(s))           return "figueres";    // Girona province
   if (/\bcadaques\b/.test(s))           return "cadaques";    // Girona province
 
-  // ── Broad province / capital names — only reach here if no specific city matched ──
-  // "Tarragona" as a city (all Tarragona-province sub-cities already matched above)
-  if (/\btarragona\b/.test(s)) return "tarragona";
-  // "Barcelona" as a city (all Barcelona-province sub-cities already matched above)
-  if (/\bbarcelona\b/.test(s)) return "barcelona_city";
-
-  // Girona city. Priced as the Girona zone, which is how the business already
-  // sells it: /transfers/girona is titled "Barcelona to Girona Transfer — from
-  // €140" and covers "Girona or Girona Airport (GRO)" as one destination.
-  //
-  // Left unmatched, this fell through to distance pricing and quoted €399 for a
-  // journey the site advertises at €140 — including in the schema.org offer
-  // Google reads.
-  //
-  // Anchored to the start of the string on purpose. Every address Nominatim
-  // returns for the province carries "Girona" as a suffix — "Banyoles, Pla de
-  // l'Estany, Girona, Catalunya" — so a loose \bgirona\b would drag every
-  // unlisted town in the province onto this price. Girona city itself is the
-  // only thing that leads with it.
+  // Girona city, anchored to the start of the string. Every address in the
+  // province carries "Girona" as a suffix — "Banyoles, Pla de l'Estany,
+  // Girona" — so only the city itself leads with it. This is an exact
+  // identification, not a province guess, so it belongs here.
   if (/^girona\b/.test(s) || /\bgirona (city|centre|center|ciutat)\b/.test(s)) return "girona_airport";
 
+  // No specific place identified. Province and capital names are guesses and
+  // live in resolveZoneBroad(); the caller decides whether to consult them or
+  // settle it with coordinates instead.
+  return null;
+}
+
+/**
+ * Province and capital names — deliberately separated from the specific-place
+ * matching above, because these are the weakest possible signal.
+ *
+ * Every Catalan address Nominatim returns ends with its province:
+ * "Sant Andreu de la Barca, Baix Llobregat, Barcelona, Catalonia". Matching a
+ * bare \bbarcelona\b therefore catches every one of the 300-odd towns in
+ * Barcelona province, not just the city. The comment that previously sat here
+ * claimed "all Barcelona-province sub-cities already matched above", but only
+ * the ~20 listed ones do; the rest were silently priced as Barcelona city.
+ * A 28 km run to Sant Andreu de la Barca quoted €50.
+ *
+ * These are now only reached when there are no coordinates to check against,
+ * which after server-side geocoding is rare.
+ */
+export function resolveZoneBroad(input: string): string | null {
+  const s = input
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/['']/g, "'");
+
+  if (/\btarragona\b/.test(s)) return "tarragona";
+  if (/\bbarcelona\b/.test(s)) return "barcelona_city";
+
+  // Girona city is an exact identification rather than a province guess, so it
+  // is matched in resolveZoneStrict() and deliberately not repeated here.
   return null;
 }
 
@@ -426,4 +451,15 @@ export function getFleetFromPrice(fv: FleetVehicle): number {
   const dbClass = FLEET_TO_DB_CLASS[fv];
   const price   = lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", dbClass);
   return price ?? DEFAULT_PRICING[dbClass]?.minimumFare ?? 0;
+}
+
+/**
+ * Backwards-compatible entry point: strict match, then the broad fallback.
+ *
+ * Callers that hold coordinates should prefer resolveZoneStrict() and let
+ * detectZoneFromCoords() settle the rest — see resolveEndpointZone() in
+ * pricing-service.ts. This exists for the surfaces that only ever have text.
+ */
+export function resolveZone(input: string): string | null {
+  return resolveZoneStrict(input) ?? resolveZoneBroad(input);
 }
