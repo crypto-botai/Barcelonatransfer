@@ -111,6 +111,27 @@ describe("AeroDataBoxProvider", () => {
     expect(s?.scheduledArrival?.toISOString()).toBe("2026-09-01T12:00:00.000Z");
   });
 
+  it("returns null when no leg lands at an airport we serve", async () => {
+    // Real case: IB6250 comes back as codeshare QR830 Doha -> Bangkok. Falling
+    // back to flights[0] quoted a Bangkok landing as the customer's arrival.
+    fetchMock.mockResolvedValue(ok([
+      { number: "QR 830", status: "EnRoute",
+        departure: { airport: { iata: "DOH" } },
+        arrival: { airport: { iata: "BKK" }, scheduledTime: { utc: "2026-09-01 00:35Z" } } },
+    ]));
+    expect(await provider.lookup("IB6250", new Date("2026-09-01T00:00:00Z"))).toBeNull();
+  });
+
+  it("accepts Girona and Reus as served arrival airports", async () => {
+    for (const iata of ["GRO", "REU"]) {
+      fetchMock.mockResolvedValue(ok([
+        { number: "RY1", arrival: { airport: { iata }, scheduledTime: { utc: "2026-09-01 09:00Z" } } },
+      ]));
+      const s = await provider.lookup("RY1", new Date("2026-09-01T00:00:00Z"));
+      expect(s?.arrivalAirport, iata).toBe(iata);
+    }
+  });
+
   it("returns null rather than guessing when the flight is not found", async () => {
     fetchMock.mockResolvedValue({ ok: false, status: 404, text: async () => "" });
     expect(await provider.lookup("ZZ9999", new Date())).toBeNull();

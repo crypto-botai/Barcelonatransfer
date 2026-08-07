@@ -213,8 +213,12 @@ describe("Per-route vehicle class overrides (BCN Airport → Barcelona City)", (
   });
 
   it("overrides do NOT affect other routes (e.g. airport → Montserrat stays at BUSINESS column)", () => {
-    expect(lookupPriceByClass("BCN_AIRPORT", "MONTSERRAT", "BUSINESS")).toBe(110);
-    expect(lookupPriceByClass("BCN_AIRPORT", "MONTSERRAT", "ELECTRIC_VIP")).toBe(110);
+    // The Camry override applies to the airport→city route alone. Montserrat
+    // must keep reading its own BUSINESS column, whatever that column says.
+    // Repriced to 130 on 7 Aug 2026; the point of the test is the isolation,
+    // not the figure.
+    expect(lookupPriceByClass("BCN_AIRPORT", "MONTSERRAT", "BUSINESS")).toBe(130);
+    expect(lookupPriceByClass("BCN_AIRPORT", "MONTSERRAT", "ELECTRIC_VIP")).toBe(130);
   });
 });
 
@@ -250,12 +254,34 @@ describe("ROUTES derived from FIXED_ROUTES", () => {
 // ── Intentional price asymmetries ─────────────────────────────────────────────
 
 describe("Intentional price asymmetries", () => {
-  it("Airport→Montserrat (€95) is cheaper than Barcelona→Montserrat (€115)", () => {
-    const airportToMontserrat = lookupFixedPrice("BCN_AIRPORT",    "MONTSERRAT", "ECONOMY")!;
+  it("Montserrat costs the same from the airport as from the city", () => {
+    // Until 7 Aug 2026 the airport route was €95 and the city route €115, and
+    // this test asserted that gap was deliberate. The owner has since repriced
+    // both routes to a single figure, so the asymmetry is gone on purpose.
+    const airportToMontserrat   = lookupFixedPrice("BCN_AIRPORT",    "MONTSERRAT", "ECONOMY")!;
     const barcelonaToMontserrat = lookupFixedPrice("BARCELONA_CITY", "MONTSERRAT", "ECONOMY")!;
-    expect(airportToMontserrat).toBe(95);
-    expect(barcelonaToMontserrat).toBe(115);
-    expect(airportToMontserrat).toBeLessThan(barcelonaToMontserrat);
+    expect(airportToMontserrat).toBe(110);
+    expect(barcelonaToMontserrat).toBe(110);
+  });
+
+  it("pins the full Montserrat price ladder", () => {
+    // Owner-set, 7 Aug 2026. Both routes carry the identical ladder, and each
+    // vehicle must cost more than the one below it — the minibus in particular,
+    // which was the figure not supplied and had to be derived.
+    for (const from of ["BCN_AIRPORT", "BARCELONA_CITY"] as const) {
+      const ladder = {
+        ECONOMY:        lookupFixedPrice(from, "MONTSERRAT", "ECONOMY"),
+        BUSINESS:       lookupFixedPrice(from, "MONTSERRAT", "BUSINESS"),
+        MINIVAN:        lookupFixedPrice(from, "MONTSERRAT", "MINIVAN"),
+        VCLASS:         lookupFixedPrice(from, "MONTSERRAT", "VCLASS"),
+        MINIBUS:        lookupFixedPrice(from, "MONTSERRAT", "MINIBUS"),
+      };
+      expect(ladder, from).toEqual({
+        ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 200, MINIBUS: 285,
+      });
+      // A 16-seat minibus must never be priced at or below a 7-seat V-Class.
+      expect(ladder.MINIBUS!, from).toBeGreaterThan(ladder.VCLASS!);
+    }
   });
 
   it("Cruise→Barcelona (€60) is more expensive than Airport→Barcelona (€50)", () => {

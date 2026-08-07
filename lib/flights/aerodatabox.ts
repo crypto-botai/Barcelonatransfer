@@ -18,6 +18,12 @@ import {
 
 const HOST = "aerodatabox.p.rapidapi.com";
 
+/**
+ * Arrival airports this business collects from. A flight landing anywhere else
+ * is not a journey we are meeting, whatever the designator says.
+ */
+const SERVED_ARRIVAL_IATA = new Set(["BCN", "GRO", "REU"]);
+
 /** AeroDataBox status strings → our states. Unlisted values become "unknown". */
 const STATE_MAP: Record<string, FlightState> = {
   Expected:    "scheduled",
@@ -104,13 +110,21 @@ export class AeroDataBoxProvider implements FlightProvider {
     const flights: AdbFlight[] = Array.isArray(payload) ? payload : [];
     if (flights.length === 0) return null;
 
-    // A designator can return several legs on multi-sector days. Prefer the one
-    // landing at Barcelona, since that is the leg this business meets.
-    const f =
-      flights.find((x) => {
-        const a = x.arrival?.airport;
-        return a?.iata === "BCN" || a?.icao === "LEBL";
-      }) ?? flights[0];
+    // A designator can return several legs, and AeroDataBox also returns
+    // codeshare partners: IB6250 comes back as QR830 Doha->Bangkok, which has
+    // no Barcelona leg at all.
+    //
+    // Only a leg arriving at an airport this business actually meets is useful.
+    // Falling back to "the first one in the list" would have quoted a Bangkok
+    // landing time as the customer's arrival and sent a driver at the wrong
+    // hour. When no served airport appears, the honest answer is that we do not
+    // know this flight — the caller treats null as unknown and stays silent.
+    const f = flights.find((x) => {
+      const a = x.arrival?.airport;
+      return a?.iata && SERVED_ARRIVAL_IATA.has(a.iata);
+    });
+
+    if (!f) return null;
 
     const arrival   = f.arrival ?? {};
     const scheduled = parseTime(arrival.scheduledTime);

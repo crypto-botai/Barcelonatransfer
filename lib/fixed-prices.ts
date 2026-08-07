@@ -88,7 +88,10 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "MONTSERRAT",
     fromLabel: "El Prat Airport", toLabel: "Montserrat",
     category: "airport-city",
-    prices: { ECONOMY: 95, BUSINESS: 110, MINIVAN: 115, VCLASS: 140, MINIBUS: 200 },
+    // Repriced on the owner's instruction, 7 Aug 2026.
+    // Was 95 / 110 / 115 / 140 / 200.
+    // Minibus set to keep the 1.43x ratio to V-Class the route already had.
+    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 200, MINIBUS: 285 },
   },
   {
     slug: "bcn-airport-andorra",
@@ -303,7 +306,11 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "MONTSERRAT",
     fromLabel: "Barcelona City", toLabel: "Montserrat",
     category: "airport-city",
-    prices: { ECONOMY: 115, BUSINESS: 130, MINIVAN: 155, VCLASS: 175, MINIBUS: 240 },
+    // Repriced on the owner's instruction, 7 Aug 2026, to match the airport
+    // route. Was 115 / 130 / 155 / 175 / 240 — so Economy, Minivan and Minibus
+    // fall here while V-Class rises. The owner confirmed this knowingly: the
+    // city route previously cost more than the airport one.
+    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 200, MINIBUS: 285 },
   },
   {
     slug: "barcelona-city-girona-airport",
