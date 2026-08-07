@@ -197,3 +197,34 @@ export async function roadDistance(from: LatLng, to: LatLng): Promise<RouteDista
   const routed = await osrmCached(from.lat, from.lng, to.lat, to.lng);
   return routed ?? estimateRoad(from, to);
 }
+
+/** 0,0 is in the Gulf of Guinea — for this business it means "not set". */
+export function hasCoords(lat?: number | null, lng?: number | null): boolean {
+  return Boolean(lat && lng && Number.isFinite(lat) && Number.isFinite(lng));
+}
+
+/**
+ * Resolves an endpoint to coordinates, geocoding the address text when the
+ * client did not supply any.
+ *
+ * The booking form only attaches coordinates when the customer picks a
+ * suggestion from the autocomplete dropdown. Type a valid address and press on
+ * without clicking one, and it posts 0,0 — which left the quote with no
+ * distance to price from, so a perfectly ordinary journey came back as
+ * "contact us" instead of a fare.
+ *
+ * Pricing must not depend on the customer having used the dropdown, so the
+ * server resolves it either way. Returns null when the address cannot be
+ * geocoded at all; that is a genuine "we cannot price this".
+ */
+export async function resolveEndpoint(
+  lat: number | undefined | null,
+  lng: number | undefined | null,
+  address?: string | null,
+): Promise<LatLng | null> {
+  if (hasCoords(lat, lng)) return { lat: lat as number, lng: lng as number };
+  if (!address?.trim()) return null;
+
+  const place = await geocode(address);
+  return place ? { lat: place.lat, lng: place.lng } : null;
+}

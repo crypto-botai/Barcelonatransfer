@@ -4,7 +4,7 @@ import { HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE
 import { isAirportLocation, isNightTime } from "@/lib/utils";
 import { getQuote } from "@/lib/pricing-service";
 import { type VehicleClass } from "@/types";
-import { roadDistance } from "@/lib/geo";
+import { roadDistance, resolveEndpoint } from "@/lib/geo";
 
 const schema = z.object({
   bookingType:     z.enum(["TRANSFER", "HOURLY", "DAY_HIRE", "CORPORATE"]).default("TRANSFER"),
@@ -53,26 +53,36 @@ export async function POST(req: NextRequest) {
     const dropoffLat = body.dropoffLat ?? 0;
     const dropoffLng = body.dropoffLng ?? 0;
 
-    let distanceKm: number;
-    let durationMin: number;
+    // The booking form only attaches coordinates when the customer clicks a
+    // suggestion in the address dropdown. Typing a valid address and moving on
+    // posts 0,0, which used to leave nothing to measure and turned an ordinary
+    // journey into "contact us". Resolve the address text server-side instead,
+    // so a fare never depends on how the customer used the autocomplete.
+    const [from, to] = await Promise.all([
+      resolveEndpoint(pickupLat,  pickupLng,  body.pickupAddress),
+      resolveEndpoint(dropoffLat, dropoffLng, body.dropoffAddress),
+    ]);
 
-    if (dropoffLat && dropoffLng) {
+    let distanceKm  = 0;
+    let durationMin = 0;
+
+    if (from && to) {
       // roadDistance() handles the OSRM call, the day-long cache, and the
       // straight-line fallback, so the chat booking path and this one cannot
       // drift apart on the same journey.
-      const route = await roadDistance(
-        { lat: pickupLat, lng: pickupLng },
-        { lat: dropoffLat, lng: dropoffLng },
-      );
+      const route = await roadDistance(from, to);
       distanceKm  = route.distanceKm;
       durationMin = route.durationMin;
-    } else {
-      distanceKm  = 0;
-      durationMin = 0;
     }
 
     const quote = await getQuote({
-      pickupLat, pickupLng, dropoffLat, dropoffLng,
+      // Pass the resolved coordinates through: zone detection falls back to
+      // coordinates when the address text does not match a known zone, and it
+      // cannot do that with 0,0 either.
+      pickupLat:   from?.lat ?? pickupLat,
+      pickupLng:   from?.lng ?? pickupLng,
+      dropoffLat:  to?.lat   ?? dropoffLat,
+      dropoffLng:  to?.lng   ?? dropoffLng,
       vehicleClass: vc, pickupDatetime: pickupDate,
       distanceKm, durationMin,
       pickupAddress:  body.pickupAddress,

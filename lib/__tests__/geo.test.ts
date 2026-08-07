@@ -157,3 +157,64 @@ describe("searchPlaces", () => {
     expect(await searchPlaces("anywhere")).toEqual([]);
   });
 });
+
+describe("resolveEndpoint", () => {
+  const fetchMock = vi.fn();
+  beforeEach(() => { vi.stubGlobal("fetch", fetchMock); fetchMock.mockReset(); vi.resetModules(); });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("uses supplied coordinates without calling out", async () => {
+    const { resolveEndpoint } = await import("@/lib/geo");
+    const r = await resolveEndpoint(41.2971, 2.0785, "Terminal 1");
+    expect(r).toEqual({ lat: 41.2971, lng: 2.0785 });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("geocodes the address when the client sent 0,0", async () => {
+    // The booking form only attaches coordinates when the customer clicks a
+    // dropdown suggestion. Typing an address and moving on posts 0,0, which
+    // left a per-km journey with no distance and quoted "contact us".
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => [{ place_id: 9, lat: "41.4500", lon: "1.9720", display_name: "Sant Andreu de la Barca" }],
+    });
+    const { resolveEndpoint } = await import("@/lib/geo");
+    const r = await resolveEndpoint(0, 0, "Sant Andreu de la Barca");
+    expect(r).toEqual({ lat: 41.45, lng: 1.972 });
+  });
+
+  it("treats missing and null coordinates the same as 0,0", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => [{ lat: "41.45", lon: "1.97", display_name: "Somewhere" }],
+    });
+    const { resolveEndpoint } = await import("@/lib/geo");
+    expect(await resolveEndpoint(undefined, undefined, "Somewhere")).toEqual({ lat: 41.45, lng: 1.97 });
+    expect(await resolveEndpoint(null, null, "Somewhere")).toEqual({ lat: 41.45, lng: 1.97 });
+  });
+
+  it("returns null when there is nothing to work from", async () => {
+    const { resolveEndpoint } = await import("@/lib/geo");
+    expect(await resolveEndpoint(0, 0, "")).toBeNull();
+    expect(await resolveEndpoint(0, 0, undefined)).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("returns null when the address cannot be geocoded", async () => {
+    fetchMock.mockResolvedValue({ ok: true, json: async () => [] });
+    const { resolveEndpoint } = await import("@/lib/geo");
+    expect(await resolveEndpoint(0, 0, "qqqzzz not a place")).toBeNull();
+  });
+});
+
+describe("hasCoords", () => {
+  it("treats 0,0 as unset", async () => {
+    const { hasCoords } = await import("@/lib/geo");
+    // 0,0 is in the Gulf of Guinea; for a Barcelona transfer it means "not set".
+    expect(hasCoords(0, 0)).toBe(false);
+    expect(hasCoords(41.4, 0)).toBe(false);
+    expect(hasCoords(41.4, 2.1)).toBe(true);
+    expect(hasCoords(NaN, 2.1)).toBe(false);
+    expect(hasCoords(undefined, undefined)).toBe(false);
+  });
+});

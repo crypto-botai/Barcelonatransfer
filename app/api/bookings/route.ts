@@ -11,6 +11,7 @@ import { isAirportLocation, isNightTime } from "@/lib/utils";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { type VehicleClass } from "@/types";
+import { roadDistance, resolveEndpoint } from "@/lib/geo";
 
 function generateBookingCode(phone: string): string {
   const digits = phone.replace(/\D/g, "");
@@ -122,15 +123,31 @@ export async function POST(req: NextRequest) {
       const airportSurcharge = isAirportLocation(body.pickupLat, body.pickupLng) ? AIRPORT_SURCHARGE : 0;
       serverBaseTotal = Math.round((subtotal + nightSurcharge + airportSurcharge) * 100) / 100;
     } else {
+      // Distance is measured server-side, never taken from the request.
+      //
+      // For a table route the distance is only informational, but a per-km fare
+      // is computed directly from it — so trusting body.quote.distanceKm would
+      // let a caller post distanceKm: 1 for a 200 km journey and pay the €50
+      // minimum. Coordinates are resolved from the address text when the client
+      // did not send any, for the same reason the quote endpoint does it.
+      const [from, to] = await Promise.all([
+        resolveEndpoint(body.pickupLat,  body.pickupLng,  body.pickupAddress),
+        resolveEndpoint(body.dropoffLat, body.dropoffLng, body.dropoffAddress),
+      ]);
+
+      const measured = from && to
+        ? await roadDistance(from, to)
+        : { distanceKm: 0, durationMin: 0, precise: false };
+
       const sq = await getQuote({
-        pickupLat:      body.pickupLat,
-        pickupLng:      body.pickupLng,
-        dropoffLat:     body.dropoffLat,
-        dropoffLng:     body.dropoffLng,
+        pickupLat:      from?.lat ?? body.pickupLat,
+        pickupLng:      from?.lng ?? body.pickupLng,
+        dropoffLat:     to?.lat   ?? body.dropoffLat,
+        dropoffLng:     to?.lng   ?? body.dropoffLng,
         vehicleClass:   vc,
         pickupDatetime,
-        distanceKm:     body.quote.distanceKm,
-        durationMin:    Math.round(body.quote.durationMin),
+        distanceKm:     measured.distanceKm,
+        durationMin:    measured.durationMin,
         pickupAddress:  body.pickupAddress || undefined,
         dropoffAddress: body.dropoffAddress || undefined,
       });
