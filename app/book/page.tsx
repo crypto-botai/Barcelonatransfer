@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Navbar from "@/components/layout/Navbar";
 import BookFormClient from "./BookFormClient";
+import { getPublicRoutes } from "@/lib/pricing-service";
 import { ROUTES } from "@/lib/pricing";
 import { faqPage, transferService } from "@/lib/schema";
 
-const fromPrice = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona_city")?.economy ?? 45;
+// Static metadata is generated at build time and cannot await the database, so
+// the "from" figure in the meta description comes from the canonical matrix —
+// the same source the database is seeded from. The visible price table below
+// reads the live DB via getPublicRoutes().
+const fromPrice = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona_city")?.economy ?? 50;
 
 export const metadata: Metadata = {
   title: { absolute: "Book Your Barcelona Transfer | Élite BCN" },
@@ -46,9 +51,14 @@ const BOOK_FAQ = [
 ] as const;
 
 // Airport & City routes for the SSR price table (Google can index these without JS)
-const AIRPORT_ROUTES = ROUTES.filter((r) => r.category === "airport").slice(0, 5);
+export default async function BookPage() {
+  // Read the same database-backed source the homepage and /pricing use.
+  // This table previously read the hardcoded ROUTES fallback, so any price
+  // edited through the admin panel would update those two pages but not this
+  // one — the two surfaces would silently disagree about the same route.
+  const allRoutes = await getPublicRoutes();
+  const AIRPORT_ROUTES = allRoutes.filter((r) => r.category === "airport").slice(0, 5);
 
-export default function BookPage() {
   const serviceSchema = transferService({
     name: "Barcelona Airport Private Transfer",
     description: "Fixed-price luxury chauffeur transfers from Barcelona El Prat Airport (T1/T2) to city centre, hotels, cruise port, and Costa Daurada. Mercedes V-Class & EQE 300 Electric. Meet & greet included.",

@@ -27,6 +27,44 @@ import {
   ZONE_CODE_TO_KEY,
 } from "../pricing";
 
+// ── 0. Public-surface price agreement ────────────────────────────────────────
+//
+// The homepage, /pricing and /book all display an "Airport ⇄ Barcelona City"
+// row. They previously read from two different sources (the DB-backed
+// pricing-service vs. the hardcoded ROUTES fallback), which meant an admin
+// price edit could update some pages and not others — the two surfaces would
+// quietly disagree about the same route. These assertions pin the canonical
+// figures so any future change has to update the matrix deliberately.
+
+describe("Airport ⇄ Barcelona City is one consistent set of numbers", () => {
+  const route = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona_city");
+
+  it("exists and is categorised as an airport route (what /book filters on)", () => {
+    expect(route).toBeDefined();
+    expect(route!.category).toBe("airport");
+  });
+
+  it("matches the published per-class figures", () => {
+    expect(route!.economy).toBe(50);
+    expect(route!.business).toBe(60);
+    expect(route!.minivan).toBe(65);
+    expect(route!.vclass).toBe(75);
+    expect(route!.minibus).toBe(180);
+  });
+
+  it("agrees with the class-aware lookup the booking engine quotes from", () => {
+    // Note: this takes a DB VehicleClass, not a price-column VehicleCode —
+    // the V-Class vehicle's class is LUXURY_MINIVAN, which maps to the VCLASS column.
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "ECONOMY")).toBe(50);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "MINIVAN")).toBe(65);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "LUXURY_MINIVAN")).toBe(75);
+    // Camry (BUSINESS class) keeps its €50 per-route override; EQE/Tesla pay the column.
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(50);
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "LUXURY")).toBe(60);
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "LUXURY_MINIVAN")).toBe(75);
+  });
+});
+
 // ── 1. Route count ────────────────────────────────────────────────────────────
 
 describe("FIXED_ROUTES count", () => {
