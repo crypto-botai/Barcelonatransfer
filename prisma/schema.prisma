@@ -233,6 +233,16 @@ model Booking {
   review          String?       @db.Text
   isDeleted       Boolean       @default(false)
   deletedAt       DateTime?
+  // Corporate billing. Both nullable: the overwhelming majority of bookings are
+  // ordinary retail journeys and must be unaffected by this.
+  companyId       String?
+  costCentreCode  String?
+  // Deposit bookings: pay part now, the balance before pickup. All nullable —
+  // a booking paid in full leaves these untouched and behaves exactly as before.
+  depositAmount     Float?
+  balanceAmount     Float?
+  balancePaidAt     DateTime?
+  balanceCheckoutId String?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
@@ -832,4 +842,94 @@ model PushSubscription {
 
   @@index([userId])
   @@map("push_subscriptions")
+}
+
+/// Issued VAT invoices.
+///
+/// Spanish law requires invoice numbers to be sequential with no gaps within a
+/// series, so the number is allocated from this table inside a transaction at
+/// the moment of issue rather than derived from the booking. One invoice per
+/// booking; re-requesting returns the existing one instead of issuing a second.
+model Invoice {
+  id              String   @id @default(cuid())
+  bookingId       String   @unique
+  series          String   @default("A")
+  year            Int
+  number          Int
+  /// Fare excluding VAT — what the customer was actually charged.
+  netAmount       Float
+  vatRate         Float    @default(10)
+  vatAmount       Float
+  grossAmount     Float
+  customerName    String
+  /// Customer NIF/CIF/VAT number, required on a business invoice.
+  customerTaxId   String?
+  customerAddress String?
+  issuedAt        DateTime @default(now())
+
+  @@unique([series, year, number])
+  @@index([bookingId])
+  @@map("invoices")
+}
+
+/// A company that books travel for its staff and settles monthly rather than
+/// per ride.
+model Company {
+  id            String   @id @default(cuid())
+  name          String
+  taxId         String?
+  address       String?
+  billingEmail  String
+  /// Agreed discount off the published fare, 0-100.
+  discountPct   Float    @default(0)
+  /// Stop new bookings when unpaid statements exceed this. 0 = no limit.
+  creditLimit   Float    @default(0)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  members     CompanyMember[]
+  costCentres CostCentre[]
+
+  @@index([active])
+  @@map("companies")
+}
+
+enum CompanyRole {
+  /// Books for themselves only.
+  TRAVELLER
+  /// Books on behalf of others and sees the whole company's bookings.
+  BOOKER
+  /// Everything a booker can do, plus members, cost centres and statements.
+  ADMIN
+}
+
+model CompanyMember {
+  id        String      @id @default(cuid())
+  companyId String
+  userId    String
+  role      CompanyRole @default(TRAVELLER)
+  createdAt DateTime    @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  /// One membership per person per company.
+  @@unique([companyId, userId])
+  @@index([userId])
+  @@map("company_members")
+}
+
+/// Department, project or client code a journey is billed against.
+model CostCentre {
+  id        String   @id @default(cuid())
+  companyId String
+  code      String
+  label     String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, code])
+  @@map("cost_centres")
 }

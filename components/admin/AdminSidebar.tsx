@@ -8,7 +8,7 @@ import {
   Settings, LogOut, ChevronRight, ChevronDown, Wallet, Clock,
   Tag, Mail, BarChart2, TrendingUp, UserCheck, PieChart, Menu, X,
   Building2, Brain, Activity, Bell, BookOpen, Zap, CreditCard,
-  FlaskConical, MessageSquare, Eye, Shield, Key,
+  FlaskConical, MessageSquare, Eye, Shield, Key, Radar,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
@@ -23,10 +23,12 @@ interface NavItem {
 
 const NAV: NavItem[] = [
   { icon: LayoutDashboard, label: "Overview",    href: "/admin" },
+  { icon: Radar,           label: "Dispatch",    href: "/admin/dispatch" },
   { icon: CalendarCheck,   label: "Bookings",    href: "/admin/bookings" },
   { icon: PieChart,        label: "Analytics",   href: "/admin/analytics" },
   { icon: TrendingUp,      label: "Revenue",     href: "/admin/revenue" },
   { icon: UserCheck,       label: "Customers",   href: "/admin/customers" },
+  { icon: Building2,       label: "Companies",   href: "/admin/companies" },
   { icon: Users,           label: "Drivers",     href: "/admin/drivers" },
   { icon: Wallet,          label: "Withdrawals", href: "/admin/withdrawals" },
   { icon: Car,             label: "Fleet",       href: "/admin/fleet" },

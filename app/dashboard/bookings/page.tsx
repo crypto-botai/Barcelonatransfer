@@ -62,9 +62,61 @@ function BookingsContent() {
   const PER_PAGE = 10;
 
   const [cancellingId,   setCancellingId]   = useState<string | null>(null);
+  const [busyId,         setBusyId]         = useState<string | null>(null);
   const [editingPickupId, setEditingPickupId] = useState<string | null>(null);
   const [editPickup,     setEditPickup]     = useState<{ address: string; lat: number; lng: number } | null>(null);
   const [savingPickup,   setSavingPickup]   = useState(false);
+
+  // Repeating a journey re-quotes at today's prices rather than carrying the old
+  // fare forward — a months-old price may no longer exist in the table.
+  const rebook = useCallback(async (id: string) => {
+    setBusyId(id);
+    try {
+      const res = await fetch(`/api/bookings/${id}/rebook`);
+      if (!res.ok) throw new Error(String(res.status));
+      const { url } = await res.json() as { url: string };
+      window.location.href = url;
+    } catch {
+      toast.error("Could not start that booking again.");
+      setBusyId(null);
+    }
+  }, []);
+
+  // Fares exclude VAT, so requesting an invoice is what adds the 10%. Confirm
+  // first: the number is sequential and the document cannot be withdrawn.
+  const requestInvoice = useCallback(async (id: string, net: number) => {
+    const vat = Math.round(net * 0.1 * 100) / 100;
+    const ok = window.confirm(
+      [
+        "A VAT invoice adds 10% VAT to your fare.",
+        "",
+        `Fare:  €${net.toFixed(2)}`,
+        `VAT:   €${vat.toFixed(2)}`,
+        `Total: €${(net + vat).toFixed(2)}`,
+        "",
+        "Issue the invoice?",
+      ].join("\n"),
+    );
+    if (!ok) return;
+
+    setBusyId(id);
+    try {
+      const res  = await fetch("/api/invoices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId: id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Could not issue the invoice.");
+      toast.success(`Invoice ${data.reference} issued`);
+      window.open(`/booking/${id}/invoice`, "_blank", "noopener");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not issue the invoice.");
+    } finally {
+      setBusyId(null);
+    }
+  }, []);
+
 
   const fetchBookings = useCallback(() => {
     fetch("/api/bookings")
