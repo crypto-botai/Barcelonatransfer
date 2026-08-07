@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPickupReminder } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
+import { sweepFlightDelays } from "@/lib/flights/sweep";
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "elite-cron-secret";
 
@@ -66,7 +67,16 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ ok: true, sent });
+  // Same daily pass, same 36h horizon: check whether any of tomorrow's flights
+  // have slipped and tell the affected customers. Kept inside this cron because
+  // the Hobby plan allows one run per day per entry, so a separate cron would
+  // add deployment risk without adding freshness.
+  const flights = await sweepFlightDelays(36).catch((err) => {
+    console.error("[cron/pickup-reminder] flight sweep:", err);
+    return null;
+  });
+
+  return NextResponse.json({ ok: true, sent, flights });
 }
 
 export async function GET(req: NextRequest) {

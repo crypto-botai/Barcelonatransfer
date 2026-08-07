@@ -156,6 +156,12 @@ async function audit(
         entityId: input.bookingId ?? input.userId ?? null,
         details: {
           title,
+          // The rendered values, not just the headline. Two things need them:
+          // an audit answering "what exactly did we tell this customer?", and
+          // callers that dedup on content — the flight sweep compares the
+          // previously announced arrival time to decide whether a delay is new.
+          // Guest bookings write no in-app row, so this is their only trace.
+          ...input.vars,
           channels: Object.fromEntries(
             Object.entries(results).map(([c, r]) => [c, r.outcome]),
           ),
