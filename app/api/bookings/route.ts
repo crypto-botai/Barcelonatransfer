@@ -134,9 +134,12 @@ export async function POST(req: NextRequest) {
         pickupAddress:  body.pickupAddress || undefined,
         dropoffAddress: body.dropoffAddress || undefined,
       });
-      if (sq.isCustomRoute) {
+      // A route with no table row is now priced per kilometre and is bookable.
+      // Only a journey we could not price at all — no dropoff coordinates, so
+      // no distance to work from — still needs a human.
+      if (sq.needsManualQuote || sq.totalAmount <= 0) {
         return NextResponse.json(
-          { error: "This route requires a custom quote. Please contact us via WhatsApp." },
+          { error: "We could not calculate a price for this route. Please contact us via WhatsApp." },
           { status: 422 }
         );
       }

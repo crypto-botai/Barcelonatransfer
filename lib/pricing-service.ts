@@ -1,13 +1,16 @@
 /**
  * pricing-service.ts — the ONLY path to a customer-facing price.
  *
- * getQuote() either returns a fixed table price or isCustomRoute:true.
- * It NEVER returns a calculated/distance-based price.
+ * getQuote() returns a fixed table price when the route is in the table, and a
+ * per-kilometre price when it is not.
+ *
+ * The table always wins. Distance pricing is only ever reached for a journey
+ * that has no row in the table, and can never override or undercut one.
  *
  * Zone resolution order (for each endpoint):
  *  1. Text-based resolveZone() on the address string (most accurate)
  *  2. Coordinate-based detectZoneFromCoords() as fallback
- *  3. null → isCustomRoute: true → UI shows "request a quote"
+ *  3. null → priced at PER_KM_RATE x distance (isCustomRoute: true)
  *
  * Cache: tagged "pricing" so revalidateTag("pricing") flushes on admin save.
  * Fallback: if the DB is unreachable, falls back to ROUTES from lib/pricing.ts.
@@ -22,6 +25,7 @@ import {
   detectZoneFromCoords,
   vehicleCodeForClass,
   lookupFixedPriceByZone,
+  distanceFare,
 } from "@/lib/pricing";
 import { haversineDistance } from "@/lib/utils";
 import type { VehicleClass } from "@/types";
@@ -69,7 +73,10 @@ export interface Quote {
   totalAmount:           number;
   currency:              string;
   isFixed:               boolean;
-  isCustomRoute:         boolean;  // true = route not in table, never show a price
+  /** true = priced per km from distance rather than read from the fixed table */
+  isCustomRoute:         boolean;
+  /** true = no price could be produced at all; the UI must ask the customer to contact us */
+  needsManualQuote?:     boolean;
   fromLabel?:            string;   // e.g. "El Prat Airport"
   toLabel?:              string;   // e.g. "Barcelona City"
 }
@@ -194,8 +201,9 @@ export async function getPublicRoutes(): Promise<PublicRoute[]> {
 /**
  * The single authoritative path to a customer-facing price.
  *
- * Returns a Quote with isCustomRoute:true when the route is not in the table.
- * NEVER falls back to distance-based pricing.
+ * Table first: any route with a row in the fixed table uses that price and
+ * never reaches the distance calculation. Routes with no row are priced per
+ * kilometre so the customer can still book instantly.
  */
 export async function getQuote(input: QuoteInput): Promise<Quote> {
   const {
@@ -246,21 +254,40 @@ function hoursUntilPickup(dt: Date): number {
   return (dt.getTime() - Date.now()) / 3_600_000;
 }
 
+/**
+ * Quote for a journey with no row in the fixed table.
+ *
+ * Previously returned €0 with isCustomRoute:true, which the booking form turned
+ * into "request a quote on WhatsApp" — the customer could not book. Now priced
+ * per kilometre so any destination is instantly bookable.
+ *
+ * isCustomRoute stays true. It no longer means "no price available"; it means
+ * "this price came from distance, not the table", which the UI uses to label
+ * the quote honestly and which keeps the admin backlog logging intact.
+ *
+ * When distance is unknown (no dropoff coordinates) there is nothing to price
+ * from, so it falls back to €0 and the UI's request-a-quote path — a guessed
+ * fare would be worse than asking.
+ */
 function customRouteQuote(vc: VehicleClass, distanceKm: number, durationMin: number): Quote {
+  const fare = distanceFare(distanceKm);
+
   return {
     vehicleClass:        vc,
     distanceKm:          Math.round(distanceKm * 10) / 10,
     durationMin,
     baseFare:            0,
-    distanceFare:        0,
+    distanceFare:        fare,
     airportSurcharge:    0,
     nightSurcharge:      0,
     lastMinuteSurcharge: 0,
     vatAmount:           0,
-    totalAmount:         0,
+    totalAmount:         fare,
     currency:            "EUR",
     isFixed:             false,
     isCustomRoute:       true,
+    // True only when we genuinely could not produce a price.
+    needsManualQuote:    fare === 0,
   };
 }
 

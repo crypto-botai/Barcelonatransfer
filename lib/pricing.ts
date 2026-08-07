@@ -35,6 +35,34 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
 export const AIRPORT_SURCHARGE = 8;
 export const NIGHT_SURCHARGE_RATE = 0.20;
 
+// ─── Distance pricing for destinations not in the fixed table ─────────────────
+//
+// The 63-route table stays authoritative: if a journey has a table price, that
+// price is used and this rate is never consulted. This exists only so a
+// destination nobody has priced yet — Terminal 1 to Sant Andreu de la Barca,
+// say — still gets an instant, bookable quote instead of "message us".
+//
+// €3.50/km is the owner's rate and matches the table closely at city distances:
+// the airport-to-city run is 14.1 km of real road, and 14.1 × 3.50 = €49.35
+// against a table price of €50.
+//
+// Flat across every vehicle class, by explicit instruction.
+export const PER_KM_RATE = 3.5;
+
+// Floor. Without it a 3 km hop quotes €10.50, which is below what it costs to
+// send a chauffeur anywhere. €50 is the cheapest fare in the fixed table, so
+// this simply refuses to undercut the published minimum.
+export const MIN_DISTANCE_FARE = 50;
+
+/**
+ * Fare for a journey with no table price. Whole euros — a quote reading
+ * "€173.25" advertises that a formula produced it.
+ */
+export function distanceFare(distanceKm: number): number {
+  if (!Number.isFinite(distanceKm) || distanceKm <= 0) return 0;
+  return Math.max(MIN_DISTANCE_FARE, Math.round(distanceKm * PER_KM_RATE));
+}
+
 export const LAST_MINUTE_SURCHARGE_RATE = 0.15;
 export const LAST_MINUTE_HOURS = 4;
 export const MIN_BOOKING_HOURS = 1;

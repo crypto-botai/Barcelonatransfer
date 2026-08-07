@@ -114,7 +114,10 @@ export interface QuoteResponse {
   totalAmount:         number;
   currency:            string;
   isFixed?:            boolean;
-  isCustomRoute?:      boolean;  // true = not in table, show "request a quote"
+  /** true = priced per km from distance rather than read from the fixed table */
+  isCustomRoute?:      boolean;
+  /** true = no price could be produced at all; show "contact us" */
+  needsManualQuote?:   boolean;
   fromLabel?:          string;   // e.g. "El Prat Airport"
   toLabel?:            string;   // e.g. "Barcelona City"
   hourlyRate?:         number;

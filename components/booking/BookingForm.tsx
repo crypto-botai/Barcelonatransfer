@@ -146,7 +146,11 @@ export default function BookingForm({ compact = false }: Props) {
     router.push(`/book?${params}`);
   };
 
-  const isCustomRoute  = quote?.isCustomRoute === true;
+  // Routes outside the fixed table are priced per kilometre and are bookable.
+  // This flag means only that no price could be produced at all.
+  const needsManualQuote = quote != null && (quote.needsManualQuote === true || quote.totalAmount <= 0);
+  // Distance-priced rather than read from the table — labelled differently.
+  const isPerKm          = quote?.isCustomRoute === true && !needsManualQuote;
   const canContinue    = !!pickup.address && !!date && !!time && (isHourly || !!dropoff.address);
 
   return (
@@ -327,20 +331,25 @@ export default function BookingForm({ compact = false }: Props) {
             </motion.div>
           )}
 
-          {!loading && quote && !isCustomRoute && (
+          {!loading && quote && !needsManualQuote && (
             <motion.div key="quote"
               initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }}>
               <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-[#c9a84c]/5 border border-[#c9a84c]/20">
                 <div className="flex items-center gap-2">
                   <Zap size={13} className="text-[#c9a84c]" />
                   <div>
-                    <p className="text-[10px] text-[#c9a84c]/60 uppercase tracking-wide font-semibold">Fixed Price</p>
-                    {quote.fromLabel && (
+                    <p className="text-[10px] text-[#c9a84c]/60 uppercase tracking-wide font-semibold">{isPerKm ? "Your Price" : "Fixed Price"}</p>
+                    {quote.fromLabel ? (
                       <p className="text-[11px] text-white/30 flex items-center gap-1 mt-0.5">
                         <MapPin size={9} className="text-[#c9a84c]/40" />
                         {quote.fromLabel} → {quote.toLabel}
                       </p>
-                    )}
+                    ) : isPerKm ? (
+                      <p className="text-[11px] text-white/30 flex items-center gap-1 mt-0.5">
+                        <MapPin size={9} className="text-[#c9a84c]/40" />
+                        {quote.distanceKm} km journey
+                      </p>
+                    ) : null}
                   </div>
                 </div>
                 <p className="font-display text-2xl text-[#c9a84c]">{formatCurrency(quote.totalAmount)}</p>
@@ -348,18 +357,18 @@ export default function BookingForm({ compact = false }: Props) {
             </motion.div>
           )}
 
-          {!loading && isCustomRoute && (
+          {!loading && needsManualQuote && (
             <motion.div key="custom"
               initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }}>
               <div className="px-4 py-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
-                <p className="text-amber-400 text-xs font-medium">Custom route — we&apos;ll confirm price in 15 min</p>
+                <p className="text-amber-400 text-xs font-medium">We couldn&apos;t price this journey — message us for a quote</p>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* CTA */}
-        {isCustomRoute ? (
+        {needsManualQuote ? (
           <a
             href="https://wa.me/34635383712"
             target="_blank"

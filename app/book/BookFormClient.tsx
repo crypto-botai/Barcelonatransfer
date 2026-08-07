@@ -143,6 +143,11 @@ export default function BookFormClient() {
   });
 
   const [quote,         setQuote]         = useState<QuoteResponse | null>(null);
+
+  // A route outside the fixed table is now priced per kilometre and is fully
+  // bookable. This flag means only one thing: we could not produce a price at
+  // all (no drop-off coordinates, so no distance), and a human must quote it.
+  const needsManualQuote = quote != null && (quote.needsManualQuote === true || quote.totalAmount <= 0);
   const [loadingQ,      setLoadingQ]      = useState(false);
   const [submitting,    setSubmitting]    = useState(false);
   const [,              setBookingId]     = useState<string | null>(null);
@@ -551,8 +556,10 @@ export default function BookFormClient() {
                   .map((v) => {
                     const dbClass = FLEET_TO_DB_CLASS[v.class];
                     const sel = data.vehicleClass === dbClass;
-                    const isCustomRoute = quote?.isCustomRoute === true;
-                    const pricing = quote && sel && !isCustomRoute ? quote : null;
+                    // A per-km route now has a real price, so it renders like any
+                    // other. Only a journey we genuinely could not price falls back
+                    // to the contact-us treatment.
+                    const pricing = quote && sel && !needsManualQuote ? quote : null;
                     const minFare = getFleetFromPrice(v.class);
                     const minHours = MIN_HOURLY_HOURS[dbClass] ?? 4;
                     const selectedHours = bookingType === "DAY_HIRE" ? 8 : Math.max(data.durationHours ?? 4, minHours);
@@ -596,7 +603,7 @@ export default function BookFormClient() {
                                 <p className="text-dark-500 text-xs ml-5">{v.models[0]} · {v.maxPassengers} pax</p>
                               </div>
                               <div className="text-right flex-shrink-0">
-                                {sel && isCustomRoute ? (
+                                {sel && needsManualQuote ? (
                                   <p className="text-amber-400 text-xs font-medium">Custom quote</p>
                                 ) : pricing ? (
                                   <>
@@ -629,10 +636,10 @@ export default function BookFormClient() {
                   })
                 }
 
-                {quote?.isCustomRoute && (
+                {needsManualQuote && (
                   <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4">
-                    <p className="text-amber-400 font-medium text-sm mb-1">Custom route — fixed price confirmed within 15 minutes.</p>
-                    <p className="text-dark-400 text-xs mb-3">This route isn&apos;t in our standard table. Contact us and we&apos;ll provide a fixed price with no surprises.</p>
+                    <p className="text-amber-400 font-medium text-sm mb-1">We couldn&apos;t calculate a price for this journey.</p>
+                    <p className="text-dark-400 text-xs mb-3">Please check the pickup and drop-off addresses, or message us and we&apos;ll quote you a fixed price by hand.</p>
                     <a
                       href={`https://wa.me/34635383712?text=${encodeURIComponent(`Hi, I need a quote for a transfer from ${data.pickupAddress ?? ""} to ${data.dropoffAddress ?? ""}.`)}`}
                       target="_blank"
@@ -644,12 +651,18 @@ export default function BookFormClient() {
                   </div>
                 )}
 
-                {quote && !quote.isCustomRoute && quote.fromLabel && (
+                {quote && !needsManualQuote && quote.totalAmount > 0 && (
                   <div className="text-center py-3 border-t border-gold-500/10">
                     <p className="font-display text-xl text-gold-400 tabular-nums">
-                      {quote.fromLabel} → {quote.toLabel} · €{quote.totalAmount} fixed
+                      {quote.fromLabel
+                        ? `${quote.fromLabel} → ${quote.toLabel} · €${quote.totalAmount} fixed`
+                        : `€${quote.totalAmount} · ${quote.distanceKm} km`}
                     </p>
-                    <p className="text-dark-400 text-xs mt-1">excl. VAT &amp; tolls · 10% VAT added only if you need an invoice</p>
+                    <p className="text-dark-400 text-xs mt-1">
+                      {quote.isCustomRoute
+                        ? "Distance-based fixed price for this journey · excl. VAT & tolls"
+                        : "excl. VAT & tolls · 10% VAT added only if you need an invoice"}
+                    </p>
                   </div>
                 )}
 
@@ -657,7 +670,7 @@ export default function BookFormClient() {
                   <button onClick={() => setStep(1)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
                     <ArrowLeft size={16} /> Back
                   </button>
-                  <button onClick={() => setStep(3)} disabled={!data.vehicleClass || !!quote?.isCustomRoute}
+                  <button onClick={() => setStep(3)} disabled={!data.vehicleClass || needsManualQuote || !quote || quote.totalAmount <= 0}
                     className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
                     Continue <ArrowRight size={16} />
                   </button>
@@ -794,13 +807,15 @@ export default function BookFormClient() {
                 </div>
 
                 {/* Price summary — shown inline once a quote is loaded */}
-                {quote && !quote.isCustomRoute && (
+                {quote && !needsManualQuote && (
                   <div className="glass-card rounded-2xl p-6">
                     <h2 className="font-display text-xl text-white mb-4">Price Summary</h2>
                     {(quote.fromLabel || quote.toLabel) && (
                       <p className="text-xs text-dark-400 mb-3 flex items-center gap-1">
                         <MapPin size={10} className="text-gold-500/50 flex-shrink-0" />
-                        {quote.fromLabel} → {quote.toLabel} · Fixed fare
+                        {quote.fromLabel
+                          ? `${quote.fromLabel} → ${quote.toLabel} · Fixed fare`
+                          : `${quote.distanceKm} km · distance-based fixed fare`}
                       </p>
                     )}
                     <div className="bg-black/30 rounded-xl p-4 space-y-2 text-sm">
@@ -877,7 +892,7 @@ export default function BookFormClient() {
                   <button onClick={() => setStep(2)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
                     <ArrowLeft size={16} /> Back
                   </button>
-                  {quote?.isCustomRoute ? (
+                  {needsManualQuote ? (
                     <a
                       href={`https://wa.me/34635383712?text=${encodeURIComponent(`Hi, I need a quote for a transfer from ${data.pickupAddress ?? ""} to ${data.dropoffAddress ?? ""}.`)}`}
                       target="_blank"

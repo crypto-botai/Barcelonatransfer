@@ -230,10 +230,12 @@ export async function createBookingFromChat(
     dropoffAddress: draft.dropoff,
   });
 
-  if (quote.isCustomRoute) {
+  // Routes outside the fixed table are priced per kilometre and can be booked.
+  // Only a genuinely unpriceable journey is handed to a human.
+  if (quote.needsManualQuote || quote.totalAmount <= 0) {
     return {
       success: false,
-      error: "Custom route — price not confirmed. Please contact us via WhatsApp for a fixed quote.",
+      error: "We could not calculate a price for this journey. Please contact us via WhatsApp for a quote.",
     };
   }
 
