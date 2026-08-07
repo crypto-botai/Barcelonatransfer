@@ -254,7 +254,21 @@ export function resolveZone(input: string): string | null {
   if (/\btarragona\b/.test(s)) return "tarragona";
   // "Barcelona" as a city (all Barcelona-province sub-cities already matched above)
   if (/\bbarcelona\b/.test(s)) return "barcelona_city";
-  // Note: bare "girona" (Girona city) has no fixed route → returns null → custom quote
+
+  // Girona city. Priced as the Girona zone, which is how the business already
+  // sells it: /transfers/girona is titled "Barcelona to Girona Transfer — from
+  // €140" and covers "Girona or Girona Airport (GRO)" as one destination.
+  //
+  // Left unmatched, this fell through to distance pricing and quoted €399 for a
+  // journey the site advertises at €140 — including in the schema.org offer
+  // Google reads.
+  //
+  // Anchored to the start of the string on purpose. Every address Nominatim
+  // returns for the province carries "Girona" as a suffix — "Banyoles, Pla de
+  // l'Estany, Girona, Catalunya" — so a loose \bgirona\b would drag every
+  // unlisted town in the province onto this price. Girona city itself is the
+  // only thing that leads with it.
+  if (/^girona\b/.test(s) || /\bgirona (city|centre|center|ciutat)\b/.test(s)) return "girona_airport";
 
   return null;
 }

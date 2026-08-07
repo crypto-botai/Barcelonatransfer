@@ -91,3 +91,56 @@ describe("unlisted destinations", () => {
     expect(distanceFare(28)).toBe(98);
   });
 });
+
+describe("Girona city resolves to the advertised price", () => {
+  // /transfers/girona is titled "Barcelona to Girona Transfer — from €140" and
+  // carries a schema.org offer at 140. Bare "girona" used to resolve to no zone,
+  // so once unlisted routes became per-km it quoted €399 for the same journey —
+  // the site contradicting its own indexed price.
+  it("prices Girona city from the table, not by distance", () => {
+    const z = resolveZone("Girona");
+    expect(z).toBe("girona_airport");
+    expect(lookupFixedPriceByZone("barcelona_city", z!, "ECONOMY")).toBe(140);
+  });
+
+  it("matches the forms a customer or Nominatim actually produces", () => {
+    for (const s of [
+      "Girona",
+      "GIRONA",
+      "Girona, Gironès, Girona, Catalunya, Spain",
+      "girona city",
+      "Girona centre",
+    ]) {
+      expect(resolveZone(s), s).toBe("girona_airport");
+    }
+  });
+
+  it("does NOT drag Girona-province towns onto the Girona price", () => {
+    // Every Nominatim address in the province carries "Girona" as a suffix, so
+    // a loose \bgirona\b here would silently reprice eight listed destinations.
+    const towns: Array<[string, string]> = [
+      ["Lloret de Mar, Selva, Girona, Catalunya",        "lloret"],
+      ["Blanes, Selva, Girona, Catalunya",               "blanes"],
+      ["Tossa de Mar, Selva, Girona, Catalunya",         "tossa"],
+      ["Figueres, Alt Empordà, Girona, Catalunya",       "figueres"],
+      ["Roses, Alt Empordà, Girona, Catalunya",          "roses"],
+      ["Cadaqués, Alt Empordà, Girona, Catalunya",       "cadaques"],
+      ["Palamós, Baix Empordà, Girona, Catalunya",       "palamos"],
+      ["Platja d'Aro, Baix Empordà, Girona, Catalunya",  "platja_daro"],
+    ];
+    for (const [address, expected] of towns) {
+      expect(resolveZone(address), address).toBe(expected);
+    }
+  });
+
+  it("leaves genuinely unlisted province towns to per-km pricing", () => {
+    expect(resolveZone("Banyoles, Pla de l'Estany, Girona, Catalunya")).toBeNull();
+    expect(resolveZone("Olot, Garrotxa, Girona, Catalunya")).toBeNull();
+  });
+
+  it("still resolves the airport itself ahead of the city", () => {
+    for (const s of ["Girona Airport", "GRO", "Girona-Costa Brava Airport"]) {
+      expect(resolveZone(s), s).toBe("girona_airport");
+    }
+  });
+});
