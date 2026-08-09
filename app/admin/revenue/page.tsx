@@ -73,9 +73,11 @@ export default function RevenuePage() {
               <div className={`w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center ${color}`}>
                 <Icon size={18} />
               </div>
-              {growth !== undefined && (
-                <span className={`text-xs font-medium ${growth >= 0 ? "text-green-400" : "text-red-400"}`}>
-                  {growth >= 0 ? "+" : ""}{growth?.toFixed(1)}%
+              {/* Defensive: the API now returns a number, but this card crashed
+                  the whole page when it was a string, so it no longer assumes. */}
+              {growth !== undefined && growth !== null && Number.isFinite(Number(growth)) && (
+                <span className={`text-xs font-medium ${Number(growth) >= 0 ? "text-green-400" : "text-red-400"}`}>
+                  {Number(growth) >= 0 ? "+" : ""}{Number(growth).toFixed(1)}%
                 </span>
               )}
             </div>

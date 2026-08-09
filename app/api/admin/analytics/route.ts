@@ -124,13 +124,28 @@ export async function GET(req: NextRequest) {
     `,
   ]);
 
-  const conversionRate = totalBookings > 0 ? ((completedBookings / totalBookings) * 100).toFixed(1) : "0";
-  const revenueGrowth  = (revenuePrevMonth._sum.totalAmount ?? 0) > 0
-    ? (((revenueThisMonth._sum.totalAmount ?? 0) - (revenuePrevMonth._sum.totalAmount ?? 0)) / (revenuePrevMonth._sum.totalAmount ?? 1) * 100).toFixed(1)
-    : "0";
+  // These are numbers, and are returned as numbers.
+  //
+  // They were built with .toFixed(1), which returns a string — including the
+  // "0" fallback, so they were strings on every code path. /admin/revenue reads
+  // revenueGrowth and calls .toFixed(1) on it, which a string does not have, so
+  // the page threw and rendered the "Something went wrong" boundary every time
+  // the data arrived. Rounding to one decimal here keeps the display identical
+  // while giving both consumers a real number.
+  const round1 = (n: number) => Math.round(n * 10) / 10;
+
+  const conversionRate = totalBookings > 0
+    ? round1((completedBookings / totalBookings) * 100)
+    : 0;
+
+  const prevRevenue = revenuePrevMonth._sum.totalAmount ?? 0;
+  const revenueGrowth = prevRevenue > 0
+    ? round1((((revenueThisMonth._sum.totalAmount ?? 0) - prevRevenue) / prevRevenue) * 100)
+    : 0;
+
   const bookingsGrowth = bookingsPrevMonth > 0
-    ? (((bookingsThisMonth - bookingsPrevMonth) / bookingsPrevMonth) * 100).toFixed(1)
-    : "0";
+    ? round1(((bookingsThisMonth - bookingsPrevMonth) / bookingsPrevMonth) * 100)
+    : 0;
 
   // Vehicle class revenue breakdown
   const vehicleRevenue = await prisma.booking.groupBy({
