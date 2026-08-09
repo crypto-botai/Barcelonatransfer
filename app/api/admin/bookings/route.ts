@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { type VehicleClass } from "@/types";
 import { sendBookingConfirmation, sendAdminNewBookingAlert } from "@/lib/resend";
+import { withUniqueBookingCode } from "@/lib/booking-code";
 
 async function requireAdmin() {
   const s = await getServerSession(authOptions);
@@ -12,13 +13,6 @@ async function requireAdmin() {
   const u = s.user as { role?: string; id?: string; name?: string };
   if (u.role !== "ADMIN") return null;
   return u;
-}
-
-function generateCode(phone: string): string {
-  const digits  = phone.replace(/\D/g, "").slice(-6).padStart(6, "0");
-  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  const suffix  = Array.from({ length: 2 }, () => letters[Math.floor(Math.random() * letters.length)]).join("");
-  return `${digits}${suffix}`;
 }
 
 export async function GET(req: NextRequest) {
@@ -83,8 +77,9 @@ export async function POST(req: NextRequest) {
     const body    = createSchema.parse(await req.json());
     const pickup  = new Date(body.pickupDatetime);
 
-    const booking = await prisma.booking.create({
+    const booking = await withUniqueBookingCode((confirmationCode) => prisma.booking.create({
       data: {
+        confirmationCode,
         guestName:       body.guestName,
         guestEmail:      body.guestEmail,
         guestPhone:      body.guestPhone,
@@ -103,11 +98,10 @@ export async function POST(req: NextRequest) {
         adminNotes:      body.notes,
         baseFare:        body.totalAmount,
         totalAmount:     body.totalAmount,
-        confirmationCode: generateCode(body.guestPhone),
         status:          "CONFIRMED",
         paymentStatus:   body.paymentStatus,
       },
-    });
+    }));
 
     // Log activity
     await prisma.activityLog.create({

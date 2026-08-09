@@ -22,6 +22,7 @@ import { DEFAULT_PRICING } from "@/lib/pricing";
 import { getQuote } from "@/lib/pricing-service";
 import { geocode, roadDistance } from "@/lib/geo";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
+import { withUniqueBookingCode } from "@/lib/booking-code";
 import type { VehicleClass } from "@/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -164,18 +165,6 @@ function vehicleClassFromPax(passengers: number): VehicleClass {
   return "MINIBUS";
 }
 
-// ─── Booking code (same logic as /api/bookings) ───────────────────────────────
-
-function generateBookingCode(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
-  const last6 = digits.slice(-6).padStart(6, "0");
-  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  const suffix = Array.from({ length: 2 }, () =>
-    letters[Math.floor(Math.random() * letters.length)],
-  ).join("");
-  return `${last6}${suffix}`;
-}
-
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 export async function createBookingFromChat(
@@ -249,8 +238,9 @@ export async function createBookingFromChat(
   try {
     const metaPrefix = `[META]${JSON.stringify({ bookingType: "TRANSFER", source: "chat_ai", sessionId })  }[/META]\n`;
 
-    booking = await prisma.booking.create({
+    booking = await withUniqueBookingCode((confirmationCode) => prisma.booking.create({
       data: {
+        confirmationCode,
         guestName:        draft.name,
         guestEmail:       draft.email,
         guestPhone:       draft.phone,
@@ -274,12 +264,11 @@ export async function createBookingFromChat(
         nightSurcharge:   quote.nightSurcharge,
         totalAmount:      quote.totalAmount,
         currency:         quote.currency,
-        confirmationCode: generateBookingCode(draft.phone),
         status:           "PENDING",
         paymentStatus:    "PENDING",
       },
       select: { id: true, confirmationCode: true, totalAmount: true, currency: true },
-    });
+    }));
   } catch (err) {
     console.error("[bookingFromChat] DB create failed:", err);
     return { success: false, error: "Could not save booking. Please contact us via WhatsApp." };

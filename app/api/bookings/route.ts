@@ -10,16 +10,9 @@ import { getQuote } from "@/lib/pricing-service";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { withUniqueBookingCode } from "@/lib/booking-code";
 import { type VehicleClass } from "@/types";
 import { roadDistance, resolveEndpoint } from "@/lib/geo";
-
-function generateBookingCode(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
-  const last6 = digits.slice(-6).padStart(6, "0");
-  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  const suffix = Array.from({ length: 2 }, () => letters[Math.floor(Math.random() * letters.length)]).join("");
-  return `${last6}${suffix}`;
-}
 
 function generatePassword(len = 10): string {
   const chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
@@ -199,8 +192,12 @@ export async function POST(req: NextRequest) {
     // Step 1: Always create the booking record first
     let booking;
     try {
-      booking = await prisma.booking.create({
+      // Wrapped so a confirmation-code collision retries instead of 500ing and
+      // losing the booking (and with it the confirmation and admin alert
+      // emails, which are sent further down this same request).
+      booking = await withUniqueBookingCode((confirmationCode) => prisma.booking.create({
         data: {
+          confirmationCode,
           userId:           user?.id ?? null,
           guestName:        body.guestName,
           guestEmail:       body.guestEmail,
@@ -224,11 +221,10 @@ export async function POST(req: NextRequest) {
           airportSurcharge: body.quote.airportSurcharge,
           nightSurcharge:   body.quote.nightSurcharge,
           totalAmount:      totalWithExtras,
-          confirmationCode: generateBookingCode(body.guestPhone),
           status:           "PENDING",
           paymentStatus:    "PENDING",
         },
-      });
+      }));
     } catch (dbErr) {
       const msg = dbErr instanceof Error ? dbErr.message : String(dbErr);
       console.error("[bookings] DB create failed:", msg, dbErr);
