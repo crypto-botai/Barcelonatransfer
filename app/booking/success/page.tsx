@@ -252,15 +252,23 @@ function SuccessInner() {
               <Link href="/" className="btn-gold w-full py-3.5 rounded-xl font-semibold">
                 Back to Home
               </Link>
-              {bookingId && (
-                <Link
-                  href={`/booking/${bookingId}/invoice`}
+              {/* Receipts and VAT invoices are issued by hand: they carry the
+                  operator's tax details and invoice sequence, so nothing is
+                  printable from the website. The confirmation email already
+                  gives the customer their booking details; anything further is
+                  requested here. */}
+              {data?.confirmationCode && (
+                <a
+                  href={`https://wa.me/34635383712?text=${encodeURIComponent(
+                    `Hi, I would like a receipt or VAT invoice for booking #${data.confirmationCode}.`,
+                  )}`}
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="btn-outline-gold w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2"
                 >
                   <FileText size={16} />
-                  View / Print Receipt
-                </Link>
+                  Request a receipt or invoice
+                </a>
               )}
               {data?.confirmationCode && (
                 <a

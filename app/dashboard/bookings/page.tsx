@@ -343,14 +343,14 @@ function BookingsContent() {
                           {b.paymentStatus === "PAID" && (
                             <a
                               href={`https://wa.me/34635383712?text=${encodeURIComponent(
-                                `Hi, I would like a VAT invoice for booking #${b.confirmationCode} (€${b.totalAmount.toFixed(2)}).`,
+                                `Hi, I would like a receipt or VAT invoice for booking #${b.confirmationCode} (€${b.totalAmount.toFixed(2)}).`,
                               )}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              title="Ask us for a VAT invoice — 10% VAT is added to your fare"
+                              title="Ask us for a receipt or VAT invoice — 10% VAT is added on an invoice"
                               className="flex items-center gap-1 text-[10px] text-dark-200 px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] transition-all"
                             >
-                              <FileText size={10} /> Request VAT invoice
+                              <FileText size={10} /> Request receipt / invoice
                             </a>
                           )}
                         </div>

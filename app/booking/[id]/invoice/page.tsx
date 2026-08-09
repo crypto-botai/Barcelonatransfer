@@ -53,17 +53,22 @@ export default async function InvoicePage({
 
   if (!booking) notFound();
 
+  // Admin only, by operator decision.
+  //
+  // Nothing on this page is printable by a customer. Invoices are tax documents
+  // issued under the operator's own NIF and against their own numbering
+  // sequence, so the entire document — receipt and invoice alike — is produced
+  // and sent by hand rather than self-served from the website. Customers who
+  // need either ask on WhatsApp.
+  //
+  // This previously accepted the booking's confirmation code, which let any
+  // customer open and print their own copy.
   const session = await getServerSession(authOptions);
   const user = session?.user as { id?: string; role?: string } | undefined;
 
-  const authorised =
-    (code && code === booking.confirmationCode) ||
-    (user?.id && user.id === booking.userId) ||
-    user?.role === "ADMIN";
-
   // 404 rather than 403: confirming that a booking id exists is itself a small
   // disclosure, and there is nothing useful an unauthorised visitor can do.
-  if (!authorised) notFound();
+  if (user?.role !== "ADMIN") notFound();
 
   const invoice = await prisma.invoice.findUnique({ where: { bookingId: id } });
   const issuer  = getIssuer();

@@ -44,9 +44,8 @@ export async function POST(req: NextRequest) {
   // rather than letting customers mint their own. Customers ask on WhatsApp —
   // their bookings page opens a pre-filled message.
   //
-  // Note this governs *issuing* only. Viewing an invoice that already exists is
-  // handled by /booking/[id]/invoice, which still accepts the customer's own
-  // confirmation code.
+  // The rendered document at /booking/[id]/invoice is admin-only too, so no
+  // part of the invoice system is reachable by a customer.
   const session = await getServerSession(authOptions);
   const user = session?.user as { id?: string; role?: string } | undefined;
 
