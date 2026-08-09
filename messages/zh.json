@@ -252,5 +252,28 @@
     "whatsappQuote": "通过 WhatsApp 询价",
     "whereTo": "您想去哪里？",
     "yourPrice": "您的价格"
+  },
+  "pricing": {
+    "book": "预订",
+    "bookHourly": "按小时预订",
+    "colBook": "预订",
+    "colRoute": "路线",
+    "footnote": "所有价格均为每车固定价格，不含增值税和路桥费。绝不溨价。",
+    "getInstantPrice": "获取即时价格",
+    "guarantee1": "绝无溨价",
+    "guarantee2": "固定价格保证",
+    "guarantee3": "24 小时前免费取消",
+    "guarantee4": "即时确认",
+    "headingAccent": "豪华定价",
+    "headingLead": "透明的",
+    "minHours": "最少 {n} 小时",
+    "noRoutes": "未找到路线。",
+    "noRoutesCta": "任何目的地均可获取即时价格",
+    "perHour": "每小时",
+    "searchPlaceholder": "搜索目的地…",
+    "tabAirportCity": "机场与市区",
+    "tabCostaBrava": "布拉瓦海岸",
+    "tabCostaDorada": "黄金海岸",
+    "tabHourly": "按小时"
   }
 }

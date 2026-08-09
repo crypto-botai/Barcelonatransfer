@@ -252,5 +252,28 @@
     "whatsappQuote": "اطلب عرض سعر عبر واتساب",
     "whereTo": "إلى أين تريد الذهاب؟",
     "yourPrice": "سعرك"
+  },
+  "pricing": {
+    "book": "احجز",
+    "bookHourly": "احجز بالساعة",
+    "colBook": "احجز",
+    "colRoute": "المسار",
+    "footnote": "جميع الأسعار ثابتة لكل مركبة ولا تشمل ضريبة القيمة المضافة ورسوم الطرق. لا زيادة في الأسعار أبدًا.",
+    "getInstantPrice": "احصل على سعر فوري",
+    "guarantee1": "بدون زيادة في الأسعار",
+    "guarantee2": "سعر ثابت مضمون",
+    "guarantee3": "إلغاء مجاني خلال 24 ساعة",
+    "guarantee4": "تأكيد فوري",
+    "headingAccent": "شفافة",
+    "headingLead": "أسعار",
+    "minHours": "بحد أدنى {n} ساعة",
+    "noRoutes": "لم يتم العثور على مسارات.",
+    "noRoutesCta": "احصل على سعر فوري لأي وجهة",
+    "perHour": "في الساعة",
+    "searchPlaceholder": "ابحث عن وجهة…",
+    "tabAirportCity": "المطار والمدينة",
+    "tabCostaBrava": "كوستا برافا",
+    "tabCostaDorada": "كوستا دورادا",
+    "tabHourly": "بالساعة"
   }
 }

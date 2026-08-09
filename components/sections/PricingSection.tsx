@@ -7,8 +7,9 @@ import { formatCurrency } from "@/lib/utils";
 import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import PriceCell from "@/components/pricing/PriceCell";
 import type { PublicRoute } from "@/lib/pricing-service";
+import { useTranslations } from "@/components/language/I18nProvider";
 
-const TABS = ["Airport & City", "Costa Dorada", "Costa Brava", "Hourly"];
+const TAB_KEYS = ["tabAirportCity", "tabCostaDorada", "tabCostaBrava", "tabHourly"] as const;
 
 const HOURLY_CARDS = [
   { label: "Economy (1–3 pax)",      price: HOURLY_RATES.ECONOMY,        min: MIN_HOURLY_HOURS.ECONOMY        },
@@ -18,6 +19,7 @@ const HOURLY_CARDS = [
 ];
 
 function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
+  const t = useTranslations("pricing");
   const filtered = data.filter((r) =>
     r.label.toLowerCase().includes(search.toLowerCase())
   );
@@ -26,7 +28,7 @@ function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
       <table className="w-full">
         <thead>
           <tr className="border-b border-white/[0.06]">
-            <th className="text-left py-3 px-4 text-xs text-dark-400 tracking-wider uppercase font-medium">Route</th>
+            <th className="text-left py-3 px-4 text-xs text-dark-400 tracking-wider uppercase font-medium">{t("colRoute")}</th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Economy<br /><span className="text-dark-400 normal-case">1–3 pax</span></th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Business<br /><span className="text-dark-400 normal-case">1–3 pax</span></th>
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minivan<br /><span className="text-dark-400 normal-case">4–8 pax</span></th>
@@ -54,7 +56,7 @@ function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
                   href="/book"
                   className="text-xs text-gold-500/70 hover:text-gold-400 transition-colors whitespace-nowrap"
                 >
-                  Book →
+                  {t("book")} →
                 </Link>
               </td>
             </tr>
@@ -62,8 +64,8 @@ function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
           {filtered.length === 0 && (
             <tr>
               <td colSpan={7} className="py-8 text-center text-dark-400 text-sm">
-                No routes found.{" "}
-                <Link href="/book" className="text-gold-500 hover:text-gold-400">Get an instant price for any destination</Link>
+                {t("noRoutes")}{" "}
+                <Link href="/book" className="text-gold-500 hover:text-gold-400">{t("noRoutesCta")}</Link>
               </td>
             </tr>
           )}
@@ -78,6 +80,7 @@ interface Props {
 }
 
 export default function PricingSection({ routes }: Props) {
+  const t = useTranslations("pricing");
   const [tab,    setTab]    = useState(0);
   const [search, setSearch] = useState("");
 
@@ -93,13 +96,13 @@ export default function PricingSection({ routes }: Props) {
             Fixed Pricing
           </span>
           <h2 className="font-display text-4xl sm:text-5xl text-white mb-4">
-            Transparent <span className="text-gold-gradient">Luxury Pricing</span>
+            {t("headingLead")} <span className="text-gold-gradient">{t("headingAccent")}</span>
           </h2>
           <p className="text-dark-400 max-w-xl mx-auto mb-6">
-            All prices are fixed per vehicle and exclude VAT and tolls. No surge pricing. Ever.
+            {t("footnote")}
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-xs text-dark-400">
-            {["No surge pricing", "Fixed fare guaranteed", "Free cancellation 24h", "Instant confirmation"].map((g) => (
+            {[t("guarantee1"), t("guarantee2"), t("guarantee3"), t("guarantee4")].map((g) => (
               <span key={g} className="flex items-center gap-1.5">
                 <span className="text-gold-500">✦</span> {g}
               </span>
@@ -112,9 +115,9 @@ export default function PricingSection({ routes }: Props) {
           {/* Tab controls */}
           <div className="flex flex-wrap items-center justify-between gap-4 p-5 border-b border-white/[0.06]">
             <div className="flex gap-2 flex-wrap">
-              {TABS.map((t, i) => (
+              {TAB_KEYS.map((tabKey, i) => (
                 <button
-                  key={t}
+                  key={tabKey}
                   onClick={() => { setTab(i); setSearch(""); }}
                   className={`px-4 py-2 rounded-lg text-xs font-medium tracking-wider transition-all ${
                     tab === i
@@ -122,7 +125,7 @@ export default function PricingSection({ routes }: Props) {
                       : "text-dark-400 hover:text-white"
                   }`}
                 >
-                  {t}
+                  {t(tabKey)}
                 </button>
               ))}
             </div>
@@ -131,7 +134,7 @@ export default function PricingSection({ routes }: Props) {
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400" />
                 <input
                   type="text"
-                  placeholder="Search destination…"
+                  placeholder={t("searchPlaceholder")}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="input-luxury pl-8 pr-4 py-2 rounded-lg text-sm w-48"
@@ -154,7 +157,7 @@ export default function PricingSection({ routes }: Props) {
                     <p className="text-dark-400 text-xs mb-1">/ hour</p>
                     <p className="text-dark-400 text-xs mb-4">Min. {h.min} hours</p>
                     <Link href="/hourly" className="btn-gold block py-2.5 rounded-lg text-xs font-semibold">
-                      Book Hourly
+                      {t("bookHourly")}
                     </Link>
                   </div>
                 ))}
@@ -168,7 +171,7 @@ export default function PricingSection({ routes }: Props) {
               All prices are fixed per vehicle and <strong className="text-white">exclude VAT and tolls</strong>. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Professional chauffeur, vehicle, fuel and meet &amp; greet are included. Child seats free on request.
             </p>
             <Link href="/book" className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">
-              Get Instant Price <ArrowRight size={12} />
+              {t("getInstantPrice")} <ArrowRight size={12} />
             </Link>
           </div>
         </div>

@@ -252,5 +252,28 @@
     "whatsappQuote": "WhatsApp for a Quote",
     "whereTo": "Where would you like to go?",
     "yourPrice": "Your Price"
+  },
+  "pricing": {
+    "book": "Book",
+    "bookHourly": "Book Hourly",
+    "colBook": "Book",
+    "colRoute": "Route",
+    "footnote": "All prices are fixed per vehicle and exclude VAT and tolls. No surge pricing. Ever.",
+    "getInstantPrice": "Get Instant Price",
+    "guarantee1": "No surge pricing",
+    "guarantee2": "Fixed fare guaranteed",
+    "guarantee3": "Free cancellation 24h",
+    "guarantee4": "Instant confirmation",
+    "headingAccent": "Luxury Pricing",
+    "headingLead": "Transparent",
+    "minHours": "min. {n}h",
+    "noRoutes": "No routes found.",
+    "noRoutesCta": "Get an instant price for any destination",
+    "perHour": "per hour",
+    "searchPlaceholder": "Search destination…",
+    "tabAirportCity": "Airport & City",
+    "tabCostaBrava": "Costa Brava",
+    "tabCostaDorada": "Costa Dorada",
+    "tabHourly": "Hourly"
   }
 }

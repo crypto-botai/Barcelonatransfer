@@ -252,5 +252,28 @@
     "whatsappQuote": "Pedir presupuesto por WhatsApp",
     "whereTo": "¿A dónde quiere ir?",
     "yourPrice": "Su precio"
+  },
+  "pricing": {
+    "book": "Reservar",
+    "bookHourly": "Reservar por horas",
+    "colBook": "Reservar",
+    "colRoute": "Trayecto",
+    "footnote": "Todos los precios son fijos por vehículo y excluyen IVA y peajes. Sin tarifas dinámicas. Nunca.",
+    "getInstantPrice": "Obtener precio inmediato",
+    "guarantee1": "Sin tarifas dinámicas",
+    "guarantee2": "Tarifa fija garantizada",
+    "guarantee3": "Cancelación gratuita 24 h",
+    "guarantee4": "Confirmación inmediata",
+    "headingAccent": "transparentes",
+    "headingLead": "Precios",
+    "minHours": "mín. {n} h",
+    "noRoutes": "No se han encontrado trayectos.",
+    "noRoutesCta": "Obtenga un precio inmediato para cualquier destino",
+    "perHour": "por hora",
+    "searchPlaceholder": "Buscar destino…",
+    "tabAirportCity": "Aeropuerto y ciudad",
+    "tabCostaBrava": "Costa Brava",
+    "tabCostaDorada": "Costa Dorada",
+    "tabHourly": "Por horas"
   }
 }
