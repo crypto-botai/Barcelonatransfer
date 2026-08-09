@@ -88,7 +88,13 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const user    = session?.user as { id?: string } | undefined;
-    const body    = schema.parse(await req.json());
+    // A non-JSON body throws here, before zod runs, so it would otherwise
+    // escape the ZodError branch below and be reported as a server error.
+    const raw = await req.json().catch(() => null);
+    if (raw === null) {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+    const body    = schema.parse(raw);
 
     const pickupDatetime = new Date(`${body.date}T${body.time}`);
     if (isNaN(pickupDatetime.getTime())) {
@@ -107,6 +113,16 @@ export async function POST(req: NextRequest) {
     const vc = body.vehicleClass as VehicleClass;
     let serverBaseTotal: number;
 
+    // The price breakdown stored on the booking must come from the server, not
+    // the request. totalAmount was already recomputed here, but the line items
+    // were taken verbatim from the client — so a tampered baseFare printed on
+    // the customer's invoice next to a correct total, and the two contradicted
+    // each other on a tax document.
+    let breakdown = {
+      distanceKm: 0, durationMin: 0,
+      baseFare: 0, distanceFare: 0, airportSurcharge: 0, nightSurcharge: 0,
+    };
+
     if (body.bookingType === "HOURLY" || body.bookingType === "DAY_HIRE") {
       const minH  = MIN_HOURLY_HOURS[vc] ?? 4;
       const hours = body.bookingType === "DAY_HIRE" ? 8 : Math.max(body.durationHours ?? 4, minH);
@@ -115,6 +131,11 @@ export async function POST(req: NextRequest) {
       const nightSurcharge = isNightTime(pickupDatetime) ? subtotal * NIGHT_SURCHARGE_RATE : 0;
       const airportSurcharge = isAirportLocation(body.pickupLat, body.pickupLng) ? AIRPORT_SURCHARGE : 0;
       serverBaseTotal = Math.round((subtotal + nightSurcharge + airportSurcharge) * 100) / 100;
+      breakdown = {
+        distanceKm: 0, durationMin: hours * 60,
+        baseFare: subtotal, distanceFare: 0,
+        airportSurcharge, nightSurcharge: Math.round(nightSurcharge * 100) / 100,
+      };
     } else {
       // Distance is measured server-side, never taken from the request.
       //
@@ -155,6 +176,14 @@ export async function POST(req: NextRequest) {
       }
       // sq.totalAmount already includes last-minute surcharge from getQuote
       serverBaseTotal = sq.totalAmount;
+      breakdown = {
+        distanceKm:       measured.distanceKm,
+        durationMin:      measured.durationMin,
+        baseFare:         sq.baseFare,
+        distanceFare:     sq.distanceFare,
+        airportSurcharge: sq.airportSurcharge,
+        nightSurcharge:   sq.nightSurcharge,
+      };
     }
 
     // Apply last-minute surcharge for HOURLY/DAY_HIRE (TRANSFER already has it from getQuote)
@@ -214,12 +243,12 @@ export async function POST(req: NextRequest) {
           vehicleClass:     body.vehicleClass as VehicleClass,
           flightNumber:     body.flightNumber ?? null,
           specialRequests,
-          distanceKm:       body.quote.distanceKm,
-          durationMin:      Math.round(body.quote.durationMin),
-          baseFare:         body.quote.baseFare,
-          distanceFare:     body.quote.distanceFare,
-          airportSurcharge: body.quote.airportSurcharge,
-          nightSurcharge:   body.quote.nightSurcharge,
+          distanceKm:       breakdown.distanceKm,
+          durationMin:      Math.round(breakdown.durationMin),
+          baseFare:         breakdown.baseFare,
+          distanceFare:     breakdown.distanceFare,
+          airportSurcharge: breakdown.airportSurcharge,
+          nightSurcharge:   breakdown.nightSurcharge,
           totalAmount:      totalWithExtras,
           status:           "PENDING",
           paymentStatus:    "PENDING",

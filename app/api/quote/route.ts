@@ -23,7 +23,13 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const body = schema.parse(await req.json());
+    // A non-JSON body throws here, before zod runs, so it would otherwise
+    // escape the ZodError branch below and be reported as a server error.
+    const raw = await req.json().catch(() => null);
+    if (raw === null) {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+    const body = schema.parse(raw);
     const { pickupLat, pickupLng, vehicleClass, pickupDatetime, bookingType } = body;
     const pickupDate = new Date(pickupDatetime);
     const vc = vehicleClass as VehicleClass;

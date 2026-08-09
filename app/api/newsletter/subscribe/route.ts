@@ -29,7 +29,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   try {
-    const { email, name, source } = schema.parse(await req.json());
+    // A non-JSON body throws here, before zod runs, so it would otherwise
+    // escape the ZodError branch below and be reported as a server error.
+    const raw = await req.json().catch(() => null);
+    if (raw === null) {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+    const { email, name, source } = schema.parse(raw);
 
     const existing = await prisma.newsletterSubscriber.findUnique({ where: { email } });
     if (existing) {
