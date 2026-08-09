@@ -86,18 +86,54 @@
       "noSurge": "不收取动态加价"
     },
     "list": {
-      "airport": { "title": "机场接送", "desc": "实时航班监控，专人举牌迎接，免费等候60分钟。" },
-      "cruise": { "title": "邮轮港口接送", "desc": "巴塞罗那邮轮码头无缝门到船服务。" },
-      "executive": { "title": "行政专车", "desc": "为商务会议和企业活动配备专职职业司机。" },
-      "corporate": { "title": "企业账户", "desc": "优先车队、对公开票和专属客户经理的高端企业账户。" },
-      "vipEvents": { "title": "VIP 活动用车", "desc": "为婚礼、晚宴、影视拍摄和私人活动提供豪华用车。" },
-      "hourly": { "title": "按小时包车", "desc": "专属私人司机随时待命——最少4小时，灵活便捷。" },
-      "costaBrava": { "title": "布拉瓦海岸接送", "desc": "略雷特德马尔、普拉亚达罗、托萨、卡达克斯——全程海岸。" },
-      "costaDorada": { "title": "黄金海岸接送", "desc": "锡切斯、萨洛、冒险乐园、塔拉戈纳，舒适至极。" },
-      "andorra": { "title": "安道尔接送", "desc": "巴塞罗那至安道尔高端专车——购物、滑雪或商务出行。" },
-      "hotel": { "title": "酒店接送", "desc": "为巴塞罗那所有四星和五星酒店提供点对点豪华服务。" },
-      "vip": { "title": "VIP 专属用车", "desc": "为高端客户提供需要绝对隐私的低调专属服务。" },
-      "tours": { "title": "私人日游", "desc": "蒙特塞拉特、拉罗卡购物村、赫罗纳葡萄酒庄和达利博物馆。" }
+      "airport": {
+        "title": "机场接送",
+        "desc": "实时航班监控，专人举牌迎接，免费等候60分钟。"
+      },
+      "cruise": {
+        "title": "邮轮港口接送",
+        "desc": "巴塞罗那邮轮码头无缝门到船服务。"
+      },
+      "executive": {
+        "title": "行政专车",
+        "desc": "为商务会议和企业活动配备专职职业司机。"
+      },
+      "corporate": {
+        "title": "企业账户",
+        "desc": "优先车队、对公开票和专属客户经理的高端企业账户。"
+      },
+      "vipEvents": {
+        "title": "VIP 活动用车",
+        "desc": "为婚礼、晚宴、影视拍摄和私人活动提供豪华用车。"
+      },
+      "hourly": {
+        "title": "按小时包车",
+        "desc": "专属私人司机随时待命——最少4小时，灵活便捷。"
+      },
+      "costaBrava": {
+        "title": "布拉瓦海岸接送",
+        "desc": "略雷特德马尔、普拉亚达罗、托萨、卡达克斯——全程海岸。"
+      },
+      "costaDorada": {
+        "title": "黄金海岸接送",
+        "desc": "锡切斯、萨洛、冒险乐园、塔拉戈纳，舒适至极。"
+      },
+      "andorra": {
+        "title": "安道尔接送",
+        "desc": "巴塞罗那至安道尔高端专车——购物、滑雪或商务出行。"
+      },
+      "hotel": {
+        "title": "酒店接送",
+        "desc": "为巴塞罗那所有四星和五星酒店提供点对点豪华服务。"
+      },
+      "vip": {
+        "title": "VIP 专属用车",
+        "desc": "为高端客户提供需要绝对隐私的低调专属服务。"
+      },
+      "tours": {
+        "title": "私人日游",
+        "desc": "蒙特塞拉特、拉罗卡购物村、赫罗纳葡萄酒庄和达利博物馆。"
+      }
     }
   },
   "footer": {
@@ -140,7 +176,8 @@
       "cadaques": "卡达克斯",
       "driverLogin": "司机登录",
       "driverRegister": "司机注册",
-      "adminLogin": "管理员登录"
+      "adminLogin": "管理员登录",
+      "hotelTransfers": "酒店接送"
     },
     "legal": {
       "faq": "常见问题",
@@ -160,5 +197,29 @@
     "tryAgain": "重试",
     "close": "关闭",
     "or": "或"
+  },
+  "routes": {
+    "allInclusive": "所有价格不含增值税和路桥费。含 60 分钟免费等候。",
+    "bookNow": "立即预订 — €{price} 起",
+    "ctaSubtitle": "即时确认。接机前 24 小时可免费取消。",
+    "ctaTitle": "准备好预订至{name}的接送了吗？",
+    "distance": "{km} 公里",
+    "duration": "{min} 分钟",
+    "eqe": "奔驰 EQE 300 电动",
+    "faqTitle": "常见问题",
+    "fixedPrice": "固定价格",
+    "fixedPriceDesc": "您看到的价格就是您支付的价格。绝不溨价。",
+    "flightTracking": "实时航班跟踪",
+    "flightTrackingDesc": "我们实时跟踪您的航班。如有延误，司机会相应调整，不额外收费。",
+    "heroSubtitle": "从巴塞罗那埃尔普拉特机场出发的私人豪华接送。固定价格，举牌接机，绝无溨价。",
+    "heroTitle": "巴塞罗那机场至{name}接送",
+    "meetGreet": "抵达厅举牌接机",
+    "meetGreetDesc": "司机会在抵达厅举牌等候您。",
+    "mpv": "奔驰 V 级（MPV）",
+    "paxLabel": "乘客",
+    "priceTable": "至{name}的价格",
+    "relatedTitle": "类似接送",
+    "sedan": "奔驰 EQE 300 电动",
+    "vehiclesAvail": "可选车型"
   }
 }

@@ -86,18 +86,54 @@
       "noSurge": "Sin tarifas dinámicas"
     },
     "list": {
-      "airport": { "title": "Transfers al Aeropuerto", "desc": "Recepción personalizada con seguimiento de vuelos en tiempo real. 60 minutos de espera incluidos." },
-      "cruise": { "title": "Transfers al Puerto", "desc": "Servicio puerta a barco en la Terminal de Cruceros de Barcelona." },
-      "executive": { "title": "Chófer Ejecutivo", "desc": "Chófer profesional dedicado para reuniones de negocios y eventos corporativos." },
-      "corporate": { "title": "Cuentas Corporativas", "desc": "Cuentas corporativas premium con flota prioritaria, facturación y gestor dedicado." },
-      "vipEvents": { "title": "Eventos VIP", "desc": "Transporte de lujo para bodas, galas, rodajes y eventos privados." },
-      "hourly": { "title": "Chófer por Horas", "desc": "Tu conductor privado a tu disposición — mínimo 4 horas, máxima flexibilidad." },
-      "costaBrava": { "title": "Transfers Costa Brava", "desc": "Lloret de Mar, Platja d'Aro, Tossa, Cadaqués — toda la costa." },
-      "costaDorada": { "title": "Transfers Costa Dorada", "desc": "Sitges, Salou, PortAventura, Tarragona con máximo confort." },
-      "andorra": { "title": "Transfers a Andorra", "desc": "Transfer premium de Barcelona a Andorra — compras, esquí o negocios." },
-      "hotel": { "title": "Transfers a Hoteles", "desc": "Servicio de lujo puerta a puerta a todos los hoteles de 4 y 5 estrellas de Barcelona." },
-      "vip": { "title": "Transporte VIP", "desc": "Servicio discreto y exclusivo para clientes de alto perfil que requieren total privacidad." },
-      "tours": { "title": "Tours Privados", "desc": "Montserrat, La Roca Village, las bodegas de Girona y los museos de Dalí." }
+      "airport": {
+        "title": "Transfers al Aeropuerto",
+        "desc": "Recepción personalizada con seguimiento de vuelos en tiempo real. 60 minutos de espera incluidos."
+      },
+      "cruise": {
+        "title": "Transfers al Puerto",
+        "desc": "Servicio puerta a barco en la Terminal de Cruceros de Barcelona."
+      },
+      "executive": {
+        "title": "Chófer Ejecutivo",
+        "desc": "Chófer profesional dedicado para reuniones de negocios y eventos corporativos."
+      },
+      "corporate": {
+        "title": "Cuentas Corporativas",
+        "desc": "Cuentas corporativas premium con flota prioritaria, facturación y gestor dedicado."
+      },
+      "vipEvents": {
+        "title": "Eventos VIP",
+        "desc": "Transporte de lujo para bodas, galas, rodajes y eventos privados."
+      },
+      "hourly": {
+        "title": "Chófer por Horas",
+        "desc": "Tu conductor privado a tu disposición — mínimo 4 horas, máxima flexibilidad."
+      },
+      "costaBrava": {
+        "title": "Transfers Costa Brava",
+        "desc": "Lloret de Mar, Platja d'Aro, Tossa, Cadaqués — toda la costa."
+      },
+      "costaDorada": {
+        "title": "Transfers Costa Dorada",
+        "desc": "Sitges, Salou, PortAventura, Tarragona con máximo confort."
+      },
+      "andorra": {
+        "title": "Transfers a Andorra",
+        "desc": "Transfer premium de Barcelona a Andorra — compras, esquí o negocios."
+      },
+      "hotel": {
+        "title": "Transfers a Hoteles",
+        "desc": "Servicio de lujo puerta a puerta a todos los hoteles de 4 y 5 estrellas de Barcelona."
+      },
+      "vip": {
+        "title": "Transporte VIP",
+        "desc": "Servicio discreto y exclusivo para clientes de alto perfil que requieren total privacidad."
+      },
+      "tours": {
+        "title": "Tours Privados",
+        "desc": "Montserrat, La Roca Village, las bodegas de Girona y los museos de Dalí."
+      }
     }
   },
   "footer": {
@@ -140,7 +176,8 @@
       "cadaques": "Cadaqués",
       "driverLogin": "Acceso Conductor",
       "driverRegister": "Registro Conductor",
-      "adminLogin": "Acceso Admin"
+      "adminLogin": "Acceso Admin",
+      "hotelTransfers": "Traslados a hoteles"
     },
     "legal": {
       "faq": "Preguntas Frecuentes",
@@ -160,5 +197,29 @@
     "tryAgain": "Inténtalo de nuevo",
     "close": "Cerrar",
     "or": "o"
+  },
+  "routes": {
+    "allInclusive": "Todos los precios excluyen IVA y peajes. Incluye 60 minutos de espera gratuita.",
+    "bookNow": "Reservar ahora — desde {price} €",
+    "ctaSubtitle": "Confirmación instantánea. Cancelación gratuita hasta 24 horas antes de la recogida.",
+    "ctaTitle": "¿Listo para reservar su traslado a {name}?",
+    "distance": "{km} km",
+    "duration": "{min} minutos",
+    "eqe": "Mercedes EQE 300 Eléctrico",
+    "faqTitle": "Preguntas frecuentes",
+    "fixedPrice": "Precio fijo",
+    "fixedPriceDesc": "El precio que ve es el precio que paga. Sin tarifas dinámicas, nunca.",
+    "flightTracking": "Seguimiento de vuelos en tiempo real",
+    "flightTrackingDesc": "Seguimos su vuelo en directo. Si se retrasa, su conductor se adapta sin coste adicional.",
+    "heroSubtitle": "Traslado privado de lujo desde el aeropuerto BCN El Prat. Precio fijo, recepción personalizada, sin tarifas dinámicas.",
+    "heroTitle": "Traslado del aeropuerto de Barcelona a {name}",
+    "meetGreet": "Recepción en llegadas",
+    "meetGreetDesc": "Su conductor le espera en la sala de llegadas con un cartel con su nombre.",
+    "mpv": "Mercedes Clase V (monovolumen)",
+    "paxLabel": "Pasajeros",
+    "priceTable": "Precios a {name}",
+    "relatedTitle": "Traslados similares",
+    "sedan": "Mercedes EQE 300 Eléctrico",
+    "vehiclesAvail": "Vehículos disponibles"
   }
 }

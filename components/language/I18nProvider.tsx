@@ -58,19 +58,46 @@ export function useI18n(): LocaleCtxValue {
  * Works identically: const t = useTranslations("hero"); t("title1");
  * Supports nested dot-notation: t("badges.rating")
  */
+/** Walks a dot path into a messages namespace. Returns null if it isn't a string. */
+function lookup(ns: unknown, key: string): string | null {
+  if (ns == null || typeof ns !== "object") return null;
+  let cur: unknown = ns;
+  for (const part of key.split(".")) {
+    if (cur == null || typeof cur !== "object") return null;
+    cur = (cur as Record<string, unknown>)[part];
+  }
+  return typeof cur === "string" ? cur : null;
+}
+
 export function useTranslations(namespace: Namespace) {
   const messages = useContext(MessagesCtx);
-  const ns = messages[namespace] as Record<string, unknown> | undefined;
 
   return function t(key: string): string {
-    if (!ns) return key;
-    const parts = key.split(".");
-    let cur: unknown = ns;
-    for (const part of parts) {
-      if (cur == null || typeof cur !== "object") return key;
-      cur = (cur as Record<string, unknown>)[part];
+    const hit = lookup(messages[namespace], key);
+    if (hit !== null) return hit;
+
+    // Fall back to English rather than returning the raw key.
+    //
+    // Previously a key present in en.json but absent from another locale
+    // rendered its own path as the label — Spanish, Arabic and Chinese visitors
+    // saw the literal text "links.hotelTransfers" in the footer. An untranslated
+    // string showing in English is a gap; a dotted key path on screen is a
+    // visible defect.
+    const english = lookup(enMsg[namespace], key);
+    if (english !== null) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn(`[i18n] missing translation: ${String(namespace)}.${key}`);
+      }
+      return english;
     }
-    return typeof cur === "string" ? cur : key;
+
+    // Neither locale has it — the key itself is wrong. Surface that in
+    // development; in production show nothing rather than debug text.
+    if (process.env.NODE_ENV === "development") {
+      console.error(`[i18n] unknown key: ${String(namespace)}.${key}`);
+      return key;
+    }
+    return "";
   };
 }
 

@@ -197,5 +197,29 @@
     "tryAgain": "Try Again",
     "close": "Close",
     "or": "or"
+  },
+  "routes": {
+    "allInclusive": "All prices exclude VAT and tolls. 60 minutes free waiting included.",
+    "bookNow": "Book now — from €{price}",
+    "ctaSubtitle": "Instant confirmation. Free cancellation up to 24 hours before pickup.",
+    "ctaTitle": "Ready to book your transfer to {name}?",
+    "distance": "{km} km",
+    "duration": "{min} minutes",
+    "eqe": "Mercedes EQE 300 Electric",
+    "faqTitle": "Frequently asked questions",
+    "fixedPrice": "Fixed price",
+    "fixedPriceDesc": "The price you see is the price you pay. No surge pricing, ever.",
+    "flightTracking": "Real-time flight tracking",
+    "flightTrackingDesc": "We track your flight live. If it is delayed, your driver adjusts at no extra cost.",
+    "heroSubtitle": "Private luxury transfer from BCN El Prat Airport. Fixed price, meet & greet, no surge pricing.",
+    "heroTitle": "Barcelona Airport Transfer to {name}",
+    "meetGreet": "Meet & greet in arrivals",
+    "meetGreetDesc": "Your driver waits in the arrivals hall with a name board.",
+    "mpv": "Mercedes V-Class (MPV)",
+    "paxLabel": "Passengers",
+    "priceTable": "Prices to {name}",
+    "relatedTitle": "Similar transfers",
+    "sedan": "Mercedes EQE 300 Electric",
+    "vehiclesAvail": "Available vehicles"
   }
 }
