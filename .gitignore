@@ -46,3 +46,6 @@ prisma/migrations/
 # temporary debug scripts — never commit
 tmp_*.js
 tmp_*.ts
+
+# Local diagnostic scripts — never part of the app
+scratch/
