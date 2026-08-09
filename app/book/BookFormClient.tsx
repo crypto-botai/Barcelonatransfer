@@ -19,6 +19,7 @@ import {
 } from "@/types";
 import { getFleetFromPrice, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import toast from "react-hot-toast";
+import { useTranslations } from "@/components/language/I18nProvider";
 
 // Addresses use short non-ambiguous strings so resolveZone() always identifies
 // the correct zone — no province names that could shadow the city name.
@@ -111,6 +112,7 @@ function roundUpToNext30(): string {
 }
 
 export default function BookFormClient() {
+  const t = useTranslations("bookflow");
   const params = useSearchParams();
 
   const hasPrefilledJourney = !!(
@@ -190,7 +192,7 @@ export default function BookFormClient() {
 
   const applyCoupon = async () => {
     if (!couponInput || !data.guestEmail) {
-      setCouponError(!data.guestEmail ? "Enter your email first" : "Enter a coupon code");
+      setCouponError(!data.guestEmail ? t("enterEmailFirst") : t("enterCoupon"));
       return;
     }
     setCouponLoading(true);
@@ -202,7 +204,7 @@ export default function BookFormClient() {
         body: JSON.stringify({ code: couponInput, email: data.guestEmail }),
       });
       const json = await res.json();
-      if (!json.valid) throw new Error(json.reason ?? "Invalid coupon");
+      if (!json.valid) throw new Error(json.reason ?? t("invalidCoupon"));
       setCouponCode(couponInput.toUpperCase());
       setCouponPct(json.discountPct);
       toast.success(`${json.discountPct}% discount applied!`);
@@ -333,7 +335,7 @@ export default function BookFormClient() {
       }
       window.location.href = json.checkoutUrl;
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Booking failed. Please try again.");
+      toast.error(err instanceof Error ? err.message : t("bookingFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -371,7 +373,7 @@ export default function BookFormClient() {
           {step === 1 && (
             <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="glass-card rounded-2xl p-6 sm:p-8">
-                <h2 className="font-display text-2xl text-white mb-6">Plan Your Journey</h2>
+                <h2 className="font-display text-2xl text-white mb-6">{t("step1")}</h2>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
                   {BOOKING_TYPES.map(({ type, label, icon: Icon, desc }) => {
@@ -399,7 +401,7 @@ export default function BookFormClient() {
                     <AddressAutocomplete
                       value={data.pickupAddress ?? ""}
                       onChange={(v) => setData((d) => ({ ...d, pickupAddress: v.address, pickupLat: v.lat, pickupLng: v.lng }))}
-                      placeholder="Airport, hotel, or type any Barcelona address…"
+                      placeholder={t("pickupPlaceholder")}
                       icon={<div className="w-5 h-5 rounded-full bg-gold-500 flex items-center justify-center"><div className="w-2 h-2 rounded-full bg-black" /></div>}
                       quickZones={PICKUP_QUICK_ZONES}
                     />
@@ -412,7 +414,7 @@ export default function BookFormClient() {
                       <AddressAutocomplete
                         value={data.dropoffAddress ?? ""}
                         onChange={(v) => setData((d) => ({ ...d, dropoffAddress: v.address, dropoffLat: v.lat, dropoffLng: v.lng }))}
-                        placeholder="Destination…"
+                        placeholder={t("dropoffPlaceholder")}
                       />
                     </div>
                   )}
@@ -448,7 +450,7 @@ export default function BookFormClient() {
                   )}
 
                   <div>
-                    <label className="text-xs text-dark-400 uppercase tracking-wider block mb-2">Date & Time</label>
+                    <label className="text-xs text-dark-400 uppercase tracking-wider block mb-2">{t("dateTime")}</label>
                     <div className="flex flex-wrap gap-2 mb-3">
                       {([
                         ["In 1.5 Hours", "now1h"],
@@ -499,7 +501,7 @@ export default function BookFormClient() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label htmlFor="book-passengers" className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Passengers</label>
+                      <label htmlFor="book-passengers" className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">{t("passengers")}</label>
                       <div className="relative">
                         <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
                         <select id="book-passengers" value={data.passengers}
@@ -512,7 +514,7 @@ export default function BookFormClient() {
                       </div>
                     </div>
                     <div>
-                      <label htmlFor="book-luggage" className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Luggage</label>
+                      <label htmlFor="book-luggage" className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">{t("luggage")}</label>
                       <div className="relative">
                         <Briefcase size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
                         <select id="book-luggage" value={data.luggage}
@@ -604,7 +606,7 @@ export default function BookFormClient() {
                               </div>
                               <div className="text-right flex-shrink-0">
                                 {sel && needsManualQuote ? (
-                                  <p className="text-amber-400 text-xs font-medium">Custom quote</p>
+                                  <p className="text-amber-400 text-xs font-medium">{t("customQuote")}</p>
                                 ) : pricing ? (
                                   <>
                                     <p className="font-display text-lg text-gold-400">{formatCurrency(pricing.totalAmount)}</p>
@@ -684,7 +686,7 @@ export default function BookFormClient() {
             <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="space-y-4">
                 <div className="glass-card rounded-2xl p-6 sm:p-8">
-                  <h2 className="font-display text-2xl text-white mb-6">Passenger Details</h2>
+                  <h2 className="font-display text-2xl text-white mb-6">{t("step3")}</h2>
                   <div className="space-y-4">
                     <div>
                       <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Full Name *</label>
@@ -692,7 +694,7 @@ export default function BookFormClient() {
                         <User size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
                         <input required type="text" value={data.guestName ?? ""}
                           onChange={(e) => setData((d) => ({ ...d, guestName: e.target.value }))}
-                          placeholder="As on travel document"
+                          placeholder={t("namePlaceholder")}
                           className="input-luxury w-full pl-10 pr-4 py-4 rounded-xl" />
                       </div>
                     </div>
@@ -703,7 +705,7 @@ export default function BookFormClient() {
                           <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
                           <input required type="email" value={data.guestEmail ?? ""}
                             onChange={(e) => setData((d) => ({ ...d, guestEmail: e.target.value }))}
-                            placeholder="you@email.com"
+                            placeholder={t("emailPlaceholder")}
                             className="input-luxury w-full pl-10 pr-4 py-4 rounded-xl text-sm" />
                         </div>
                       </div>
@@ -713,7 +715,7 @@ export default function BookFormClient() {
                           <Phone size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
                           <input required type="tel" value={data.guestPhone ?? ""}
                             onChange={(e) => setData((d) => ({ ...d, guestPhone: e.target.value }))}
-                            placeholder="+34 6xx xxx xxx"
+                            placeholder={t("phonePlaceholder")}
                             className="input-luxury w-full pl-10 pr-4 py-4 rounded-xl text-sm" />
                         </div>
                       </div>
@@ -728,7 +730,7 @@ export default function BookFormClient() {
                           <Plane size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
                           <input type="text" value={data.flightNumber ?? ""}
                             onChange={(e) => setData((d) => ({ ...d, flightNumber: e.target.value }))}
-                            placeholder="e.g. IB3456 or VY1234"
+                            placeholder={t("flightPlaceholder")}
                             className="input-luxury w-full pl-10 pr-4 py-4 rounded-xl text-sm" />
                         </div>
                       </div>
@@ -742,7 +744,7 @@ export default function BookFormClient() {
                         <MessageSquare size={14} className="absolute left-3.5 top-3.5 text-gold-500/60 pointer-events-none" />
                         <textarea rows={2} value={data.specialRequests ?? ""}
                           onChange={(e) => setData((d) => ({ ...d, specialRequests: e.target.value }))}
-                          placeholder="Any specific instructions for your driver…"
+                          placeholder={t("notesPlaceholder")}
                           className="input-luxury w-full pl-10 pr-4 py-4 rounded-xl text-sm resize-none" />
                       </div>
                     </div>
@@ -750,7 +752,7 @@ export default function BookFormClient() {
                 </div>
 
                 <div className="glass-card rounded-2xl p-6 sm:p-8">
-                  <h2 className="font-display text-xl text-white mb-2">Add Extras</h2>
+                  <h2 className="font-display text-xl text-white mb-2">{t("addExtras")}</h2>
                   <p className="text-dark-400 text-sm mb-5">Enhance your journey with optional add-ons</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {EXTRAS_CATALOG.map((extra) => {
@@ -782,7 +784,7 @@ export default function BookFormClient() {
                           {selected && extra.maxQty > 1 && (
                             <div className="flex items-center gap-3 mt-3 pt-3 border-t border-white/[0.06]"
                               onClick={(e) => e.stopPropagation()}>
-                              <span className="text-xs text-dark-400">Quantity:</span>
+                              <span className="text-xs text-dark-400">{t("quantity")}</span>
                               <div className="flex items-center gap-2">
                                 <button onClick={() => updateExtraQty(extra.id, -1)}
                                   className="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center text-dark-300 hover:border-gold-500/40">
@@ -809,7 +811,7 @@ export default function BookFormClient() {
                 {/* Price summary — shown inline once a quote is loaded */}
                 {quote && !needsManualQuote && (
                   <div className="glass-card rounded-2xl p-6">
-                    <h2 className="font-display text-xl text-white mb-4">Price Summary</h2>
+                    <h2 className="font-display text-xl text-white mb-4">{t("priceSummary")}</h2>
                     {(quote.fromLabel || quote.toLabel) && (
                       <p className="text-xs text-dark-400 mb-3 flex items-center gap-1">
                         <MapPin size={10} className="text-gold-500/50 flex-shrink-0" />
@@ -820,7 +822,7 @@ export default function BookFormClient() {
                     )}
                     <div className="bg-black/30 rounded-xl p-4 space-y-2 text-sm">
                       <div className="flex justify-between text-dark-400">
-                        <span>Transfer price</span><span>{formatCurrency(quote.totalAmount)}</span>
+                        <span>{t("transferPrice")}</span><span>{formatCurrency(quote.totalAmount)}</span>
                       </div>
                       {(data.extras ?? []).filter((e) => e.price > 0).map((e) => (
                         <div key={e.id} className="flex justify-between text-dark-400">
@@ -841,13 +843,13 @@ export default function BookFormClient() {
                         </div>
                       )}
                       <div className="border-t border-white/10 pt-3 flex justify-between items-end">
-                        <span className="text-white font-semibold">Total</span>
+                        <span className="text-white font-semibold">{t("total")}</span>
                         <span className="font-display text-xl text-gold-400">{formatCurrency(grandTotal)}</span>
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-xs text-dark-500">
                       <span className="flex items-center gap-1"><Shield size={11} className="text-gold-500" /> Free cancellation 24h+</span>
-                      <span className="flex items-center gap-1"><CreditCard size={11} className="text-gold-500" /> Secure SumUp payment</span>
+                      <span className="flex items-center gap-1"><CreditCard size={11} className="text-gold-500" /> {t("securePayment")}</span>
                       {hoursUntilPickup < 4 && hoursUntilPickup >= 1 && (
                         <span className="flex items-center gap-1 text-amber-400 font-medium"><Zap size={11} /> 15% last-minute fee applied</span>
                       )}
@@ -858,22 +860,22 @@ export default function BookFormClient() {
                 {/* Coupon */}
                 {!couponCode ? (
                   <div className="glass-card rounded-xl p-4">
-                    <label className="text-xs text-dark-400 uppercase tracking-wider block mb-2">Have a coupon code?</label>
+                    <label className="text-xs text-dark-400 uppercase tracking-wider block mb-2">{t("haveCoupon")}</label>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
                         <Tag size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
                         <input type="text" value={couponInput}
                           onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
-                          placeholder="ELITE-XXXXXX"
+                          placeholder={t("couponPlaceholder")}
                           className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm" />
                       </div>
                       <button onClick={applyCoupon} disabled={couponLoading || !data.guestEmail}
                         className="btn-outline-gold px-4 py-3 rounded-xl text-sm whitespace-nowrap disabled:opacity-40">
-                        {couponLoading ? <Loader2 size={14} className="animate-spin" /> : "Apply"}
+                        {couponLoading ? <Loader2 size={14} className="animate-spin" /> : t("apply")}
                       </button>
                     </div>
                     {couponError && <p className="text-red-400 text-xs mt-1">{couponError}</p>}
-                    {!data.guestEmail && <p className="text-dark-500 text-[11px] mt-1">Enter your email above to apply a coupon</p>}
+                    {!data.guestEmail && <p className="text-dark-500 text-[11px] mt-1">{t("enterEmailFirst")}</p>}
                   </div>
                 ) : (
                   <div className="flex items-center justify-between bg-green-500/8 border border-green-500/20 rounded-xl px-4 py-3">
@@ -905,7 +907,7 @@ export default function BookFormClient() {
                     <button onClick={handlePay} disabled={!step3Valid || submitting}
                       className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40">
                       {submitting ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
-                      {submitting ? "Processing…" : quote ? `Pay ${formatCurrency(grandTotal)}` : "Confirm Booking"}
+                      {submitting ? t("processing") : quote ? `${t("pay")} ${formatCurrency(grandTotal)}` : t("confirmBooking")}
                     </button>
                   )}
                 </div>
