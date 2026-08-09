@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getSumUpCheckout } from "@/lib/sumup";
-import { finalizeSumUpPayment, markSumUpPaymentFailed } from "@/lib/payment-completion";
+import { reconcilePendingPayments } from "@/lib/payments/reconcile";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,42 +22,7 @@ function authorise(req: NextRequest): boolean {
 export async function GET(req: NextRequest) {
   if (!authorise(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Give the live verify-poll flow a few minutes to finish on its own before we duplicate the work.
-  const olderThan = new Date(Date.now() - 3 * 60_000);
-  // Don't chase checkouts indefinitely — SumUp checkouts go stale long before this.
-  const newerThan = new Date(Date.now() - 7 * 24 * 60 * 60_000);
-
-  const stuck = await prisma.booking.findMany({
-    where: {
-      paymentStatus:   "PENDING",
-      stripeSessionId: { not: null },
-      createdAt:       { lt: olderThan, gt: newerThan },
-    },
-    take: 50,
-    orderBy: { createdAt: "asc" },
-  });
-
-  const results = { checked: stuck.length, confirmed: 0, failed: 0, stillPending: 0, errors: 0 };
-
-  for (const booking of stuck) {
-    if (!booking.stripeSessionId) continue;
-    try {
-      const checkout = await getSumUpCheckout(booking.stripeSessionId);
-      if (checkout.status === "PAID") {
-        await finalizeSumUpPayment(booking.id, checkout);
-        results.confirmed++;
-      } else if (checkout.status === "FAILED" || checkout.status === "EXPIRED") {
-        await markSumUpPaymentFailed(booking.id);
-        results.failed++;
-      } else {
-        results.stillPending++;
-      }
-    } catch (err) {
-      console.error("[cron/payment-reconcile]", booking.id, err);
-      results.errors++;
-    }
-  }
-
+  const results = await reconcilePendingPayments();
   return NextResponse.json({ ok: true, ...results });
 }
 

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPickupReminder, sendReviewRequestEmail, resend } from "@/lib/resend";
 import { COMPANY } from "@/lib/company-facts";
+import { reconcilePendingPayments } from "@/lib/payments/reconcile";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -312,6 +313,13 @@ export async function GET(req: NextRequest) {
     runReviewRequest(),
   ]);
 
+  // Payment reconciliation piggybacks on this job as well. The Hobby plan
+  // allows one run per cron entry per day, so a payment that failed at 17:00
+  // used to sit labelled PENDING in the admin panel until 05:00 the next
+  // morning. Running it from several existing jobs spreads the checks across
+  // the day without adding a cron entry the plan would reject.
+  const payments = await reconcilePendingPayments().catch(() => null);
+
   // AI executive summary — runs after agent cron (06:00) so data is fresh
   await runAiExecutiveSummary().catch(() => {});
 
@@ -320,6 +328,7 @@ export async function GET(req: NextRequest) {
     abandoned: abandoned.status === "fulfilled" ? abandoned.value : 0,
     reminders: reminders.status === "fulfilled" ? reminders.value : 0,
     reviews:   reviews.status   === "fulfilled" ? reviews.value   : 0,
+    payments,
   });
 }
 

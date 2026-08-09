@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sendPickupReminder } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
 import { sweepFlightDelays } from "@/lib/flights/sweep";
+import { reconcilePendingPayments } from "@/lib/payments/reconcile";
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "elite-cron-secret";
 
@@ -76,7 +77,12 @@ export async function POST(req: NextRequest) {
     return null;
   });
 
-  return NextResponse.json({ ok: true, sent, flights });
+  // Payment reconciliation piggybacks here: the Hobby plan allows one run
+  // per cron entry per day, so spreading it across the existing jobs is the
+  // only way to catch a failed payment before the next morning.
+  const payments = await reconcilePendingPayments().catch(() => null);
+
+  return NextResponse.json({ ok: true, sent, flights, payments });
 }
 
 export async function GET(req: NextRequest) {
