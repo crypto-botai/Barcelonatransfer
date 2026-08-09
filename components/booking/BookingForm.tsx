@@ -10,6 +10,7 @@ import {
 import { cn, formatCurrency } from "@/lib/utils";
 import { VEHICLE_CATALOG, FLEET_TO_DB_CLASS, type FleetVehicle, type QuoteResponse } from "@/types";
 import AddressAutocomplete, { type QuickZone } from "./AddressAutocomplete";
+import { useTranslations } from "@/components/language/I18nProvider";
 
 /* ── Quick-select zones (pickup + drop-off) ────────────────────────────────── */
 // Addresses use short non-ambiguous strings so resolveZone() always identifies
@@ -54,10 +55,10 @@ const PICKUP_QUICK_ZONES: QuickZone[] = [
 
 type TripType = "oneway" | "return" | "hourly";
 
-const TRIP_TABS: { type: TripType; label: string; icon: React.ElementType }[] = [
-  { type: "oneway",  label: "One Way",    icon: ArrowRight },
-  { type: "return",  label: "Return",     icon: RotateCcw },
-  { type: "hourly",  label: "By the Hour",icon: Timer },
+const TRIP_TABS: { type: TripType; labelKey: string; icon: React.ElementType }[] = [
+  { type: "oneway",  labelKey: "tripOneWay", icon: ArrowRight },
+  { type: "return",  labelKey: "tripReturn", icon: RotateCcw },
+  { type: "hourly",  labelKey: "tripHourly", icon: Timer },
 ];
 
 const HOURS_OPTIONS = [2, 3, 4, 5, 6, 8];
@@ -72,6 +73,7 @@ const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
 interface Props { compact?: boolean }
 
 export default function BookingForm({ compact = false }: Props) {
+  const t = useTranslations("booking");
   const router = useRouter();
 
   const [tripType, setTripType] = useState<TripType>("oneway");
@@ -161,13 +163,13 @@ export default function BookingForm({ compact = false }: Props) {
 
       {/* ── Gold header ─────────────────────────────────────────────────────── */}
       <div className="bg-gradient-to-br from-[#c9a84c] via-[#b8913d] to-[#a07828] px-6 pt-5 pb-4">
-        <p className="text-black/50 text-[10px] font-semibold uppercase tracking-[0.2em] mb-1">Reservation</p>
-        <h2 className="font-display text-xl text-black leading-tight">Plan your transfer</h2>
-        <p className="text-black/40 text-xs mt-0.5">Instant quote · Fixed pricing · 24/7</p>
+        <p className="text-black/50 text-[10px] font-semibold uppercase tracking-[0.2em] mb-1">{t("headerEyebrow")}</p>
+        <h2 className="font-display text-xl text-black leading-tight">{t("headerTitle")}</h2>
+        <p className="text-black/40 text-xs mt-0.5">{t("headerSubtitle")}</p>
 
         {/* Trip type tabs */}
         <div className="flex gap-1.5 mt-4">
-          {TRIP_TABS.map(({ type, label, icon: Icon }) => (
+          {TRIP_TABS.map(({ type, labelKey, icon: Icon }) => (
             <button
               key={type}
               onClick={() => setTripType(type)}
@@ -179,7 +181,7 @@ export default function BookingForm({ compact = false }: Props) {
               )}
             >
               <Icon size={11} />
-              {label}
+              {t(labelKey)}
             </button>
           ))}
         </div>
@@ -189,15 +191,15 @@ export default function BookingForm({ compact = false }: Props) {
       <div className="bg-[#0c0c0c] px-6 py-5 space-y-4">
 
         {/* Where label */}
-        <p className="text-white/50 text-xs font-medium tracking-wide">Where would you like to go?</p>
+        <p className="text-white/50 text-xs font-medium tracking-wide">{t("whereTo")}</p>
 
         {/* Pickup */}
         <div>
-          <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Pickup</label>
+          <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">{t("pickup")}</label>
           <AddressAutocomplete
             value={pickup.address}
             onChange={setPickup}
-            placeholder="Pick a zone, type an address, or hotel…"
+            placeholder={t("pickupPlaceholder")}
             icon={<div className="w-4 h-4 rounded-full bg-[#c9a84c] flex items-center justify-center flex-shrink-0"><div className="w-1.5 h-1.5 rounded-full bg-black" /></div>}
             quickZones={PICKUP_QUICK_ZONES}
           />
@@ -213,11 +215,11 @@ export default function BookingForm({ compact = false }: Props) {
         {/* Drop-off (hidden for hourly) */}
         {!isHourly && (
           <div>
-            <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Drop-off</label>
+            <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">{t("dropoff")}</label>
             <AddressAutocomplete
               value={dropoff.address}
               onChange={setDropoff}
-              placeholder="Pick a zone or type a destination"
+              placeholder={t("dropoffPlaceholder")}
               icon={<div className="w-4 h-4 rounded-full border-2 border-[#c9a84c] flex items-center justify-center flex-shrink-0"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a84c]" /></div>}
               quickZones={PICKUP_QUICK_ZONES}
             />
@@ -227,7 +229,7 @@ export default function BookingForm({ compact = false }: Props) {
         {/* Hours selector (hourly only) */}
         {isHourly && (
           <div>
-            <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-2">Duration</label>
+            <label className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-2">{t("duration")}</label>
             <div className="flex flex-wrap gap-2">
               {HOURS_OPTIONS.map((h) => (
                 <button
@@ -250,7 +252,7 @@ export default function BookingForm({ compact = false }: Props) {
         {/* Date & Time */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label htmlFor="hero-booking-date" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Date</label>
+            <label htmlFor="hero-booking-date" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">{t("date")}</label>
             <div className="relative">
               <Calendar size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none z-10" />
               <input
@@ -264,7 +266,7 @@ export default function BookingForm({ compact = false }: Props) {
             </div>
           </div>
           <div>
-            <label htmlFor="hero-booking-time" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Time</label>
+            <label htmlFor="hero-booking-time" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">{t("time")}</label>
             <div className="relative">
               <Clock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none z-10" />
               <select
@@ -273,7 +275,7 @@ export default function BookingForm({ compact = false }: Props) {
                 onChange={(e) => setTime(e.target.value)}
                 className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm appearance-none"
               >
-                <option value="" className="bg-[#111]">HH : MM</option>
+                <option value="" className="bg-[#111]">{t("timePlaceholder")}</option>
                 {TIME_SLOTS.map((t) => (
                   <option key={t} value={t} className="bg-[#111]">{t}</option>
                 ))}
@@ -285,7 +287,7 @@ export default function BookingForm({ compact = false }: Props) {
         {/* Passengers + Vehicle */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="hero-booking-pax" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Passengers</label>
+            <label htmlFor="hero-booking-pax" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">{t("passengers")}</label>
             <div className="relative">
               <Users size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none" />
               <select
@@ -295,13 +297,13 @@ export default function BookingForm({ compact = false }: Props) {
                 className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm appearance-none"
               >
                 {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (
-                  <option key={n} value={n} className="bg-[#111]">{n} pax</option>
+                  <option key={n} value={n} className="bg-[#111]">{t("pax").replace("{n}", String(n))}</option>
                 ))}
               </select>
             </div>
           </div>
           <div>
-            <label htmlFor="hero-booking-vehicle" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">Vehicle</label>
+            <label htmlFor="hero-booking-vehicle" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">{t("vehicle")}</label>
             <div className="relative">
               <select
                 id="hero-booking-vehicle"
@@ -327,7 +329,7 @@ export default function BookingForm({ compact = false }: Props) {
             <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex items-center justify-center gap-2 py-2 text-xs text-white/30">
               <Loader2 size={13} className="animate-spin text-[#c9a84c]" />
-              Getting your price…
+              {t("gettingPrice")}
             </motion.div>
           )}
 
@@ -338,7 +340,7 @@ export default function BookingForm({ compact = false }: Props) {
                 <div className="flex items-center gap-2">
                   <Zap size={13} className="text-[#c9a84c]" />
                   <div>
-                    <p className="text-[10px] text-[#c9a84c]/60 uppercase tracking-wide font-semibold">{isPerKm ? "Your Price" : "Fixed Price"}</p>
+                    <p className="text-[10px] text-[#c9a84c]/60 uppercase tracking-wide font-semibold">{isPerKm ? t("yourPrice") : t("fixedPrice")}</p>
                     {quote.fromLabel ? (
                       <p className="text-[11px] text-white/30 flex items-center gap-1 mt-0.5">
                         <MapPin size={9} className="text-[#c9a84c]/40" />
@@ -347,7 +349,7 @@ export default function BookingForm({ compact = false }: Props) {
                     ) : isPerKm ? (
                       <p className="text-[11px] text-white/30 flex items-center gap-1 mt-0.5">
                         <MapPin size={9} className="text-[#c9a84c]/40" />
-                        {quote.distanceKm} km journey
+                        {t("kmJourney").replace("{km}", String(quote.distanceKm))}
                       </p>
                     ) : null}
                   </div>
@@ -361,7 +363,7 @@ export default function BookingForm({ compact = false }: Props) {
             <motion.div key="custom"
               initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }}>
               <div className="px-4 py-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
-                <p className="text-amber-400 text-xs font-medium">We couldn&apos;t price this journey — message us for a quote</p>
+                <p className="text-amber-400 text-xs font-medium">{t("couldNotPrice")}</p>
               </div>
             </motion.div>
           )}
@@ -375,7 +377,7 @@ export default function BookingForm({ compact = false }: Props) {
             rel="noopener noreferrer"
             className="btn-gold w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2"
           >
-            <MessageCircle size={15} /> WhatsApp for a Quote
+            <MessageCircle size={15} /> {t("whatsappQuote")}
           </a>
         ) : (
           <button
@@ -383,15 +385,15 @@ export default function BookingForm({ compact = false }: Props) {
             disabled={!canContinue}
             className="btn-gold w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-35 disabled:cursor-not-allowed"
           >
-            {quote ? `Book — ${formatCurrency(quote.totalAmount)}` : "Continue"}
+            {quote ? `${t("book")} — ${formatCurrency(quote.totalAmount)}` : t("continueLabel")}
             <ArrowRight size={15} />
           </button>
         )}
 
         {/* Footer trust bar */}
         <div className="flex items-center justify-center gap-4 pt-1">
-          {["Mercedes-Benz Fleet", "24/7 Availability", "English & Español"].map((t) => (
-            <span key={t} className="text-[10px] text-white/50 uppercase tracking-wider">{t}</span>
+          {([t("badgeFleet"), t("badgeAvailability"), t("badgeLanguages")] as const).map((badge) => (
+            <span key={badge} className="text-[10px] text-white/50 uppercase tracking-wider">{badge}</span>
           ))}
         </div>
       </div>
