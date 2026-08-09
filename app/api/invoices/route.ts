@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 const schema = z.object({
   bookingId: z.string().min(1),
-  /** Confirmation code, for guests with no account. */
+  /** Optional: included in the returned link so a guest can open the invoice. */
   code:      z.string().min(1).optional(),
   taxId:     z.string().max(40).optional(),
   address:   z.string().max(200).optional(),
@@ -37,15 +37,22 @@ export async function POST(req: NextRequest) {
   });
   if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  // Issuing is admin-only, by operator decision.
+  //
+  // Every invoice issued creates a VAT liability and consumes a number in a
+  // sequence that legally cannot have gaps, so the operator approves each one
+  // rather than letting customers mint their own. Customers ask on WhatsApp —
+  // their bookings page opens a pre-filled message.
+  //
+  // Note this governs *issuing* only. Viewing an invoice that already exists is
+  // handled by /booking/[id]/invoice, which still accepts the customer's own
+  // confirmation code.
   const session = await getServerSession(authOptions);
   const user = session?.user as { id?: string; role?: string } | undefined;
 
-  const authorised =
-    (code && code === booking.confirmationCode) ||
-    (user?.id && user.id === booking.userId) ||
-    user?.role === "ADMIN";
-
-  if (!authorised) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (user?.role !== "ADMIN") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   // Invoicing an unpaid booking would put a tax document into the sequence for
   // money that has not been received.

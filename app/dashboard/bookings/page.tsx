@@ -8,7 +8,7 @@ import {
   Search, Calendar, Clock, CheckCircle2, XCircle,
   AlertCircle, ChevronRight, Download, Car,
   MapPin, Users, ArrowUpDown, Star, X, Pencil, Loader2,
-  MessageCircle, Trash2, Lock,
+  MessageCircle, Trash2, Lock, RotateCcw, FileText,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
@@ -82,40 +82,6 @@ function BookingsContent() {
     }
   }, []);
 
-  // Fares exclude VAT, so requesting an invoice is what adds the 10%. Confirm
-  // first: the number is sequential and the document cannot be withdrawn.
-  const requestInvoice = useCallback(async (id: string, net: number) => {
-    const vat = Math.round(net * 0.1 * 100) / 100;
-    const ok = window.confirm(
-      [
-        "A VAT invoice adds 10% VAT to your fare.",
-        "",
-        `Fare:  €${net.toFixed(2)}`,
-        `VAT:   €${vat.toFixed(2)}`,
-        `Total: €${(net + vat).toFixed(2)}`,
-        "",
-        "Issue the invoice?",
-      ].join("\n"),
-    );
-    if (!ok) return;
-
-    setBusyId(id);
-    try {
-      const res  = await fetch("/api/invoices", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookingId: id }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Could not issue the invoice.");
-      toast.success(`Invoice ${data.reference} issued`);
-      window.open(`/booking/${id}/invoice`, "_blank", "noopener");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not issue the invoice.");
-    } finally {
-      setBusyId(null);
-    }
-  }, []);
 
 
   const fetchBookings = useCallback(() => {
@@ -355,6 +321,37 @@ function BookingsContent() {
                             >
                               <Star size={10} /> Review
                             </Link>
+                          )}
+
+                          {b.status === "COMPLETED" && (
+                            <button
+                              onClick={() => rebook(b.id)}
+                              disabled={busyId === b.id}
+                              className="flex items-center gap-1 text-[10px] text-white px-2 py-1 rounded-lg bg-white/[0.06] border border-white/[0.1] hover:bg-white/[0.1] transition-all disabled:opacity-40"
+                            >
+                              {busyId === b.id
+                                ? <Loader2 size={10} className="animate-spin" />
+                                : <RotateCcw size={10} />}
+                              Book again
+                            </button>
+                          )}
+
+                          {/* Invoices are issued by hand rather than self-served: each
+                              one creates a VAT liability the operator wants to approve
+                              first. This opens WhatsApp already filled in, so the
+                              customer never has to find or type the reference. */}
+                          {b.paymentStatus === "PAID" && (
+                            <a
+                              href={`https://wa.me/34635383712?text=${encodeURIComponent(
+                                `Hi, I would like a VAT invoice for booking #${b.confirmationCode} (€${b.totalAmount.toFixed(2)}).`,
+                              )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Ask us for a VAT invoice — 10% VAT is added to your fare"
+                              className="flex items-center gap-1 text-[10px] text-dark-200 px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] transition-all"
+                            >
+                              <FileText size={10} /> Request VAT invoice
+                            </a>
                           )}
                         </div>
                       </div>

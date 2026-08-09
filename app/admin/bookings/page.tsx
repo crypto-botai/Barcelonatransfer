@@ -5,6 +5,7 @@ import { Search, CheckCircle2, XCircle, User, Loader2, X, Car, MapPin, Calendar,
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
 import toast from "react-hot-toast";
+import IssueInvoiceButton from "@/components/admin/IssueInvoiceButton";
 
 type Driver = { id: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] };
 
@@ -102,12 +103,22 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
             <p className="text-dark-500 text-xs mt-0.5">{new Date(booking.createdAt).toLocaleString("en-GB")}</p>
           </div>
           <div className="flex items-center gap-2">
+            {/* Customers ask for a VAT invoice on WhatsApp; this is where it
+                actually gets issued. Only shown once the booking is paid —
+                issuing against unpaid money would put a tax document into the
+                sequence for a fare not received. */}
+            {booking.paymentStatus === "PAID" && (
+              <IssueInvoiceButton
+                bookingId={booking.id}
+                netAmount={booking.totalAmount}
+              />
+            )}
             <a
               href={`/booking/${booking.id}/invoice`}
               target="_blank"
               rel="noreferrer"
               className="p-2 rounded-lg bg-gold-500/10 text-gold-400 hover:bg-gold-500/20 transition-colors"
-              title="View invoice"
+              title="View receipt / invoice"
             >
               <Receipt size={14} />
             </a>
