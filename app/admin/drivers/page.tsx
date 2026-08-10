@@ -10,6 +10,7 @@ import {
   Pencil, Trash2, AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import SendPasswordButton from "@/components/admin/SendPasswordButton";
 
 type Withdrawal = {
   id: string;
@@ -463,6 +464,9 @@ function DriverRow({ d, onUpdate }: { d: Driver; onUpdate: () => void }) {
         </td>
         <td className="py-3 px-4">
           <div className="flex gap-2 items-center">
+            {/* Drivers registered before credentials were being emailed have a
+                password nobody knows. This issues a fresh one and sends it. */}
+            <SendPasswordButton email={d.user.email} name={d.user.name} compact />
             {(d.status === "PENDING_APPROVAL" || d.status === "SUSPENDED") && (
               <button onClick={approve}
                 className="p-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors"
