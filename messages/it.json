@@ -322,5 +322,28 @@
     "typeHourlyDesc": "Autista per 2–12 ore",
     "typeTransfer": "Transfer",
     "typeTransferDesc": "Da punto a punto"
+  },
+  "success": {
+    "accountCreated": "Abbiamo creato un account per lei",
+    "accountSaveNow": "Account creato — salvi questi dati",
+    "alreadyPaid": "Già pagato? Verifica lo stato",
+    "backHome": "Torna alla home",
+    "checking": "Verifica…",
+    "confirmationCode": "Codice di conferma",
+    "confirmed": "Prenotazione confermata!",
+    "confirmedBody": "Il suo transfer di lusso è confermato. Le abbiamo inviato un’email di conferma.",
+    "connecting": "Connessione a SumUp…",
+    "copied": "Copiato!",
+    "copyCredentials": "Copia credenziali",
+    "email": "Email",
+    "password": "Password",
+    "payNow": "Paga ora con SumUp",
+    "paymentError": "Impossibile avviare il pagamento. La preghiamo di contattarci.",
+    "paymentFailed": "Impossibile creare il pagamento",
+    "paymentUnsuccessful": "Pagamento non riuscito",
+    "received": "Prenotazione ricevuta!",
+    "reference": "Il suo riferimento",
+    "requestDocs": "Richiedi ricevuta o fattura",
+    "totalPaid": "Totale pagato"
   }
 }

@@ -322,5 +322,28 @@
     "typeHourlyDesc": "司机服务 2–12 小时",
     "typeTransfer": "接送",
     "typeTransferDesc": "点对点"
+  },
+  "success": {
+    "accountCreated": "已为您创建账户",
+    "accountSaveNow": "账户已创建 — 请保存",
+    "alreadyPaid": "已支付？查看状态",
+    "backHome": "返回首页",
+    "checking": "检查中…",
+    "confirmationCode": "确认码",
+    "confirmed": "预订已确认！",
+    "confirmedBody": "您的豪华接送已确认。确认邮件已发送。",
+    "connecting": "正在连接 SumUp…",
+    "copied": "已复制！",
+    "copyCredentials": "复制登录信息",
+    "email": "邮箱",
+    "password": "密码",
+    "payNow": "使用 SumUp 立即支付",
+    "paymentError": "无法启动支付，请联系我们。",
+    "paymentFailed": "无法创建支付",
+    "paymentUnsuccessful": "支付未成功",
+    "received": "已收到预订！",
+    "reference": "您的编号",
+    "requestDocs": "索取收据或发票",
+    "totalPaid": "已支付总额"
   }
 }

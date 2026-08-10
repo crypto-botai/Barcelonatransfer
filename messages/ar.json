@@ -322,5 +322,28 @@
     "typeHourlyDesc": "سائق لمدة 2–12 ساعة",
     "typeTransfer": "نقل",
     "typeTransferDesc": "من نقطة إلى نقطة"
+  },
+  "success": {
+    "accountCreated": "أنشأنا لك حسابًا",
+    "accountSaveNow": "تم إنشاء الحساب — احفظ البيانات",
+    "alreadyPaid": "دفعت بالفعل؟ تحقق من الحالة",
+    "backHome": "العودة إلى الصفحة الرئيسية",
+    "checking": "جارٍ التحقق…",
+    "confirmationCode": "رمز التأكيد",
+    "confirmed": "تم تأكيد الحجز!",
+    "confirmedBody": "تم تأكيد رحلتك الفاخرة. تم إرسال رسالة تأكيد إلى بريدك الإلكتروني.",
+    "connecting": "جارٍ الاتصال بـ SumUp…",
+    "copied": "تم النسخ!",
+    "copyCredentials": "نسخ بيانات الدخول",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "payNow": "ادفع الآن عبر SumUp",
+    "paymentError": "تعذر بدء عملية الدفع. يرجى التواصل معنا.",
+    "paymentFailed": "تعذر إنشاء عملية الدفع",
+    "paymentUnsuccessful": "لم تتم عملية الدفع",
+    "received": "تم استلام الحجز!",
+    "reference": "رقمك المرجعي",
+    "requestDocs": "اطلب إيصالًا أو فاتورة",
+    "totalPaid": "الإجمالي المدفوع"
   }
 }

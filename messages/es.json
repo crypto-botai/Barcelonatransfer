@@ -322,5 +322,28 @@
     "typeHourlyDesc": "Chófer de 2 a 12 horas",
     "typeTransfer": "Traslado",
     "typeTransferDesc": "De punto a punto"
+  },
+  "success": {
+    "accountCreated": "Hemos creado una cuenta para usted",
+    "accountSaveNow": "Cuenta creada — guarde estos datos",
+    "alreadyPaid": "¿Ya ha pagado? Comprobar estado",
+    "backHome": "Volver al inicio",
+    "checking": "Comprobando…",
+    "confirmationCode": "Código de confirmación",
+    "confirmed": "¡Reserva confirmada!",
+    "confirmedBody": "Su traslado de lujo está confirmado. Le hemos enviado un email de confirmación.",
+    "connecting": "Conectando con SumUp…",
+    "copied": "¡Copiado!",
+    "copyCredentials": "Copiar credenciales",
+    "email": "Email",
+    "password": "Contraseña",
+    "payNow": "Pagar ahora con SumUp",
+    "paymentError": "No se ha podido iniciar el pago. Contáctenos, por favor.",
+    "paymentFailed": "No se ha podido crear el pago",
+    "paymentUnsuccessful": "Pago no completado",
+    "received": "¡Reserva recibida!",
+    "reference": "Su referencia",
+    "requestDocs": "Solicitar recibo o factura",
+    "totalPaid": "Total pagado"
   }
 }

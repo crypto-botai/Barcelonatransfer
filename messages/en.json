@@ -322,5 +322,28 @@
     "typeHourlyDesc": "Chauffeur for 2–12 hours",
     "typeTransfer": "Transfer",
     "typeTransferDesc": "Point to point"
+  },
+  "success": {
+    "accountCreated": "Account created for you",
+    "accountSaveNow": "Account Created — Save Now",
+    "alreadyPaid": "Already paid? Check status",
+    "backHome": "Back to Home",
+    "checking": "Checking…",
+    "confirmationCode": "Confirmation Code",
+    "confirmed": "Booking Confirmed!",
+    "confirmedBody": "Your luxury transfer is confirmed. A confirmation email has been sent.",
+    "connecting": "Connecting to SumUp…",
+    "copied": "Copied!",
+    "copyCredentials": "Copy credentials",
+    "email": "Email",
+    "password": "Password",
+    "payNow": "Pay Now with SumUp",
+    "paymentError": "Could not start payment. Please contact us.",
+    "paymentFailed": "Failed to create payment",
+    "paymentUnsuccessful": "Payment Unsuccessful",
+    "received": "Booking Received!",
+    "reference": "Your Reference",
+    "requestDocs": "Request a receipt or invoice",
+    "totalPaid": "Total Paid"
   }
 }

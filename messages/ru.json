@@ -322,5 +322,28 @@
     "typeHourlyDesc": "Водитель на 2–12 часов",
     "typeTransfer": "Трансфер",
     "typeTransferDesc": "Из точки в точку"
+  },
+  "success": {
+    "accountCreated": "Мы создали для вас аккаунт",
+    "accountSaveNow": "Аккаунт создан — сохраните данные",
+    "alreadyPaid": "Уже оплатили? Проверить статус",
+    "backHome": "На главную",
+    "checking": "Проверяем…",
+    "confirmationCode": "Код подтверждения",
+    "confirmed": "Бронирование подтверждено!",
+    "confirmedBody": "Ваш трансфер подтверждён. Письмо с подтверждением отправлено.",
+    "connecting": "Подключение к SumUp…",
+    "copied": "Скопировано!",
+    "copyCredentials": "Скопировать данные",
+    "email": "Email",
+    "password": "Пароль",
+    "payNow": "Оплатить через SumUp",
+    "paymentError": "Не удалось начать оплату. Пожалуйста, свяжитесь с нами.",
+    "paymentFailed": "Не удалось создать платёж",
+    "paymentUnsuccessful": "Платёж не прошёл",
+    "received": "Бронирование принято!",
+    "reference": "Ваш номер",
+    "requestDocs": "Запросить чек или счёт",
+    "totalPaid": "Итого оплачено"
   }
 }

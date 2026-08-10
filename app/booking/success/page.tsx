@@ -11,6 +11,7 @@ import {
   MessageCircle, Mail, RefreshCw, CreditCard, FileText, Copy, Eye, EyeOff,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
+import { useTranslations } from "@/components/language/I18nProvider";
 
 type BookingData = {
   status: "PAID" | "PENDING" | "FAILED";
@@ -25,6 +26,7 @@ type BookingData = {
 };
 
 function SuccessInner() {
+  const t = useTranslations("success");
   const params    = useSearchParams();
   const bookingId = params.get("booking_id");
   const { status: sessionStatus } = useSession();
@@ -90,10 +92,10 @@ function SuccessInner() {
         body: JSON.stringify({ bookingId }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Failed to create payment");
+      if (!res.ok) throw new Error(json.error ?? t("paymentFailed"));
       window.location.href = json.checkoutUrl;
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Could not start payment. Please contact us.");
+      alert(err instanceof Error ? err.message : t("paymentError"));
     } finally {
       setPayLoading(false);
     }
@@ -157,13 +159,13 @@ function SuccessInner() {
             >
               <CheckCircle2 size={36} className="text-green-400" />
             </motion.div>
-            <h1 className="font-display text-3xl text-white mb-2">Booking Confirmed!</h1>
-            <p className="text-dark-400 mb-6">Your luxury transfer is confirmed. A confirmation email has been sent.</p>
+            <h1 className="font-display text-3xl text-white mb-2">{t("confirmed")}</h1>
+            <p className="text-dark-400 mb-6">{t("confirmedBody")}</p>
 
             {data?.confirmationCode && (
               <div className="bg-black/30 rounded-xl p-5 mb-6 text-left space-y-3 text-sm">
                 <div className="text-center mb-4">
-                  <p className="text-dark-400 text-xs tracking-[0.2em] uppercase">Confirmation Code</p>
+                  <p className="text-dark-400 text-xs tracking-[0.2em] uppercase">{t("confirmationCode")}</p>
                   <p className="font-display text-2xl text-gold-400 mt-1 tracking-widest">
                     {data.confirmationCode}
                   </p>
@@ -184,7 +186,7 @@ function SuccessInner() {
                   </div>
                 )}
                 <div className="border-t border-white/[0.06] pt-3 flex justify-between">
-                  <span className="text-dark-400">Total Paid</span>
+                  <span className="text-dark-400">{t("totalPaid")}</span>
                   <span className="text-gold-400 font-semibold">€{data.totalAmount?.toFixed(2)}</span>
                 </div>
               </div>
@@ -196,18 +198,18 @@ function SuccessInner() {
                   <div className="w-7 h-7 rounded-lg bg-gold-500/10 flex items-center justify-center">
                     <Mail size={13} className="text-gold-400" />
                   </div>
-                  <p className="text-sm font-semibold text-white">Account Created — Save Now</p>
+                  <p className="text-sm font-semibold text-white">{t("accountSaveNow")}</p>
                 </div>
                 <p className="text-xs text-amber-400 font-medium mb-3">
                   These credentials are shown once only. Screenshot or copy them before leaving.
                 </p>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2.5">
-                    <span className="text-dark-400 text-xs uppercase tracking-wider">Email</span>
+                    <span className="text-dark-400 text-xs uppercase tracking-wider">{t("email")}</span>
                     <span className="text-white font-mono text-xs">{newAccount.email}</span>
                   </div>
                   <div className="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2.5 gap-2">
-                    <span className="text-dark-400 text-xs uppercase tracking-wider">Password</span>
+                    <span className="text-dark-400 text-xs uppercase tracking-wider">{t("password")}</span>
                     <div className="flex items-center gap-2">
                       <span className="text-white font-mono text-xs">
                         {showPw ? newAccount.tempPassword : "••••••••••"}
@@ -227,7 +229,7 @@ function SuccessInner() {
                   className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-gold-500/20 text-xs text-gold-400 hover:bg-gold-500/5 transition-all"
                 >
                   <Copy size={12} />
-                  {copied ? "Copied!" : "Copy credentials"}
+                  {copied ? t("copied") : t("copyCredentials")}
                 </button>
                 <p className="text-xs text-dark-500 mt-2 text-center">
                   Change your password after first login at <Link href="/dashboard" className="text-gold-500 hover:underline">your dashboard</Link>.
@@ -237,7 +239,7 @@ function SuccessInner() {
               <div className="bg-gold-500/8 border border-gold-500/20 rounded-xl p-4 mb-4 flex items-start gap-3 text-left">
                 <Mail size={16} className="text-gold-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm text-white font-medium mb-0.5">Account created for you</p>
+                  <p className="text-sm text-white font-medium mb-0.5">{t("accountCreated")}</p>
                   <p className="text-xs text-dark-400">
                     Login details sent to <span className="text-gold-400">{data.guestEmail}</span>. Track your booking, see driver info &amp; manage future rides.
                   </p>
@@ -250,7 +252,7 @@ function SuccessInner() {
 
             <div className="flex flex-col gap-3">
               <Link href="/" className="btn-gold w-full py-3.5 rounded-xl font-semibold">
-                Back to Home
+                {t("backHome")}
               </Link>
               {/* Receipts and VAT invoices are issued by hand: they carry the
                   operator's tax details and invoice sequence, so nothing is
@@ -267,7 +269,7 @@ function SuccessInner() {
                   className="btn-outline-gold w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2"
                 >
                   <FileText size={16} />
-                  Request a receipt or invoice
+                  {t("requestDocs")}
                 </a>
               )}
               {data?.confirmationCode && (
@@ -297,7 +299,7 @@ function SuccessInner() {
             <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6">
               <XCircle size={36} className="text-red-400" />
             </div>
-            <h1 className="font-display text-3xl text-white mb-2">Payment Unsuccessful</h1>
+            <h1 className="font-display text-3xl text-white mb-2">{t("paymentUnsuccessful")}</h1>
             <p className="text-dark-400 mb-8">
               Your payment could not be processed. No charge was made. Please try again or contact us.
             </p>
@@ -322,7 +324,7 @@ function SuccessInner() {
             >
               <Clock size={36} className="text-gold-400" />
             </motion.div>
-            <h1 className="font-display text-3xl text-white mb-2">Booking Received!</h1>
+            <h1 className="font-display text-3xl text-white mb-2">{t("received")}</h1>
             <p className="text-dark-400 mb-2">
               Your booking is saved and our team has been notified.
             </p>
@@ -332,7 +334,7 @@ function SuccessInner() {
 
             {data?.confirmationCode && (
               <div className="bg-black/30 rounded-xl p-5 mb-5 text-sm">
-                <p className="text-dark-400 text-xs tracking-[0.2em] uppercase mb-2">Your Reference</p>
+                <p className="text-dark-400 text-xs tracking-[0.2em] uppercase mb-2">{t("reference")}</p>
                 <p className="font-display text-2xl text-gold-400 tracking-widest">{data.confirmationCode}</p>
                 {data.totalAmount && (
                   <p className="text-dark-500 text-xs mt-2">Amount: €{data.totalAmount.toFixed(2)}</p>
@@ -347,7 +349,7 @@ function SuccessInner() {
                 className="btn-gold w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2"
               >
                 <CreditCard size={16} className={payLoading ? "animate-pulse" : ""} />
-                {payLoading ? "Connecting to SumUp…" : "Pay Now with SumUp"}
+                {payLoading ? t("connecting") : t("payNow")}
               </button>
               <button
                 onClick={manualCheck}
@@ -355,7 +357,7 @@ function SuccessInner() {
                 className="btn-outline-gold w-full py-3 rounded-xl text-sm flex items-center justify-center gap-2"
               >
                 <RefreshCw size={14} className={manualChecking ? "animate-spin" : ""} />
-                {manualChecking ? "Checking…" : "Already paid? Check status"}
+                {manualChecking ? t("checking") : t("alreadyPaid")}
               </button>
             </div>
 
@@ -372,7 +374,7 @@ function SuccessInner() {
                 Problems? Pay via WhatsApp instead
               </a>
               <Link href="/" className="text-xs text-dark-600 hover:text-dark-400 text-center transition-colors">
-                Back to Home
+                {t("backHome")}
               </Link>
             </div>
           </>
