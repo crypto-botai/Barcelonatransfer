@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { shouldForcePasswordChange } from "@/lib/auth-gates";
 
 export async function middleware(req: NextRequest) {
   // Block crawling on any non-production host (Vercel preview URLs, *.vercel.app)
@@ -13,6 +14,20 @@ export async function middleware(req: NextRequest) {
 
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
+
+  // ── Force password change for anyone issued a temporary one ──────
+  //
+  // This runs before everything else because the staff-route block below
+  // returns early, and /driver and /dashboard are exactly where someone lands
+  // after signing in with a temporary password.
+  //
+  // API calls are never redirected. A redirected POST arrives at the target as
+  // a GET for an HTML page, so the caller gets a JSON parse error rather than a
+  // result — which would have made /api/auth/change-password, the one call that
+  // clears this flag, impossible to complete.
+  if (shouldForcePasswordChange(pathname, token?.mustChangePassword as boolean | undefined)) {
+    return NextResponse.redirect(new URL("/auth/change-password", req.url));
+  }
 
   // Noindex all staff/auth routes — never want these in Google
   if (
@@ -40,13 +55,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const role               = token.role as string | undefined;
-  const mustChangePassword = token.mustChangePassword as boolean | undefined;
-
-  // ── Force password change for auto-created accounts ──────────
-  if (mustChangePassword && !pathname.startsWith("/auth/change-password") && !pathname.startsWith("/auth/logout")) {
-    return NextResponse.redirect(new URL("/auth/change-password", req.url));
-  }
+  const role = token.role as string | undefined;
 
   // ── Already logged-in users hitting /auth/login → redirect to their dashboard ─
   if (pathname.startsWith("/auth/login") || pathname.startsWith("/auth/register")) {

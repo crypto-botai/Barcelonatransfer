@@ -7,6 +7,7 @@ import {
   X, ChevronRight, TrendingUp, Repeat2, Phone, Mail,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import SendPasswordButton from "@/components/admin/SendPasswordButton";
 
 type Customer = {
   id:            string;
@@ -232,6 +233,15 @@ export default function CustomersPage() {
                       <Phone size={12} className="text-gold-500/50" /> {selected.phone}
                     </a>
                   )}
+                  {/* Locked out, or never set a password after booking as a guest. */}
+                  <div className="pt-1">
+                    <SendPasswordButton
+                      userId={selected.id}
+                      email={selected.email}
+                      name={selected.name}
+                      compact
+                    />
+                  </div>
                 </div>
 
                 {/* Stats */}

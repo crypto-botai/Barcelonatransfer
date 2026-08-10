@@ -48,7 +48,11 @@ export default function ChangePasswordPage() {
       // Refresh JWT so mustChangePassword flag is cleared
       await update();
       setDone(true);
-      setTimeout(() => router.replace("/dashboard"), 2000);
+      // Straight to their own portal. Drivers sent to /dashboard would only be
+      // bounced onward by the middleware.
+      const role = (session?.user as { role?: string })?.role;
+      const home = role === "ADMIN" ? "/admin" : role === "DRIVER" ? "/driver" : "/dashboard";
+      setTimeout(() => router.replace(home), 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
