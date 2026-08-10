@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { DriverStatus } from "@prisma/client";
+import { resolveBookingStatus } from "@/lib/booking-status";
 import { sendDriverAssignedEmail, sendBookingCancelledEmail, sendDriverBookingDetailsEmail } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
 
@@ -106,11 +108,41 @@ export async function PATCH(
     if (body.driverAmount !== undefined) data.driverAmount = body.driverAmount === null ? null : parseFloat(body.driverAmount);
     if (body.isDeleted === true)  { data.isDeleted = true;  data.deletedAt = new Date(); }
     if (body.isDeleted === false) { data.isDeleted = false; data.deletedAt = null; }
-    const isNewDriverAssignment = body.driverId && body.driverId !== (await prisma.booking.findUnique({ where: { id }, select: { driverId: true } }))?.driverId;
+    const current = await prisma.booking.findUnique({
+      where: { id },
+      select: { driverId: true, status: true, rideEndedAt: true },
+    });
+    const isNewDriverAssignment = Boolean(body.driverId) && body.driverId !== current?.driverId;
+
     if (body.driverId) {
       data.driverId = body.driverId;
-      data.status = "DRIVER_ASSIGNED";
       data.driverAssignedAt = new Date();
+    }
+
+    // See lib/booking-status.ts — the form posts the existing driver alongside
+    // the chosen status, and treating that as a fresh assignment used to
+    // overwrite whatever the admin picked.
+    const nextStatus = resolveBookingStatus({
+      submittedStatus:   body.status,
+      submittedDriverId: body.driverId,
+      currentStatus:     current?.status,
+      currentDriverId:   current?.driverId,
+    });
+    if (nextStatus) data.status = nextStatus;
+
+    // Completing by hand should leave the same trail as the driver's own
+    // "ride completed" tap, or the journey stays open: the car is still shown
+    // as on a ride and never becomes available for dispatch again.
+    if (data.status === "COMPLETED" && current?.status !== "COMPLETED") {
+      if (!current?.rideEndedAt) data.rideEndedAt = new Date();
+      data.rideStage = "COMPLETED";
+      const freeingDriverId = (body.driverId as string | undefined) ?? current?.driverId;
+      if (freeingDriverId) {
+        await prisma.driver.update({
+          where: { id: freeingDriverId },
+          data:  { status: DriverStatus.ONLINE, totalRides: { increment: 1 } },
+        }).catch((e) => console.error("[bookings] freeing driver on manual completion:", e));
+      }
     }
     const booking = await prisma.booking.update({
       where: { id }, data,
