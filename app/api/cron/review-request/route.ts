@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendReviewRequestEmail } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
+import { sweepFlightDelays } from "@/lib/flights/sweep";
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "elite-cron-secret";
 
@@ -55,6 +56,11 @@ export async function POST(req: NextRequest) {
       console.error("[cron/review-request]", err);
     }
   }
+
+  // Flight delays are also swept here. Each cron entry may run only once
+  // per day on the Hobby plan, so checking from several existing jobs is
+  // the only way to catch a delay announced after the morning run.
+  await sweepFlightDelays(36).catch(() => null);
 
   return NextResponse.json({ ok: true, sent });
 }

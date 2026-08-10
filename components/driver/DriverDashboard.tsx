@@ -12,6 +12,7 @@ import { signOut } from "next-auth/react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
 import LocationSharing from "@/components/driver/LocationSharing";
+import FlightStatusBadge from "@/components/driver/FlightStatusBadge";
 import toast from "react-hot-toast";
 
 type Booking = {
@@ -346,7 +347,7 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                             </span>
                             <span>{b.passengers} pax</span>
                             {b.luggage != null && b.luggage > 0 && <span>{b.luggage} bags</span>}
-                            {b.flightNumber && <span className="flex items-center gap-1 text-blue-400"><Plane size={10} />{b.flightNumber}</span>}
+                            {b.flightNumber && <FlightStatusBadge bookingId={b.id} flightNumber={b.flightNumber} />}
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">

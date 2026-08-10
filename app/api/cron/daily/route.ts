@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { sendPickupReminder, sendReviewRequestEmail, resend } from "@/lib/resend";
 import { COMPANY } from "@/lib/company-facts";
 import { reconcilePendingPayments } from "@/lib/payments/reconcile";
+import { sweepFlightDelays } from "@/lib/flights/sweep";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -322,6 +323,11 @@ export async function GET(req: NextRequest) {
 
   // AI executive summary — runs after agent cron (06:00) so data is fresh
   await runAiExecutiveSummary().catch(() => {});
+
+  // Flight delays are also swept here. Each cron entry may run only once
+  // per day on the Hobby plan, so checking from several existing jobs is
+  // the only way to catch a delay announced after the morning run.
+  await sweepFlightDelays(36).catch(() => null);
 
   return NextResponse.json({
     ok: true,
