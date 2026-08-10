@@ -278,6 +278,18 @@ export function resolveZoneStrict(input: string): string | null {
   // Andorra
   if (/\bandorra\b/.test(s)) return "andorra";
 
+  // Lourdes — the sanctuary, the town, and Tarbes-Lourdes airport 15 km away
+  // all resolve to the same fare, being within a few minutes of each other.
+  //
+  // Guarded, unlike the zones above, because the downside is not symmetric:
+  // "Mare de Déu de Lourdes" and "Virgen de Lourdes" are ordinary street names
+  // in Catalonia, and reading one as the French sanctuary turns a €50 city hop
+  // into a €750 international fare. A Spanish or Catalan street word means the
+  // address is local — the French sanctuary is not on a carrer.
+  if (/\b(lourdes|tarbes)\b/.test(s) && !/\b(carrer|calle|c\/|avinguda|avenida|passeig|paseo|placa|plaza|rambla|ronda|travessera|urbanitzacion|urbanizacion)\b/.test(s)) {
+    return "lourdes";
+  }
+
   // Montserrat — before "barcelona" (address includes "Barcelona" as province)
   if (/\bmontserrat\b/.test(s)) return "montserrat";
 
