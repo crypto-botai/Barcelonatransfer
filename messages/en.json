@@ -345,5 +345,35 @@
     "reference": "Your Reference",
     "requestDocs": "Request a receipt or invoice",
     "totalPaid": "Total Paid"
+  },
+  "track": {
+    "callDriver": "Call your driver",
+    "journeyCompleted": "Journey completed",
+    "mapNotActive": "Live map not active yet",
+    "mapNotActiveBody": "Your driver’s position appears here once they start the journey.",
+    "needHelp": "Need help? WhatsApp",
+    "reference": "Booking reference",
+    "stageCompleted": "Completed",
+    "stageConfirmed": "Confirmed",
+    "stageDriverAssigned": "Driver assigned",
+    "stageOnTheWay": "On the way",
+    "thankYou": "Thank you for travelling with us.",
+    "title": "Your transfer",
+    "whatsappDriver": "Message your driver on WhatsApp"
+  },
+  "auth": {
+    "badCredentials": "Incorrect email or password.",
+    "continueGoogle": "Continue with Google",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "orEmail": "or sign in with email",
+    "password": "Password",
+    "privacy": "Privacy Policy",
+    "redirecting": "Redirecting…",
+    "signIn": "Sign In",
+    "signInSubtitle": "Sign in to manage your bookings and account.",
+    "signedIn": "Welcome back!",
+    "terms": "Terms",
+    "welcomeBack": "Welcome Back"
   }
 }

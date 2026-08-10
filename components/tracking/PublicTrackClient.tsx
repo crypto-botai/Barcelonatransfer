@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Loader2, MapPin, Phone, MessageCircle, CheckCircle2, Car } from "lucide-react";
+import { useTranslations } from "@/components/language/I18nProvider";
 
 const LiveMap = dynamic(() => import("@/components/dashboard/LiveMap"), {
   ssr: false,
@@ -33,15 +34,16 @@ export interface TrackBooking {
 interface Point { lat: number; lng: number; speed?: number | null; heading?: number | null; createdAt: string }
 
 const STAGES = [
-  { key: "CONFIRMED",       label: "Confirmed" },
-  { key: "DRIVER_ASSIGNED", label: "Driver assigned" },
-  { key: "IN_PROGRESS",     label: "On the way" },
-  { key: "COMPLETED",       label: "Completed" },
+  { key: "CONFIRMED",       labelKey: "stageConfirmed" },
+  { key: "DRIVER_ASSIGNED", labelKey: "stageDriverAssigned" },
+  { key: "IN_PROGRESS",     labelKey: "stageOnTheWay" },
+  { key: "COMPLETED",       labelKey: "stageCompleted" },
 ] as const;
 
 const POLL_MS = 15_000;
 
 export default function PublicTrackClient({ booking }: { booking: TrackBooking }) {
+  const t = useTranslations("track");
   const [point, setPoint]   = useState<Point | null>(null);
   const [status, setStatus] = useState(booking.status);
   const [live, setLive]     = useState(false);
@@ -84,7 +86,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-5">
       <header className="text-center">
         <p className="text-gold-500 text-[11px] tracking-[0.28em] uppercase mb-2">Élite BCN Transfers</p>
-        <h1 className="font-display text-2xl sm:text-3xl text-white">Your transfer</h1>
+        <h1 className="font-display text-2xl sm:text-3xl text-white">{t("title")}</h1>
         <p className="text-dark-400 text-sm mt-1">
           {booking.pickupAddress}
           {booking.dropoffAddress ? ` → ${booking.dropoffAddress}` : ""}
@@ -101,7 +103,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
             <li key={s.key} className="flex-1 min-w-0">
               <div className={`h-1 rounded-full mb-2 ${done ? "bg-gold-500" : "bg-white/[0.08]"}`} />
               <p className={`text-[10px] leading-tight truncate ${active ? "text-gold-300" : done ? "text-dark-300" : "text-dark-600"}`}>
-                {s.label}
+                {t(s.labelKey)}
               </p>
             </li>
           );
@@ -128,15 +130,15 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
           ) : status === "COMPLETED" ? (
             <>
               <CheckCircle2 size={26} className="text-emerald-400 mx-auto mb-2" />
-              <p className="text-white text-sm font-medium">Journey completed</p>
-              <p className="text-dark-400 text-xs mt-1">Thank you for travelling with us.</p>
+              <p className="text-white text-sm font-medium">{t("journeyCompleted")}</p>
+              <p className="text-dark-400 text-xs mt-1">{t("thankYou")}</p>
             </>
           ) : (
             <>
               <MapPin size={24} className="text-dark-600 mx-auto mb-2" />
-              <p className="text-white text-sm font-medium">Live map not active yet</p>
+              <p className="text-white text-sm font-medium">{t("mapNotActive")}</p>
               <p className="text-dark-400 text-xs mt-1 leading-relaxed">
-                Your driver&apos;s position appears here once they start the journey.
+                {t("mapNotActiveBody")}
               </p>
             </>
           )}
@@ -162,7 +164,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
               <div className="flex gap-2 flex-shrink-0">
                 <a
                   href={`tel:${booking.driverPhone}`}
-                  aria-label="Call your driver"
+                  aria-label={t("callDriver")}
                   className="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center text-dark-300 hover:text-white transition-colors"
                 >
                   <Phone size={14} />
@@ -171,7 +173,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
                   href={`https://wa.me/${booking.driverPhone.replace(/\D/g, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Message your driver on WhatsApp"
+                  aria-label={t("whatsappDriver")}
                   className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 hover:bg-emerald-500/20 transition-colors"
                 >
                   <MessageCircle size={14} />
@@ -183,7 +185,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
       )}
 
       <p className="text-center text-dark-600 text-[11px]">
-        Booking reference {booking.code} · Need help? WhatsApp +34 635 383 712
+        {t("reference")} {booking.code} · {t("needHelp")} +34 635 383 712
       </p>
     </div>
   );

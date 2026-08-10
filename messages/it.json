@@ -345,5 +345,35 @@
     "reference": "Il suo riferimento",
     "requestDocs": "Richiedi ricevuta o fattura",
     "totalPaid": "Totale pagato"
+  },
+  "track": {
+    "callDriver": "Chiami il suo autista",
+    "journeyCompleted": "Tragitto completato",
+    "mapNotActive": "Mappa in tempo reale non ancora attiva",
+    "mapNotActiveBody": "La posizione del suo autista apparirà qui appena inizierà il tragitto.",
+    "needHelp": "Serve aiuto? WhatsApp",
+    "reference": "Riferimento prenotazione",
+    "stageCompleted": "Completato",
+    "stageConfirmed": "Confermato",
+    "stageDriverAssigned": "Autista assegnato",
+    "stageOnTheWay": "In arrivo",
+    "thankYou": "Grazie per aver viaggiato con noi.",
+    "title": "Il suo transfer",
+    "whatsappDriver": "Scriva al suo autista su WhatsApp"
+  },
+  "auth": {
+    "badCredentials": "Email o password non corretti.",
+    "continueGoogle": "Continua con Google",
+    "email": "Email",
+    "emailPlaceholder": "lei@email.com",
+    "orEmail": "oppure acceda con email",
+    "password": "Password",
+    "privacy": "Informativa sulla privacy",
+    "redirecting": "Reindirizzamento…",
+    "signIn": "Accedi",
+    "signInSubtitle": "Acceda per gestire le sue prenotazioni e il suo account.",
+    "signedIn": "Bentornato!",
+    "terms": "Termini",
+    "welcomeBack": "Bentornato"
   }
 }

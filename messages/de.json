@@ -345,5 +345,35 @@
     "reference": "Ihre Referenz",
     "requestDocs": "Beleg oder Rechnung anfordern",
     "totalPaid": "Gesamt bezahlt"
+  },
+  "track": {
+    "callDriver": "Fahrer anrufen",
+    "journeyCompleted": "Fahrt abgeschlossen",
+    "mapNotActive": "Live-Karte noch nicht aktiv",
+    "mapNotActiveBody": "Die Position Ihres Fahrers erscheint hier, sobald die Fahrt beginnt.",
+    "needHelp": "Brauchen Sie Hilfe? WhatsApp",
+    "reference": "Buchungsreferenz",
+    "stageCompleted": "Abgeschlossen",
+    "stageConfirmed": "Bestätigt",
+    "stageDriverAssigned": "Fahrer zugewiesen",
+    "stageOnTheWay": "Unterwegs",
+    "thankYou": "Danke, dass Sie mit uns gefahren sind.",
+    "title": "Ihr Transfer",
+    "whatsappDriver": "Fahrer über WhatsApp schreiben"
+  },
+  "auth": {
+    "badCredentials": "E-Mail oder Passwort falsch.",
+    "continueGoogle": "Mit Google fortfahren",
+    "email": "E-Mail",
+    "emailPlaceholder": "ihre@email.com",
+    "orEmail": "oder per E-Mail anmelden",
+    "password": "Passwort",
+    "privacy": "Datenschutz",
+    "redirecting": "Weiterleitung…",
+    "signIn": "Anmelden",
+    "signInSubtitle": "Melden Sie sich an, um Ihre Buchungen und Ihr Konto zu verwalten.",
+    "signedIn": "Willkommen zurück!",
+    "terms": "AGB",
+    "welcomeBack": "Willkommen zurück"
   }
 }

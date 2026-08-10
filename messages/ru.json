@@ -345,5 +345,35 @@
     "reference": "Ваш номер",
     "requestDocs": "Запросить чек или счёт",
     "totalPaid": "Итого оплачено"
+  },
+  "track": {
+    "callDriver": "Позвонить водителю",
+    "journeyCompleted": "Поездка завершена",
+    "mapNotActive": "Карта пока не активна",
+    "mapNotActiveBody": "Положение водителя появится здесь, как только он начнёт поездку.",
+    "needHelp": "Нужна помощь? WhatsApp",
+    "reference": "Номер бронирования",
+    "stageCompleted": "Завершён",
+    "stageConfirmed": "Подтверждён",
+    "stageDriverAssigned": "Водитель назначен",
+    "stageOnTheWay": "В пути",
+    "thankYou": "Спасибо, что поехали с нами.",
+    "title": "Ваш трансфер",
+    "whatsappDriver": "Написать водителю в WhatsApp"
+  },
+  "auth": {
+    "badCredentials": "Неверный email или пароль.",
+    "continueGoogle": "Продолжить через Google",
+    "email": "Email",
+    "emailPlaceholder": "vy@email.com",
+    "orEmail": "или войдите по email",
+    "password": "Пароль",
+    "privacy": "Политика конфиденциальности",
+    "redirecting": "Перенаправление…",
+    "signIn": "Войти",
+    "signInSubtitle": "Войдите, чтобы управлять бронированиями и аккаунтом.",
+    "signedIn": "С возвращением!",
+    "terms": "Условия",
+    "welcomeBack": "С возвращением"
   }
 }

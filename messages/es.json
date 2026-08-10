@@ -345,5 +345,35 @@
     "reference": "Su referencia",
     "requestDocs": "Solicitar recibo o factura",
     "totalPaid": "Total pagado"
+  },
+  "track": {
+    "callDriver": "Llamar a su conductor",
+    "journeyCompleted": "Trayecto completado",
+    "mapNotActive": "El mapa en directo aún no está activo",
+    "mapNotActiveBody": "La posición de su conductor aparecerá aquí cuando inicie el trayecto.",
+    "needHelp": "¿Necesita ayuda? WhatsApp",
+    "reference": "Referencia de la reserva",
+    "stageCompleted": "Completado",
+    "stageConfirmed": "Confirmado",
+    "stageDriverAssigned": "Conductor asignado",
+    "stageOnTheWay": "En camino",
+    "thankYou": "Gracias por viajar con nosotros.",
+    "title": "Su traslado",
+    "whatsappDriver": "Escribir a su conductor por WhatsApp"
+  },
+  "auth": {
+    "badCredentials": "Email o contraseña incorrectos.",
+    "continueGoogle": "Continuar con Google",
+    "email": "Email",
+    "emailPlaceholder": "usted@email.com",
+    "orEmail": "o inicie sesión con email",
+    "password": "Contraseña",
+    "privacy": "Política de privacidad",
+    "redirecting": "Redirigiendo…",
+    "signIn": "Iniciar sesión",
+    "signInSubtitle": "Inicie sesión para gestionar sus reservas y su cuenta.",
+    "signedIn": "¡Bienvenido de nuevo!",
+    "terms": "Términos",
+    "welcomeBack": "Bienvenido de nuevo"
   }
 }

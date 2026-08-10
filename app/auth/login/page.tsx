@@ -7,6 +7,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslations } from "@/components/language/I18nProvider";
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
@@ -18,6 +19,7 @@ const GoogleIcon = () => (
 );
 
 function LoginForm() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
@@ -39,10 +41,10 @@ function LoginForm() {
     const res = await signIn("credentials", { email, password, redirect: false });
     setLoading(false);
     if (res?.ok) {
-      toast.success("Welcome back!");
+      toast.success(t("signedIn"));
       router.push(callbackUrl);
     } else {
-      toast.error("Incorrect email or password.");
+      toast.error(t("badCredentials"));
     }
   };
 
@@ -73,8 +75,8 @@ function LoginForm() {
             </span>
           </Link>
 
-          <h1 className="font-display text-2xl text-white mb-1">Welcome Back</h1>
-          <p className="text-white/35 text-sm mb-7">Sign in to manage your bookings and account.</p>
+          <h1 className="font-display text-2xl text-white mb-1">{t("welcomeBack")}</h1>
+          <p className="text-white/35 text-sm mb-7">{t("signInSubtitle")}</p>
 
           {/* Google — Primary CTA */}
           <button
@@ -83,7 +85,7 @@ function LoginForm() {
             className="w-full flex items-center justify-center gap-3 py-4 rounded-xl bg-white text-[#0a0a0a] font-semibold text-sm hover:bg-gray-50 transition-colors duration-200 shadow-sm disabled:opacity-70"
           >
             {googleLoading ? <Loader2 size={18} className="animate-spin text-gray-600" /> : <GoogleIcon />}
-            {googleLoading ? "Redirecting…" : "Continue with Google"}
+            {googleLoading ? t("redirecting") : t("continueGoogle")}
           </button>
 
           {/* Guest link */}
@@ -101,20 +103,20 @@ function LoginForm() {
               <div className="w-full h-px bg-white/[0.07]" />
             </div>
             <div className="relative flex justify-center">
-              <span className="px-3 bg-[#0c0c0c] text-xs text-white/25 tracking-widest uppercase">or sign in with email</span>
+              <span className="px-3 bg-[#0c0c0c] text-xs text-white/25 tracking-widest uppercase">{t("orEmail")}</span>
             </div>
           </div>
 
           {/* Email / password form */}
           <form onSubmit={handleSubmit} className="space-y-3.5">
             <div>
-              <label className="text-[11px] text-white/30 uppercase tracking-[0.12em] block mb-1.5">Email</label>
+              <label className="text-[11px] text-white/30 uppercase tracking-[0.12em] block mb-1.5">{t("email")}</label>
               <div className="relative">
                 <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#c9a84c]/50" />
                 <input
                   required type="email" value={email}
                   onChange={e => setEmail(e.target.value)}
-                  placeholder="your@email.com"
+                  placeholder={t("emailPlaceholder")}
                   autoComplete="email"
                   className="input-luxury w-full pl-10 pr-4 py-3.5 rounded-xl text-sm"
                 />
@@ -122,7 +124,7 @@ function LoginForm() {
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-[11px] text-white/30 uppercase tracking-[0.12em]">Password</label>
+                <label className="text-[11px] text-white/30 uppercase tracking-[0.12em]">{t("password")}</label>
                 <Link href="/auth/forgot-password" className="text-[11px] text-[#c9a84c]/70 hover:text-[#c9a84c] transition-colors">
                   Forgot password?
                 </Link>
@@ -172,9 +174,9 @@ function LoginForm() {
         {/* Bottom note */}
         <p className="text-center text-white/15 text-xs mt-5 leading-relaxed">
           By continuing, you agree to our{" "}
-          <Link href="/terms" className="underline hover:text-white/30 transition-colors">Terms</Link>
+          <Link href="/terms" className="underline hover:text-white/30 transition-colors">{t("terms")}</Link>
           {" "}and{" "}
-          <Link href="/privacy" className="underline hover:text-white/30 transition-colors">Privacy Policy</Link>.
+          <Link href="/privacy" className="underline hover:text-white/30 transition-colors">{t("privacy")}</Link>.
         </p>
       </motion.div>
     </main>

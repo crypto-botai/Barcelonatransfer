@@ -345,5 +345,35 @@
     "reference": "Votre référence",
     "requestDocs": "Demander un reçu ou une facture",
     "totalPaid": "Total payé"
+  },
+  "track": {
+    "callDriver": "Appeler votre chauffeur",
+    "journeyCompleted": "Trajet terminé",
+    "mapNotActive": "Carte en direct pas encore active",
+    "mapNotActiveBody": "La position de votre chauffeur apparaîtra ici dès qu’il démarrera le trajet.",
+    "needHelp": "Besoin d’aide ? WhatsApp",
+    "reference": "Référence de réservation",
+    "stageCompleted": "Terminé",
+    "stageConfirmed": "Confirmé",
+    "stageDriverAssigned": "Chauffeur assigné",
+    "stageOnTheWay": "En route",
+    "thankYou": "Merci d’avoir voyagé avec nous.",
+    "title": "Votre transfert",
+    "whatsappDriver": "Écrire à votre chauffeur sur WhatsApp"
+  },
+  "auth": {
+    "badCredentials": "E-mail ou mot de passe incorrect.",
+    "continueGoogle": "Continuer avec Google",
+    "email": "E-mail",
+    "emailPlaceholder": "vous@email.com",
+    "orEmail": "ou connectez-vous par e-mail",
+    "password": "Mot de passe",
+    "privacy": "Politique de confidentialité",
+    "redirecting": "Redirection…",
+    "signIn": "Se connecter",
+    "signInSubtitle": "Connectez-vous pour gérer vos réservations et votre compte.",
+    "signedIn": "Bon retour !",
+    "terms": "Conditions",
+    "welcomeBack": "Bon retour"
   }
 }
