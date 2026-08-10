@@ -74,6 +74,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/transfers/sitges`,        lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/transfers/girona`,        lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/transfers/montserrat`,    lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/transfers/lourdes`,       lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
     { url: `${BASE}/transfers/costa-brava`,   lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },
     { url: `${BASE}/transfers/lloret-de-mar`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/transfers/cadaques`,      lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.75 },

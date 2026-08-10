@@ -22,10 +22,35 @@ describe("per-km rate", () => {
     expect(distanceFare(31.4)).toBe(110); // 109.9 -> 110
   });
 
-  it("is flat across vehicles — distanceFare takes no vehicle argument", () => {
-    // Owner decision: one rate for every vehicle class. Encoded as a signature
-    // constraint so a future change has to be deliberate.
-    expect(distanceFare.length).toBe(1);
+  it("charges more for a bigger car, in the same ratios as the fixed table", () => {
+    // Superseded the previous flat-rate rule at the owner's request: a V-Class
+    // to an unlisted destination used to cost exactly what a sedan did, while
+    // the table charged half as much again for that same upgrade.
+    const sedan = distanceFare(415, "ECONOMY");
+    expect(distanceFare(415, "BUSINESS")).toBeGreaterThan(sedan);
+    expect(distanceFare(415, "VCLASS")).toBe(Math.round((sedan / 1) * 1.5));
+    expect(distanceFare(415, "MINIBUS")).toBeGreaterThan(distanceFare(415, "VCLASS"));
+  });
+
+  it("prices an unknown vehicle as a sedan rather than guessing upward", () => {
+    const sedan = distanceFare(415, "ECONOMY");
+    expect(distanceFare(415, "NOT_A_VEHICLE")).toBe(sedan);
+    expect(distanceFare(415)).toBe(sedan);
+  });
+
+  it("tapers on long journeys instead of extrapolating the city rate", () => {
+    // Lourdes at 415 km. Flat 3.50/km quoted 1451 against a market of 655-759,
+    // so the quote could never be accepted.
+    const lourdes = distanceFare(415, "ECONOMY");
+    expect(lourdes).toBeLessThan(1000);
+    expect(lourdes).toBeGreaterThan(600);
+  });
+
+  it("leaves city distances on the original rate", () => {
+    // The taper must not quietly reprice the everyday work: the first band is
+    // still a flat 3.50/km, which is what the fixed table was built around.
+    expect(distanceFare(20)).toBe(70);
+    expect(distanceFare(50)).toBe(175);
   });
 
   it("never quotes below the published minimum fare", () => {

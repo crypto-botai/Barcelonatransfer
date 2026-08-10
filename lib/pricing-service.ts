@@ -305,7 +305,10 @@ function hoursUntilPickup(dt: Date): number {
  * fare would be worse than asking.
  */
 function customRouteQuote(vc: VehicleClass, distanceKm: number, durationMin: number): Quote {
-  const fare = distanceFare(distanceKm);
+  // Price the car they actually asked for. Without this a V-Class to an unlisted
+  // destination cost exactly what a sedan did, while the fixed table charged
+  // half as much again for the same upgrade.
+  const fare = distanceFare(distanceKm, vehicleCodeForClass(vc) ?? undefined);
 
   return {
     vehicleClass:        vc,

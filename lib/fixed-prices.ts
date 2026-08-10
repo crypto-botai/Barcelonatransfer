@@ -17,7 +17,8 @@ export type ZoneCode =
   | "MATARO"      | "CALELLA"        | "PINEDA_DE_MAR"   | "SANTA_SUSANNA"
   | "MALGRAT"     | "BLANES"         | "LLORET"          | "TOSSA"
   | "SAGARO"      | "PLATJA_DARO"    | "PALAMOS"
-  | "ROSES"       | "EMPURIABRAVA"   | "FIGUERES"        | "CADAQUES";
+  | "ROSES"       | "EMPURIABRAVA"   | "FIGUERES"        | "CADAQUES"
+  | "LOURDES";
 
 export type Category = "airport-city" | "costa-dorada" | "costa-brava";
 
@@ -99,6 +100,22 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "El Prat Airport", toLabel: "Andorra",
     category: "airport-city",
     prices: { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 630 },
+  },
+  {
+    slug: "bcn-airport-lourdes",
+    from: "BCN_AIRPORT", to: "LOURDES",
+    fromLabel: "El Prat Airport", toLabel: "Lourdes",
+    category: "airport-city",
+    // 415 km each way, ~5h55. A round trip is the driver's whole day, which is
+    // what this price reflects rather than the distance alone.
+    prices: { ECONOMY: 750, BUSINESS: 875, MINIVAN: 925, VCLASS: 1125, MINIBUS: 1575 },
+  },
+  {
+    slug: "barcelona-city-lourdes",
+    from: "BARCELONA_CITY", to: "LOURDES",
+    fromLabel: "Barcelona City", toLabel: "Lourdes",
+    category: "airport-city",
+    prices: { ECONOMY: 750, BUSINESS: 875, MINIVAN: 925, VCLASS: 1125, MINIBUS: 1575 },
   },
   {
     slug: "bcn-airport-girona-airport",

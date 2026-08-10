@@ -1,5 +1,6 @@
 import { getAdminRoutes, getPricingSettings } from "@/lib/pricing-service";
 import AdminPricingGrid from "./AdminPricingGrid";
+import SyncRoutesButton from "@/components/admin/SyncRoutesButton";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,8 @@ export default async function AdminPricingPage() {
           Edit route prices here — changes go live across the site instantly (cache flushes on save).
         </p>
       </div>
+      {/* Renders only when the code has routes the database has not got yet. */}
+      <SyncRoutesButton />
       <AdminPricingGrid routes={routes} settings={settings} />
     </div>
   );

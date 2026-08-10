@@ -68,8 +68,8 @@ describe("Airport ⇄ Barcelona City is one consistent set of numbers", () => {
 // ── 1. Route count ────────────────────────────────────────────────────────────
 
 describe("FIXED_ROUTES count", () => {
-  it("has exactly 63 routes", () => {
-    expect(FIXED_ROUTES.length).toBe(63);
+  it("has exactly 65 routes", () => {
+    expect(FIXED_ROUTES.length).toBe(65);
   });
 });
 

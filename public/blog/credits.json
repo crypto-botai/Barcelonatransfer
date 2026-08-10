@@ -180,5 +180,19 @@
     "article": "(explicit Commons file)",
     "localFile": "/blog/barcelona-christmas-and-new-year.jpg",
     "bytes": 881402
+  },
+  {
+    "slug": "lourdes",
+    "file": "2018 - Basilique Notre-Dame-du-Rosaire de Lourdes.jpg",
+    "licence": "CC BY-SA 4.0",
+    "artist": "Moahim",
+    "credit": "Own work",
+    "descUrl": "https://commons.wikimedia.org/wiki/File:2018_-_Basilique_Notre-Dame-du-Rosaire_de_Lourdes.jpg",
+    "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/2018_-_Basilique_Notre-Dame-du-Rosaire_de_Lourdes.jpg/1920px-2018_-_Basilique_Notre-Dame-du-Rosaire_de_Lourdes.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "mime": "image/jpeg",
+    "width": 1920,
+    "article": "Lourdes",
+    "localFile": "/blog/lourdes-pilgrimage-transfer.jpg",
+    "bytes": 628002
   }
 ]

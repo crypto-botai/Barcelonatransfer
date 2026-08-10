@@ -46,7 +46,6 @@ export const NIGHT_SURCHARGE_RATE = 0.20;
 // the airport-to-city run is 14.1 km of real road, and 14.1 × 3.50 = €49.35
 // against a table price of €50.
 //
-// Flat across every vehicle class, by explicit instruction.
 export const PER_KM_RATE = 3.5;
 
 // Floor. Without it a 3 km hop quotes €10.50, which is below what it costs to
@@ -55,12 +54,67 @@ export const PER_KM_RATE = 3.5;
 export const MIN_DISTANCE_FARE = 50;
 
 /**
+ * Distance bands.
+ *
+ * A flat €3.50/km is right for city work, where most of the cost is the driver
+ * turning out at all. It does not survive being extrapolated: Lourdes at 415 km
+ * priced flat comes to €1,451 against a market of €655–759, so the quote was
+ * never going to be accepted. Motorway kilometres are simply cheaper to supply
+ * than city ones — no traffic, no waiting, no parking — and the rate tapers to
+ * match.
+ *
+ * The bands are cumulative: a 300 km run is charged 50 at the first rate, 150
+ * at the second and 100 at the third.
+ */
+export const DISTANCE_BANDS: readonly { upToKm: number; ratePerKm: number }[] = [
+  { upToKm: 50,       ratePerKm: 3.5 },  // city and near suburbs — unchanged
+  { upToKm: 200,      ratePerKm: 2.2 },  // regional: Costa Brava, Tarragona
+  { upToKm: Infinity, ratePerKm: 1.4 },  // long haul: France, deep Aragón
+];
+
+/**
+ * Per-vehicle multipliers for off-table routes.
+ *
+ * The fixed table has always charged more for a bigger car; the per-km path did
+ * not, so a V-Class to any unlisted destination cost exactly what a sedan did.
+ * These ratios are taken from the table itself — Andorra is 300/350/370/450/630
+ * against a sedan — so on-table and off-table quotes stay recognisably related.
+ */
+export const VEHICLE_DISTANCE_MULTIPLIER: Record<string, number> = {
+  ECONOMY:  1,
+  BUSINESS: 1.17,
+  MINIVAN:  1.23,
+  VCLASS:   1.5,
+  MINIBUS:  2.1,
+};
+
+/**
  * Fare for a journey with no table price. Whole euros — a quote reading
  * "€173.25" advertises that a formula produced it.
+ *
+ * @param vehicleCode price-class code (ECONOMY, BUSINESS, MINIVAN, VCLASS,
+ *   MINIBUS). An unknown or absent code prices as a sedan, which is the
+ *   cheapest — an unrecognised vehicle must never silently cost the customer
+ *   more than the car they asked for.
  */
-export function distanceFare(distanceKm: number): number {
+export function distanceFare(distanceKm: number, vehicleCode?: string): number {
   if (!Number.isFinite(distanceKm) || distanceKm <= 0) return 0;
-  return Math.max(MIN_DISTANCE_FARE, Math.round(distanceKm * PER_KM_RATE));
+
+  let remaining = distanceKm;
+  let previous = 0;
+  let fare = 0;
+  for (const { upToKm, ratePerKm } of DISTANCE_BANDS) {
+    if (remaining <= 0) break;
+    const inBand = Math.min(remaining, upToKm - previous);
+    fare += inBand * ratePerKm;
+    remaining -= inBand;
+    previous = upToKm;
+  }
+
+  const multiplier = (vehicleCode && VEHICLE_DISTANCE_MULTIPLIER[vehicleCode]) || 1;
+  // The floor applies after the multiplier so the minimum is a sedan minimum,
+  // not a per-vehicle one.
+  return Math.max(MIN_DISTANCE_FARE, Math.round(fare * multiplier));
 }
 
 export const LAST_MINUTE_SURCHARGE_RATE = 0.15;
@@ -109,6 +163,7 @@ export const ZONE_LABELS: Record<string, string> = {
   montserrat:     "Montserrat",
   girona_airport: "Girona Airport",
   andorra:        "Andorra",
+  lourdes:        "Lourdes",
   castelldefels:  "Castelldefels",
   sitges:         "Sitges",
   cubelles:       "Cubelles",
@@ -145,6 +200,7 @@ export const ZONE_CODE_TO_KEY: Record<ZoneCode, string> = {
   SANTS_STATION:  "sants",
   MONTSERRAT:     "montserrat",
   ANDORRA:        "andorra",
+  LOURDES:        "lourdes",
   LA_ROCA:        "la_roca",
   GIRONA_AIRPORT: "girona_airport",
   CASTELLDEFELS:  "castelldefels",
@@ -311,6 +367,7 @@ const KNOWN_LOCATIONS: Record<string, GeoPoint> = {
   montserrat:     { lat: 41.5932, lng: 1.8360,  radiusKm: 4   },
   girona_airport: { lat: 41.9010, lng: 2.7607,  radiusKm: 3   },
   andorra:        { lat: 42.5063, lng: 1.5218,  radiusKm: 12  },
+  lourdes:        { lat: 43.0951, lng: -0.0459, radiusKm: 15  },
   castelldefels:  { lat: 41.2800, lng: 1.9780,  radiusKm: 3   },
   sitges:         { lat: 41.2369, lng: 1.8140,  radiusKm: 3   },
   cubelles:       { lat: 41.2134, lng: 1.6764,  radiusKm: 2   },
