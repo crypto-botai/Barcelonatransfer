@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import { useTranslations } from "@/components/language/I18nProvider";
+import InstallPrompt from "@/components/pwa/InstallPrompt";
 
 type BookingData = {
   status: "PAID" | "PENDING" | "FAILED";
@@ -249,6 +250,8 @@ function SuccessInner() {
                 </div>
               </div>
             )}
+
+            <InstallPrompt />
 
             <div className="flex flex-col gap-3">
               <Link href="/" className="btn-gold w-full py-3.5 rounded-xl font-semibold">

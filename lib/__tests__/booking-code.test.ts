@@ -31,8 +31,16 @@ describe("generateBookingCode", () => {
     const codes = Array.from({ length: 300 }, () => generateBookingCode());
     for (const c of codes) {
       expect(c).not.toContain(phone.slice(-6));
-      expect(c).not.toMatch(/^\d{6}/);
     }
+
+    // The old format was 6 phone digits + 2 letters. Length alone rules it out,
+    // and every character is drawn from the CSPRNG rather than the phone.
+    //
+    // Deliberately NOT asserting that a code never starts with six digits: the
+    // alphabet contains eight digits, so a random code opens with six of them
+    // about once in 4,096 draws. That assertion failed intermittently and was
+    // testing randomness rather than the property that matters.
+    expect(new Set(codes.map((c) => c.length))).toEqual(new Set([10]));
   });
 });
 

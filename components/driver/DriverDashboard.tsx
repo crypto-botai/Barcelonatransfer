@@ -13,6 +13,8 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
 import LocationSharing from "@/components/driver/LocationSharing";
 import FlightStatusBadge from "@/components/driver/FlightStatusBadge";
+import RideStageControl from "@/components/driver/RideStageControl";
+import type { RideStage } from "@prisma/client";
 import toast from "react-hot-toast";
 
 type Booking = {
@@ -32,6 +34,7 @@ type Booking = {
   guestName?: string | null;
   guestPhone?: string | null;
   flightNumber?: string | null;
+  rideStage?: RideStage | null;
 };
 
 type Withdrawal = {
@@ -358,32 +361,22 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                         </div>
                       </div>
 
-                      {/* Ride action buttons */}
-                      {b.status === "DRIVER_ASSIGNED" && (
-                        <div className="mt-3 pt-3 border-t border-white/[0.04]">
-                          <button
-                            onClick={() => handleRideAction(b.id, "START")}
-                            disabled={rideAction === b.id}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/30 text-sm font-medium hover:bg-blue-500/25 transition-colors"
-                          >
-                            {rideAction === b.id ? <Loader2 size={14} className="animate-spin" /> : <PlayCircle size={14} />}
-                            Start Ride
-                          </button>
-                        </div>
-                      )}
-                      {b.status === "IN_PROGRESS" && (
+                      {/* Journey controls — one tap per stage. Each is logged
+                          with a timestamp and notifies the customer where that
+                          actually helps them. */}
+                      {["DRIVER_ASSIGNED", "IN_PROGRESS"].includes(b.status) && (
                         <div className="mt-3 pt-3 border-t border-white/[0.04] space-y-3">
-                          <LocationSharing bookingId={b.id} active />
-                          <button
-                            onClick={() => handleRideAction(b.id, "COMPLETE")}
-                            disabled={rideAction === b.id}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/15 text-green-400 border border-green-500/30 text-sm font-medium hover:bg-green-500/25 transition-colors"
-                          >
-                            {rideAction === b.id ? <Loader2 size={14} className="animate-spin" /> : <FlagTriangleRight size={14} />}
-                            Complete Ride
-                          </button>
+                          {b.rideStage && b.rideStage !== "COMPLETED" && (
+                            <LocationSharing bookingId={b.id} active />
+                          )}
+                          <RideStageControl
+                            bookingId={b.id}
+                            currentStage={b.rideStage ?? null}
+                            onAdvance={() => window.location.reload()}
+                          />
                         </div>
                       )}
+
 
                       {/* Customer contact + navigation (only for active/upcoming rides) */}
                       {["DRIVER_ASSIGNED","IN_PROGRESS","CONFIRMED","PENDING"].includes(b.status) && (

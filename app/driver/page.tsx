@@ -23,6 +23,7 @@ export default async function DriverPage() {
           pickupAddress: true, dropoffAddress: true, pickupLat: true, pickupLng: true,
           pickupDatetime: true, passengers: true, luggage: true,
           vehicleClass: true, totalAmount: true, driverAmount: true,
+          rideStage: true, rideStageAt: true,
           guestName: true, guestPhone: true, flightNumber: true,
         },
       },

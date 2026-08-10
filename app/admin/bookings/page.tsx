@@ -6,6 +6,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
 import toast from "react-hot-toast";
 import IssueInvoiceButton from "@/components/admin/IssueInvoiceButton";
+import RideTimeline from "@/components/admin/RideTimeline";
 
 type Driver = { id: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] };
 
@@ -158,6 +159,9 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
               )}
             </div>
           </section>
+
+          {/* Live flight status + stage-by-stage history */}
+          <RideTimeline bookingId={booking.id} flightNumber={booking.flightNumber} />
 
           {/* Status */}
           <section className="glass-card rounded-xl p-4">

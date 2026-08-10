@@ -1,9 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { BookingStatus, DriverStatus } from "@prisma/client";
+import { BookingStatus, DriverStatus, type RideStage } from "@prisma/client";
 import { notify } from "@/lib/notifications/service";
+import { canTransition, STAGE_META, RIDE_STAGES } from "@/lib/ride-stages";
+
+export const dynamic = "force-dynamic";
+
+const schema = z.object({
+  bookingId: z.string().min(1),
+  /** New granular stage. */
+  stage: z.enum(["ON_THE_WAY", "ARRIVED", "WAITING_PASSENGER", "ON_BOARD", "COMPLETED"]).optional(),
+  /** Legacy two-step control, kept so an older client keeps working. */
+  action: z.enum(["START", "COMPLETE"]).optional(),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+});
+
+/** The legacy buttons map onto the two stages that change booking status. */
+const LEGACY: Record<string, RideStage> = { START: "ON_THE_WAY", COMPLETE: "COMPLETED" };
 
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -12,102 +29,96 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { bookingId, action } = await req.json() as {
-    bookingId: string;
-    action: "START" | "COMPLETE";
-  };
+  const parsed = schema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
 
-  if (!bookingId || !["START", "COMPLETE"].includes(action)) {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
-  }
+  const { bookingId, lat, lng } = parsed.data;
+  const stage: RideStage | undefined =
+    parsed.data.stage ?? (parsed.data.action ? LEGACY[parsed.data.action] : undefined);
+  if (!stage) return NextResponse.json({ error: "No stage given" }, { status: 400 });
 
   const driver = await prisma.driver.findUnique({
     where: { userId: user.id },
-    select: { id: true },
+    select: { id: true, user: { select: { name: true } } },
   });
   if (!driver) return NextResponse.json({ error: "Driver not found" }, { status: 404 });
 
-  const booking = await prisma.booking.findUnique({
-    where: { id: bookingId },
+  const booking = await prisma.booking.findFirst({
+    where: { id: bookingId, driverId: driver.id },
     select: {
-      id: true, driverId: true, status: true,
-      userId: true, guestPhone: true, pickupAddress: true, confirmationCode: true,
+      id: true, status: true, rideStage: true, userId: true, guestPhone: true,
+      pickupAddress: true, dropoffAddress: true, confirmationCode: true,
     },
   });
-
-  if (!booking || booking.driverId !== driver.id) {
-    return NextResponse.json({ error: "Booking not found or not assigned to you" }, { status: 403 });
+  if (!booking) {
+    return NextResponse.json({ error: "Booking not assigned to you" }, { status: 403 });
   }
 
-  if (action === "START") {
-    if (booking.status !== BookingStatus.DRIVER_ASSIGNED && booking.status !== BookingStatus.CONFIRMED) {
-      return NextResponse.json({ error: "Booking is not in an assignable state" }, { status: 400 });
-    }
-    const [updated] = await prisma.$transaction([
-      prisma.booking.update({
-        where: { id: bookingId },
-        data: {
-          status: BookingStatus.IN_PROGRESS,
-          rideStartedAt: new Date(),
-        },
-      }),
-      prisma.driver.update({
-        where: { id: driver.id },
-        data: { status: DriverStatus.ON_RIDE },
-      }),
-    ]);
+  // Forward-only, one step at a time. A driver cannot mark a passenger on board
+  // before arriving, and cannot walk back a stage the customer has already been
+  // told about — the message has gone, so the timeline must match it.
+  if (!canTransition(booking.rideStage, stage)) {
+    return NextResponse.json(
+      {
+        error: booking.rideStage === stage
+          ? "Already at this stage"
+          : `Cannot go from ${booking.rideStage ?? "not started"} to ${stage}`,
+        currentStage: booking.rideStage,
+      },
+      { status: 409 },
+    );
+  }
 
-    // Hand the customer their live tracking link at the one moment it becomes
-    // useful. notify() never throws, so a messaging failure cannot leave the
-    // ride un-started after the transaction has already committed.
-    const driverRecord = await prisma.driver.findUnique({
-      where:  { id: driver.id },
-      select: { user: { select: { name: true } } },
-    });
+  const now = new Date();
 
+  // Only the first and last stages move the booking's own status; the ones in
+  // between describe where the driver is, not what the booking is.
+  const statusPatch =
+    stage === "ON_THE_WAY"  ? { status: BookingStatus.IN_PROGRESS, rideStartedAt: now }
+  : stage === "COMPLETED"   ? { status: BookingStatus.COMPLETED, rideEndedAt: now, paymentStatus: "PAID" as const }
+  : {};
+
+  await prisma.$transaction([
+    prisma.booking.update({
+      where: { id: bookingId },
+      data: { rideStage: stage, rideStageAt: now, ...statusPatch },
+    }),
+    prisma.rideEvent.create({
+      data: { bookingId, stage, lat: lat ?? null, lng: lng ?? null },
+    }),
+    prisma.driver.update({
+      where: { id: driver.id },
+      data: stage === "COMPLETED"
+        ? { status: DriverStatus.ONLINE, totalRides: { increment: 1 } }
+        : { status: DriverStatus.ON_RIDE },
+    }),
+  ]);
+
+  // Tell the customer, where there is something worth telling them. notify()
+  // never throws, so a messaging failure cannot leave the stage unrecorded
+  // after the transaction has already committed.
+  const meta = STAGE_META[stage];
+  if (meta.event) {
+    const base = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
     await notify({
-      event:     "DRIVER_EN_ROUTE",
+      event:     meta.event,
       userId:    booking.userId,
       bookingId: booking.id,
       phone:     booking.guestPhone,
       vars: {
-        driver: driverRecord?.user.name ?? "Your driver",
-        pickup: booking.pickupAddress,
-        link:   `${process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info"}/track/${booking.confirmationCode}`,
+        driver:  driver.user.name ?? "Your driver",
+        pickup:  booking.pickupAddress,
+        dropoff: booking.dropoffAddress,
+        code:    booking.confirmationCode,
+        link:    `${base}/track/${booking.confirmationCode}`,
       },
     });
-
-    return NextResponse.json({ status: updated.status });
   }
 
-  // COMPLETE
-  if (booking.status !== BookingStatus.IN_PROGRESS) {
-    return NextResponse.json({ error: "Ride is not in progress" }, { status: 400 });
-  }
-  const [updated] = await prisma.$transaction([
-    prisma.booking.update({
-      where: { id: bookingId },
-      data: {
-        status: BookingStatus.COMPLETED,
-        rideEndedAt: new Date(),
-        paymentStatus: "PAID",
-      },
-    }),
-    prisma.driver.update({
-      where: { id: driver.id },
-      data: {
-        status: DriverStatus.ONLINE,
-        totalRides: { increment: 1 },
-      },
-    }),
-  ]);
-
-  await notify({
-    event:     "RIDE_COMPLETED",
-    userId:    booking.userId,
-    bookingId: booking.id,
-    vars:      { code: booking.confirmationCode },
+  return NextResponse.json({
+    ok: true,
+    stage,
+    stageAt: now.toISOString(),
+    remaining: RIDE_STAGES.slice(RIDE_STAGES.indexOf(stage) + 1),
   });
-
-  return NextResponse.json({ status: updated.status });
 }

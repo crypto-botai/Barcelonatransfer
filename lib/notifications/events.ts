@@ -19,6 +19,7 @@ export const NOTIFICATION_EVENTS = [
   "FLIGHT_DELAYED_DRIVER",
   "DRIVER_EN_ROUTE",
   "DRIVER_ARRIVED",
+  "RIDE_ON_BOARD",
   "RIDE_COMPLETED",
   "REVIEW_REQUEST",
   "BOOKING_CANCELLED",
@@ -147,6 +148,22 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
       es: { title: "Tu conductor ha llegado",    body: "{{driver}} te espera en {{pickup}}." },
       fr: { title: "Votre chauffeur est arrivé", body: "{{driver}} vous attend à {{pickup}}." },
       de: { title: "Ihr Fahrer ist eingetroffen", body: "{{driver}} wartet an {{pickup}}." },
+    },
+  },
+
+
+  /**
+   * The passenger is in the car and moving. Sent because it is the moment a
+   * customer stops worrying about whether the driver turned up, and because it
+   * timestamps the start of the journey for anyone tracking from home.
+   */
+  RIDE_ON_BOARD: {
+    channels: ["inapp", "whatsapp", "push"],
+    copy: {
+      en: { title: "Your journey has started", body: "You are on board with {driver}. Next stop: {dropoff}." },
+      es: { title: "Su trayecto ha comenzado", body: "Está a bordo con {driver}. Próxima parada: {dropoff}." },
+      fr: { title: "Votre trajet a commencé", body: "Vous êtes à bord avec {driver}. Prochain arrêt : {dropoff}." },
+      de: { title: "Ihre Fahrt hat begonnen", body: "Sie sind mit {driver} unterwegs. Nächster Halt: {dropoff}." },
     },
   },
 

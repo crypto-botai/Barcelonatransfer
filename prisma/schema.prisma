@@ -243,6 +243,10 @@ model Booking {
   balanceAmount     Float?
   balancePaidAt     DateTime?
   balanceCheckoutId String?
+  // Current position within an in-progress journey. Null until the driver sets
+  // off; the full history lives in RideEvent.
+  rideStage         RideStage?
+  rideStageAt       DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
@@ -250,6 +254,7 @@ model Booking {
   driver   Driver?    @relation(fields: [driverId], references: [id])
   vehicle  Vehicle?   @relation(fields: [vehicleId], references: [id])
   tracking RideTracking[]
+  rideEvents RideEvent[]
   payment  Payment?
 
   @@map("bookings")
@@ -932,4 +937,36 @@ model CostCentre {
 
   @@unique([companyId, code])
   @@map("cost_centres")
+}
+
+/// Where the driver is within a journey that is already underway.
+///
+/// Deliberately separate from BookingStatus. That enum drives the booking and
+/// payment lifecycle and is read in dozens of places; overloading it with
+/// in-journey detail would mean every one of those call sites has to learn
+/// about stages it does not care about.
+enum RideStage {
+  ON_THE_WAY
+  ARRIVED
+  WAITING_PASSENGER
+  ON_BOARD
+  COMPLETED
+}
+
+/// One row per stage change, so the operator can see the whole journey after
+/// the fact — when the driver set off, when they reached arrivals, how long the
+/// passenger kept them waiting. Coordinates are captured where the driver was
+/// sharing location, which makes a disputed "the driver never arrived" answerable.
+model RideEvent {
+  id        String    @id @default(cuid())
+  bookingId String
+  stage     RideStage
+  lat       Float?
+  lng       Float?
+  createdAt DateTime  @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId, createdAt])
+  @@map("ride_events")
 }

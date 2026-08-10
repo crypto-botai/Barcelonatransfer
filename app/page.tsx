@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import InstallPrompt from "@/components/pwa/InstallPrompt";
 import ScrollReset from "@/components/layout/ScrollReset";
 import HeroSection from "@/components/sections/HeroSection";
 import ServicesSection from "@/components/sections/ServicesSection";
@@ -41,6 +42,7 @@ export default async function HomePage() {
         <TestimonialsSection />
         <FAQSection />
       </main>
+      <InstallPrompt />
       <Footer />
     </>
   );
