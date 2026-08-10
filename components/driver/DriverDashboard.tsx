@@ -14,6 +14,7 @@ import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
 import LocationSharing from "@/components/driver/LocationSharing";
 import FlightStatusBadge from "@/components/driver/FlightStatusBadge";
 import RideStageControl from "@/components/driver/RideStageControl";
+import NoShowPanel from "@/components/driver/NoShowPanel";
 import type { RideStage } from "@prisma/client";
 import toast from "react-hot-toast";
 
@@ -35,6 +36,9 @@ type Booking = {
   guestPhone?: string | null;
   flightNumber?: string | null;
   rideStage?: RideStage | null;
+  rideStageAt?: Date | string | null;
+  arrivedAt?: Date | string | null;
+  noShowFiled?: boolean;
 };
 
 type Withdrawal = {
@@ -374,6 +378,18 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                             currentStage={b.rideStage ?? null}
                             onAdvance={() => window.location.reload()}
                           />
+
+                          {/* Once the driver has arrived the clock is running.
+                              Waiting and no-show evidence belong together: the
+                              timer is the reason to file, and the elapsed time
+                              is the evidence. */}
+                          {(b.rideStage === "ARRIVED" || b.rideStage === "WAITING_PASSENGER") && b.rideStageAt && (
+                            <NoShowPanel
+                              bookingId={b.id}
+                              arrivedAt={b.arrivedAt ?? b.rideStageAt}
+                              alreadyFiled={b.noShowFiled}
+                            />
+                          )}
                         </div>
                       )}
 

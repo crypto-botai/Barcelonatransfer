@@ -42,11 +42,22 @@ export async function GET(
 
   if (!authorised) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const events = await prisma.rideEvent.findMany({
-    where:   { bookingId: id },
-    orderBy: { createdAt: "asc" },
-    select:  { stage: true, createdAt: true, lat: true, lng: true },
-  });
+  const [events, noShow] = await Promise.all([
+    prisma.rideEvent.findMany({
+      where:   { bookingId: id },
+      orderBy: { createdAt: "asc" },
+      select:  { stage: true, createdAt: true, lat: true, lng: true },
+    }),
+    // Photographs only go to the operator. A customer disputing a no-show
+    // should not be handed the evidence file before the operator has looked at
+    // it, and the driver does not need their own submission read back.
+    user?.role === "ADMIN"
+      ? prisma.noShowReport.findUnique({
+          where:  { bookingId: id },
+          select: { images: true, note: true, lat: true, lng: true, waitedMin: true, createdAt: true },
+        })
+      : Promise.resolve(null),
+  ]);
 
-  return NextResponse.json({ events });
+  return NextResponse.json({ events, noShow });
 }

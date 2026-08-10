@@ -24,6 +24,8 @@ export default async function DriverPage() {
           pickupDatetime: true, passengers: true, luggage: true,
           vehicleClass: true, totalAmount: true, driverAmount: true,
           rideStage: true, rideStageAt: true,
+          noShow: { select: { id: true } },
+          rideEvents: { where: { stage: "ARRIVED" }, take: 1, select: { createdAt: true } },
           guestName: true, guestPhone: true, flightNumber: true,
         },
       },
@@ -82,7 +84,14 @@ export default async function DriverPage() {
           whatsappNumber: driver.whatsappNumber,
           user:         driver.user,
         }}
-        bookings={driver.bookings as Parameters<typeof DriverDashboard>[0]["bookings"]}
+        // Flatten what the panel needs: when the driver tapped Arrived, and
+        // whether a no-show has already been filed. The `as` cast below would
+        // otherwise happily hide a shape mismatch here.
+        bookings={driver.bookings.map((b) => ({
+          ...b,
+          arrivedAt:   b.rideEvents?.[0]?.createdAt ?? null,
+          noShowFiled: Boolean(b.noShow),
+        })) as Parameters<typeof DriverDashboard>[0]["bookings"]}
         withdrawals={driver.withdrawals as Parameters<typeof DriverDashboard>[0]["withdrawals"]}
         completedCount={completedCount}
         totalEarnings={totalEarnings}

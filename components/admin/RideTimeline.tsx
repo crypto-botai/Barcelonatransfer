@@ -6,6 +6,11 @@ import { RIDE_STAGES, STAGE_META, waitMinutes } from "@/lib/ride-stages";
 import type { RideStage } from "@prisma/client";
 
 interface Event { stage: RideStage; createdAt: string; lat: number | null; lng: number | null }
+interface NoShow {
+  images: string[]; note: string | null;
+  lat: number | null; lng: number | null;
+  waitedMin: number | null; createdAt: string;
+}
 interface Flight {
   state: string; scheduledArrival: string | null; estimatedArrival: string | null;
   delayMinutes: number | null; arrivalTerminal: string | null; departureAirport: string | null;
@@ -32,6 +37,7 @@ export default function RideTimeline({
   flightNumber?: string | null;
 }) {
   const [events, setEvents] = useState<Event[] | null>(null);
+  const [noShow, setNoShow] = useState<NoShow | null>(null);
   const [flight, setFlight] = useState<Flight | null>(null);
   const [flightState, setFlightState] = useState<"loading" | "ok" | "none">("loading");
 
@@ -39,7 +45,7 @@ export default function RideTimeline({
     let alive = true;
     fetch(`/api/bookings/${bookingId}/timeline`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => alive && setEvents(d?.events ?? []))
+      .then((d) => { if (!alive) return; setEvents(d?.events ?? []); setNoShow(d?.noShow ?? null); })
       .catch(() => alive && setEvents([]));
 
     if (!flightNumber) { setFlightState("none"); return; }
@@ -106,6 +112,52 @@ export default function RideTimeline({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* No-show evidence — shown first because it is the thing awaiting a
+          decision from the operator, not just a record. */}
+      {noShow && (
+        <div className="rounded-xl border border-amber-500/25 bg-amber-500/[0.05] p-4 space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-amber-300 text-sm font-medium">Driver reported a no-show</p>
+            <span className="text-amber-400/70 text-[11px]">
+              {new Date(noShow.createdAt).toLocaleString("en-GB")}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4 text-xs text-dark-300">
+            {noShow.waitedMin !== null && (
+              <span className={noShow.waitedMin >= 60 ? "text-amber-400 font-medium" : ""}>
+                waited {noShow.waitedMin} min
+              </span>
+            )}
+            {noShow.lat != null && noShow.lng != null && (
+              <a
+                href={`https://www.google.com/maps?q=${noShow.lat},${noShow.lng}`}
+                target="_blank" rel="noopener noreferrer"
+                className="text-gold-400 hover:text-gold-300 inline-flex items-center gap-1"
+              >
+                <MapPin size={11} /> where the driver was
+              </a>
+            )}
+          </div>
+
+          {noShow.note && (
+            <p className="text-dark-200 text-xs leading-relaxed bg-black/20 rounded-lg p-2.5">
+              {noShow.note}
+            </p>
+          )}
+
+          <div className="flex flex-wrap gap-2">
+            {noShow.images.map((src, i) => (
+              <a key={src} href={src} target="_blank" rel="noopener noreferrer"
+                 className="block w-20 h-20 rounded-lg overflow-hidden border border-white/[0.1] hover:border-gold-500/40 transition-colors">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt={`No-show evidence ${i + 1}`} className="w-full h-full object-cover" />
+              </a>
+            ))}
+          </div>
         </div>
       )}
 

@@ -255,6 +255,7 @@ model Booking {
   vehicle  Vehicle?   @relation(fields: [vehicleId], references: [id])
   tracking RideTracking[]
   rideEvents RideEvent[]
+  noShow   NoShowReport?
   payment  Payment?
 
   @@map("bookings")
@@ -969,4 +970,31 @@ model RideEvent {
 
   @@index([bookingId, createdAt])
   @@map("ride_events")
+}
+
+/// Evidence that a passenger did not turn up.
+///
+/// A no-show is a billing dispute waiting to happen: the customer says nobody
+/// came, the driver says they waited. Photographs taken at the pickup point,
+/// stamped with the time and the driver's coordinates, turn that into a
+/// question with an answer.
+model NoShowReport {
+  id        String   @id @default(cuid())
+  bookingId String   @unique
+  driverId  String
+  /// Uploaded photo URLs, in the order the driver took them.
+  images    String[]
+  note      String?  @db.Text
+  /// Where the driver was when they filed it.
+  lat       Float?
+  lng       Float?
+  /// Minutes between tapping Arrived and filing, computed at filing time so it
+  /// survives later edits to the ride timeline.
+  waitedMin Int?
+  createdAt DateTime @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([driverId])
+  @@map("no_show_reports")
 }
