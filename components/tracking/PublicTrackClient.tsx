@@ -78,7 +78,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
   }, [poll, status]);
 
   const stageIndex = STAGES.findIndex((s) => s.key === status);
-  const when = new Date(booking.pickupDatetime).toLocaleString("en-GB", {
+  const when = new Date(booking.pickupDatetime).toLocaleString("en-GB", { timeZone: "Europe/Madrid",
     weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
   });
 

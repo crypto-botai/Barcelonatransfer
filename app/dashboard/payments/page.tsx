@@ -114,7 +114,7 @@ export default function PaymentsPage() {
                   {new Date(b.pickupDatetime).getDate()}
                 </p>
                 <p className="text-dark-500 text-[10px] uppercase">
-                  {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { month: "short" })}
+                  {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", month: "short" })}
                 </p>
               </div>
 

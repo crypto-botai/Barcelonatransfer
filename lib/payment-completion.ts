@@ -3,6 +3,7 @@ import { sendPaymentConfirmationEmail, sendAdminNewBookingAlert, sendFailedPayme
 import { sendWhatsAppBookingConfirmation } from "@/lib/whatsapp";
 import { notify } from "@/lib/notifications/service";
 import type { SumUpCheckout } from "@/lib/sumup";
+import { formatPickupDateTime } from "@/lib/datetime";
 
 // Shared by app/api/payments/webhook, app/api/payments/verify, and app/api/cron/payment-reconcile
 // so all three entry points apply the exact same DB + email side-effects for a paid or failed
@@ -68,7 +69,7 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
         confirmationCode: updated.confirmationCode,
         pickupAddress:    updated.pickupAddress,
         dropoffAddress:   updated.dropoffAddress,
-        pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
+        pickupDatetime:   formatPickupDateTime(updated.pickupDatetime),
         vehicleClass:     updated.vehicleClass,
         totalAmount:      updated.totalAmount,
         passengers:       updated.passengers,
@@ -82,7 +83,7 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
         guestPhone:       updated.guestPhone ?? undefined,
         pickupAddress:    updated.pickupAddress,
         dropoffAddress:   updated.dropoffAddress ?? "",
-        pickupDatetime:   updated.pickupDatetime.toLocaleString("en-GB"),
+        pickupDatetime:   formatPickupDateTime(updated.pickupDatetime),
         vehicleClass:     updated.vehicleClass,
         totalAmount:      updated.totalAmount,
         passengers:       updated.passengers,
@@ -100,7 +101,7 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
         await sendWhatsAppBookingConfirmation({
           phone:          updated.guestPhone,
           bookingRef:     updated.confirmationCode,
-          pickupDatetime: updated.pickupDatetime.toLocaleString("en-GB"),
+          pickupDatetime: formatPickupDateTime(updated.pickupDatetime),
           route,
         });
       } catch (waErr) {

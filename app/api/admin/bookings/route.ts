@@ -6,6 +6,7 @@ import { z } from "zod";
 import { type VehicleClass } from "@/types";
 import { sendBookingConfirmation, sendAdminNewBookingAlert } from "@/lib/resend";
 import { withUniqueBookingCode } from "@/lib/booking-code";
+import { parsePickupInput, formatPickupDateTime } from "@/lib/datetime";
 
 async function requireAdmin() {
   const s = await getServerSession(authOptions);
@@ -75,7 +76,12 @@ export async function POST(req: NextRequest) {
 
   try {
     const body    = createSchema.parse(await req.json());
-    const pickup  = new Date(body.pickupDatetime);
+    // A wall-clock string from an admin form means Barcelona time, not the
+    // server's zone. Offset-bearing input is respected as given.
+    const pickup  = parsePickupInput(body.pickupDatetime);
+    if (!pickup) {
+      return NextResponse.json({ error: "Invalid date or time" }, { status: 422 });
+    }
 
     const booking = await withUniqueBookingCode((confirmationCode) => prisma.booking.create({
       data: {
@@ -122,7 +128,7 @@ export async function POST(req: NextRequest) {
       confirmationCode: booking.confirmationCode,
       pickupAddress:    body.pickupAddress,
       dropoffAddress:   body.dropoffAddress || "",
-      pickupDatetime:   pickup.toLocaleString("en-GB"),
+      pickupDatetime:   formatPickupDateTime(pickup),
       vehicleClass:     body.vehicleClass,
       totalAmount:      body.totalAmount,
       passengers:       body.passengers,
@@ -137,7 +143,7 @@ export async function POST(req: NextRequest) {
       guestPhone:       body.guestPhone,
       pickupAddress:    body.pickupAddress,
       dropoffAddress:   body.dropoffAddress || "",
-      pickupDatetime:   pickup.toLocaleString("en-GB"),
+      pickupDatetime:   formatPickupDateTime(pickup),
       vehicleClass:     body.vehicleClass,
       totalAmount:      body.totalAmount,
       passengers:       body.passengers,

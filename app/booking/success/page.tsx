@@ -183,7 +183,7 @@ function SuccessInner() {
                 {data.pickupDatetime && (
                   <div className="flex items-center gap-3">
                     <Calendar size={14} className="text-gold-500 flex-shrink-0" />
-                    <p className="text-dark-200">{new Date(data.pickupDatetime).toLocaleString("en-GB")}</p>
+                    <p className="text-dark-200">{new Date(data.pickupDatetime).toLocaleString("en-GB", { timeZone: "Europe/Madrid", })}</p>
                   </div>
                 )}
                 <div className="border-t border-white/[0.06] pt-3 flex justify-between">

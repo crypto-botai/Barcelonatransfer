@@ -7,6 +7,7 @@ import { sendAdminNewBookingAlert, sendBookingConfirmation, sendWelcomeEmail } f
 import { redeemCoupon, validateCoupon } from "@/lib/marketing";
 import { calculateLastMinuteSurcharge, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, MIN_BOOKING_HOURS } from "@/lib/pricing";
 import { getQuote } from "@/lib/pricing-service";
+import { pickupToUtc, formatPickupDateTime } from "@/lib/datetime";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -96,8 +97,12 @@ export async function POST(req: NextRequest) {
     }
     const body    = schema.parse(raw);
 
-    const pickupDatetime = new Date(`${body.date}T${body.time}`);
-    if (isNaN(pickupDatetime.getTime())) {
+    // The one conversion in the pipeline. The picker gives a wall-clock date and
+    // time with no zone; on a Barcelona website that means Barcelona. Parsing it
+    // with `new Date()` read it as the server's zone — UTC on Vercel — and
+    // stored every pickup one or two hours early, depending on the season.
+    const pickupDatetime = pickupToUtc(body.date, body.time);
+    if (!pickupDatetime) {
       return NextResponse.json({ error: "Invalid date or time" }, { status: 422 });
     }
 
@@ -325,7 +330,7 @@ export async function POST(req: NextRequest) {
         confirmationCode: booking.confirmationCode,
         pickupAddress:    body.pickupAddress,
         dropoffAddress:   body.dropoffAddress || body.bookingType,
-        pickupDatetime:   pickupDatetime.toLocaleString("en-GB"),
+        pickupDatetime:   formatPickupDateTime(pickupDatetime),
         vehicleClass:     body.vehicleClass,
         totalAmount:      totalWithExtras,
         passengers:       body.passengers,
@@ -338,7 +343,7 @@ export async function POST(req: NextRequest) {
         guestPhone:       body.guestPhone,
         pickupAddress:    body.pickupAddress,
         dropoffAddress:   body.dropoffAddress || `${body.bookingType} – ${body.durationHours ?? ""}h`,
-        pickupDatetime:   pickupDatetime.toLocaleString("en-GB"),
+        pickupDatetime:   formatPickupDateTime(pickupDatetime),
         vehicleClass:     body.vehicleClass,
         totalAmount:      totalWithExtras,
         passengers:       body.passengers,

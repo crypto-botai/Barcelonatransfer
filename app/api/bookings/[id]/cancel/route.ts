@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { refundSumUpTransaction } from "@/lib/sumup";
 import { sendCancellationEmail, sendAdminCancellationAlert } from "@/lib/resend";
+import { formatPickupDateTime } from "@/lib/datetime";
 
 export async function POST(
   _req: NextRequest,
@@ -76,7 +77,7 @@ export async function POST(
         guestEmail:       customerEmail,
         totalAmount:      booking.totalAmount,
         refundProcessed,
-        pickupDatetime:   booking.pickupDatetime.toLocaleString("en-GB"),
+        pickupDatetime:   formatPickupDateTime(booking.pickupDatetime),
         pickupAddress:    booking.pickupAddress,
       }),
     ]);

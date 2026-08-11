@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendPickupChangedEmail, sendAdminPickupChangedAlert } from "@/lib/resend";
 import { z } from "zod";
+import { formatPickupDateTime } from "@/lib/datetime";
 
 const schema = z.object({
   pickupAddress: z.string().min(3),
@@ -69,7 +70,7 @@ export async function PATCH(
         name,
         confirmationCode: booking.confirmationCode,
         newPickupAddress: body.pickupAddress,
-        pickupDatetime:   booking.pickupDatetime.toLocaleString("en-GB"),
+        pickupDatetime:   formatPickupDateTime(booking.pickupDatetime),
       }),
       sendAdminPickupChangedAlert({
         confirmationCode:  booking.confirmationCode,
@@ -77,7 +78,7 @@ export async function PATCH(
         guestEmail:        customerEmail,
         oldPickupAddress:  booking.pickupAddress,
         newPickupAddress:  body.pickupAddress,
-        pickupDatetime:    booking.pickupDatetime.toLocaleString("en-GB"),
+        pickupDatetime:    formatPickupDateTime(booking.pickupDatetime),
       }),
     ]);
   }

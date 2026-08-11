@@ -150,7 +150,7 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
             <div className="space-y-2 text-sm">
               <div className="flex gap-2"><MapPin size={13} className="text-green-400 flex-shrink-0 mt-0.5" /><span className="text-white">{booking.pickupAddress}</span></div>
               <div className="flex gap-2"><MapPin size={13} className="text-red-400 flex-shrink-0 mt-0.5" /><span className="text-dark-300">{booking.dropoffAddress}</span></div>
-              <div className="flex gap-2"><Calendar size={13} className="text-gold-500 flex-shrink-0 mt-0.5" /><span className="text-dark-300">{new Date(booking.pickupDatetime).toLocaleString("en-GB")}</span></div>
+              <div className="flex gap-2"><Calendar size={13} className="text-gold-500 flex-shrink-0 mt-0.5" /><span className="text-dark-300">{new Date(booking.pickupDatetime).toLocaleString("en-GB", { timeZone: "Europe/Madrid", })}</span></div>
               <div className="flex gap-2"><Car size={13} className="text-gold-500 flex-shrink-0 mt-0.5" /><span className="text-dark-300">{booking.vehicleClass.replace(/_/g, " ")} · {booking.passengers} pax</span></div>
               {booking.flightNumber && <div className="flex gap-2"><Plane size={13} className="text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-dark-300">Flight: {booking.flightNumber}</span></div>}
               {cleanNotes && <div className="flex gap-2 pt-1 border-t border-white/[0.06]"><FileText size={13} className="text-dark-500 flex-shrink-0 mt-0.5" /><span className="text-dark-400 text-xs">{cleanNotes}</span></div>}
@@ -310,8 +310,8 @@ function DeletedBookingRow({ b, onRestore }: { b: Booking; onRestore: (id: strin
         <p className="truncate text-dark-600">→ {b.dropoffAddress}</p>
       </td>
       <td className="py-3 px-3 text-xs text-dark-500 whitespace-nowrap">
-        {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { day:"2-digit", month:"short" })}<br />
-        <span className="text-dark-600">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit" })}</span>
+        {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", day:"2-digit", month:"short" })}<br />
+        <span className="text-dark-600">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { timeZone: "Europe/Madrid", hour:"2-digit", minute:"2-digit" })}</span>
       </td>
       <td className="hidden lg:table-cell py-3 px-3 text-xs text-dark-500 whitespace-nowrap">{b.vehicleClass.replace(/_/g, " ")}</td>
       <td className="py-3 px-3 text-sm text-dark-500 font-semibold whitespace-nowrap">{formatCurrency(b.totalAmount)}</td>
@@ -537,8 +537,8 @@ export default function AdminBookingsPage() {
                           <p className="truncate text-dark-600">→ {b.dropoffAddress}</p>
                         </td>
                         <td className="py-3 px-3 text-xs text-dark-400 whitespace-nowrap">
-                          {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { day:"2-digit", month:"short" })}<br />
-                          <span className="text-dark-600">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit" })}</span>
+                          {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", day:"2-digit", month:"short" })}<br />
+                          <span className="text-dark-600">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { timeZone: "Europe/Madrid", hour:"2-digit", minute:"2-digit" })}</span>
                         </td>
                         <td className="hidden lg:table-cell py-3 px-3 text-xs text-dark-400 whitespace-nowrap">{b.vehicleClass.replace(/_/g, " ")}</td>
                         <td className="py-3 px-3 text-sm text-gold-400 font-semibold whitespace-nowrap">{formatCurrency(b.totalAmount)}</td>
