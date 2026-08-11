@@ -39,7 +39,7 @@ export async function generateMetadata(
     title: `${vehicle.label} — Barcelona Private Transfer | Élite BCN`,
     description: `${vehicle.description} From €${minFare} fixed price. Meet & greet, flight tracking, no surge pricing.`,
     alternates: { canonical: `${BASE}/fleet/${slug}` },
-    keywords: [`barcelona ${vehicle.label.toLowerCase()} transfer`, `${vehicle.label.toLowerCase()} private hire barcelona`, "barcelona airport transfer", "luxury chauffeur barcelona"],
+    keywords: [`barcelona ${vehicle.label.toLowerCase()} transfer`, `${vehicle.label.toLowerCase()} private hire barcelona`, "luxury chauffeur barcelona"],
     openGraph: {
       ...SHARED_OG,
       title: `${vehicle.label} — Barcelona Private Transfer`,

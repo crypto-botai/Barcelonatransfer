@@ -8,22 +8,32 @@ import { SHARED_OG } from "@/lib/seo";
 
 const airportCityEco = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona_city")?.economy ?? 45;
 
+/**
+ * Differentiated from the homepage, which owns the broad "barcelona airport
+ * transfer" term outright: 812 impressions at position 14.4 against this page's
+ * 79 at 38.8. Two URLs were carrying the identical title and keyword, and
+ * Google had already picked the winner.
+ *
+ * This page takes the arrivals intent instead — terminals, meet & greet, where
+ * the driver waits. That cluster is currently unowned and shows 26 impressions
+ * at around position 57, which is a gap rather than a contest.
+ */
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona Airport Transfer — BCN El Prat | Élite BCN" },
-  description: `Private transfer from Barcelona Airport (BCN) from €${airportCityEco}. Meet & greet, real-time flight tracking, 60 min free waiting. Mercedes V-Class & EQE 300 Electric.`,
+  title: { absolute: "BCN Airport Meet & Greet — T1 & T2 Arrivals | Élite BCN" },
+  description: `Meet & greet at Barcelona Airport arrivals, T1 and T2. Your driver waits inside with a name board from €${airportCityEco}. Real-time flight tracking and 60 minutes free waiting from landing.`,
   alternates: { canonical: "https://www.elitebcn.info/airport-transfers" },
-  keywords: ["barcelona airport transfer", "bcn el prat transfer", "barcelona airport private car", "airport chauffeur barcelona"],
+  keywords: ["barcelona airport meet and greet", "bcn arrivals pickup", "barcelona airport t1 transfer", "barcelona airport t2 transfer", "bcn el prat arrivals driver"],
   openGraph: {
     ...SHARED_OG,
-    title: "Barcelona Airport Transfer — BCN El Prat | Élite BCN",
-    description: `Private luxury transfer from Barcelona Airport (BCN) from €${airportCityEco}. Meet & greet, flight tracking, 60 min free wait. Mercedes V-Class & EQE 300 Electric.`,
+    title: "BCN Airport Meet & Greet — T1 & T2 Arrivals | Élite BCN",
+    description: `Meet & greet at Barcelona Airport arrivals, T1 and T2. Driver waiting inside with a name board from €${airportCityEco}. Flight tracking and 60 min free waiting.`,
     url: "https://www.elitebcn.info/airport-transfers",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Airport Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Airport Transfer — BCN El Prat | Élite BCN",
-    description: `Private luxury transfer from Barcelona Airport from €${airportCityEco}. Meet & greet, flight tracking, 60 min free wait. Mercedes V-Class & EQE 300 Electric. No surge pricing.`,
+    title: "BCN Airport Meet & Greet — T1 & T2 Arrivals | Élite BCN",
+    description: `Meet & greet at Barcelona Airport arrivals, T1 and T2. Driver waiting inside with a name board from €${airportCityEco}. Flight tracking and 60 min free waiting.`,
     images: ["/opengraph-image"],
   },
 };
@@ -58,13 +68,15 @@ export default function AirportTransfersPage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,rgba(201,168,76,0.07),transparent)]" />
           <div className="container mx-auto px-4 text-center relative z-10">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold-500/30 bg-gold-500/5 text-gold-400 text-xs tracking-[0.2em] uppercase font-medium mb-6">
-              <Plane size={12} /> Airport Transfers
+              <Plane size={12} /> Arrivals Meet &amp; Greet
             </span>
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-6">
-              Barcelona Airport <br /><span className="text-gold-gradient">Luxury Transfers</span>
+              BCN Airport <br /><span className="text-gold-gradient">Meet &amp; Greet</span>
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
-              Premium chauffeur service to and from Barcelona El Prat Airport (BCN) and Cruise Terminal. Your driver meets you in arrivals — flight monitored, sign displayed, vehicle ready.
+              Your driver waits inside the arrivals hall at Terminal 1 or Terminal 2, name board in hand,
+              and walks you to the car. We track your flight, so an early landing or a two-hour delay
+              changes nothing — the first 60 minutes of waiting are free from the moment you touch down.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link href="/book?pickup=Barcelona+Airport" className="btn-gold px-8 py-4 rounded-xl font-semibold">

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "Barcelona to Costa Brava Transfer — from €90 | Élite BCN",
   description: "Private transfer from Barcelona to Costa Brava. Lloret, Tossa, Blanes, Roses, Palamós, Cadaqués. Fixed price from €90. All vehicles. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/costa-brava" },
-  keywords: ["barcelona costa brava transfer", "airport lloret de mar transfer", "barcelona tossa de mar transfer", "lloret de mar private transfer"],
+  keywords: ["barcelona costa brava transfer"],
   openGraph: {
     ...SHARED_OG,
     title: "Barcelona to Costa Brava Transfer — from €90 | Fixed Price",

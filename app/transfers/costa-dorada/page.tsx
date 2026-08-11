@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description:
     "Private transfer from Barcelona to Costa Dorada. Sitges, Tarragona, Salou, PortAventura, Cambrils. Fixed prices from €50. All vehicle classes. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/costa-dorada" },
-  keywords: ["barcelona costa dorada transfer", "airport salou transfer", "barcelona portaventura transfer", "barcelona sitges transfer", "salou private transfer"],
+  keywords: ["barcelona costa dorada transfer", "airport salou transfer", "barcelona portaventura transfer", "salou private transfer"],
   openGraph: {
     ...SHARED_OG,
     title: "Barcelona to Costa Dorada Transfer — from €50 | Fixed Price",

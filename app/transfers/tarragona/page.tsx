@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description:
     "Private transfer from Barcelona to Tarragona or PortAventura. Fixed price from €150. 1-hour journey. Meet & greet, no surge pricing. Book instantly.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/tarragona" },
-  keywords: ["barcelona tarragona transfer", "barcelona portaventura transfer", "tarragona private car barcelona", "barcelona roman ruins transfer"],
+  keywords: ["barcelona tarragona transfer", "tarragona private car barcelona", "barcelona roman ruins transfer"],
   openGraph: {
     ...SHARED_OG,
     title: "Barcelona to Tarragona Transfer — from €150 | Fixed Price",
