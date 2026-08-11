@@ -15,8 +15,8 @@ export const FAQ_GROUPS = [
       { q: "Do you track my flight for delays?", a: "Yes. We monitor your flight in real time using your flight number. If your flight is delayed, your driver will adjust their arrival time automatically — you will never be charged for flight delays." },
       { q: "Where will the driver meet me at the airport?", a: "Your driver will be waiting in the arrivals hall at El Prat Airport (Terminal 1 or Terminal 2) holding a personalised name board. For Meet & Greet bookings, the driver will assist you from the baggage reclaim area." },
       { q: "How much free waiting time do I get at the airport?", a: "We offer 60 minutes of complimentary waiting time for all airport pickups, counted from the actual flight landing time. Additional waiting time can be added as an extra at €25 per 30 minutes." },
-      { q: "Do you cover Girona Airport?", a: "Yes. We provide transfers to and from Girona–Costa Brava Airport (GRO). Fixed price from Barcelona El Prat Airport is €140 for an Economy sedan. From Barcelona city, the price starts at €135. Booking in advance is recommended." },
-      { q: "Do you serve all Costa Brava and Costa Daurada resorts?", a: "Yes. We cover all major resorts with fixed prices from Barcelona Airport: Lloret de Mar from €100, Tossa de Mar from €110, Salou from €150, PortAventura from €150, Cambrils from €160, Sitges from €80. All routes are fixed-price per vehicle, excluding VAT and tolls." },
+      { q: "Do you cover Girona Airport?", a: "Yes. We provide transfers to and from Girona–Costa Brava Airport (GRO). Fixed price from Barcelona El Prat Airport is €165 for an Economy sedan. From Barcelona city, the price starts at €140. Booking in advance is recommended." },
+      { q: "Do you serve all Costa Brava and Costa Daurada resorts?", a: "Yes. We cover all major resorts with fixed prices from Barcelona Airport: Lloret de Mar from €145, Tossa de Mar from €155, Salou from €155, PortAventura from €155, Cambrils from €160, Sitges from €80. All routes are fixed-price per vehicle, excluding VAT and tolls." },
     ],
   },
   {
@@ -43,10 +43,10 @@ export const FAQ_GROUPS = [
   {
     group: "Extras & Add-ons",
     items: [
-      { q: "Can I add child seats to my booking?", a: "Yes. We offer Baby Seats (0–13 kg), Child Seats (9–18 kg), and Booster Seats (15–36 kg) at €5 each. Simply add them during the booking process. Please specify your child's weight so we can provide the correct seat." },
-      { q: "Can I bring my pet?", a: "Pets are welcome with prior notice. Add the Pet Transport extra (€20) when booking. Please ensure your pet is in a carrier or on a lead. Our drivers are pet-friendly and the vehicle will be cleaned appropriately." },
-      { q: "What is the Meet & Greet service?", a: "For €5, your driver will meet you inside the arrivals hall at the airport, assist with your luggage from baggage reclaim, and escort you to the vehicle. This is especially recommended for first-time visitors or those with heavy luggage." },
-      { q: "Can the driver make multiple stops?", a: "Yes — add the Multiple Stops extra (€25 per stop) to your booking. This is ideal for hotel-to-meeting-to-restaurant itineraries or multi-destination tours." },
+      { q: "Can I add child seats to my booking?", a: "Yes. Baby Seats (0–13 kg), Child Seats (9–18 kg), and Booster Seats (15–36 kg) are available free of charge. Ask for them under Special Requests when booking, and please specify your child's weight so we can provide the correct seat." },
+      { q: "Can I bring my pet?", a: "Pets are welcome with prior notice. Tell us under Special Requests when booking and we will confirm the arrangement and any cleaning charge before you travel. Please ensure your pet is in a carrier or on a lead. Our drivers are pet-friendly." },
+      { q: "What is the Meet & Greet service?", a: "It is included in every airport transfer at no extra charge. Your driver waits inside the arrivals hall with a name board, assists with your luggage from baggage reclaim, and escorts you to the vehicle. Airport pickups also include 60 minutes of free waiting from your actual landing time." },
+      { q: "Can the driver make multiple stops?", a: "Yes. Add the stops under Special Requests when booking and we will confirm the price before you travel, as it depends on the detour. This is ideal for hotel-to-meeting-to-restaurant itineraries or multi-destination tours." },
     ],
   },
   {

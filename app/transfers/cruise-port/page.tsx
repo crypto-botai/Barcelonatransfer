@@ -152,7 +152,7 @@ export default function CruisePortTransferPage() {
                 <tbody>
                   {[
                     { route: "BCN Airport → Cruise Port (sedan)", price: `€${cruisePrice}` },
-                    { route: "BCN Airport → Cruise Port (MPV, 7 seats)", price: "€60" },
+                    { route: "BCN Airport → Cruise Port (MPV, 7 seats)", price: "€65" },
                     { route: "Cruise Port → BCN Airport (sedan)", price: `€${cruisePrice}` },
                     { route: "Barcelona City Hotel → Cruise Port", price: "€35" },
                     { route: "Cruise Port → Sitges", price: "€65" },
@@ -166,7 +166,7 @@ export default function CruisePortTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">All prices include meet & greet and 60 min free waiting. No hidden fees.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet and 60 min free waiting.</p>
           </div>
         </section>
 

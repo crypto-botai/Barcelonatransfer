@@ -148,9 +148,16 @@ export default function AndorraTransferPage() {
                 <tbody>
                   {[
                     { route: "BCN Airport → Andorra la Vella (sedan)", price: `€${andorraPrice}` },
-                    { route: "BCN Airport → Andorra la Vella (MPV, 7 seats)", price: "€250" },
-                    { route: "BCN Airport → Grandvalira ski resort", price: "€240" },
-                    { route: "BCN Airport → Vallnord ski resort", price: "€240" },
+                    { route: "BCN Airport → Andorra la Vella (MPV, 7 seats)", price: "€370" },
+                    // The ski stations have no row in the price table. Both were
+                    // advertised at €240; a booking to Vallnord resolves to the
+                    // Andorra zone and charges €300, and Grandvalira sits outside
+                    // that zone, prices by distance and charges over €500. Whether
+                    // the ski stations should carry the Andorra fare is a pricing
+                    // decision for the owner, so the page no longer names a figure
+                    // it cannot honour.
+                    { route: "BCN Airport → Grandvalira ski resort", price: "On request" },
+                    { route: "BCN Airport → Vallnord ski resort", price: "On request" },
                     { route: "Andorra la Vella → BCN Airport", price: `€${andorraPrice}` },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">

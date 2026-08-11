@@ -184,7 +184,8 @@ export default function SitgesTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { vehicle: "Economy / Business sedan", pax: "1–3", price: "€80" },
+                    { vehicle: "Economy sedan",            pax: "1–3", price: "€80" },
+                    { vehicle: "Business sedan",           pax: "1–3", price: "€100" },
                     { vehicle: "Minivan (4–8 pax)",        pax: "1–8", price: "€110" },
                     { vehicle: "V-Class (7 pax)",          pax: "1–7", price: "€130" },
                     { vehicle: "Minibus (9+ pax)",         pax: "9–16", price: "€200" },

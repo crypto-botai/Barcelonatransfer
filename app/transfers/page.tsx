@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MapPin, ChevronRight, Clock, Star } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
 import destinations from "@/data/destinations.json";
+import { getDestinationPrices, SLUG_TO_ZONE } from "@/lib/destination-pricing";
 
 /**
  * Full index of the programmatic destination pages, grouped by type.
@@ -75,7 +76,6 @@ const DESTINATIONS = [
     slug: "sitges",
     name: "Sitges",
     tagline: "Barcelona's glamorous coastal resort",
-    price: 65,
     duration: "35 min",
     distance: "35 km",
     description: "The jewel of the Garraf coast. Gateway to the famous Sitges Carnival, Film Festival, and year-round beach scene.",
@@ -85,7 +85,6 @@ const DESTINATIONS = [
     slug: "girona",
     name: "Girona",
     tagline: "Medieval city & Costa Brava gateway",
-    price: 110,
     duration: "1 hr 10 min",
     distance: "100 km",
     description: "UNESCO-listed medieval quarter, the famous Girona Cathedral, and gateway to the wild Costa Brava.",
@@ -95,7 +94,6 @@ const DESTINATIONS = [
     slug: "tarragona",
     name: "Tarragona",
     tagline: "Roman ruins & PortAventura theme park",
-    price: 95,
     duration: "1 hr",
     distance: "90 km",
     description: "UNESCO Roman remains, a stunning amphitheatre on the sea, and PortAventura World theme park next door.",
@@ -105,7 +103,6 @@ const DESTINATIONS = [
     slug: "montserrat",
     name: "Montserrat",
     tagline: "Catalonia's sacred mountain monastery",
-    price: 85,
     duration: "50 min",
     distance: "50 km",
     description: "The striking serrated mountain housing the famous Black Madonna and the Benedictine monastery of Montserrat.",
@@ -115,7 +112,6 @@ const DESTINATIONS = [
     slug: "costa-brava",
     name: "Costa Brava",
     tagline: "Wild coastline of rugged cliffs & coves",
-    price: 130,
     duration: "1 hr 30 min",
     distance: "130 km",
     description: "The 'Wild Coast' — stunning cliffs, hidden coves, Dalí museums, and charming fishing villages from Tossa de Mar to Cadaqués.",
@@ -125,7 +121,6 @@ const DESTINATIONS = [
     slug: "andorra",
     name: "Andorra",
     tagline: "Tax-free Pyrenean principality",
-    price: 220,
     duration: "3 hr",
     distance: "210 km",
     description: "The tiny tax-free Pyrenean principality famous for ski resorts, duty-free shopping, and dramatic mountain scenery.",
@@ -135,7 +130,6 @@ const DESTINATIONS = [
     slug: "lourdes",
     name: "Lourdes",
     tagline: "France's great pilgrimage sanctuary",
-    price: 750,
     duration: "6 hr",
     distance: "415 km",
     description: "The Pyrenean sanctuary where Bernadette Soubirous reported the 1858 apparitions — six million pilgrims a year, and no direct train or flight from Barcelona.",
@@ -145,7 +139,6 @@ const DESTINATIONS = [
     slug: "cruise-port",
     name: "Barcelona Cruise Port",
     tagline: "World Trade Centre & Moll Adossat terminals",
-    price: 45,
     duration: "20 min",
     distance: "10 km",
     description: "Meet-and-greet transfers to all of Barcelona's cruise terminals. We track your vessel arrival and wait for free.",
@@ -155,7 +148,6 @@ const DESTINATIONS = [
     slug: "port-aventura",
     name: "PortAventura World",
     tagline: "Spain's #1 theme park resort",
-    price: 99,
     duration: "1 hr 10 min",
     distance: "95 km",
     description: "Direct private transfers to Spain's most-visited theme park resort — PortAventura, Ferrari Land & Caribe Aquatic Park.",
@@ -165,7 +157,6 @@ const DESTINATIONS = [
     slug: "costa-dorada",
     name: "Costa Dorada",
     tagline: "Golden beaches south of Barcelona",
-    price: 50,
     duration: "1 hr",
     distance: "90 km",
     description: "The 'Golden Coast' — Sitges, Tarragona, Salou, PortAventura and Cambrils, all covered by one fixed-price transfer service.",
@@ -175,7 +166,6 @@ const DESTINATIONS = [
     slug: "figueres",
     name: "Figueres",
     tagline: "The Dalí Theatre-Museum",
-    price: 155,
     duration: "1 hr 40 min",
     distance: "140 km",
     description: "Home of the Dalí Theatre-Museum, built by the artist himself inside a burned-out theatre — and his burial place.",
@@ -185,7 +175,6 @@ const DESTINATIONS = [
     slug: "tossa-de-mar",
     name: "Tossa de Mar",
     tagline: "The only walled town on the coast",
-    price: 110,
     duration: "1 hr 15 min",
     distance: "90 km",
     description: "A twelfth-century fortress standing directly in the sea, with three beaches and the clearest water on the southern Costa Brava.",
@@ -195,7 +184,6 @@ const DESTINATIONS = [
     slug: "salou",
     name: "Salou",
     tagline: "Costa Daurada beaches & PortAventura",
-    price: 150,
     duration: "1 hr 10 min",
     distance: "100 km",
     description: "The main Costa Daurada resort — long golden beaches, gentle shelving water, and PortAventura World ten minutes inland.",
@@ -205,7 +193,6 @@ const DESTINATIONS = [
     slug: "castelldefels",
     name: "Castelldefels",
     tagline: "The closest beach to the airport",
-    price: 50,
     duration: "22 min",
     distance: "20 km",
     description: "Five kilometres of wide, flat sand just 20 km from El Prat — the fastest airport-to-beach transfer on this coast.",
@@ -213,7 +200,18 @@ const DESTINATIONS = [
   },
 ];
 
-export default function TransfersHubPage() {
+export default async function TransfersHubPage() {
+  // Prices come from the same table that quotes a booking, so a card can no
+  // longer advertise a fare the checkout will not honour.
+  const priced = await Promise.all(
+    DESTINATIONS.map(async (d) => ({
+      ...d,
+      price: SLUG_TO_ZONE[d.slug]
+        ? (await getDestinationPrices(SLUG_TO_ZONE[d.slug]))?.economy ?? null
+        : null,
+    })),
+  );
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(transfersHubSchema) }} />
@@ -240,7 +238,7 @@ export default function TransfersHubPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {DESTINATIONS.map((dest) => (
+              {priced.map((dest) => (
                 <Link
                   key={dest.slug}
                   href={`/transfers/${dest.slug}`}
@@ -261,9 +259,11 @@ export default function TransfersHubPage() {
                     <span className="flex items-center gap-1"><MapPin size={12} /> {dest.distance}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gold-400 font-semibold text-lg">from €{dest.price}</span>
+                    <span className="text-gold-400 font-semibold text-lg">
+                      {dest.price !== null ? `from €${dest.price}` : "Price on quote"}
+                    </span>
                     <span className="text-xs text-dark-500 bg-dark-800 border border-white/[0.06] rounded px-2 py-1">
-                      Fixed price
+                      {dest.price !== null ? "Fixed price" : "By distance"}
                     </span>
                   </div>
                 </Link>

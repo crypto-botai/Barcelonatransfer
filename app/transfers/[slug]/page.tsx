@@ -6,6 +6,7 @@ import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-
 import destinations from "@/data/destinations.json";
 import { STATIC_TRANSFER_PAGES } from "@/data/static-transfer-pages";
 import { SHARED_OG } from "@/lib/seo";
+import { getPlacePrices, getDestinationPrices, SLUG_TO_ZONE, type ResolvedPlacePrices } from "@/lib/destination-pricing";
 
 type Destination = (typeof destinations)[number];
 
@@ -40,14 +41,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: "summary_large_image",
-      title: `Barcelona Airport → ${dest.name} — from €${dest.prices.sedan} fixed`,
+      title: `Barcelona Airport → ${dest.name} — from €${(await getPlacePrices(dest.coordinates.lat, dest.coordinates.lng, dest.distance_km))?.economy ?? dest.prices.sedan} fixed`,
       description: dest.description,
       images: [`${BASE}/opengraph-image`],
     },
   };
 }
 
-function buildSchema(dest: Destination) {
+function buildSchema(dest: Destination, prices: ResolvedPlacePrices | null) {
+  // Schema must state the fare the checkout will actually charge.
+  const sedan = prices?.economy ?? dest.prices.sedan;
+  const mpv   = prices?.minivan ?? dest.prices.mpv;
   const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -65,8 +69,8 @@ function buildSchema(dest: Destination) {
     ],
     offers: {
       "@type": "AggregateOffer",
-      lowPrice: dest.prices.sedan,
-      highPrice: dest.prices.mpv,
+      lowPrice: sedan,
+      highPrice: mpv,
       priceCurrency: "EUR",
       offerCount: 3,
     },
@@ -121,13 +125,31 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
     );
   }
 
-  const { serviceSchema, breadcrumbSchema, faqSchema } = buildSchema(dest);
+  // One resolution, from the same authority that quotes a booking.
+  const prices = await getPlacePrices(dest.coordinates.lat, dest.coordinates.lng, dest.distance_km);
+  const sedan  = prices?.economy ?? dest.prices.sedan;
+  const isFixed = prices?.basis !== "distance";
+  const { serviceSchema, breadcrumbSchema, faqSchema } = buildSchema(dest, prices);
   // "nearby" slugs can point either at a programmatic destinations.json entry or at one
   // of the hand-built static pages (girona, sitges, costa-brava, ...) — check both so a
   // valid reference never silently disappears from the related-destinations grid.
   const nearbyDests = dest.nearby
     .map((s) => destinations.find((d) => d.slug === s) ?? STATIC_TRANSFER_PAGES.find((d) => d.slug === s))
     .filter((d): d is Destination | (typeof STATIC_TRANSFER_PAGES)[number] => Boolean(d));
+
+  // Nearby cards priced from the authority too. Programmatic entries carry
+  // coordinates; the hand-built pages are looked up by their zone name.
+  const nearbyPriced = await Promise.all(
+    nearbyDests.map(async (n) => {
+      const coords = (n as Destination).coordinates;
+      const resolved = coords
+        ? await getPlacePrices(coords.lat, coords.lng, n.distance_km)
+        : SLUG_TO_ZONE[n.slug]
+          ? await getDestinationPrices(SLUG_TO_ZONE[n.slug])
+          : null;
+      return { ...n, fromPrice: resolved?.economy ?? null };
+    }),
+  );
 
   return (
     <>
@@ -161,7 +183,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
             <p className="text-dark-300 text-lg max-w-2xl mx-auto mb-8">
               Fixed-price private transfer from BCN El Prat Airport to {dest.name} ({dest.area}).{" "}
               {dest.distance_km} km — approximately {dest.duration_min} minutes. From{" "}
-              <span className="text-gold-400 font-semibold">€{dest.prices.sedan} fixed</span>.
+              <span className="text-gold-400 font-semibold">€{sedan}{isFixed ? " fixed" : ""}</span>.
               No surge pricing, ever.
             </p>
 
@@ -177,7 +199,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
               </div>
               <div className="flex items-center gap-2 text-white">
                 <Star size={16} className="text-gold-500" />
-                from €{dest.prices.sedan} fixed
+                from €{sedan}{isFixed ? " fixed" : ""}
               </div>
             </div>
 
@@ -185,7 +207,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
               href={`/book?destination=${encodeURIComponent(dest.name)}`}
               className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors"
             >
-              Book Transfer — from €{dest.prices.sedan}
+              Book Transfer — from €{sedan}
             </Link>
           </div>
         </section>
@@ -201,7 +223,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
               {[
                 {
                   icon: Shield,
-                  title: `Fixed price — €${dest.prices.sedan}`,
+                  title: isFixed ? `Fixed price — €${sedan}` : `From €${sedan}`,
                   body: "The price you see is the price you pay. No meter, no traffic surcharges, no airport supplements added at drop-off.",
                 },
                 {
@@ -272,20 +294,24 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                   <tr className="border-b border-white/[0.08] bg-dark-800">
                     <th className="text-left text-dark-400 font-medium p-4">Vehicle</th>
                     <th className="text-left text-dark-400 font-medium p-4">Passengers</th>
-                    <th className="text-right text-dark-400 font-medium p-4">Fixed Price</th>
+                    <th className="text-right text-dark-400 font-medium p-4">{isFixed ? "Fixed Price" : "Price"}</th>
                   </tr>
                 </thead>
                 <tbody>
+                  {/* Each vehicle at its own price column. The EQE is a
+                      business-class car and the V-Class its own class again —
+                      quoting both at the cheaper column advertised less than
+                      the booking would charge. */}
                   {[
-                    { vehicle: "Mercedes EQE 300 Electric", pax: "1–4", price: dest.prices.sedan },
-                    { vehicle: "Mercedes Vito (8 pax)", pax: "1–8", price: dest.prices.mpv },
-                    { vehicle: "Mercedes V-Class (7 pax)", pax: "1–7", price: dest.prices.mpv },
+                    { vehicle: "Mercedes EQE 300 Electric", pax: "1–4", price: prices?.business },
+                    { vehicle: "Mercedes Vito (8 pax)",     pax: "1–8", price: prices?.minivan  },
+                    { vehicle: "Mercedes V-Class (7 pax)",  pax: "1–7", price: prices?.vclass   },
                   ].map((row) => (
                     <tr key={row.vehicle} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
                       <td className="p-4 text-white">{row.vehicle}</td>
                       <td className="p-4 text-dark-400">{row.pax} pax</td>
                       <td className="p-4 text-right">
-                        <span className="text-gold-400 font-semibold text-base">€{row.price}</span>
+                        <span className="text-gold-400 font-semibold text-base">{row.price != null ? `€${row.price}` : "On request"}</span>
                       </td>
                     </tr>
                   ))}
@@ -300,7 +326,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                 href={`/book?destination=${encodeURIComponent(dest.name)}`}
                 className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-8 py-3 rounded-lg transition-colors"
               >
-                Book Now — from €{dest.prices.sedan}
+                Book Now — from €{sedan}
               </Link>
             </div>
           </div>
@@ -351,7 +377,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                 Related <span className="text-gold-gradient">Transfers</span>
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {nearbyDests.map((nearby) => (
+                {nearbyPriced.map((nearby) => (
                   <Link
                     key={nearby.slug}
                     href={`/transfers/${nearby.slug}`}
@@ -359,7 +385,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                   >
                     <p className="text-xs text-gold-500 uppercase tracking-widest mb-1">{typeLabel(nearby.type)}</p>
                     <h3 className="text-white font-semibold group-hover:text-gold-400 transition-colors mb-1">{nearby.name}</h3>
-                    <p className="text-dark-400 text-sm">{nearby.distance_km} km · from €{nearby.prices.sedan}</p>
+                    <p className="text-dark-400 text-sm">{nearby.distance_km} km{nearby.fromPrice !== null ? ` · from €${nearby.fromPrice}` : ""}</p>
                   </Link>
                 ))}
               </div>
@@ -383,7 +409,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
               href={`/book?destination=${encodeURIComponent(dest.name)}`}
               className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors"
             >
-              Book Now — from €{dest.prices.sedan}
+              Book Now — from €{sedan}
             </Link>
           </div>
         </section>
