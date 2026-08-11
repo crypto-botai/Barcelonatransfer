@@ -54,12 +54,45 @@ async function findMissing(): Promise<Missing[]> {
 }
 
 /** Preview — what a sync would add, changing nothing. */
+/**
+ * Routes whose database price no longer matches the code table.
+ *
+ * Bookings quote from the database, so an edit here takes effect immediately.
+ * The destination pages read the code table, which is compiled into the build,
+ * so they keep showing the old fare until the site is deployed again — and no
+ * cache flush can change a constant. Divergence is therefore expected right
+ * after a price edit, and it is only dangerous when nobody is told.
+ */
+async function findDivergent() {
+  const existing = await prisma.route.findMany({ include: { prices: true } });
+  const out: { slug: string; label: string; vehicleCode: string; page: number; booking: number }[] = [];
+
+  for (const row of existing) {
+    for (const code of ["ECONOMY", "BUSINESS", "MINIVAN", "VCLASS", "MINIBUS"] as const) {
+      const booking = row.prices.find((p) => p.vehicleCode === code)?.price;
+      if (booking === undefined) continue;
+
+      const codeRoute = FIXED_ROUTES.find((r) => {
+        const f = ZONE_CODE_TO_KEY[r.from] ?? String(r.from).toLowerCase();
+        const t = ZONE_CODE_TO_KEY[r.to]   ?? String(r.to).toLowerCase();
+        return (f === row.fromKey && t === row.toKey) || (f === row.toKey && t === row.fromKey);
+      });
+      const page = (codeRoute?.prices as Record<string, number> | undefined)?.[code];
+      if (page === undefined || page === booking) continue;
+
+      out.push({ slug: row.slug, label: row.label, vehicleCode: code, page, booking });
+    }
+  }
+  return out;
+}
+
 export async function GET() {
   const session = await getServerSession(authOptions);
   if ((session?.user as { role?: string } | undefined)?.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  return NextResponse.json({ missing: await findMissing() });
+  const [missing, divergent] = await Promise.all([findMissing(), findDivergent()]);
+  return NextResponse.json({ missing, divergent });
 }
 
 export async function POST() {

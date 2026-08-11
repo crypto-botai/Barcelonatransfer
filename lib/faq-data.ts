@@ -1,3 +1,17 @@
+import { ladderFor } from "@/lib/destination-pricing";
+
+/**
+ * Fares quoted in the FAQ are read from the route table, never typed.
+ *
+ * Every stale price this site has carried began as a correct number written by
+ * hand. The €25 additional-waiting charge below stays a literal because it is a
+ * contractual fee, not a route, and has nothing to read from.
+ */
+const eco = (zone: string, origin: "airport" | "barcelona_city" = "airport") =>
+  ladderFor(zone, origin)?.economy ?? 0;
+const col = (zone: string, key: "minivan" | "vclass", origin: "airport" | "barcelona_city" = "airport") =>
+  ladderFor(zone, origin)?.[key] ?? 0;
+
 export const FAQ_GROUPS = [
   {
     group: "Booking & Reservations",
@@ -15,8 +29,8 @@ export const FAQ_GROUPS = [
       { q: "Do you track my flight for delays?", a: "Yes. We monitor your flight in real time using your flight number. If your flight is delayed, your driver will adjust their arrival time automatically — you will never be charged for flight delays." },
       { q: "Where will the driver meet me at the airport?", a: "Your driver will be waiting in the arrivals hall at El Prat Airport (Terminal 1 or Terminal 2) holding a personalised name board. For Meet & Greet bookings, the driver will assist you from the baggage reclaim area." },
       { q: "How much free waiting time do I get at the airport?", a: "We offer 60 minutes of complimentary waiting time for all airport pickups, counted from the actual flight landing time. Additional waiting time can be added as an extra at €25 per 30 minutes." },
-      { q: "Do you cover Girona Airport?", a: "Yes. We provide transfers to and from Girona–Costa Brava Airport (GRO). Fixed price from Barcelona El Prat Airport is €165 for an Economy sedan. From Barcelona city, the price starts at €140. Booking in advance is recommended." },
-      { q: "Do you serve all Costa Brava and Costa Daurada resorts?", a: "Yes. We cover all major resorts with fixed prices from Barcelona Airport: Lloret de Mar from €145, Tossa de Mar from €155, Salou from €155, PortAventura from €155, Cambrils from €160, Sitges from €80. All routes are fixed-price per vehicle, excluding VAT and tolls." },
+      { q: "Do you cover Girona Airport?", a: `Yes. We provide transfers to and from Girona–Costa Brava Airport (GRO). Fixed price from Barcelona El Prat Airport is €${eco('girona_airport')} for an Economy sedan. From Barcelona city, the price starts at €${eco('girona_airport', 'barcelona_city')}. Booking in advance is recommended.` },
+      { q: "Do you serve all Costa Brava and Costa Daurada resorts?", a: `Yes. We cover all major resorts with fixed prices from Barcelona Airport: Lloret de Mar from €${eco('lloret')}, Tossa de Mar from €${eco('tossa')}, Salou from €${eco('salou')}, PortAventura from €${eco('portaventura')}, Cambrils from €${eco('cambrils')}, Sitges from €${eco('sitges')}. All routes are fixed-price per vehicle, excluding VAT and tolls.` },
     ],
   },
   {
@@ -32,7 +46,7 @@ export const FAQ_GROUPS = [
     group: "Pricing & Payment",
     items: [
       { q: "Are your prices fixed or do they use surge pricing?", a: "All our prices are fixed per vehicle. We never apply surge pricing, peak-hour multipliers, or hidden fees. Note that quoted prices exclude VAT and tolls — see the questions below for details." },
-      { q: "How much is a transfer within Barcelona city?", a: "A point-to-point transfer inside Barcelona city is charged at the same fixed rate as an airport transfer: from €50 for an Economy sedan (1–3 passengers), €65 for a Minivan (up to 8) and €75 for a V-Class. That is the same price whether you travel airport to city, city to airport, or between two addresses within the city. Prices exclude VAT and tolls." },
+      { q: "How much is a transfer within Barcelona city?", a: `A point-to-point transfer inside Barcelona city is charged at the same fixed rate as an airport transfer: from €${eco('barcelona_city')} for an Economy sedan (1–3 passengers), €${col('barcelona_city', 'minivan')} for a Minivan (up to 8) and €${col('barcelona_city', 'vclass')} for a V-Class. That is the same price whether you travel airport to city, city to airport, or between two addresses within the city. Prices exclude VAT and tolls.` },
       { q: "Is VAT included in the price?", a: "No. Quoted prices exclude VAT. If you require an invoice — for a company, business travel, or expense claims — 10% Spanish VAT is added to the fare. If you do not need an invoice, you simply pay the quoted price. Let us know when booking so we can issue the invoice correctly." },
       { q: "Are motorway tolls included?", a: "No. Tolls are not included in the quoted price and are charged separately where the route uses a toll motorway. Longer routes — Costa Brava, Costa Daurada, Tarragona, Girona, Andorra and similar — normally involve tolls; short city and airport transfers usually do not. Your driver can confirm the exact toll amount for your route." },
       { q: "What is included in the price?", a: "The quoted price includes the professional chauffeur, the vehicle, fuel, parking and standard waiting time. Airport transfers also include flight tracking and 60 minutes of free waiting. VAT and tolls are NOT included — see the two questions above." },

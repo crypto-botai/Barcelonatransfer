@@ -245,3 +245,35 @@ describe("destinations.json prices never reach a customer", () => {
     }
   });
 });
+
+describe("the AI knowledge base carries no fare", () => {
+  it("keeps route prices out of the seed", () => {
+    // The support prompt injects a live pricing block read from the route table.
+    // A fare in the seed is a second place for a price to live, and it is the one
+    // that goes stale: eight of the ten figures once seeded had drifted below
+    // what the checkout charges.
+    const src = fs.readFileSync("app/api/ai/seed/route.ts", "utf8");
+    const fares = [...src.matchAll(/€\s?(\d[\d.,]*)/g)].map((m) => m[1]);
+    expect(
+      fares,
+      `app/api/ai/seed/route.ts states €${fares.join(", €")} — the agent reads live pricing, so the seed must not carry fares`,
+    ).toEqual([]);
+  });
+
+  it("still instructs the agent to quote only live pricing", () => {
+    const prompt = fs.readFileSync("lib/ai/prompts/support.ts", "utf8");
+    expect(prompt).toContain("LIVE PRICING");
+    expect(prompt).toMatch(/Never invent prices/i);
+  });
+});
+
+describe("the FAQ reads its route fares", () => {
+  it("quotes no route fare as a literal", () => {
+    const src = fs.readFileSync("lib/faq-data.ts", "utf8");
+    const literals = [...src.matchAll(/€(\d[\d.,]*)/g)].map((m) => m[1]);
+    // €25 is the additional-waiting charge: a contractual fee with no route to
+    // read from, and deliberately left alone.
+    const routeFares = literals.filter((v) => v !== "25");
+    expect(routeFares, `lib/faq-data.ts still states €${routeFares.join(", €")}`).toEqual([]);
+  });
+});
