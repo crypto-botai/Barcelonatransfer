@@ -116,6 +116,7 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
     accent: ["#264653", "#8ECAE6"],
     motif: "snow",
     bookDestination: "Barcelona City",
+    transferHref: "/transfers/andorra",
     distanceKm: 0,
     durationMin: 0,
     body: [
@@ -415,6 +416,7 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
     accent: ["#7209B7", "#F4A261"],
     motif: "arches",
     bookDestination: "Figueres",
+    transferHref: "/transfers/figueres",
     priceZone: "figueres",
     distanceKm: 140,
     durationMin: 100,

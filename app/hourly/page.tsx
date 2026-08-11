@@ -99,6 +99,53 @@ export default function HourlyPage() {
             </p>
           </div>
         </section>
+
+        {/* The page ranked page two on roughly 50 words. Every figure below is
+            read from the pricing module rather than written by hand, so the copy
+            cannot drift from what the booking actually charges. */}
+        <section className="py-16 bg-[#050505] border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display text-3xl text-white mb-6">
+              How hourly hire <span className="text-gold-gradient">works</span>
+            </h2>
+            <div className="space-y-4 text-dark-300 leading-relaxed">
+              <p>
+                You book the car and the driver for a block of time rather than for a single journey. The
+                minimum is <strong className="text-white">{MIN_HOURS} hours</strong>, and the clock runs from
+                the pickup time you choose, not from the first stop. Within that block the itinerary is yours:
+                the driver waits while you are in a meeting, a restaurant or a shop, and moves when you do.
+              </p>
+              <p>
+                This is what most people want when a fixed transfer does not fit — a morning of viewings, a
+                day of meetings across the city, a wedding, or a shopping run where nobody wants to find a
+                taxi with the bags. It is also the sensible choice when you need the same driver all day
+                rather than a different car each time.
+              </p>
+              <p>
+                Rates start at <strong className="text-white">€{MIN_RATE} an hour</strong> for an economy
+                sedan and rise with the vehicle, as the table above shows. A{" "}
+                <strong className="text-white">20% night surcharge</strong> applies to hourly hire between
+                22:00 and 06:00; fixed-price transfers have no night surcharge at all. VAT is added only if
+                you ask for an invoice, and tolls are charged separately where the route uses them.
+              </p>
+              <p>
+                Journeys with a set start and end are usually cheaper booked as a{" "}
+                <Link href="/transfers" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  fixed-price transfer
+                </Link>{" "}
+                instead — airport runs, the{" "}
+                <Link href="/transfers/cruise-port" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  cruise terminal
+                </Link>
+                , or a long single leg such as{" "}
+                <Link href="/transfers/andorra" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  Barcelona to Andorra
+                </Link>
+                . Tell us what the day looks like and we will say which way is cheaper.
+              </p>
+            </div>
+          </div>
+        </section>
       </main>
       <Footer />
     </>

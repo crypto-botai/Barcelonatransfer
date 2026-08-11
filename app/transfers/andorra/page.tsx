@@ -14,7 +14,10 @@ export const metadata: Metadata = {
   description:
     `Private transfer Barcelona to Andorra la Vella. Fixed price from €${andorraPrice}. 3-hour Pyrenean journey. Ski season & shopping specialist. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/andorra" },
-  keywords: ["barcelona andorra transfer", "barcelona andorra private car", "andorra ski transfer barcelona", "andorra la vella transfer"],
+  // Encamp (87 impressions, position 48.8) and the return leg (22) had no owner
+  // anywhere on the site. Both are served by this page's fixed fare and are now
+  // covered in its content, so it claims them here too.
+  keywords: ["barcelona andorra transfer", "barcelona andorra private car", "andorra ski transfer barcelona", "andorra la vella transfer", "barcelona to encamp transfer", "andorra to barcelona transfer"],
   openGraph: {
     ...SHARED_OG,
     title: `Barcelona to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
@@ -129,8 +132,84 @@ export default function AndorraTransferPage() {
                 and is packed with tax-free shops for electronics, perfume, alcohol, and tobacco.
               </p>
               <p>
-                There is no direct public transport from Barcelona Airport to Andorra. A private transfer is the standard
-                solution — departing from arrivals and arriving at your Andorran hotel or ski hotel in approximately 3 hours.
+                Andorra has no airport and no railway, so every arrival comes by road. Scheduled coaches run from
+                Barcelona to Andorra on a fixed timetable from a fixed stop, which works well if your flight lands
+                near a departure and less well if it does not. A private transfer leaves when you land, from the
+                arrivals hall, and stops at your own door.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Named destinations. Encamp in particular: it is the second most
+            searched Andorra term reaching this site and had no content at all,
+            while sharing the Andorra fare exactly. A section here beats a
+            separate page that would duplicate this one's price and route. */}
+        <section className="py-16 bg-dark-950 border-b border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display text-3xl text-white mb-6">
+              Where in Andorra <span className="text-gold-gradient">we drive</span>
+            </h2>
+            <p className="text-dark-300 leading-relaxed mb-8">
+              The parishes below are all covered by the same fixed fare of €{andorraPrice} for an economy
+              sedan. Andorra is small and the road up the valley serves all of them, so where you are
+              staying inside the country does not change what you pay.
+            </p>
+
+            <div className="space-y-6">
+              {[
+                {
+                  name: "Andorra la Vella",
+                  body: "The capital, and where most first visits stay. Europe's highest capital city at 1,023 m, and the centre of the duty-free shopping that brings a good share of Andorra's visitors. Drop-off at your hotel door on Meritxell or Carlemany rather than at a coach stop with your luggage.",
+                },
+                {
+                  name: "Encamp",
+                  body: "Ten minutes further up the CG-2 from the capital, and the parish that reaches all the way to the French border. Encamp is where many winter visitors actually sleep: rooms cost less than in Soldeu or Pas de la Casa, and the Funicamp gondola climbs straight from the town into the Grandvalira ski area, so you can stay in the valley and still be on the snow early. The same fixed fare applies as to the capital.",
+                },
+                {
+                  name: "Canillo, La Massana, Ordino, Sant Julià de Lòria",
+                  body: "The remaining parishes are served at the same price. Tell us the hotel or apartment address when you book and the driver takes you to it.",
+                },
+                {
+                  name: "The ski stations",
+                  body: "Grandvalira, Pas de la Casa and Vallnord sit above the towns, further than the parish villages and on mountain roads. They are quoted by distance rather than at the Andorra fare — ask us and we will confirm the price before you book.",
+                },
+              ].map(({ name, body }) => (
+                <div key={name} className="border-l-2 border-gold-500/30 pl-5">
+                  <h3 className="text-white font-medium mb-1.5">{name}</h3>
+                  <p className="text-dark-400 text-sm leading-relaxed">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Serves the "andorra airport shuttle" searches without ever claiming
+            to run one. The underlying need is transport from BCN to Andorra;
+            what we sell is the private alternative, and the copy says so. */}
+        <section className="py-16 bg-[#050505] border-b border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display text-3xl text-white mb-6">
+              Private car, <span className="text-gold-gradient">not a shared shuttle</span>
+            </h2>
+            <div className="space-y-4 text-dark-300 leading-relaxed">
+              <p>
+                People searching for an airport shuttle to Andorra are usually looking for one thing: a way to
+                get from the terminal to their hotel without hiring a car and driving a mountain pass after a
+                flight. We are not that shuttle. Élite BCN runs <strong className="text-white">private
+                transfers only</strong> — the car is booked for your party alone, with no other passengers,
+                no other stops, and no seat-by-seat pricing.
+              </p>
+              <p>
+                What that changes in practice: the car leaves when you are ready rather than at a published
+                departure time, the price is per vehicle so a family of four pays once rather than four times,
+                and the ski bags and suitcases go in the boot of the car you booked instead of competing for
+                space with strangers&apos; luggage.
+              </p>
+              <p>
+                The return works the same way. <strong className="text-white">Andorra to Barcelona Airport</strong> is
+                the same fixed fare in reverse, and we will set the pickup against your flight time so you are
+                not standing outside a hotel at dawn guessing how long the descent takes.
               </p>
             </div>
           </div>

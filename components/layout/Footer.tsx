@@ -170,6 +170,12 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+              {/* The only priority destination with no sitewide link. */}
+              <li>
+                <Link href="/transfers/costa-brava" className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
+                  Costa Brava
+                </Link>
+              </li>
               <li>
                 <Link href="/transfers" className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
                   All destinations
