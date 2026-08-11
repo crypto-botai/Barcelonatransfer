@@ -44,23 +44,23 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "BARCELONA_CITY",
     fromLabel: "El Prat Airport", toLabel: "Barcelona City",
     category: "airport-city",
+    // Business is €60 here, as everywhere. A €50 override used to sit on this
+    // route for the Camry, which meant the fare depended on which code path
+    // answered: the database said €60 and served every normal booking, while
+    // the offline fallback said €50. Owner decision is €60, so the override is
+    // gone and the two paths cannot disagree again.
     prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
-    // Camry (BUSINESS) → €50 for this route only, by explicit instruction.
-    // Tesla M3 and EQE 300 (LUXURY) are not overridden — both keep the
-    // BUSINESS column price (€60), which is the only matrix-legal value.
-    vehicleClassOverrides: { BUSINESS: 50 },
   },
   {
     // Point-to-point within Barcelona city. Priced identically to the
-    // airport ⇄ city route (including the Camry override) so a city-centre
-    // hop never falls through to "custom quote".
+    // airport ⇄ city route so a city-centre hop never falls through to
+    // "custom quote".
     slug: "barcelona-city-barcelona-city",
     from: "BARCELONA_CITY", to: "BARCELONA_CITY",
     fromLabel: "Barcelona City", toLabel: "Barcelona City",
     category: "airport-city",
     note: "Within Barcelona city",
     prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
-    vehicleClassOverrides: { BUSINESS: 50 },
   },
   {
     slug: "bcn-airport-cruise-terminal",

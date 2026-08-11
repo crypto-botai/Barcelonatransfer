@@ -277,3 +277,47 @@ describe("the FAQ reads its route fares", () => {
     expect(routeFares, `lib/faq-data.ts still states €${routeFares.join(", €")}`).toEqual([]);
   });
 });
+
+describe("Business airport → Barcelona city is €60", () => {
+  /**
+   * A €50 override sat on this route for the Camry, so the fare depended on
+   * which code path answered: the database said €60 and served every normal
+   * booking, the offline fallback said €50. The owner settled it at €60 and
+   * the override is gone. These assertions exist so it cannot come back.
+   */
+  const ROUTES: [string, string][] = [
+    ["airport", "barcelona_city"],
+    ["barcelona_city", "barcelona_city"],
+  ];
+
+  it.each(ROUTES)("%s → %s charges €60 for Business", (from, to) => {
+    expect(lookupFixedPriceByZone(from, to, "BUSINESS")).toBe(60);
+    expect(lookupFixedPriceByZone(from, to, "BUSINESS")).not.toBe(50);
+  });
+
+  it("agrees between the ladder pages read and the lookup the booking falls back to", () => {
+    // These two disagreeing is precisely what produced the €50/€60 split.
+    expect(ladderFor("barcelona_city", "airport")!.business)
+      .toBe(lookupFixedPriceByZone("airport", "barcelona_city", "BUSINESS"));
+  });
+
+  it("carries no vehicle-class override on either route", () => {
+    const src = fs.readFileSync("lib/fixed-prices.ts", "utf8");
+    const overrides = [...src.matchAll(/vehicleClassOverrides:\s*\{[^}]*\}/g)].map((m) => m[0]);
+    expect(overrides, `an override reintroduces a per-route fare: ${overrides.join(" | ")}`).toEqual([]);
+  });
+
+  it("leaves the other classes on this route alone", () => {
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "ECONOMY")).toBe(50);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "MINIVAN")).toBe(65);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "LUXURY_MINIVAN")).toBe(75);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "MINIBUS")).toBe(180);
+  });
+
+  it("keeps the AI's offline pricing block off a hand-typed fare", () => {
+    const src = fs.readFileSync("lib/ai/prompts/support.ts", "utf8");
+    expect(src).not.toMatch(/Economy \/ Business.*€\s?\d/);
+    const literals = [...src.matchAll(/from €(\d+)/g)].map((m) => m[1]);
+    expect(literals, `support prompt states €${literals.join(", €")} literally`).toEqual([]);
+  });
+});
