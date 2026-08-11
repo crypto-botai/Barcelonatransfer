@@ -140,6 +140,13 @@ export default function AndorraTransferPage() {
                 near a departure and less well if it does not. A private transfer leaves when you land, from the
                 arrivals hall, and stops at your own door.
               </p>
+              <p>
+                The road runs up through Lleida and the Segre valley to{" "}
+                <strong className="text-white">La Seu d&apos;Urgell</strong>, the last Spanish town before the
+                border and a stop we are often asked for in its own right — either as the destination, or as a
+                halt on the way up. Ask when you book and we will price it; it sits outside the Andorra fare and
+                is quoted by distance.
+              </p>
             </div>
           </div>
         </section>
@@ -175,7 +182,7 @@ export default function AndorraTransferPage() {
                 },
                 {
                   name: "The ski stations",
-                  body: "Grandvalira, Pas de la Casa and Vallnord sit above the towns, further than the parish villages and on mountain roads. They are quoted by distance rather than at the Andorra fare — ask us and we will confirm the price before you book.",
+                  body: "Grandvalira and its sectors — Soldeu, El Tarter, Pas de la Casa, Grau Roig — and the Vallnord stations at Arinsal, Pal and Ordino-Arcalís all sit above the towns, further than the parish villages and on mountain roads. They are quoted by distance rather than at the Andorra fare, so ask us and we will confirm the price before you book.",
                 },
               ].map(({ name, body }) => (
                 <div key={name} className="border-l-2 border-gold-500/30 pl-5">
