@@ -39,6 +39,14 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Raw Search Console exports — never published.
+#
+# This repository is public. The exports carry the full query list and the
+# country breakdown, which is commercial intelligence and hands a competitor
+# the keyword research for free. Analysis and conclusions get committed; the
+# raw files stay on the machine that downloaded them.
+/seo-data/
+
 # prisma
 prisma/migrations/
 .env*.local
