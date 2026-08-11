@@ -14,22 +14,22 @@ const LADDER = ladderFor("cadaques", "airport")!;
 const BASE = "https://www.elitebcn.info";
 
 export const metadata: Metadata = {
-  title: "Barcelona to Cadaqués Transfer — from €240 | Élite BCN",
+  title: `Barcelona to Cadaqués Transfer — from €${LADDER.economy} | Élite BCN`,
   description:
-    "Private transfer from Barcelona to Cadaqués. Fixed price from €240. 2h 15min journey via AP-7. Meet & greet, no surge pricing. Book instantly.",
+    `Private transfer from Barcelona to Cadaqués. Fixed price from €${LADDER.economy}. 2h 15min journey via AP-7. Meet & greet, no surge pricing. Book instantly.`,
   alternates: { canonical: `${BASE}/transfers/cadaques` },
   keywords: ["barcelona cadaques transfer", "cadaques private car barcelona", "cadaques airport transfer", "costa brava transfer cadaques"],
   openGraph: {
     ...SHARED_OG,
-    title: "Barcelona to Cadaqués Transfer — from €240 | Fixed Price",
-    description: "Private transfer from Barcelona to Cadaqués from €240. Fixed price, meet & greet, no surge pricing. 2h 15min.",
+    title: `Barcelona to Cadaqués Transfer — from €${LADDER.economy} | Fixed Price`,
+    description: `Private transfer from Barcelona to Cadaqués from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing. 2h 15min.`,
     url: `${BASE}/transfers/cadaques`,
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Cadaqués Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona to Cadaqués Transfer — from €240 | Élite BCN",
-    description: "Private transfer from Barcelona to Cadaqués from €240. Fixed price, meet & greet, no surge pricing.",
+    title: `Barcelona to Cadaqués Transfer — from €${LADDER.economy} | Élite BCN`,
+    description: `Private transfer from Barcelona to Cadaqués from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing.`,
     images: ["/opengraph-image"],
   },
 };
@@ -48,7 +48,7 @@ const SERVICE_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: "Barcelona to Cadaqués Private Transfer",
-  description: "Luxury fixed-price private transfer from Barcelona (city or El Prat Airport) to Cadaqués, Costa Brava. From €240. Meet & greet, flight tracking, 60 min free wait.",
+  description: `Luxury fixed-price private transfer from Barcelona (city or El Prat Airport) to Cadaqués, Costa Brava. From €${LADDER.economy}. Meet & greet, flight tracking, 60 min free wait.`,
   url: `${BASE}/transfers/cadaques`,
   provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: BASE, telephone: "+34635383712" },
   areaServed: [
@@ -65,7 +65,7 @@ const FAQS = [
   },
   {
     q: "How much does a private transfer from Barcelona to Cadaqués cost?",
-    a: "A fixed-price private transfer from Barcelona to Cadaqués starts from €240 for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €260, and a Mercedes V-Class for groups up to 7 is €310. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and motorway tolls are charged separately. Meet & greet and 60 minutes of free waiting are included, with no surcharge for the longer mountain approach.",
+    a: `A fixed-price private transfer from Barcelona to Cadaqués starts from €${LADDER.economy} for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €260, and a Mercedes V-Class for groups up to 7 is €310. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and motorway tolls are charged separately. Meet & greet and 60 minutes of free waiting are included, with no surcharge for the longer mountain approach.`,
   },
   {
     q: "Can Élite BCN transfer us onward from Cadaqués to Girona Airport or back to Barcelona?",
@@ -120,13 +120,13 @@ export default function CadaquesTransferPage() {
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 2h 15min</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 170 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €240 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €{LADDER.economy} fixed</div>
             </div>
             <Link
               href="/book?destination=Cadaques"
               className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors"
             >
-              Book Cadaqués Transfer — €240
+              Book Cadaqués Transfer — €{LADDER.economy}
             </Link>
           </div>
         </section>
@@ -139,7 +139,7 @@ export default function CadaquesTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed price €240", body: "The price you see is the price you pay — including the winding final approach over Cap de Creus. No meter, no surcharges." },
+                { icon: Shield, title: `Fixed price €${LADDER.economy}`, body: "The price you see is the price you pay — including the winding final approach over Cap de Creus. No meter, no surcharges." },
                 { icon: Clock, title: "Meet & greet included", body: "Your driver waits in the arrivals hall or your Barcelona address with your name on a board. 60 minutes free waiting from your flight landing." },
                 { icon: Star, title: "Real-time flight tracking", body: "We monitor your flight live. If it's delayed, your driver adjusts automatically — no extra charge." },
                 { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, bottled water, WiFi on request." },
@@ -279,7 +279,7 @@ export default function CadaquesTransferPage() {
               href="/book?destination=Cadaques"
               className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors"
             >
-              Book Now — from €240
+              Book Now — from €{LADDER.economy}
             </Link>
           </div>
         </section>

@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: "summary_large_image",
-      title: `Barcelona Airport → ${dest.name} — from €${(await getPlacePrices(dest.coordinates.lat, dest.coordinates.lng, dest.distance_km))?.economy ?? dest.prices.sedan} fixed`,
+      title: `Barcelona Airport → ${dest.name} — from €${(await getPlacePrices(dest.coordinates.lat, dest.coordinates.lng, dest.distance_km))?.economy ?? "—"} fixed`,
       description: dest.description,
       images: [`${BASE}/opengraph-image`],
     },
@@ -49,9 +49,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 function buildSchema(dest: Destination, prices: ResolvedPlacePrices | null) {
-  // Schema must state the fare the checkout will actually charge.
-  const sedan = prices?.economy ?? dest.prices.sedan;
-  const mpv   = prices?.minivan ?? dest.prices.mpv;
+  // Schema states the fare the checkout will charge, or states none at all.
+  // The stale figures in destinations.json are never a fallback: publishing an
+  // out-of-date price to Google is worse than publishing no price.
+  const sedan = prices?.economy ?? null;
+  const mpv   = prices?.minivan ?? null;
   const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -67,13 +69,10 @@ function buildSchema(dest: Destination, prices: ResolvedPlacePrices | null) {
       { "@type": "City", name: "Barcelona" },
       { "@type": "Place", name: dest.name },
     ],
-    offers: {
-      "@type": "AggregateOffer",
-      lowPrice: sedan,
-      highPrice: mpv,
-      priceCurrency: "EUR",
-      offerCount: 3,
-    },
+    // Omitted when no published fare resolves, rather than defaulted.
+    ...(sedan !== null && mpv !== null
+      ? { offers: { "@type": "AggregateOffer", lowPrice: sedan, highPrice: mpv, priceCurrency: "EUR", offerCount: 3 } }
+      : {}),
   };
 
   const breadcrumbSchema = {
@@ -127,7 +126,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
 
   // One resolution, from the same authority that quotes a booking.
   const prices = await getPlacePrices(dest.coordinates.lat, dest.coordinates.lng, dest.distance_km);
-  const sedan  = prices?.economy ?? dest.prices.sedan;
+  const sedan  = prices?.economy ?? null;
   const isFixed = prices?.basis !== "distance";
   const { serviceSchema, breadcrumbSchema, faqSchema } = buildSchema(dest, prices);
   // "nearby" slugs can point either at a programmatic destinations.json entry or at one
@@ -183,7 +182,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
             <p className="text-dark-300 text-lg max-w-2xl mx-auto mb-8">
               Fixed-price private transfer from BCN El Prat Airport to {dest.name} ({dest.area}).{" "}
               {dest.distance_km} km — approximately {dest.duration_min} minutes. From{" "}
-              <span className="text-gold-400 font-semibold">€{sedan}{isFixed ? " fixed" : ""}</span>.
+              <span className="text-gold-400 font-semibold">{sedan !== null ? `€${sedan}${isFixed ? " fixed" : ""}` : "price on request"}</span>.
               No surge pricing, ever.
             </p>
 
@@ -199,7 +198,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
               </div>
               <div className="flex items-center gap-2 text-white">
                 <Star size={16} className="text-gold-500" />
-                from €{sedan}{isFixed ? " fixed" : ""}
+                from {sedan !== null ? `€${sedan}${isFixed ? " fixed" : ""}` : "price on request"}
               </div>
             </div>
 
@@ -207,7 +206,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
               href={`/book?destination=${encodeURIComponent(dest.name)}`}
               className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors"
             >
-              Book Transfer — from €{sedan}
+              Book Transfer{sedan !== null ? ` — from €${sedan}` : ""}
             </Link>
           </div>
         </section>
@@ -223,7 +222,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
               {[
                 {
                   icon: Shield,
-                  title: isFixed ? `Fixed price — €${sedan}` : `From €${sedan}`,
+                  title: sedan === null ? "Price on request" : isFixed ? `Fixed price — €${sedan}` : `From €${sedan}`,
                   body: "The price you see is the price you pay. No meter, no traffic surcharges, no airport supplements added at drop-off.",
                 },
                 {
@@ -326,7 +325,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                 href={`/book?destination=${encodeURIComponent(dest.name)}`}
                 className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-8 py-3 rounded-lg transition-colors"
               >
-                Book Now — from €{sedan}
+                Book Now{sedan !== null ? ` — from €${sedan}` : ""}
               </Link>
             </div>
           </div>
@@ -409,7 +408,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
               href={`/book?destination=${encodeURIComponent(dest.name)}`}
               className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors"
             >
-              Book Now — from €{sedan}
+              Book Now{sedan !== null ? ` — from €${sedan}` : ""}
             </Link>
           </div>
         </section>

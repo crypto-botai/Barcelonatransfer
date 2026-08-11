@@ -8,6 +8,7 @@ import I18nProvider from "@/components/language/I18nProvider";
 import SupportCenter from "@/components/support/LazySupportCenter";
 import MobileBookBar from "@/components/layout/MobileBookBar";
 import DeferredAnalytics from "@/components/layout/DeferredAnalytics";
+import { buildOfferCatalog } from "@/lib/offer-catalog";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -188,30 +189,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   hasOfferCatalog: {
                     "@type": "OfferCatalog",
                     name: "Barcelona Private Transfer Services",
-                    itemListElement: [
-                      // Airport ⇄ Barcelona
-                      { "@type": "Offer", name: "BCN Airport to Barcelona City Centre", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "El Prat Airport to Barcelona City Transfer", description: "Fixed-price luxury private transfer from Barcelona El Prat Airport (T1/T2) to city centre hotels. From €50 economy to €75 V-Class." } },
-                      // Airport ⇄ Cruise Port
-                      { "@type": "Offer", name: "BCN Airport to Cruise Port Transfer", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Cruise Port Private Transfer", description: "Fixed-price transfer from El Prat Airport to Barcelona World Trade Centre or Moll Adossat cruise terminals." } },
-                      // Airport ⇄ Andorra
-                      { "@type": "Offer", name: "BCN Airport to Andorra Transfer", price: "300", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Andorra la Vella Private Transfer", description: "Fixed-price luxury transfer from BCN Airport to Andorra la Vella. From €300 economy to €630 minibus." } },
-                      // Airport ⇄ Girona Airport
-                      { "@type": "Offer", name: "BCN Airport to Girona Airport Transfer", price: "140", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona El Prat Airport to Girona Costa Brava Airport Transfer", description: "Inter-airport private transfer between BCN (El Prat) and GRO (Girona). From €140 economy." } },
-                      // Airport ⇄ Costa Daurada
-                      { "@type": "Offer", name: "BCN Airport to Sitges Transfer", price: "80", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Sitges Private Transfer", description: "Fixed-price private transfer from Barcelona El Prat Airport to Sitges. From €80 economy." } },
-                      { "@type": "Offer", name: "BCN Airport to Tarragona / PortAventura", price: "150", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Tarragona and PortAventura Transfer", description: "Fixed-price transfer from BCN Airport to Tarragona, Salou, La Pineda, and PortAventura World. From €150." } },
-                      { "@type": "Offer", name: "BCN Airport to Salou Transfer", price: "150", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Salou Private Transfer", description: "Direct fixed-price transfer from BCN Airport to Salou resort. From €150 economy." } },
-                      { "@type": "Offer", name: "BCN Airport to Cambrils Transfer", price: "160", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Cambrils Private Transfer", description: "Direct fixed-price transfer from BCN Airport to Cambrils. From €160 economy." } },
-                      // Airport ⇄ Costa Brava
-                      { "@type": "Offer", name: "BCN Airport to Lloret de Mar Transfer", price: "100", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Lloret de Mar Private Transfer", description: "Fixed-price transfer from BCN El Prat Airport to Lloret de Mar, Costa Brava. From €100 economy." } },
-                      { "@type": "Offer", name: "BCN Airport to Tossa de Mar Transfer", price: "110", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Tossa de Mar Private Transfer", description: "Fixed-price transfer from BCN Airport to Tossa de Mar, Costa Brava. From €110 economy." } },
-                      { "@type": "Offer", name: "BCN Airport to Roses / Empuriabrava", price: "155", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona Airport to Roses and Empuriabrava Transfer", description: "Fixed-price transfer from BCN Airport to Roses and Empuriabrava, northern Costa Brava. From €155 economy." } },
-                      // City routes
-                      { "@type": "Offer", name: "Barcelona to Sitges Transfer", price: "75", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona City to Sitges Private Transfer", description: "Fixed-price luxury transfer from Barcelona city centre to Sitges. No surge pricing." } },
-                      { "@type": "Offer", name: "Barcelona to Tarragona Transfer", price: "145", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Barcelona City to Tarragona Private Transfer", description: "Fixed-price luxury transfer from Barcelona to Tarragona and PortAventura." } },
-                      // Hourly
-                      { "@type": "Offer", name: "Executive Hourly Chauffeur Barcelona", price: "50", priceCurrency: "EUR", itemOffered: { "@type": "Service", name: "Hourly Chauffeur Service Barcelona", description: "By-the-hour luxury chauffeur hire in Barcelona. From €45/h economy, €50/h business, €65/h luxury. Minimum 4 hours." } },
-                    ],
+                    itemListElement: buildOfferCatalog(),
                   },
                   parentOrganization: { "@id": "https://www.elitebcn.info/#organization" },
                 },

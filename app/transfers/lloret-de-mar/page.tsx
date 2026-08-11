@@ -14,22 +14,22 @@ const LADDER = ladderFor("lloret", "airport")!;
 const BASE = "https://www.elitebcn.info";
 
 export const metadata: Metadata = {
-  title: "Barcelona to Lloret de Mar Transfer — from €145 | Élite BCN",
+  title: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy} | Élite BCN`,
   description:
-    "Private transfer from Barcelona to Lloret de Mar. Fixed price from €145. 65-minute journey via AP-7. Meet & greet, no surge pricing. Book instantly.",
+    `Private transfer from Barcelona to Lloret de Mar. Fixed price from €${LADDER.economy}. 65-minute journey via AP-7. Meet & greet, no surge pricing. Book instantly.`,
   alternates: { canonical: `${BASE}/transfers/lloret-de-mar` },
   keywords: ["barcelona lloret de mar transfer", "lloret de mar private car barcelona", "lloret de mar airport transfer", "costa brava transfer lloret"],
   openGraph: {
     ...SHARED_OG,
-    title: "Barcelona to Lloret de Mar Transfer — from €145 | Fixed Price",
-    description: "Private transfer from Barcelona to Lloret de Mar from €145. Fixed price, meet & greet, no surge pricing. 65 minutes.",
+    title: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy} | Fixed Price`,
+    description: `Private transfer from Barcelona to Lloret de Mar from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing. 65 minutes.`,
     url: `${BASE}/transfers/lloret-de-mar`,
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Lloret de Mar Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona to Lloret de Mar Transfer — from €145 | Élite BCN",
-    description: "Private transfer from Barcelona to Lloret de Mar from €145. Fixed price, meet & greet, no surge pricing.",
+    title: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy} | Élite BCN`,
+    description: `Private transfer from Barcelona to Lloret de Mar from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing.`,
     images: ["/opengraph-image"],
   },
 };
@@ -48,7 +48,7 @@ const SERVICE_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: "Barcelona to Lloret de Mar Private Transfer",
-  description: "Luxury fixed-price private transfer from Barcelona (city or El Prat Airport) to Lloret de Mar, Costa Brava. From €145. Meet & greet, flight tracking, 60 min free wait.",
+  description: `Luxury fixed-price private transfer from Barcelona (city or El Prat Airport) to Lloret de Mar, Costa Brava. From €${LADDER.economy}. Meet & greet, flight tracking, 60 min free wait.`,
   url: `${BASE}/transfers/lloret-de-mar`,
   provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: BASE, telephone: "+34635383712" },
   areaServed: [
@@ -65,7 +65,7 @@ const FAQS = [
   },
   {
     q: "How much does a private transfer from Barcelona to Lloret de Mar cost?",
-    a: "A fixed-price private transfer from Barcelona to Lloret de Mar starts from €145 for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €165, and a Mercedes V-Class for groups up to 7 is €205. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and AP-7 motorway tolls are charged separately. Meet & greet and 60 minutes of free waiting are included.",
+    a: `A fixed-price private transfer from Barcelona to Lloret de Mar starts from €${LADDER.economy} for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €165, and a Mercedes V-Class for groups up to 7 is €205. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and AP-7 motorway tolls are charged separately. Meet & greet and 60 minutes of free waiting are included.`,
   },
   {
     q: "Can Élite BCN pick us up from our Lloret de Mar hotel for the return to Barcelona?",
@@ -120,13 +120,13 @@ export default function LloretDeMarTransferPage() {
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 65 minutes</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 75 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €145 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €{LADDER.economy} fixed</div>
             </div>
             <Link
               href="/book?destination=Lloret+de+Mar"
               className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors"
             >
-              Book Lloret de Mar Transfer — €145
+              Book Lloret de Mar Transfer — €{LADDER.economy}
             </Link>
           </div>
         </section>
@@ -139,7 +139,7 @@ export default function LloretDeMarTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed price €145", body: "The price you see is the price you pay. No meter, no traffic surcharges, no hidden fees." },
+                { icon: Shield, title: `Fixed price €${LADDER.economy}`, body: "The price you see is the price you pay. No meter, no traffic surcharges, no hidden fees." },
                 { icon: Clock, title: "Meet & greet included", body: "Your driver waits in the arrivals hall or your Barcelona address with your name on a board. 60 minutes free waiting from your flight landing." },
                 { icon: Star, title: "Real-time flight tracking", body: "We monitor your flight live. If it's delayed, your driver adjusts automatically — no extra charge." },
                 { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, bottled water, WiFi on request." },
@@ -279,7 +279,7 @@ export default function LloretDeMarTransferPage() {
               href="/book?destination=Lloret+de+Mar"
               className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors"
             >
-              Book Now — from €145
+              Book Now — from €{LADDER.economy}
             </Link>
           </div>
         </section>
