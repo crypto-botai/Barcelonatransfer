@@ -4,6 +4,14 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
+import { ladderFor } from "@/lib/destination-pricing";
+
+const portAventura = ladderFor("portaventura", "airport")!;
+
+// Read from the price table, never restated. A repriced route reaches
+// this page, its schema and the checkout together, or reaches none.
+const LADDER = ladderFor("tarragona", "airport")!;
+
 
 export const metadata: Metadata = {
   title: "Barcelona to Tarragona Transfer — from €150 | Fixed Price",
@@ -34,7 +42,7 @@ const tarragonaServiceSchema = {
   url: "https://www.elitebcn.info/transfers/tarragona",
   provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Tarragona, Catalonia, Spain",
-  offers: { "@type": "Offer", price: "150", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+  offers: { "@type": "Offer", price: String(LADDER.economy), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const BREADCRUMB = {
@@ -141,11 +149,11 @@ export default function TarragonaTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { route: "Barcelona → Tarragona (Economy sedan)",     price: "€150" },
-                    { route: "Barcelona → Tarragona (Business sedan)",    price: "€170" },
-                    { route: "Barcelona → Tarragona (Minivan, 4–8 pax)", price: "€190" },
-                    { route: "Barcelona → PortAventura / Salou",          price: "€155" },
-                    { route: "Tarragona → Barcelona (same fixed price)",  price: "€150" },
+                    { route: "Barcelona → Tarragona (Economy sedan)",     price: `€${LADDER.economy}` },
+                    { route: "Barcelona → Tarragona (Business sedan)",    price: `€${LADDER.business}` },
+                    { route: "Barcelona → Tarragona (Minivan, 4–8 pax)", price: `€${LADDER.minivan}` },
+                    { route: "Barcelona → PortAventura / Salou",          price: `€${portAventura.economy}` },
+                    { route: "Tarragona → Barcelona (same fixed price)",  price: `€${LADDER.economy}` },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.route}</td>

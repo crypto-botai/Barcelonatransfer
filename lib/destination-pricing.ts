@@ -1,5 +1,5 @@
 import { getPublicRoutes } from "@/lib/pricing-service";
-import { detectZoneFromCoords, distanceFare } from "@/lib/pricing";
+import { detectZoneFromCoords, distanceFare, ROUTES } from "@/lib/pricing";
 
 /**
  * Prices for a destination page, read from the same authority that quotes a
@@ -155,3 +155,74 @@ export const SLUG_TO_ZONE: Record<string, string> = {
   salou:           "salou",
   castelldefels:   "castelldefels",
 };
+
+/** The five price columns for one route, in display order. */
+export interface PriceLadder {
+  economy:  number;
+  business: number;
+  minivan:  number;
+  vclass:   number;
+  minibus:  number;
+}
+
+/**
+ * Synchronous ladder for a statically rendered destination page.
+ *
+ * The destination pages each carried their own hand-typed ladder — five prices
+ * per page, plus a figure inside the JSON-LD Offer. They matched the table on
+ * the day they were written, which is exactly what made them dangerous: the
+ * cruise page advertised a hotel-to-port fare of €35 against a real €60 for
+ * however long it took someone to notice, because nothing connected the two.
+ *
+ * Reading the ladder means a price change in the table reaches the page, the
+ * schema and the checkout together, or reaches none of them.
+ *
+ * Deliberately reads ROUTES rather than the database: these pages are
+ * statically rendered, and a synchronous source keeps them so. The database is
+ * seeded from the same table and the two are verified identical, so the figures
+ * agree; a route repriced in the admin panel updates the booking immediately
+ * and these pages at their next build.
+ *
+ * @param origin which end the page quotes from. Only Girona (€165 airport,
+ *   €140 city) and the cruise port (€50 / €60) differ, but where they differ it
+ *   is the whole point of the parameter.
+ */
+export function ladderFor(
+  zoneKey: string,
+  origin: "airport" | "barcelona_city" = "airport",
+): PriceLadder | null {
+  const r = ROUTES.find(
+    (x) => (x.from === origin && x.to === zoneKey) || (x.from === zoneKey && x.to === origin),
+  );
+  if (!r) return null;
+  return {
+    economy:  r.economy,
+    business: r.business,
+    minivan:  r.minivan,
+    vclass:   r.vclass,
+    minibus:  r.minibus,
+  };
+}
+
+/**
+ * Cheapest published fare across a group of destinations.
+ *
+ * The two regional pages — Costa Brava and Costa Dorada — cover a stretch of
+ * coast rather than one place, so neither has a route of its own in the table
+ * and both advertised a "from" figure that nothing produced. Costa Brava said
+ * €90 while the cheapest destination it names, Blanes, costs €135: a €45
+ * understatement of the kind this module exists to stop.
+ *
+ * @param zoneKeys the destinations the page actually names. Deriving from that
+ *   list keeps the headline honest as prices move, and keeps it tied to what
+ *   the page claims to cover rather than to the cheapest route on the coast.
+ */
+export function cheapestOf(
+  zoneKeys: string[],
+  origin: "airport" | "barcelona_city" = "airport",
+): number | null {
+  const fares = zoneKeys
+    .map((z) => ladderFor(z, origin)?.economy)
+    .filter((n): n is number => typeof n === "number" && n > 0);
+  return fares.length ? Math.min(...fares) : null;
+}

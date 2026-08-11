@@ -5,6 +5,9 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight, Anchor } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
+import { ladderFor } from "@/lib/destination-pricing";
+
+const cruiseLadder = ladderFor("cruise", "airport")!;
 
 const cruisePrice = ROUTES.find((r) => r.from === "airport" && r.to === "cruise")?.economy ?? 45;
 // The hotel-to-port fare had been typed by hand as €35 while the table the
@@ -156,7 +159,7 @@ export default function CruisePortTransferPage() {
                 <tbody>
                   {[
                     { route: "BCN Airport → Cruise Port (sedan)", price: `€${cruisePrice}` },
-                    { route: "BCN Airport → Cruise Port (MPV, 7 seats)", price: "€65" },
+                    { route: "BCN Airport → Cruise Port (MPV, 7 seats)", price: `€${cruiseLadder.minivan}` },
                     { route: "Cruise Port → BCN Airport (sedan)", price: `€${cruisePrice}` },
                     { route: "Barcelona City Hotel ↔ Cruise Port", price: `€${hotelPort}` },
                     { route: "Cruise Port → Sitges", price: "Quoted by distance" },

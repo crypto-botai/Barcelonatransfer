@@ -4,6 +4,12 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
+import { ladderFor } from "@/lib/destination-pricing";
+
+// Read from the price table, never restated. A repriced route reaches
+// this page, its schema and the checkout together, or reaches none.
+const LADDER = ladderFor("girona_airport", "barcelona_city")!;
+
 
 export const metadata: Metadata = {
   title: "Barcelona to Girona Transfer — from €140 | Fixed Price",
@@ -34,7 +40,7 @@ const gironaServiceSchema = {
   url: "https://www.elitebcn.info/transfers/girona",
   provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Girona, Costa Brava, Catalonia, Spain",
-  offers: { "@type": "Offer", price: "140", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+  offers: { "@type": "Offer", price: String(LADDER.economy), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const BREADCRUMB = {
@@ -137,10 +143,10 @@ export default function GironaTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { route: "Barcelona → Girona Airport GRO (Economy)",    price: "€140" },
-                    { route: "Barcelona → Girona Airport GRO (Business)",   price: "€155" },
-                    { route: "Barcelona → Girona Airport GRO (Minivan)",    price: "€170" },
-                    { route: "Girona Airport GRO → Barcelona (same price)", price: "€140" },
+                    { route: "Barcelona → Girona Airport GRO (Economy)",    price: `€${LADDER.economy}` },
+                    { route: "Barcelona → Girona Airport GRO (Business)",   price: `€${LADDER.business}` },
+                    { route: "Barcelona → Girona Airport GRO (Minivan)",    price: `€${LADDER.minivan}` },
+                    { route: "Girona Airport GRO → Barcelona (same price)", price: `€${LADDER.economy}` },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.route}</td>

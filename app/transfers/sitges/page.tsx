@@ -4,6 +4,12 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
+import { ladderFor } from "@/lib/destination-pricing";
+
+// Read from the price table, never restated. A repriced route reaches
+// this page, its schema and the checkout together, or reaches none.
+const LADDER = ladderFor("sitges", "airport")!;
+
 
 export const metadata: Metadata = {
   title: "Barcelona to Sitges Transfer — from €80 | Fixed Price",
@@ -34,7 +40,7 @@ const sitgesServiceSchema = {
   url: "https://www.elitebcn.info/transfers/sitges",
   provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Sitges, Garraf, Catalonia, Spain",
-  offers: { "@type": "Offer", price: "80", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+  offers: { "@type": "Offer", price: String(LADDER.economy), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const BREADCRUMB = {
@@ -64,9 +70,9 @@ const SCHEMA = {
   ],
   offers: {
     "@type": "Offer",
-    price: "80",
+    price: String(LADDER.economy),
     priceCurrency: "EUR",
-    priceSpecification: { "@type": "UnitPriceSpecification", price: "80", priceCurrency: "EUR", unitText: "per vehicle" },
+    priceSpecification: { "@type": "UnitPriceSpecification", price: String(LADDER.economy), priceCurrency: "EUR", unitText: "per vehicle" },
   },
 };
 
@@ -184,11 +190,11 @@ export default function SitgesTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { vehicle: "Economy sedan",            pax: "1–3", price: "€80" },
-                    { vehicle: "Business sedan",           pax: "1–3", price: "€100" },
-                    { vehicle: "Minivan (4–8 pax)",        pax: "1–8", price: "€110" },
-                    { vehicle: "V-Class (7 pax)",          pax: "1–7", price: "€130" },
-                    { vehicle: "Minibus (9+ pax)",         pax: "9–16", price: "€200" },
+                    { vehicle: "Economy sedan",            pax: "1–3", price: `€${LADDER.economy}` },
+                    { vehicle: "Business sedan",           pax: "1–3", price: `€${LADDER.business}` },
+                    { vehicle: "Minivan (4–8 pax)",        pax: "1–8", price: `€${LADDER.minivan}` },
+                    { vehicle: "V-Class (7 pax)",          pax: "1–7", price: `€${LADDER.vclass}` },
+                    { vehicle: "Minibus (9+ pax)",         pax: "9–16", price: `€${LADDER.minibus}` },
                   ].map((row) => (
                     <tr key={row.vehicle} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.vehicle}</td>

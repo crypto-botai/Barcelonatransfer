@@ -5,6 +5,9 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
+import { ladderFor } from "@/lib/destination-pricing";
+
+const LADDER = ladderFor("portaventura", "airport")!;
 
 const PA = ROUTES.find((r) => r.to === "portaventura")!;
 
@@ -37,7 +40,7 @@ const paSchema = {
   url: "https://www.elitebcn.info/transfers/port-aventura",
   provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "PortAventura, Salou, Tarragona, Spain",
-  offers: { "@type": "Offer", price: "155", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+  offers: { "@type": "Offer", price: String(LADDER.economy), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const paBreadcrumb = {

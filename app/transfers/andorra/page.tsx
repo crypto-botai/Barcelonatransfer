@@ -5,6 +5,9 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
+import { ladderFor } from "@/lib/destination-pricing";
+
+const andorraLadder = ladderFor("andorra", "airport")!;
 
 const andorraPrice =
   ROUTES.find((r) => r.from === "barcelona_city" && r.to === "andorra")?.economy ?? 285;
@@ -104,7 +107,7 @@ export default function AndorraTransferPage() {
                 { icon: Star, title: "Winter mountain driving", body: "Our drivers are experienced in Pyrenean mountain routes year-round, including winter conditions." },
                 { icon: CheckCircle2, title: "Grandvalira ski station", body: "Direct drop-off at Grandvalira (Europe's largest ski area), Vallnord, or your Andorran hotel." },
                 { icon: MapPin, title: "Duty-free shopping trips", body: "Use us for day-trip shopping in Andorra la Vella — we can wait and return you to Barcelona." },
-                { icon: Shield, title: "No public transport alternative", body: "There is no direct bus or train from Barcelona Airport to Andorra. Private transfer is the only practical option." },
+                { icon: Shield, title: "No airport, no railway", body: "Andorra has neither, so every arrival comes by road. Scheduled coaches run to a fixed timetable from a fixed stop; a private car leaves when you land and stops at your door." },
               ].map(({ icon: Icon, title, body }) => (
                 <div key={title} className="bg-dark-900 border border-white/[0.08] rounded-xl p-6">
                   <Icon size={24} className="text-gold-500 mb-3" />
@@ -229,7 +232,7 @@ export default function AndorraTransferPage() {
                 <tbody>
                   {[
                     { route: "BCN Airport → Andorra la Vella (sedan)", price: `€${andorraPrice}` },
-                    { route: "BCN Airport → Andorra la Vella (MPV, 7 seats)", price: "€370" },
+                    { route: "BCN Airport → Andorra la Vella (MPV, 7 seats)", price: `€${andorraLadder.minivan}` },
                     // The ski stations are charged as destinations outside
                     // Andorra, not at the Andorra fare. They are priced by road
                     // distance, so the exact figure depends on which station and

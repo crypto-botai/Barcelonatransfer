@@ -4,6 +4,12 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
+import { ladderFor } from "@/lib/destination-pricing";
+
+// Read from the price table, never restated. A repriced route reaches
+// this page, its schema and the checkout together, or reaches none.
+const LADDER = ladderFor("cadaques", "airport")!;
+
 
 const BASE = "https://www.elitebcn.info";
 
@@ -49,7 +55,7 @@ const SERVICE_SCHEMA = {
     { "@type": "City", name: "Barcelona" },
     { "@type": "City", name: "Cadaqués" },
   ],
-  offers: { "@type": "Offer", price: "240", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+  offers: { "@type": "Offer", price: String(LADDER.economy), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const FAQS = [
@@ -207,11 +213,11 @@ export default function CadaquesTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { vehicle: "Economy sedan (Corolla)",              pax: "1–3", price: "€240" },
-                    { vehicle: "Business sedan (EQE 300 / Tesla M3)",   pax: "1–3", price: "€260" },
-                    { vehicle: "Minivan (Vito, 4–8 pax)",               pax: "1–8", price: "€285" },
-                    { vehicle: "V-Class (7 pax)",                      pax: "1–7", price: "€310" },
-                    { vehicle: "Minibus (Sprinter, 9+ pax)",            pax: "9–16", price: "€360" },
+                    { vehicle: "Economy sedan (Corolla)",              pax: "1–3", price: `€${LADDER.economy}` },
+                    { vehicle: "Business sedan (EQE 300 / Tesla M3)",   pax: "1–3", price: `€${LADDER.business}` },
+                    { vehicle: "Minivan (Vito, 4–8 pax)",               pax: "1–8", price: `€${LADDER.minivan}` },
+                    { vehicle: "V-Class (7 pax)",                      pax: "1–7", price: `€${LADDER.vclass}` },
+                    { vehicle: "Minibus (Sprinter, 9+ pax)",            pax: "9–16", price: `€${LADDER.minibus}` },
                   ].map((row) => (
                     <tr key={row.vehicle} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.vehicle}</td>
