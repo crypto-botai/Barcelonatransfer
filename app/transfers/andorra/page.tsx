@@ -73,8 +73,10 @@ export default function AndorraTransferPage() {
               Barcelona Airport to <br /><span className="text-gold-gradient">Andorra Transfer</span>
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
-              Private luxury transfer from BCN El Prat Airport direct to Andorra la Vella or Grandvalira ski resort.
+              Private luxury transfer from BCN El Prat Airport direct to Andorra la Vella.
               Fixed price €{andorraPrice} — no meter, no tolls surprise, no surge pricing.
+              We also serve the ski stations at Grandvalira and Vallnord, which are further up
+              the valley and quoted by distance.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> ~3 hours</div>
@@ -94,7 +96,7 @@ export default function AndorraTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: `Fixed price €${andorraPrice}`, body: `One fixed price covers the full 210 km journey and mountain road sections. VAT and tolls are charged separately.` },
+                { icon: Shield, title: `Fixed price €${andorraPrice}`, body: `One fixed price covers the full 210 km journey to Andorra la Vella and the mountain road sections. The ski stations sit further up the valley and are quoted by distance. VAT and tolls are charged separately.` },
                 { icon: Clock, title: "Ski equipment transport", body: "Large boot space for ski bags, boot bags, and suitcases. The V-Class handles full ski kit for 4+ people." },
                 { icon: Star, title: "Winter mountain driving", body: "Our drivers are experienced in Pyrenean mountain routes year-round, including winter conditions." },
                 { icon: CheckCircle2, title: "Grandvalira ski station", body: "Direct drop-off at Grandvalira (Europe's largest ski area), Vallnord, or your Andorran hotel." },
@@ -149,15 +151,13 @@ export default function AndorraTransferPage() {
                   {[
                     { route: "BCN Airport → Andorra la Vella (sedan)", price: `€${andorraPrice}` },
                     { route: "BCN Airport → Andorra la Vella (MPV, 7 seats)", price: "€370" },
-                    // The ski stations have no row in the price table. Both were
-                    // advertised at €240; a booking to Vallnord resolves to the
-                    // Andorra zone and charges €300, and Grandvalira sits outside
-                    // that zone, prices by distance and charges over €500. Whether
-                    // the ski stations should carry the Andorra fare is a pricing
-                    // decision for the owner, so the page no longer names a figure
-                    // it cannot honour.
-                    { route: "BCN Airport → Grandvalira ski resort", price: "On request" },
-                    { route: "BCN Airport → Vallnord ski resort", price: "On request" },
+                    // The ski stations are charged as destinations outside
+                    // Andorra, not at the Andorra fare. They are priced by road
+                    // distance, so the exact figure depends on which station and
+                    // comes from the quote at booking — quoting one number here
+                    // would be the same mistake that had them advertised at €240.
+                    { route: "BCN Airport → Grandvalira ski resort", price: "Quoted by distance" },
+                    { route: "BCN Airport → Vallnord ski resort", price: "Quoted by distance" },
                     { route: "Andorra la Vella → BCN Airport", price: `€${andorraPrice}` },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
