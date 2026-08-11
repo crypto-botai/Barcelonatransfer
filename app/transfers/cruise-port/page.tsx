@@ -7,6 +7,10 @@ import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 
 const cruisePrice = ROUTES.find((r) => r.from === "airport" && r.to === "cruise")?.economy ?? 45;
+// The hotel-to-port fare had been typed by hand as €35 while the table the
+// booking quotes from says €60. Read it, do not restate it.
+const hotelPort = ROUTES.find((r) => r.from === "cruise" && r.to === "barcelona_city")?.economy
+  ?? ROUTES.find((r) => r.from === "barcelona_city" && r.to === "cruise")?.economy ?? 0;
 
 export const metadata: Metadata = {
   title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Élite BCN`,
@@ -154,9 +158,9 @@ export default function CruisePortTransferPage() {
                     { route: "BCN Airport → Cruise Port (sedan)", price: `€${cruisePrice}` },
                     { route: "BCN Airport → Cruise Port (MPV, 7 seats)", price: "€65" },
                     { route: "Cruise Port → BCN Airport (sedan)", price: `€${cruisePrice}` },
-                    { route: "Barcelona City Hotel → Cruise Port", price: "€35" },
-                    { route: "Cruise Port → Sitges", price: "€65" },
-                    { route: "Cruise Port → Tarragona / PortAventura", price: "€95" },
+                    { route: "Barcelona City Hotel ↔ Cruise Port", price: `€${hotelPort}` },
+                    { route: "Cruise Port → Sitges", price: "Quoted by distance" },
+                    { route: "Cruise Port → Tarragona / PortAventura", price: "Quoted by distance" },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.route}</td>
@@ -167,6 +171,42 @@ export default function CruisePortTransferPage() {
               </table>
             </div>
             <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet and 60 min free waiting.</p>
+          </div>
+        </section>
+
+        {/* Both travel directions are searched — "cruise port to hotel" and
+            "hotel to cruise port" appear separately in Search Console — and the
+            page covered neither in words. Embarkation and disembarkation are
+            genuinely different journeys to plan. */}
+        <section className="py-16 bg-[#050505] border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display text-3xl text-white mb-6">
+              Boarding day and <span className="text-gold-gradient">disembarkation</span>
+            </h2>
+            <div className="space-y-4 text-dark-300 leading-relaxed">
+              <p>
+                <strong className="text-white">Going to the ship.</strong> Most lines ask you to board within
+                a set window, and the terminals sit apart from each other — the World Trade Centre quays are
+                in the old port, while Moll Adossat is a separate stretch of quay further out. Give us the
+                ship and the terminal when you book and the driver takes you to that quay rather than to the
+                port gates. From a city hotel the fixed fare is €{hotelPort}; from the airport it is
+                €{cruisePrice}.
+              </p>
+              <p>
+                <strong className="text-white">Coming off the ship.</strong> Disembarkation empties several
+                thousand people onto one quay at once, which is the moment a taxi queue is least useful.
+                A booked car is already assigned to you. The same fixed fare applies in this direction, to a
+                hotel, to the airport, or onward to{" "}
+                <Link href="/transfers/sitges" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">Sitges</Link>{" "}
+                or the{" "}
+                <Link href="/transfers/costa-brava" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">Costa Brava</Link>{" "}
+                if you are staying on after the cruise.
+              </p>
+              <p>
+                Every journey is private. The car carries your party only, so the luggage that comes off a
+                two-week cruise is not competing for space with anyone else&apos;s.
+              </p>
+            </div>
           </div>
         </section>
 

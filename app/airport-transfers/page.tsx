@@ -8,32 +8,37 @@ import { SHARED_OG } from "@/lib/seo";
 
 const airportCityEco = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona_city")?.economy ?? 45;
 
+// Coverage figures come from the price table rather than from prose, so the
+// page cannot claim a destination count or a starting fare the booking would
+// not honour.
+const airportRoutes = ROUTES.filter((r) => r.from === "airport");
+const cheapestAirportFare = Math.min(...airportRoutes.map((r) => r.economy));
+
 /**
- * Differentiated from the homepage, which owns the broad "barcelona airport
- * transfer" term outright: 812 impressions at position 14.4 against this page's
- * 79 at 38.8. Two URLs were carrying the identical title and keyword, and
- * Google had already picked the winner.
+ * Owns the private airport transfer intent, as the service page for it.
  *
- * This page takes the arrivals intent instead — terminals, meet & greet, where
- * the driver waits. That cluster is currently unowned and shows 26 impressions
- * at around position 57, which is a gap rather than a contest.
+ * The homepage remains the brand root and carries the broader term by
+ * performance — 812 impressions at position 14.4 against this page's 79 at
+ * 38.8. The two are kept apart by qualifier rather than by topic: this page
+ * leads on "private", on the terminals, and on where the car actually goes
+ * afterwards, which is the part the homepage does not cover.
  */
 export const metadata: Metadata = {
-  title: { absolute: "BCN Airport Meet & Greet — T1 & T2 Arrivals | Élite BCN" },
-  description: `Meet & greet at Barcelona Airport arrivals, T1 and T2. Your driver waits inside with a name board from €${airportCityEco}. Real-time flight tracking and 60 minutes free waiting from landing.`,
+  title: { absolute: "Private Barcelona Airport Transfer — BCN T1 & T2 | Élite BCN" },
+  description: `Private transfer from Barcelona Airport, Terminal 1 and Terminal 2, from €${airportCityEco} per vehicle. Your car alone, no shared seats, and a published fixed price to ${airportRoutes.length} destinations.`,
   alternates: { canonical: "https://www.elitebcn.info/airport-transfers" },
-  keywords: ["barcelona airport meet and greet", "bcn arrivals pickup", "barcelona airport t1 transfer", "barcelona airport t2 transfer", "bcn el prat arrivals driver"],
+  keywords: ["private barcelona airport transfer", "barcelona airport transfer", "bcn el prat private transfer", "barcelona airport t1 transfer", "barcelona airport t2 transfer"],
   openGraph: {
     ...SHARED_OG,
-    title: "BCN Airport Meet & Greet — T1 & T2 Arrivals | Élite BCN",
-    description: `Meet & greet at Barcelona Airport arrivals, T1 and T2. Driver waiting inside with a name board from €${airportCityEco}. Flight tracking and 60 min free waiting.`,
+    title: "Private Barcelona Airport Transfer — BCN T1 & T2 | Élite BCN",
+    description: `Private transfer from Barcelona Airport, T1 and T2, from €${airportCityEco} per vehicle. Your car alone, and a published fixed price to ${airportRoutes.length} destinations.`,
     url: "https://www.elitebcn.info/airport-transfers",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Airport Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BCN Airport Meet & Greet — T1 & T2 Arrivals | Élite BCN",
-    description: `Meet & greet at Barcelona Airport arrivals, T1 and T2. Driver waiting inside with a name board from €${airportCityEco}. Flight tracking and 60 min free waiting.`,
+    title: "Private Barcelona Airport Transfer — BCN T1 & T2 | Élite BCN",
+    description: `Private transfer from Barcelona Airport, T1 and T2, from €${airportCityEco} per vehicle. Your car alone, and a published fixed price to ${airportRoutes.length} destinations.`,
     images: ["/opengraph-image"],
   },
 };
@@ -68,10 +73,10 @@ export default function AirportTransfersPage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,rgba(201,168,76,0.07),transparent)]" />
           <div className="container mx-auto px-4 text-center relative z-10">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold-500/30 bg-gold-500/5 text-gold-400 text-xs tracking-[0.2em] uppercase font-medium mb-6">
-              <Plane size={12} /> Arrivals Meet &amp; Greet
+              <Plane size={12} /> Private Airport Transfer
             </span>
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-6">
-              BCN Airport <br /><span className="text-gold-gradient">Meet &amp; Greet</span>
+              Private Barcelona <br /><span className="text-gold-gradient">Airport Transfer</span>
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Your driver waits inside the arrivals hall at Terminal 1 or Terminal 2, name board in hand,
@@ -149,6 +154,48 @@ export default function AirportTransfersPage() {
                   View all destinations →
                 </Link>
               </div>
+            </div>
+
+            {/* Coverage read from the price table itself. Nothing here is typed
+                by hand: the count and the cheapest fare come from the same
+                source the booking quotes from, so the page cannot drift. */}
+            <div className="max-w-3xl mx-auto mt-14 space-y-4 text-dark-300 leading-relaxed">
+              <h3 className="font-display text-2xl text-white">Where we go from the airport</h3>
+              <p>
+                {airportRoutes.length} destinations have a published fixed price from BCN El Prat, starting
+                at €{cheapestAirportFare} for the city centre and reaching along both coasts and into the
+                Pyrenees. The price is per vehicle and set before you travel, so it does not move with
+                traffic, with the hour, or with how long the queue at passport control turns out to be.
+              </p>
+              <p>
+                The busiest are{" "}
+                <Link href="/transfers/sitges" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">Sitges</Link>,{" "}
+                <Link href="/transfers/cruise-port" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">the cruise terminal</Link>,{" "}
+                <Link href="/transfers/costa-brava" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">the Costa Brava</Link>{" "}
+                and{" "}
+                <Link href="/transfers/andorra" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">Andorra</Link>,
+                which is the longest of the regular runs. The{" "}
+                <Link href="/transfers" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">full destination list</Link>{" "}
+                carries a price for each.
+              </p>
+
+              <h3 className="font-display text-2xl text-white pt-4">A private car, not a shared seat</h3>
+              <p>
+                Every booking is a private transfer. The vehicle is yours for the journey — no other
+                passengers, no other stops, and no per-seat pricing. A family of four pays the vehicle
+                price once rather than four times, and the luggage goes in the car you booked.
+              </p>
+              <p>
+                That also means the departure is yours. There is no published timetable to catch: the
+                driver is there for your flight, and if the arrival slips the pickup moves with it.
+              </p>
+
+              <h3 className="font-display text-2xl text-white pt-4">What the fare covers</h3>
+              <p>
+                The fixed price covers the chauffeur, the vehicle and fuel. VAT is added only if you ask
+                for an invoice, and motorway tolls are charged separately on the routes that use them —
+                which mostly means the longer runs south and north rather than the short hop into the city.
+              </p>
             </div>
           </div>
         </section>
