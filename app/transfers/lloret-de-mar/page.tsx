@@ -14,7 +14,7 @@ const LADDER = ladderFor("lloret", "airport")!;
 const BASE = "https://www.elitebcn.info";
 
 export const metadata: Metadata = {
-  title: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy} | Élite BCN`,
+  title: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy} | Elite BCN`,
   description:
     `Private transfer from Barcelona to Lloret de Mar. Fixed price from €${LADDER.economy}. 65-minute journey via AP-7. Meet & greet, no surge pricing. Book instantly.`,
   alternates: { canonical: `${BASE}/transfers/lloret-de-mar` },
@@ -24,11 +24,11 @@ export const metadata: Metadata = {
     title: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy} | Fixed Price`,
     description: `Private transfer from Barcelona to Lloret de Mar from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing. 65 minutes.`,
     url: `${BASE}/transfers/lloret-de-mar`,
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Lloret de Mar Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Lloret de Mar Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy} | Élite BCN`,
+    title: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy} | Elite BCN`,
     description: `Private transfer from Barcelona to Lloret de Mar from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing.`,
     images: ["/opengraph-image"],
   },
@@ -50,7 +50,7 @@ const SERVICE_SCHEMA = {
   name: "Barcelona to Lloret de Mar Private Transfer",
   description: `Luxury fixed-price private transfer from Barcelona (city or El Prat Airport) to Lloret de Mar, Costa Brava. From €${LADDER.economy}. Meet & greet, flight tracking, 60 min free wait.`,
   url: `${BASE}/transfers/lloret-de-mar`,
-  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: BASE, telephone: "+34635383712" },
+  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: BASE, telephone: "+34635383712" },
   areaServed: [
     { "@type": "City", name: "Barcelona" },
     { "@type": "City", name: "Lloret de Mar" },
@@ -68,7 +68,7 @@ const FAQS = [
     a: `A fixed-price private transfer from Barcelona to Lloret de Mar starts from €${LADDER.economy} for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €165, and a Mercedes V-Class for groups up to 7 is €205. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and AP-7 motorway tolls are charged separately. Meet & greet and 60 minutes of free waiting are included.`,
   },
   {
-    q: "Can Élite BCN pick us up from our Lloret de Mar hotel for the return to Barcelona?",
+    q: "Can Elite BCN pick us up from our Lloret de Mar hotel for the return to Barcelona?",
     a: "Yes. Every route is bidirectional at the same fixed price — book your return from any Lloret de Mar hotel, villa, or address back to Barcelona city or BCN Airport in advance to guarantee availability, especially during the July–August peak season.",
   },
 ];
@@ -135,7 +135,7 @@ export default function LloretDeMarTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">Lloret de Mar transfer</span>
+              Why choose Elite BCN for your <span className="text-gold-gradient">Lloret de Mar transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
@@ -228,7 +228,7 @@ export default function LloretDeMarTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet & greet, child seats and other extras are optional and charged separately.</p>
           </div>
         </section>
 

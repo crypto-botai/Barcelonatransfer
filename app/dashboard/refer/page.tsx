@@ -48,7 +48,7 @@ export default function ReferPage() {
         <div className="space-y-3">
           {[
             { step: "1", title: "Share your link",    desc: "Copy and share your unique referral link or code with friends." },
-            { step: "2", title: "Friend books",       desc: "Your friend uses your link to book their first Élite BCN transfer." },
+            { step: "2", title: "Friend books",       desc: "Your friend uses your link to book their first Elite BCN transfer." },
             { step: "3", title: "Both earn €10",      desc: "Once their trip is completed, you both receive €10 credit on your accounts." },
           ].map(({ step, title, desc }) => (
             <div key={step} className="flex items-start gap-4">

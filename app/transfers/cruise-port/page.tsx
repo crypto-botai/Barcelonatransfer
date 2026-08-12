@@ -16,8 +16,8 @@ const hotelPort = ROUTES.find((r) => r.from === "cruise" && r.to === "barcelona_
   ?? ROUTES.find((r) => r.from === "barcelona_city" && r.to === "cruise")?.economy ?? 0;
 
 export const metadata: Metadata = {
-  title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Élite BCN`,
-  description: `Private transfer to Barcelona cruise terminals (WTC & Moll Adossat). Vessel tracking, meet & greet, fixed price from €${cruisePrice}. No surge pricing. Book 24/7.`,
+  title: { absolute: "Barcelona Cruise Port Transfer — from €50" },
+  description: "Fixed €50 from the airport, €60 from a city hotel, to the WTC quays or Moll Adossat. Tell us your ship and the driver meets you at that terminal.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/cruise-port" },
   keywords: ["barcelona cruise port transfer", "world trade centre transfer", "moll adossat transfer", "barcelona port taxi", "cruise ship transfer barcelona"],
   openGraph: {
@@ -25,11 +25,11 @@ export const metadata: Metadata = {
     title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Fixed Price`,
     description: `Private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €${cruisePrice}. Vessel tracking, meet & greet, fixed price.`,
     url: "https://www.elitebcn.info/transfers/cruise-port",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Cruise Port Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona Cruise Port Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Élite BCN`,
+    title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Elite BCN`,
     description: `Fixed-price private transfer to Barcelona cruise port. Vessel tracking, meet & greet. From €${cruisePrice}.`,
     images: ["/opengraph-image"],
   },
@@ -41,7 +41,7 @@ const cruisePortSchema = {
   name: "Barcelona Cruise Port Transfer",
   description: `Fixed-price private transfers to all Barcelona cruise terminals — World Trade Centre (WTC) and Moll Adossat (T-A to T-D). Vessel tracking included.`,
   url: "https://www.elitebcn.info/transfers/cruise-port",
-  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Barcelona, Spain",
   offers: { "@type": "Offer", price: String(cruisePrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -116,7 +116,7 @@ export default function CruisePortTransferPage() {
               ))}
             </div>
             <p className="text-dark-400 text-sm text-center mt-6">
-              Not sure which terminal? Enter your cruise line when booking and we&apos;ll confirm the correct terminal for your vessel.
+              Not sure which terminal? Enter your cruise line when booking and we&apos;ll confirm the correct quay for your vessel. Your driver waits dockside at Moll Adossat or the World Trade Centre, outside next to the taxi rank where reserved VTC cars are permitted to park and wait.
             </p>
           </div>
         </section>
@@ -124,7 +124,7 @@ export default function CruisePortTransferPage() {
         <section className="py-16 bg-[#050505] border-y border-white/[0.06]">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">cruise transfer</span>
+              Why choose Elite BCN for your <span className="text-gold-gradient">cruise transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
@@ -173,7 +173,7 @@ export default function CruisePortTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet &amp; greet, child seats and other extras are optional and charged separately.</p>
           </div>
         </section>
 

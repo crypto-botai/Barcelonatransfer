@@ -5,20 +5,20 @@ import { COMPANY } from "@/lib/company-facts";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions — Élite BCN Barcelona Private Transfers",
-  description: "Terms and Conditions for Élite BCN Transfers — the Barcelona luxury private chauffeur and airport transfer service.",
+  title: "Terms & Conditions — Elite BCN Barcelona Private Transfers",
+  description: "Terms and Conditions for Elite BCN Transfers — the Barcelona luxury private chauffeur and airport transfer service.",
   alternates: { canonical: "https://www.elitebcn.info/terms" },
   openGraph: {
     ...SHARED_OG,
-    title: "Terms & Conditions — Élite BCN Barcelona Private Transfers",
-    description: "Terms and Conditions for Élite BCN Transfers — Barcelona luxury private chauffeur service.",
+    title: "Terms & Conditions — Elite BCN Barcelona Private Transfers",
+    description: "Terms and Conditions for Elite BCN Transfers — Barcelona luxury private chauffeur service.",
     url: "https://www.elitebcn.info/terms",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN Transfers — Terms & Conditions" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN Transfers — Terms & Conditions" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Terms & Conditions — Élite BCN Barcelona Private Transfers",
-    description: "Terms and Conditions for Élite BCN Transfers — Barcelona luxury private chauffeur service.",
+    title: "Terms & Conditions — Elite BCN Barcelona Private Transfers",
+    description: "Terms and Conditions for Elite BCN Transfers — Barcelona luxury private chauffeur service.",
     images: ["/opengraph-image"],
   },
 };
@@ -46,7 +46,7 @@ export default function TermsPage() {
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">1. Agreement</h2>
-                  <p>By booking a service with Élite BCN Transfers (&quot;the Company&quot;), you (&quot;the Client&quot;) agree to be bound by these Terms and Conditions. These terms apply to all bookings made via our website, WhatsApp, phone, or email.</p>
+                  <p>By booking a service with Elite BCN Transfers (&quot;the Company&quot;), you (&quot;the Client&quot;) agree to be bound by these Terms and Conditions. These terms apply to all bookings made via our website, WhatsApp, phone, or email.</p>
                 </div>
 
                 <div>
@@ -127,7 +127,7 @@ export default function TermsPage() {
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">11. Contact</h2>
-                  <p>Élite BCN Transfers · Barcelona, Spain · <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300">{COMPANY.email}</a> · +34 635 383 712</p>
+                  <p>Elite BCN Transfers · Barcelona, Spain · <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300">{COMPANY.email}</a> · +34 635 383 712</p>
                 </div>
 
               </div>

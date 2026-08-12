@@ -4,7 +4,7 @@ import { XCircle, ArrowLeft, MessageCircle } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
-  title: "Payment Failed | Élite BCN",
+  title: "Payment Failed | Elite BCN",
   robots: { index: false, follow: false },
 };
 

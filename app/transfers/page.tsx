@@ -23,21 +23,21 @@ const TYPE_GROUPS: { type: string; heading: string }[] = [
 ];
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona Private Transfer Destinations | Élite BCN" },
+  title: { absolute: "Barcelona Private Transfer Destinations | Elite BCN" },
   description:
     "Luxury transfers from Barcelona to Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat, cruise port & more. Fixed prices, no surge pricing.",
   alternates: { canonical: "https://www.elitebcn.info/transfers" },
   keywords: ["barcelona transfer destinations", "barcelona to sitges transfer", "barcelona to girona transfer", "barcelona andorra transfer", "barcelona costa brava transfer"],
   openGraph: {
     ...SHARED_OG,
-    title: "Barcelona Private Transfer Destinations | Élite BCN",
+    title: "Barcelona Private Transfer Destinations | Elite BCN",
     description: "Fixed-price luxury private transfers from Barcelona Airport to Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat and more.",
     url: "https://www.elitebcn.info/transfers",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Transfer Routes & Destinations" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona Transfer Routes & Destinations" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Private Transfer Destinations | Élite BCN",
+    title: "Barcelona Private Transfer Destinations | Elite BCN",
     description: "Fixed-price luxury private transfers from Barcelona Airport to Sitges, Girona, Tarragona, Andorra, Costa Brava and more.",
     images: ["/opengraph-image"],
   },

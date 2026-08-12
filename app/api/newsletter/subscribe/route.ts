@@ -11,7 +11,7 @@ const schema = z.object({
 });
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
-const FROM     = "Élite BCN Transfers <noreply@elitebcntransfers.com>";
+const FROM     = "Elite BCN Transfers <noreply@elitebcntransfers.com>";
 
 const rateMap = new Map<string, number[]>();
 
@@ -56,9 +56,9 @@ export async function POST(req: NextRequest) {
     // Send confirmation email (fire-and-forget)
     resend.emails.send({
       from: FROM, to: email,
-      subject: "Welcome to Élite BCN — You're on the list 🎉",
+      subject: "Welcome to Elite BCN — You're on the list 🎉",
       html: `<div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#0a0a0a;color:#d0d0d0;padding:36px;">
-        <h2 style="color:#c9a84c;">Welcome to Élite BCN!</h2>
+        <h2 style="color:#c9a84c;">Welcome to Elite BCN!</h2>
         <p>Hi ${name ?? "there"},</p>
         <p>You're now subscribed to our newsletter. You'll receive exclusive deals, travel tips, and Barcelona insider guides.</p>
         <p style="margin-top:16px;"><a href="${SITE_URL}/book" style="background:#c9a84c;color:#000;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;">Book a Transfer</a></p>

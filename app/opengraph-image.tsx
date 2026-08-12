@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Élite BCN Luxury Airport Transfers Barcelona";
+export const alt = "Elite BCN Luxury Airport Transfers Barcelona";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -80,7 +80,7 @@ export default function OGImage() {
             marginBottom: 24,
           }}
         >
-          <span style={{ color: "#ffffff" }}>ÉLITE</span>
+          <span style={{ color: "#ffffff" }}>ELITE</span>
           <span style={{ color: "#c9a84c" }}>BCN</span>
         </div>
 

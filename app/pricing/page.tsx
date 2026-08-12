@@ -10,20 +10,20 @@ import { SHARED_OG } from "@/lib/seo";
 import { ladderFor } from "@/lib/destination-pricing";
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona Transfer Prices — Fixed Rates | Élite BCN" },
-  description: "Fixed prices for Barcelona airport, cruise port, Sitges, Andorra & more. Rates from €50 per vehicle, excl. VAT & tolls. Chauffeur & meet & greet included.",
+  title: { absolute: "Barcelona Transfer Prices — Fixed Rates | Elite BCN" },
+  description: "Fixed prices for Barcelona airport, cruise port, Sitges, Andorra & more. Rates from €50 per vehicle, excl. VAT & tolls. Chauffeur and vehicle included; extras charged separately.",
   alternates: { canonical: "https://www.elitebcn.info/pricing" },
   keywords: ["barcelona transfer prices", "barcelona airport transfer cost", "fixed price transfer barcelona", "private transfer rates barcelona"],
   openGraph: {
     ...SHARED_OG,
-    title: "Barcelona Transfer Prices — Fixed Rates | Élite BCN",
+    title: "Barcelona Transfer Prices — Fixed Rates | Elite BCN",
     description: "Fixed prices for luxury private transfers from Barcelona Airport. From €50. No hidden fees. Book online instantly.",
     url: "https://www.elitebcn.info/pricing",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Transfer Fixed Prices" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona Transfer Fixed Prices" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Transfer Prices — Fixed Rates | Élite BCN",
+    title: "Barcelona Transfer Prices — Fixed Rates | Elite BCN",
     description: "Fixed prices for luxury private transfers from Barcelona Airport. From €50. No hidden fees. Book online instantly.",
     images: ["/opengraph-image"],
   },

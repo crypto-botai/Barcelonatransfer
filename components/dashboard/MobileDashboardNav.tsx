@@ -63,7 +63,7 @@ export default function MobileDashboardNav({ isOpen, onClose, userName, memberTi
                   <Car size={14} className="text-gold-500" />
                 </div>
                 <div>
-                  <span className="text-white font-semibold text-sm">Élite BCN</span>
+                  <span className="text-white font-semibold text-sm">Elite BCN</span>
                   <p className="text-dark-500 text-[10px] tracking-widest uppercase">Dashboard</p>
                 </div>
               </div>

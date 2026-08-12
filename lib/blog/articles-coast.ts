@@ -9,7 +9,7 @@ export const COAST_ARTICLES: BlogArticle[] = [
     title: "Sitges: Beaches, Carnival and the Garraf Coast",
     excerpt:
       "Seventeen beaches, a whitewashed old town built around a sea-facing church, and the most theatrical carnival in Catalonia — all 35 km from Barcelona.",
-    metaTitle: "Things to Do in Sitges — Beaches & Old Town | Élite BCN",
+    metaTitle: "Things to Do in Sitges — Beaches & Old Town | Elite BCN",
     metaDescription:
       "What to see and do in Sitges: the old town, 17 beaches, Cau Ferrat museum, Carnival and the Film Festival. Plus how to get there from Barcelona.",
     keywords: ["things to do in sitges", "sitges beaches", "sitges carnival", "sitges day trip from barcelona", "sitges old town"],
@@ -88,7 +88,7 @@ export const COAST_ARTICLES: BlogArticle[] = [
     title: "Tossa de Mar: The Walled Town on the Costa Brava",
     excerpt:
       "A twelfth-century fortress standing directly in the sea, three beaches inside the town, and the cleanest water within easy reach of Barcelona.",
-    metaTitle: "Tossa de Mar Guide — Castle, Beaches & Coves | Élite BCN",
+    metaTitle: "Tossa de Mar Guide — Castle, Beaches & Coves | Elite BCN",
     metaDescription:
       "A guide to Tossa de Mar: the walled Vila Vella, the main beach and hidden coves, coastal walks, and how to reach it from Barcelona.",
     keywords: ["things to do in tossa de mar", "tossa de mar", "tossa de mar beaches", "vila vella tossa", "costa brava towns", "barcelona to tossa de mar"],
@@ -176,7 +176,7 @@ export const COAST_ARTICLES: BlogArticle[] = [
     title: "Lloret de Mar Beyond the Nightlife",
     excerpt:
       "The Costa Brava's best-known resort has a cliffside modernist garden, a medieval castle and a string of quiet coves that most visitors never find.",
-    metaTitle: "Lloret de Mar Guide — Gardens, Beaches & Coves | Élite BCN",
+    metaTitle: "Lloret de Mar Guide — Gardens, Beaches & Coves | Elite BCN",
     metaDescription:
       "What to do in Lloret de Mar besides the nightlife: Santa Clotilde gardens, Sant Joan castle, the quieter coves, and how to get there from Barcelona.",
     keywords: ["things to do in lloret de mar", "lloret de mar", "santa clotilde gardens", "lloret beaches", "barcelona to lloret de mar"],
@@ -264,7 +264,7 @@ export const COAST_ARTICLES: BlogArticle[] = [
     title: "Cadaqués and the Dalí Coast",
     excerpt:
       "A whitewashed village at the end of a mountain road, the surrealist's house at Portlligat, and the raw geology of Cap de Creus.",
-    metaTitle: "Cadaqués & Dalí Guide — Portlligat, Cap de Creus | Élite BCN",
+    metaTitle: "Cadaqués & Dalí Guide — Portlligat, Cap de Creus | Elite BCN",
     metaDescription:
       "Visiting Cadaqués: Dalí's house at Portlligat, the old town, Cap de Creus natural park, and how to reach this remote Costa Brava village.",
     keywords: ["things to do in cadaques", "cadaques", "dali house portlligat", "cap de creus", "cadaques from barcelona", "costa brava dali"],

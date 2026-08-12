@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const body = schema.parse(await req.json());
 
     await resend.emails.send({
-      from: "Élite BCN Transfers <noreply@elitebcntransfers.com>",
+      from: "Elite BCN Transfers <noreply@elitebcntransfers.com>",
       to:   ADMIN_EMAIL,
       replyTo: body.email,
       subject: `📩 Contact Enquiry from ${body.name}`,

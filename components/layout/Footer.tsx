@@ -94,7 +94,7 @@ export default function Footer() {
                 <div className="w-3 h-3 bg-gold-500" />
               </div>
               <span className="font-display text-xl tracking-[0.25em]">
-                <span className="text-white">ÉLITE</span>
+                <span className="text-white">ELITE</span>
                 <span className="text-gold-500">BCN</span>
               </span>
             </Link>
@@ -196,7 +196,7 @@ export default function Footer() {
       <div className="border-t border-white/[0.06]">
         <div className="container mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-dark-400 text-xs">
-            © {new Date().getFullYear()} Élite BCN Transfers. {t("copyright")}
+            © {new Date().getFullYear()} Elite BCN Transfers. {t("copyright")}
           </p>
           <div className="flex gap-5">
             <Link href="/blog"         className="text-xs text-dark-400 hover:text-gold-400 transition-colors">Travel Guides</Link>

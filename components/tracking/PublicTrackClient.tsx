@@ -85,7 +85,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-5">
       <header className="text-center">
-        <p className="text-gold-500 text-[11px] tracking-[0.28em] uppercase mb-2">Élite BCN Transfers</p>
+        <p className="text-gold-500 text-[11px] tracking-[0.28em] uppercase mb-2">Elite BCN Transfers</p>
         <h1 className="font-display text-2xl sm:text-3xl text-white">{t("title")}</h1>
         <p className="text-dark-400 text-sm mt-1">
           {booking.pickupAddress}

@@ -36,14 +36,14 @@ function generateNewsletterHtml(f: {
 }): string {
   return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Barcelona Travel Insider — Élite BCN</title></head>
+<title>The Barcelona Travel Insider — Elite BCN</title></head>
 <body style="margin:0;padding:0;background-color:#efece5;">
 <div style="display:none;max-height:0;overflow:hidden;">${esc(f.issueTeaser)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#efece5;">
 <tr><td align="center" style="padding:32px 12px;">
   <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;">
     <tr><td style="background-color:#141414;padding:36px 40px 24px 40px;text-align:center;">
-      <div style="font-family:Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:5px;color:#8a8a8a;text-transform:uppercase;margin-bottom:14px;">Élite BCN Presents</div>
+      <div style="font-family:Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:5px;color:#8a8a8a;text-transform:uppercase;margin-bottom:14px;">Elite BCN Presents</div>
       <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px;letter-spacing:3px;color:#ffffff;">The Barcelona Travel Insider</div>
       <div style="font-family:Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:4px;color:#c9a96e;padding-top:10px;text-transform:uppercase;">${esc(f.issueMonth)} ${esc(f.issueYear)} &nbsp;·&nbsp; Issue No. ${esc(f.issueNumber)}</div>
     </td></tr>
@@ -79,10 +79,10 @@ function generateNewsletterHtml(f: {
     </td></tr>
     <tr><td style="background-color:#faf8f4;padding:36px 48px;text-align:center;">
       <div style="font-family:Georgia,'Times New Roman',serif;font-size:16px;color:#1a1a1a;font-style:italic;">See you at arrivals,</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#b39159;margin-top:8px;">The Élite BCN Team</div>
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#b39159;margin-top:8px;">The Elite BCN Team</div>
     </td></tr>
     <tr><td style="background-color:#141414;padding:28px 48px;text-align:center;">
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:14px;letter-spacing:5px;color:#ffffff;">ÉLITE<span style="color:#c9a96e;">BCN</span></div>
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:14px;letter-spacing:5px;color:#ffffff;">ELITE<span style="color:#c9a96e;">BCN</span></div>
       <div style="font-family:Helvetica,Arial,sans-serif;font-size:11px;line-height:19px;color:#8a8a8a;padding-top:12px;">+34 635 383 712 &nbsp;·&nbsp; www.elitebcn.info</div>
       <div style="font-family:Helvetica,Arial,sans-serif;font-size:10px;color:#4a4a4a;padding-top:12px;">
         <a href="{{UNSUB_URL}}" style="color:#4a4a4a;text-decoration:underline;">Unsubscribe</a>

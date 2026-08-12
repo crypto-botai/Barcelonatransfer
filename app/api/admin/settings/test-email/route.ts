@@ -13,9 +13,9 @@ export async function POST() {
 
   try {
     const result = await resend.emails.send({
-      from: process.env.RESEND_FROM ?? "Élite BCN Transfers <noreply@elitebcn.info>",
+      from: process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>",
       to,
-      subject: "✓ Email Test — Élite BCN Admin",
+      subject: "✓ Email Test — Elite BCN Admin",
       html: "<p>Your email system is working correctly.</p><p>This test was triggered from the admin settings page.</p>",
     });
 

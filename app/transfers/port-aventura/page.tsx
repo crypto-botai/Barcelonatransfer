@@ -12,9 +12,9 @@ const LADDER = ladderFor("portaventura", "airport")!;
 const PA = ROUTES.find((r) => r.to === "portaventura")!;
 
 export const metadata: Metadata = {
-  title: "Barcelona to PortAventura Transfer — from €155 | Fixed Price",
+  title: { absolute: "Barcelona to PortAventura Transfer — from €155" },
   description:
-    "Private transfer from Barcelona to PortAventura World. Fixed price from €155 (sedan) to €275 (minibus). Family-friendly, no surge pricing. Book instantly.",
+    "Fixed €155 per vehicle to PortAventura World, door to door. The price covers the whole car rather than each seat, so a family pays once.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/port-aventura" },
   keywords: ["barcelona portaventura transfer", "portaventura theme park transfer", "barcelona portaventura world private transfer", "salou portaventura taxi"],
   openGraph: {
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "Barcelona to PortAventura Transfer — from €155 | Fixed Price",
     description: "Private transfer from Barcelona to PortAventura World from €155. Fixed price, family-friendly, all vehicle classes.",
     url: "https://www.elitebcn.info/transfers/port-aventura",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to PortAventura Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to PortAventura Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ const paSchema = {
   name: "Barcelona to PortAventura World Transfer",
   description: "Fixed-price private transfer from Barcelona to PortAventura World, Ferrari Land and Caribe Aquatic Park. From €155 economy to €275 minibus.",
   url: "https://www.elitebcn.info/transfers/port-aventura",
-  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "PortAventura, Salou, Tarragona, Spain",
   offers: { "@type": "Offer", price: String(LADDER.economy), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -92,7 +92,7 @@ export default function PortAventuraTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">PortAventura transfer</span>
+              Why choose Elite BCN for your <span className="text-gold-gradient">PortAventura transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
@@ -162,7 +162,7 @@ export default function PortAventuraTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet &amp; greet, child seats and other extras are optional and charged separately.</p>
           </div>
         </section>
 

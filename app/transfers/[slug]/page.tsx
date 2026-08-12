@@ -23,10 +23,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const dest = getDestination(slug);
-  if (!dest) return { title: "Transfer | Élite BCN" };
+  if (!dest) return { title: "Transfer | Elite BCN" };
 
   return {
-    title: { absolute: `${dest.name} — Barcelona Airport Transfer | Élite BCN` },
+    title: { absolute: `${dest.name} — Barcelona Airport Transfer | Elite BCN` },
     description: dest.description,
     alternates: {
       canonical: `${BASE}/transfers/${slug}`,
@@ -34,10 +34,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     keywords: [`${dest.name.toLowerCase()} barcelona transfer`, `barcelona airport ${dest.name.toLowerCase()} transfer`, "private transfer barcelona"],
     openGraph: {
       ...SHARED_OG,
-      title: `${dest.name} — Barcelona Airport Transfer | Élite BCN`,
+      title: `${dest.name} — Barcelona Airport Transfer | Elite BCN`,
       description: dest.description,
       url: `${BASE}/transfers/${slug}`,
-      images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: `Élite BCN — Transfer to ${dest.name}` }],
+      images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: `Elite BCN — Transfer to ${dest.name}` }],
     },
     twitter: {
       card: "summary_large_image",
@@ -61,7 +61,7 @@ function buildSchema(dest: Destination, prices: ResolvedPlacePrices | null) {
     description: dest.description,
     provider: {
       "@type": "LocalBusiness",
-      name: "Élite BCN Transfers",
+      name: "Elite BCN Transfers",
       url: BASE,
       telephone: "+34635383712",
     },
@@ -211,11 +211,11 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
           </div>
         </section>
 
-        {/* ── Why choose Élite BCN ─────────────────────────── */}
+        {/* ── Why choose Elite BCN ─────────────────────────── */}
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your{" "}
+              Why choose Elite BCN for your{" "}
               <span className="text-gold-gradient">{dest.name}</span> transfer
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">

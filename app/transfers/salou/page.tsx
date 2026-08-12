@@ -43,7 +43,7 @@ const D: DestinationSpec = {
 };
 
 export const metadata: Metadata = {
-  title: "Barcelona to Salou Transfer — PortAventura | Élite BCN",
+  title: "Barcelona to Salou Transfer — PortAventura | Elite BCN",
   description:
     "Private transfer from Barcelona Airport to Salou and PortAventura. Fixed price per vehicle, family luggage space, child seats free. Book online.",
   alternates: { canonical: `${BASE_URL}/transfers/salou` },
@@ -53,11 +53,11 @@ export const metadata: Metadata = {
     title: "Barcelona to Salou Transfer — PortAventura | Fixed Price",
     description: "Private transfer from Barcelona Airport to Salou and PortAventura. Fixed price, family vehicles, child seats free.",
     url: `${BASE_URL}/transfers/salou`,
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Salou Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Salou Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona to Salou Transfer — PortAventura | Élite BCN",
+    title: "Barcelona to Salou Transfer — PortAventura | Elite BCN",
     description: "Private transfer from Barcelona Airport to Salou and PortAventura. Fixed price, family vehicles.",
     images: ["/opengraph-image"],
   },

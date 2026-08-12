@@ -7,7 +7,7 @@ import { SHARED_OG } from "@/lib/seo";
 const BASE = "https://www.elitebcn.info";
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona Airport Transfer Cost Calculator | Élite BCN" },
+  title: { absolute: "Barcelona Airport Transfer Cost Calculator | Elite BCN" },
   description:
     "Compare Barcelona airport transfer costs: private chauffeur vs taxi vs Aerobus vs metro. Real prices by destination and group size. Instant comparison.",
   alternates: { canonical: `${BASE}/tools/transfer-cost-calculator` },
@@ -37,7 +37,7 @@ const SCHEMA = {
   applicationCategory: "TravelApplication",
   operatingSystem: "Any",
   offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
-  author: { "@type": "Organization", name: "Élite BCN Transfers", url: BASE },
+  author: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE },
 };
 
 export default function TransferCostCalculatorPage() {

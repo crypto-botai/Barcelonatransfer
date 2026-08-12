@@ -8,22 +8,22 @@ import { SHARED_OG } from "@/lib/seo";
 const BASE = "https://www.elitebcn.info";
 
 export const metadata: Metadata = {
-  title: { absolute: "VIP Transportation Barcelona — Élite BCN Private Chauffeur" },
+  title: { absolute: "VIP Transportation Barcelona — Elite BCN Private Chauffeur" },
   description:
     "VIP chauffeur in Barcelona: private jet meets, gala events, executive roadshows, red-carpet arrivals. Discreet, punctual, fully licensed. Available 24/7.",
   alternates: { canonical: `${BASE}/vip-transportation` },
   keywords: ["vip transportation barcelona", "celebrity chauffeur barcelona", "private jet transfer barcelona", "executive transport barcelona"],
   openGraph: {
     ...SHARED_OG,
-    title: "VIP Transportation Barcelona — Élite BCN Private Chauffeur",
+    title: "VIP Transportation Barcelona — Elite BCN Private Chauffeur",
     description:
       "Discreet VIP chauffeur service for celebrities, executives and dignitaries. Private jet meets, gala event transport, red-carpet arrivals.",
     url: `${BASE}/vip-transportation`,
-    images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: "Élite BCN — VIP Transportation Barcelona" }],
+    images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: "Elite BCN — VIP Transportation Barcelona" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "VIP Transportation Barcelona — Élite BCN",
+    title: "VIP Transportation Barcelona — Elite BCN",
     description: "Discreet VIP chauffeur for celebrities, executives, private jet meets and gala events in Barcelona.",
     images: [`${BASE}/opengraph-image`],
   },
@@ -43,7 +43,7 @@ const SCHEMA = {
   "@type": "Service",
   name: "VIP Transportation Barcelona",
   serviceType: "VIP Chauffeur Service",
-  provider: { "@type": "Organization", name: "Élite BCN Transfers", url: BASE },
+  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE },
   areaServed: { "@type": "City", name: "Barcelona" },
   description:
     "Discreet, luxury VIP transportation for high-profile clients: private jet connections, gala arrivals, executive roadshows and red-carpet events.",
@@ -181,12 +181,12 @@ export default function VIPTransportationPage() {
           </div>
         </section>
 
-        {/* Why Élite BCN */}
+        {/* Why Elite BCN */}
         <section className="py-20 bg-dark-950">
           <div className="container mx-auto px-4 max-w-4xl">
             <h2 className="font-display text-3xl text-white text-center mb-12">
               Why High-Profile Clients Choose{" "}
-              <span className="text-gold-gradient">Élite BCN</span>
+              <span className="text-gold-gradient">Elite BCN</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {[

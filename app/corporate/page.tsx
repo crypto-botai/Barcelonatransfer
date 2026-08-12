@@ -5,20 +5,20 @@ import Link from "next/link";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: { absolute: "Corporate Chauffeur Barcelona — Executive Travel | Élite BCN" },
+  title: { absolute: "Corporate Chauffeur Barcelona — Executive Travel | Elite BCN" },
   description: "Corporate chauffeur in Barcelona. Executive airport transfers, roadshows, board meetings & MICE events. Monthly invoicing, account manager. VTC licensed.",
   alternates: { canonical: "https://www.elitebcn.info/corporate" },
   keywords: ["corporate chauffeur barcelona", "executive transfer barcelona", "business chauffeur barcelona", "corporate account chauffeur"],
   openGraph: {
     ...SHARED_OG,
-    title: "Corporate Chauffeur Barcelona — Executive Travel | Élite BCN",
+    title: "Corporate Chauffeur Barcelona — Executive Travel | Elite BCN",
     description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, events. Monthly invoicing, account manager.",
     url: "https://www.elitebcn.info/corporate",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Corporate Chauffeur Barcelona" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Corporate Chauffeur Barcelona" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Corporate Chauffeur Barcelona — Executive Travel | Élite BCN",
+    title: "Corporate Chauffeur Barcelona — Executive Travel | Elite BCN",
     description: "Dedicated corporate chauffeur accounts in Barcelona. Executive airport transfers, roadshows, events. Monthly invoicing, account manager.",
     images: ["/opengraph-image"],
   },
@@ -29,7 +29,7 @@ const CORPORATE_SCHEMA = {
   "@type": "Service",
   name: "Corporate Chauffeur Barcelona",
   serviceType: "Corporate Chauffeur Service",
-  provider: { "@type": "Organization", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: { "@type": "City", name: "Barcelona", sameAs: "https://www.wikidata.org/wiki/Q1492" },
   description: "Dedicated corporate chauffeur accounts in Barcelona for executive airport transfers, roadshows, board meetings and MICE events. Monthly invoicing available.",
   url: "https://www.elitebcn.info/corporate",

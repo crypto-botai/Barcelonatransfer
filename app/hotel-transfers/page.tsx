@@ -14,22 +14,22 @@ const airportCityPrice = PRICING_ROUTES.find(
 )?.economy ?? 45;
 
 export const metadata: Metadata = {
-  title: { absolute: "Hotel Transfers Barcelona — Airport to Hotel | Élite BCN" },
+  title: { absolute: "Hotel Transfers Barcelona — Airport to Hotel | Elite BCN" },
   description:
     `Private hotel transfers in Barcelona from €${airportCityPrice}. Airport to hotel, hotel to cruise port. Meet & greet, flight tracking, free waiting. All 5-star hotels covered.`,
   alternates: { canonical: `${BASE}/hotel-transfers` },
   keywords: ["hotel transfer barcelona", "airport hotel transfer barcelona", "barcelona hotel chauffeur"],
   openGraph: {
     ...SHARED_OG,
-    title: "Hotel Transfers Barcelona — Élite BCN Private Chauffeur",
+    title: "Hotel Transfers Barcelona — Elite BCN Private Chauffeur",
     description:
       "Private transfers between Barcelona Airport and all major hotels. Fixed price, flight tracking, meet & greet.",
     url: `${BASE}/hotel-transfers`,
-    images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: "Élite BCN — Hotel Transfer Barcelona" }],
+    images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: "Elite BCN — Hotel Transfer Barcelona" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Hotel Transfers Barcelona — Élite BCN",
+    title: "Hotel Transfers Barcelona — Elite BCN",
     description: `Private airport to hotel transfers in Barcelona from €${airportCityPrice}. Fixed price, flight tracking, meet & greet.`,
     images: [`${BASE}/opengraph-image`],
   },
@@ -49,7 +49,7 @@ const SCHEMA = {
   "@type": "Service",
   name: "Hotel Transfers Barcelona",
   serviceType: "Airport Hotel Transfer",
-  provider: { "@type": "Organization", name: "Élite BCN Transfers", url: BASE },
+  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE },
   areaServed: { "@type": "City", name: "Barcelona" },
   description:
     "Private luxury transfers between Barcelona Airport and all major Barcelona hotels. Fixed prices, flight monitoring, free 60-minute wait.",

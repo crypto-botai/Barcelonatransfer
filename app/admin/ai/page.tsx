@@ -92,7 +92,7 @@ export default async function AiCommandCenterPage() {
             <span className="ml-2 px-2 py-0.5 rounded bg-red-500/20 text-red-400 text-xs font-semibold tracking-wide">KILL SWITCH ON</span>
           )}
         </div>
-        <p className="text-dark-400 text-sm">Élite BCN AI Ecosystem — real agents, real tasks, real results.</p>
+        <p className="text-dark-400 text-sm">Elite BCN AI Ecosystem — real agents, real tasks, real results.</p>
       </div>
 
       {killSwitch && (
@@ -115,7 +115,7 @@ export default async function AiCommandCenterPage() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-mono tracking-[0.3em] uppercase text-[#c9a84c]/60 mb-0.5">Mission Control</p>
-            <h2 className="text-white font-display tracking-wider text-lg">ÉLITE BCN AI HEADQUARTERS</h2>
+            <h2 className="text-white font-display tracking-wider text-lg">ELITE BCN AI HEADQUARTERS</h2>
             <p className="text-dark-400 text-xs mt-0.5">Live org chart · Agent floor · CEO suite · Communications wall</p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">

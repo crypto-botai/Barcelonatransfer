@@ -97,7 +97,7 @@ export default function AbandonedBookingsPage() {
                       {item.phone ? (
                         <a
                           href={`https://wa.me/${item.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                            `Hi${item.name ? ` ${item.name}` : ""}! I noticed you started a booking with Élite BCN Transfers but didn't finish.${item.coupon && !item.coupon.usedAt ? ` Here's your ${item.coupon.discountPct}% discount code to complete it: ${item.coupon.code}` : " Can I help you complete it or answer any questions?"}`
+                            `Hi${item.name ? ` ${item.name}` : ""}! I noticed you started a booking with Elite BCN Transfers but didn't finish.${item.coupon && !item.coupon.usedAt ? ` Here's your ${item.coupon.discountPct}% discount code to complete it: ${item.coupon.code}` : " Can I help you complete it or answer any questions?"}`
                           )}`}
                           target="_blank"
                           rel="noopener noreferrer"

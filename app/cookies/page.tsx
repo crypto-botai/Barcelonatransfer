@@ -5,20 +5,20 @@ import { COMPANY } from "@/lib/company-facts";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy — Élite BCN Barcelona Private Transfers",
-  description: "Cookie Policy for Élite BCN Transfers — how we use cookies and similar technologies on our Barcelona private transfer booking platform.",
+  title: "Cookie Policy — Elite BCN Barcelona Private Transfers",
+  description: "Cookie Policy for Elite BCN Transfers — how we use cookies and similar technologies on our Barcelona private transfer booking platform.",
   alternates: { canonical: "https://www.elitebcn.info/cookies" },
   openGraph: {
     ...SHARED_OG,
-    title: "Cookie Policy — Élite BCN Barcelona Private Transfers",
-    description: "Cookie Policy for Élite BCN Transfers — how we use cookies and similar technologies.",
+    title: "Cookie Policy — Elite BCN Barcelona Private Transfers",
+    description: "Cookie Policy for Elite BCN Transfers — how we use cookies and similar technologies.",
     url: "https://www.elitebcn.info/cookies",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN Transfers — Cookie Policy" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN Transfers — Cookie Policy" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cookie Policy — Élite BCN Barcelona Private Transfers",
-    description: "Cookie Policy for Élite BCN Transfers — how we use cookies and similar technologies.",
+    title: "Cookie Policy — Elite BCN Barcelona Private Transfers",
+    description: "Cookie Policy for Elite BCN Transfers — how we use cookies and similar technologies.",
     images: ["/opengraph-image"],
   },
 };

@@ -40,7 +40,7 @@ export function destinationSchemas(d: DestinationSpec, fromPrice: number | null)
       name: `Barcelona to ${d.name} Private Transfer`,
       description: d.intro,
       url,
-      provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: BASE_URL, telephone: "+34635383712" },
+      provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: BASE_URL, telephone: "+34635383712" },
       areaServed: [{ "@type": "City", name: "Barcelona" }, { "@type": "Place", name: d.areaServed }],
       ...(fromPrice ? { offers: { "@type": "Offer", price: String(fromPrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" } } : {}),
     },
@@ -109,7 +109,7 @@ export default function DestinationTemplate({ d }: { d: DestinationSpec }) {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">{d.name} transfer</span>
+              Why choose Elite BCN for your <span className="text-gold-gradient">{d.name} transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
@@ -181,7 +181,7 @@ export default function DestinationTemplate({ d }: { d: DestinationSpec }) {
               </table>
             </div>
             <p className="text-dark-400 text-xs text-center mt-4">
-              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.
+              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet &amp; greet, child seats and other extras are optional and charged separately.
             </p>
           </div>
         </section>

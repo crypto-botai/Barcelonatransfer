@@ -78,7 +78,7 @@ export class AnalyticsAgent extends BaseAgent {
       [
         {
           role:    "system",
-          content: "You are a business analyst for Élite BCN, a luxury Barcelona chauffeur service. Give 3 specific, numbered, actionable insights based on the data. Focus on revenue and growth opportunities.",
+          content: "You are a business analyst for Elite BCN, a luxury Barcelona chauffeur service. Give 3 specific, numbered, actionable insights based on the data. Focus on revenue and growth opportunities.",
         },
         { role: "user", content: contextLines },
       ],

@@ -80,7 +80,7 @@ export default function SupportCenter() {
     if (tab === "ai" && messages.length === 0) {
       setMessages([{
         role: "assistant",
-        content: "Hello! I'm the Élite BCN AI Concierge.\n\nAsk me anything — pricing, vehicles, booking, service areas, and more.",
+        content: "Hello! I'm the Elite BCN AI Concierge.\n\nAsk me anything — pricing, vehicles, booking, service areas, and more.",
       }]);
       setTimeout(() => inputRef.current?.focus(), 150);
     }
@@ -218,7 +218,7 @@ export default function SupportCenter() {
               <LifeBuoy size={16} className="text-[#c9a84c]" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-semibold leading-none">Élite BCN Support</p>
+              <p className="text-white text-sm font-semibold leading-none">Elite BCN Support</p>
               <p className="text-white/40 text-xs mt-0.5">24/7 — AI Concierge &amp; WhatsApp</p>
             </div>
             <button type="button" onClick={closePanel}
@@ -285,7 +285,7 @@ export default function SupportCenter() {
                 </p>
               </button>
 
-              <p className="text-white/20 text-[10px] text-center pt-1">Élite BCN Transfers · Licensed VTC Barcelona</p>
+              <p className="text-white/20 text-[10px] text-center pt-1">Elite BCN Transfers · Licensed VTC Barcelona</p>
             </div>
           )}
 
@@ -304,7 +304,7 @@ export default function SupportCenter() {
                       <MessageCircle size={20} className="text-white" />
                     </div>
                     <div>
-                      <p className="text-white text-sm font-semibold">Élite BCN Team</p>
+                      <p className="text-white text-sm font-semibold">Elite BCN Team</p>
                       <p className="text-[#25D366] text-xs flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#25D366]" />
                         Online · Typically replies instantly

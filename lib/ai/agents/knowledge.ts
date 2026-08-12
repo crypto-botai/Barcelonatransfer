@@ -91,7 +91,7 @@ export class KnowledgeAgent extends BaseAgent {
       [
         {
           role:    "system",
-          content: `You are the Knowledge Manager for Élite BCN Transfers, a luxury Barcelona chauffeur service.
+          content: `You are the Knowledge Manager for Elite BCN Transfers, a luxury Barcelona chauffeur service.
 Analyse customer conversations and identify:
 1. Questions that appear multiple times or were escalated (not already covered in the KB)
 2. Topics that are in the KB but seem to be outdated or mismatched

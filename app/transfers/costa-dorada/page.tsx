@@ -15,8 +15,8 @@ const COSTA_DORADA_FROM = cheapestOf(["castelldefels", "sitges", "cubelles", "ca
 const COSTA_DORADA = ROUTES.filter((r) => r.category === "costa-dorada");
 
 export const metadata: Metadata = {
-  title: `Barcelona to Costa Dorada Transfer — from €${COSTA_DORADA_FROM} | Élite BCN`,
-  description: `Private transfer from Barcelona to Costa Dorada. Sitges, Tarragona, Salou, PortAventura, Cambrils. Fixed prices from €${COSTA_DORADA_FROM}. All vehicle classes. Book instantly.`,
+  title: { absolute: "Barcelona to Costa Dorada Transfer — from €50" },
+  description: "Sitges, Tarragona, Salou, PortAventura and Cambrils, each with a published fixed fare from €50. One price per car, whatever the traffic does.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/costa-dorada" },
   keywords: ["barcelona costa dorada transfer", "airport salou transfer", "barcelona portaventura transfer", "salou private transfer"],
   openGraph: {
@@ -24,11 +24,11 @@ export const metadata: Metadata = {
     title: `Barcelona to Costa Dorada Transfer — from €${COSTA_DORADA_FROM} | Fixed Price`,
     description: `Private transfer from Barcelona to Costa Dorada from €${COSTA_DORADA_FROM}. Sitges, Tarragona, Salou, PortAventura. Fixed price, all vehicles.`,
     url: "https://www.elitebcn.info/transfers/costa-dorada",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Costa Dorada Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Costa Dorada Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Barcelona to Costa Dorada Transfer — from €${COSTA_DORADA_FROM} | Élite BCN`,
+    title: `Barcelona to Costa Dorada Transfer — from €${COSTA_DORADA_FROM} | Elite BCN`,
     description: `Private transfer from Barcelona to Costa Dorada from €${COSTA_DORADA_FROM}. Sitges, Salou, PortAventura. Fixed price, all vehicles.`,
     images: ["/opengraph-image"],
   },
@@ -40,7 +40,7 @@ const costadoradaSchema = {
   name: "Barcelona to Costa Dorada Private Transfer",
   description: "Luxury fixed-price private transfers from Barcelona to all Costa Dorada resorts — Sitges, Tarragona, Salou, PortAventura, Cambrils and beyond.",
   url: "https://www.elitebcn.info/transfers/costa-dorada",
-  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Costa Dorada, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(COSTA_DORADA_FROM), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -125,7 +125,7 @@ export default function CostaDoradaTransferPage() {
               </table>
             </div>
             <p className="text-dark-500 text-xs text-center mt-4">
-              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Child seats free.
+              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet &amp; greet, child seats and other extras are optional and charged separately. Child seats free.
             </p>
           </div>
         </section>
@@ -156,7 +156,7 @@ export default function CostaDoradaTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">Costa Dorada transfer</span>
+              Why choose Elite BCN for your <span className="text-gold-gradient">Costa Dorada transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[

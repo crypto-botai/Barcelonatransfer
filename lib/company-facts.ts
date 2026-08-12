@@ -2,7 +2,7 @@
 // Every component imports from here — zero hardcoded numbers elsewhere.
 
 export const COMPANY = {
-  legalName:    "Élite BCN Transfers",
+  legalName:    "Elite BCN Transfers",
   foundedYear:  2018,
   phone:        "+34635383712",
   phoneDisplay: "+34 635 383 712",

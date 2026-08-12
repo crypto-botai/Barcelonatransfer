@@ -103,7 +103,7 @@ export default function DriverRegisterPage() {
             <div className="w-3 h-3 bg-gold-500" />
           </div>
           <span className="font-display text-xl tracking-[0.25em]">
-            <span className="text-white">ÉLITE</span><span className="text-gold-500">BCN</span>
+            <span className="text-white">ELITE</span><span className="text-gold-500">BCN</span>
           </span>
         </Link>
 
@@ -112,7 +112,7 @@ export default function DriverRegisterPage() {
           <h1 className="font-display text-2xl text-white">Driver Registration</h1>
         </div>
         <p className="text-dark-400 text-sm mb-6">
-          Join the Élite BCN driver network. Your account will be reviewed and approved by admin.
+          Join the Elite BCN driver network. Your account will be reviewed and approved by admin.
         </p>
 
         {/* Step indicator */}

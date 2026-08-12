@@ -10,20 +10,20 @@ const MIN_RATE = HOURLY_RATES.ECONOMY;
 const MIN_HOURS = MIN_HOURLY_HOURS.ECONOMY;
 
 export const metadata: Metadata = {
-  title: { absolute: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Élite BCN` },
+  title: { absolute: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Elite BCN` },
   description: `Private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr. Meetings, shopping, events & city tours. Mercedes V-Class & EQE 300 Electric. ${MIN_HOURS}-hr minimum.`,
   alternates: { canonical: "https://www.elitebcn.info/hourly" },
   keywords: ["hourly chauffeur barcelona", "chauffeur by the hour barcelona", "barcelona disposal chauffeur", "private driver barcelona hourly"],
   openGraph: {
     ...SHARED_OG,
-    title: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Élite BCN`,
+    title: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Elite BCN`,
     description: `Book a private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr. Meetings, shopping, events & city tours. ${MIN_HOURS}-hr minimum.`,
     url: "https://www.elitebcn.info/hourly",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Hourly Chauffeur Barcelona" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Hourly Chauffeur Barcelona" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Élite BCN`,
+    title: `Hourly Chauffeur Barcelona — From €${MIN_RATE}/hr | Elite BCN`,
     description: `Book a private chauffeur in Barcelona by the hour from €${MIN_RATE}/hr. Meetings, shopping, events & city tours. ${MIN_HOURS}-hr minimum.`,
     images: ["/opengraph-image"],
   },
@@ -41,7 +41,7 @@ const HOURLY_SCHEMA = {
   "@type": "Service",
   name: "Hourly Chauffeur Service Barcelona",
   serviceType: "Hourly Chauffeur Hire",
-  provider: { "@type": "Organization", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: { "@type": "City", name: "Barcelona", sameAs: "https://www.wikidata.org/wiki/Q1492" },
   description: "By-the-hour private chauffeur hire in Barcelona. Minimum 4 hours. Ideal for meetings, events, shopping, airport standby.",
   url: "https://www.elitebcn.info/hourly",

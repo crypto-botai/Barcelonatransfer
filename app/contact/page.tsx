@@ -7,22 +7,22 @@ import { COMPANY } from "@/lib/company-facts";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: { absolute: "Contact Élite BCN | 24/7 Transfer Support Barcelona" },
+  title: { absolute: "Contact Elite BCN | 24/7 Transfer Support Barcelona" },
   description:
-    "Contact Élite BCN Transfers for bookings, support, or enquiries. Available 24/7 by phone, WhatsApp, or email. Barcelona's premier private chauffeur service.",
+    "Contact Elite BCN Transfers for bookings, support, or enquiries. Available 24/7 by phone, WhatsApp, or email. Barcelona's premier private chauffeur service.",
   alternates: { canonical: "https://www.elitebcn.info/contact" },
   keywords: ["contact elite bcn", "barcelona transfer contact", "chauffeur barcelona phone", "barcelona transfer whatsapp"],
   openGraph: {
     ...SHARED_OG,
-    title: "Contact Élite BCN — 24/7 Support",
+    title: "Contact Elite BCN — 24/7 Support",
     description:
       "Reach our team 24/7 by phone, WhatsApp, or email. Barcelona luxury private transfer specialists.",
     url: "https://www.elitebcn.info/contact",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Contact Élite BCN Transfers" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Contact Elite BCN Transfers" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Contact Élite BCN — 24/7 Support",
+    title: "Contact Elite BCN — 24/7 Support",
     description: "Reach our team 24/7 by phone, WhatsApp, or email. Barcelona luxury private transfer specialists.",
     images: ["/opengraph-image"],
   },
@@ -38,12 +38,12 @@ const CONTACT_ITEMS = [
 const CONTACT_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "ContactPage",
-  name: "Contact Élite BCN Transfers",
+  name: "Contact Elite BCN Transfers",
   url: "https://www.elitebcn.info/contact",
-  description: "Contact Élite BCN Transfers 24/7 for bookings, enquiries and corporate accounts.",
+  description: "Contact Elite BCN Transfers 24/7 for bookings, enquiries and corporate accounts.",
   mainEntity: {
     "@type": "Organization",
-    name: "Élite BCN Transfers",
+    name: "Elite BCN Transfers",
     telephone: "+34635383712",
     email: "vtcbcn2025@gmail.com",
     contactPoint: {
@@ -74,7 +74,7 @@ export default function ContactPage() {
           <div className="container mx-auto px-4 text-center relative z-10">
             <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">Contact</span>
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-4">
-              Contact Élite BCN — <span className="text-gold-gradient">Barcelona Transfers</span>
+              Contact Elite BCN — <span className="text-gold-gradient">Barcelona Transfers</span>
             </h1>
             <p className="text-dark-400 max-w-xl mx-auto">
               Available 24/7 for bookings, inquiries, and corporate accounts.

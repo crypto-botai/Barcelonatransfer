@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: `Barcelona to Sitges Transfer — from €${LADDER.economy} | Fixed Price`,
     description: `Private transfer from Barcelona to Sitges from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing. 35 minutes.`,
     url: "https://www.elitebcn.info/transfers/sitges",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Sitges Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Sitges Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ const sitgesServiceSchema = {
   name: "Barcelona to Sitges Private Transfer",
   description: `Fixed-price private transfer from Barcelona Airport or City to Sitges. From €${LADDER.economy}. 35-minute journey, meet & greet, no surge pricing.`,
   url: "https://www.elitebcn.info/transfers/sitges",
-  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Sitges, Garraf, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(LADDER.economy), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -60,7 +60,7 @@ const SCHEMA = {
   description: "Luxury fixed-price private transfer from Barcelona El Prat Airport to Sitges. Meet & greet, flight tracking, 60 min free wait.",
   provider: {
     "@type": "LocalBusiness",
-    name: "Élite BCN Transfers",
+    name: "Elite BCN Transfers",
     url: "https://www.elitebcn.info",
     telephone: "+34635383712",
   },
@@ -123,12 +123,12 @@ export default function SitgesTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">Sitges transfer</span>
+              Why choose Elite BCN for your <span className="text-gold-gradient">Sitges transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
                 { icon: Shield, title: `Fixed price €${LADDER.economy}`, body: "The price you see is the price you pay. No meter, no traffic surcharges, no hidden fees." },
-                { icon: Clock, title: "Meet & greet included", body: "Your driver waits in the arrivals hall with your name on a board. 60 minutes free waiting from your flight landing." },
+                { icon: Clock, title: "60 minutes free waiting", body: "Airport pickups include 60 free minutes from landing. Meet & greet inside arrivals with a name board is an optional €5 add-on." },
                 { icon: Star, title: "Real-time flight tracking", body: "We monitor your flight live. If it's delayed, your driver adjusts automatically — no extra charge." },
                 { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, bottled water, WiFi on request." },
                 { icon: MapPin, title: "Door-to-door service", body: "Dropped directly at your Sitges hotel, villa, or address. No sharing, no stops, no detours." },
@@ -205,7 +205,7 @@ export default function SitgesTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet & greet, child seats and other extras are optional and charged separately.</p>
           </div>
         </section>
 

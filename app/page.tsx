@@ -13,17 +13,17 @@ import { getPublicRoutes } from "@/lib/pricing-service";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: { absolute: "Élite BCN | Barcelona Airport Transfers — From €50" },
+  title: { absolute: "Elite BCN | Barcelona Airport Transfers & Private Chauffeur" },
   description:
-    "Barcelona's #1 luxury private transfer. Fixed prices from €50, no surge. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class & EQE 300 Electric. 24/7.",
+    "Private car and driver from Barcelona Airport, T1 and T2. Fixed price per vehicle from €50, with 60 minutes of free waiting from the moment you land.",
   alternates: { canonical: "https://www.elitebcn.info" },
   keywords: ["barcelona airport transfer", "barcelona private transfer", "bcn el prat transfer", "luxury chauffeur barcelona", "mercedes v class barcelona"],
   openGraph: {
     ...SHARED_OG,
-    title: "Élite BCN | Barcelona Airport Transfers — From €50",
+    title: "Elite BCN | Barcelona Airport Transfers — From €50",
     description: "Barcelona's #1 luxury private transfer. Fixed prices from €50, no surge pricing. BCN El Prat T1/T2. Mercedes V-Class & EQE 300 Electric. Book 24/7.",
     url: "https://www.elitebcn.info",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Luxury Private Transfer Barcelona Airport" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Luxury Private Transfer Barcelona Airport" }],
   },
 };
 

@@ -24,20 +24,20 @@ const cheapestAirportFare = Math.min(...airportRoutes.map((r) => r.economy));
  * afterwards, which is the part the homepage does not cover.
  */
 export const metadata: Metadata = {
-  title: { absolute: "Private Barcelona Airport Transfer — BCN T1 & T2 | Élite BCN" },
-  description: `Private transfer from Barcelona Airport, Terminal 1 and Terminal 2, from €${airportCityEco} per vehicle. Your car alone, no shared seats, and a published fixed price to ${airportRoutes.length} destinations.`,
+  title: { absolute: "Private Barcelona Airport Transfer — BCN T1 & T2" },
+  description: "Your own car from Barcelona Airport arrivals, never a shared seat. Fixed fares from €50 to 33 published destinations across Catalonia and beyond.",
   alternates: { canonical: "https://www.elitebcn.info/airport-transfers" },
   keywords: ["private barcelona airport transfer", "barcelona airport transfer", "bcn el prat private transfer", "barcelona airport t1 transfer", "barcelona airport t2 transfer"],
   openGraph: {
     ...SHARED_OG,
-    title: "Private Barcelona Airport Transfer — BCN T1 & T2 | Élite BCN",
+    title: "Private Barcelona Airport Transfer — BCN T1 & T2 | Elite BCN",
     description: `Private transfer from Barcelona Airport, T1 and T2, from €${airportCityEco} per vehicle. Your car alone, and a published fixed price to ${airportRoutes.length} destinations.`,
     url: "https://www.elitebcn.info/airport-transfers",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Airport Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona Airport Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Private Barcelona Airport Transfer — BCN T1 & T2 | Élite BCN",
+    title: "Private Barcelona Airport Transfer — BCN T1 & T2 | Elite BCN",
     description: `Private transfer from Barcelona Airport, T1 and T2, from €${airportCityEco} per vehicle. Your car alone, and a published fixed price to ${airportRoutes.length} destinations.`,
     images: ["/opengraph-image"],
   },
@@ -48,9 +48,9 @@ const AIRPORT_SCHEMA = {
   "@type": "Service",
   name: "Barcelona Airport Transfer — BCN El Prat",
   serviceType: "Airport Transfer",
-  provider: { "@type": "Organization", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: { "@type": "Airport", name: "Barcelona El Prat Airport", iataCode: "BCN" },
-  description: "Fixed-price luxury private transfers from Barcelona El Prat Airport (T1 & T2). Meet & greet, flight tracking, 60 min free waiting.",
+  description: "Fixed-price private transfers from Barcelona El Prat Airport (T1 & T2). Flight tracking and 60 minutes of free waiting from landing. Meet & greet available as a paid extra.",
   url: "https://www.elitebcn.info/airport-transfers",
   offers: { "@type": "Offer", price: `${airportCityEco}`, priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
   breadcrumb: {
@@ -79,9 +79,11 @@ export default function AirportTransfersPage() {
               Private Barcelona <br /><span className="text-gold-gradient">Airport Transfer</span>
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
-              Your driver waits inside the arrivals hall at Terminal 1 or Terminal 2, name board in hand,
-              and walks you to the car. We track your flight, so an early landing or a two-hour delay
-              changes nothing — the first 60 minutes of waiting are free from the moment you touch down.
+              Your driver meets you at the designated meeting point at Terminal 1 or Terminal 2 —
+              outside, next to the taxi rank, where reserved VTC cars are permitted to park and wait.
+              We track your flight, so an early landing or a two-hour delay changes nothing, and the
+              first 60 minutes of waiting are free from the moment you touch down. Prefer to be met
+              inside arrivals with a name board? Add meet &amp; greet for €5.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link href="/book?pickup=Barcelona+Airport" className="btn-gold px-8 py-4 rounded-xl font-semibold">
@@ -101,7 +103,7 @@ export default function AirportTransfersPage() {
               {[
                 { icon: Plane,    title: "Live Flight Tracking",     desc: "We monitor your flight and adjust pickup time automatically. No stress if your flight is early or delayed." },
                 { icon: Clock,    title: "60-Min Free Waiting",       desc: "Complimentary 60 minutes waiting time from flight landing. For other pickups, 15 minutes is included." },
-                { icon: Shield,   title: "Meet & Greet Service",     desc: "Your chauffeur meets you in the arrivals hall with a name board — helping with bags and guiding you to the vehicle." },
+                { icon: Shield,   title: "Meet & Greet (€5)",        desc: "Optional add-on: your chauffeur meets you inside the arrivals hall with a name board and helps with your bags. Without it, the driver waits at the designated meeting point outside." },
                 { icon: Star,     title: "All Prices Fixed",          desc: "Airport transfer prices are fixed regardless of traffic or time of day. No surge pricing on holiday periods." },
                 { icon: Anchor,   title: "Cruise Port Service",       desc: "Full service to Barcelona Cruise Terminal — including luggage assistance and flexible ship departure timing." },
                 { icon: CheckCircle2, title: "Free Cancellation",     desc: "Cancel for free up to 24 hours before pickup. Your money is refunded in full within 5 business days." },

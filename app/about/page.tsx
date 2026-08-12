@@ -6,20 +6,20 @@ import { COMPANY } from "@/lib/company-facts";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "About Élite BCN — Barcelona's Luxury Transfer Company",
+  title: "About Elite BCN — Barcelona's Luxury Transfer Company",
   description: "4.9★ rated, 595+ reviews. Licensed VTC chauffeur service in Barcelona since 2018. Professional drivers, Mercedes V-Class, EQE 300 Electric & Tesla Model 3.",
   alternates: { canonical: "https://www.elitebcn.info/about" },
   keywords: ["about elite bcn", "barcelona vtc company", "licensed vtc barcelona"],
   openGraph: {
     ...SHARED_OG,
-    title: "About Élite BCN — Barcelona's Luxury Transfer Company",
+    title: "About Elite BCN — Barcelona's Luxury Transfer Company",
     description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet. 595+ five-star reviews.",
     url: "https://www.elitebcn.info/about",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN Transfers — About Our Company" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN Transfers — About Our Company" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "About Élite BCN — Barcelona's Luxury Transfer Company",
+    title: "About Elite BCN — Barcelona's Luxury Transfer Company",
     description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet.",
     images: ["/opengraph-image"],
   },
@@ -32,7 +32,7 @@ const aboutSchema = {
       "@type": "AboutPage",
       "@id":   "https://www.elitebcn.info/about",
       url:     "https://www.elitebcn.info/about",
-      name:    "About Élite BCN Transfers",
+      name:    "About Elite BCN Transfers",
       description: "Licensed VTC chauffeur company in Barcelona since 2018. 4.9★ rated with 595+ five-star reviews.",
       inLanguage: "en",
       isPartOf: { "@id": "https://www.elitebcn.info" },
@@ -47,7 +47,7 @@ const aboutSchema = {
     {
       "@type":       "Organization",
       "@id":         "https://www.elitebcn.info/#organization",
-      name:          "Élite BCN Transfers",
+      name:          "Elite BCN Transfers",
       url:           "https://www.elitebcn.info",
       foundingDate:  "2018",
       description:   "Licensed VTC private chauffeur service in Barcelona. Airport transfers, corporate travel, luxury fleet.",
@@ -78,7 +78,7 @@ export default function AboutPage() {
                 Barcelona&apos;s <span className="text-gold-gradient">Luxury Standard</span>
               </h1>
               <p className="text-dark-300 text-lg leading-relaxed mb-8">
-                Founded in Barcelona in 2018, Élite BCN was created with a single mission: to deliver a level of chauffeur service that genuinely rivals the world&apos;s finest cities. Not just a transfer — an experience.
+                Founded in Barcelona in 2018, Elite BCN was created with a single mission: to deliver a level of chauffeur service that genuinely rivals the world&apos;s finest cities. Not just a transfer — an experience.
               </p>
               <p className="text-dark-400 leading-relaxed">
                 We are a licensed VTC operator serving Barcelona, Catalonia, and beyond. Our professional drivers speak English, Spanish, and Catalan. Every vehicle in our fleet is premium, immaculate, and never older than 3 years.

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Booking Confirmed | Élite BCN",
+  title: "Booking Confirmed | Elite BCN",
   robots: { index: false, follow: false },
 };
 

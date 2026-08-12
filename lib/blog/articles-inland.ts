@@ -9,7 +9,7 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     title: "Montserrat: Catalonia's Sacred Mountain",
     excerpt:
       "A Benedictine monastery wedged into a wall of serrated rock, the Black Madonna, a boys' choir with a thousand-year history, and walking trails above the clouds.",
-    metaTitle: "Montserrat Day Trip Guide — Monastery & Trails | Élite BCN",
+    metaTitle: "Montserrat Day Trip Guide — Monastery & Trails | Elite BCN",
     metaDescription:
       "How to visit Montserrat from Barcelona: the monastery, the Black Madonna, the Escolania choir, the best walking routes and when to go.",
     keywords: ["things to do in montserrat", "montserrat day trip", "montserrat monastery", "black madonna montserrat", "montserrat from barcelona", "montserrat hiking"],
@@ -104,7 +104,7 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     title: "Girona: Medieval Walls and the Jewish Quarter",
     excerpt:
       "One of Europe's best-preserved Jewish quarters, a cathedral with the widest Gothic nave in the world, and coloured houses reflected in the Onyar.",
-    metaTitle: "Girona Guide — Old Town, Cathedral & El Call | Élite BCN",
+    metaTitle: "Girona Guide — Old Town, Cathedral & El Call | Elite BCN",
     metaDescription:
       "A guide to Girona: the Jewish quarter, the cathedral steps, walking the city walls, the Onyar houses, and how to get there from Barcelona.",
     keywords: ["things to do in girona", "girona old town", "girona jewish quarter", "girona cathedral", "barcelona to girona"],
@@ -201,7 +201,7 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     title: "Tarragona: Roman Capital by the Sea",
     excerpt:
       "An amphitheatre on the beach, a UNESCO-listed Roman city, and the finest surviving aqueduct in Catalonia — an hour south of Barcelona.",
-    metaTitle: "Tarragona Guide — Roman Ruins & Amphitheatre | Élite BCN",
+    metaTitle: "Tarragona Guide — Roman Ruins & Amphitheatre | Elite BCN",
     metaDescription:
       "Visiting Tarragona: the seafront amphitheatre, the Roman circus and walls, Les Ferreres aqueduct, the cathedral and the best time to go.",
     keywords: ["things to do in tarragona", "tarragona roman ruins", "tarragona amphitheatre", "tarraco", "tarragona from barcelona", "tarragona aqueduct"],
@@ -294,7 +294,7 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     title: "Andorra in Winter: Skiing, Spas and Duty-Free",
     excerpt:
       "The largest ski area in the Pyrenees, Europe's biggest mountain spa, and tax-free shopping — three hours from Barcelona in a country of 468 square kilometres.",
-    metaTitle: "Andorra Winter Guide — Ski, Spa & Shopping | Élite BCN",
+    metaTitle: "Andorra Winter Guide — Ski, Spa & Shopping | Elite BCN",
     metaDescription:
       "Visiting Andorra in winter: Grandvalira and Pal Arinsal ski areas, the Caldea spa, duty-free shopping, and the transfer from Barcelona.",
     keywords: ["things to do in andorra", "andorra skiing", "grandvalira", "caldea spa andorra", "andorra duty free", "barcelona to andorra transfer"],

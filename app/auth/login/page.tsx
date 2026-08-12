@@ -71,7 +71,7 @@ function LoginForm() {
               <div className="w-3 h-3 bg-[#c9a84c] group-hover:bg-black transition-colors duration-300" />
             </div>
             <span className="font-display text-xl tracking-[0.25em]">
-              <span className="text-white">ÉLITE</span><span className="text-[#c9a84c]">BCN</span>
+              <span className="text-white">ELITE</span><span className="text-[#c9a84c]">BCN</span>
             </span>
           </Link>
 
@@ -157,7 +157,7 @@ function LoginForm() {
           {/* Footer links */}
           <div className="mt-6 flex flex-col gap-2 text-center">
             <p className="text-sm text-white/30">
-              New to Élite BCN?{" "}
+              New to Elite BCN?{" "}
               <Link href="/auth/register" className="text-[#c9a84c] hover:text-[#e4c97e] transition-colors font-medium">
                 Create account
               </Link>

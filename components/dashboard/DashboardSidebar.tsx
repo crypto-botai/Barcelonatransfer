@@ -66,7 +66,7 @@ export default function DashboardSidebar({ userName, memberTier = "Gold", notifi
                 <Car size={14} className="text-gold-500" />
               </div>
               <div>
-                <span className="text-white font-semibold text-sm tracking-wide">Élite BCN</span>
+                <span className="text-white font-semibold text-sm tracking-wide">Elite BCN</span>
                 <p className="text-dark-500 text-[10px] tracking-widest uppercase">Dashboard</p>
               </div>
             </motion.div>

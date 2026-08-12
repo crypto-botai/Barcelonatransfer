@@ -127,7 +127,7 @@ async function submitURL(url, token) {
 
 // ─── Main ─────────────────────────────────────────────────────
 async function main() {
-  console.log("\n🚀 Élite BCN — Google Indexing API Submission");
+  console.log("\n🚀 Elite BCN — Google Indexing API Submission");
   console.log("━".repeat(55));
   console.log(`📋 Submitting ${URLS.length} URLs...\n`);
 

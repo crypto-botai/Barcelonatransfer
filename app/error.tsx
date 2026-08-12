@@ -34,7 +34,7 @@ export default function GlobalError({
                 <div style={{ width: 12, height: 12, background: "#c9a84c" }} />
               </div>
               <span style={{ fontSize: 22, letterSpacing: "0.25em", color: "#fff", fontFamily: "Georgia, serif" }}>
-                ÉLITE<span style={{ color: "#c9a84c" }}>BCN</span>
+                ELITE<span style={{ color: "#c9a84c" }}>BCN</span>
               </span>
             </div>
 

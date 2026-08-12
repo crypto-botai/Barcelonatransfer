@@ -36,7 +36,7 @@ export async function generateMetadata(
   const minFare = getFleetFromPrice(vehicleClass as FleetVehicle);
 
   return {
-    title: `${vehicle.label} — Barcelona Private Transfer | Élite BCN`,
+    title: `${vehicle.label} — Barcelona Private Transfer | Elite BCN`,
     description: `${vehicle.description} From €${minFare} fixed price. Meet & greet, flight tracking, no surge pricing.`,
     alternates: { canonical: `${BASE}/fleet/${slug}` },
     keywords: [`barcelona ${vehicle.label.toLowerCase()} transfer`, `${vehicle.label.toLowerCase()} private hire barcelona`, "luxury chauffeur barcelona"],
@@ -45,11 +45,11 @@ export async function generateMetadata(
       title: `${vehicle.label} — Barcelona Private Transfer`,
       description: `From €${minFare}. Fixed-price private transfer in ${vehicle.label}. No surge pricing, ever.`,
       url: `${BASE}/fleet/${slug}`,
-      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `Élite BCN — ${vehicle.label} Barcelona Private Transfer` }],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `Elite BCN — ${vehicle.label} Barcelona Private Transfer` }],
     },
     twitter: {
       card: "summary_large_image" as const,
-      title: `${vehicle.label} — Barcelona Private Transfer | Élite BCN`,
+      title: `${vehicle.label} — Barcelona Private Transfer | Elite BCN`,
       description: `From €${minFare}. Fixed-price private transfer in ${vehicle.label}. Meet & greet, flight tracking, no surge pricing.`,
       images: ["/opengraph-image"],
     },
@@ -256,7 +256,7 @@ export default async function FleetVehiclePage(
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-400 text-xs text-center mt-3">Fixed price per vehicle, excluding VAT and tolls. 10% VAT is added only if you request an invoice; tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
+            <p className="text-dark-400 text-xs text-center mt-3">Fixed price per vehicle, excluding VAT and tolls. 10% VAT is added only if you request an invoice; tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet &amp; greet, child seats and other extras are optional and charged separately.</p>
           </div>
         </section>
 

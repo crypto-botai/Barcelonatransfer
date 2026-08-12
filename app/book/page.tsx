@@ -13,7 +13,7 @@ import { faqPage, transferService } from "@/lib/schema";
 const fromPrice = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona_city")?.economy ?? 50;
 
 export const metadata: Metadata = {
-  title: { absolute: "Book Your Barcelona Transfer | Élite BCN" },
+  title: { absolute: "Book Your Barcelona Transfer | Elite BCN" },
   description:
     `Book your Barcelona luxury transfer in 60 seconds. Fixed prices from €${fromPrice}. BCN El Prat T1/T2, cruise port, hotels, Sitges & Andorra. Instant confirmation 24/7.`,
   alternates: {
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     description:
       "Instant online booking for luxury private transfers in Barcelona. Fixed prices, no surge pricing. Mercedes V-Class & EQE 300 Electric.",
     url: "https://www.elitebcn.info/book",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Book Élite BCN Airport Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Book Elite BCN Airport Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -43,7 +43,7 @@ const BOOKING_STEPS = [
 
 const BOOK_FAQ = [
   { q: "How far in advance do I need to book?",       a: "We recommend booking at least 4 hours before your pickup. Bookings under 4 hours carry a 15% last-minute surcharge. We cannot accept bookings with less than 1 hour notice." },
-  { q: "What does the price include?",                a: "The fixed price covers the professional chauffeur, the vehicle, fuel, meet & greet, and up to 60 minutes free waiting after landing. No surge pricing, ever. VAT and tolls are NOT included: 10% VAT is added only if you request an invoice, and motorway tolls are charged separately where the route uses them." },
+  { q: "What does the price include?",                a: "The fixed price covers the professional chauffeur, the vehicle and fuel, plus up to 60 minutes of free waiting after landing on airport pickups. No surge pricing, ever. VAT and tolls are NOT included: 10% VAT is added only if you request an invoice, and motorway tolls are charged separately where the route uses them. Meet & greet, child seats and other extras are optional and charged separately." },
   { q: "Can I cancel or change my booking?",          a: "Yes. Free cancellation up to 24 hours before pickup. Pickup address changes are free if made more than 8 hours before departure. Changes within those windows require a WhatsApp message to +34 635 383 712." },
   { q: "What if my flight is delayed?",               a: "We monitor all flights in real time. Your driver automatically adjusts to your actual landing time at no extra cost. The first 60 minutes after landing are always free." },
   { q: "Where do you pick me up at the airport?",     a: "Your driver will be waiting in the Arrivals hall of your terminal (T1 or T2) holding a name board with your name. No need to call — just follow Arrivals signs." },
@@ -61,7 +61,7 @@ export default async function BookPage() {
 
   const serviceSchema = transferService({
     name: "Barcelona Airport Private Transfer",
-    description: "Fixed-price luxury chauffeur transfers from Barcelona El Prat Airport (T1/T2) to city centre, hotels, cruise port, and Costa Daurada. Mercedes V-Class & EQE 300 Electric. Meet & greet included.",
+    description: "Fixed-price luxury chauffeur transfers from Barcelona El Prat Airport (T1/T2) to city centre, hotels, cruise port, and Costa Daurada. Mercedes V-Class & EQE 300 Electric. Fixed price per vehicle.",
     url: "/book",
     priceFrom: 45,
     fromCity: "El Prat de Llobregat",

@@ -350,7 +350,7 @@ export default function CostCalculatorClient() {
         {/* Book CTA */}
         <div className="mt-8 text-center">
           <p className="text-dark-400 text-sm mb-4">
-            Élite BCN private transfer: fixed price, meet & greet in arrivals, flight tracking, no surge pricing.
+            Elite BCN private transfer: fixed price, meet & greet in arrivals, flight tracking, no surge pricing.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

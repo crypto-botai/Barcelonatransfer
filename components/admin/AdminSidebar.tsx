@@ -198,7 +198,7 @@ export default function AdminSidebar() {
               <div className="w-2.5 h-2.5 bg-gold-500" />
             </div>
             <span className="font-display text-base tracking-[0.2em]">
-              <span className="text-white">ÉLITE</span><span className="text-gold-500">BCN</span>
+              <span className="text-white">ELITE</span><span className="text-gold-500">BCN</span>
             </span>
           </Link>
           <p className="text-dark-500 text-xs mt-1 ml-9">Admin Panel</p>
@@ -222,7 +222,7 @@ export default function AdminSidebar() {
             <div className="w-2 h-2 bg-gold-500" />
           </div>
           <span className="font-display text-sm tracking-[0.2em]">
-            <span className="text-white">ÉLITE</span><span className="text-gold-500">BCN</span>
+            <span className="text-white">ELITE</span><span className="text-gold-500">BCN</span>
           </span>
         </Link>
         <div className="flex items-center gap-3">
@@ -255,7 +255,7 @@ export default function AdminSidebar() {
         <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
           <div>
             <p className="text-white text-sm font-medium">Admin Panel</p>
-            <p className="text-dark-500 text-xs mt-0.5">Élite BCN Transfers</p>
+            <p className="text-dark-500 text-xs mt-0.5">Elite BCN Transfers</p>
           </div>
           <button
             onClick={() => setDrawerOpen(false)}

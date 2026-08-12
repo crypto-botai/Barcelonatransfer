@@ -6,7 +6,7 @@ import OfficeCanvas from "@/components/hq/OfficeCanvas";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
-  title: "AI Headquarters | Élite BCN Admin",
+  title: "AI Headquarters | Elite BCN Admin",
   robots: { index: false, follow: false },
 };
 

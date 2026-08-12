@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { BLOG_ARTICLES, getArticle } from "@/lib/blog";
 
-export const alt = "Élite BCN Travel Guide";
+export const alt = "Elite BCN Travel Guide";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -18,7 +18,7 @@ export default async function OG({ params }: { params: Promise<{ slug: string }>
   const a = getArticle(slug);
 
   const [c1, c2] = a?.accent ?? ["#c9a84c", "#0a0a0a"];
-  const title    = a?.title ?? "Élite BCN Travel Guides";
+  const title    = a?.title ?? "Elite BCN Travel Guides";
   const season   = a?.season ?? "Barcelona";
 
   return new ImageResponse(
@@ -45,7 +45,7 @@ export default async function OG({ params }: { params: Promise<{ slug: string }>
             <div style={{ width: 14, height: 14, background: "#c9a84c" }} />
           </div>
           <div style={{ display: "flex", fontSize: 26, fontWeight: 700, letterSpacing: "0.22em" }}>
-            <span style={{ color: "#fff" }}>ÉLITE</span>
+            <span style={{ color: "#fff" }}>ELITE</span>
             <span style={{ color: "#c9a84c" }}>BCN</span>
           </div>
         </div>

@@ -6,10 +6,10 @@ import { SOCIAL_PROOF } from "@/lib/company-facts";
 
 // 6 reviews — first name + initial + city only (no full names, no companies, no Verified badge)
 const REVIEWS = [
-  { name: "James H.",     location: "London",    avatar: "JH", rating: 5, text: "I use Élite BCN every time I fly into Barcelona for business. The professionalism is unmatched — impeccably dressed driver, spotless vehicle, real-time flight tracking every time." },
+  { name: "James H.",     location: "London",    avatar: "JH", rating: 5, text: "I use Elite BCN every time I fly into Barcelona for business. The professionalism is unmatched — impeccably dressed driver, spotless vehicle, real-time flight tracking every time." },
   { name: "Sophie B.",    location: "Paris",     avatar: "SB", rating: 5, text: "Booked a Mercedes Vito for our entire fashion team arriving at El Prat. They were waiting with name boards, helped with all 12 suitcases, and had refreshments ready. Absolutely five-star." },
   { name: "Marcus V.",    location: "Frankfurt", avatar: "MV", rating: 5, text: "Excellent service from start to finish. Pricing is fully transparent — what you see at booking is exactly what you pay. When my meeting ran late, the driver waited without complaint." },
-  { name: "Isabella R.",  location: "Milan",     avatar: "IR", rating: 5, text: "I recommend Élite BCN to all my high-net-worth clients. They consistently deliver the discretion and quality that VIP travellers demand. The V-Class for larger groups is exceptional." },
+  { name: "Isabella R.",  location: "Milan",     avatar: "IR", rating: 5, text: "I recommend Elite BCN to all my high-net-worth clients. They consistently deliver the discretion and quality that VIP travellers demand. The V-Class for larger groups is exceptional." },
   { name: "Michael C.",   location: "Singapore", avatar: "MC", rating: 5, text: "Booked three rides over four days for a conference. Every driver arrived early, kept the car at the perfect temperature, and had phone chargers ready. This is what premium means." },
   { name: "Laura J.",     location: "Oslo",      avatar: "LJ", rating: 5, text: "Organised transport for artist riders over two festival weekends. Zero complaints from any of the talent — the drivers were professional, quiet, and respected the no-photography requests completely." },
 ];

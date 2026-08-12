@@ -15,9 +15,9 @@ const AIRPORT_LADDER = ladderFor("girona_airport", "airport")!;
 
 
 export const metadata: Metadata = {
-  title: `Barcelona to Girona Transfer — from €${LADDER.economy} | Fixed Price`,
+  title: { absolute: "Barcelona to Girona Transfer — from €140" },
   description:
-    `Private transfer from Barcelona to Girona or Girona Airport (GRO). Fixed price from €${LADDER.economy}. 1 hr 10 min, no surge pricing. Book instantly.`,
+    "€140 from Barcelona city, €165 from the airport, to Girona or Girona-Costa Brava airport (GRO). Both fares fixed per vehicle and set before you book.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/girona" },
   keywords: ["barcelona girona transfer", "barcelona girona airport transfer", "gro airport transfer", "girona costa brava transfer barcelona"],
   openGraph: {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: `Barcelona to Girona Transfer — from €${LADDER.economy} | Fixed Price`,
     description: `Private transfer Barcelona to Girona or Girona Airport (GRO) from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing.`,
     url: "https://www.elitebcn.info/transfers/girona",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Girona Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Girona Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -41,7 +41,7 @@ const gironaServiceSchema = {
   name: "Barcelona to Girona Private Transfer",
   description: `Fixed-price private transfer from Barcelona Airport or City to Girona city or Girona Costa Brava Airport (GRO). From €${LADDER.economy}.`,
   url: "https://www.elitebcn.info/transfers/girona",
-  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Girona, Costa Brava, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(LADDER.economy), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -95,7 +95,7 @@ export default function GironaTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">Girona transfer</span>
+              Why choose Elite BCN for your <span className="text-gold-gradient">Girona transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
@@ -159,7 +159,7 @@ export default function GironaTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet & greet, child seats and other extras are optional and charged separately.</p>
           </div>
         </section>
 

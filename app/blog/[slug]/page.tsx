@@ -16,7 +16,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const a = getArticle(slug);
-  if (!a) return { title: "Guide not found | Élite BCN" };
+  if (!a) return { title: "Guide not found | Elite BCN" };
 
   const url = `${BASE_URL}/blog/${a.slug}`;
   return {
@@ -125,8 +125,8 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
     dateModified: article.updatedAt,
     inLanguage: "en-GB",
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
-    author:    { "@type": "Organization", name: "Élite BCN Transfers", url: BASE_URL },
-    publisher: { "@type": "Organization", name: "Élite BCN Transfers", url: BASE_URL },
+    author:    { "@type": "Organization", name: "Elite BCN Transfers", url: BASE_URL },
+    publisher: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE_URL },
     keywords: article.keywords.join(", "),
   };
 

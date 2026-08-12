@@ -8,20 +8,20 @@ import { MessageCircle } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "FAQ — Barcelona Transfer Questions Answered | Élite BCN",
+  title: "FAQ — Barcelona Transfer Questions Answered | Elite BCN",
   description: "Answers to the most common questions about booking a luxury private transfer in Barcelona — pricing, fleet, airport pickups, cancellation, child seats and more.",
   alternates: { canonical: "https://www.elitebcn.info/faq" },
   keywords: ["barcelona transfer faq", "airport transfer questions", "vtc barcelona faq", "private transfer barcelona help"],
   openGraph: {
     ...SHARED_OG,
-    title: "FAQ — Barcelona Transfer Questions Answered | Élite BCN",
+    title: "FAQ — Barcelona Transfer Questions Answered | Elite BCN",
     description: "Everything you need to know about booking a luxury private transfer in Barcelona. Fixed prices, fleet, airport pickups, cancellation policy.",
     url: "https://www.elitebcn.info/faq",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN Transfers — Frequently Asked Questions" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN Transfers — Frequently Asked Questions" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "FAQ — Barcelona Transfer Questions | Élite BCN",
+    title: "FAQ — Barcelona Transfer Questions | Elite BCN",
     description: "Everything you need to know about booking a luxury private transfer in Barcelona.",
     images: ["/opengraph-image"],
   },

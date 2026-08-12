@@ -5,20 +5,20 @@ import { COMPANY } from "@/lib/company-facts";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Élite BCN Barcelona Private Transfers",
-  description: "Privacy Policy for Élite BCN Transfers — how we collect, use and protect your personal data on our Barcelona private transfer booking platform.",
+  title: "Privacy Policy — Elite BCN Barcelona Private Transfers",
+  description: "Privacy Policy for Elite BCN Transfers — how we collect, use and protect your personal data on our Barcelona private transfer booking platform.",
   alternates: { canonical: "https://www.elitebcn.info/privacy" },
   openGraph: {
     ...SHARED_OG,
-    title: "Privacy Policy — Élite BCN Barcelona Private Transfers",
-    description: "Privacy Policy for Élite BCN Transfers — how we collect, use and protect your personal data.",
+    title: "Privacy Policy — Elite BCN Barcelona Private Transfers",
+    description: "Privacy Policy for Elite BCN Transfers — how we collect, use and protect your personal data.",
     url: "https://www.elitebcn.info/privacy",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN Transfers — Privacy Policy" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN Transfers — Privacy Policy" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Privacy Policy — Élite BCN Barcelona Private Transfers",
-    description: "Privacy Policy for Élite BCN Transfers — how we collect, use and protect your personal data.",
+    title: "Privacy Policy — Elite BCN Barcelona Private Transfers",
+    description: "Privacy Policy for Elite BCN Transfers — how we collect, use and protect your personal data.",
     images: ["/opengraph-image"],
   },
 };
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">1. Who We Are</h2>
-                  <p>Élite BCN Transfers (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is a licensed VTC operator based in Barcelona, Spain. We operate the website elitebcn.info and provide luxury private chauffeur services. Contact: {COMPANY.email} · +34 635 383 712.</p>
+                  <p>Elite BCN Transfers (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is a licensed VTC operator based in Barcelona, Spain. We operate the website elitebcn.info and provide luxury private chauffeur services. Contact: {COMPANY.email} · +34 635 383 712.</p>
                 </div>
 
                 <div>

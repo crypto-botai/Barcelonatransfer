@@ -44,7 +44,7 @@ const D: DestinationSpec = {
 };
 
 export const metadata: Metadata = {
-  title: "Barcelona to Tossa de Mar Transfer | Élite BCN",
+  title: "Barcelona to Tossa de Mar Transfer | Elite BCN",
   description:
     "Private transfer from Barcelona to Tossa de Mar on the Costa Brava. Fixed price per vehicle, 1h 15min, meet & greet included. Book online.",
   alternates: { canonical: `${BASE_URL}/transfers/tossa-de-mar` },
@@ -54,11 +54,11 @@ export const metadata: Metadata = {
     title: "Barcelona to Tossa de Mar Transfer | Fixed Price",
     description: "Private transfer from Barcelona to Tossa de Mar. Fixed price, meet & greet, scenic coast road on request.",
     url: `${BASE_URL}/transfers/tossa-de-mar`,
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Tossa de Mar Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Tossa de Mar Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona to Tossa de Mar Transfer | Élite BCN",
+    title: "Barcelona to Tossa de Mar Transfer | Elite BCN",
     description: "Private transfer from Barcelona to Tossa de Mar. Fixed price, meet & greet, no surge pricing.",
     images: ["/opengraph-image"],
   },

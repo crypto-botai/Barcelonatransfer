@@ -80,7 +80,7 @@ function envOrNull(name: string): string | null {
 
 export function getIssuer(): IssuerDetails {
   return {
-    legalName: envOrNull("COMPANY_LEGAL_NAME") ?? "Élite BCN Transfers",
+    legalName: envOrNull("COMPANY_LEGAL_NAME") ?? "Elite BCN Transfers",
     tradeName: envOrNull("COMPANY_TRADE_NAME"),
     taxId:     envOrNull("COMPANY_TAX_ID"),
     address:   envOrNull("COMPANY_ADDRESS"),

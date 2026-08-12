@@ -14,9 +14,9 @@ const LADDER = ladderFor("cadaques", "airport")!;
 const BASE = "https://www.elitebcn.info";
 
 export const metadata: Metadata = {
-  title: `Barcelona to Cadaqués Transfer — from €${LADDER.economy} | Élite BCN`,
+  title: { absolute: "Barcelona to Cadaqués Transfer — from €240" },
   description:
-    `Private transfer from Barcelona to Cadaqués. Fixed price from €${LADDER.economy}. 2h 15min journey via AP-7. Meet & greet, no surge pricing. Book instantly.`,
+    "Fixed €240 per vehicle over the Cap de Creus road to Cadaqués. No meter on the winding final approach, and the fare is set before you travel.",
   alternates: { canonical: `${BASE}/transfers/cadaques` },
   keywords: ["barcelona cadaques transfer", "cadaques private car barcelona", "cadaques airport transfer", "costa brava transfer cadaques"],
   openGraph: {
@@ -24,11 +24,11 @@ export const metadata: Metadata = {
     title: `Barcelona to Cadaqués Transfer — from €${LADDER.economy} | Fixed Price`,
     description: `Private transfer from Barcelona to Cadaqués from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing. 2h 15min.`,
     url: `${BASE}/transfers/cadaques`,
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Cadaqués Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Cadaqués Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Barcelona to Cadaqués Transfer — from €${LADDER.economy} | Élite BCN`,
+    title: `Barcelona to Cadaqués Transfer — from €${LADDER.economy} | Elite BCN`,
     description: `Private transfer from Barcelona to Cadaqués from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing.`,
     images: ["/opengraph-image"],
   },
@@ -50,7 +50,7 @@ const SERVICE_SCHEMA = {
   name: "Barcelona to Cadaqués Private Transfer",
   description: `Luxury fixed-price private transfer from Barcelona (city or El Prat Airport) to Cadaqués, Costa Brava. From €${LADDER.economy}. Meet & greet, flight tracking, 60 min free wait.`,
   url: `${BASE}/transfers/cadaques`,
-  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: BASE, telephone: "+34635383712" },
+  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: BASE, telephone: "+34635383712" },
   areaServed: [
     { "@type": "City", name: "Barcelona" },
     { "@type": "City", name: "Cadaqués" },
@@ -68,7 +68,7 @@ const FAQS = [
     a: `A fixed-price private transfer from Barcelona to Cadaqués starts from €${LADDER.economy} for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €260, and a Mercedes V-Class for groups up to 7 is €310. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and motorway tolls are charged separately. Meet & greet and 60 minutes of free waiting are included, with no surcharge for the longer mountain approach.`,
   },
   {
-    q: "Can Élite BCN transfer us onward from Cadaqués to Girona Airport or back to Barcelona?",
+    q: "Can Elite BCN transfer us onward from Cadaqués to Girona Airport or back to Barcelona?",
     a: "Yes. Every route is bidirectional at the same fixed price, and we can also arrange a one-way transfer from Cadaqués directly to Girona-Costa Brava Airport (GRO) instead of returning to Barcelona — useful if you're flying out from Girona rather than BCN. Contact us to confirm pricing for that specific combination.",
   },
 ];
@@ -135,7 +135,7 @@ export default function CadaquesTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">Cadaqués transfer</span>
+              Why choose Elite BCN for your <span className="text-gold-gradient">Cadaqués transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
@@ -228,7 +228,7 @@ export default function CadaquesTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet & greet, child seats and other extras are optional and charged separately.</p>
           </div>
         </section>
 

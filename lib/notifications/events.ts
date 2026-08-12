@@ -170,10 +170,10 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
   RIDE_COMPLETED: {
     channels: ["inapp"],
     copy: {
-      en: { title: "Trip completed",             body: "Thank you for travelling with Élite BCN. Booking {{code}}." },
-      es: { title: "Viaje completado",           body: "Gracias por viajar con Élite BCN. Reserva {{code}}." },
-      fr: { title: "Trajet terminé",             body: "Merci d'avoir voyagé avec Élite BCN. Réservation {{code}}." },
-      de: { title: "Fahrt abgeschlossen",        body: "Danke, dass Sie mit Élite BCN gefahren sind. Buchung {{code}}." },
+      en: { title: "Trip completed",             body: "Thank you for travelling with Elite BCN. Booking {{code}}." },
+      es: { title: "Viaje completado",           body: "Gracias por viajar con Elite BCN. Reserva {{code}}." },
+      fr: { title: "Trajet terminé",             body: "Merci d'avoir voyagé avec Elite BCN. Réservation {{code}}." },
+      de: { title: "Fahrt abgeschlossen",        body: "Danke, dass Sie mit Elite BCN gefahren sind. Buchung {{code}}." },
     },
   },
 

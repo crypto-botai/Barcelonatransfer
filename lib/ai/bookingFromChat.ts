@@ -296,7 +296,7 @@ export async function createBookingFromChat(
       bookingId:     booking.id,
       amount:        booking.totalAmount,
       currency:      booking.currency,
-      description:   `Élite BCN Transfer — ${draft.pickup} → ${draft.dropoff}`,
+      description:   `Elite BCN Transfer — ${draft.pickup} → ${draft.dropoff}`,
       customerEmail: draft.email,
     });
     paymentUrl = getSumUpCheckoutUrl(checkout.id, booking.id);

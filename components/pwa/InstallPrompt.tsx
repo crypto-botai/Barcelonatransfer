@@ -91,7 +91,7 @@ export default function InstallPrompt() {
 
           <div className="flex-1 min-w-0">
             <h2 className="font-display text-xl text-white mb-1.5">
-              Add Élite BCN to your phone
+              Add Elite BCN to your phone
             </h2>
             <p className="text-dark-400 text-sm leading-relaxed mb-4">
               Get a message the moment your driver sets off, arrives and is waiting —

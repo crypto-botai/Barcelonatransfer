@@ -156,7 +156,7 @@ export default function ResetPasswordPage() {
               <div className="w-3 h-3 bg-[#c9a84c]" />
             </div>
             <span className="font-display text-xl tracking-[0.25em]">
-              <span className="text-white">ÉLITE</span><span className="text-[#c9a84c]">BCN</span>
+              <span className="text-white">ELITE</span><span className="text-[#c9a84c]">BCN</span>
             </span>
           </Link>
 

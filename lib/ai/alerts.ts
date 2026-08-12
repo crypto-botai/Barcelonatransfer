@@ -41,7 +41,7 @@ export async function createAlert(opts: CreateAlertOptions): Promise<void> {
     const adminEmail = process.env.ADMIN_EMAIL ?? COMPANY.email;
     await resend.emails
       .send({
-        from:    process.env.RESEND_FROM ?? "Élite BCN AI <noreply@elitebcn.info>",
+        from:    process.env.RESEND_FROM ?? "Elite BCN AI <noreply@elitebcn.info>",
         to:      adminEmail,
         subject: `[${opts.severity}] ${opts.title}`,
         html:    `<p>${opts.message}</p><p><a href="https://www.elitebcn.info/admin/ai/alerts">View in dashboard →</a></p>`,

@@ -113,7 +113,7 @@ export default function ChatWidget() {
     if (open && messages.length === 0) {
       setMessages([{
         role: "assistant",
-        content: "Hello! 👋 I'm the Élite BCN AI assistant. How can I help you today?\n\nYou can ask me about pricing, our fleet, pickup locations, or I can help you book a transfer right now.",
+        content: "Hello! 👋 I'm the Elite BCN AI assistant. How can I help you today?\n\nYou can ask me about pricing, our fleet, pickup locations, or I can help you book a transfer right now.",
       }]);
       inputRef.current?.focus();
     }
@@ -272,7 +272,7 @@ export default function ChatWidget() {
               <MessageCircle size={16} className="text-[#c9a84c]" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-semibold leading-none">Élite BCN Assistant</p>
+              <p className="text-white text-sm font-semibold leading-none">Elite BCN Assistant</p>
               <p className="text-green-400 text-xs mt-0.5 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" /> Online · Book &amp; pay in chat
               </p>

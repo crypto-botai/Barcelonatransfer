@@ -15,8 +15,8 @@ const COSTA_BRAVA_FROM = cheapestOf(["blanes", "lloret", "tossa", "sagaro", "pla
 const COSTA_BRAVA = ROUTES.filter((r) => r.category === "costa-brava");
 
 export const metadata: Metadata = {
-  title: `Barcelona to Costa Brava Transfer — from €${COSTA_BRAVA_FROM} | Élite BCN`,
-  description: `Private transfer from Barcelona to Costa Brava. Lloret, Tossa, Blanes, Roses, Palamós, Cadaqués. Fixed price from €${COSTA_BRAVA_FROM}. All vehicles. Book instantly.`,
+  title: { absolute: "Barcelona to Costa Brava Transfer — from €135" },
+  description: "Lloret, Tossa, Blanes, Palamós, Roses and Cadaqués, each with its own published fare from €135. Fixed per car, set before you travel.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/costa-brava" },
   keywords: ["barcelona costa brava transfer"],
   openGraph: {
@@ -24,11 +24,11 @@ export const metadata: Metadata = {
     title: `Barcelona to Costa Brava Transfer — from €${COSTA_BRAVA_FROM} | Fixed Price`,
     description: `Private transfer from Barcelona to Costa Brava from €${COSTA_BRAVA_FROM}. Lloret, Tossa, Blanes, Roses, Cadaqués. Fixed price, all vehicles.`,
     url: "https://www.elitebcn.info/transfers/costa-brava",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Costa Brava Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Costa Brava Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Barcelona to Costa Brava Transfer — from €${COSTA_BRAVA_FROM} | Élite BCN`,
+    title: `Barcelona to Costa Brava Transfer — from €${COSTA_BRAVA_FROM} | Elite BCN`,
     description: `Private transfer from Barcelona to Costa Brava from €${COSTA_BRAVA_FROM}. Lloret, Tossa, Blanes, Roses. Fixed price.`,
     images: ["/opengraph-image"],
   },
@@ -40,7 +40,7 @@ const costaBravaSchema = {
   name: "Barcelona to Costa Brava Private Transfer",
   description: "Luxury fixed-price private transfers from Barcelona to all Costa Brava resorts — Lloret de Mar, Tossa de Mar, Cadaqués, Roses and beyond.",
   url: "https://www.elitebcn.info/transfers/costa-brava",
-  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Costa Brava, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(COSTA_BRAVA_FROM), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -125,7 +125,7 @@ export default function CostaBravaTransferPage() {
               </table>
             </div>
             <p className="text-dark-500 text-xs text-center mt-4">
-              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Child seats free.
+              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet &amp; greet, child seats and other extras are optional and charged separately. Child seats free.
             </p>
           </div>
         </section>
@@ -157,7 +157,7 @@ export default function CostaBravaTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">Costa Brava transfer</span>
+              Why choose Elite BCN for your <span className="text-gold-gradient">Costa Brava transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[

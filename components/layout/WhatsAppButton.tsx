@@ -23,7 +23,7 @@ export default function WhatsAppButton() {
                 <MessageCircle size={18} className="text-white" />
               </div>
               <div>
-                <p className="text-white text-sm font-semibold">Élite BCN Support</p>
+                <p className="text-white text-sm font-semibold">Elite BCN Support</p>
                 <p className="text-green-400 text-xs flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
                   Online — Typically replies instantly

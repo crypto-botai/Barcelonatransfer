@@ -4,7 +4,7 @@ import { resend } from "@/lib/resend";
 import crypto from "crypto";
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
-const FROM = process.env.RESEND_FROM ?? "Élite BCN Transfers <noreply@elitebcn.info>";
+const FROM = process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>";
 
 export async function POST(req: Request) {
   try {
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     const emailResult = await resend.emails.send({
       from: FROM,
       to: normalised,
-      subject: "Reset your Élite BCN password",
+      subject: "Reset your Elite BCN password",
       html: `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,13 +66,13 @@ export async function POST(req: Request) {
 <body>
 <div class="wrapper">
   <div class="header">
-    <div class="logo-text">ÉLITE<span>BCN</span></div>
+    <div class="logo-text">ELITE<span>BCN</span></div>
     <p class="tagline">Luxury Transfers · Barcelona</p>
   </div>
   <div class="body">
     <h2>Reset Your Password</h2>
     <p>Hi${user.name ? ` ${user.name}` : ""},</p>
-    <p style="margin-top:12px;">We received a request to reset the password for your Élite BCN account (<strong style="color:#c9a84c;">${normalised}</strong>).</p>
+    <p style="margin-top:12px;">We received a request to reset the password for your Elite BCN account (<strong style="color:#c9a84c;">${normalised}</strong>).</p>
     <p style="margin-top:12px;">Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>
     <div style="text-align:center;">
       <a href="${resetUrl}" class="btn">Reset My Password →</a>
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
     <p style="color:#666;font-size:13px;margin-top:20px;">If you didn't request a password reset, you can safely ignore this email — your password won't change.</p>
   </div>
   <div class="footer">
-    <p>© ${new Date().getFullYear()} Élite BCN Transfers · <a href="tel:+34635383712" style="color:#888;">+34 635 383 712</a></p>
+    <p>© ${new Date().getFullYear()} Elite BCN Transfers · <a href="tel:+34635383712" style="color:#888;">+34 635 383 712</a></p>
   </div>
 </div>
 </body>

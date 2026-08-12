@@ -75,7 +75,7 @@ async function runAbandonedCheck(): Promise<number> {
 
     // Note: actual email sending uses existing resend infrastructure
     await prisma.emailLog.create({
-      data: { to: ab.email, subject: "Complete your Élite BCN booking", type: "ABANDONED", status: "SENT" },
+      data: { to: ab.email, subject: "Complete your Elite BCN booking", type: "ABANDONED", status: "SENT" },
     }).catch(() => {});
   }
 
@@ -225,7 +225,7 @@ async function runAiExecutiveSummary(): Promise<void> {
     <div style="border:1px solid #c9a84c44;padding:20px;margin-bottom:20px">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
         <span style="color:#c9a84c;font-size:20px">⬛</span>
-        <span style="color:#c9a84c;font-size:16px;letter-spacing:.25em">ÉLITE BCN AI HQ</span>
+        <span style="color:#c9a84c;font-size:16px;letter-spacing:.25em">ELITE BCN AI HQ</span>
       </div>
       <div style="color:#666;font-size:12px">Daily Executive Briefing — ${dateStr}</div>
     </div>
@@ -293,13 +293,13 @@ async function runAiExecutiveSummary(): Promise<void> {
       <a href="https://www.elitebcn.info/admin/hq/learning" style="color:#c9a84c;font-size:11px;text-decoration:none">▶ Learning Queue</a>
       <a href="https://www.elitebcn.info/admin" style="color:#c9a84c;font-size:11px;text-decoration:none">▶ Admin Dashboard</a>
     </div>
-    <div style="color:#444;font-size:10px;margin-top:12px">Élite BCN AI Headquarters • Automated daily briefing</div>
+    <div style="color:#444;font-size:10px;margin-top:12px">Elite BCN AI Headquarters • Automated daily briefing</div>
 
   </div>
 </body></html>`;
 
   await (resend as { emails: { send(o: object): Promise<unknown> } }).emails.send({
-    from:    "Élite BCN AI <noreply@elitebcn.info>",
+    from:    "Elite BCN AI <noreply@elitebcn.info>",
     to:      adminEmail,
     subject: `[AI Briefing] ${dateStr} — ${bookingsToday} bookings · ${completedTasks} tasks · ${errorAgents.length > 0 ? `${errorAgents.length} errors` : "all clear"}`,
     html,

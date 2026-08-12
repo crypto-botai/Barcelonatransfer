@@ -363,7 +363,7 @@ export async function POST(req: NextRequest) {
         const checkout = await createSumUpCheckout({
           bookingId:     booking.id,
           amount:        totalWithExtras,
-          description:   `Élite BCN: ${body.pickupAddress} → ${body.dropoffAddress || body.bookingType}`,
+          description:   `Elite BCN: ${body.pickupAddress} → ${body.dropoffAddress || body.bookingType}`,
           customerEmail: body.guestEmail,
         });
 

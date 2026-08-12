@@ -154,7 +154,7 @@ function ReviewInner() {
         </button>
 
         <p className="text-center text-xs text-dark-500 mt-4">
-          Élite BCN Transfers · {COMPANY.email}
+          Elite BCN Transfers · {COMPANY.email}
         </p>
       </motion.div>
     </main>

@@ -132,7 +132,7 @@ Reply with JSON only:
     const adminEmail = process.env.ADMIN_EMAIL ?? COMPANY.email;
     await resend.emails
       .send({
-        from:    process.env.RESEND_FROM ?? "Élite BCN AI <noreply@elitebcn.info>",
+        from:    process.env.RESEND_FROM ?? "Elite BCN AI <noreply@elitebcn.info>",
         to:      adminEmail,
         subject: `🔥 Priority Booking: ${b.confirmationCode}`,
         html: `<h2>Priority Booking Alert</h2>

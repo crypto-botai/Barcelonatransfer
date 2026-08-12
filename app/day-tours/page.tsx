@@ -23,22 +23,22 @@ const P = {
 } as const;
 
 export const metadata: Metadata = {
-  title: { absolute: "Private Day Tours from Barcelona — Élite BCN Chauffeur" },
+  title: { absolute: "Private Day Tours from Barcelona — Elite BCN Chauffeur" },
   description:
     `Private day tours from Barcelona: Montserrat (€${P.montserrat}), Sitges (€${P.sitges}), Costa Brava (€${P.lloret}), Andorra (€${P.andorra}). Fixed price, luxury vehicle, no groups.`,
   alternates: { canonical: `${BASE}/day-tours` },
   keywords: ["private day tours barcelona", "barcelona montserrat tour", "barcelona sitges day trip", "barcelona costa brava tour"],
   openGraph: {
     ...SHARED_OG,
-    title: "Private Day Tours from Barcelona — Élite BCN",
+    title: "Private Day Tours from Barcelona — Elite BCN",
     description:
       "Discover Catalonia with a private chauffeur. Montserrat, Sitges, Costa Brava, Andorra — fixed prices, no groups, door-to-door.",
     url: `${BASE}/day-tours`,
-    images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: "Élite BCN — Private Day Tours from Barcelona" }],
+    images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: "Elite BCN — Private Day Tours from Barcelona" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Private Day Tours from Barcelona — Élite BCN",
+    title: "Private Day Tours from Barcelona — Elite BCN",
     description: "Montserrat, Sitges, Costa Brava, Andorra — private chauffeur, fixed prices, no groups.",
     images: [`${BASE}/opengraph-image`],
   },
@@ -58,7 +58,7 @@ const SCHEMA = {
   "@type": "Service",
   name: "Private Day Tours from Barcelona",
   serviceType: "Private Chauffeur Day Tour",
-  provider: { "@type": "Organization", name: "Élite BCN Transfers", url: BASE },
+  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE },
   areaServed: { "@type": "City", name: "Barcelona" },
   description:
     "Luxury private day tours from Barcelona: Montserrat, Sitges, Costa Brava, Andorra and more — fixed price, private vehicle, no groups.",

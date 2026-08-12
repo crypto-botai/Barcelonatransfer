@@ -44,7 +44,7 @@ const D: DestinationSpec = {
 };
 
 export const metadata: Metadata = {
-  title: "Barcelona to Figueres Transfer — Dalí Museum | Élite BCN",
+  title: "Barcelona to Figueres Transfer — Dalí Museum | Elite BCN",
   description:
     "Private transfer from Barcelona to Figueres and the Dalí Theatre-Museum. Fixed price per vehicle, 1h 40min, meet & greet included. Book online.",
   alternates: { canonical: `${BASE_URL}/transfers/figueres` },
@@ -54,11 +54,11 @@ export const metadata: Metadata = {
     title: "Barcelona to Figueres Transfer — Dalí Museum | Fixed Price",
     description: "Private transfer from Barcelona to Figueres and the Dalí Theatre-Museum. Fixed price, meet & greet, no surge pricing.",
     url: `${BASE_URL}/transfers/figueres`,
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Figueres Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Figueres Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona to Figueres Transfer — Dalí Museum | Élite BCN",
+    title: "Barcelona to Figueres Transfer — Dalí Museum | Elite BCN",
     description: "Private transfer from Barcelona to Figueres and the Dalí Theatre-Museum. Fixed price, meet & greet.",
     images: ["/opengraph-image"],
   },

@@ -7,21 +7,21 @@ import { SHARED_OG } from "@/lib/seo";
 import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona Fleet — Mercedes V-Class & Tesla | Élite BCN" },
+  title: { absolute: "Barcelona Fleet — Mercedes V-Class & Tesla | Elite BCN" },
   description:
     "Barcelona private transfer fleet: Mercedes V-Class, EQE 300 Electric, Tesla Model 3 & Vito. All under 3 years old, WiFi, water. Fixed prices.",
   alternates: { canonical: "https://www.elitebcn.info/fleet" },
   keywords: ["barcelona transfer fleet", "mercedes v-class barcelona", "tesla model 3 barcelona transfer", "luxury chauffeur barcelona fleet"],
   openGraph: {
     ...SHARED_OG,
-    title: "Barcelona Fleet — Mercedes V-Class & Tesla | Élite BCN",
+    title: "Barcelona Fleet — Mercedes V-Class & Tesla | Elite BCN",
     description: "Mercedes V-Class, EQE 300 Electric & Tesla Model 3. Premium private hire fleet for Barcelona airport transfers.",
     url: "https://www.elitebcn.info/fleet",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Luxury Fleet Barcelona Transfers" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Luxury Fleet Barcelona Transfers" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Fleet — Mercedes V-Class & Tesla | Élite BCN",
+    title: "Barcelona Fleet — Mercedes V-Class & Tesla | Elite BCN",
     description: "Mercedes V-Class, EQE 300 Electric & Tesla Model 3. Premium private hire fleet for Barcelona airport transfers.",
     images: ["/opengraph-image"],
   },
@@ -39,7 +39,7 @@ const breadcrumbSchema = {
 const fleetSchema = {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "Élite BCN Transfers Fleet",
+  name: "Elite BCN Transfers Fleet",
   description: "Luxury private transfer fleet available in Barcelona — fixed prices, no surge pricing.",
   itemListElement: [
     {

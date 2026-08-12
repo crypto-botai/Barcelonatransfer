@@ -22,7 +22,7 @@ import { saveMemory } from "@/lib/ai/memory";
 import { log } from "@/lib/ai/logger";
 
 const BRAND_VOICE = `
-Brand: Élite BCN Transfers — luxury VTC chauffeur service in Barcelona, Spain.
+Brand: Elite BCN Transfers — luxury VTC chauffeur service in Barcelona, Spain.
 Tone: premium, confident, effortless elegance. Never salesy. Short & punchy.
 Fleet: Mercedes V-Class (7 pax), Mercedes EQE 300 Electric (4 pax), Mercedes Vito (8 pax), Mercedes Sprinter (minibus).
 Services: airport transfers, cruise port, hourly hire, corporate, day tours.
@@ -98,7 +98,7 @@ export class MarketingAgent extends BaseAgent {
         : "No testimonials available — focus on service features",
     ].join("\n");
 
-    const systemPrompt = `${BRAND_VOICE}\n\nYou are the marketing copywriter for Élite BCN Transfers. Write compelling, brand-aligned content. Do NOT invent prices — say "competitive fixed rates" or "from €X" only if X is below €45. Output ONLY the JSON object requested.`;
+    const systemPrompt = `${BRAND_VOICE}\n\nYou are the marketing copywriter for Elite BCN Transfers. Write compelling, brand-aligned content. Do NOT invent prices — say "competitive fixed rates" or "from €X" only if X is below €45. Output ONLY the JSON object requested.`;
 
     const userPrompt = `Business context:
 ${contextBlock}

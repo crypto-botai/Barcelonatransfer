@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 // A receipt carries the customer's name, email, phone and home address. It must
 // never be indexed, and must not leak through a referrer header either.
 export const metadata: Metadata = {
-  title: { absolute: "Receipt | Élite BCN" },
+  title: { absolute: "Receipt | Elite BCN" },
   robots: { index: false, follow: false },
   referrer: "no-referrer",
 };
@@ -180,7 +180,7 @@ export default async function InvoicePage({
         <div className="header">
           <div>
             <div className="logo-mark"><div className="logo-dot" /></div>
-            <div className="logo-text">ÉLITE<span className="gold">BCN</span></div>
+            <div className="logo-text">ELITE<span className="gold">BCN</span></div>
             <div className="issuer">
               {/*
                 The operator here is a sole trader, so the "company" tax number
@@ -202,7 +202,7 @@ export default async function InvoicePage({
                 </>
               ) : (
                 <div>
-                  <strong style={{ color: "#333" }}>{issuer.tradeName ?? "Élite BCN Transfers"}</strong>
+                  <strong style={{ color: "#333" }}>{issuer.tradeName ?? "Elite BCN Transfers"}</strong>
                   {" · Luxury Private Transfers, Barcelona"}
                 </div>
               )}
@@ -306,7 +306,7 @@ export default async function InvoicePage({
 
         <div className="footer">
           <div>
-            <p>Thank you for choosing Élite BCN Transfers.</p>
+            <p>Thank you for choosing Elite BCN Transfers.</p>
             <p>Questions? Contact {COMPANY.email}</p>
           </div>
           <p>Booking #{booking.confirmationCode.slice(0, 12).toUpperCase()}</p>

@@ -39,7 +39,7 @@ export default function NewsletterForm({ source = "footer" }: { source?: string 
         </div>
         <div>
           <p className="text-sm text-white font-medium">You&apos;re subscribed!</p>
-          <p className="text-xs text-dark-400">Welcome to the Élite BCN community.</p>
+          <p className="text-xs text-dark-400">Welcome to the Elite BCN community.</p>
         </div>
       </div>
     );

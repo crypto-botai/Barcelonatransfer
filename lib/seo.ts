@@ -8,7 +8,7 @@
  * to guarantee those fields are always present.
  */
 
-export const SITE_NAME = "Élite BCN Transfers";
+export const SITE_NAME = "Elite BCN Transfers";
 export const BASE_URL  = "https://www.elitebcn.info";
 export const OG_IMAGE  = "/opengraph-image";
 

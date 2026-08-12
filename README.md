@@ -1,4 +1,4 @@
-# Élite BCN — Luxury Transfer Platform
+# Elite BCN — Luxury Transfer Platform
 
 A full-stack luxury private transfer booking platform built with Next.js 15, TypeScript, Tailwind CSS, Framer Motion, Stripe, Supabase, and Google Maps.
 

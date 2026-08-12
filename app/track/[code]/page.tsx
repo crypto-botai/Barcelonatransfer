@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 // A tracking link is personal and transient. Keeping it out of the index and
 // out of referrer headers matters more here than any SEO value it could carry.
 export const metadata: Metadata = {
-  title: { absolute: "Track your transfer | Élite BCN" },
+  title: { absolute: "Track your transfer | Elite BCN" },
   robots: { index: false, follow: false },
   referrer: "no-referrer",
 };

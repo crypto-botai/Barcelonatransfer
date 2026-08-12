@@ -651,7 +651,7 @@ function drawFurniture(ctx: CanvasRenderingContext2D, room: RoomCfg, t: number) 
       // Table nameplate strip
       ctx.fillStyle = hexAlpha(ac, 0.20); ctx.fillRect(tx2 + tw/2 - 28, ty + th/2 - 6, 56, 12);
       ctx.fillStyle = hexAlpha(ac, 0.7); ctx.font = "4px monospace";
-      ctx.fillText("ÉLITE BCN HQ", tx2 + tw/2 - 24, ty + th/2 + 2);
+      ctx.fillText("ELITE BCN HQ", tx2 + tw/2 - 24, ty + th/2 + 2);
 
       // Chairs around the table (6 chairs)
       const chairColor = "#0e0c0a";
@@ -1217,7 +1217,7 @@ export default function OfficeCanvas({ initialData }: { initialData: HQData }) {
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"7px 14px", borderBottom:"1px solid rgba(201,168,76,.15)", background:"rgba(0,0,0,.85)" }}>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ width:7, height:7, background:"#c9a84c", transform:"rotate(45deg)" }} />
-          <span style={{ color:"#c9a84c", fontSize:11, letterSpacing:".3em", textTransform:"uppercase" }}>ÉLITE BCN AI HEADQUARTERS</span>
+          <span style={{ color:"#c9a84c", fontSize:11, letterSpacing:".3em", textTransform:"uppercase" }}>ELITE BCN AI HEADQUARTERS</span>
           <span className="live" style={{ fontSize:9, marginLeft:4 }}>● LIVE</span>
         </div>
         <div style={{ display:"flex", gap:14, fontSize:10, color:"rgba(255,255,255,.4)" }}>

@@ -8,7 +8,7 @@ import { SHARED_OG, BASE_URL, breadcrumbSchema } from "@/lib/seo";
 import { ArrowRight, Clock, MapPin } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona Travel Guides & Destination Blog | Élite BCN" },
+  title: { absolute: "Barcelona Travel Guides & Destination Blog | Elite BCN" },
   description:
     "In-depth guides to Barcelona's best day trips: Montserrat, Sitges, the Costa Brava, Girona, Tarragona and Andorra — plus what to do in summer, winter and at New Year.",
   alternates: { canonical: `${BASE_URL}/blog` },
@@ -19,14 +19,14 @@ export const metadata: Metadata = {
   openGraph: {
     ...SHARED_OG,
     type: "website",
-    title: "Barcelona Travel Guides & Destination Blog | Élite BCN",
+    title: "Barcelona Travel Guides & Destination Blog | Elite BCN",
     description: "Guides to Montserrat, Sitges, the Costa Brava, Girona, Tarragona, Andorra and more — with fixed-price transfers to every one.",
     url: `${BASE_URL}/blog`,
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona Travel Guides" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona Travel Guides" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Travel Guides & Destination Blog | Élite BCN",
+    title: "Barcelona Travel Guides & Destination Blog | Elite BCN",
     description: "Guides to Montserrat, Sitges, the Costa Brava, Girona, Tarragona, Andorra and more.",
     images: ["/opengraph-image"],
   },
@@ -41,10 +41,10 @@ const BLOG_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Blog",
   "@id": `${BASE_URL}/blog`,
-  name: "Élite BCN Travel Guides",
+  name: "Elite BCN Travel Guides",
   description: "Destination guides and seasonal travel advice for Barcelona and Catalonia.",
   url: `${BASE_URL}/blog`,
-  publisher: { "@type": "Organization", name: "Élite BCN Transfers", url: BASE_URL },
+  publisher: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE_URL },
   blogPost: BLOG_ARTICLES.map((a) => ({
     "@type": "BlogPosting",
     headline: a.title,

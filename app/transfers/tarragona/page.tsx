@@ -14,9 +14,9 @@ const LADDER = ladderFor("tarragona", "airport")!;
 
 
 export const metadata: Metadata = {
-  title: `Barcelona to Tarragona Transfer — from €${LADDER.economy} | Fixed Price`,
+  title: { absolute: "Barcelona to Tarragona Transfer — from €150" },
   description:
-    `Private transfer from Barcelona to Tarragona or PortAventura. Fixed price from €${LADDER.economy}. 1-hour journey. Meet & greet, no surge pricing. Book instantly.`,
+    "Fixed €150 per car to Tarragona, Salou, La Pineda or PortAventura. Roman city and theme park on one route, priced per vehicle rather than per seat.",
   alternates: { canonical: "https://www.elitebcn.info/transfers/tarragona" },
   keywords: ["barcelona tarragona transfer", "tarragona private car barcelona", "barcelona roman ruins transfer"],
   openGraph: {
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: `Barcelona to Tarragona Transfer — from €${LADDER.economy} | Fixed Price`,
     description: `Private transfer Barcelona to Tarragona or PortAventura from €${LADDER.economy}. Fixed price, no surge pricing.`,
     url: "https://www.elitebcn.info/transfers/tarragona",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Tarragona Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Tarragona Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -40,7 +40,7 @@ const tarragonaServiceSchema = {
   name: "Barcelona to Tarragona Private Transfer",
   description: `Fixed-price private transfer from Barcelona Airport or City to Tarragona, PortAventura World and Salou. From €${LADDER.economy}.`,
   url: "https://www.elitebcn.info/transfers/tarragona",
-  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Tarragona, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(LADDER.economy), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -94,7 +94,7 @@ export default function TarragonaTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">Tarragona transfer</span>
+              Why choose Elite BCN for your <span className="text-gold-gradient">Tarragona transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
@@ -163,7 +163,7 @@ export default function TarragonaTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet & greet, child seats and other extras are optional and charged separately.</p>
           </div>
         </section>
 

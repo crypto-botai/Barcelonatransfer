@@ -65,7 +65,7 @@ export function vehicleProduct(opts: {
     description: opts.description,
     image:      opts.image.startsWith("http") ? opts.image : `${SITE}${opts.image}`,
     url:        opts.url.startsWith("http") ? opts.url : `${SITE}${opts.url}`,
-    brand:      { "@type": "Brand", name: "Élite BCN" },
+    brand:      { "@type": "Brand", name: "Elite BCN" },
     offers: {
       "@type":        "Offer",
       priceCurrency:  "EUR",

@@ -43,7 +43,7 @@ const D: DestinationSpec = {
 };
 
 export const metadata: Metadata = {
-  title: "Barcelona Airport to Castelldefels Transfer | Élite BCN",
+  title: "Barcelona Airport to Castelldefels Transfer | Elite BCN",
   description:
     "Private transfer from El Prat Airport to Castelldefels in 22 minutes. Fixed price per vehicle, child seats free, meet & greet included.",
   alternates: { canonical: `${BASE_URL}/transfers/castelldefels` },
@@ -53,11 +53,11 @@ export const metadata: Metadata = {
     title: "Barcelona Airport to Castelldefels Transfer | Fixed Price",
     description: "Private transfer from El Prat Airport to Castelldefels in 22 minutes. Fixed price, child seats free.",
     url: `${BASE_URL}/transfers/castelldefels`,
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Airport to Castelldefels Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Airport to Castelldefels Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona Airport to Castelldefels Transfer | Élite BCN",
+    title: "Barcelona Airport to Castelldefels Transfer | Elite BCN",
     description: "Private transfer from El Prat Airport to Castelldefels in 22 minutes. Fixed price per vehicle.",
     images: ["/opengraph-image"],
   },

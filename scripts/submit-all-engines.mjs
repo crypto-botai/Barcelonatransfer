@@ -11,7 +11,7 @@
 const BASE    = "https://www.elitebcn.info";
 const SITEMAP = `${BASE}/sitemap.xml`;
 
-console.log(`\n🚀 Élite BCN — Search Engine Submission`);
+console.log(`\n🚀 Elite BCN — Search Engine Submission`);
 console.log(`   Site: ${BASE}\n`);
 
 // ── Helper ────────────────────────────────────────────────────────────────────

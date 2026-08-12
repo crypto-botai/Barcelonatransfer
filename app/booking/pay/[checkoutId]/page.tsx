@@ -108,7 +108,7 @@ function PayInner() {
             <CreditCard size={24} className="text-gold-400" />
           </div>
           <h1 className="font-display text-2xl text-white mb-1">Secure Payment</h1>
-          <p className="text-dark-400 text-sm">Complete your Élite BCN booking</p>
+          <p className="text-dark-400 text-sm">Complete your Elite BCN booking</p>
         </div>
 
         {/* Widget card */}
@@ -177,7 +177,7 @@ function PayInner() {
         <p className="text-center text-xs text-dark-600 mt-3">
           Problems paying?{" "}
           <a
-            href={`https://wa.me/34635383712?text=${encodeURIComponent("Hi! I need help with my Élite BCN payment.")}`}
+            href={`https://wa.me/34635383712?text=${encodeURIComponent("Hi! I need help with my Elite BCN payment.")}`}
             target="_blank"
             rel="noreferrer"
             className="text-gold-500 hover:text-gold-400 underline"

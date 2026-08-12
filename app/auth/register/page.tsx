@@ -45,7 +45,7 @@ export default function RegisterPage() {
             <div className="w-3 h-3 bg-gold-500" />
           </div>
           <span className="font-display text-xl tracking-[0.25em]">
-            <span className="text-white">ÉLITE</span><span className="text-gold-500">BCN</span>
+            <span className="text-white">ELITE</span><span className="text-gold-500">BCN</span>
           </span>
         </Link>
 

@@ -159,7 +159,7 @@ export default function HQClient({ initialData }: { initialData: HQData }) {
                 </div>
                 <div>
                   <h1 className="font-display text-lg tracking-[0.25em] text-white uppercase">
-                    Élite BCN <span className="text-[#c9a84c]">AI Headquarters</span>
+                    Elite BCN <span className="text-[#c9a84c]">AI Headquarters</span>
                   </h1>
                   <p className="text-white/30 text-[10px] tracking-[0.3em] uppercase mt-0.5">
                     Mission Control · {now.toLocaleString("en-GB", { weekday:"short", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}

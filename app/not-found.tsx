@@ -17,7 +17,7 @@ export default function NotFound() {
               <div className="w-4 h-4 bg-[#c9a84c]" />
             </div>
             <span className="font-display text-2xl tracking-[0.25em]">
-              <span className="text-white">ÉLITE</span><span className="text-[#c9a84c]">BCN</span>
+              <span className="text-white">ELITE</span><span className="text-[#c9a84c]">BCN</span>
             </span>
           </div>
 

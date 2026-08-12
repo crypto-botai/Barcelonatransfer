@@ -196,7 +196,14 @@ describe("no public page publishes a hand-typed fare", () => {
     const body = src.slice(src.indexOf("export default"));
     if (body.length === 0) return;
 
-    const shown = [...body.matchAll(/>[^<>{}]*?€\s?(\d[\d,.]*)/g)].map((m) => m[1]);
+    // Contractual add-on fees are not route fares and have no table to read
+    // from: €5 a child seat or meet & greet, €20 a pet, €25 an extra stop or
+    // each further half hour of waiting.
+    const ADD_ON_FEES = new Set(["5", "20", "25"]);
+    const shown = [...body.matchAll(/>[^<>{}]*?€\s?(\d[\d,.]*)/g)]
+      // Trailing sentence punctuation rides along with the match.
+      .map((m) => m[1].replace(/[.,]+$/, ""))
+      .filter((v) => !ADD_ON_FEES.has(v));
 
     expect(
       shown,

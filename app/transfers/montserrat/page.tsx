@@ -11,7 +11,7 @@ const cityPrice    = ROUTES.find((r) => r.from === "barcelona_city" && r.to === 
 const mpvPrice     = ROUTES.find((r) => r.from === "airport" && r.to === "montserrat")?.minivan ?? 105;
 
 export const metadata: Metadata = {
-  title: `Barcelona Airport to Montserrat — from €${airportPrice} | Élite BCN`,
+  title: `Barcelona Airport to Montserrat — from €${airportPrice} | Elite BCN`,
   description: `Private transfer from Barcelona Airport to Montserrat monastery. Fixed price from €${airportPrice}. 50-minute journey. Meet & greet, no surge pricing. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/montserrat" },
   keywords: ["barcelona airport montserrat transfer", "montserrat private transfer", "montserrat day trip barcelona", "barcelona montserrat tour transfer"],
@@ -20,11 +20,11 @@ export const metadata: Metadata = {
     title: `Barcelona Airport to Montserrat Transfer — from €${airportPrice} | Fixed Price`,
     description: `Private transfer Barcelona Airport to Montserrat from €${airportPrice}. Fixed price, no surge pricing. 50-minute journey.`,
     url: "https://www.elitebcn.info/transfers/montserrat",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Montserrat Private Transfer" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Montserrat Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Barcelona Airport to Montserrat — from €${airportPrice} | Élite BCN`,
+    title: `Barcelona Airport to Montserrat — from €${airportPrice} | Elite BCN`,
     description: `Private transfer Barcelona Airport to Montserrat monastery from €${airportPrice}. Fixed price, no surge pricing.`,
     images: ["/opengraph-image"],
   },
@@ -36,7 +36,7 @@ const montserratSchema = {
   name: "Barcelona Airport to Montserrat Transfer",
   description: `Fixed-price private transfer from Barcelona Airport (BCN El Prat) to Montserrat monastery. From €${airportPrice}. 50-minute journey.`,
   url: "https://www.elitebcn.info/transfers/montserrat",
-  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Montserrat, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(airportPrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -90,7 +90,7 @@ export default function MontserratTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why choose Élite BCN for your <span className="text-gold-gradient">Montserrat transfer</span>
+              Why choose Elite BCN for your <span className="text-gold-gradient">Montserrat transfer</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
@@ -159,7 +159,7 @@ export default function MontserratTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet & greet, child seats and other extras are optional and charged separately.</p>
           </div>
         </section>
 

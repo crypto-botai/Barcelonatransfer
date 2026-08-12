@@ -56,7 +56,7 @@ const serviceSchema = {
   name: "Barcelona to Lourdes Private Transfer",
   description: `Fixed-price private transfer from Barcelona and BCN El Prat Airport to the Sanctuary of Our Lady of Lourdes, France. From €${lourdesPrice} per vehicle. 415 km, approximately 6 hours.`,
   url: URL,
-  provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Lourdes, Hautes-Pyrénées, France",
   offers: { "@type": "Offer", price: String(lourdesPrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -179,7 +179,7 @@ export default function LourdesTransferPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white text-center mb-10">
-              Why pilgrims choose Élite BCN for the <span className="text-gold-gradient">Lourdes journey</span>
+              Why pilgrims choose Elite BCN for the <span className="text-gold-gradient">Lourdes journey</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
@@ -266,7 +266,7 @@ export default function LourdesTransferPage() {
             <p className="text-dark-500 text-xs text-center mt-4">
               Fixed price per vehicle, not per passenger. Same price from BCN Airport or central Barcelona.
               Excl. VAT and tolls — 10% VAT is added only if you request an invoice; motorway tolls are charged
-              separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Return journeys and waiting time
+              separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet &amp; greet, child seats and other extras are optional and charged separately. Return journeys and waiting time
               quoted on request.
             </p>
           </div>
