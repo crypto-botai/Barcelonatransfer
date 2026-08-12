@@ -13,29 +13,46 @@ import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { SUPPORTED_LOCALES, RTL_LOCALES, LANGUAGE_META, type SupportedLocale } from "@/lib/i18n";
 
-// Statically import all locales — bundled at build time, zero runtime fetch
+// English is bundled: the server renders in it, so it must be present
+// synchronously or the first paint would show translation keys.
 import enMsg from "@/messages/en.json";
-import esMsg from "@/messages/es.json";
-import frMsg from "@/messages/fr.json";
-import arMsg from "@/messages/ar.json";
-import ruMsg from "@/messages/ru.json";
-import zhMsg from "@/messages/zh.json";
-import deMsg from "@/messages/de.json";
-import itMsg from "@/messages/it.json";
 
 type Messages = typeof enMsg;
 type Namespace = keyof Messages;
 
-const ALL_MESSAGES: Record<SupportedLocale, Messages> = {
-  en: enMsg,
-  es: esMsg as unknown as Messages,
-  fr: frMsg as unknown as Messages,
-  ar: arMsg as unknown as Messages,
-  ru: ruMsg as unknown as Messages,
-  zh: zhMsg as unknown as Messages,
-  de: deMsg as unknown as Messages,
-  it: itMsg as unknown as Messages,
+/**
+ * The other seven locales load on demand.
+ *
+ * All eight were statically imported, which put roughly 125 KB of JSON into the
+ * bundle every visitor downloads and parses — for seven languages the average
+ * visitor never opens. On a phone that cost is paid before anything becomes
+ * interactive, which is why the language menu felt slow to appear.
+ *
+ * Each locale is now its own chunk, fetched the first time it is chosen and
+ * cached by the browser thereafter.
+ */
+const LOADERS: Record<Exclude<SupportedLocale, "en">, () => Promise<{ default: unknown }>> = {
+  es: () => import("@/messages/es.json"),
+  fr: () => import("@/messages/fr.json"),
+  ar: () => import("@/messages/ar.json"),
+  ru: () => import("@/messages/ru.json"),
+  zh: () => import("@/messages/zh.json"),
+  de: () => import("@/messages/de.json"),
+  it: () => import("@/messages/it.json"),
 };
+
+const CACHE = new Map<SupportedLocale, Messages>([["en", enMsg]]);
+
+async function loadMessages(locale: SupportedLocale): Promise<Messages> {
+  const cached = CACHE.get(locale);
+  if (cached) return cached;
+  const loader = LOADERS[locale as Exclude<SupportedLocale, "en">];
+  if (!loader) return enMsg;
+  const mod = await loader();
+  const msgs = mod.default as Messages;
+  CACHE.set(locale, msgs);
+  return msgs;
+}
 
 // ─── Contexts ────────────────────────────────────────────────────────────────
 // Default = English messages. useContext() falls back to this default during
@@ -106,6 +123,7 @@ export default function I18nProvider({ children }: { children: ReactNode }) {
   // Start with English — guarantees SSR HTML has real text, not keys.
   // useEffect fires only on the client, after hydration is complete.
   const [locale, setLocaleState] = useState<SupportedLocale>("en");
+  const [messages, setMessages] = useState<Messages>(enMsg);
 
   useEffect(() => {
     // Read stored preference from cookie (set by setLocale below)
@@ -113,11 +131,15 @@ export default function I18nProvider({ children }: { children: ReactNode }) {
     const stored = cookie?.split("=")?.[1]?.trim() as SupportedLocale | undefined;
     if (stored && SUPPORTED_LOCALES.includes(stored) && stored !== "en") {
       setLocaleState(stored);
+      // Text stays English until this resolves, which is the honest fallback:
+      // the alternative is a flash of untranslated keys.
+      loadMessages(stored).then(setMessages).catch(() => {});
     }
   }, []);
 
   function setLocale(newLocale: SupportedLocale) {
     setLocaleState(newLocale);
+    loadMessages(newLocale).then(setMessages).catch(() => {});
     document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000`;
     document.documentElement.lang = newLocale;
     document.documentElement.dir = RTL_LOCALES.includes(newLocale) ? "rtl" : "ltr";
@@ -133,7 +155,7 @@ export default function I18nProvider({ children }: { children: ReactNode }) {
 
   return (
     <LocaleCtx.Provider value={{ locale, setLocale }}>
-      <MessagesCtx.Provider value={ALL_MESSAGES[locale]}>
+      <MessagesCtx.Provider value={messages}>
         {children}
       </MessagesCtx.Provider>
     </LocaleCtx.Provider>

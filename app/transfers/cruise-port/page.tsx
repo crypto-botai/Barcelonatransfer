@@ -84,7 +84,7 @@ export default function CruisePortTransferPage() {
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 20 minutes from BCN Airport</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 10 km from city centre</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €{cruisePrice} fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> €{cruisePrice} from the airport · €{hotelPort} from a city hotel</div>
             </div>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
               Book Cruise Port Transfer — from €{cruisePrice}

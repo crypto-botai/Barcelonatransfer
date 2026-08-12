@@ -9,6 +9,9 @@ import { ladderFor } from "@/lib/destination-pricing";
 // Read from the price table, never restated. A repriced route reaches
 // this page, its schema and the checkout together, or reaches none.
 const LADDER = ladderFor("girona_airport", "barcelona_city")!;
+// The airport pickup is a separate, dearer route. Naming both stops the page
+// from looking as though it contradicts the price list.
+const AIRPORT_LADDER = ladderFor("girona_airport", "airport")!;
 
 
 export const metadata: Metadata = {
@@ -81,7 +84,7 @@ export default function GironaTransferPage() {
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 1 hr 10 min</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 100 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €{LADDER.economy} fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> €{LADDER.economy} from the city · €{AIRPORT_LADDER.economy} from the airport</div>
             </div>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
               Book Girona Transfer — €{LADDER.economy}
