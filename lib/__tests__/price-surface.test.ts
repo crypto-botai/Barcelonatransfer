@@ -253,7 +253,12 @@ describe("the AI knowledge base carries no fare", () => {
     // that goes stale: eight of the ten figures once seeded had drifted below
     // what the checkout charges.
     const src = fs.readFileSync("app/api/ai/seed/route.ts", "utf8");
-    const fares = [...src.matchAll(/€\s?(\d[\d.,]*)/g)].map((m) => m[1]);
+    // Contractual fees are not route fares and have no table to read from:
+    // €5 a child seat, €25 per extra half hour of waiting.
+    const NON_ROUTE_FEES = new Set(["5", "25"]);
+    const fares = [...src.matchAll(/€\s?(\d[\d.,]*)/g)]
+      .map((m) => m[1])
+      .filter((v) => !NON_ROUTE_FEES.has(v));
     expect(
       fares,
       `app/api/ai/seed/route.ts states €${fares.join(", €")} — the agent reads live pricing, so the seed must not carry fares`,
@@ -271,9 +276,9 @@ describe("the FAQ reads its route fares", () => {
   it("quotes no route fare as a literal", () => {
     const src = fs.readFileSync("lib/faq-data.ts", "utf8");
     const literals = [...src.matchAll(/€(\d[\d.,]*)/g)].map((m) => m[1]);
-    // €25 is the additional-waiting charge: a contractual fee with no route to
-    // read from, and deliberately left alone.
-    const routeFares = literals.filter((v) => v !== "25");
+    // Contractual fees, not route fares: €25 per extra half hour of waiting and
+    // €5 a child seat. Neither has a route in the table to read from.
+    const routeFares = literals.filter((v) => v !== "25" && v !== "5");
     expect(routeFares, `lib/faq-data.ts still states €${routeFares.join(", €")}`).toEqual([]);
   });
 });

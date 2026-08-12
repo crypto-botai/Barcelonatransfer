@@ -129,7 +129,7 @@ export default function CruisePortTransferPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
                 { icon: Anchor, title: "Vessel arrival tracking", body: "We monitor your ship&apos;s AIS position and adjust driver dispatch based on actual docking time — not scheduled time." },
-                { icon: Clock, title: "60 min free waiting", body: "Disembarkation takes time. Your driver waits 60 minutes for free. Additional waiting charged at €15/30 min." },
+                { icon: Clock, title: "15 min free waiting", body: "Port pickups include 15 minutes of free waiting; the 60 free minutes apply to airport pickups, timed from landing. After that, waiting is €25 per 30 minutes." },
                 { icon: Shield, title: "Port security clearance", body: "Our drivers are pre-registered for all Barcelona port terminals and know exactly where to meet you post-customs." },
                 { icon: Star, title: "Pre-cruise airport runs", body: "Transfer from BCN Airport to your cruise terminal in just 20 minutes. Ideal for same-day arrivals." },
                 { icon: CheckCircle2, title: "Large luggage handled", body: "Cruise luggage is heavy. The V-Class handles 7 passengers with full-size suitcases per person." },
@@ -173,7 +173,7 @@ export default function CruisePortTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet and 60 min free waiting.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
           </div>
         </section>
 

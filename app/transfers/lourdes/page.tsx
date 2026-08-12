@@ -266,7 +266,7 @@ export default function LourdesTransferPage() {
             <p className="text-dark-500 text-xs text-center mt-4">
               Fixed price per vehicle, not per passenger. Same price from BCN Airport or central Barcelona.
               Excl. VAT and tolls — 10% VAT is added only if you request an invoice; motorway tolls are charged
-              separately. Includes meet &amp; greet and 60 min free waiting. Return journeys and waiting time
+              separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Return journeys and waiting time
               quoted on request.
             </p>
           </div>

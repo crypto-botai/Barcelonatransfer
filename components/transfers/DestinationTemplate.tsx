@@ -181,7 +181,7 @@ export default function DestinationTemplate({ d }: { d: DestinationSpec }) {
               </table>
             </div>
             <p className="text-dark-400 text-xs text-center mt-4">
-              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet and 60 min free waiting.
+              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.
             </p>
           </div>
         </section>

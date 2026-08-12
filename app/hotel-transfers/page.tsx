@@ -169,7 +169,7 @@ export default function HotelTransfersPage() {
                 "Meet & greet at arrivals",
                 "Bottled water on board",
                 "WiFi available on request",
-                "Child seats available free",
+                "Child seats €5 per seat",
                 "Assistance with luggage",
                 "Confirmation email & WhatsApp",
               ].map((item) => (

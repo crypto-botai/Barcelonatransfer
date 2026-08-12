@@ -97,7 +97,7 @@ export default function PortAventuraTransferPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
                 { icon: Shield, title: "Fixed price from €155", body: "Single fixed price per vehicle, excluding VAT and tolls. No meter running, no extra charge for luggage." },
-                { icon: CheckCircle2, title: "Child seats available", body: "Free baby seats and booster seats on request — essential for families flying in with young children." },
+                { icon: CheckCircle2, title: "Child seats available", body: "Baby and booster seats on request, €5 per seat — essential for families flying in with young children." },
                 { icon: Star, title: "Direct to theme park gate", body: "Drop-off at PortAventura main entrance, Ferrari Land entrance, or your on-site hotel lobby." },
                 { icon: Clock, title: "Meet & greet in arrivals", body: "Driver waits with your name board in the arrivals hall. 60 minutes free waiting from your flight landing." },
                 { icon: MapPin, title: "All Costa Daurada hotels", body: "We drop at any resort hotel in Salou, Cambrils, La Pineda, or Vila-seca on the same journey." },
@@ -162,7 +162,7 @@ export default function PortAventuraTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet and 60 min free waiting.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
           </div>
         </section>
 

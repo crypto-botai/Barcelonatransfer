@@ -256,7 +256,7 @@ export default async function FleetVehiclePage(
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-400 text-xs text-center mt-3">Fixed price per vehicle, excluding VAT and tolls. 10% VAT is added only if you request an invoice; tolls are charged separately. Includes meet &amp; greet and up to 60 min free waiting.</p>
+            <p className="text-dark-400 text-xs text-center mt-3">Fixed price per vehicle, excluding VAT and tolls. 10% VAT is added only if you request an invoice; tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
           </div>
         </section>
 

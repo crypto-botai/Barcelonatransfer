@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     // Fleet
     { category: "fleet", question: "What vehicles do you have?", answer: "Our fleet includes:\n- **EQE 300 Electric** — Mercedes EQE 300 (up to 4 pax, 100% electric)\n- **Tesla Model 3** — electric VIP sedan (up to 4 pax)\n- **V-Class VIP** — Mercedes V-Class (up to 7 pax)\n- **Vito** — Mercedes Vito (up to 8 pax)\n- **Minibus** — Mercedes Sprinter (up to 16 pax)\n\nAll vehicles are immaculate and never older than 3 years.", tags: ["fleet", "vehicles", "car"] },
-    { category: "fleet", question: "Do you have child seats?", answer: "Yes. Baby seats and child booster seats are available free of charge. Please mention this when booking under Special Requests.", tags: ["child seat", "baby", "kids"] },
+    { category: "fleet", question: "Do you have child seats?", answer: "Yes. Baby seats and child booster seats are €5 per seat. Ask for one under Special Requests when booking and tell us your child's weight so we bring the right size.", tags: ["child seat", "baby", "kids"] },
     { category: "fleet", question: "Do you have wheelchair-accessible vehicles?", answer: "Please contact us directly via WhatsApp (+34 635 383 712) or email (${COMPANY.email}) for accessibility requirements — we'll arrange the right vehicle for your needs.", tags: ["wheelchair", "accessibility"] },
 
     // Booking

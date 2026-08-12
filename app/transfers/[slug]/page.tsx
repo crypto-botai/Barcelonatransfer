@@ -318,7 +318,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
               </table>
             </div>
             <p className="text-dark-500 text-xs text-center mt-4">
-              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet in arrivals, 60 min free waiting, and luggage handling.
+              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes, and luggage handling.
             </p>
             <div className="mt-6 text-center">
               <Link

@@ -99,7 +99,7 @@ export default function MontserratTransferPage() {
                 { icon: Star, title: "Direct from airport", body: "Start your Montserrat visit directly from the airport without going into Barcelona first." },
                 { icon: CheckCircle2, title: "Monastery access points", body: "Drop at the main monastery plaza, Aeri cable car base, or rack railway (Cremallera) station at Monistrol." },
                 { icon: MapPin, title: "Barcelona city pickup too", body: "Prefer to start from your Barcelona hotel? We offer pickup from any city address." },
-                { icon: Shield, title: "Child seats available", body: "Baby seats and child booster seats available on request at no extra charge." },
+                { icon: Shield, title: "Child seats available", body: "Baby seats and child booster seats available on request, €5 per seat." },
               ].map(({ icon: Icon, title, body }) => (
                 <div key={title} className="bg-dark-900 border border-white/[0.08] rounded-xl p-6">
                   <Icon size={24} className="text-gold-500 mb-3" />
@@ -159,7 +159,7 @@ export default function MontserratTransferPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet and 60 min free waiting.</p>
+            <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet & greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes.</p>
           </div>
         </section>
 

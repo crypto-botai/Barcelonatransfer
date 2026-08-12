@@ -35,7 +35,7 @@ const FAQS = [
   },
   {
     q: "Can I request a child seat?",
-    a: "Yes — child seats are available for infants and young children at no extra charge. Please mention this when booking so we can ensure the correct seat is installed. We offer forward and rearward-facing options.",
+    a: "Yes — baby, child and booster seats are available at €5 per seat. Please mention this when booking, with your child's weight, so we install the correct seat. We offer forward and rearward-facing options.",
   },
 ];
 

@@ -125,7 +125,7 @@ export default function CostaBravaTransferPage() {
               </table>
             </div>
             <p className="text-dark-500 text-xs text-center mt-4">
-              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet and 60 min free waiting. Child seats free.
+              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Child seats free.
             </p>
           </div>
         </section>
@@ -164,7 +164,7 @@ export default function CostaBravaTransferPage() {
                 { icon: Shield, title: "Fixed transparent prices", body: "Fixed price per vehicle, excluding VAT and tolls. Fuel and driver included; 10% VAT applies only if you need an invoice." },
                 { icon: Clock, title: "Direct door-to-door", body: "Straight to your villa, hotel, or port — no bus stops, no changes, no shared rides." },
                 { icon: Star, title: "All vehicle classes", body: "Sedan, Business, Minivan (Vito), V-Class VIP, or Minibus — choose what fits your group." },
-                { icon: CheckCircle2, title: "Child seats available", body: "Baby seats and boosters free on request. Perfect for family holidays." },
+                { icon: CheckCircle2, title: "Child seats available", body: "Baby seats and boosters on request, €5 per seat. Perfect for family holidays." },
                 { icon: MapPin, title: "Return transfers", body: "Book outbound and return together. We arrive at your villa exactly when you need." },
                 { icon: Shield, title: "24/7 availability", body: "Early morning flights, late-night arrivals — we operate every hour of every day." },
               ].map(({ icon: Icon, title, body }) => (

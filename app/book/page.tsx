@@ -47,7 +47,7 @@ const BOOK_FAQ = [
   { q: "Can I cancel or change my booking?",          a: "Yes. Free cancellation up to 24 hours before pickup. Pickup address changes are free if made more than 8 hours before departure. Changes within those windows require a WhatsApp message to +34 635 383 712." },
   { q: "What if my flight is delayed?",               a: "We monitor all flights in real time. Your driver automatically adjusts to your actual landing time at no extra cost. The first 60 minutes after landing are always free." },
   { q: "Where do you pick me up at the airport?",     a: "Your driver will be waiting in the Arrivals hall of your terminal (T1 or T2) holding a name board with your name. No need to call — just follow Arrivals signs." },
-  { q: "Do you offer child seats?",                   a: "Yes. Baby seats and child booster seats are available free of charge. Add them under Special Requests when booking." },
+  { q: "Do you offer child seats?",                   a: "Yes. Baby seats and child booster seats are €5 per seat. Add them under Special Requests when booking and tell us your child's weight." },
 ] as const;
 
 // Airport & City routes for the SSR price table (Google can index these without JS)

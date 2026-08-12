@@ -125,7 +125,7 @@ export default function CostaDoradaTransferPage() {
               </table>
             </div>
             <p className="text-dark-500 text-xs text-center mt-4">
-              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet and 60 min free waiting. Child seats free.
+              Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Includes meet &amp; greet. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Child seats free.
             </p>
           </div>
         </section>
@@ -163,7 +163,7 @@ export default function CostaDoradaTransferPage() {
                 { icon: Shield, title: "Fixed transparent prices", body: "Fixed price per vehicle, excluding VAT and tolls. Fuel and driver included; 10% VAT applies only if you need an invoice." },
                 { icon: Clock, title: "Direct door-to-door", body: "Straight to your hotel, resort, or theme park entrance — no stops, no shared rides." },
                 { icon: Star, title: "All vehicle classes", body: "Sedan, Business, Minivan (Vito), V-Class VIP, or Minibus — choose what fits your group." },
-                { icon: CheckCircle2, title: "Family-friendly", body: "Free child seats and baby seats on request. Ideal for families flying in with young children." },
+                { icon: CheckCircle2, title: "Family-friendly", body: "Child and baby seats on request, €5 per seat. Ideal for families flying in with young children." },
                 { icon: MapPin, title: "PortAventura specialists", body: "Drop at any PortAventura entrance, Ferrari Land, or resort hotel on the Costa Dorada." },
                 { icon: Shield, title: "24/7 availability", body: "Early morning flights, late-night arrivals — we operate every hour of every day, 365 days." },
               ].map(({ icon: Icon, title, body }) => (
