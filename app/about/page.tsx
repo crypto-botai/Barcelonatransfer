@@ -59,12 +59,6 @@ const aboutSchema = {
         addressRegion:     "Catalonia",
         addressCountry:    "ES",
       },
-      aggregateRating: {
-        "@type":       "AggregateRating",
-        ratingValue:   "4.9",
-        reviewCount:   "595",
-        bestRating:    "5",
-      },
     },
   ],
 };

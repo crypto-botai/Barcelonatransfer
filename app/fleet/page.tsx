@@ -52,7 +52,6 @@ const fleetSchema = {
         image: "https://www.elitebcn.info/fleet/v-class-mercedes.png",
         brand: { "@type": "Brand", name: "Mercedes-Benz" },
         offers: { "@type": "Offer", price: String(HOURLY_RATES.LUXURY_MINIVAN), priceCurrency: "EUR", priceSpecification: { "@type": "UnitPriceSpecification", price: String(HOURLY_RATES.LUXURY_MINIVAN), priceCurrency: "EUR", unitCode: "HUR", referenceQuantity: { "@type": "QuantitativeValue", value: MIN_HOURLY_HOURS.LUXURY_MINIVAN, unitCode: "HUR" } }, availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
-        aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
       },
     },
     {
@@ -65,7 +64,6 @@ const fleetSchema = {
         image: "https://www.elitebcn.info/fleet/eqe-300.png",
         brand: { "@type": "Brand", name: "Mercedes-Benz" },
         offers: { "@type": "Offer", price: String(HOURLY_RATES.BUSINESS), priceCurrency: "EUR", priceSpecification: { "@type": "UnitPriceSpecification", price: String(HOURLY_RATES.BUSINESS), priceCurrency: "EUR", unitCode: "HUR", referenceQuantity: { "@type": "QuantitativeValue", value: MIN_HOURLY_HOURS.BUSINESS, unitCode: "HUR" } }, availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
-        aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
       },
     },
     {
@@ -78,7 +76,6 @@ const fleetSchema = {
         image: "https://www.elitebcn.info/fleet/mercedes-vito.png",
         brand: { "@type": "Brand", name: "Mercedes-Benz" },
         offers: { "@type": "Offer", price: String(HOURLY_RATES.MINIVAN), priceCurrency: "EUR", priceSpecification: { "@type": "UnitPriceSpecification", price: String(HOURLY_RATES.MINIVAN), priceCurrency: "EUR", unitCode: "HUR", referenceQuantity: { "@type": "QuantitativeValue", value: MIN_HOURLY_HOURS.MINIVAN, unitCode: "HUR" } }, availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
-        aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
       },
     },
   ],

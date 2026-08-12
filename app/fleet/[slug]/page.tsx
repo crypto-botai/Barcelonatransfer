@@ -81,13 +81,6 @@ export default async function FleetVehiclePage(
       availability: "https://schema.org/InStock",
       url: `${BASE}/book`,
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.9",
-      reviewCount: "312",
-      bestRating: "5",
-      worstRating: "1",
-    },
   };
 
   const breadcrumb = {
