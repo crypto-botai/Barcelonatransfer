@@ -46,7 +46,7 @@ describe("Airport ⇄ Barcelona City is one consistent set of numbers", () => {
 
   it("matches the published per-class figures", () => {
     expect(route!.economy).toBe(50);
-    expect(route!.business).toBe(60);
+    expect(route!.business).toBe(70);
     expect(route!.minivan).toBe(65);
     expect(route!.vclass).toBe(75);
     expect(route!.minibus).toBe(180);
@@ -59,9 +59,10 @@ describe("Airport ⇄ Barcelona City is one consistent set of numbers", () => {
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "MINIVAN")).toBe(65);
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "LUXURY_MINIVAN")).toBe(75);
     // Every Business vehicle pays the column. The Camry once had a €50
-    // per-route override; the owner settled the fare at €60 and it was removed.
-    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(60);
-    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "LUXURY")).toBe(60);
+    // per-route override; it was removed, and the fare rose to €70 on the
+    // owner's table of 13 Aug 2026. This is also the E-Class fare.
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(70);
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "LUXURY")).toBe(70);
     expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "LUXURY_MINIVAN")).toBe(75);
   });
 });
@@ -89,9 +90,9 @@ describe("Barcelona city → Barcelona city (same-zone route)", () => {
     }
   });
 
-  it("prices Business at the same €60 as airport ⇄ city", () => {
-    expect(lookupPriceByClass("BARCELONA_CITY", "BARCELONA_CITY", "BUSINESS")).toBe(60);
-    expect(lookupPriceByClass("BARCELONA_CITY", "BARCELONA_CITY", "LUXURY")).toBe(60);
+  it("prices Business at the same €70 as airport ⇄ city", () => {
+    expect(lookupPriceByClass("BARCELONA_CITY", "BARCELONA_CITY", "BUSINESS")).toBe(70);
+    expect(lookupPriceByClass("BARCELONA_CITY", "BARCELONA_CITY", "LUXURY")).toBe(70);
   });
 
   it("a same-zone pair with no defined route still returns null (custom quote)", () => {
@@ -190,39 +191,40 @@ describe("Fleet and DB class price parity", () => {
 // ── 4d. Per-route vehicle class overrides (airport → city only) ───────────────
 
 describe("Per-route vehicle class overrides (BCN Airport → Barcelona City)", () => {
-  it("has no override left — every Business vehicle pays the €60 column", () => {
+  it("has no override left — every Business vehicle pays the €70 column", () => {
     // A €50 Camry override used to live here. It meant the fare depended on
     // which code path answered: the database returned €60 for every normal
-    // booking while the offline fallback returned €50. Owner decision is €60.
-    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(60);
-    expect(lookupFixedPrice("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(60);
+    // booking while the offline fallback returned €50. The override went, and
+    // the fare then rose to €70 on the owner's 13 Aug table.
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(70);
+    expect(lookupFixedPrice("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(70);
   });
 
-  it("Tesla Model 3 (ELECTRIC_VIP class) keeps the BUSINESS column price €60 — no override", () => {
-    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "ELECTRIC_VIP")).toBe(60);
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "TESLA_M3")).toBe(60);
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "ELECTRIC_VIP")).toBe(60);
+  it("Tesla Model 3 (ELECTRIC_VIP class) keeps the BUSINESS column price €70 — no override", () => {
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "ELECTRIC_VIP")).toBe(70);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "TESLA_M3")).toBe(70);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "ELECTRIC_VIP")).toBe(70);
   });
 
-  it("EQE 300 (LUXURY class) keeps the BUSINESS column price €60 — no override", () => {
-    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "LUXURY")).toBe(60);
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "EQE_300")).toBe(60);
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "LUXURY")).toBe(60);
+  it("EQE 300 (LUXURY class) keeps the BUSINESS column price €70 — no override", () => {
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "LUXURY")).toBe(70);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "EQE_300")).toBe(70);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "LUXURY")).toBe(70);
   });
 
   it("prices the same in both directions (city → airport same as airport → city)", () => {
-    expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "BUSINESS")).toBe(60);
-    expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "ELECTRIC_VIP")).toBe(60);
-    expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "LUXURY")).toBe(60);
+    expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "BUSINESS")).toBe(70);
+    expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "ELECTRIC_VIP")).toBe(70);
+    expect(lookupPriceByClass("BARCELONA_CITY", "BCN_AIRPORT", "LUXURY")).toBe(70);
   });
 
   it("overrides do NOT affect other routes (e.g. airport → Montserrat stays at BUSINESS column)", () => {
     // The Camry override applies to the airport→city route alone. Montserrat
     // must keep reading its own BUSINESS column, whatever that column says.
-    // Repriced to 130 on 7 Aug 2026; the point of the test is the isolation,
+    // Repriced to 140 on 13 Aug 2026; the point of the test is the isolation,
     // not the figure.
-    expect(lookupPriceByClass("BCN_AIRPORT", "MONTSERRAT", "BUSINESS")).toBe(130);
-    expect(lookupPriceByClass("BCN_AIRPORT", "MONTSERRAT", "ELECTRIC_VIP")).toBe(130);
+    expect(lookupPriceByClass("BCN_AIRPORT", "MONTSERRAT", "BUSINESS")).toBe(140);
+    expect(lookupPriceByClass("BCN_AIRPORT", "MONTSERRAT", "ELECTRIC_VIP")).toBe(140);
   });
 });
 
@@ -281,7 +283,7 @@ describe("Intentional price asymmetries", () => {
         MINIBUS:        lookupFixedPrice(from, "MONTSERRAT", "MINIBUS"),
       };
       expect(ladder, from).toEqual({
-        ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 200, MINIBUS: 285,
+        ECONOMY: 110, BUSINESS: 140, MINIVAN: 145, VCLASS: 200, MINIBUS: 285,
       });
       // A 16-seat minibus must never be priced at or below a 7-seat V-Class.
       expect(ladder.MINIBUS!, from).toBeGreaterThan(ladder.VCLASS!);

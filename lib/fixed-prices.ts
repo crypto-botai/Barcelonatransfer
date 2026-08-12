@@ -44,12 +44,12 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "BARCELONA_CITY",
     fromLabel: "El Prat Airport", toLabel: "Barcelona City",
     category: "airport-city",
-    // Business is €60 here, as everywhere. A €50 override used to sit on this
-    // route for the Camry, which meant the fare depended on which code path
-    // answered: the database said €60 and served every normal booking, while
-    // the offline fallback said €50. Owner decision is €60, so the override is
-    // gone and the two paths cannot disagree again.
-    prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Business is €70, raised from €60 on the owner's table of 13 Aug 2026.
+    // This is also the Mercedes E-Class fare: the E-Class is a Business-class
+    // car and takes the column price rather than a per-vehicle override — the
+    // override mechanism is what previously let one route charge €50 offline
+    // and €60 online.
+    prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
   },
   {
     // Point-to-point within Barcelona city. Priced identically to the
@@ -60,14 +60,14 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "Barcelona City", toLabel: "Barcelona City",
     category: "airport-city",
     note: "Within Barcelona city",
-    prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
   },
   {
     slug: "bcn-airport-cruise-terminal",
     from: "BCN_AIRPORT", to: "CRUISE_TERMINAL",
     fromLabel: "El Prat Airport", toLabel: "Cruise Terminal",
     category: "airport-city",
-    prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
   },
   {
     slug: "cruise-terminal-barcelona-city",
@@ -75,7 +75,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "Cruise Terminal", toLabel: "Barcelona City",
     category: "airport-city",
     note: "City-centre traffic route",
-    prices: { ECONOMY: 60, BUSINESS: 60, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    prices: { ECONOMY: 60, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
   },
   {
     slug: "bcn-airport-sants-station",
@@ -92,7 +92,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // Repriced on the owner's instruction, 7 Aug 2026.
     // Was 95 / 110 / 115 / 140 / 200.
     // Minibus set to keep the 1.43x ratio to V-Class the route already had.
-    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 200, MINIBUS: 285 },
+    prices: { ECONOMY: 110, BUSINESS: 140, MINIVAN: 145, VCLASS: 200, MINIBUS: 285 },
   },
   {
     slug: "bcn-airport-andorra",
@@ -140,7 +140,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "CASTELLDEFELS",
     fromLabel: "El Prat Airport", toLabel: "Castelldefels",
     category: "costa-dorada",
-    prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
   },
   {
     slug: "bcn-airport-sitges",
@@ -175,7 +175,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "TARRAGONA",
     fromLabel: "El Prat Airport", toLabel: "Tarragona",
     category: "costa-dorada",
-    prices: { ECONOMY: 150, BUSINESS: 170, MINIVAN: 190, VCLASS: 210, MINIBUS: 270 },
+    prices: { ECONOMY: 150, BUSINESS: 180, MINIVAN: 190, VCLASS: 210, MINIBUS: 270 },
   },
   {
     slug: "bcn-airport-la-pineda",
@@ -189,14 +189,14 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "SALOU",
     fromLabel: "El Prat Airport", toLabel: "Salou",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
   },
   {
     slug: "bcn-airport-portaventura",
     from: "BCN_AIRPORT", to: "PORTAVENTURA",
     fromLabel: "El Prat Airport", toLabel: "PortAventura",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
   },
   {
     slug: "bcn-airport-cambrils",
@@ -309,7 +309,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "CADAQUES",
     fromLabel: "El Prat Airport", toLabel: "Cadaqués",
     category: "costa-brava",
-    prices: { ECONOMY: 240, BUSINESS: 260, MINIVAN: 285, VCLASS: 310, MINIBUS: 360 },
+    prices: { ECONOMY: 240, BUSINESS: 280, MINIVAN: 285, VCLASS: 320, MINIBUS: 360 },
   },
   {
     slug: "barcelona-city-la-roca",
@@ -327,14 +327,14 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // route. Was 115 / 130 / 155 / 175 / 240 — so Economy, Minivan and Minibus
     // fall here while V-Class rises. The owner confirmed this knowingly: the
     // city route previously cost more than the airport one.
-    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 200, MINIBUS: 285 },
+    prices: { ECONOMY: 110, BUSINESS: 140, MINIVAN: 145, VCLASS: 200, MINIBUS: 285 },
   },
   {
     slug: "barcelona-city-girona-airport",
     from: "BARCELONA_CITY", to: "GIRONA_AIRPORT",
     fromLabel: "Barcelona City", toLabel: "Girona Airport",
     category: "airport-city",
-    prices: { ECONOMY: 140, BUSINESS: 155, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 },
+    prices: { ECONOMY: 140, BUSINESS: 170, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 },
   },
   {
     slug: "barcelona-city-andorra",
@@ -349,7 +349,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "CASTELLDEFELS",
     fromLabel: "Barcelona City", toLabel: "Castelldefels",
     category: "costa-dorada",
-    prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
   },
   {
     slug: "barcelona-city-sitges",
@@ -384,7 +384,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "TARRAGONA",
     fromLabel: "Barcelona City", toLabel: "Tarragona",
     category: "costa-dorada",
-    prices: { ECONOMY: 150, BUSINESS: 170, MINIVAN: 190, VCLASS: 210, MINIBUS: 270 },
+    prices: { ECONOMY: 150, BUSINESS: 180, MINIVAN: 190, VCLASS: 210, MINIBUS: 270 },
   },
   {
     slug: "barcelona-city-la-pineda",
@@ -398,14 +398,14 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "SALOU",
     fromLabel: "Barcelona City", toLabel: "Salou",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
   },
   {
     slug: "barcelona-city-portaventura",
     from: "BARCELONA_CITY", to: "PORTAVENTURA",
     fromLabel: "Barcelona City", toLabel: "PortAventura",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
   },
   {
     slug: "barcelona-city-cambrils",
@@ -518,7 +518,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "CADAQUES",
     fromLabel: "Barcelona City", toLabel: "Cadaqués",
     category: "costa-brava",
-    prices: { ECONOMY: 240, BUSINESS: 260, MINIVAN: 285, VCLASS: 310, MINIBUS: 360 },
+    prices: { ECONOMY: 240, BUSINESS: 280, MINIVAN: 285, VCLASS: 320, MINIBUS: 360 },
   },
 ];
 

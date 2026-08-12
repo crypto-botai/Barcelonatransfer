@@ -278,20 +278,21 @@ describe("the FAQ reads its route fares", () => {
   });
 });
 
-describe("Business airport → Barcelona city is €60", () => {
+describe("Business airport → Barcelona city is €70", () => {
   /**
    * A €50 override sat on this route for the Camry, so the fare depended on
    * which code path answered: the database said €60 and served every normal
-   * booking, the offline fallback said €50. The owner settled it at €60 and
-   * the override is gone. These assertions exist so it cannot come back.
+   * booking, the offline fallback said €50. The override is gone, and the
+   * fare rose to €70 on the owner's 13 Aug table — the E-Class fare too.
+   * These assertions exist so the split cannot come back.
    */
   const ROUTES: [string, string][] = [
     ["airport", "barcelona_city"],
     ["barcelona_city", "barcelona_city"],
   ];
 
-  it.each(ROUTES)("%s → %s charges €60 for Business", (from, to) => {
-    expect(lookupFixedPriceByZone(from, to, "BUSINESS")).toBe(60);
+  it.each(ROUTES)("%s → %s charges €70 for Business", (from, to) => {
+    expect(lookupFixedPriceByZone(from, to, "BUSINESS")).toBe(70);
     expect(lookupFixedPriceByZone(from, to, "BUSINESS")).not.toBe(50);
   });
 
