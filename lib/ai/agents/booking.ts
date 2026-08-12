@@ -5,6 +5,7 @@ import { callProvider } from "@/lib/ai/providers";
 import { saveMemory } from "@/lib/ai/memory";
 import { COMPANY } from "@/lib/company-facts";
 import { Resend } from "resend";
+import { formatPickupDateTime } from "@/lib/datetime";
 
 type BookingWithUser = Prisma.BookingGetPayload<{
   include: { user: { select: { id: true; createdAt: true; bookings: { select: { id: true } } } } };
@@ -48,7 +49,7 @@ Booking:
 - Route: ${b.pickupAddress} → ${b.dropoffAddress}
 - Vehicle: ${b.vehicleClass}
 - Amount: €${b.totalAmount.toFixed(2)}
-- Pickup: ${b.pickupDatetime.toLocaleString("en-GB")}
+- Pickup: ${formatPickupDateTime(b.pickupDatetime)}
 - Passengers: ${b.passengers}
 - Hours until pickup: ${hoursOut.toFixed(1)}
 - New customer: ${isNew}
@@ -139,7 +140,7 @@ Reply with JSON only:
 <p><strong>Guest:</strong> ${b.guestName ?? "Guest"} (${b.guestEmail ?? ""})</p>
 <p><strong>Route:</strong> ${b.pickupAddress} → ${b.dropoffAddress}</p>
 <p><strong>Amount:</strong> €${b.totalAmount.toFixed(2)}</p>
-<p><strong>Pickup:</strong> ${b.pickupDatetime.toLocaleString("en-GB")}</p>
+<p><strong>Pickup:</strong> ${formatPickupDateTime(b.pickupDatetime)}</p>
 <pre style="background:#f5f5f5;padding:10px">${note}</pre>
 <p><a href="https://www.elitebcn.info/admin/bookings">View in admin →</a></p>`,
       })

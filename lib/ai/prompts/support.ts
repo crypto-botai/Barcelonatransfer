@@ -1,6 +1,7 @@
 import { SUPPORT_GUARDRAILS } from "@/lib/ai/guardrails";
 import { getPublicRoutes } from "@/lib/pricing-service";
 import { COMPANY } from "@/lib/company-facts";
+import { ladderFor } from "@/lib/destination-pricing";
 
 const LANG_MAP: Record<string, string> = {
   es: "Always reply in Spanish (Español).",
@@ -31,12 +32,25 @@ async function buildLivePricingSection(): Promise<string> {
   }
 }
 
+/**
+ * Used only when the live pricing read fails.
+ *
+ * Read from the route table rather than written out, so an outage cannot make
+ * the agent quote last year's fares. It previously listed Economy and Business
+ * together on one line at the economy rate, merging two classes that do not
+ * share a price and understating Business by ten euros.
+ */
 function buildFallbackPricing(): string {
+  const l = ladderFor("barcelona_city", "airport");
+  if (!l) {
+    return `## PRICING\nPrices are fixed per vehicle and quoted at booking. Do not state a figure — ask the customer to check the booking form.`;
+  }
   return `## PRICING (fixed per vehicle, EXCLUDING VAT and tolls — no surcharges on transfers)
-- **Economy / Business** (1–3 pax): from €50
-- **Minivan** (4–8 pax): from €65
-- **V-Class** (7 pax): from €75
-- **Minibus** (9–16 pax): from €180
+- **Economy** (1–3 pax): from €${l.economy}
+- **Business** (1–3 pax): from €${l.business}
+- **Minivan** (4–8 pax): from €${l.minivan}
+- **V-Class** (7 pax): from €${l.vclass}
+- **Minibus** (9–16 pax): from €${l.minibus}
 All transfer prices are fixed. No night surcharge, no surge pricing, no airport fees.`;
 }
 

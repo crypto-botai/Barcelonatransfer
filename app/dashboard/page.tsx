@@ -169,7 +169,7 @@ export default function DashboardOverview() {
                       <div className="flex items-center gap-2">
                         <span className={`text-[10px] px-1.5 py-0.5 rounded border ${STATUS_COLORS[b.status]}`}>{STATUS_LABELS[b.status]}</span>
                         <span className="text-dark-500 text-[10px]">
-                          {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                          {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", day: "numeric", month: "short" })}
                         </span>
                       </div>
                     </div>

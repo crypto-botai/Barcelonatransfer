@@ -10,6 +10,14 @@ interface Missing {
   prices: Record<string, number>;
 }
 
+interface Divergent {
+  slug: string;
+  label: string;
+  vehicleCode: string;
+  page: number;
+  booking: number;
+}
+
 /**
  * Copies newly added routes from the code price table into the database.
  *
@@ -19,6 +27,7 @@ interface Missing {
  */
 export default function SyncRoutesButton() {
   const [missing, setMissing] = useState<Missing[] | null>(null);
+  const [divergent, setDivergent] = useState<Divergent[]>([]);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -26,7 +35,7 @@ export default function SyncRoutesButton() {
     let alive = true;
     fetch("/api/admin/pricing/sync")
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => alive && setMissing(d?.missing ?? []))
+      .then((d) => { if (!alive) return; setMissing(d?.missing ?? []); setDivergent(d?.divergent ?? []); })
       .catch(() => alive && setMissing([]));
     return () => { alive = false; };
   }, []);
@@ -48,10 +57,49 @@ export default function SyncRoutesButton() {
     }
   }
 
-  // Nothing to say when the database already matches the code.
-  if (missing === null || missing.length === 0 || done) return null;
+  const nothingToAdd = missing === null || missing.length === 0 || done;
+
+  // Nothing to say when the database matches the code in both directions.
+  if (nothingToAdd && divergent.length === 0) return null;
 
   return (
+    <>
+      {divergent.length > 0 && (
+        <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/[0.06] p-4">
+          <p className="text-amber-300 text-sm font-medium mb-1">
+            {divergent.length} price{divergent.length === 1 ? "" : "s"} changed but not yet published
+          </p>
+          <p className="text-dark-400 text-xs mb-3 leading-relaxed">
+            Bookings already charge the new amount — that took effect the moment you saved. The
+            destination pages still show the old one, because those figures are built into the site
+            rather than read live. Redeploy to bring the pages in line.
+          </p>
+          <div className="rounded-lg border border-white/[0.06] overflow-hidden">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-white/[0.03] text-dark-400">
+                  <th className="text-left font-normal px-3 py-2">Route</th>
+                  <th className="text-left font-normal px-3 py-2">Vehicle</th>
+                  <th className="text-right font-normal px-3 py-2">Pages show</th>
+                  <th className="text-right font-normal px-3 py-2">Bookings charge</th>
+                </tr>
+              </thead>
+              <tbody>
+                {divergent.map((d) => (
+                  <tr key={`${d.slug}-${d.vehicleCode}`} className="border-t border-white/[0.04]">
+                    <td className="px-3 py-2 text-white">{d.label}</td>
+                    <td className="px-3 py-2 text-dark-400">{d.vehicleCode}</td>
+                    <td className="px-3 py-2 text-right text-dark-300 tabular-nums">€{d.page}</td>
+                    <td className="px-3 py-2 text-right text-amber-300 tabular-nums">€{d.booking}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {!nothingToAdd && (
     <div className="mb-6 rounded-xl border border-gold-500/25 bg-gold-500/[0.05] p-4">
       <p className="text-gold-300 text-sm font-medium mb-1">
         {missing.length} new route{missing.length === 1 ? "" : "s"} ready to publish
@@ -97,5 +145,7 @@ export default function SyncRoutesButton() {
         Add to price list
       </button>
     </div>
+      )}
+    </>
   );
 }

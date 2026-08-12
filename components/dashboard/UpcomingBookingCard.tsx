@@ -114,11 +114,11 @@ export default function UpcomingBookingCard({ booking }: { booking: Booking }) {
         <div className="flex flex-wrap gap-3 mb-5 text-xs text-dark-400">
           <span className="flex items-center gap-1.5 bg-dark-800 px-2.5 py-1.5 rounded-lg">
             <Calendar size={12} className="text-gold-500" />
-            {pickupTime.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+            {pickupTime.toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", day: "numeric", month: "short", year: "numeric" })}
           </span>
           <span className="flex items-center gap-1.5 bg-dark-800 px-2.5 py-1.5 rounded-lg">
             <Clock size={12} className="text-gold-500" />
-            {pickupTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+            {pickupTime.toLocaleTimeString("en-GB", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit" })}
           </span>
           <span className="flex items-center gap-1.5 bg-dark-800 px-2.5 py-1.5 rounded-lg">
             <Car size={12} className="text-gold-500" />

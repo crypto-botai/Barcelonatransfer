@@ -6,6 +6,7 @@ import { DriverStatus } from "@prisma/client";
 import { resolveBookingStatus } from "@/lib/booking-status";
 import { sendDriverAssignedEmail, sendBookingCancelledEmail, sendDriverBookingDetailsEmail } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
+import { formatPickupDateTime } from "@/lib/datetime";
 
 export async function GET(
   req: NextRequest,
@@ -91,7 +92,7 @@ export async function PATCH(
           to:               booking.guestEmail,
           name:             booking.guestName ?? "Valued Client",
           confirmationCode: booking.confirmationCode,
-          pickupDatetime:   new Date(booking.pickupDatetime).toLocaleString("en-GB"),
+          pickupDatetime:   formatPickupDateTime(booking.pickupDatetime),
           totalAmount:      booking.totalAmount,
         }).catch(e => console.error("[resend] booking cancelled (customer):", e));
       }
@@ -174,7 +175,7 @@ export async function PATCH(
           vehicleMake:     vehicle?.make  ?? "Vehicle",
           vehicleModel:    vehicle?.model ?? "",
           licensePlate:    vehicle?.licensePlate ?? "",
-          pickupDatetime:  new Date(booking.pickupDatetime).toLocaleString("en-GB"),
+          pickupDatetime:  formatPickupDateTime(booking.pickupDatetime),
         }).catch(e => console.error("[resend] driver assigned (customer):", e));
       }
 
@@ -188,7 +189,7 @@ export async function PATCH(
           guestPhone:       booking.guestPhone ?? "",
           pickupAddress:    booking.pickupAddress,
           dropoffAddress:   booking.dropoffAddress,
-          pickupDatetime:   new Date(booking.pickupDatetime).toLocaleString("en-GB"),
+          pickupDatetime:   formatPickupDateTime(booking.pickupDatetime),
           vehicleClass:     booking.vehicleClass,
           passengers:       booking.passengers,
           luggage:          booking.luggage,
@@ -209,7 +210,7 @@ export async function PATCH(
         vars: {
           driver: driverName,
           code:   booking.confirmationCode,
-          when:   new Date(booking.pickupDatetime).toLocaleString("en-GB"),
+          when:   formatPickupDateTime(booking.pickupDatetime),
           link:   `${process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info"}/track/${booking.confirmationCode}`,
         },
       });

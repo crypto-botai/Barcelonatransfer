@@ -119,7 +119,7 @@ export default function TrackingPage({ params }: { params: Promise<{ id: string 
             </div>
             <h1 className="font-display text-2xl text-white mb-1">#{booking.confirmationCode}</h1>
             <p className="text-dark-400 text-sm">
-              {new Date(booking.pickupDatetime).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}
+              {new Date(booking.pickupDatetime).toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}
             </p>
           </div>
           <div className="text-right">

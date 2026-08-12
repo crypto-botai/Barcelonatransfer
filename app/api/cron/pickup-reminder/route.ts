@@ -4,6 +4,7 @@ import { sendPickupReminder } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
 import { sweepFlightDelays } from "@/lib/flights/sweep";
 import { reconcilePendingPayments } from "@/lib/payments/reconcile";
+import { formatPickupDateTime } from "@/lib/datetime";
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "elite-cron-secret";
 
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
         name:            b.guestName,
         confirmationCode: b.confirmationCode,
         pickupAddress:   b.pickupAddress,
-        pickupDatetime:  new Date(b.pickupDatetime).toLocaleString("en-GB"),
+        pickupDatetime:  formatPickupDateTime(b.pickupDatetime),
         vehicleClass:    b.vehicleClass,
       });
       sent++;
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
         phone:     b.guestPhone,
         vars: {
           code:  b.confirmationCode,
-          when:  new Date(b.pickupDatetime).toLocaleString("en-GB"),
+          when:  formatPickupDateTime(b.pickupDatetime),
           route: b.dropoffAddress ? `${b.pickupAddress} → ${b.dropoffAddress}` : b.pickupAddress,
         },
       });

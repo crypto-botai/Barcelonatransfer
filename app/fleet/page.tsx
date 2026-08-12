@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import FleetSection from "@/components/sections/FleetSection";
 import Link from "next/link";
 import { SHARED_OG } from "@/lib/seo";
+import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Fleet — Mercedes V-Class & Tesla | Élite BCN" },
@@ -50,8 +51,7 @@ const fleetSchema = {
         description: "7-seat luxury MPV ideal for groups and families. Perfect for airport transfers from Barcelona El Prat.",
         image: "https://www.elitebcn.info/fleet/v-class-mercedes.png",
         brand: { "@type": "Brand", name: "Mercedes-Benz" },
-        offers: { "@type": "Offer", price: "65", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
-        aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
+        offers: { "@type": "Offer", price: String(HOURLY_RATES.LUXURY_MINIVAN), priceCurrency: "EUR", priceSpecification: { "@type": "UnitPriceSpecification", price: String(HOURLY_RATES.LUXURY_MINIVAN), priceCurrency: "EUR", unitCode: "HUR", referenceQuantity: { "@type": "QuantitativeValue", value: MIN_HOURLY_HOURS.LUXURY_MINIVAN, unitCode: "HUR" } }, availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
       },
     },
     {
@@ -63,8 +63,7 @@ const fleetSchema = {
         description: "Premium all-electric executive saloon for airport transfers in Barcelona. Up to 4 passengers. Zero emissions.",
         image: "https://www.elitebcn.info/fleet/eqe-300.png",
         brand: { "@type": "Brand", name: "Mercedes-Benz" },
-        offers: { "@type": "Offer", price: "50", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
-        aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
+        offers: { "@type": "Offer", price: String(HOURLY_RATES.BUSINESS), priceCurrency: "EUR", priceSpecification: { "@type": "UnitPriceSpecification", price: String(HOURLY_RATES.BUSINESS), priceCurrency: "EUR", unitCode: "HUR", referenceQuantity: { "@type": "QuantitativeValue", value: MIN_HOURLY_HOURS.BUSINESS, unitCode: "HUR" } }, availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
       },
     },
     {
@@ -76,8 +75,7 @@ const fleetSchema = {
         description: "Executive minivan for groups up to 8 passengers. Spacious and practical for families and large groups.",
         image: "https://www.elitebcn.info/fleet/mercedes-vito.png",
         brand: { "@type": "Brand", name: "Mercedes-Benz" },
-        offers: { "@type": "Offer", price: "60", priceCurrency: "EUR", availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
-        aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "312", bestRating: "5", worstRating: "1" },
+        offers: { "@type": "Offer", price: String(HOURLY_RATES.MINIVAN), priceCurrency: "EUR", priceSpecification: { "@type": "UnitPriceSpecification", price: String(HOURLY_RATES.MINIVAN), priceCurrency: "EUR", unitCode: "HUR", referenceQuantity: { "@type": "QuantitativeValue", value: MIN_HOURLY_HOURS.MINIVAN, unitCode: "HUR" } }, availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
       },
     },
   ],

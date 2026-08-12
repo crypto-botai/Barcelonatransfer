@@ -38,6 +38,9 @@ export interface PublicRoute {
   slug:      string;
   label:     string;
   category:  string;
+  /** Pricing zone keys, so a caller can find the route for a destination. */
+  fromKey:   string;
+  toKey:     string;
   note:      string | null;
   sortOrder: number;
   economy:   number;
@@ -203,6 +206,8 @@ export async function getPublicRoutes(): Promise<PublicRoute[]> {
       slug:      `${r.from}-${r.to}`,
       label:     r.label,
       category:  r.category,
+      fromKey:   r.from,
+      toKey:     r.to,
       note:      r.note ?? null,
       sortOrder: i,
       economy:   r.economy,
@@ -221,6 +226,8 @@ export async function getPublicRoutes(): Promise<PublicRoute[]> {
       slug:      r.slug,
       label:     r.label,
       category:  r.category,
+      fromKey:   r.fromKey,
+      toKey:     r.toKey,
       note:      r.note,
       sortOrder: r.sortOrder,
       economy:   byCode["ECONOMY"]  ?? 0,

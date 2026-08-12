@@ -262,7 +262,7 @@ export default async function AdminPage() {
                     {b.dropoffAddress && <p className="truncate text-dark-600">→ {b.dropoffAddress}</p>}
                   </td>
                   <td className="py-3 px-4 text-xs text-dark-400 whitespace-nowrap">
-                    {new Date(b.pickupDatetime).toLocaleDateString("en-GB")}
+                    {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", })}
                   </td>
                   <td className="py-3 px-4 text-xs text-dark-400">{b.vehicleClass.replace(/_/g, " ")}</td>
                   <td className="py-3 px-4 text-sm text-gold-400 font-semibold">{formatCurrency(b.totalAmount)}</td>

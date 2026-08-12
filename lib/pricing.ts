@@ -275,6 +275,10 @@ export function resolveZoneStrict(input: string): string | null {
   // Sants Station — before "barcelona" check
   if (/\b(sants|estacion sants|estacio sants|barcelona sants|sants estacio)\b/.test(s)) return "sants";
 
+  // Ski stations before Andorra: their addresses nearly always carry the word
+  // "Andorra" too, and they are charged as destinations outside it.
+  if (SKI_STATION_NAMES.test(s)) return null;
+
   // Andorra
   if (/\bandorra\b/.test(s)) return "andorra";
 
@@ -351,6 +355,56 @@ export function resolveZoneStrict(input: string): string | null {
  * These are now only reached when there are no coordinates to check against,
  * which after server-side geocoding is rare.
  */
+/**
+ * Andorran ski stations, which do not take the Andorra fare.
+ *
+ * The €300 Andorra price is for Andorra la Vella and the valley towns around
+ * it. The ski stations sit well beyond that — up the mountain, an hour further
+ * on winter roads — and are charged as destinations outside Andorra, by
+ * distance, per the owner's instruction.
+ *
+ * They have to be excluded twice over. By name, because the address text is
+ * trusted ahead of coordinates, and "Grandvalira, Canillo, Andorra" would
+ * otherwise match the word Andorra. And by position, because Arinsal sits about
+ * 8 km from Andorra la Vella and so falls inside the zone's 12 km radius — that
+ * one was already quoting €300 against a real cost well above it.
+ *
+ * Only the stations themselves are listed. Encamp and Canillo are ordinary
+ * towns that happen to have a gondola, and keep the Andorra fare.
+ */
+const SKI_STATION_NAMES =
+  /\b(grandvalira|vallnord|pas de la casa|grau roig|soldeu|el tarter|arinsal|pal arinsal|ordino[ -]?arcalis|arcalis)\b/;
+
+const SKI_STATION_POINTS: GeoPoint[] = [
+  { lat: 42.5427, lng: 1.7336, radiusKm: 4 },  // Pas de la Casa
+  { lat: 42.5405, lng: 1.7050, radiusKm: 3 },  // Grau Roig
+  { lat: 42.5766, lng: 1.6672, radiusKm: 4 },  // Soldeu
+  { lat: 42.5760, lng: 1.6470, radiusKm: 3 },  // El Tarter
+  { lat: 42.5720, lng: 1.4850, radiusKm: 4 },  // Arinsal
+  { lat: 42.5400, lng: 1.4750, radiusKm: 3 },  // Pal
+  { lat: 42.6320, lng: 1.5030, radiusKm: 4 },  // Ordino-Arcalís
+];
+
+/**
+ * Whether this journey ends at a ski station rather than in Andorra proper.
+ *
+ * Returning true means "no fixed zone": the quote falls through to distance
+ * pricing, which is the whole point.
+ */
+export function isSkiStation(address?: string, lat?: number, lng?: number): boolean {
+  if (address) {
+    const s = address
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "");
+    if (SKI_STATION_NAMES.test(s)) return true;
+  }
+  if (lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng)) {
+    return SKI_STATION_POINTS.some((p) => haversineKm(lat, lng, p.lat, p.lng) <= p.radiusKm);
+  }
+  return false;
+}
+
 export function resolveZoneBroad(input: string): string | null {
   const s = input
     .toLowerCase()
@@ -421,6 +475,10 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): nu
 }
 
 export function detectZoneFromCoords(lat: number, lng: number): string | null {
+  // Checked first: Arinsal sits inside the Andorra radius and would otherwise
+  // take the Andorra fare on coordinates alone.
+  if (isSkiStation(undefined, lat, lng)) return null;
+
   for (const [name, geo] of Object.entries(KNOWN_LOCATIONS)) {
     if (haversineKm(lat, lng, geo.lat, geo.lng) <= geo.radiusKm) return name;
   }

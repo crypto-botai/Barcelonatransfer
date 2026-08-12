@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "About Élite BCN — Barcelona's Luxury Transfer Company",
   description: "4.9★ rated, 595+ reviews. Licensed VTC chauffeur service in Barcelona since 2018. Professional drivers, Mercedes V-Class, EQE 300 Electric & Tesla Model 3.",
   alternates: { canonical: "https://www.elitebcn.info/about" },
-  keywords: ["about elite bcn", "barcelona vtc company", "luxury chauffeur barcelona", "licensed vtc barcelona"],
+  keywords: ["about elite bcn", "barcelona vtc company", "licensed vtc barcelona"],
   openGraph: {
     ...SHARED_OG,
     title: "About Élite BCN — Barcelona's Luxury Transfer Company",
@@ -58,12 +58,6 @@ const aboutSchema = {
         addressLocality:   "Barcelona",
         addressRegion:     "Catalonia",
         addressCountry:    "ES",
-      },
-      aggregateRating: {
-        "@type":       "AggregateRating",
-        ratingValue:   "4.9",
-        reviewCount:   "595",
-        bestRating:    "5",
       },
     },
   ],

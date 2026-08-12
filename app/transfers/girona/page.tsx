@@ -4,24 +4,30 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
+import { ladderFor } from "@/lib/destination-pricing";
+
+// Read from the price table, never restated. A repriced route reaches
+// this page, its schema and the checkout together, or reaches none.
+const LADDER = ladderFor("girona_airport", "barcelona_city")!;
+
 
 export const metadata: Metadata = {
-  title: "Barcelona to Girona Transfer — from €140 | Fixed Price",
+  title: `Barcelona to Girona Transfer — from €${LADDER.economy} | Fixed Price`,
   description:
-    "Private transfer from Barcelona to Girona or Girona Airport (GRO). Fixed price from €140. 1 hr 10 min, no surge pricing. Book instantly.",
+    `Private transfer from Barcelona to Girona or Girona Airport (GRO). Fixed price from €${LADDER.economy}. 1 hr 10 min, no surge pricing. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/girona" },
   keywords: ["barcelona girona transfer", "barcelona girona airport transfer", "gro airport transfer", "girona costa brava transfer barcelona"],
   openGraph: {
     ...SHARED_OG,
-    title: "Barcelona to Girona Transfer — from €140 | Fixed Price",
-    description: "Private transfer Barcelona to Girona or Girona Airport (GRO) from €140. Fixed price, meet & greet, no surge pricing.",
+    title: `Barcelona to Girona Transfer — from €${LADDER.economy} | Fixed Price`,
+    description: `Private transfer Barcelona to Girona or Girona Airport (GRO) from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing.`,
     url: "https://www.elitebcn.info/transfers/girona",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Girona Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona to Girona Transfer — from €140 | Fixed Price",
-    description: "Private transfer Barcelona to Girona from €140. Fixed price, meet & greet, no surge pricing.",
+    title: `Barcelona to Girona Transfer — from €${LADDER.economy} | Fixed Price`,
+    description: `Private transfer Barcelona to Girona from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing.`,
     images: ["/opengraph-image"],
   },
 };
@@ -30,11 +36,11 @@ const gironaServiceSchema = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: "Barcelona to Girona Private Transfer",
-  description: "Fixed-price private transfer from Barcelona Airport or City to Girona city or Girona Costa Brava Airport (GRO). From €140.",
+  description: `Fixed-price private transfer from Barcelona Airport or City to Girona city or Girona Costa Brava Airport (GRO). From €${LADDER.economy}.`,
   url: "https://www.elitebcn.info/transfers/girona",
   provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Girona, Costa Brava, Catalonia, Spain",
-  offers: { "@type": "Offer", price: "140", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+  offers: { "@type": "Offer", price: String(LADDER.economy), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const BREADCRUMB = {
@@ -75,10 +81,10 @@ export default function GironaTransferPage() {
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 1 hr 10 min</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 100 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €140 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €{LADDER.economy} fixed</div>
             </div>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Girona Transfer — €140
+              Book Girona Transfer — €{LADDER.economy}
             </Link>
           </div>
         </section>
@@ -90,7 +96,7 @@ export default function GironaTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed price €140", body: "One fixed price for the full motorway journey. Tolls and VAT are charged separately; no surprise surcharges at destination." },
+                { icon: Shield, title: `Fixed price €${LADDER.economy}`, body: "One fixed price for the full motorway journey. Tolls and VAT are charged separately; no surprise surcharges at destination." },
                 { icon: Clock, title: "Meet & greet included", body: "Driver meets you in arrivals with your name board. 60 minutes free waiting from your flight landing." },
                 { icon: Star, title: "Girona Airport (GRO) transfers", body: "We also transfer between Girona Airport and Barcelona city — useful for Ryanair passengers flying into GRO." },
                 { icon: CheckCircle2, title: "Medieval city drop-off", body: "Direct to your Girona hotel, apartment, or the historic quarter without navigating public transport." },
@@ -137,10 +143,10 @@ export default function GironaTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { route: "Barcelona → Girona Airport GRO (Economy)",    price: "€140" },
-                    { route: "Barcelona → Girona Airport GRO (Business)",   price: "€155" },
-                    { route: "Barcelona → Girona Airport GRO (Minivan)",    price: "€170" },
-                    { route: "Girona Airport GRO → Barcelona (same price)", price: "€140" },
+                    { route: "Barcelona → Girona Airport GRO (Economy)",    price: `€${LADDER.economy}` },
+                    { route: "Barcelona → Girona Airport GRO (Business)",   price: `€${LADDER.business}` },
+                    { route: "Barcelona → Girona Airport GRO (Minivan)",    price: `€${LADDER.minivan}` },
+                    { route: "Girona Airport GRO → Barcelona (same price)", price: `€${LADDER.economy}` },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.route}</td>
@@ -159,7 +165,7 @@ export default function GironaTransferPage() {
             <h2 className="font-display text-3xl text-white mb-4">Ready to book your Girona transfer?</h2>
             <p className="text-dark-400 mb-8">Instant confirmation. Free cancellation up to 24 hours before pickup.</p>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Now — from €140
+              Book Now — from €{LADDER.economy}
             </Link>
           </div>
         </section>

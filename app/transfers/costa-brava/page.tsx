@@ -5,25 +5,31 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
+import { cheapestOf } from "@/lib/destination-pricing";
+
+// The region has no single route in the table; the headline is the
+// cheapest of the destinations this page actually names.
+const COSTA_BRAVA_FROM = cheapestOf(["blanes", "lloret", "tossa", "sagaro", "platja_daro", "palamos", "roses", "cadaques"])!;
+
 
 const COSTA_BRAVA = ROUTES.filter((r) => r.category === "costa-brava");
 
 export const metadata: Metadata = {
-  title: "Barcelona to Costa Brava Transfer — from €90 | Élite BCN",
-  description: "Private transfer from Barcelona to Costa Brava. Lloret, Tossa, Blanes, Roses, Palamós, Cadaqués. Fixed price from €90. All vehicles. Book instantly.",
+  title: `Barcelona to Costa Brava Transfer — from €${COSTA_BRAVA_FROM} | Élite BCN`,
+  description: `Private transfer from Barcelona to Costa Brava. Lloret, Tossa, Blanes, Roses, Palamós, Cadaqués. Fixed price from €${COSTA_BRAVA_FROM}. All vehicles. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/costa-brava" },
-  keywords: ["barcelona costa brava transfer", "airport lloret de mar transfer", "barcelona tossa de mar transfer", "lloret de mar private transfer"],
+  keywords: ["barcelona costa brava transfer"],
   openGraph: {
     ...SHARED_OG,
-    title: "Barcelona to Costa Brava Transfer — from €90 | Fixed Price",
-    description: "Private transfer from Barcelona to Costa Brava from €90. Lloret, Tossa, Blanes, Roses, Cadaqués. Fixed price, all vehicles.",
+    title: `Barcelona to Costa Brava Transfer — from €${COSTA_BRAVA_FROM} | Fixed Price`,
+    description: `Private transfer from Barcelona to Costa Brava from €${COSTA_BRAVA_FROM}. Lloret, Tossa, Blanes, Roses, Cadaqués. Fixed price, all vehicles.`,
     url: "https://www.elitebcn.info/transfers/costa-brava",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Costa Brava Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona to Costa Brava Transfer — from €90 | Élite BCN",
-    description: "Private transfer from Barcelona to Costa Brava from €90. Lloret, Tossa, Blanes, Roses. Fixed price.",
+    title: `Barcelona to Costa Brava Transfer — from €${COSTA_BRAVA_FROM} | Élite BCN`,
+    description: `Private transfer from Barcelona to Costa Brava from €${COSTA_BRAVA_FROM}. Lloret, Tossa, Blanes, Roses. Fixed price.`,
     images: ["/opengraph-image"],
   },
 };
@@ -36,7 +42,7 @@ const costaBravaSchema = {
   url: "https://www.elitebcn.info/transfers/costa-brava",
   provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Costa Brava, Catalonia, Spain",
-  offers: { "@type": "Offer", price: "90", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+  offers: { "@type": "Offer", price: String(COSTA_BRAVA_FROM), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const costaBravaBreadcrumb = {
@@ -78,7 +84,7 @@ export default function CostaBravaTransferPage() {
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 1–3 hrs</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 60–200 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €90 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €{COSTA_BRAVA_FROM} fixed</div>
             </div>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
               Book Costa Brava Transfer
@@ -178,7 +184,7 @@ export default function CostaBravaTransferPage() {
             <h2 className="font-display text-3xl text-white mb-4">Ready to book your Costa Brava transfer?</h2>
             <p className="text-dark-400 mb-8">Instant confirmation. Free cancellation up to 24 hours before pickup.</p>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Now — from €90
+              Book Now — from €{COSTA_BRAVA_FROM}
             </Link>
           </div>
         </section>

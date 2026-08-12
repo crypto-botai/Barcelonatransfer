@@ -5,26 +5,31 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
+import { cheapestOf } from "@/lib/destination-pricing";
+
+// The region has no single route in the table; the headline is the
+// cheapest of the destinations this page actually names.
+const COSTA_DORADA_FROM = cheapestOf(["castelldefels", "sitges", "cubelles", "calafell", "vendrell", "tarragona", "la_pineda", "salou", "portaventura", "cambrils"])!;
+
 
 const COSTA_DORADA = ROUTES.filter((r) => r.category === "costa-dorada");
 
 export const metadata: Metadata = {
-  title: "Barcelona to Costa Dorada Transfer — from €50 | Élite BCN",
-  description:
-    "Private transfer from Barcelona to Costa Dorada. Sitges, Tarragona, Salou, PortAventura, Cambrils. Fixed prices from €50. All vehicle classes. Book instantly.",
+  title: `Barcelona to Costa Dorada Transfer — from €${COSTA_DORADA_FROM} | Élite BCN`,
+  description: `Private transfer from Barcelona to Costa Dorada. Sitges, Tarragona, Salou, PortAventura, Cambrils. Fixed prices from €${COSTA_DORADA_FROM}. All vehicle classes. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/costa-dorada" },
-  keywords: ["barcelona costa dorada transfer", "airport salou transfer", "barcelona portaventura transfer", "barcelona sitges transfer", "salou private transfer"],
+  keywords: ["barcelona costa dorada transfer", "airport salou transfer", "barcelona portaventura transfer", "salou private transfer"],
   openGraph: {
     ...SHARED_OG,
-    title: "Barcelona to Costa Dorada Transfer — from €50 | Fixed Price",
-    description: "Private transfer from Barcelona to Costa Dorada from €50. Sitges, Tarragona, Salou, PortAventura. Fixed price, all vehicles.",
+    title: `Barcelona to Costa Dorada Transfer — from €${COSTA_DORADA_FROM} | Fixed Price`,
+    description: `Private transfer from Barcelona to Costa Dorada from €${COSTA_DORADA_FROM}. Sitges, Tarragona, Salou, PortAventura. Fixed price, all vehicles.`,
     url: "https://www.elitebcn.info/transfers/costa-dorada",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Élite BCN — Barcelona to Costa Dorada Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona to Costa Dorada Transfer — from €50 | Élite BCN",
-    description: "Private transfer from Barcelona to Costa Dorada from €50. Sitges, Salou, PortAventura. Fixed price, all vehicles.",
+    title: `Barcelona to Costa Dorada Transfer — from €${COSTA_DORADA_FROM} | Élite BCN`,
+    description: `Private transfer from Barcelona to Costa Dorada from €${COSTA_DORADA_FROM}. Sitges, Salou, PortAventura. Fixed price, all vehicles.`,
     images: ["/opengraph-image"],
   },
 };
@@ -37,7 +42,7 @@ const costadoradaSchema = {
   url: "https://www.elitebcn.info/transfers/costa-dorada",
   provider: { "@type": "LocalBusiness", name: "Élite BCN Transfers", url: "https://www.elitebcn.info" },
   areaServed: "Costa Dorada, Catalonia, Spain",
-  offers: { "@type": "Offer", price: "50", priceCurrency: "EUR", availability: "https://schema.org/InStock" },
+  offers: { "@type": "Offer", price: String(COSTA_DORADA_FROM), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
 
 const costadoradaBreadcrumb = {
@@ -79,7 +84,7 @@ export default function CostaDoradaTransferPage() {
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 20 min – 2 hrs</div>
               <div className="flex items-center gap-2 text-white"><MapPin size={16} className="text-gold-500" /> 20–170 km</div>
-              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €50 fixed</div>
+              <div className="flex items-center gap-2 text-white"><Star size={16} className="text-gold-500" /> from €{COSTA_DORADA_FROM} fixed</div>
             </div>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
               Book Costa Dorada Transfer
@@ -192,7 +197,7 @@ export default function CostaDoradaTransferPage() {
             <h2 className="font-display text-3xl text-white mb-4">Ready to book your Costa Dorada transfer?</h2>
             <p className="text-dark-400 mb-8">Instant confirmation. Free cancellation up to 24 hours before pickup.</p>
             <Link href="/book" className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
-              Book Now — from €50
+              Book Now — from €{COSTA_DORADA_FROM}
             </Link>
           </div>
         </section>

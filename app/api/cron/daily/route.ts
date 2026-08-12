@@ -6,6 +6,7 @@ import { sendPickupReminder, sendReviewRequestEmail, resend } from "@/lib/resend
 import { COMPANY } from "@/lib/company-facts";
 import { reconcilePendingPayments } from "@/lib/payments/reconcile";
 import { sweepFlightDelays } from "@/lib/flights/sweep";
+import { formatPickupDateTime } from "@/lib/datetime";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -107,7 +108,7 @@ async function runPickupReminder(): Promise<number> {
       name:             b.guestName ?? "Guest",
       confirmationCode: b.confirmationCode,
       pickupAddress:    b.pickupAddress,
-      pickupDatetime:   b.pickupDatetime.toLocaleString("en-GB"),
+      pickupDatetime:   formatPickupDateTime(b.pickupDatetime),
       vehicleClass:     b.vehicleClass ?? "BUSINESS",
     }).catch(() => {});
 

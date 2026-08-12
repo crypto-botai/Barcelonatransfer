@@ -6,6 +6,12 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight, Accessibility, Users } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
+import { ladderFor } from "@/lib/destination-pricing";
+
+// Read from the price table, never restated. A repriced route reaches
+// this page, its schema and the checkout together, or reaches none.
+const LADDER = ladderFor("lourdes", "airport")!;
+
 
 const lourdesPrice =
   ROUTES.find((r) => r.from === "airport" && r.to === "lourdes")?.economy ?? 750;
@@ -242,11 +248,11 @@ export default function LourdesTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { v: "Sedan",             cap: "3 passengers",  price: "€750"   },
-                    { v: "Business sedan",    cap: "3 passengers",  price: "€875"   },
-                    { v: "Minivan",           cap: "6 passengers",  price: "€925"   },
-                    { v: "Mercedes V-Class",  cap: "7 passengers",  price: "€1,125" },
-                    { v: "Minibus",           cap: "16 passengers", price: "€1,575" },
+                    { v: "Sedan",             cap: "3 passengers",  price: `€${LADDER.economy}`   },
+                    { v: "Business sedan",    cap: "3 passengers",  price: `€${LADDER.business}`   },
+                    { v: "Minivan",           cap: "6 passengers",  price: `€${LADDER.minivan}`   },
+                    { v: "Mercedes V-Class",  cap: "7 passengers",  price: `€${LADDER.vclass}` },
+                    { v: "Minibus",           cap: "16 passengers", price: `€${LADDER.minibus}` },
                   ].map((row) => (
                     <tr key={row.v} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.v}</td>

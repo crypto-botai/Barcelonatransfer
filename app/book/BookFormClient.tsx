@@ -20,6 +20,7 @@ import {
 import { getFleetFromPrice, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import toast from "react-hot-toast";
 import { useTranslations } from "@/components/language/I18nProvider";
+import { pickupToUtc } from "@/lib/datetime";
 
 // Addresses use short non-ambiguous strings so resolveZone() always identifies
 // the correct zone — no province names that could shadow the city name.
@@ -293,7 +294,7 @@ export default function BookFormClient() {
   };
 
   const hoursUntilPickup = data.date && data.time
-    ? (new Date(`${data.date}T${data.time}`).getTime() - Date.now()) / 3_600_000
+    ? ((pickupToUtc(data.date, data.time)?.getTime() ?? NaN) - Date.now()) / 3_600_000
     : Infinity;
 
   const goToStep2 = () => {

@@ -77,7 +77,7 @@ export default async function InvoicePage({
   const fmt = (n: number) =>
     new Intl.NumberFormat("es-ES", { style: "currency", currency: booking.currency }).format(n);
 
-  const dateStr = new Date(booking.pickupDatetime).toLocaleString("en-GB", {
+  const dateStr = new Date(booking.pickupDatetime).toLocaleString("en-GB", { timeZone: "Europe/Madrid",
     weekday: "long", year: "numeric", month: "long", day: "numeric",
     hour: "2-digit", minute: "2-digit",
   });
