@@ -235,7 +235,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     features: ["Air Conditioning", "USB Charging", "WiFi", "Professional Driver", "Comfortable Seating"],
     image: "/fleet/sedan-camry.png",
     description: "A step above standard — the Camry delivers a smooth, quiet ride perfect for business and leisure travel.",
-    badge: "Business",
+    badge: "Standard",
   },
   {
     class: "TESLA_M3",
@@ -248,7 +248,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     features: ["100% Electric", "Autopilot", "Panoramic Roof", "WiFi", "USB Charging"],
     image: "/fleet/tesla-model-3.png",
     description: "All-electric executive sedan with autopilot and panoramic roof. Zero emissions for a tech-forward transfer.",
-    badge: "Electric VIP",
+    badge: "Electric",
   },
   {
     class: "EQE_300",
@@ -261,7 +261,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     features: ["100% Electric", "Leather Seats", "Climate Control", "WiFi", "Water & Mints", "USB-C Charging"],
     image: "/fleet/eqe-300.png",
     description: "Premium all-electric Mercedes EQE 300 — zero emissions, whisper-quiet, executive comfort for any transfer.",
-    badge: "Luxury",
+    badge: "Business",
   },
   {
     class: "VITO",
@@ -357,3 +357,27 @@ export const BOOKING_TYPE_LABELS: Record<BookingType, string> = {
   DAY_HIRE:  "Full Day Hire (8h)",
   CORPORATE: "Corporate Transfer",
 };
+
+/**
+ * The tier name a customer sees for a stored VehicleClass.
+ *
+ * Derived from the catalogue rather than written out, so it cannot drift from
+ * the badge on the fleet page. That drift was real: the Camry is badged
+ * Standard and the EQE Business, while the classes they are stored under are
+ * BUSINESS and LUXURY — so a customer who booked a Camry saw "Standard" when
+ * choosing it and "BUSINESS" on their dashboard afterwards.
+ *
+ * Classes with no car in the fleet fall back to their own name, title-cased.
+ */
+const CLASS_TO_BADGE: Partial<Record<VehicleClass, string>> = Object.fromEntries(
+  VEHICLE_CATALOG.map((v) => [FLEET_TO_DB_CLASS[v.class], v.badge ?? v.label]),
+) as Partial<Record<VehicleClass, string>>;
+
+export function vehicleClassLabel(vc: string): string {
+  const known = CLASS_TO_BADGE[vc as VehicleClass];
+  if (known) return known;
+  return vc
+    .split("_")
+    .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
+    .join(" ");
+}

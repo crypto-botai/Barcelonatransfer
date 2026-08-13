@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { vehicleClassLabel } from "@/types";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -126,7 +127,7 @@ export default function PaymentsPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-dark-500 text-xs font-mono">#{b.confirmationCode}</span>
                   <span className="text-dark-600 text-xs">·</span>
-                  <span className="text-dark-500 text-xs">{b.vehicleClass.replace(/_/g, " ")}</span>
+                  <span className="text-dark-500 text-xs">{vehicleClassLabel(b.vehicleClass)}</span>
                 </div>
               </div>
 

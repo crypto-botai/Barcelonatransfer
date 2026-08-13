@@ -151,9 +151,9 @@ const _getRoutesFromDB = unstable_cache(
   //
   // Bump the suffix when changing prices by direct database write, or call
   // /api/cron/revalidate-pricing with the cron secret. Last bumped 13 Aug 2026,
-  // when Girona city, Begur/Aiguablava, Vilanova i la Geltrú and Reus Airport
-  // were published straight to the database by scripts/publish-new-routes.mts.
-  ["pricing-routes-v3"],
+  // when the Business column went to €65 — the Mercedes EQE 300, which the
+  // owner made the Business car — by scripts/sync-db-prices.mts.
+  ["pricing-routes-v4"],
   { tags: ["pricing"], revalidate: 3600 }
 );
 

@@ -10,16 +10,21 @@ import { FLEET_TO_DB_CLASS, VEHICLE_CATALOG, type FleetVehicle } from "@/types";
 /**
  * Per-car prices, set by the owner on 13 Aug 2026.
  *
- * The five price columns cannot separate cars that share one, and neither can
- * VehicleClass: the Camry and the E-Class are both Business, priced €60 and
- * €70. So the price is keyed on the car.
+ * The tiers as the customer sees them: Economy is the Corolla at €50, Standard
+ * the Camry at €60, Electric the Tesla at €60, Business the EQE 300 at €65.
+ *
+ * Three of those four are columns. The Camry and the Tesla are not: they are
+ * stored under BUSINESS and ELECTRIC_VIP, both of which read the €65 Business
+ * column, so without a price of their own they would cost €65 rather than €60.
+ * VehicleClass cannot fix that — a class is not a car — so the price is keyed
+ * on the car.
  *
  * The risk this carries is the one that made per-vehicle overrides suspect in
- * the first place — a route charging one figure on the page and another at the
+ * the first place: a route charging one figure on the page and another at the
  * checkout. The last describe block is what holds that shut.
  */
 
-// The six routes whose Business column is €70.
+// The six routes whose Business column is €65.
 const CITY_TIER = [
   "bcn-airport-barcelona-city",
   "barcelona-city-barcelona-city",
@@ -29,10 +34,12 @@ const CITY_TIER = [
   "barcelona-city-castelldefels",
 ];
 
+// Cars with a price of their own. The EQE is not here: it is the Business car
+// and the €65 column already says so, which is the point of naming the tier
+// after the car that fills it.
 const EXPECTED: [FleetVehicle, number][] = [
   ["CAMRY", 60],
   ["TESLA_M3", 60],
-  ["EQE_300", 65],
 ];
 
 describe("the owner's per-car prices", () => {
@@ -47,13 +54,13 @@ describe("the owner's per-car prices", () => {
     }
   });
 
-  it("leaves the Business column at €70, which is the E-Class fare", () => {
+  it("sets the Business column to €65, which is the EQE — the Business car", () => {
     for (const slug of CITY_TIER) {
       const route = FIXED_ROUTES.find((r) => r.slug === slug)!;
-      expect(route.prices.BUSINESS, slug).toBe(70);
-      // Anything Business without a per-car price of its own still pays €70 —
-      // which is what the E-Class will do when it joins the fleet.
-      expect(lookupPriceByClass(route.from, route.to, "BUSINESS")).toBe(70);
+      expect(route.prices.BUSINESS, slug).toBe(65);
+      expect(lookupPriceByClass(route.from, route.to, "BUSINESS")).toBe(65);
+      // The EQE needs no per-car price: the column is its price.
+      expect(lookupPriceByFleetVehicle(route.from, route.to, "EQE_300"), slug).toBe(65);
     }
   });
 
@@ -105,8 +112,8 @@ describe("the zone lookup the quote path uses agrees", () => {
     for (const [car, price] of EXPECTED) {
       expect(lookupFixedPriceByZone(from, to, car), `${from}→${to} ${car}`).toBe(price);
     }
-    // The class lookup still returns the column, for the E-Class.
-    expect(lookupFixedPriceByZone(from, to, "BUSINESS")).toBe(70);
+    // The class lookup returns the column, which is the EQE's fare.
+    expect(lookupFixedPriceByZone(from, to, "BUSINESS")).toBe(65);
   });
 });
 

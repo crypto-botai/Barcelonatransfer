@@ -297,7 +297,7 @@ describe("the FAQ reads its route fares", () => {
   });
 });
 
-describe("Business airport → Barcelona city is €70", () => {
+describe("Business airport → Barcelona city is €65", () => {
   /**
    * A €50 override sat on this route for the Camry, so the fare depended on
    * which code path answered: the database said €60 and served every normal
@@ -310,8 +310,8 @@ describe("Business airport → Barcelona city is €70", () => {
     ["barcelona_city", "barcelona_city"],
   ];
 
-  it.each(ROUTES)("%s → %s charges €70 for Business", (from, to) => {
-    expect(lookupFixedPriceByZone(from, to, "BUSINESS")).toBe(70);
+  it.each(ROUTES)("%s → %s charges €65 for Business", (from, to) => {
+    expect(lookupFixedPriceByZone(from, to, "BUSINESS")).toBe(65);
     expect(lookupFixedPriceByZone(from, to, "BUSINESS")).not.toBe(50);
   });
 

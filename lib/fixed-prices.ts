@@ -59,9 +59,10 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "BARCELONA_CITY",
     fromLabel: "El Prat Airport", toLabel: "Barcelona City",
     category: "airport-city",
-    // Business is €70, raised from €60 on the owner's table of 13 Aug 2026.
-    // This is the Mercedes E-Class fare, and the E-Class takes it from the
-    // column: it is a Business car with no per-car price of its own.
+    // Business is €65: the Mercedes EQE 300, which the owner made the Business
+    // car on 13 Aug 2026. It was €70 for a few hours between the take-higher
+    // reprice and that decision, and no car on the site charged €70 in the end.
+    // A future E-Class sits above Business at €70 as its own tier.
     //
     // The three cars below DO have per-car prices, which is a mechanism that
     // once let a route charge €50 offline and €60 online. It cannot do that
@@ -69,11 +70,11 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // the database returns, so the page and the checkout read the same figure,
     // and scripts/verify-live-prices.mts quotes every car on every route to
     // prove it.
-    prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
-    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
-    // the E-Class fare, and the E-Class shares the Business class with the
-    // Camry — so these three are priced as the cars they are.
-    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
+    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
+    // the Business column below is €65, which is the EQE — the Business car —
+    // so the EQE needs no per-car price of its own.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60 },
   },
   {
     // Point-to-point within Barcelona city. Priced identically to the
@@ -84,22 +85,22 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "Barcelona City", toLabel: "Barcelona City",
     category: "airport-city",
     note: "Within Barcelona city",
-    prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
-    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
-    // the E-Class fare, and the E-Class shares the Business class with the
-    // Camry — so these three are priced as the cars they are.
-    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
+    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
+    // the Business column below is €65, which is the EQE — the Business car —
+    // so the EQE needs no per-car price of its own.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60 },
   },
   {
     slug: "bcn-airport-cruise-terminal",
     from: "BCN_AIRPORT", to: "CRUISE_TERMINAL",
     fromLabel: "El Prat Airport", toLabel: "Cruise Terminal",
     category: "airport-city",
-    prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
-    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
-    // the E-Class fare, and the E-Class shares the Business class with the
-    // Camry — so these three are priced as the cars they are.
-    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
+    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
+    // the Business column below is €65, which is the EQE — the Business car —
+    // so the EQE needs no per-car price of its own.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60 },
   },
   {
     slug: "cruise-terminal-barcelona-city",
@@ -107,11 +108,11 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "Cruise Terminal", toLabel: "Barcelona City",
     category: "airport-city",
     note: "City-centre traffic route",
-    prices: { ECONOMY: 60, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
-    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
-    // the E-Class fare, and the E-Class shares the Business class with the
-    // Camry — so these three are priced as the cars they are.
-    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
+    prices: { ECONOMY: 60, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
+    // the Business column below is €65, which is the EQE — the Business car —
+    // so the EQE needs no per-car price of its own.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60 },
   },
   {
     slug: "bcn-airport-sants-station",
@@ -186,11 +187,11 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "CASTELLDEFELS",
     fromLabel: "El Prat Airport", toLabel: "Castelldefels",
     category: "costa-dorada",
-    prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
-    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
-    // the E-Class fare, and the E-Class shares the Business class with the
-    // Camry — so these three are priced as the cars they are.
-    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
+    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
+    // the Business column below is €65, which is the EQE — the Business car —
+    // so the EQE needs no per-car price of its own.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60 },
   },
   {
     slug: "bcn-airport-sitges",
@@ -434,11 +435,11 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "CASTELLDEFELS",
     fromLabel: "Barcelona City", toLabel: "Castelldefels",
     category: "costa-dorada",
-    prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
-    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
-    // the E-Class fare, and the E-Class shares the Business class with the
-    // Camry — so these three are priced as the cars they are.
-    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
+    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
+    // the Business column below is €65, which is the EQE — the Business car —
+    // so the EQE needs no per-car price of its own.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60 },
   },
   {
     slug: "barcelona-city-sitges",

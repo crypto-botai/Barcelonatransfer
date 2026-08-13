@@ -11,7 +11,7 @@ import {
   MessageCircle, Trash2, Lock, RotateCcw, FileText,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
+import { STATUS_COLORS, STATUS_LABELS, type BookingStatus , vehicleClassLabel } from "@/types";
 import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
 import toast from "react-hot-toast";
 
@@ -292,7 +292,7 @@ function BookingsContent() {
                           <span className="flex items-center gap-1"><Calendar size={10} /> {pickup.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
                           <span className="flex items-center gap-1"><Clock size={10} /> {pickup.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
                           <span className="flex items-center gap-1"><Users size={10} /> {b.passengers} pax</span>
-                          <span className="flex items-center gap-1"><Car size={10} /> {b.vehicleClass.replace(/_/g, " ")}</span>
+                          <span className="flex items-center gap-1"><Car size={10} /> {vehicleClassLabel(b.vehicleClass)}</span>
                         </div>
                       </div>
 

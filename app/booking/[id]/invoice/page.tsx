@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { vehicleClassLabel } from "@/types";
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
@@ -85,13 +86,6 @@ export default async function InvoicePage({
   const issuedDate = new Date(invoice?.issuedAt ?? booking.createdAt).toLocaleDateString("en-GB", {
     year: "numeric", month: "long", day: "numeric",
   });
-
-  const vehicleLabel: Record<string, string> = {
-    ECONOMY: "Economy", BUSINESS: "Business Class", LUXURY: "Luxury",
-    FIRST_CLASS: "First Class", ELECTRIC_VIP: "Electric VIP",
-    SUV: "SUV", LUXURY_SUV: "Luxury SUV",
-    MINIVAN: "Minivan", LUXURY_MINIVAN: "Luxury Minivan", MINIBUS: "Minibus",
-  };
 
   const lineItems = [
     { label: "Base fare",             amount: booking.baseFare,         show: booking.baseFare > 0 },
@@ -230,7 +224,7 @@ export default async function InvoicePage({
           </div>
           <div className="info-block">
             <p className="section-title">Transfer Details</p>
-            <p><strong>{vehicleLabel[booking.vehicleClass] ?? booking.vehicleClass}</strong></p>
+            <p><strong>{vehicleClassLabel(booking.vehicleClass)}</strong></p>
             <p>
               {booking.passengers} passenger{booking.passengers !== 1 ? "s" : ""}
               {booking.luggage > 0 ? `, ${booking.luggage} bag${booking.luggage !== 1 ? "s" : ""}` : ""}
