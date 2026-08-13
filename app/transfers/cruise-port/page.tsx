@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     ...SHARED_OG,
     title: `Barcelona Cruise Port Transfer — from €${cruisePrice} | Fixed Price`,
-    description: `Private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €${cruisePrice}. Vessel tracking, meet & greet, fixed price.`,
+    description: `Private transfer to Barcelona cruise terminals (WTC & Moll Adossat) from €${cruisePrice}. Vessel tracking and a fixed price; meet & greet €5.`,
     url: "https://www.elitebcn.info/transfers/cruise-port",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona Cruise Port Private Transfer" }],
   },

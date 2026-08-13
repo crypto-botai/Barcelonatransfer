@@ -23,14 +23,14 @@ export const metadata: Metadata = {
     ...SHARED_OG,
     title: "Hotel Transfers Barcelona — Elite BCN Private Chauffeur",
     description:
-      "Private transfers between Barcelona Airport and all major hotels. Fixed price, flight tracking, meet & greet.",
+      "Private transfers between Barcelona Airport and all major hotels. Fixed price and flight tracking; meet & greet €5.",
     url: `${BASE}/hotel-transfers`,
     images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: "Elite BCN — Hotel Transfer Barcelona" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Hotel Transfers Barcelona — Elite BCN",
-    description: `Private airport to hotel transfers in Barcelona from €${airportCityPrice}. Fixed price, flight tracking, meet & greet.`,
+    description: `Private airport to hotel transfers in Barcelona from €${airportCityPrice}. Fixed price and flight tracking; meet & greet €5.`,
     images: [`${BASE}/opengraph-image`],
   },
 };
