@@ -70,8 +70,10 @@ describe("Airport ⇄ Barcelona City is one consistent set of numbers", () => {
 // ── 1. Route count ────────────────────────────────────────────────────────────
 
 describe("FIXED_ROUTES count", () => {
-  it("has exactly 65 routes", () => {
-    expect(FIXED_ROUTES.length).toBe(65);
+  // 73 since 13 Aug 2026: Girona city, Begur/Aiguablava, Vilanova i la Geltrú
+  // and Reus Airport were added, each from both origins.
+  it("has exactly 73 routes", () => {
+    expect(FIXED_ROUTES.length).toBe(73);
   });
 });
 
@@ -364,14 +366,16 @@ describe("Costa routes", () => {
     (r) => r.category === "costa-dorada" || r.category === "costa-brava"
   );
 
-  it("has 50 costa routes total (25 airport + 25 city-origin)", () => {
-    expect(costaRoutes.length).toBe(50);
+  // 56 since 13 Aug 2026: Begur/Aiguablava on the Costa Brava, Vilanova i la
+  // Geltrú and Reus Airport on the Costa Dorada, each from both origins.
+  it("has 56 costa routes total (28 airport + 28 city-origin)", () => {
+    expect(costaRoutes.length).toBe(56);
   });
 
-  it("25 of the costa routes have BCN_AIRPORT as origin (direct airport pickups added)", () => {
+  it("28 of the costa routes have BCN_AIRPORT as origin (direct airport pickups added)", () => {
     const airportCosta = costaRoutes.filter(
       (r) => r.from === "BCN_AIRPORT" || r.to === "BCN_AIRPORT"
     );
-    expect(airportCosta.length).toBe(25);
+    expect(airportCosta.length).toBe(28);
   });
 });

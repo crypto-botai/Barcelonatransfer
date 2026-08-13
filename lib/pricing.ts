@@ -203,6 +203,10 @@ export const ZONE_CODE_TO_KEY: Record<ZoneCode, string> = {
   LOURDES:        "lourdes",
   LA_ROCA:        "la_roca",
   GIRONA_AIRPORT: "girona_airport",
+  GIRONA_CITY:    "girona_city",
+  BEGUR:          "begur",
+  VILANOVA:       "vilanova",
+  REUS_AIRPORT:   "reus_airport",
   CASTELLDEFELS:  "castelldefels",
   SITGES:         "sitges",
   CUBELLES:       "cubelles",
@@ -301,6 +305,10 @@ export function resolveZoneStrict(input: string): string | null {
   if (/\b(la roca|laroca|roca del valles|la roca village|outlet)\b/.test(s)) return "la_roca";
 
   // ── Costa Dorada cities — ALL before "tarragona" (province) and "barcelona" (province) ──
+  // Reus Airport before the Costa Dorada towns: "Reus" is the comarca in
+  // Salou and Cambrils addresses, so the bare word must not win.
+  if (/\b(reu\b|reus airport|aeroport de reus|aeropuerto de reus|reus.*airport|airport.*reus)\b/.test(s)) return "reus_airport";
+  if (/\b(vilanova i la geltru|vilanova la geltru|villanueva y geltru|vilanova)\b/.test(s)) return "vilanova";
   if (/\bcastelldefels\b/.test(s)) return "castelldefels";  // Barcelona province
   if (/\bsitges\b/.test(s))        return "sitges";          // Barcelona province
   if (/\bcubelles\b/.test(s))      return "cubelles";        // Barcelona province
@@ -322,6 +330,7 @@ export function resolveZoneStrict(input: string): string | null {
   if (/\b(tossa de mar|tossa mar|tossa)\b/.test(s)) return "tossa";    // Girona province
   if (/\b(s'agaro|s agaro|sagaro|sant feliu de guixols)\b/.test(s)) return "sagaro";     // Girona province
   if (/\b(platja d'aro|platja daro|playa de aro|platjadaro)\b/.test(s)) return "platja_daro"; // Girona province
+  if (/\b(begur|bagur|aiguablava|aigua blava|sa tuna|sa riera)\b/.test(s)) return "begur"; // Girona province
   if (/\b(palamos|la fosca)\b/.test(s)) return "palamos";     // Girona province
   if (/\b(roses|rosas)\b/.test(s))      return "roses";       // Girona province
   if (/\b(empuriabrava|ampuriabrava|empuries)\b/.test(s)) return "empuriabrava"; // Girona province
@@ -332,7 +341,7 @@ export function resolveZoneStrict(input: string): string | null {
   // province carries "Girona" as a suffix — "Banyoles, Pla de l'Estany,
   // Girona" — so only the city itself leads with it. This is an exact
   // identification, not a province guess, so it belongs here.
-  if (/^girona\b/.test(s) || /\bgirona (city|centre|center|ciutat)\b/.test(s)) return "girona_airport";
+  if (/^girona\b/.test(s) || /\bgirona (city|centre|center|ciutat)\b/.test(s)) return "girona_city";
 
   // No specific place identified. Province and capital names are guesses and
   // live in resolveZoneBroad(); the caller decides whether to consult them or

@@ -124,9 +124,13 @@ describe("Girona city resolves to the advertised price", () => {
   // carries a schema.org offer at 140. Bare "girona" used to resolve to no zone,
   // so once unlisted routes became per-km it quoted €399 for the same journey —
   // the site contradicting its own indexed price.
+  // The city now has a zone of its own rather than borrowing the airport's. The
+  // economy fare is unchanged at €140 — only Minivan and V-Class differ, by the
+  // €5 the owner set on 13 Aug 2026 — so the price this test guards is the same
+  // price it has always guarded.
   it("prices Girona city from the table, not by distance", () => {
     const z = resolveZone("Girona");
-    expect(z).toBe("girona_airport");
+    expect(z).toBe("girona_city");
     expect(lookupFixedPriceByZone("barcelona_city", z!, "ECONOMY")).toBe(140);
   });
 
@@ -138,7 +142,7 @@ describe("Girona city resolves to the advertised price", () => {
       "girona city",
       "Girona centre",
     ]) {
-      expect(resolveZone(s), s).toBe("girona_airport");
+      expect(resolveZone(s), s).toBe("girona_city");
     }
   });
 

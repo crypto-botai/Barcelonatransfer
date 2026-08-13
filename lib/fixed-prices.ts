@@ -18,7 +18,8 @@ export type ZoneCode =
   | "MALGRAT"     | "BLANES"         | "LLORET"          | "TOSSA"
   | "SAGARO"      | "PLATJA_DARO"    | "PALAMOS"
   | "ROSES"       | "EMPURIABRAVA"   | "FIGUERES"        | "CADAQUES"
-  | "LOURDES";
+  | "LOURDES"
+  | "GIRONA_CITY"  | "BEGUR"          | "VILANOVA"        | "REUS_AIRPORT";
 
 export type Category = "airport-city" | "costa-dorada" | "costa-brava";
 
@@ -127,6 +128,16 @@ export const FIXED_ROUTES: FixedRoute[] = [
     prices: { ECONOMY: 165, BUSINESS: 180, MINIVAN: 195, VCLASS: 220, MINIBUS: 280 },
   },
   {
+    slug: "bcn-airport-girona-city",
+    from: "BCN_AIRPORT", to: "GIRONA_CITY",
+    fromLabel: "El Prat Airport", toLabel: "Girona City",
+    category: "airport-city",
+    // The Girona Airport ladder with €5 off Minivan and V-Class, per the
+    // owner's instruction of 13 Aug 2026. Girona city is 4 km beyond the
+    // airport but is the more commonly booked of the two.
+    prices: { ECONOMY: 165, BUSINESS: 180, MINIVAN: 190, VCLASS: 215, MINIBUS: 280 },
+  },
+  {
     slug: "bcn-airport-la-roca",
     from: "BCN_AIRPORT", to: "LA_ROCA",
     fromLabel: "El Prat Airport", toLabel: "La Roca Village",
@@ -148,6 +159,14 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "El Prat Airport", toLabel: "Sitges",
     category: "costa-dorada",
     prices: { ECONOMY: 80, BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 },
+  },
+  {
+    slug: "bcn-airport-vilanova",
+    from: "BCN_AIRPORT", to: "VILANOVA",
+    fromLabel: "El Prat Airport", toLabel: "Vilanova i la Geltrú",
+    category: "costa-dorada",
+    // 36 km by road, between Sitges (30 km, €80) and Cubelles (41 km, €90).
+    prices: { ECONOMY: 85, BUSINESS: 105, MINIVAN: 115, VCLASS: 140, MINIBUS: 205 },
   },
   {
     slug: "bcn-airport-cubelles",
@@ -204,6 +223,15 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "El Prat Airport", toLabel: "Cambrils",
     category: "costa-dorada",
     prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 280 },
+  },
+  {
+    slug: "bcn-airport-reus-airport",
+    from: "BCN_AIRPORT", to: "REUS_AIRPORT",
+    fromLabel: "El Prat Airport", toLabel: "Reus Airport (REU)",
+    category: "costa-dorada",
+    // 92 km by road, in the same cluster as Salou, La Pineda and PortAventura,
+    // all of which sit within 6 km of it and all of which cost €155.
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
   },
   // ── Airport → Costa Brava (same prices as Barcelona City → Costa Brava) ───
   {
@@ -284,6 +312,16 @@ export const FIXED_ROUTES: FixedRoute[] = [
     prices: { ECONOMY: 185, BUSINESS: 205, MINIVAN: 225, VCLASS: 250, MINIBUS: 305 },
   },
   {
+    slug: "bcn-airport-begur",
+    from: "BCN_AIRPORT", to: "BEGUR",
+    fromLabel: "El Prat Airport", toLabel: "Begur / Aiguablava",
+    category: "costa-brava",
+    // 146 km by road, between Palamós (132 km, €185) and Figueres (155 km,
+    // €200). Aiguablava is a cove inside the Begur municipality, four minutes
+    // down the same road, so it takes the same fare.
+    prices: { ECONOMY: 200, BUSINESS: 220, MINIVAN: 240, VCLASS: 265, MINIBUS: 320 },
+  },
+  {
     slug: "bcn-airport-roses",
     from: "BCN_AIRPORT", to: "ROSES",
     fromLabel: "El Prat Airport", toLabel: "Roses",
@@ -337,6 +375,14 @@ export const FIXED_ROUTES: FixedRoute[] = [
     prices: { ECONOMY: 140, BUSINESS: 170, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 },
   },
   {
+    slug: "barcelona-city-girona-city",
+    from: "BARCELONA_CITY", to: "GIRONA_CITY",
+    fromLabel: "Barcelona City", toLabel: "Girona City",
+    category: "airport-city",
+    // As above: €5 off Minivan and V-Class against the Girona Airport ladder.
+    prices: { ECONOMY: 140, BUSINESS: 170, MINIVAN: 165, VCLASS: 190, MINIBUS: 255 },
+  },
+  {
     slug: "barcelona-city-andorra",
     from: "BARCELONA_CITY", to: "ANDORRA",
     fromLabel: "Barcelona City", toLabel: "Andorra",
@@ -357,6 +403,13 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "Barcelona City", toLabel: "Sitges",
     category: "costa-dorada",
     prices: { ECONOMY: 80, BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 },
+  },
+  {
+    slug: "barcelona-city-vilanova",
+    from: "BARCELONA_CITY", to: "VILANOVA",
+    fromLabel: "Barcelona City", toLabel: "Vilanova i la Geltrú",
+    category: "costa-dorada",
+    prices: { ECONOMY: 85, BUSINESS: 105, MINIVAN: 115, VCLASS: 140, MINIBUS: 205 },
   },
   {
     slug: "barcelona-city-cubelles",
@@ -413,6 +466,13 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "Barcelona City", toLabel: "Cambrils",
     category: "costa-dorada",
     prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 280 },
+  },
+  {
+    slug: "barcelona-city-reus-airport",
+    from: "BARCELONA_CITY", to: "REUS_AIRPORT",
+    fromLabel: "Barcelona City", toLabel: "Reus Airport (REU)",
+    category: "costa-dorada",
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
   },
   // ── Costa Brava ───────────────────────────────────────────────────────────
   {
@@ -491,6 +551,13 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "Barcelona City", toLabel: "Palamós",
     category: "costa-brava",
     prices: { ECONOMY: 185, BUSINESS: 205, MINIVAN: 225, VCLASS: 250, MINIBUS: 305 },
+  },
+  {
+    slug: "barcelona-city-begur",
+    from: "BARCELONA_CITY", to: "BEGUR",
+    fromLabel: "Barcelona City", toLabel: "Begur / Aiguablava",
+    category: "costa-brava",
+    prices: { ECONOMY: 200, BUSINESS: 220, MINIVAN: 240, VCLASS: 265, MINIBUS: 320 },
   },
   {
     slug: "barcelona-city-roses",
