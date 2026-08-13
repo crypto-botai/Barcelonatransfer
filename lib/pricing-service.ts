@@ -27,9 +27,11 @@ import {
   vehicleCodeForClass,
   lookupFixedPriceByZone,
   distanceFare,
+  KEY_TO_ZONE_CODE,
 } from "@/lib/pricing";
+import { FIXED_ROUTES } from "@/lib/fixed-prices";
 import { haversineDistance } from "@/lib/utils";
-import type { VehicleClass } from "@/types";
+import type { VehicleClass, FleetVehicle } from "@/types";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -57,6 +59,8 @@ export interface QuoteInput {
   dropoffLat:      number;
   dropoffLng:      number;
   vehicleClass:    VehicleClass;
+  /** The exact car chosen, when the caller knows it. Enables per-car pricing. */
+  fleetVehicle?:   FleetVehicle;
   pickupDatetime:  Date;
   distanceKm:      number;
   durationMin:     number;
@@ -168,11 +172,23 @@ async function lookupFixedPrice(
   fromZone: string,
   toZone: string,
   vc: VehicleClass,
+  fleetVehicle?: FleetVehicle,
 ): Promise<number | null> {
   // Same-zone lookups are allowed: the route table is the authority, so a
   // defined same-zone route (e.g. within Barcelona city) resolves normally,
   // and an undefined one still falls through to null → custom quote.
   if (!fromZone || !toZone) return null;
+
+  // A per-car price outranks the database, because the database cannot hold
+  // one. It stores five columns per route — Economy, Business, Minivan,
+  // V-Class, Minibus — and the Camry, the Tesla, the EQE and the E-Class all
+  // read Business while costing €60, €60, €65 and €70. Were the database
+  // consulted first here, the fleet page would advertise €60 and the checkout
+  // would take €70, which is the exact fault this file exists to prevent.
+  if (fleetVehicle) {
+    const perCar = perCarPrice(fromZone, toZone, fleetVehicle);
+    if (perCar !== null) return perCar;
+  }
 
   // Try DB first — if it has rows and the route is found there, use it
   const rows = await getDBRoutes();
@@ -193,6 +209,23 @@ async function lookupFixedPrice(
   // Always fall back to hardcoded routes when DB is empty, unreachable,
   // or the specific route pair isn't stored there yet
   return lookupFixedPriceByZone(fromZone, toZone, vc);
+}
+
+/**
+ * The per-car price for this route, or null when the car has none.
+ *
+ * Null means "nothing special about this car here", which sends the caller back
+ * to the database and then the column — so adding a car without an override
+ * changes no price at all.
+ */
+function perCarPrice(fromZone: string, toZone: string, fv: FleetVehicle): number | null {
+  const from = KEY_TO_ZONE_CODE[fromZone];
+  const to   = KEY_TO_ZONE_CODE[toZone];
+  if (!from || !to) return null;
+  const route = FIXED_ROUTES.find(
+    (r) => (r.from === from && r.to === to) || (r.from === to && r.to === from),
+  );
+  return route?.vehicleOverrides?.[fv] ?? null;
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -251,7 +284,7 @@ export async function getPublicRoutes(): Promise<PublicRoute[]> {
 export async function getQuote(input: QuoteInput): Promise<Quote> {
   const {
     pickupLat, pickupLng, dropoffLat, dropoffLng,
-    vehicleClass, pickupDatetime, distanceKm, durationMin,
+    vehicleClass, fleetVehicle, pickupDatetime, distanceKm, durationMin,
     pickupAddress, dropoffAddress,
   } = input;
 
@@ -265,7 +298,7 @@ export async function getQuote(input: QuoteInput): Promise<Quote> {
     return customRouteQuote(vehicleClass, distanceKm, durationMin);
   }
 
-  const fixedPrice = await lookupFixedPrice(fromZone, toZone, vehicleClass);
+  const fixedPrice = await lookupFixedPrice(fromZone, toZone, vehicleClass, fleetVehicle);
 
   if (fixedPrice === null) {
     console.info(

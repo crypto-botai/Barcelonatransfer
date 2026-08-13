@@ -138,6 +138,14 @@ export interface BookingFormData {
   passengers:      number;
   luggage:         number;
   vehicleClass:    VehicleClass;
+  /**
+   * The exact car the customer picked.
+   *
+   * Kept alongside the class because the class cannot identify the car: the
+   * Camry and the E-Class are both Business and are priced apart. Optional, and
+   * absent simply prices at the class.
+   */
+  fleetVehicle?:   FleetVehicle;
   durationHours?:  number;
   flightNumber?:   string;
   specialRequests?: string;

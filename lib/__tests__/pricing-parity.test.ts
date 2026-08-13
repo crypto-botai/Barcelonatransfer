@@ -173,11 +173,13 @@ describe("Fleet and DB class price parity", () => {
   const from  = ZONE_CODE_TO_KEY[pivot.from];
   const to    = ZONE_CODE_TO_KEY[pivot.to];
 
-  // Vehicles that share the BUSINESS price column AND have no per-route override
+  // Cars whose fare is still the column, i.e. those with no per-car price.
+  // EQE_300 dropped off this list on 13 Aug 2026 when the owner priced it at
+  // €65 against a €70 Business column; its class, LUXURY, still reads the
+  // column and is asserted separately below.
   const sameCases: Array<[string, string]> = [
-    ["EQE_300",       "BUSINESS"],       // FleetVehicle EQE 300 → BUSINESS column, no override
     ["V_CLASS",       "VCLASS"],
-    ["LUXURY",        "BUSINESS"],       // DB class: EQE 300 → BUSINESS, no override
+    ["LUXURY",        "BUSINESS"],       // DB class, no per-car price of its own
     ["LUXURY_MINIVAN","VCLASS"],         // DB class: V-Class → VCLASS
   ];
 
@@ -193,7 +195,7 @@ describe("Fleet and DB class price parity", () => {
 // ── 4d. Per-route vehicle class overrides (airport → city only) ───────────────
 
 describe("Per-route vehicle class overrides (BCN Airport → Barcelona City)", () => {
-  it("has no override left — every Business vehicle pays the €70 column", () => {
+  it("has no class-level override left — the class column answers €70", () => {
     // A €50 Camry override used to live here. It meant the fare depended on
     // which code path answered: the database returned €60 for every normal
     // booking while the offline fallback returned €50. The override went, and
@@ -202,16 +204,25 @@ describe("Per-route vehicle class overrides (BCN Airport → Barcelona City)", (
     expect(lookupFixedPrice("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(70);
   });
 
-  it("Tesla Model 3 (ELECTRIC_VIP class) keeps the BUSINESS column price €70 — no override", () => {
+  // The owner set per-car prices on 13 Aug 2026: Camry €60, Tesla €60,
+  // EQE €65. The class prices below are unchanged — the E-Class is a Business
+  // car with no per-car price and still pays the €70 column.
+  it("Tesla Model 3 costs €60, while its class still reads the €70 column", () => {
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "TESLA_M3")).toBe(60);
     expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "ELECTRIC_VIP")).toBe(70);
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "TESLA_M3")).toBe(70);
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "ELECTRIC_VIP")).toBe(70);
   });
 
-  it("EQE 300 (LUXURY class) keeps the BUSINESS column price €70 — no override", () => {
+  it("EQE 300 costs €65, while its class still reads the €70 column", () => {
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "EQE_300")).toBe(65);
     expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "LUXURY")).toBe(70);
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "EQE_300")).toBe(70);
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "LUXURY")).toBe(70);
+  });
+
+  it("Camry costs €60 — the price the E-Class cannot share with it", () => {
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "CAMRY")).toBe(60);
+    // Both are Business. Only the per-car price tells them apart.
+    expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(70);
   });
 
   it("prices the same in both directions (city → airport same as airport → city)", () => {

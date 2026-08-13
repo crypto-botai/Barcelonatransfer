@@ -99,6 +99,7 @@ export default function BookingForm({ compact = false }: Props) {
         pickupLat:      pickup.lat,
         pickupLng:      pickup.lng,
         vehicleClass:   FLEET_TO_DB_CLASS[vehicle],
+        fleetVehicle:   vehicle,
         pickupDatetime: `${date}T${time}`,
         passengers:     pax,
         pickupAddress:  pickup.address,

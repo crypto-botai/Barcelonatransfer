@@ -13,6 +13,7 @@
  */
 import { FIXED_ROUTES } from "../lib/fixed-prices";
 import { ZONE_CODE_TO_KEY } from "../lib/pricing";
+import { FLEET_TO_DB_CLASS, type FleetVehicle } from "../types";
 
 const ROOT = process.argv[2] ?? "https://www.elitebcn.info";
 
@@ -67,7 +68,12 @@ const CLASSES: [string, "ECONOMY" | "BUSINESS" | "MINIVAN" | "VCLASS" | "MINIBUS
   ["MINIBUS", "MINIBUS"],
 ];
 
-async function quote(from: string, to: string, vehicleClass: string): Promise<number | null> {
+async function quote(
+  from: string,
+  to: string,
+  vehicleClass: string,
+  fleetVehicle?: string,
+): Promise<number | null> {
   const a = ZONE_POINT[from];
   const b = ZONE_POINT[to];
   if (!a || !b) return null;
@@ -78,6 +84,7 @@ async function quote(from: string, to: string, vehicleClass: string): Promise<nu
       pickupLat: a[0], pickupLng: a[1], pickupAddress: a[2],
       dropoffLat: b[0], dropoffLng: b[1], dropoffAddress: b[2],
       vehicleClass,
+      fleetVehicle,
       pickupDatetime: "2026-09-15T10:00",
       passengers: 2,
     }),
@@ -114,6 +121,32 @@ async function main() {
           `quoted €${got}, table €${expected}`,
         );
       }
+    }
+  }
+
+  // ── per-car prices ────────────────────────────────────────────────────────
+  //
+  // The database holds five columns per route and cannot express a per-car
+  // price, so these are the quotes most likely to diverge from the page. Every
+  // car with an override is asked for directly.
+  console.log("\nPer-car prices:");
+  for (const route of FIXED_ROUTES) {
+    const overrides = Object.entries(route.vehicleOverrides ?? {});
+    if (!overrides.length) continue;
+    const from = ZONE_CODE_TO_KEY[route.from];
+    const to = ZONE_CODE_TO_KEY[route.to];
+    if (!ZONE_POINT[from] || !ZONE_POINT[to]) continue;
+
+    for (const [car, expected] of overrides) {
+      const cls = FLEET_TO_DB_CLASS[car as FleetVehicle];
+      const got = await quote(from, to, cls, car);
+      checked++;
+      const ok = got === expected;
+      if (!ok) mismatched++;
+      console.log(
+        `  ${ok ? "ok  " : "MISMATCH"} ${route.fromLabel} → ${route.toLabel}  ` +
+        `${car.padEnd(9)} quoted €${got}, expected €${expected}`,
+      );
     }
   }
 

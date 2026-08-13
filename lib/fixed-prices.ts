@@ -36,6 +36,20 @@ export interface FixedRoute {
   // Takes priority over the generic prices[] column lookup.
   // Used to differentiate vehicles that share a price column (e.g. Camry vs Tesla vs EQE).
   vehicleClassOverrides?: Partial<Record<import("@/types").VehicleClass, number>>;
+
+  /**
+   * Per-car prices, keyed on the actual fleet vehicle.
+   *
+   * The five price columns cannot separate cars that share one. Camry, Tesla
+   * Model 3 and EQE 300 all read Business, and so will the E-Class — but the
+   * owner prices them at €60, €60, €65 and €70. VehicleClass cannot express
+   * that either, because the Camry and the E-Class are both Business cars.
+   *
+   * Keyed on the car itself, which is the level the prices are actually set at.
+   * Highest priority: checked before vehicleClassOverrides and before the
+   * column.
+   */
+  vehicleOverrides?: Partial<Record<import("@/types").FleetVehicle, number>>;
 }
 
 export const FIXED_ROUTES: FixedRoute[] = [
@@ -46,11 +60,20 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "El Prat Airport", toLabel: "Barcelona City",
     category: "airport-city",
     // Business is €70, raised from €60 on the owner's table of 13 Aug 2026.
-    // This is also the Mercedes E-Class fare: the E-Class is a Business-class
-    // car and takes the column price rather than a per-vehicle override — the
-    // override mechanism is what previously let one route charge €50 offline
-    // and €60 online.
+    // This is the Mercedes E-Class fare, and the E-Class takes it from the
+    // column: it is a Business car with no per-car price of its own.
+    //
+    // The three cars below DO have per-car prices, which is a mechanism that
+    // once let a route charge €50 offline and €60 online. It cannot do that
+    // again — lib/pricing-service.ts applies these overrides on top of whatever
+    // the database returns, so the page and the checkout read the same figure,
+    // and scripts/verify-live-prices.mts quotes every car on every route to
+    // prove it.
     prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
+    // the E-Class fare, and the E-Class shares the Business class with the
+    // Camry — so these three are priced as the cars they are.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
   },
   {
     // Point-to-point within Barcelona city. Priced identically to the
@@ -62,6 +85,10 @@ export const FIXED_ROUTES: FixedRoute[] = [
     category: "airport-city",
     note: "Within Barcelona city",
     prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
+    // the E-Class fare, and the E-Class shares the Business class with the
+    // Camry — so these three are priced as the cars they are.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
   },
   {
     slug: "bcn-airport-cruise-terminal",
@@ -69,6 +96,10 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "El Prat Airport", toLabel: "Cruise Terminal",
     category: "airport-city",
     prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
+    // the E-Class fare, and the E-Class shares the Business class with the
+    // Camry — so these three are priced as the cars they are.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
   },
   {
     slug: "cruise-terminal-barcelona-city",
@@ -77,6 +108,10 @@ export const FIXED_ROUTES: FixedRoute[] = [
     category: "airport-city",
     note: "City-centre traffic route",
     prices: { ECONOMY: 60, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
+    // the E-Class fare, and the E-Class shares the Business class with the
+    // Camry — so these three are priced as the cars they are.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
   },
   {
     slug: "bcn-airport-sants-station",
@@ -152,6 +187,10 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "El Prat Airport", toLabel: "Castelldefels",
     category: "costa-dorada",
     prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
+    // the E-Class fare, and the E-Class shares the Business class with the
+    // Camry — so these three are priced as the cars they are.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
   },
   {
     slug: "bcn-airport-sitges",
@@ -396,6 +435,10 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "Barcelona City", toLabel: "Castelldefels",
     category: "costa-dorada",
     prices: { ECONOMY: 50, BUSINESS: 70, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    // Per-car, 13 Aug 2026. The Business column stays €70 because that is
+    // the E-Class fare, and the E-Class shares the Business class with the
+    // Camry — so these three are priced as the cars they are.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
   },
   {
     slug: "barcelona-city-sitges",
@@ -602,7 +645,7 @@ export function findRoute(from: ZoneCode, to: ZoneCode): FixedRoute | null {
   ) ?? null;
 }
 
-import type { FleetVehicle, VehicleClass } from "@/types";
+import { FLEET_TO_DB_CLASS, type FleetVehicle, type VehicleClass } from "@/types";
 
 // FleetVehicle → price column. The single source that maps each physical vehicle
 // to one of the 5 fixed-price columns. No arithmetic — every value is a literal code.
@@ -645,4 +688,28 @@ export function lookupPriceByClass(
   const override = route.vehicleClassOverrides?.[cls];
   if (override !== undefined) return override;
   return route.prices[DB_CLASS_TO_CODE[cls]];
+}
+
+/**
+ * Price for one specific car on one route.
+ *
+ * The most precise lookup there is, and the only one that can tell a Camry from
+ * an E-Class — they share the Business class, so every lookup above this one
+ * necessarily gives them the same fare.
+ *
+ * Falls through to the class price, then the column, when no per-car price is
+ * set, so a car without an override costs exactly what it did before.
+ */
+export function lookupPriceByFleetVehicle(
+  from: ZoneCode,
+  to:   ZoneCode,
+  fv:   FleetVehicle,
+): number | null {
+  const route = FIXED_ROUTES.find(
+    (r) => (r.from === from && r.to === to) || (r.from === to && r.to === from)
+  );
+  if (!route) return null;
+  const perCar = route.vehicleOverrides?.[fv];
+  if (perCar !== undefined) return perCar;
+  return lookupPriceByClass(from, to, FLEET_TO_DB_CLASS[fv]);
 }

@@ -4,6 +4,7 @@ import {
   FIXED_ROUTES,
   lookupFixedPrice as lookupFixedPriceFn,
   lookupPriceByClass,
+  lookupPriceByFleetVehicle,
   VEHICLE_TO_PRICE_CLASS,
   DB_CLASS_TO_CODE,
   type VehicleCode,
@@ -564,10 +565,10 @@ export function lookupFixedPriceByZone(
   const toCode   = KEY_TO_ZONE_CODE[toZone];
   if (!fromCode || !toCode) return null;
 
-  // FleetVehicle → convert to DB VehicleClass → class-aware lookup (respects overrides)
+  // FleetVehicle → per-car lookup, which falls through to the class and then
+  // the column when the car has no price of its own.
   if (vc in VEHICLE_TO_PRICE_CLASS) {
-    const dbClass = FLEET_TO_DB_CLASS[vc as FleetVehicle];
-    return lookupPriceByClass(fromCode, toCode, dbClass);
+    return lookupPriceByFleetVehicle(fromCode, toCode, vc as FleetVehicle);
   }
   // DB VehicleClass → class-aware lookup (respects overrides)
   if (vc in DB_CLASS_TO_CODE) {
@@ -585,7 +586,10 @@ export function lookupFixedPriceByZone(
  */
 export function getFleetFromPrice(fv: FleetVehicle): number {
   const dbClass = FLEET_TO_DB_CLASS[fv];
-  const price   = lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", dbClass);
+  // Per-car, so the fleet page shows what the car actually costs rather than
+  // what its class costs. The Camry and the E-Class are both Business and are
+  // €60 and €70; reading the class here would have shown both at €70.
+  const price   = lookupPriceByFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", fv);
   return price ?? DEFAULT_PRICING[dbClass]?.minimumFare ?? 0;
 }
 

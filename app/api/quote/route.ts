@@ -3,7 +3,7 @@ import { z } from "zod";
 import { HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, calculateLastMinuteSurcharge, LAST_MINUTE_HOURS } from "@/lib/pricing";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
 import { getQuote } from "@/lib/pricing-service";
-import { type VehicleClass } from "@/types";
+import { FLEET_TO_DB_CLASS, type VehicleClass, type FleetVehicle } from "@/types";
 import { roadDistance, resolveEndpoint } from "@/lib/geo";
 
 const schema = z.object({
@@ -13,6 +13,9 @@ const schema = z.object({
   dropoffLat:      z.number().optional(),
   dropoffLng:      z.number().optional(),
   vehicleClass:    z.string(),
+  // The exact car chosen. Optional so older clients keep working; without it
+  // the price falls back to the vehicle class, which is what it always was.
+  fleetVehicle:    z.string().optional(),
   pickupDatetime:  z.string(),
   passengers:      z.number().int().min(1).max(20).optional(),
   durationHours:   z.number().min(1).max(24).optional(),
@@ -89,7 +92,14 @@ export async function POST(req: NextRequest) {
       pickupLng:   from?.lng ?? pickupLng,
       dropoffLat:  to?.lat   ?? dropoffLat,
       dropoffLng:  to?.lng   ?? dropoffLng,
-      vehicleClass: vc, pickupDatetime: pickupDate,
+      vehicleClass: vc,
+      // Validated against the catalogue rather than trusted: an unknown value
+      // simply prices as the vehicle class, never at a figure of the caller's
+      // choosing.
+      fleetVehicle: body.fleetVehicle && body.fleetVehicle in FLEET_TO_DB_CLASS
+        ? (body.fleetVehicle as FleetVehicle)
+        : undefined,
+      pickupDatetime: pickupDate,
       distanceKm, durationMin,
       pickupAddress:  body.pickupAddress,
       dropoffAddress: body.dropoffAddress,

@@ -104,6 +104,18 @@ function normalizeVehicleClass(v: string | null): VehicleClass {
   return v as VehicleClass;
 }
 
+/**
+ * The exact car from a ?vehicle= parameter.
+ *
+ * Tracked alongside the class because the class alone cannot identify the car:
+ * the Camry and the E-Class are both Business, and they are priced apart. A
+ * parameter naming only a class leaves this undefined, which prices at the
+ * class exactly as before.
+ */
+function normalizeFleetVehicle(v: string | null): FleetVehicle | undefined {
+  return v && v in FLEET_TO_DB_CLASS ? (v as FleetVehicle) : undefined;
+}
+
 function roundUpToNext30(): string {
   const now = new Date();
   now.setMinutes(now.getMinutes() + 90);
@@ -137,6 +149,7 @@ export default function BookFormClient() {
     luggage:         0,
     durationHours:   4,
     vehicleClass:    normalizeVehicleClass(params.get("vehicle")),
+    fleetVehicle:    normalizeFleetVehicle(params.get("vehicle")),
     guestName:       "",
     guestEmail:      "",
     guestPhone:      "",
@@ -216,7 +229,7 @@ export default function BookFormClient() {
     }
   };
 
-  const fetchQuote = useCallback(async (vehicleClass: VehicleClass, bType?: BookingType) => {
+  const fetchQuote = useCallback(async (vehicleClass: VehicleClass, bType?: BookingType, fleetVehicle?: FleetVehicle) => {
     const type = bType ?? bookingType;
     if (!data.pickupLat || !data.date || !data.time) return;
     if (type === "TRANSFER" && (!data.dropoffLat)) return;
@@ -228,6 +241,7 @@ export default function BookFormClient() {
         pickupLat:      data.pickupLat,
         pickupLng:      data.pickupLng,
         vehicleClass,
+        fleetVehicle,
         pickupDatetime: `${data.date}T${data.time}`,
         passengers:     data.passengers,
         pickupAddress:  data.pickupAddress,
@@ -252,7 +266,7 @@ export default function BookFormClient() {
 
   useEffect(() => {
     if (hasPrefilledJourney && data.vehicleClass && data.pickupLat && data.date && data.time) {
-      fetchQuote(data.vehicleClass as VehicleClass);
+      fetchQuote(data.vehicleClass as VehicleClass, undefined, data.fleetVehicle);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -303,7 +317,7 @@ export default function BookFormClient() {
       return;
     }
     setStep(2);
-    if (data.vehicleClass) fetchQuote(data.vehicleClass);
+    if (data.vehicleClass) fetchQuote(data.vehicleClass, undefined, data.fleetVehicle);
   };
 
   const step1Valid = !!data.pickupLat && !!data.date && !!data.time && (bookingType !== "TRANSFER" || !!data.dropoffLat);
@@ -572,7 +586,7 @@ export default function BookFormClient() {
 
                     return (
                       <motion.button key={v.class}
-                        onClick={() => { setData((d) => ({ ...d, vehicleClass: dbClass })); fetchQuote(dbClass); }}
+                        onClick={() => { setData((d) => ({ ...d, vehicleClass: dbClass, fleetVehicle: v.class })); fetchQuote(dbClass, undefined, v.class); }}
                         className={cn(
                           "w-full text-left rounded-xl border overflow-hidden transition-all duration-200",
                           sel ? "border-gold-500/60 bg-gold-500/5 shadow-lg shadow-gold-500/10"

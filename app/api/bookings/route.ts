@@ -12,7 +12,7 @@ import { isAirportLocation, isNightTime } from "@/lib/utils";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { withUniqueBookingCode } from "@/lib/booking-code";
-import { type VehicleClass } from "@/types";
+import { FLEET_TO_DB_CLASS, type VehicleClass, type FleetVehicle } from "@/types";
 import { roadDistance, resolveEndpoint } from "@/lib/geo";
 import { extrasCostFor, resolveTier, type MemberTier } from "@/lib/loyalty";
 
@@ -62,6 +62,7 @@ const schema = z.object({
   passengers:      z.number().int().min(1),
   luggage:         z.number().int().min(0),
   vehicleClass:    z.string(),
+  fleetVehicle:    z.string().optional(),
   durationHours:   z.number().int().min(1).max(24).optional(),
   flightNumber:    z.string().optional(),
   specialRequests: z.string().optional(),
@@ -185,6 +186,11 @@ export async function POST(req: NextRequest) {
         dropoffLat:     to?.lat   ?? body.dropoffLat,
         dropoffLng:     to?.lng   ?? body.dropoffLng,
         vehicleClass:   vc,
+        // Same per-car price the quote widget showed, validated the same way,
+        // so the figure the customer accepted is the figure that is charged.
+        fleetVehicle:   body.fleetVehicle && body.fleetVehicle in FLEET_TO_DB_CLASS
+          ? (body.fleetVehicle as FleetVehicle)
+          : undefined,
         pickupDatetime,
         distanceKm:     measured.distanceKm,
         durationMin:    measured.durationMin,
