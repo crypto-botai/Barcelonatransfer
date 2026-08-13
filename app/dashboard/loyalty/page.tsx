@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Star, Gift, ChevronRight, Crown, Zap, Check, ArrowUpRight } from "lucide-react";
+import { TIERS, nextTierFor, type MemberTier } from "@/lib/loyalty";
 
 interface LoyaltyData {
   totalSpent: number;
@@ -13,39 +14,6 @@ interface LoyaltyData {
   totalBookings: number;
 }
 
-const TIERS = [
-  {
-    id: "Silver",
-    label: "Silver",
-    threshold: 0,
-    icon: "⚡",
-    color: "from-slate-400/10 to-transparent",
-    border: "border-slate-400/20",
-    textColor: "text-slate-300",
-    perks: ["Priority support", "1% cashback points", "Birthday discount"],
-  },
-  {
-    id: "Gold",
-    label: "Gold",
-    threshold: 500,
-    icon: "⭐",
-    color: "from-gold-500/15 to-transparent",
-    border: "border-gold-500/30",
-    textColor: "text-gold-400",
-    perks: ["Priority booking", "2% cashback points", "Free meet & greet upgrade", "Dedicated phone line", "Birthday discount 10%"],
-  },
-  {
-    id: "VIP",
-    label: "VIP Elite",
-    threshold: 2000,
-    icon: "👑",
-    color: "from-purple-500/15 to-transparent",
-    border: "border-purple-500/30",
-    textColor: "text-purple-300",
-    perks: ["Dedicated concierge 24/7", "5% cashback points", "Complimentary upgrades", "VIP lounge access", "Priority dispatch", "Annual luxury gift"],
-  },
-];
-
 export default function LoyaltyPage() {
   const [data, setData] = useState<LoyaltyData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,8 +22,13 @@ export default function LoyaltyPage() {
     fetch("/api/user/stats").then(r => r.json()).then(d => { setData(d); setLoading(false); });
   }, []);
 
-  const currentTier = TIERS.find(t => t.id === data?.memberTier) ?? TIERS[1];
-  const nextTier = TIERS[TIERS.indexOf(currentTier) + 1];
+  // Defaults to Silver, not Gold. While the stats request was in flight this
+  // rendered the Gold card, so every member saw a tier they might not hold.
+  const currentTier = TIERS.find(t => t.id === data?.memberTier) ?? TIERS[0];
+  // Only tiers reachable by spending are offered as the next rung; VIP is by
+  // invitation, so showing "€1,400 to go" for it would promise an upgrade that
+  // spending alone never triggers.
+  const nextTier = nextTierFor(currentTier.id as MemberTier);
   const toNextTier = nextTier ? Math.max(0, nextTier.threshold - (data?.totalSpent ?? 0)) : 0;
   const progressPct = nextTier ? Math.min(100, ((data?.totalSpent ?? 0) / nextTier.threshold) * 100) : 100;
 

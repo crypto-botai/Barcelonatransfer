@@ -14,6 +14,27 @@ import { z } from "zod";
 import { withUniqueBookingCode } from "@/lib/booking-code";
 import { type VehicleClass } from "@/types";
 import { roadDistance, resolveEndpoint } from "@/lib/geo";
+import { extrasCostFor, resolveTier, type MemberTier } from "@/lib/loyalty";
+
+/**
+ * Membership tier of whoever is booking.
+ *
+ * Guests book without an account and pay the full extras price; there is no
+ * tier to read. A profile read that fails must not take the booking down with
+ * it, so any error simply prices the extras at Silver.
+ */
+async function tierForUser(userId: string | undefined): Promise<MemberTier> {
+  if (!userId) return "Silver";
+  try {
+    const profile = await prisma.customerProfile.findUnique({
+      where:  { userId },
+      select: { isVip: true, totalSpent: true },
+    });
+    return resolveTier(profile?.totalSpent ?? 0, profile?.isVip ?? false);
+  } catch {
+    return "Silver";
+  }
+}
 
 function generatePassword(len = 10): string {
   const chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
@@ -208,15 +229,32 @@ export async function POST(req: NextRequest) {
       ? Math.round(serverTotal * (couponDiscountPct / 100) * 100) / 100
       : 0;
 
-    const extrasCost = (body.extras ?? []).reduce((sum, e) => sum + e.price * e.quantity, 0);
+    // Priced server-side from EXTRAS_CATALOG, and with the booker's tier applied
+    // so Gold's meet & greet is actually free rather than merely advertised.
+    //
+    // The old line multiplied the price the *client* sent by the quantity it
+    // sent. Nothing checked either against the catalogue, so a crafted request
+    // could attach an extra at a negative price and pay less than the fare.
+    const tier = await tierForUser(user?.id);
+    const extrasCost = extrasCostFor(body.extras, tier);
     const totalWithExtras = Math.round((serverTotal + extrasCost - couponDiscount) * 100) / 100;
 
-    // Encode booking metadata into specialRequests
+    // Encode booking metadata into specialRequests.
+    //
+    // The stored extras carry the catalogue price actually charged, not the
+    // price the client sent, so the record and the receipt agree. A waived
+    // extra is stored at 0 with the tier that earned it, which is what makes a
+    // €0 line on the confirmation explicable later.
+    const pricedExtras = (body.extras ?? []).map((e) => ({
+      ...e,
+      price: extrasCostFor([{ ...e, quantity: 1 }], tier),
+    }));
     const metaObj = {
       bookingType:  body.bookingType,
       durationHours: body.durationHours ?? null,
-      extras:       body.extras ?? [],
+      extras:       pricedExtras,
       extrasCost,
+      memberTier:   tier,
     };
     const metaPrefix = `[META]${JSON.stringify(metaObj)}[/META]\n`;
     const specialRequests = body.specialRequests

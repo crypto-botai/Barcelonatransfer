@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone, ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useTranslations } from "@/components/language/I18nProvider";
@@ -97,27 +96,19 @@ export default function Navbar() {
                           dropdown === link.label && "rotate-180"
                         )} />
                       </Link>
-                      <AnimatePresence>
-                        {dropdown === link.label && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                            transition={{ duration: 0.18 }}
-                            className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 glass-card rounded-xl overflow-hidden"
-                          >
-                            {link.children.map((c) => (
-                              <Link
-                                key={c.href}
-                                href={c.href}
-                                className="block px-4 py-3 text-sm text-dark-300 hover:text-gold-400 hover:bg-gold-500/5 transition-colors border-b border-white/5 last:border-0"
-                              >
-                                {c.label}
-                              </Link>
-                            ))}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      {dropdown === link.label && (
+                        <div className="animate-menu-in absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 glass-card rounded-xl overflow-hidden">
+                          {link.children.map((c) => (
+                            <Link
+                              key={c.href}
+                              href={c.href}
+                              className="block px-4 py-3 text-sm text-dark-300 hover:text-gold-400 hover:bg-gold-500/5 transition-colors border-b border-white/5 last:border-0"
+                            >
+                              {c.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <Link
@@ -166,8 +157,10 @@ export default function Navbar() {
               <LanguageSwitcher compact />
               <button
                 onClick={() => setMobile(!mobileOpen)}
+                style={{ touchAction: "manipulation" }}
                 className="p-2.5 text-dark-300 hover:text-gold-400 transition-colors"
                 aria-label="Toggle menu"
+                aria-expanded={mobileOpen}
               >
                 {mobileOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
@@ -176,23 +169,18 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 z-40 bg-black/98 backdrop-blur-xl flex flex-col pt-24 px-6 pb-8 overflow-y-auto"
-          >
+      {/* Mobile Menu. The drawer slides in with CSS; the per-item stagger is a
+          CSS delay rather than seven more animated components. The panel is
+          opaque instead of blurred — a full-screen backdrop-blur is one of the
+          most expensive things a phone can be asked to composite. */}
+      {mobileOpen && (
+        <div className="animate-drawer-in fixed inset-0 z-40 bg-black flex flex-col pt-24 px-6 pb-8 overflow-y-auto">
             <nav className="flex flex-col gap-2">
               {NAV_LINKS.map((link, i) => (
-                <motion.div
+                <div
                   key={link.label}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.06 }}
+                  className="animate-menu-in"
+                  style={{ animationDelay: `${i * 0.05}s` }}
                 >
                   {link.children ? (
                     <div>
@@ -219,7 +207,7 @@ export default function Navbar() {
                       {link.label}
                     </Link>
                   )}
-                </motion.div>
+                </div>
               ))}
             </nav>
 
@@ -258,9 +246,8 @@ export default function Navbar() {
                 <span>+34 635 383 712</span>
               </a>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </>
   );
 }

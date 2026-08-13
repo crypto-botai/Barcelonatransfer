@@ -245,6 +245,29 @@
   100% { transform: translateX(200%); }
 }
 
+/* Menu open animations.
+   These replace the framer-motion enter transitions in the navbar and the
+   language switcher. Both live in the header, which is the first thing anyone
+   taps, and framer-motion had to be downloaded, parsed and hydrated before
+   either would respond — on a phone that was the whole delay. CSS runs on the
+   compositor and needs no JavaScript at all. */
+@keyframes menuIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+@keyframes drawerIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.animate-menu-in   { animation: menuIn 0.16s ease-out both; }
+.animate-drawer-in { animation: drawerIn 0.26s ease-in-out both; }
+
+/* Someone who has asked their phone to stop animating gets no animation. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-menu-in,
+  .animate-drawer-in { animation: none; }
+}
+
 /* ─── Page Transition ───────────────────────────────────── */
 .page-enter { animation: fadeIn 0.4s ease-out; }
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { resolveTier } from "@/lib/loyalty";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -53,7 +54,9 @@ export async function GET() {
     cancelledCount:   cancelled.length,
     totalSpent,
     loyaltyPoints,
-    memberTier:       profile?.isVip ? "VIP" : totalSpent >= 1000 ? "Gold" : "Silver",
+    // Gold at €500, which is the figure the loyalty page has always shown
+    // customers. This line used to require €1,000.
+    memberTier:       resolveTier(totalSpent, profile?.isVip ?? false),
     upcomingBookings: upcoming.slice(0, 3),
     recentBookings:   bookings.slice(-10).reverse(),
     nextBooking:      upcoming[0] ?? null,

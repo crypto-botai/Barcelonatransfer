@@ -146,9 +146,10 @@ const _getRoutesFromDB = unstable_cache(
   // that and leaves stale figures served for up to an hour.
   //
   // Bump the suffix when changing prices by direct database write, or call
-  // /api/cron/revalidate-pricing with the cron secret. Last bumped 7 Aug 2026
-  // for the Montserrat reprice.
-  ["pricing-routes-v2"],
+  // /api/cron/revalidate-pricing with the cron secret. Last bumped 13 Aug 2026,
+  // when Girona city, Begur/Aiguablava, Vilanova i la Geltrú and Reus Airport
+  // were published straight to the database by scripts/publish-new-routes.mts.
+  ["pricing-routes-v3"],
   { tags: ["pricing"], revalidate: 3600 }
 );
 

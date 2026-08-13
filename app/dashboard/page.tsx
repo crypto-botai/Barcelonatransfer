@@ -8,6 +8,7 @@ import {
   Calendar, Clock, CheckCircle2, Wallet, Star, Gift,
   Plane, ChevronRight, ArrowUpRight, Sparkles, MapPin, Car
 } from "lucide-react";
+import { TIERS } from "@/lib/loyalty";
 import StatCard from "@/components/dashboard/StatCard";
 import UpcomingBookingCard from "@/components/dashboard/UpcomingBookingCard";
 import { formatCurrency } from "@/lib/utils";
@@ -36,11 +37,11 @@ interface Stats {
   }>;
 }
 
-const TIER_BENEFITS: Record<string, { label: string; perks: string[] }> = {
-  Silver: { label: "Silver", perks: ["Priority support", "1% cashback points"] },
-  Gold:   { label: "Gold",   perks: ["Priority booking", "2% cashback points", "Free meet & greet upgrade"] },
-  VIP:    { label: "VIP",    perks: ["Dedicated concierge", "5% cashback points", "Complimentary upgrades", "VIP lounge access"] },
-};
+// Read from lib/loyalty so the overview cannot promise a perk the loyalty page
+// and the checkout disagree about. Trimmed to three here for the summary card.
+const TIER_BENEFITS: Record<string, { label: string; perks: string[] }> = Object.fromEntries(
+  TIERS.map((t) => [t.id, { label: t.label, perks: t.perks.slice(0, 3) }]),
+);
 
 export default function DashboardOverview() {
   const { data: session } = useSession();
@@ -53,8 +54,10 @@ export default function DashboardOverview() {
     fetch("/api/user/stats").then(r => r.json()).then(d => { setStats(d); setLoading(false); });
   }, []);
 
-  const tier = stats?.memberTier ?? "Gold";
-  const tierInfo = TIER_BENEFITS[tier] ?? TIER_BENEFITS.Gold;
+  // Silver until the stats say otherwise. Defaulting to Gold showed every
+  // member Gold's perks for as long as the request took.
+  const tier = stats?.memberTier ?? "Silver";
+  const tierInfo = TIER_BENEFITS[tier] ?? TIER_BENEFITS.Silver;
 
   return (
     <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
