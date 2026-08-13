@@ -81,6 +81,41 @@ const nextConfig: NextConfig = {
       { source: "/dashboard/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
     );
 
+    // Baseline security headers on every response.
+    //
+    // Only Strict-Transport-Security was being sent. These four are the rest of
+    // the standard set, and they matter here specifically: the site takes names,
+    // phone numbers and addresses on the booking form and hands off to a payment
+    // provider, so it should not be frameable by a third party, should not leak
+    // full booking URLs in the Referer when a customer follows an outbound link,
+    // and should not let a browser second-guess a declared content type.
+    result.push({
+      source: "/:path*",
+      headers: [
+        // Never let the browser guess a type we did not declare.
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        // Nobody frames this site. Clickjacking a booking form is the concern;
+        // the payment step embeds SumUp rather than the other way round, so
+        // same-origin framing is all that is ever needed.
+        { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+        // Send the origin to other sites, the full path only to ourselves — so a
+        // tracking link cannot learn a customer's booking reference.
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        // Camera and microphone are denied outright; nothing here uses them.
+        //
+        // Payment is NOT denied. SumUp's card widget mounts in-page from
+        // gateway.sumup.com and needs the Payment Request API for Apple Pay and
+        // Google Pay, so denying it would break checkout for exactly the
+        // customers most likely to complete it. Self and SumUp are allowed and
+        // everyone else is not.
+        {
+          key: "Permissions-Policy",
+          value: 'camera=(), microphone=(), geolocation=(self), payment=(self "https://gateway.sumup.com")',
+        },
+      ],
+    });
+
     // Explicit Content-Type for sitemap and robots so no proxy/CDN can misidentify them.
     // Google requires application/xml for sitemaps — this is belt-and-suspenders
     // on top of what Next.js already sets via the MetadataRoute handler.

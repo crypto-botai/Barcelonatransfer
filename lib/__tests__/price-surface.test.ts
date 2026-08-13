@@ -2,7 +2,8 @@ import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import { ladderFor, SLUG_TO_ZONE } from "../destination-pricing";
-import { lookupFixedPriceByZone } from "../pricing";
+import { lookupFixedPriceByZone, ZONE_CODE_TO_KEY } from "../pricing";
+import { FIXED_ROUTES } from "../fixed-prices";
 
 /**
  * Price integrity across every customer-visible surface.
@@ -338,5 +339,44 @@ describe("Business airport → Barcelona city is €70", () => {
     expect(src).not.toMatch(/Economy \/ Business.*€\s?\d/);
     const literals = [...src.matchAll(/from €(\d+)/g)].map((m) => m[1]);
     expect(literals, `support prompt states €${literals.join(", €")} literally`).toEqual([]);
+  });
+});
+
+describe("the database seed carries no prices of its own", () => {
+  // prisma/seed.ts held a hand-maintained copy of the fare table that drifted
+  // nineteen fares below lib/fixed-prices.ts — the airport ⇄ city Business fare
+  // sat at €60 against the €70 in force. Its price upsert overwrites, so a seed
+  // run would have rolled a live reprice back. It reads FIXED_ROUTES now.
+  const src = fs.readFileSync("prisma/seed.ts", "utf8");
+
+  it("declares no fare literals", () => {
+    const fares = [...src.matchAll(/\b(?:ECONOMY|BUSINESS|MINIVAN|VCLASS|MINIBUS):\s*(\d+)/g)]
+      .map((m) => m[1]);
+    expect(fares, `prisma/seed.ts states €${fares.join(", €")} literally`).toEqual([]);
+  });
+
+  it("reads the authoritative table instead", () => {
+    expect(src).toMatch(/from "\.\.\/lib\/fixed-prices"/);
+    expect(src).toMatch(/FIXED_ROUTES/);
+  });
+
+  it("has a table entry for every route it seeds, so nothing is skipped", () => {
+    // A skipped route is not a failure at runtime — the seed says so and moves
+    // on — but it would mean a published route quietly stops being seeded.
+    const pairs = [...src.matchAll(/fromKey:\s*"([^"]+)",\s*toKey:\s*"([^"]+)"/g)]
+      .map((m) => [m[1], m[2]] as const);
+    expect(pairs.length).toBeGreaterThan(50);
+
+    const unmatched = pairs.filter(([from, to]) =>
+      !FIXED_ROUTES.some((f) => {
+        const a = ZONE_CODE_TO_KEY[f.from];
+        const b = ZONE_CODE_TO_KEY[f.to];
+        return (a === from && b === to) || (a === to && b === from);
+      }),
+    );
+    expect(
+      unmatched.map(([f, t]) => `${f} ⇄ ${t}`),
+      "seed routes with no FIXED_ROUTES entry",
+    ).toEqual([]);
   });
 });
