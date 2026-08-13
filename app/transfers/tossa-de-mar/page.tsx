@@ -46,7 +46,7 @@ const D: DestinationSpec = {
 export const metadata: Metadata = {
   title: "Barcelona to Tossa de Mar Transfer | Elite BCN",
   description:
-    "Private transfer from Barcelona to Tossa de Mar on the Costa Brava. Fixed price per vehicle, 1h 15min, meet & greet included. Book online.",
+    "Private transfer from Barcelona to Tossa de Mar on the Costa Brava. Fixed price per vehicle, 1h 15min, meet & greet €5. Book online.",
   alternates: { canonical: `${BASE_URL}/transfers/tossa-de-mar` },
   keywords: ["barcelona tossa de mar transfer", "tossa de mar taxi", "tossa de mar private transfer", "airport tossa de mar"],
   openGraph: {

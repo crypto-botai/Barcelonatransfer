@@ -57,7 +57,7 @@ const SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: "Barcelona Airport to Sitges Private Transfer",
-  description: "Luxury fixed-price private transfer from Barcelona El Prat Airport to Sitges. Meet & greet, flight tracking, 60 min free wait.",
+  description: "Luxury fixed-price private transfer from Barcelona El Prat Airport to Sitges. Flight tracking and 60 min free wait at the airport; meet & greet €5.",
   provider: {
     "@type": "LocalBusiness",
     name: "Elite BCN Transfers",

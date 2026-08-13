@@ -45,13 +45,13 @@ const D: DestinationSpec = {
 export const metadata: Metadata = {
   title: "Barcelona Airport to Castelldefels Transfer | Elite BCN",
   description:
-    "Private transfer from El Prat Airport to Castelldefels in 22 minutes. Fixed price per vehicle, child seats free, meet & greet included.",
+    "Private transfer from El Prat Airport to Castelldefels in 22 minutes. Fixed price per vehicle. Child seats and meet & greet €5 each.",
   alternates: { canonical: `${BASE_URL}/transfers/castelldefels` },
   keywords: ["castelldefels transfer", "airport castelldefels taxi", "barcelona castelldefels transfer", "castelldefels beach transfer", "el prat castelldefels"],
   openGraph: {
     ...SHARED_OG,
     title: "Barcelona Airport to Castelldefels Transfer | Fixed Price",
-    description: "Private transfer from El Prat Airport to Castelldefels in 22 minutes. Fixed price, child seats free.",
+    description: "Private transfer from El Prat Airport to Castelldefels in 22 minutes. Fixed price, child seats €5 each.",
     url: `${BASE_URL}/transfers/castelldefels`,
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Airport to Castelldefels Private Transfer" }],
   },

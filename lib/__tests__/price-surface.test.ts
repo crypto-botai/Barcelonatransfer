@@ -264,7 +264,9 @@ describe("the AI knowledge base carries no fare", () => {
     // €5 a child seat, €25 per extra half hour of waiting.
     const NON_ROUTE_FEES = new Set(["5", "25"]);
     const fares = [...src.matchAll(/€\s?(\d[\d.,]*)/g)]
-      .map((m) => m[1])
+      // Trailing sentence punctuation rides along with the match, so "€5." would
+      // otherwise read as the fare "5." and miss the allowlist.
+      .map((m) => m[1].replace(/[.,]+$/, ""))
       .filter((v) => !NON_ROUTE_FEES.has(v));
     expect(
       fares,
@@ -282,9 +284,13 @@ describe("the AI knowledge base carries no fare", () => {
 describe("the FAQ reads its route fares", () => {
   it("quotes no route fare as a literal", () => {
     const src = fs.readFileSync("lib/faq-data.ts", "utf8");
-    const literals = [...src.matchAll(/€(\d[\d.,]*)/g)].map((m) => m[1]);
+    const literals = [...src.matchAll(/€(\d[\d.,]*)/g)]
+      // Trailing sentence punctuation rides along with the match, so "€5." would
+      // otherwise read as the fare "5." and miss the allowlist.
+      .map((m) => m[1].replace(/[.,]+$/, ""));
     // Contractual fees, not route fares: €25 per extra half hour of waiting and
-    // €5 a child seat. Neither has a route in the table to read from.
+    // €5 a child seat or meet & greet. Neither has a route in the table to read
+    // from.
     const routeFares = literals.filter((v) => v !== "25" && v !== "5");
     expect(routeFares, `lib/faq-data.ts still states €${routeFares.join(", €")}`).toEqual([]);
   });

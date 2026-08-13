@@ -67,7 +67,7 @@
     "maxCapacity": "capacidad máxima",
     "luggage": "equipaje",
     "inclVat": "precio fijo · IVA y peajes no incl.",
-    "pricingNote": "Precio fijo por vehículo, sin IVA ni peajes. Se añade un 10% de IVA solo si solicita factura; los peajes se cobran aparte. Incluye conductor, vehículo, combustible y servicio de recepción. Sillas infantiles gratuitas."
+    "pricingNote": "Precio fijo por vehículo, sin IVA ni peajes. Se añade un 10% de IVA solo si solicita factura; los peajes se cobran aparte. Incluye conductor, vehículo y combustible. El servicio de recepción, las sillas infantiles y otros extras son opcionales y se cobran aparte."
   },
   "services": {
     "label": "Nuestros Servicios",

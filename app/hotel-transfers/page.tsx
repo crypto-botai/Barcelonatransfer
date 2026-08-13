@@ -16,7 +16,7 @@ const airportCityPrice = PRICING_ROUTES.find(
 export const metadata: Metadata = {
   title: { absolute: "Hotel Transfers Barcelona — Airport to Hotel | Elite BCN" },
   description:
-    `Private hotel transfers in Barcelona from €${airportCityPrice}. Airport to hotel, hotel to cruise port. Meet & greet, flight tracking, free waiting. All 5-star hotels covered.`,
+    `Private hotel transfers in Barcelona from €${airportCityPrice}. Airport to hotel, hotel to cruise port. Flight tracking and free waiting included; meet & greet €5. All 5-star hotels covered.`,
   alternates: { canonical: `${BASE}/hotel-transfers` },
   keywords: ["hotel transfer barcelona", "airport hotel transfer barcelona", "barcelona hotel chauffeur"],
   openGraph: {
@@ -149,7 +149,7 @@ export default function HotelTransfersPage() {
               </table>
             </div>
             <p className="text-dark-500 text-xs text-center">
-              Prices shown for sedan (1–3 pax). MPV/minivan available for larger groups. Prices exclude VAT and tolls; meet & greet and 60 min free waiting are included.
+              Prices shown for sedan (1–3 pax). MPV/minivan available for larger groups. Prices exclude VAT and tolls. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet & greet, child seats and other extras are optional and charged separately.
             </p>
           </div>
         </section>

@@ -67,7 +67,7 @@
     "maxCapacity": "capacité max.",
     "luggage": "bagages",
     "inclVat": "prix fixe · TVA et péages en sus",
-    "pricingNote": "Prix fixe par véhicule, hors TVA et péages. La TVA de 10% est ajoutée uniquement si vous demandez une facture ; les péages sont facturés séparément. Chauffeur, véhicule, carburant et accueil inclus. Sièges enfants gratuits."
+    "pricingNote": "Prix fixe par véhicule, hors TVA et péages. La TVA de 10% est ajoutée uniquement si vous demandez une facture ; les péages sont facturés séparément. Chauffeur, véhicule et carburant inclus. L'accueil, les sièges enfants et les autres extras sont en option et facturés séparément."
   },
   "services": {
     "label": "Nos Services",

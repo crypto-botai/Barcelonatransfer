@@ -100,7 +100,7 @@ export default function GironaTransferPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
                 { icon: Shield, title: `Fixed price €${LADDER.economy}`, body: "One fixed price for the full motorway journey. Tolls and VAT are charged separately; no surprise surcharges at destination." },
-                { icon: Clock, title: "Meet & greet included", body: "Driver meets you in arrivals with your name board. 60 minutes free waiting from your flight landing." },
+                { icon: Clock, title: "Where your driver waits", body: "At the designated meeting point outside, next to the taxi rank. 60 minutes free waiting from your flight landing. A name board inside arrivals is a €5 extra." },
                 { icon: Star, title: "Girona Airport (GRO) transfers", body: "We also transfer between Girona Airport and Barcelona city — useful for Ryanair passengers flying into GRO." },
                 { icon: CheckCircle2, title: "Medieval city drop-off", body: "Direct to your Girona hotel, apartment, or the historic quarter without navigating public transport." },
                 { icon: MapPin, title: "Costa Brava access", body: "Girona is the gateway to the Costa Brava. We can continue to Tossa de Mar, Lloret de Mar, or Cadaqués." },

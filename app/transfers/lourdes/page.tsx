@@ -98,7 +98,7 @@ const FAQ = [
   },
   {
     q: "What is included in the price?",
-    a: `The fixed price of €${lourdesPrice} covers the whole vehicle for the journey, meet & greet, and 60 minutes of free waiting at the airport. Motorway tolls and 10% VAT are charged separately; VAT is added only if you request an invoice.`,
+    a: `The fixed price of €${lourdesPrice} covers the whole vehicle for the journey and 60 minutes of free waiting at the airport. Meet & greet is an optional €5 extra. Motorway tolls and 10% VAT are charged separately; VAT is added only if you request an invoice.`,
   },
 ];
 

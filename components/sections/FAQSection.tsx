@@ -15,7 +15,7 @@ const FAQS = [
   },
   {
     q: "Is VAT included? What about tolls?",
-    a: "The price you see is fixed per vehicle and does NOT include VAT or tolls. If you need an invoice (for business or expenses), 10% Spanish VAT is added to the fare. Motorway tolls, where the route uses them, are charged separately. Everything else is included: the professional chauffeur, the vehicle, fuel, meet & greet, and 60 minutes of free waiting at the airport. There is zero surge pricing, ever.",
+    a: "The price you see is fixed per vehicle and does NOT include VAT or tolls. If you need an invoice (for business or expenses), 10% Spanish VAT is added to the fare. Motorway tolls, where the route uses them, are charged separately. Everything else is included: the professional chauffeur, the vehicle, fuel, and the free waiting window — 60 minutes from landing at the airport, 15 minutes at a city address, port or station. Meet & greet, child seats and other extras are optional and charged separately. There is zero surge pricing, ever.",
   },
   {
     q: "What vehicles do you offer?",

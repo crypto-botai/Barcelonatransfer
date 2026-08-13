@@ -168,7 +168,7 @@ export default function PricingSection({ routes }: Props) {
           {/* Footer note */}
           <div className="p-5 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-dark-400 text-xs">
-              All prices are fixed per vehicle and <strong className="text-white">exclude VAT and tolls</strong>. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Professional chauffeur, vehicle, fuel and meet &amp; greet are included. Child seats free on request.
+              All prices are fixed per vehicle and <strong className="text-white">exclude VAT and tolls</strong>. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Professional chauffeur, vehicle and fuel are included. Meet &amp; greet, child seats and other extras are optional and charged separately.
             </p>
             <Link href="/book" className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">
               {t("getInstantPrice")} <ArrowRight size={12} />

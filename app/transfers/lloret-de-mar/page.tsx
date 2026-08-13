@@ -48,7 +48,7 @@ const SERVICE_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: "Barcelona to Lloret de Mar Private Transfer",
-  description: `Luxury fixed-price private transfer from Barcelona (city or El Prat Airport) to Lloret de Mar, Costa Brava. From €${LADDER.economy}. Meet & greet, flight tracking, 60 min free wait.`,
+  description: `Luxury fixed-price private transfer from Barcelona (city or El Prat Airport) to Lloret de Mar, Costa Brava. From €${LADDER.economy}. Flight tracking and 60 min free wait at the airport; meet & greet €5.`,
   url: `${BASE}/transfers/lloret-de-mar`,
   provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: BASE, telephone: "+34635383712" },
   areaServed: [
@@ -65,7 +65,7 @@ const FAQS = [
   },
   {
     q: "How much does a private transfer from Barcelona to Lloret de Mar cost?",
-    a: `A fixed-price private transfer from Barcelona to Lloret de Mar starts from €${LADDER.economy} for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €165, and a Mercedes V-Class for groups up to 7 is €205. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and AP-7 motorway tolls are charged separately. Meet & greet and 60 minutes of free waiting are included.`,
+    a: `A fixed-price private transfer from Barcelona to Lloret de Mar starts from €${LADDER.economy} for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €165, and a Mercedes V-Class for groups up to 7 is €205. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and AP-7 motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing. Meet & greet is an optional €5 extra.`,
   },
   {
     q: "Can Elite BCN pick us up from our Lloret de Mar hotel for the return to Barcelona?",
@@ -140,7 +140,7 @@ export default function LloretDeMarTransferPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
                 { icon: Shield, title: `Fixed price €${LADDER.economy}`, body: "The price you see is the price you pay. No meter, no traffic surcharges, no hidden fees." },
-                { icon: Clock, title: "Meet & greet included", body: "Your driver waits in the arrivals hall or your Barcelona address with your name on a board. 60 minutes free waiting from your flight landing." },
+                { icon: Clock, title: "Where your driver waits", body: "At the designated meeting point outside the terminal, next to the taxi rank, or at your Barcelona address. 60 minutes free waiting from your flight landing. A name board inside arrivals is a €5 extra." },
                 { icon: Star, title: "Real-time flight tracking", body: "We monitor your flight live. If it's delayed, your driver adjusts automatically — no extra charge." },
                 { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, bottled water, WiFi on request." },
                 { icon: MapPin, title: "Door-to-door service", body: "Dropped directly at your Lloret de Mar hotel, villa, or address. No sharing, no stops, no detours." },

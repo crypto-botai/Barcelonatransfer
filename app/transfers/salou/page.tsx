@@ -28,7 +28,7 @@ const D: DestinationSpec = {
     },
     {
       q: "Do you have vehicles with space for family luggage?",
-      a: "Yes. The Mercedes Vito takes up to 8 passengers and the V-Class up to 7 with generous boot space, and the Sprinter minibus handles groups of up to 16. If you are travelling with pushchairs, large cases or sports equipment, tell us when booking and we will assign the right vehicle. Child seats are provided free on request.",
+      a: "Yes. The Mercedes Vito takes up to 8 passengers and the V-Class up to 7 with generous boot space, and the Sprinter minibus handles groups of up to 16. If you are travelling with pushchairs, large cases or sports equipment, tell us when booking and we will assign the right vehicle. Child seats are €5 each — tell us the child's age and weight when booking.",
     },
     {
       q: "Is a transfer better than the train to Salou?",
@@ -45,13 +45,13 @@ const D: DestinationSpec = {
 export const metadata: Metadata = {
   title: "Barcelona to Salou Transfer — PortAventura | Elite BCN",
   description:
-    "Private transfer from Barcelona Airport to Salou and PortAventura. Fixed price per vehicle, family luggage space, child seats free. Book online.",
+    "Private transfer from Barcelona Airport to Salou and PortAventura. Fixed price per vehicle, family luggage space, child seats €5 each. Book online.",
   alternates: { canonical: `${BASE_URL}/transfers/salou` },
   keywords: ["barcelona salou transfer", "airport salou transfer", "salou portaventura transfer", "salou private transfer", "barcelona to salou taxi"],
   openGraph: {
     ...SHARED_OG,
     title: "Barcelona to Salou Transfer — PortAventura | Fixed Price",
-    description: "Private transfer from Barcelona Airport to Salou and PortAventura. Fixed price, family vehicles, child seats free.",
+    description: "Private transfer from Barcelona Airport to Salou and PortAventura. Fixed price, family vehicles, child seats €5 each.",
     url: `${BASE_URL}/transfers/salou`,
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Salou Private Transfer" }],
   },

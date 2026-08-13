@@ -67,7 +67,7 @@
     "maxCapacity": "max capacity",
     "luggage": "luggage",
     "inclVat": "fixed price · excl. VAT & tolls",
-    "pricingNote": "Fixed price per vehicle, excluding VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Chauffeur, vehicle, fuel and meet & greet included. Child seats free."
+    "pricingNote": "Fixed price per vehicle, excluding VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Chauffeur, vehicle and fuel included. Meet & greet, child seats and other extras are optional and charged separately."
   },
   "services": {
     "label": "Our Services",

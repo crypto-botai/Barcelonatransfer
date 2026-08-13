@@ -114,7 +114,7 @@ export default function DestinationTemplate({ d }: { d: DestinationSpec }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
                 { icon: Shield, title: fromPrice ? `Fixed price from €${fromPrice}` : "Fixed price", body: "Agreed before you travel. No meter, no traffic surcharges. VAT and tolls are charged separately." },
-                { icon: Clock, title: "Meet & greet included", body: "Your driver waits in arrivals with your name on a board. 60 minutes free waiting from your flight landing." },
+                { icon: Clock, title: "Where your driver waits", body: "At the designated meeting point outside, next to the taxi rank where reserved VTC cars may park. 60 minutes free waiting from your flight landing. A name board inside arrivals is a €5 extra." },
                 { icon: Star, title: "Real-time flight tracking", body: "We monitor your flight live. If it's delayed, your driver adjusts automatically — no extra charge." },
                 { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class, EQE 300 Electric and Vito. Air-conditioned, bottled water, WiFi on request." },
                 { icon: MapPin, title: "Door-to-door service", body: `Dropped directly at your ${d.name} hotel, villa or address. No sharing, no stops, no detours.` },

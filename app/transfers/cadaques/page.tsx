@@ -48,7 +48,7 @@ const SERVICE_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: "Barcelona to Cadaqués Private Transfer",
-  description: `Luxury fixed-price private transfer from Barcelona (city or El Prat Airport) to Cadaqués, Costa Brava. From €${LADDER.economy}. Meet & greet, flight tracking, 60 min free wait.`,
+  description: `Luxury fixed-price private transfer from Barcelona (city or El Prat Airport) to Cadaqués, Costa Brava. From €${LADDER.economy}. Flight tracking and 60 min free wait at the airport; meet & greet €5.`,
   url: `${BASE}/transfers/cadaques`,
   provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: BASE, telephone: "+34635383712" },
   areaServed: [
@@ -65,7 +65,7 @@ const FAQS = [
   },
   {
     q: "How much does a private transfer from Barcelona to Cadaqués cost?",
-    a: `A fixed-price private transfer from Barcelona to Cadaqués starts from €${LADDER.economy} for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €260, and a Mercedes V-Class for groups up to 7 is €310. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and motorway tolls are charged separately. Meet & greet and 60 minutes of free waiting are included, with no surcharge for the longer mountain approach.`,
+    a: `A fixed-price private transfer from Barcelona to Cadaqués starts from €${LADDER.economy} for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €260, and a Mercedes V-Class for groups up to 7 is €310. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing, with no surcharge for the longer mountain approach. Meet & greet is an optional €5 extra.`,
   },
   {
     q: "Can Elite BCN transfer us onward from Cadaqués to Girona Airport or back to Barcelona?",
@@ -140,7 +140,7 @@ export default function CadaquesTransferPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
                 { icon: Shield, title: `Fixed price €${LADDER.economy}`, body: "The price you see is the price you pay — including the winding final approach over Cap de Creus. No meter, no surcharges." },
-                { icon: Clock, title: "Meet & greet included", body: "Your driver waits in the arrivals hall or your Barcelona address with your name on a board. 60 minutes free waiting from your flight landing." },
+                { icon: Clock, title: "Where your driver waits", body: "At the designated meeting point outside the terminal, next to the taxi rank, or at your Barcelona address. 60 minutes free waiting from your flight landing. A name board inside arrivals is a €5 extra." },
                 { icon: Star, title: "Real-time flight tracking", body: "We monitor your flight live. If it's delayed, your driver adjusts automatically — no extra charge." },
                 { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, bottled water, WiFi on request." },
                 { icon: MapPin, title: "Door-to-door service", body: "Dropped directly at your Cadaqués hotel, villa, or address — no need to navigate the village's narrow one-way streets yourself." },

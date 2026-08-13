@@ -59,7 +59,7 @@ export const FAQ_GROUPS = [
     items: [
       { q: "Can I add child seats to my booking?", a: "Yes. Baby Seats (0–13 kg), Child Seats (9–18 kg), and Booster Seats (15–36 kg) are €5 per seat. Ask for them under Special Requests when booking, and please specify your child's weight so we can provide the correct seat." },
       { q: "Can I bring my pet?", a: "Pets are welcome with prior notice. Tell us under Special Requests when booking and we will confirm the arrangement and any cleaning charge before you travel. Please ensure your pet is in a carrier or on a lead. Our drivers are pet-friendly." },
-      { q: "What is the Meet & Greet service?", a: "It is included in every airport transfer at no extra charge. Your driver waits inside the arrivals hall with a name board, assists with your luggage from baggage reclaim, and escorts you to the vehicle. Airport pickups also include 60 minutes of free waiting from your actual landing time." },
+      { q: "What is the Meet & Greet service?", a: "It is an optional extra, €5. Your driver waits inside the arrivals hall with a name board, assists with your luggage from baggage reclaim, and escorts you to the vehicle. Without it your driver waits at the designated meeting point outside, next to the taxi rank where reserved VTC cars may park. Either way, airport pickups include 60 minutes of free waiting from your actual landing time." },
       { q: "Can the driver make multiple stops?", a: "Yes. Add the stops under Special Requests when booking and we will confirm the price before you travel, as it depends on the detour. This is ideal for hotel-to-meeting-to-restaurant itineraries or multi-destination tours." },
     ],
   },
