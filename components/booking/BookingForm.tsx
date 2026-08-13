@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+
 import {
   Calendar, Clock, Users, Zap, ArrowRight,
   Loader2, MessageCircle, MapPin, RotateCcw, Timer,
@@ -323,19 +323,21 @@ export default function BookingForm({ compact = false }: Props) {
           </div>
         </div>
 
-        {/* Quote result */}
-        <AnimatePresence>
+        {/* Quote result.
+            Three fades, done in CSS. This form is embedded in the hero, so it
+            was the last thing keeping framer-motion in the homepage's initial
+            bundle — every visitor downloaded and parsed the library before the
+            header would answer a tap, for three opacity transitions. */}
+        <>
           {loading && (
-            <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="flex items-center justify-center gap-2 py-2 text-xs text-white/30">
+            <div className="animate-fade-in flex items-center justify-center gap-2 py-2 text-xs text-white/30">
               <Loader2 size={13} className="animate-spin text-[#c9a84c]" />
               {t("gettingPrice")}
-            </motion.div>
+            </div>
           )}
 
           {!loading && quote && !needsManualQuote && (
-            <motion.div key="quote"
-              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }}>
+            <div className="animate-menu-in">
               <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-[#c9a84c]/5 border border-[#c9a84c]/20">
                 <div className="flex items-center gap-2">
                   <Zap size={13} className="text-[#c9a84c]" />
@@ -356,18 +358,17 @@ export default function BookingForm({ compact = false }: Props) {
                 </div>
                 <p className="font-display text-2xl text-[#c9a84c]">{formatCurrency(quote.totalAmount)}</p>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {!loading && needsManualQuote && (
-            <motion.div key="custom"
-              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }}>
+            <div className="animate-menu-in">
               <div className="px-4 py-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
                 <p className="text-amber-400 text-xs font-medium">{t("couldNotPrice")}</p>
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        </>
 
         {/* CTA */}
         {needsManualQuote ? (
