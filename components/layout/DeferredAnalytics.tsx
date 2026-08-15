@@ -1,12 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import Script from "next/script";
+
+declare global {
+  interface Window {
+    dataLayer?: unknown[];
+  }
+}
 
 /**
- * Loads Google Analytics off the critical path.
+ * Loads Google Analytics and Google Ads off the critical path.
  *
- * Loaded eagerly, gtag/js is ~161 KiB of third-party JavaScript that competes
+ * Loaded eagerly, gtag.js is ~161 KiB of third-party JavaScript that competes
  * with the page's own render work — Lighthouse attributed several long
  * main-thread tasks and a large share of unused JS to it, and it was the
  * single biggest non-first-party cost on the homepage.
@@ -16,13 +22,20 @@ import { GoogleAnalytics } from "@next/third-parties/google";
  *   2. the browser going idle (requestIdleCallback, with a timeout so it
  *      still fires on browsers that stay busy or lack the API).
  *
- * Page views are still recorded — GA reports the view whenever it initialises,
- * and the delay is on the order of a second on a normal connection. The only
- * genuine loss is a visitor who closes the tab before the browser ever goes
- * idle, which is a very small share of traffic and a fair trade for the
- * render cost it removes.
+ * Page views are still recorded — both properties report the view whenever
+ * gtag initialises, and the delay is on the order of a second on a normal
+ * connection. The only genuine loss is a visitor who closes the tab before
+ * the browser ever goes idle, which is a very small share of traffic and a
+ * fair trade for the render cost it removes.
+ *
+ * One gtag.js load serves both IDs. The Google-provided Ads snippet loads its
+ * own copy of the same script, but gtag.js is generic — the src URL's ?id= only
+ * selects which property gets auto-configured, and a second `gtag('config', …)`
+ * call attaches any other ID to the library already on the page. Loading it
+ * twice would mean two network requests for the same ~28 KB file for no
+ * behavioural difference.
  */
-export default function DeferredAnalytics({ gaId }: { gaId: string }) {
+export default function DeferredAnalytics({ gaId, adsId }: { gaId: string; adsId?: string }) {
   const [load, setLoad] = useState(false);
 
   useEffect(() => {
@@ -60,5 +73,22 @@ export default function DeferredAnalytics({ gaId }: { gaId: string }) {
   }, [load]);
 
   if (!load) return null;
-  return <GoogleAnalytics gaId={gaId} />;
+
+  return (
+    <>
+      <Script
+        id="_next-ga-init"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){window.dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${gaId}');
+            ${adsId ? `gtag('config', '${adsId}');` : ""}
+          `,
+        }}
+      />
+      <Script id="_next-ga" src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
+    </>
+  );
 }
