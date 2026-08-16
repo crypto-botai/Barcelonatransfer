@@ -32,6 +32,8 @@ async function sendEmail(payload: Parameters<Resend["emails"]["send"]>[0]): Prom
   return result?.data?.id;
 }
 
+import { parseBookingMeta, formatExtras } from "@/lib/booking-meta";
+
 // ─── Vehicle class → display name ────────────────────────────
 const VEHICLE_NAMES: Record<string, string> = {
   // FleetVehicle keys
@@ -253,15 +255,21 @@ function bookingConfirmationHtml({
 function adminNewBookingAlertHtml({
   confirmationCode, clientName, clientEmail, clientPhone,
   pickupAddress, dropoffAddress, pickupDatetime, vehicleClass,
-  passengers, totalAmount, specialRequests,
+  passengers, luggage, flightNumber, totalAmount, specialRequests,
 }: {
   confirmationCode: string; clientName: string; clientEmail: string; clientPhone?: string | null;
   pickupAddress: string; dropoffAddress?: string | null; pickupDatetime: string;
-  vehicleClass: string; passengers: number; totalAmount: number; specialRequests?: string | null;
+  vehicleClass: string; passengers: number; luggage?: number; flightNumber?: string | null;
+  totalAmount: number; specialRequests?: string | null;
 }): string {
   const { date, time } = splitDatetime(pickupDatetime);
   const code = esc(confirmationCode);
-  const notes = esc(specialRequests?.replace(/\[META\][\s\S]*?\[\/META\]\n?/, "").trim()) || "—";
+  // Extras were being thrown away here: the metadata block was stripped and
+  // only the customer's own note survived, so a paid-for child seat reached
+  // nobody who could act on it.
+  const meta = parseBookingMeta(specialRequests);
+  const notes = esc(meta.notes ?? "") || "—";
+  const extrasLine = meta.extras.length ? esc(formatExtras(meta.extras)) : "";
 
   return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -372,9 +380,27 @@ function adminNewBookingAlertHtml({
             <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Vehicle</span>
           </td>
           <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a;">${esc(vehicleName(vehicleClass))} &nbsp;&middot;&nbsp; ${passengers} pax</span>
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a;">${esc(vehicleName(vehicleClass))} &nbsp;&middot;&nbsp; ${passengers} pax${luggage != null ? ` &nbsp;&middot;&nbsp; ${luggage} bags` : ""}</span>
           </td>
         </tr>
+${flightNumber ? `
+        <tr>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Flight</span>
+          </td>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a; font-weight:bold;">${esc(flightNumber)}</span>
+          </td>
+        </tr>` : ""}
+${extrasLine ? `
+        <tr>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Extras</span>
+          </td>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a; font-weight:bold;">${extrasLine}</span>
+          </td>
+        </tr>` : ""}
 
         <tr>
           <td style="padding:14px 0; vertical-align:top;">
@@ -795,11 +821,12 @@ export async function sendBookingConfirmation({
 // ─── Admin Alert ─────────────────────────────────────────────
 export async function sendAdminNewBookingAlert({
   confirmationCode, guestName, guestEmail, guestPhone, pickupAddress, dropoffAddress,
-  pickupDatetime, vehicleClass, totalAmount, passengers, specialRequests,
+  pickupDatetime, vehicleClass, totalAmount, passengers, luggage, flightNumber, specialRequests,
 }: {
   confirmationCode: string; guestName: string; guestEmail: string; guestPhone?: string;
   pickupAddress: string; dropoffAddress: string; pickupDatetime: string;
-  vehicleClass: string; totalAmount: number; passengers?: number; specialRequests?: string | null;
+  vehicleClass: string; totalAmount: number; passengers?: number; luggage?: number;
+  flightNumber?: string | null; specialRequests?: string | null;
 }) {
   const html = adminNewBookingAlertHtml({
     confirmationCode,
@@ -811,6 +838,8 @@ export async function sendAdminNewBookingAlert({
     pickupDatetime,
     vehicleClass,
     passengers:      passengers ?? 1,
+    luggage,
+    flightNumber,
     totalAmount,
     specialRequests,
   });
@@ -1076,6 +1105,9 @@ export async function sendDriverBookingDetailsEmail({
   pickupDatetime: string; vehicleClass: string; passengers: number; luggage: number;
   flightNumber?: string | null; specialRequests?: string | null; driverAmount?: number | null;
 }) {
+  // The driver is the one who has to bring the child seat, so the extras go in
+  // a row of their own rather than being stripped out with the metadata block.
+  const driverMeta = parseBookingMeta(specialRequests);
   const html = emailLayout(`
     <h2>New Booking Assigned</h2>
     <p>Hi ${driverName},</p>
@@ -1093,7 +1125,8 @@ export async function sendDriverBookingDetailsEmail({
       <tr><td>Vehicle Class</td><td>${vehicleClass.replace(/_/g, " ")}</td></tr>
       <tr><td>Passengers</td><td>${passengers} pax · ${luggage} bags</td></tr>
       ${flightNumber ? `<tr><td>Flight</td><td>${flightNumber}</td></tr>` : ""}
-      ${specialRequests ? `<tr><td>Notes</td><td>${specialRequests.replace(/\[META\][\s\S]*?\[\/META\]\n?/, "").trim() || "—"}</td></tr>` : ""}
+      ${driverMeta.extras.length ? `<tr><td>Extras to bring</td><td><strong>${formatExtras(driverMeta.extras)}</strong></td></tr>` : ""}
+      ${driverMeta.notes ? `<tr><td>Notes</td><td>${driverMeta.notes}</td></tr>` : ""}
     </table>
     ${driverAmount != null ? `
     <div class="total-row">

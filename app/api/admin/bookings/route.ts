@@ -147,6 +147,8 @@ export async function POST(req: NextRequest) {
       vehicleClass:     body.vehicleClass,
       totalAmount:      body.totalAmount,
       passengers:       body.passengers,
+      luggage:          body.luggage,
+      flightNumber:     body.flightNumber,
       specialRequests:  body.specialRequests,
     }).catch(() => {});
 

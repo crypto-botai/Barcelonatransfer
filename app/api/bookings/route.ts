@@ -391,7 +391,9 @@ export async function POST(req: NextRequest) {
         vehicleClass:     body.vehicleClass,
         totalAmount:      totalWithExtras,
         passengers:       body.passengers,
-        specialRequests:  body.specialRequests,
+        luggage:          body.luggage,
+        flightNumber:     body.flightNumber,
+        specialRequests:  specialRequests,
       }),
     ]);
     if (confResult.status === "rejected")  console.error("[bookings/confirmation-email]", confResult.reason);

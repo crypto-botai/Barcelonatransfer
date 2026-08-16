@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { Search, CheckCircle2, XCircle, User, Loader2, X, Car, MapPin, Calendar, Phone, Mail, Plane, FileText, Save, UserCheck, Receipt, Trash2, RotateCcw, Clock, CheckCheck, Archive } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
+import { STATUS_COLORS, STATUS_LABELS, type BookingStatus, vehicleClassLabel } from "@/types";
+import { parseBookingMeta, formatExtraLine } from "@/lib/booking-meta";
 import toast from "react-hot-toast";
 import IssueInvoiceButton from "@/components/admin/IssueInvoiceButton";
 import RideTimeline from "@/components/admin/RideTimeline";
@@ -43,10 +44,11 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
   const [deleting, setDeleting]         = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const metaMatch = booking.specialRequests?.match(/\[META\]([\s\S]*?)\[\/META\]/);
-  let meta: Record<string, unknown> = {};
-  try { if (metaMatch) meta = JSON.parse(metaMatch[1]); } catch { /* */ }
-  const cleanNotes = booking.specialRequests?.replace(/\[META\][\s\S]*?\[\/META\]\n?/, "").trim() || null;
+  // Extras, the booking type and the member tier all live in the metadata block
+  // on specialRequests. This used to read only bookingType, so a baby seat or a
+  // name board the customer had paid for never appeared anywhere in the admin.
+  const meta = parseBookingMeta(booking.specialRequests);
+  const cleanNotes = meta.notes;
 
   const save = async () => {
     setSaving(true);
@@ -151,14 +153,41 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
               <div className="flex gap-2"><MapPin size={13} className="text-green-400 flex-shrink-0 mt-0.5" /><span className="text-white">{booking.pickupAddress}</span></div>
               <div className="flex gap-2"><MapPin size={13} className="text-red-400 flex-shrink-0 mt-0.5" /><span className="text-dark-300">{booking.dropoffAddress}</span></div>
               <div className="flex gap-2"><Calendar size={13} className="text-gold-500 flex-shrink-0 mt-0.5" /><span className="text-dark-300">{new Date(booking.pickupDatetime).toLocaleString("en-GB", { timeZone: "Europe/Madrid", })}</span></div>
-              <div className="flex gap-2"><Car size={13} className="text-gold-500 flex-shrink-0 mt-0.5" /><span className="text-dark-300">{booking.vehicleClass.replace(/_/g, " ")} · {booking.passengers} pax</span></div>
+              <div className="flex gap-2"><Car size={13} className="text-gold-500 flex-shrink-0 mt-0.5" /><span className="text-dark-300">{vehicleClassLabel(booking.vehicleClass)} · {booking.passengers} pax · {booking.luggage} bags</span></div>
               {booking.flightNumber && <div className="flex gap-2"><Plane size={13} className="text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-dark-300">Flight: {booking.flightNumber}</span></div>}
               {cleanNotes && <div className="flex gap-2 pt-1 border-t border-white/[0.06]"><FileText size={13} className="text-dark-500 flex-shrink-0 mt-0.5" /><span className="text-dark-400 text-xs">{cleanNotes}</span></div>}
-              {(meta.bookingType as string) && (meta.bookingType as string) !== "TRANSFER" && (
-                <div className="text-xs text-gold-400/70">Type: {meta.bookingType as string} {meta.durationHours ? `· ${meta.durationHours}h` : ""}</div>
+              {meta.bookingType && meta.bookingType !== "TRANSFER" && (
+                <div className="text-xs text-gold-400/70">Type: {meta.bookingType} {meta.durationHours ? `· ${meta.durationHours}h` : ""}</div>
               )}
             </div>
           </section>
+
+          {/* Extras — what the customer paid for on top of the fare, and what
+              the driver has to bring. Given a section of its own rather than a
+              line in the notes, because a missing child seat ruins the journey. */}
+          {meta.extras.length > 0 && (
+            <section className="glass-card rounded-xl p-4 border border-gold-500/20">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs text-dark-500 uppercase tracking-wider">Extras Booked</p>
+                {meta.extrasCost > 0 && (
+                  <span className="text-xs text-gold-400 font-medium">{formatCurrency(meta.extrasCost)}</span>
+                )}
+              </div>
+              <ul className="space-y-1.5">
+                {meta.extras.map((e) => (
+                  <li key={e.id || e.label} className="flex items-start gap-2 text-sm">
+                    <CheckCheck size={13} className="text-gold-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-dark-200">{formatExtraLine(e)}</span>
+                  </li>
+                ))}
+              </ul>
+              {meta.memberTier && meta.memberTier !== "Silver" && (
+                <p className="text-xs text-dark-500 mt-3 pt-2 border-t border-white/[0.06]">
+                  Member tier: <span className="text-gold-400">{meta.memberTier}</span>
+                </p>
+              )}
+            </section>
+          )}
 
           {/* Live flight status + stage-by-stage history */}
           <RideTimeline bookingId={booking.id} flightNumber={booking.flightNumber} />
