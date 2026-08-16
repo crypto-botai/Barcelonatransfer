@@ -16,7 +16,7 @@ const airportCityPrice = PRICING_ROUTES.find(
 export const metadata: Metadata = {
   title: { absolute: "Hotel Transfers Barcelona — Airport to Hotel | Elite BCN" },
   description:
-    `Private hotel transfers in Barcelona from €${airportCityPrice}. Airport to hotel, hotel to cruise port. Flight tracking and free waiting included; meet & greet €5. All 5-star hotels covered.`,
+    `Private hotel transfers in Barcelona from €${airportCityPrice}. Airport to hotel, hotel to cruise port, with flight tracking and free waiting included.`,
   alternates: { canonical: `${BASE}/hotel-transfers` },
   keywords: ["hotel transfer barcelona", "airport hotel transfer barcelona", "barcelona hotel chauffeur"],
   openGraph: {

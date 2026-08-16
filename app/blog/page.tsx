@@ -10,7 +10,7 @@ import { ArrowRight, Clock, MapPin } from "lucide-react";
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Travel Guides & Destination Blog | Elite BCN" },
   description:
-    "In-depth guides to Barcelona's best day trips: Montserrat, Sitges, the Costa Brava, Girona, Tarragona and Andorra — plus what to do in summer, winter and at New Year.",
+    "In-depth guides to Barcelona's best day trips: Montserrat, Sitges, the Costa Brava, Girona, Tarragona and Andorra — and when to visit each.",
   alternates: { canonical: `${BASE_URL}/blog` },
   keywords: [
     "barcelona travel blog", "barcelona day trips", "things to do near barcelona",
