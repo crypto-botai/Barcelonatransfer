@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import destinations from "@/data/destinations.json";
 import { STATIC_TRANSFER_PAGES } from "@/data/static-transfer-pages";
-import { SHARED_OG } from "@/lib/seo";
+import { SHARED_OG, fitTitle, fitDescription } from "@/lib/seo";
 import { getPlacePrices, getDestinationPrices, SLUG_TO_ZONE, type ResolvedPlacePrices } from "@/lib/destination-pricing";
 
 type Destination = (typeof destinations)[number];
@@ -23,26 +23,49 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const dest = getDestination(slug);
-  if (!dest) return { title: "Transfer | Elite BCN" };
+  if (!dest) return { title: { absolute: "Transfer | Elite BCN" } };
+
+  const prices = await getPlacePrices(dest.coordinates.lat, dest.coordinates.lng, dest.distance_km);
+  const from = prices?.economy;
+
+  // The stored description is page prose — 256 to 351 characters, well past
+  // what Google shows. These are built from the same facts instead: what the
+  // journey is, how long it takes, and what it costs.
+  const title = fitTitle([
+    `${dest.name} — BCN Airport Transfer | Elite BCN`,
+    `${dest.name} — BCN Airport Transfer`,
+    `${dest.name} Transfer`,
+    dest.name,
+  ]);
+
+  const description = fitDescription([
+    `Private transfer from Barcelona Airport to ${dest.name}.`,
+    dest.duration_min ? `About ${dest.duration_min} minutes door to door.` : "",
+    from ? `Fixed from €${from} per vehicle, set before you travel.` : "Fixed price per vehicle, set before you travel.",
+  ]);
 
   return {
-    title: { absolute: `${dest.name} — Barcelona Airport Transfer | Elite BCN` },
-    description: dest.description,
+    title: { absolute: title },
+    description,
     alternates: {
       canonical: `${BASE}/transfers/${slug}`,
     },
     keywords: [`${dest.name.toLowerCase()} barcelona transfer`, `barcelona airport ${dest.name.toLowerCase()} transfer`, "private transfer barcelona"],
     openGraph: {
       ...SHARED_OG,
-      title: `${dest.name} — Barcelona Airport Transfer | Elite BCN`,
-      description: dest.description,
+      title,
+      description,
       url: `${BASE}/transfers/${slug}`,
       images: [{ url: `${BASE}/opengraph-image`, width: 1200, height: 630, alt: `Elite BCN — Transfer to ${dest.name}` }],
     },
     twitter: {
       card: "summary_large_image",
-      title: `Barcelona Airport → ${dest.name} — from €${(await getPlacePrices(dest.coordinates.lat, dest.coordinates.lng, dest.distance_km))?.economy ?? "—"} fixed`,
-      description: dest.description,
+      title: fitTitle([
+        `Barcelona Airport → ${dest.name} — from €${from ?? "—"} fixed`,
+        `Barcelona Airport → ${dest.name}`,
+        dest.name,
+      ]),
+      description,
       images: [`${BASE}/opengraph-image`],
     },
   };

@@ -43,7 +43,7 @@ const D: DestinationSpec = {
 };
 
 export const metadata: Metadata = {
-  title: "Barcelona Airport to Castelldefels Transfer | Elite BCN",
+  title: { absolute: "Barcelona Airport to Castelldefels Transfer" },
   description:
     "Private transfer from El Prat Airport to Castelldefels in 22 minutes. Fixed price per vehicle. Child seats and meet & greet €5 each.",
   alternates: { canonical: `${BASE_URL}/transfers/castelldefels` },

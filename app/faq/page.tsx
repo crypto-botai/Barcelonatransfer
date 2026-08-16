@@ -8,7 +8,7 @@ import { MessageCircle } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "FAQ — Barcelona Transfer Questions Answered | Elite BCN",
+  title: { absolute: "Barcelona Transfer FAQ — Your Questions Answered" },
   description: "Answers to the most common questions about booking a luxury private transfer in Barcelona — pricing, fleet, airport pickups, cancellation, child seats and more.",
   alternates: { canonical: "https://www.elitebcn.info/faq" },
   keywords: ["barcelona transfer faq", "airport transfer questions", "vtc barcelona faq", "private transfer barcelona help"],

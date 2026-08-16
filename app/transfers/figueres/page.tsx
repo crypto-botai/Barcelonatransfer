@@ -44,7 +44,7 @@ const D: DestinationSpec = {
 };
 
 export const metadata: Metadata = {
-  title: "Barcelona to Figueres Transfer — Dalí Museum | Elite BCN",
+  title: { absolute: "Barcelona to Figueres Transfer — Dalí Museum" },
   description:
     "Private transfer from Barcelona to Figueres and the Dalí Theatre-Museum. Fixed price per vehicle, 1h 40min, meet & greet €5. Book online.",
   alternates: { canonical: `${BASE_URL}/transfers/figueres` },

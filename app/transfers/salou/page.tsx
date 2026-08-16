@@ -43,7 +43,7 @@ const D: DestinationSpec = {
 };
 
 export const metadata: Metadata = {
-  title: "Barcelona to Salou Transfer — PortAventura | Elite BCN",
+  title: { absolute: "Barcelona to Salou Transfer — PortAventura" },
   description:
     "Private transfer from Barcelona Airport to Salou and PortAventura. Fixed price per vehicle, family luggage space, child seats €5 each. Book online.",
   alternates: { canonical: `${BASE_URL}/transfers/salou` },

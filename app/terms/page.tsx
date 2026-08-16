@@ -5,7 +5,7 @@ import { COMPANY } from "@/lib/company-facts";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions — Elite BCN Barcelona Private Transfers",
+  title: { absolute: "Terms & Conditions | Elite BCN Transfers" },
   description: "Terms and Conditions for Elite BCN Transfers — the Barcelona luxury private chauffeur and airport transfer service.",
   alternates: { canonical: "https://www.elitebcn.info/terms" },
   openGraph: {

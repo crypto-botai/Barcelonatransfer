@@ -11,7 +11,7 @@ import { ladderFor } from "@/lib/destination-pricing";
 
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Transfer Prices — Fixed Rates | Elite BCN" },
-  description: "Fixed prices for Barcelona airport, cruise port, Sitges, Andorra & more. Rates from €50 per vehicle, excl. VAT & tolls. Chauffeur and vehicle included; extras charged separately.",
+  description: "Fixed prices for Barcelona airport, cruise port, Sitges, Andorra and more. From €50 per vehicle, excluding VAT and tolls. Extras charged separately.",
   alternates: { canonical: "https://www.elitebcn.info/pricing" },
   keywords: ["barcelona transfer prices", "barcelona airport transfer cost", "fixed price transfer barcelona", "private transfer rates barcelona"],
   openGraph: {

@@ -5,7 +5,7 @@ import { COMPANY } from "@/lib/company-facts";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Elite BCN Barcelona Private Transfers",
+  title: { absolute: "Privacy Policy | Elite BCN Transfers" },
   description: "Privacy Policy for Elite BCN Transfers — how we collect, use and protect your personal data on our Barcelona private transfer booking platform.",
   alternates: { canonical: "https://www.elitebcn.info/privacy" },
   openGraph: {

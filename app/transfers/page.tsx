@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, ChevronRight, Clock, Star } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
+import { SOCIAL_PROOF } from "@/lib/company-facts";
 import destinations from "@/data/destinations.json";
 import { getDestinationPrices, SLUG_TO_ZONE } from "@/lib/destination-pricing";
 
@@ -336,7 +337,7 @@ export default async function TransfersHubPage() {
           <div className="container mx-auto px-4">
             <div className="flex flex-wrap justify-center gap-8 text-center">
               {[
-                { icon: Star, label: "4.9★ Rating", sub: "595+ reviews" },
+                { icon: Star, label: `${SOCIAL_PROOF.google.rating}★ Rating`, sub: `${SOCIAL_PROOF.google.count} Google reviews` },
                 { icon: Clock, label: "24/7 Available", sub: "All flights & arrivals" },
                 { icon: MapPin, label: "Fixed Prices", sub: "No surge pricing" },
               ].map(({ icon: Icon, label, sub }) => (

@@ -14,7 +14,7 @@ const LADDER = ladderFor("lloret", "airport")!;
 const BASE = "https://www.elitebcn.info";
 
 export const metadata: Metadata = {
-  title: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy} | Elite BCN`,
+  title: { absolute: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy}` },
   description:
     `Private transfer from Barcelona to Lloret de Mar. Fixed price from €${LADDER.economy}. 65-minute journey via AP-7. Meet & greet, no surge pricing. Book instantly.`,
   alternates: { canonical: `${BASE}/transfers/lloret-de-mar` },

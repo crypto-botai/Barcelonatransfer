@@ -20,7 +20,7 @@ const URL = "https://www.elitebcn.info/transfers/lourdes";
 const PHOTO = "/blog/lourdes-pilgrimage-transfer.jpg";
 
 export const metadata: Metadata = {
-  title: `Barcelona to Lourdes Transfer — from €${lourdesPrice} | Private Car`,
+  title: { absolute: `Barcelona to Lourdes Transfer — from €${lourdesPrice}` },
   description:
     `Private transfer Barcelona to Lourdes sanctuary, France. Fixed price from €${lourdesPrice} per vehicle. Direct 415 km door-to-door, no changes. Wheelchair accessible options and group minibus for parish pilgrimages.`,
   alternates: { canonical: URL },

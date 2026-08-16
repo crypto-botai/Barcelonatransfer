@@ -2,25 +2,25 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
-import { COMPANY } from "@/lib/company-facts";
+import { COMPANY, SOCIAL_PROOF, OPERATIONS } from "@/lib/company-facts";
 import { SHARED_OG } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "About Elite BCN — Barcelona's Luxury Transfer Company",
-  description: "4.9★ rated, 595+ reviews. Licensed VTC chauffeur service in Barcelona since 2018. Professional drivers, Mercedes V-Class, EQE 300 Electric & Tesla Model 3.",
+  title: { absolute: "About Elite BCN — Barcelona Chauffeur Company" },
+  description: `Licensed VTC chauffeur service in Barcelona since ${COMPANY.foundedYear}. Professional drivers, Mercedes V-Class, EQE 300 Electric and Tesla Model 3.`,
   alternates: { canonical: "https://www.elitebcn.info/about" },
   keywords: ["about elite bcn", "barcelona vtc company", "licensed vtc barcelona"],
   openGraph: {
     ...SHARED_OG,
     title: "About Elite BCN — Barcelona's Luxury Transfer Company",
-    description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet. 595+ five-star reviews.",
+    description: `Licensed VTC private transfer company in Barcelona, rated ${SOCIAL_PROOF.google.rating} on Google from ${SOCIAL_PROOF.google.count} reviews.`,
     url: "https://www.elitebcn.info/about",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN Transfers — About Our Company" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "About Elite BCN — Barcelona's Luxury Transfer Company",
-    description: "4.9★ rated luxury private transfer company in Barcelona. Licensed VTC, professional drivers, premium fleet.",
+    description: "Licensed VTC private transfer company in Barcelona. Professional drivers, premium fleet, fixed prices.",
     images: ["/opengraph-image"],
   },
 };
@@ -33,7 +33,7 @@ const aboutSchema = {
       "@id":   "https://www.elitebcn.info/about",
       url:     "https://www.elitebcn.info/about",
       name:    "About Elite BCN Transfers",
-      description: "Licensed VTC chauffeur company in Barcelona since 2018. 4.9★ rated with 595+ five-star reviews.",
+      description: `Licensed VTC chauffeur company in Barcelona since ${COMPANY.foundedYear}, rated ${SOCIAL_PROOF.google.rating} on Google from ${SOCIAL_PROOF.google.count} reviews.`,
       inLanguage: "en",
       isPartOf: { "@id": "https://www.elitebcn.info" },
       breadcrumb: {
@@ -90,11 +90,14 @@ export default function AboutPage() {
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-4 gap-6 text-center mb-16">
+              {/* Read from lib/company-facts rather than typed here, so the
+                  founding year, the transfer count and the rating cannot drift
+                  from what the rest of the site and the structured data say. */}
               {[
-                { v: "2018", l: "Founded" },
-                { v: "5,000+", l: "Transfers" },
-                { v: "4.9★", l: "Rating" },
-                { v: "24/7", l: "Available" },
+                { v: String(COMPANY.foundedYear), l: "Founded" },
+                { v: OPERATIONS.transfersDisplay, l: "Transfers" },
+                { v: `${SOCIAL_PROOF.google.rating}★`, l: "Rating" },
+                { v: OPERATIONS.supportHours, l: "Available" },
               ].map((s) => (
                 <div key={s.l} className="glass-card rounded-xl p-6">
                   <p className="font-display text-4xl text-gold-400 mb-2">{s.v}</p>

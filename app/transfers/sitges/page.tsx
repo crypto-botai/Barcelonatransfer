@@ -12,7 +12,7 @@ const LADDER = ladderFor("sitges", "airport")!;
 
 
 export const metadata: Metadata = {
-  title: `Barcelona to Sitges Transfer — from €${LADDER.economy} | Fixed Price`,
+  title: { absolute: `Barcelona to Sitges Transfer — from €${LADDER.economy}` },
   description:
     `Private transfer from Barcelona to Sitges. Fixed price from €${LADDER.economy}. 35-minute journey. Meet & greet in arrivals, no surge pricing. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/sitges" },

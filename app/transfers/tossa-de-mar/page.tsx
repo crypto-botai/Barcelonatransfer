@@ -44,7 +44,7 @@ const D: DestinationSpec = {
 };
 
 export const metadata: Metadata = {
-  title: "Barcelona to Tossa de Mar Transfer | Elite BCN",
+  title: { absolute: "Barcelona to Tossa de Mar Transfer" },
   description:
     "Private transfer from Barcelona to Tossa de Mar on the Costa Brava. Fixed price per vehicle, 1h 15min, meet & greet €5. Book online.",
   alternates: { canonical: `${BASE_URL}/transfers/tossa-de-mar` },

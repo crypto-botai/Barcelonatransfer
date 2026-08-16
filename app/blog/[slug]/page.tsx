@@ -16,7 +16,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const a = getArticle(slug);
-  if (!a) return { title: "Guide not found | Elite BCN" };
+  if (!a) return { title: { absolute: "Guide not found | Elite BCN" } };
 
   const url = `${BASE_URL}/blog/${a.slug}`;
   return {

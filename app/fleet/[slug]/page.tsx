@@ -7,7 +7,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { VEHICLE_CATALOG, vehicleBadgeClass, BAG_SIZES, type FleetVehicle } from "@/types";
 import { getFleetFromPrice, lookupFixedPriceByZone } from "@/lib/pricing";
-import { SHARED_OG } from "@/lib/seo";
+import { SHARED_OG, fitTitle, fitDescription } from "@/lib/seo";
 
 const SLUG_TO_CLASS: Record<string, FleetVehicle> = {
   "standard-sedan":    "COROLLA",
@@ -35,22 +35,40 @@ export async function generateMetadata(
   if (!vehicle) return {};
   const minFare = getFleetFromPrice(vehicleClass as FleetVehicle);
 
+  // Marked absolute: without it the layout appends "| Elite BCN Transfers" to a
+  // title that already ends in "| Elite BCN", so every fleet page published the
+  // brand twice and ran to 75-80 characters.
+  //
+  // Meet & greet is no longer listed as though it came with the fare — it is a
+  // €5 extra, and saying otherwise here contradicted the rest of the site.
+  const title = fitTitle([
+    `${vehicle.label} — Barcelona Private Transfer`,
+    `${vehicle.label} — Barcelona Transfer`,
+    `${vehicle.label} Transfer Barcelona`,
+    vehicle.label,
+  ]);
+
+  const description = fitDescription([
+    `${vehicle.label} with a professional chauffeur in Barcelona, from €${minFare} fixed per vehicle.`,
+    `Up to ${vehicle.maxPassengers} passengers. Flight tracking, no surge pricing.`,
+  ]);
+
   return {
-    title: `${vehicle.label} — Barcelona Private Transfer | Elite BCN`,
-    description: `${vehicle.description} From €${minFare} fixed price. Meet & greet, flight tracking, no surge pricing.`,
+    title: { absolute: title },
+    description,
     alternates: { canonical: `${BASE}/fleet/${slug}` },
     keywords: [`barcelona ${vehicle.label.toLowerCase()} transfer`, `${vehicle.label.toLowerCase()} private hire barcelona`, "luxury chauffeur barcelona"],
     openGraph: {
       ...SHARED_OG,
-      title: `${vehicle.label} — Barcelona Private Transfer`,
-      description: `From €${minFare}. Fixed-price private transfer in ${vehicle.label}. No surge pricing, ever.`,
+      title,
+      description,
       url: `${BASE}/fleet/${slug}`,
       images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `Elite BCN — ${vehicle.label} Barcelona Private Transfer` }],
     },
     twitter: {
       card: "summary_large_image" as const,
-      title: `${vehicle.label} — Barcelona Private Transfer | Elite BCN`,
-      description: `From €${minFare}. Fixed-price private transfer in ${vehicle.label}. Meet & greet, flight tracking, no surge pricing.`,
+      title,
+      description,
       images: ["/opengraph-image"],
     },
   };

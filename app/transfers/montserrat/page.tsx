@@ -11,7 +11,7 @@ const cityPrice    = ROUTES.find((r) => r.from === "barcelona_city" && r.to === 
 const mpvPrice     = ROUTES.find((r) => r.from === "airport" && r.to === "montserrat")?.minivan ?? 105;
 
 export const metadata: Metadata = {
-  title: `Barcelona Airport to Montserrat — from €${airportPrice} | Elite BCN`,
+  title: { absolute: `Barcelona Airport to Montserrat — from €${airportPrice}` },
   description: `Private transfer from Barcelona Airport to Montserrat monastery. Fixed price from €${airportPrice}. 50-minute journey. Meet & greet, no surge pricing. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/montserrat" },
   keywords: ["barcelona airport montserrat transfer", "montserrat private transfer", "montserrat day trip barcelona", "barcelona montserrat tour transfer"],
