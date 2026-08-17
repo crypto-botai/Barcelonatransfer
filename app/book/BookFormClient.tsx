@@ -200,9 +200,19 @@ export default function BookFormClient() {
     }, 1500);
   }, [data, step]);
 
+  // Only record a session once the visitor has actually entered something.
+  //
+  // This fired on mount, so every page load wrote a row before anyone had
+  // touched the form: 264 of 296 step-one sessions held no data at all and a
+  // median time of zero seconds. That made the funnel count page loads rather
+  // than intent, and buried the 32 people who really did start filling it in.
+  const hasStarted =
+    !!data.pickupAddress || !!data.dropoffAddress || !!data.date || !!data.time ||
+    !!data.guestEmail || !!data.guestName || !!data.guestPhone || step > 1;
+
   useEffect(() => {
-    if (step >= 1) saveSession();
-  }, [data.guestEmail, data.guestName, data.guestPhone, step, saveSession]);
+    if (hasStarted) saveSession();
+  }, [hasStarted, data.guestEmail, data.guestName, data.guestPhone, step, saveSession]);
 
   const applyCoupon = async () => {
     if (!couponInput || !data.guestEmail) {

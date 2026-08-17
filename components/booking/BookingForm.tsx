@@ -136,7 +136,12 @@ export default function BookingForm({ compact = false }: Props) {
       date,
       time,
       pax:         String(pax),
-      vehicle:     FLEET_TO_DB_CLASS[vehicle],
+      // The car itself, not its class. Sending the class lost which car was
+      // chosen: a Camry quoted at €60 here arrived at /book as "BUSINESS" and
+      // was re-quoted at the €65 column price, so the fare rose by €5 at the
+      // exact moment the customer committed. /book accepts either — it maps a
+      // fleet key back to its class — so the specific value is the safe one.
+      vehicle:     vehicle,
       bookingType: isHourly ? "HOURLY" : "TRANSFER",
     });
     if (!isHourly) {

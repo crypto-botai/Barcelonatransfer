@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import { describe, it, expect } from "vitest";
 import {
   FIXED_ROUTES,
@@ -157,5 +158,40 @@ describe("a per-car price cannot diverge from the column silently", () => {
         expect(Number.isInteger(price), `${route.slug} ${car}`).toBe(true);
       }
     }
+  });
+});
+
+describe("the price does not change between the widget and the booking page", () => {
+  // The homepage widget quotes a car, then hands off to /book through the URL.
+  // It used to send FLEET_TO_DB_CLASS[vehicle], which throws away which car was
+  // chosen: a Camry quoted at €60 arrived as "BUSINESS" and was re-quoted at
+  // the €65 column. The fare rose by €5 at the moment the customer committed.
+  const src = fs.readFileSync("components/booking/BookingForm.tsx", "utf8");
+
+  it("hands the car itself to /book, not its class", () => {
+    const handoff = src.slice(src.indexOf("const params = new URLSearchParams"));
+    const vehicleParam = handoff.match(/vehicle:\s*([^,\n]+)/)?.[1] ?? "";
+    expect(
+      vehicleParam,
+      "the vehicle param must carry the FleetVehicle, or per-car pricing is lost in the handoff",
+    ).not.toMatch(/FLEET_TO_DB_CLASS/);
+  });
+
+  it("every car the widget can send still resolves to its own price", () => {
+    // What /book does with the parameter: a fleet key maps back to its class,
+    // and the per-car price is found from the key itself.
+    for (const v of VEHICLE_CATALOG) {
+      const viaFleetKey = lookupFixedPriceByZone("airport", "barcelona_city", v.class);
+      const expected = lookupPriceByFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", v.class);
+      expect(viaFleetKey, `${v.class} handed off by fleet key`).toBe(expected);
+    }
+  });
+
+  it("the two cars with their own price are the ones that would have jumped", () => {
+    // Regression evidence: these quote €60, their class column is €65.
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "CAMRY")).toBe(60);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "BUSINESS")).toBe(65);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "TESLA_M3")).toBe(60);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "ELECTRIC_VIP")).toBe(65);
   });
 });
