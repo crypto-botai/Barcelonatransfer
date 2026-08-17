@@ -115,3 +115,32 @@ describe("no page lets the layout append the brand twice", () => {
     ).toBe(false);
   });
 });
+
+describe("the /book explainer matches the form's actual steps", () => {
+  // The page carries a static "how it works" list beside the form. It described
+  // "Your Journey / Choose Vehicle / Confirm & Pay" after the form had moved to
+  // journey, details, then vehicle — so the page and the form disagreed about
+  // what would happen next.
+  it("names the same three steps, in the same order", () => {
+    const form = fs.readFileSync("app/book/BookFormClient.tsx", "utf8");
+    const page = fs.readFileSync("app/book/page.tsx", "utf8");
+
+    const stepsBlock = form.slice(form.indexOf("const STEPS = ["));
+    const labels = [...stepsBlock.slice(0, stepsBlock.indexOf("];")).matchAll(/label:\s*"([^"]+)"/g)]
+      .map((m) => m[1].toLowerCase());
+    expect(labels).toHaveLength(3);
+
+    const titles = [...page.matchAll(/\{\s*n:\s*\d+,\s*title:\s*"([^"]+)"/g)].map((m) => m[1].toLowerCase());
+    expect(titles, "app/book/page.tsx should list three steps").toHaveLength(3);
+
+    // Compared on the distinguishing word rather than exact string, since the
+    // page phrases each one as a sentence heading.
+    for (let i = 0; i < 3; i++) {
+      const key = labels[i].split(" ")[0].replace(/[^a-z]/g, "");
+      expect(
+        titles[i],
+        `step ${i + 1}: form says "${labels[i]}", page says "${titles[i]}"`,
+      ).toContain(key);
+    }
+  });
+});

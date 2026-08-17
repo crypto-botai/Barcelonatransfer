@@ -36,9 +36,12 @@ export const metadata: Metadata = {
 };
 
 const BOOKING_STEPS = [
-  { n: 1, title: "Your Journey",  body: "Enter your pickup address, destination, date, time, and number of passengers." },
-  { n: 2, title: "Choose Vehicle", body: "Select from Economy EQE 300 Electric, V-Class VIP (7 pax), Vito (8 pax), or Minibus (16 pax)." },
-  { n: 3, title: "Confirm & Pay",  body: "Review your fixed quote, apply any coupon code, and pay securely by card. Instant email confirmation." },
+  // Kept in step with BookFormClient's STEPS. The order changed on 17 Aug 2026:
+  // contact details now come before the price, so this described a journey the
+  // form no longer follows.
+  { n: 1, title: "Your journey",   body: "Enter your pickup address, destination, date, time, and number of passengers." },
+  { n: 2, title: "Your details",   body: "Your name, email and phone, so we can confirm the booking and reach you on the day." },
+  { n: 3, title: "Vehicle & price", body: "Choose your car and see the fixed price straight away, add any extras, and pay securely." },
 ] as const;
 
 const BOOK_FAQ = [
