@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clock, Mail, Tag, TrendingUp, RefreshCw, MessageCircle } from "lucide-react";
+import { Clock, Mail, Tag, TrendingUp, RefreshCw, MessageCircle, Users, AlertTriangle } from "lucide-react";
 
 type AbandonedBooking = {
   id:          string;
@@ -19,9 +19,26 @@ type AbandonedBooking = {
   } | null;
 };
 
+type Funnel = {
+  sessions:        number;
+  withEmail:       number;
+  convertedToBook: number;
+  byStep:          { step: number; count: number }[];
+  pendingRecovery: number;
+};
+
+/** What the customer is doing at each step of the booking form. */
+const STEP_LABELS: Record<number, string> = {
+  1: "Route, date & vehicle",
+  2: "Extras",
+  3: "Contact details",
+  4: "Review & pay",
+};
+
 export default function AbandonedBookingsPage() {
   const [items,     setItems]     = useState<AbandonedBooking[]>([]);
   const [stats,     setStats]     = useState({ total: 0, converted: 0 });
+  const [funnel,    setFunnel]    = useState<Funnel | null>(null);
   const [loading,   setLoading]   = useState(true);
 
   const load = async () => {
@@ -31,6 +48,7 @@ export default function AbandonedBookingsPage() {
       const data = await res.json();
       setItems(data.items ?? []);
       setStats({ total: data.total ?? 0, converted: data.converted ?? 0 });
+      setFunnel(data.funnel ?? null);
     } finally {
       setLoading(false);
     }
@@ -45,17 +63,75 @@ export default function AbandonedBookingsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-display text-3xl text-white">Abandoned Bookings</h1>
-          <p className="text-dark-400 text-sm mt-1">Auto-recovery system with 5% OFF coupons</p>
+          <p className="text-dark-400 text-sm mt-1">
+            Where visitors stop, and the ones we can still email back
+          </p>
         </div>
         <button onClick={load} className="btn-outline-gold px-4 py-2 rounded-lg text-sm flex items-center gap-2">
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
         </button>
       </div>
 
-      {/* Stats */}
+      {/* Funnel — the whole picture. The recovery table below covers only the
+          slice where an email was captured, which is a small fraction of it. */}
+      {funnel && funnel.sessions > 0 && (
+        <div className="glass-card rounded-xl p-5 mb-6">
+          <div className="flex items-start justify-between mb-5 gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Users size={16} className="text-gold-400" />
+                <p className="text-white font-medium">Booking form funnel</p>
+              </div>
+              <p className="text-dark-400 text-xs">
+                {funnel.sessions} people started the booking form ·{" "}
+                {funnel.convertedToBook} completed a booking ·{" "}
+                {funnel.withEmail} left an email
+              </p>
+            </div>
+            {funnel.pendingRecovery > 0 && (
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-amber-500/30 bg-amber-500/5 flex-shrink-0">
+                <AlertTriangle size={13} className="text-amber-400" />
+                <span className="text-amber-300 text-xs">
+                  {funnel.pendingRecovery} awaiting recovery email — cron may have stopped
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            {funnel.byStep.map(({ step, count }) => {
+              const pct = Math.round((count / funnel.sessions) * 100);
+              return (
+                <div key={step} className="flex items-center gap-3">
+                  <span className="text-dark-400 text-xs w-40 flex-shrink-0">
+                    {step}. {STEP_LABELS[step] ?? `Step ${step}`}
+                  </span>
+                  <div className="flex-1 h-5 rounded bg-white/[0.04] overflow-hidden">
+                    <div
+                      className="h-full bg-gold-500/40 border-r border-gold-500"
+                      style={{ width: `${Math.max(pct, 1)}%` }}
+                    />
+                  </div>
+                  <span className="text-dark-300 text-xs w-20 text-right flex-shrink-0 tabular-nums">
+                    {count} · {pct}%
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          <p className="text-dark-500 text-xs mt-4 pt-3 border-t border-white/[0.06]">
+            Only visitors who reach the contact step can be emailed back, so the
+            recovery list below is always a fraction of the total. A large first-step
+            number means people are getting a price and leaving.
+          </p>
+        </div>
+      )}
+
+      {/* Recovery stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
-          { icon: Clock,       label: "Total Abandoned",  value: stats.total },
+          { icon: Clock,       label: "Recoverable",      value: stats.total },
           { icon: TrendingUp,  label: "Converted",        value: stats.converted },
           { icon: Tag,         label: "Conversion Rate",  value: `${convRate}%` },
           { icon: Mail,        label: "Emails Sent",      value: items.filter((i) => i.emailSentAt).length },
