@@ -74,8 +74,8 @@ function getOrCreateSessionId(): string {
 
 const STEPS = [
   { id: 1, label: "Journey" },
-  { id: 2, label: "Vehicle" },
-  { id: 3, label: "Confirm" },
+  { id: 2, label: "Your details" },
+  { id: 3, label: "Vehicle & price" },
 ];
 
 const BOOKING_TYPES: { type: BookingType; label: string; icon: React.ElementType; desc: string }[] = [
@@ -327,11 +327,19 @@ export default function BookFormClient() {
       return;
     }
     setStep(2);
+  };
+
+  // Entering the vehicle step quotes immediately, so a price is on screen
+  // without the customer having to pick a car first.
+  const goToStep3 = () => {
+    setStep(3);
     if (data.vehicleClass) fetchQuote(data.vehicleClass, undefined, data.fleetVehicle);
   };
 
   const step1Valid = !!data.pickupLat && !!data.date && !!data.time && (bookingType !== "TRANSFER" || !!data.dropoffLat);
-  const step3Valid = !!data.guestName && !!data.guestEmail && !!data.guestPhone;
+  // Named for what it checks rather than which step it sits on, since the
+  // contact fields have now moved a step earlier.
+  const contactValid = !!data.guestName && !!data.guestEmail && !!data.guestPhone;
 
   const handlePay = async () => {
     setSubmitting(true);
@@ -555,16 +563,17 @@ export default function BookFormClient() {
 
                   <button onClick={goToStep2} disabled={!step1Valid}
                     className="btn-gold w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed mt-2">
-                    Select Vehicle <ArrowRight size={16} />
+                    Continue <ArrowRight size={16} />
                   </button>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* STEP 2: Vehicle Selection */}
-          {step === 2 && (
-            <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+          {/* STEP 3a: Vehicle selection and price. Renders above the extras
+              block below, which is also step 3. */}
+          {step === 3 && (
+            <motion.div key="s3a" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="space-y-4">
                 <div className="glass-card rounded-xl p-4 flex items-center justify-between">
                   <div>
@@ -693,22 +702,15 @@ export default function BookFormClient() {
                   </div>
                 )}
 
-                <div className="flex gap-3">
-                  <button onClick={() => setStep(1)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
-                    <ArrowLeft size={16} /> Back
-                  </button>
-                  <button onClick={() => setStep(3)} disabled={!data.vehicleClass || needsManualQuote || !quote || quote.totalAmount <= 0}
-                    className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
-                    Continue <ArrowRight size={16} />
-                  </button>
-                </div>
               </div>
             </motion.div>
           )}
 
-          {/* STEP 3: Details & Extras */}
-          {step === 3 && (
-            <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+          {/* STEP 2: Your details — moved ahead of the price on the owner's
+              instruction, so a booking that is abandoned still carries a name
+              and an email to follow up on. */}
+          {step === 2 && (
+            <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="space-y-4">
                 <div className="glass-card rounded-2xl p-6 sm:p-8">
                   <h2 className="font-display text-2xl text-white mb-6">{t("step3")}</h2>
@@ -776,6 +778,42 @@ export default function BookFormClient() {
                   </div>
                 </div>
 
+                {/* Why the details are asked for before the price is shown.
+                    Saying so plainly is both fairer and the lawful basis for
+                    using the address if the booking is not completed. */}
+                <div className="glass-card rounded-2xl p-5">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={data.contactConsent ?? false}
+                      onChange={(e) => setData((d) => ({ ...d, contactConsent: e.target.checked }))}
+                      className="mt-0.5 w-4 h-4 accent-[#c9a84c] flex-shrink-0"
+                    />
+                    <span className="text-dark-300 text-xs leading-relaxed">
+                      Send me this quote and hold my booking details. If I do not finish
+                      booking, Elite BCN may contact me once about this journey. No
+                      marketing, and you can ask us to delete your details at any time.
+                    </span>
+                  </label>
+                </div>
+
+                <div className="flex gap-3">
+                  <button onClick={() => setStep(1)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
+                    <ArrowLeft size={16} /> Back
+                  </button>
+                  <button onClick={goToStep3} disabled={!contactValid}
+                    className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                    See vehicles &amp; price <ArrowRight size={16} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* STEP 3b: Extras, summary and payment — below the vehicle block. */}
+          {step === 3 && (
+            <motion.div key="s3b" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <div className="space-y-4">
                 <div className="glass-card rounded-2xl p-6 sm:p-8">
                   <h2 className="font-display text-xl text-white mb-2">{t("addExtras")}</h2>
                   <p className="text-dark-400 text-sm mb-5">Enhance your journey with optional add-ons</p>
@@ -929,7 +967,7 @@ export default function BookFormClient() {
                       <MessageCircle size={16} /> WhatsApp for quote
                     </a>
                   ) : (
-                    <button onClick={handlePay} disabled={!step3Valid || submitting}
+                    <button onClick={handlePay} disabled={!contactValid || submitting}
                       className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40">
                       {submitting ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
                       {submitting ? t("processing") : quote ? `${t("pay")} ${formatCurrency(grandTotal)}` : t("confirmBooking")}
@@ -947,8 +985,8 @@ export default function BookFormClient() {
         </AnimatePresence>
       </div>
 
-      {/* Mobile sticky price bar — visible on steps 2–4 when vehicle + quote ready */}
-      {step >= 2 && data.vehicleClass && grandTotal > 0 && (
+      {/* Mobile sticky price bar. Step 3 only: there is no price before it. */}
+      {step === 3 && data.vehicleClass && grandTotal > 0 && (
         <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0d0d0d]/95 backdrop-blur border-t border-gold-500/20 px-4 py-3 flex items-center gap-3 safe-area-pb">
           <div className="flex-1 min-w-0">
             <p className="text-xs text-dark-400 truncate">
@@ -956,14 +994,8 @@ export default function BookFormClient() {
             </p>
             <p className="font-display text-lg text-gold-400 leading-tight">{formatCurrency(grandTotal)}</p>
           </div>
-          {step === 2 && (
-            <button onClick={() => setStep(3)} disabled={!data.vehicleClass}
-              className="btn-gold px-5 py-3 rounded-xl text-sm font-semibold flex-shrink-0">
-              Continue
-            </button>
-          )}
           {step === 3 && (
-            <button onClick={handlePay} disabled={!step3Valid || submitting}
+            <button onClick={handlePay} disabled={!contactValid || submitting}
               className="btn-gold px-5 py-3 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-2 disabled:opacity-40">
               {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
               {submitting ? "…" : `Pay ${formatCurrency(grandTotal)}`}

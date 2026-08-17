@@ -31,6 +31,11 @@ export async function POST(req: NextRequest) {
 
   for (const s of newSessions) {
     if (!s.email) continue;
+    // The form asks for contact details before showing a price, so an address
+    // here does not by itself mean the person agreed to be written to. Only
+    // send where they ticked the box on the details step.
+    const consented = (s.formData as { contactConsent?: boolean } | null)?.contactConsent === true;
+    if (!consented) { results.skipped++; continue; }
     try {
       const couponCode = await createAbandonedCoupon(s.email);
       const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });

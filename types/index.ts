@@ -146,6 +146,15 @@ export interface BookingFormData {
    * absent simply prices at the class.
    */
   fleetVehicle?:   FleetVehicle;
+  /**
+   * Consent to hold the contact details and send one follow-up if the booking
+   * is not completed.
+   *
+   * The form asks for a name, email and phone before showing a price, so the
+   * details of someone who never books are held either way. This is what makes
+   * using them lawful, and it is asked for on the same step.
+   */
+  contactConsent?: boolean;
   durationHours?:  number;
   flightNumber?:   string;
   specialRequests?: string;
