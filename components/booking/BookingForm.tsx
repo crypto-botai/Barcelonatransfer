@@ -7,7 +7,7 @@ import {
   Calendar, Clock, Users, Zap, ArrowRight,
   Loader2, MessageCircle, MapPin, RotateCcw, Timer,
 } from "lucide-react";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { VEHICLE_CATALOG, FLEET_TO_DB_CLASS, type FleetVehicle, type QuoteResponse } from "@/types";
 import AddressAutocomplete, { type QuickZone } from "./AddressAutocomplete";
 import { useTranslations } from "@/components/language/I18nProvider";
@@ -344,25 +344,24 @@ export default function BookingForm({ compact = false }: Props) {
 
           {!loading && quote && !needsManualQuote && (
             <div className="animate-menu-in">
-              <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-[#c9a84c]/5 border border-[#c9a84c]/20">
-                <div className="flex items-center gap-2">
-                  <Zap size={13} className="text-[#c9a84c]" />
-                  <div>
-                    <p className="text-[10px] text-[#c9a84c]/60 uppercase tracking-wide font-semibold">{isPerKm ? t("yourPrice") : t("fixedPrice")}</p>
-                    {quote.fromLabel ? (
-                      <p className="text-[11px] text-white/30 flex items-center gap-1 mt-0.5">
-                        <MapPin size={9} className="text-[#c9a84c]/40" />
-                        {quote.fromLabel} → {quote.toLabel}
-                      </p>
-                    ) : isPerKm ? (
-                      <p className="text-[11px] text-white/30 flex items-center gap-1 mt-0.5">
-                        <MapPin size={9} className="text-[#c9a84c]/40" />
-                        {t("kmJourney").replace("{km}", String(quote.distanceKm))}
-                      </p>
-                    ) : null}
-                  </div>
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#c9a84c]/5 border border-[#c9a84c]/20">
+                <Zap size={13} className="text-[#c9a84c] flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[10px] text-[#c9a84c]/60 uppercase tracking-wide font-semibold">
+                    {t("fixedPrice")}
+                  </p>
+                  {quote.fromLabel ? (
+                    <p className="text-[11px] text-white/30 flex items-center gap-1 mt-0.5 truncate">
+                      <MapPin size={9} className="text-[#c9a84c]/40 flex-shrink-0" />
+                      {quote.fromLabel} → {quote.toLabel}
+                    </p>
+                  ) : isPerKm ? (
+                    <p className="text-[11px] text-white/30 flex items-center gap-1 mt-0.5">
+                      <MapPin size={9} className="text-[#c9a84c]/40 flex-shrink-0" />
+                      {t("kmJourney").replace("{km}", String(quote.distanceKm))}
+                    </p>
+                  ) : null}
                 </div>
-                <p className="font-display text-2xl text-[#c9a84c]">{formatCurrency(quote.totalAmount)}</p>
               </div>
             </div>
           )}
@@ -392,7 +391,7 @@ export default function BookingForm({ compact = false }: Props) {
             disabled={!canContinue}
             className="btn-gold w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-35 disabled:cursor-not-allowed"
           >
-            {quote ? `${t("book")} — ${formatCurrency(quote.totalAmount)}` : t("continueLabel")}
+            {t("continueLabel")}
             <ArrowRight size={15} />
           </button>
         )}
