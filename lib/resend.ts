@@ -45,10 +45,13 @@ const VEHICLE_NAMES: Record<string, string> = {
   V_CLASS:  "Mercedes V-Class",
   SPRINTER: "Mercedes Sprinter",
   // DB VehicleClass keys (for legacy booking records)
-  ECONOMY:        "Standard Sedan (Toyota Corolla)",
-  BUSINESS:       "Business Sedan (Toyota Camry)",
-  LUXURY:         "Mercedes EQE 300 Electric",
-  ELECTRIC_VIP:   "Tesla Model 3",
+  // Tier names as the customer chose them. The Corolla is Economy and the Camry
+  // Standard since 17 Aug; these still read "Standard Sedan (Corolla)" and
+  // "Business Sedan (Camry)", which now name the wrong tiers.
+  ECONOMY:        "Economy (Toyota Corolla)",
+  BUSINESS:       "Standard (Toyota Camry)",
+  LUXURY:         "Business (Mercedes EQE 300 Electric)",
+  ELECTRIC_VIP:   "Electric (Tesla Model 3)",
   MINIVAN:        "Mercedes Vito",
   LUXURY_MINIVAN: "Mercedes V-Class",
   MINIBUS:        "Mercedes Sprinter",
@@ -843,13 +846,24 @@ export async function sendAdminNewBookingAlert({
     totalAmount,
     specialRequests,
   });
-  await sendEmail({
-    from:    FROM,
-    to:      ADMIN_EMAIL,
-    replyTo: guestEmail,
-    subject: `New Booking — ${confirmationCode} · €${totalAmount.toFixed(2)}`,
-    html,
-  });
+  // Logged like every other email. This was the one send that recorded nothing,
+  // so there was no way to tell from the admin whether a new-booking alert had
+  // gone out — which is exactly the question asked when one appears to be
+  // missing. A failure is recorded rather than swallowed.
+  const subject = `New Booking — ${confirmationCode} · €${totalAmount.toFixed(2)}`;
+  try {
+    const id = await sendEmail({
+      from:    FROM,
+      to:      ADMIN_EMAIL,
+      replyTo: guestEmail,
+      subject,
+      html,
+    });
+    await logEmail({ to: ADMIN_EMAIL, subject, type: "ADMIN_ALERT", resendId: id });
+  } catch (err) {
+    await logEmail({ to: ADMIN_EMAIL, subject, type: "ADMIN_ALERT", status: "FAILED" });
+    throw err;
+  }
 
   // WhatsApp fallback — fires if WA_PHONE_ID + WA_TOKEN + WA_ADMIN_NUMBER are set.
   void notifyAdminWhatsApp(
