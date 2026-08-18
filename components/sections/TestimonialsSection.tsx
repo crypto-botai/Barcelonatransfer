@@ -43,8 +43,11 @@ export default function TestimonialsSection() {
             What our <span className="text-gold-gradient">clients say</span>
           </h2>
 
-          {/* The rating as it stands on the Google profile. No inflated total:
-              the figure here is the one a reader would find if they looked. */}
+          {/* The rating as it stands on the Google profile. The owner asked for
+              no review total on the page — the reviews themselves are the
+              evidence. GOOGLE_PROFILE.count still governs how many may be
+              listed, and still feeds the structured data, where a count is
+              required to be accurate rather than hidden. */}
           <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl border border-gold-500/20 bg-gold-500/[0.04]">
             <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0">
               <span className="font-display text-[#4285F4] text-base font-bold leading-none">G</span>
@@ -60,9 +63,7 @@ export default function TestimonialsSection() {
                   ))}
                 </span>
               </div>
-              <p className="text-dark-400 text-xs mt-0.5">
-                {GOOGLE_PROFILE.count} reviews on Google
-              </p>
+              <p className="text-dark-400 text-xs mt-0.5">Rated on Google</p>
             </div>
           </div>
         </div>
