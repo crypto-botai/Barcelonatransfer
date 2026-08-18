@@ -5,7 +5,10 @@ import { COMPANY } from "@/lib/company-facts";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
 import I18nProvider from "@/components/language/I18nProvider";
-import SupportCenter from "@/components/support/LazySupportCenter";
+// WhatsApp only. The support centre also offered an AI concierge; the owner
+// asked for the one channel their customers actually use and that they
+// answer themselves.
+import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import MobileBookBar from "@/components/layout/MobileBookBar";
 import DeferredAnalytics from "@/components/layout/DeferredAnalytics";
 import { buildOfferCatalog } from "@/lib/offer-catalog";
@@ -217,7 +220,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <I18nProvider>
           {children}
-          <SupportCenter />
+          <WhatsAppButton />
           <MobileBookBar />
 <Toaster
             position="top-right"

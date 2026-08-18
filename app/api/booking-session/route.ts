@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { sendNewLeadAlert } from "@/lib/resend";
 
 const schema = z.object({
   sessionId: z.string().min(1),
@@ -37,6 +38,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Tell the office straight away, the first time a session has a full set of
+    // contact details. The daily recovery job is for the discount offer; this
+    // is so somebody can ring while the customer is still on the page.
+    void alertOnFirstContact(body, session.converted);
+
     return NextResponse.json({ ok: true, id: session.id });
   } catch (err) {
     if (err instanceof z.ZodError)
@@ -63,4 +69,43 @@ export async function DELETE(req: NextRequest) {
     data:  { converted: true },
   });
   return NextResponse.json({ ok: true });
+}
+
+/**
+ * Fires once per session, and only with a complete set of contact details.
+ *
+ * Dedupe is against the email log rather than a new column on the session, so
+ * this needed no migration. A failure here must never fail the save — the
+ * customer's progress matters more than the alert.
+ */
+async function alertOnFirstContact(
+  body: { sessionId: string; email?: string; name?: string; phone?: string; formData: Record<string, unknown> },
+  converted: boolean,
+) {
+  try {
+    if (converted) return;
+    const { email, name, phone } = body;
+    if (!email || !name || !phone) return;
+
+    const already = await prisma.emailLog.count({
+      where: { type: "ADMIN_LEAD", subject: `LEAD ${body.sessionId}` },
+    });
+    if (already > 0) return;
+
+    const fd = body.formData as {
+      pickupAddress?: string; dropoffAddress?: string;
+      date?: string; time?: string; passengers?: number;
+    };
+
+    await sendNewLeadAlert({
+      name, email, phone,
+      pickup:     fd.pickupAddress ?? null,
+      dropoff:    fd.dropoffAddress ?? null,
+      when:       fd.date ? `${fd.date}${fd.time ? ` ${fd.time}` : ""}` : null,
+      passengers: fd.passengers ?? null,
+      sessionId:  body.sessionId,
+    });
+  } catch (err) {
+    console.error("[booking-session] lead alert failed", err);
+  }
 }

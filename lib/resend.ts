@@ -871,6 +871,58 @@ export async function sendAdminNewBookingAlert({
   );
 }
 
+// ─── New Lead Alert (booking started, not yet paid) ──────────
+/**
+ * Sent the moment someone finishes the contact step of the booking form.
+ *
+ * The abandoned-booking email is a daily job, which is the right cadence for a
+ * discount offer and far too slow for a lead: an airport transfer is usually
+ * booked within the hour. This exists so the office can ring or message while
+ * the customer is still deciding.
+ *
+ * Deliberately plain. It is an internal alert, read on a phone, and the only
+ * things that matter are who to contact and what they were booking.
+ */
+export async function sendNewLeadAlert({
+  name, email, phone, pickup, dropoff, when, passengers, sessionId,
+}: {
+  name: string; email: string; phone: string;
+  pickup?: string | null; dropoff?: string | null; when?: string | null;
+  passengers?: number | null; sessionId: string;
+}) {
+  const subject = `New lead — ${name} · ${phone}`;
+  const wa = `https://wa.me/${phone.replace(/\D/g, "")}`;
+  const html = emailLayout(`
+    <h2>Someone is booking now</h2>
+    <p>They have entered their details but have not paid yet. Reaching them in
+       the next few minutes is the best chance of winning the booking.</p>
+    <table class="detail-table">
+      <tr><td>Name</td><td><strong>${esc(name)}</strong></td></tr>
+      <tr><td>Phone</td><td><a href="tel:${esc(phone)}" style="color:#c9a84c;">${esc(phone)}</a></td></tr>
+      <tr><td>WhatsApp</td><td><a href="${wa}" style="color:#25D366;">Message on WhatsApp</a></td></tr>
+      <tr><td>Email</td><td><a href="mailto:${esc(email)}" style="color:#c9a84c;">${esc(email)}</a></td></tr>
+      ${pickup  ? `<tr><td>Pick-up</td><td>${esc(pickup)}</td></tr>` : ""}
+      ${dropoff ? `<tr><td>Drop-off</td><td>${esc(dropoff)}</td></tr>` : ""}
+      ${when    ? `<tr><td>When</td><td>${esc(when)}</td></tr>` : ""}
+      ${passengers ? `<tr><td>Passengers</td><td>${esc(passengers)}</td></tr>` : ""}
+    </table>
+    <p style="color:#888;font-size:12px;">If they finish paying you will get the
+       usual booking confirmation as well.</p>
+  `);
+
+  try {
+    const id = await sendEmail({ from: FROM, to: ADMIN_EMAIL, replyTo: email, subject, html });
+    await logEmail({ to: ADMIN_EMAIL, subject: `LEAD ${sessionId}`, type: "ADMIN_LEAD", resendId: id });
+  } catch (err) {
+    await logEmail({ to: ADMIN_EMAIL, subject: `LEAD ${sessionId}`, type: "ADMIN_LEAD", status: "FAILED" });
+    throw err;
+  }
+
+  void notifyAdminWhatsApp(
+    `\u{1F464} New lead — not paid yet\n${name}\n${phone}\n${pickup ?? ""} \u2192 ${dropoff ?? ""}\n${when ?? ""}`,
+  );
+}
+
 // ─── Welcome Email ───────────────────────────────────────────
 export async function sendWelcomeEmail({
   to, name, password, confirmationCode, totalAmount,
