@@ -72,12 +72,23 @@ function FleetCardInner({
         </div>
         <p className="text-[10px] text-white/60 tracking-wider">{t("inclVat")}</p>
         <div className="mt-auto">
+          {/* rel=nofollow because the href carries a query parameter. An audit
+              flags internal links with parameters unless they are nofollow, and
+              the parameter has to stay: it is what tells the booking form which
+              car was chosen, and losing it re-quotes a Camry at the Business
+              price.
+
+              The label names the car rather than reading "Reserve this vehicle"
+              on all seven cards. Seven links sharing one anchor text was the
+              other finding, and a screen reader hitting seven identical links
+              had the same problem. */}
           <Link
             href={`/book?vehicle=${vehicle.class}`}
+            rel="nofollow"
             className="group/btn flex items-center justify-between w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.07] text-sm text-white/45 hover:text-[#c9a84c] hover:border-[#c9a84c]/28 hover:bg-[#c9a84c]/[0.04] transition-all duration-300"
             tabIndex={asHeading ? 0 : -1}
           >
-            <span className="font-medium">{t("reserveVehicle")}</span>
+            <span className="font-medium">Reserve the {vehicle.label}</span>
             <ChevronRight size={14} className="text-white/25 group-hover/btn:text-[#c9a84c] group-hover/btn:translate-x-0.5 transition-all duration-300" />
           </Link>
         </div>

@@ -7,6 +7,7 @@ import HeroSection from "@/components/sections/HeroSection";
 import ServicesSection from "@/components/sections/ServicesSection";
 import FleetSection from "@/components/sections/FleetSection";
 import PricingSection from "@/components/sections/PricingSection";
+import HowItWorksSection from "@/components/sections/HowItWorksSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import FAQSection from "@/components/sections/FAQSection";
 import { getPublicRoutes } from "@/lib/pricing-service";
@@ -39,6 +40,10 @@ export default async function HomePage() {
         <ServicesSection />
         <FleetSection />
         <PricingSection routes={routes} />
+        {/* Sits after the price table because it explains what the price
+            covers, and before the reviews because the reader who has just
+            understood the offer is the one ready to be reassured about it. */}
+        <HowItWorksSection />
         <TestimonialsSection />
         <FAQSection />
       </main>

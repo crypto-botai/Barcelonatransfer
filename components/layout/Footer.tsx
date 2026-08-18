@@ -48,7 +48,7 @@ export default function Footer() {
       <div className="border-b border-gold-500/15 bg-gradient-to-r from-transparent via-gold-500/5 to-transparent">
         <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
-            <h3 className="font-display text-xl text-white">{t("newsletter.title")}</h3>
+            <p className="font-display text-xl text-white">{t("newsletter.title")}</p>
             <p className="text-dark-400 text-sm mt-1">{t("newsletter.subtitle")}</p>
           </div>
           <div className="w-full md:w-auto md:min-w-[340px]">
@@ -61,7 +61,7 @@ export default function Footer() {
       <div className="border-b border-gold-500/15">
         <div className="container mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h3 className="font-display text-lg text-white">{t("cta.title")}</h3>
+            <p className="font-display text-lg text-white">{t("cta.title")}</p>
             <p className="text-dark-400 text-sm mt-1">{t("cta.subtitle")}</p>
           </div>
           <div className="flex gap-3">
@@ -131,7 +131,7 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("sections.services")}</h4>
+            <p className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("sections.services")}</p>
             <ul className="flex flex-col gap-2.5">
               {SERVICES.map((s) => (
                 <li key={s.key}>
@@ -145,7 +145,7 @@ export default function Footer() {
 
           {/* Fleet */}
           <div>
-            <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("sections.fleet")}</h4>
+            <p className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("sections.fleet")}</p>
             <ul className="flex flex-col gap-2.5">
               {FLEET_LINKS.map((f) => (
                 <li key={f.key}>
@@ -161,7 +161,7 @@ export default function Footer() {
 
           {/* Destinations */}
           <div>
-            <h4 className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("sections.destinations")}</h4>
+            <p className="text-white text-xs tracking-[0.2em] uppercase mb-5 font-medium">{t("sections.destinations")}</p>
             <ul className="flex flex-col gap-2.5">
               {DESTINATIONS.map(({ key, href }) => (
                 <li key={key}>
