@@ -1,3 +1,5 @@
+import { GOOGLE_PROFILE } from "@/data/reviews";
+
 // Single source of truth for all facts, counts, and claims.
 // Every component imports from here — zero hardcoded numbers elsewhere.
 
@@ -20,7 +22,11 @@ export const COMPANY = {
 };
 
 export const SOCIAL_PROOF = {
-  google:      { rating: 4.9, count: 312 },
+  // Read from the reviews file rather than repeated here, so the rating shown
+  // beside the reviews and the rating published in structured data cannot drift
+  // apart. They already had: this said 4.9 from 312 while /about claimed 595,
+  // and the real profile holds 5.0 from 15.
+  google:      { rating: GOOGLE_PROFILE.rating, count: GOOGLE_PROFILE.count },
   // Trustpilot and TripAdvisor: include only after confirming live profiles exist.
   // Re-add and update COMPANY_FACTS.totalReviewCount once verified.
 } as const;
