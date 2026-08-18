@@ -8,6 +8,11 @@ const CRON_SECRET             = process.env.CRON_SECRET ?? "elite-cron-secret";
 const ABANDON_AFTER_MINUTES   = 60;   // wait 1 hour before first email
 const FOLLOW_UP_HOURS         = 24;   // send follow-ups every 24 hours
 const MAX_ABANDONED_EMAILS    = 3;    // stop after 3 emails total
+// Stop chasing an abandoned booking once the trip it was for has come and gone.
+// Without this the follow-up query selects any unconverted record whose last
+// email was over a day ago, so records from June were still queued for
+// "follow-ups" about journeys that had already happened.
+const FOLLOW_UP_MAX_AGE_DAYS  = 7;
 
 export async function POST(req: NextRequest) {
   const auth = req.headers.get("authorization");
@@ -80,6 +85,7 @@ export async function POST(req: NextRequest) {
     where: {
       convertedAt: null,
       emailSentAt: { lt: followUpCutoff },
+      createdAt:   { gt: new Date(Date.now() - FOLLOW_UP_MAX_AGE_DAYS * 864e5) },
     },
     include: { coupon: true },
     take: 30,
@@ -97,6 +103,14 @@ export async function POST(req: NextRequest) {
           where: { id: ab.id },
           data:  { convertedAt: new Date() },
         });
+        results.skipped++;
+        continue;
+      }
+
+      // A pickup date in the past means the journey is over, whatever the
+      // record's age says.
+      const snapshot = (ab.formSnapshot ?? {}) as { date?: string };
+      if (snapshot.date && new Date(snapshot.date) < new Date()) {
         results.skipped++;
         continue;
       }

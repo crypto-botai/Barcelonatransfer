@@ -25,13 +25,19 @@ type Funnel = {
   convertedToBook: number;
   byStep:          { step: number; count: number }[];
   pendingRecovery: number;
+  overdueRecovery: number;
 };
 
-/** What the customer is doing at each step of the booking form. */
+/**
+ * What the customer is doing at each step of the booking form.
+ *
+ * Kept in step with BookFormClient's STEPS. The order changed on 17 Aug 2026,
+ * and these labels described the flow that came before it.
+ */
 const STEP_LABELS: Record<number, string> = {
-  1: "Route, date & vehicle",
-  2: "Extras",
-  3: "Contact details",
+  1: "Route, date & passengers",
+  2: "Contact details",
+  3: "Vehicle & price",
   4: "Review & pay",
 };
 
@@ -88,14 +94,24 @@ export default function AbandonedBookingsPage() {
                 {funnel.withEmail} left an email
               </p>
             </div>
-            {funnel.pendingRecovery > 0 && (
+            {/* Only alarming once a session has waited longer than the daily
+                cron interval. Before that it is simply queued for the next
+                run, which is not a fault. */}
+            {funnel.overdueRecovery > 0 ? (
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-amber-500/30 bg-amber-500/5 flex-shrink-0">
                 <AlertTriangle size={13} className="text-amber-400" />
                 <span className="text-amber-300 text-xs">
-                  {funnel.pendingRecovery} awaiting recovery email — cron may have stopped
+                  {funnel.overdueRecovery} overdue by more than a day — check the cron
                 </span>
               </div>
-            )}
+            ) : funnel.pendingRecovery > 0 ? (
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 bg-white/[0.03] flex-shrink-0">
+                <Clock size={13} className="text-dark-400" />
+                <span className="text-dark-400 text-xs">
+                  {funnel.pendingRecovery} queued for the next daily run
+                </span>
+              </div>
+            ) : null}
           </div>
 
           <div className="space-y-2">

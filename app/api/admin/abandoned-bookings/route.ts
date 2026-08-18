@@ -48,14 +48,28 @@ export async function GET(req: NextRequest) {
   // Sessions that meet every condition the cron looks for but have no
   // AbandonedBooking yet. Anything other than zero means the cron has stopped.
   const ABANDON_AFTER_MINUTES = 60;
-  const pendingRecovery = await prisma.bookingSession.count({
-    where: {
-      email: { not: null },
-      converted: false,
-      lastActivity: { lt: new Date(Date.now() - ABANDON_AFTER_MINUTES * 60_000) },
-      abandonedBooking: null,
-    },
-  });
+  const eligibleWhere = {
+    email: { not: null },
+    converted: false,
+    abandonedBooking: null,
+  } as const;
+
+  const [pendingRecovery, overdueRecovery] = await Promise.all([
+    prisma.bookingSession.count({
+      where: {
+        ...eligibleWhere,
+        lastActivity: { lt: new Date(Date.now() - ABANDON_AFTER_MINUTES * 60_000) },
+      },
+    }),
+    // Overdue means it has waited longer than the daily cron interval, which is
+    // the only case that suggests the cron itself has stopped.
+    prisma.bookingSession.count({
+      where: {
+        ...eligibleWhere,
+        lastActivity: { lt: new Date(Date.now() - 25 * 3_600_000) },
+      },
+    }),
+  ]);
 
   return NextResponse.json({
     items,
@@ -67,6 +81,7 @@ export async function GET(req: NextRequest) {
       convertedToBook: sessionsConverted,
       byStep,
       pendingRecovery,
+      overdueRecovery,
     },
   });
 }
