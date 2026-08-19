@@ -57,7 +57,7 @@ export default function TestimonialsSection() {
                 <span className="font-display text-xl text-white leading-none">
                   {GOOGLE_PROFILE.rating.toFixed(1)}
                 </span>
-                <span className="flex" aria-label={`${GOOGLE_PROFILE.rating} out of 5`}>
+                <span className="flex" role="img" aria-label={`Rated ${GOOGLE_PROFILE.rating} out of 5`}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} size={13} className="fill-gold-500 text-gold-500" />
                   ))}
@@ -79,7 +79,7 @@ export default function TestimonialsSection() {
                 key={`${r.author}-${r.when}`}
                 className="snap-center flex-shrink-0 w-[300px] sm:w-[380px] glass-card rounded-2xl p-6 flex flex-col"
               >
-                <div className="flex items-center gap-1 mb-3" aria-label={`${r.rating} out of 5`}>
+                <div className="flex items-center gap-1 mb-3" role="img" aria-label={`Rated ${r.rating} out of 5`}>
                   {Array.from({ length: r.rating }).map((_, i) => (
                     <Star key={i} size={14} className="fill-gold-500 text-gold-500" />
                   ))}
@@ -106,7 +106,7 @@ export default function TestimonialsSection() {
                         </span>
                       )}
                     </div>
-                    <p className="text-dark-500 text-xs mt-0.5">Google · {r.when}</p>
+                    <p className="text-dark-400 text-xs mt-0.5">Google · {r.when}</p>
                   </div>
                 </div>
               </article>
