@@ -85,6 +85,67 @@ export const REVIEWS: Review[] = [
     text:     "Very nice and clean service. Up on time thanks",
     verified: true,
   },
+  {
+    author:   "ZaiD T",
+    rating:   5,
+    when:     "5 days ago",
+    text:     "Really good service. On time, clean car and very professional driver. Everything went smoothly. Would definitely use Elite BCN again.",
+    verified: true,
+  },
+  {
+    author:   "Zohaib Kayani",
+    rating:   5,
+    when:     "5 days ago",
+    text:     "Very reliable service. The driver arrived early, the car was clean, and the ride was comfortable. No stress at all. Highly recommended.",
+    verified: true,
+  },
+  {
+    author:   "Raja Zain",
+    rating:   5,
+    when:     "5 days ago",
+    text:     "Excellent service, very punctual and comfortable. The driver was friendly and professional. Everything was easy and smooth. Highly recommended!",
+    verified: true,
+  },
+  {
+    // Google shows this one translated from Norwegian.
+    author:   "Mirsal Musa",
+    rating:   5,
+    when:     "5 days ago",
+    text:     "Very happy with the service! Punctual driver, clean car and a comfortable ride. Everything went very smoothly. Recommended.",
+    verified: true,
+  },
+  {
+    // Translated from French.
+    author:   "Mr Nomi",
+    rating:   5,
+    when:     "5 days ago",
+    text:     "Excellent service! The driver was punctual, friendly, and the car was very clean. Everything went perfectly. I highly recommend them!",
+    verified: true,
+  },
+  {
+    // Translated from Spanish.
+    author:   "HUMAYUN RAFQAT",
+    rating:   5,
+    when:     "2 weeks ago",
+    text:     "Very reliable and professional service. Easy booking, great communication, and the driver was friendly and punctual. Everything went exactly as promised. I would definitely recommend Elite BCN Transfers to anyone visiting Barcelona.",
+    verified: true,
+  },
+  {
+    // Translated from Spanish.
+    author:   "Arshad Muhammad",
+    rating:   5,
+    when:     "2 weeks ago",
+    text:     "Excellent service and very professional. The booking was quick, the driver was friendly and punctual, and the trip was very comfortable. Highly recommended. I will definitely book again!",
+    verified: true,
+  },
+  {
+    // Translated from Spanish. The emoji is the reviewer's own.
+    author:   "Maryam",
+    rating:   5,
+    when:     "2 weeks ago",
+    text:     "Very good experience and it arrived on time 🚗",
+    verified: true,
+  },
 ];
 
 /** Initials for the avatar circle, from the reviewer's own name. */
