@@ -40,11 +40,12 @@ export default async function HomePage() {
         <ServicesSection />
         <FleetSection />
         <PricingSection routes={routes} />
-        {/* Sits after the price table because it explains what the price
-            covers, and before the reviews because the reader who has just
-            understood the offer is the one ready to be reassured about it. */}
-        <HowItWorksSection />
+        {/* Reviews come straight after the price: the reader who has just seen
+            what it costs is the one who wants to know whether it is any good.
+            The explanation of how a transfer works sits below them — it answers
+            questions somebody already interested will have. */}
         <TestimonialsSection />
+        <HowItWorksSection />
         <FAQSection />
       </main>
       <InstallPrompt />

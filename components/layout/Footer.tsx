@@ -119,12 +119,38 @@ export default function Footer() {
                 {t("contact.location")}
               </p>
             </div>
+            {/* The handle is elitebcn.info on all three. These previously
+                pointed at "elitebcntransfers", which is not an account. */}
             <div className="flex gap-3 mt-5">
-              <a href="https://www.instagram.com/elitebcntransfers" target="_blank" rel="noreferrer" aria-label="Instagram" className="w-9 h-9 border border-white/10 rounded-lg flex items-center justify-center text-dark-400 hover:text-gold-400 hover:border-gold-500/30 transition-all">
+              <a
+                href="https://www.instagram.com/elitebcn.info"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Elite BCN on Instagram"
+                className="w-9 h-9 border border-white/10 rounded-lg flex items-center justify-center text-dark-400 hover:text-gold-400 hover:border-gold-500/30 transition-all"
+              >
                 <Instagram size={16} />
               </a>
-              <a href="https://www.facebook.com/elitebcntransfers" target="_blank" rel="noreferrer" aria-label="Facebook" className="w-9 h-9 border border-white/10 rounded-lg flex items-center justify-center text-dark-400 hover:text-gold-400 hover:border-gold-500/30 transition-all">
+              <a
+                href="https://www.facebook.com/elitebcn.info"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Elite BCN on Facebook"
+                className="w-9 h-9 border border-white/10 rounded-lg flex items-center justify-center text-dark-400 hover:text-gold-400 hover:border-gold-500/30 transition-all"
+              >
                 <Facebook size={16} />
+              </a>
+              <a
+                href="https://www.tiktok.com/@elitebcn.info"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Elite BCN on TikTok"
+                className="w-9 h-9 border border-white/10 rounded-lg flex items-center justify-center text-dark-400 hover:text-gold-400 hover:border-gold-500/30 transition-all"
+              >
+                {/* lucide has no TikTok glyph, so the mark is inline. */}
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                  <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 1 1-1.83-2.48V9.77a5.68 5.68 0 1 0 4.92 5.63V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3a4.28 4.28 0 0 1-3.24-1.48z" />
+                </svg>
               </a>
             </div>
           </div>

@@ -119,11 +119,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     availableLanguage: ["English", "Spanish", "Catalan"],
                     hoursAvailable: { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], opens: "00:00", closes: "23:59" },
                   },
+                  // Profiles that actually belong to this business. The last
+                  // two entries used to be tripadvisor.com and google.com/maps
+                  // — the sites' home pages, which tell Google nothing and
+                  // claim a presence that was not there. The Maps link is the
+                  // real listing, and it is the one that connects this domain
+                  // to the reviews shown on the site.
                   sameAs: [
-                    "https://www.instagram.com/elitebcntransfers",
-                    "https://www.facebook.com/elitebcntransfers",
-                    "https://www.tripadvisor.com/",
-                    "https://www.google.com/maps/",
+                    "https://www.instagram.com/elitebcn.info",
+                    "https://www.facebook.com/elitebcn.info",
+                    "https://www.tiktok.com/@elitebcn.info",
+                    "https://www.google.com/maps?cid=8610295895899713122",
                   ],
                 },
                 {

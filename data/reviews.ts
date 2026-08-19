@@ -3,15 +3,17 @@
  *
  * This file replaced six invented testimonials — names and cities that were
  * never customers. Nothing may be added here that is not on the live Google
- * profile, and the wording is the reviewer's own, not tidied up.
+ * profile, and the wording is the reviewer's own: spelling, capitalisation and
+ * emoji as written, not tidied up.
  *
- * The profile stands at 5.0 from 15 reviews. GOOGLE_PROFILE below must match
- * it exactly: it is what the site displays and what the structured data
- * publishes to Google, and a figure that disagrees with the profile is the kind
- * of claim that gets a listing penalised.
+ * Where Google shows a review translated from Spanish, French or Norwegian, the
+ * English Google gives is what appears here, since that is what a reader of
+ * this site would have seen on the profile.
  *
- * Reviews are shown, never linked. The owner asked for them to stay on the site
- * rather than send the reader out to Google.
+ * GOOGLE_PROFILE must match the profile exactly. It no longer appears on the
+ * page — the owner asked for the reviews to speak for themselves — but it caps
+ * how many may be listed and it feeds the AggregateRating structured data,
+ * where the figure has to be accurate.
  */
 
 export interface Review {
@@ -33,6 +35,8 @@ export interface Review {
 
 export const GOOGLE_PROFILE = {
   name:   "Elite Barcelona Transfer",
+  /** google.com/maps?cid=… — the profile these reviews come from. */
+  cid:    "8610295895899713122",
   rating: 5.0,
   /** Reviews on the profile. Update alongside the list below. */
   count:  15,
@@ -40,10 +44,45 @@ export const GOOGLE_PROFILE = {
 
 export const REVIEWS: Review[] = [
   {
+    author:   "Bilal Irfan",
+    rating:   5,
+    when:     "2 weeks ago",
+    text:     "Fantastic experience! Booking was simple, the driver arrived on time, and the transfer was smooth and comfortable. Great value for money and excellent customer service. Highly recommended!",
+    verified: true,
+  },
+  {
+    author:   "Mr.sheikh Sk",
+    rating:   5,
+    when:     "2 weeks ago",
+    text:     "Great service from start to finish. The driver was polite, the car was spotless, and everything was on time. Very competitive prices and excellent communication. Highly recommended!",
+    verified: true,
+  },
+  {
     author:   "licencia hub",
     rating:   5,
     when:     "2 weeks ago",
     text:     "Excellent service! The driver was on time, waiting at the airport with my name sign, and the car was clean and comfortable. Great communication, fair price, and a smooth transfer to my hotel. Highly recommended, and I'll definitely use Elite BCN Transfers again",
+    verified: true,
+  },
+  {
+    author:   "Tooba Idrees",
+    rating:   5,
+    when:     "2 weeks ago",
+    text:     "It's very good and they have excellent service",
+    verified: true,
+  },
+  {
+    author:   "Husna Nouman",
+    rating:   5,
+    when:     "2 months ago",
+    text:     "very useful, highly recommend 👍👍👍👍👍",
+    verified: true,
+  },
+  {
+    author:   "pay pal",
+    rating:   5,
+    when:     "2 months ago",
+    text:     "Very nice and clean service. Up on time thanks",
     verified: true,
   },
 ];
