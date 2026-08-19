@@ -108,7 +108,7 @@ export const REVIEWS: Review[] = [
   },
   {
     // Google shows this one translated from Norwegian.
-    author:   "Mirsal Musa",
+    author:   "Miral Musa",
     rating:   5,
     when:     "5 days ago",
     text:     "Very happy with the service! Punctual driver, clean car and a comfortable ride. Everything went very smoothly. Recommended.",
@@ -124,7 +124,7 @@ export const REVIEWS: Review[] = [
   },
   {
     // Translated from Spanish.
-    author:   "HUMAYUN RAFQAT",
+    author:   "Hamayun Rafqat",
     rating:   5,
     when:     "2 weeks ago",
     text:     "Very reliable and professional service. Easy booking, great communication, and the driver was friendly and punctual. Everything went exactly as promised. I would definitely recommend Elite BCN Transfers to anyone visiting Barcelona.",
