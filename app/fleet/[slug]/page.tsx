@@ -226,6 +226,11 @@ export default async function FleetVehiclePage(
         {/* Why choose strip */}
         <section className="py-14 bg-dark-950 border-y border-white/[0.06]">
           <div className="container mx-auto px-4">
+            {/* The three cards below are h3; without this every fleet page
+                went h1 to h3. One template, seven pages. */}
+            <h2 className="font-display text-2xl text-white text-center mb-8">
+              What every transfer includes
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {[
                 { icon: Star,   title: "Fixed price guaranteed", body: "The price you see is the price you pay. No meter, no surge pricing, no airport fees at drop-off." },

@@ -309,7 +309,9 @@ export default function CostCalculatorClient() {
 
         {/* Per-person breakdown */}
         <div className="mt-8 bg-dark-900 border border-white/[0.08] rounded-xl p-5">
-          <h3 className="text-white font-semibold mb-4">Per-person cost breakdown</h3>
+          {/* h2, not h3: this is the first heading under the page's h1, and
+              as an h3 it skipped a level. */}
+          <h2 className="text-white font-semibold mb-4">Per-person cost breakdown</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>

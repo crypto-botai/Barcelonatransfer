@@ -66,6 +66,10 @@ export default function CorporatePage() {
 
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
+            {/* The cards below are h3; without this the page went h1 to h3. */}
+            <h2 className="font-display text-3xl text-white text-center mb-10">
+              How corporate accounts <span className="text-gold-gradient">work</span>
+            </h2>
             <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
                 { title: "Priority Fleet",          desc: "Guaranteed vehicle availability for your team, even during peak demand or major events in Barcelona." },

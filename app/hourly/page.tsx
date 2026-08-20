@@ -79,6 +79,10 @@ export default function HourlyPage() {
 
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
+            {/* The rate cards below are h3; without this the page went h1 to h3. */}
+            <h2 className="font-display text-3xl text-white text-center mb-8">
+              Hourly rates by <span className="text-gold-gradient">vehicle</span>
+            </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
               {RATE_CARDS.map((r) => (
                 <div key={r.class} className="glass-card gold-hover-border rounded-xl p-6 text-center">

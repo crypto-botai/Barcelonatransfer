@@ -99,6 +99,12 @@ export default function AirportTransfersPage() {
         {/* Features grid */}
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">
+            {/* The six cards below are h3. Without a section heading the page
+                went h1 straight to h3, which Lighthouse fails as a skipped
+                level and which reads to a screen reader as a missing section. */}
+            <h2 className="font-display text-3xl text-white text-center mb-10">
+              What every airport transfer <span className="text-gold-gradient">includes</span>
+            </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { icon: Plane,    title: "Live Flight Tracking",     desc: "We monitor your flight and adjust pickup time automatically. No stress if your flight is early or delayed." },

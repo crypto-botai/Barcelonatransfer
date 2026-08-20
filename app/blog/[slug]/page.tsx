@@ -67,13 +67,17 @@ function BlockRenderer({ block }: { block: Block }) {
       );
     case "h3":
       return <h3 className="font-display text-xl sm:text-2xl text-white mt-10 mb-4 leading-snug">{block.text}</h3>;
+    // h4 and h5 in the article data are styling choices, not document levels —
+    // they sit directly under an h2, so rendering them as <h4>/<h5> skipped a
+    // level on eleven posts. They keep their own look and are marked h3, which
+    // is the level they actually occupy.
     case "h4":
-      return <h4 className="text-base font-semibold text-[#c9a84c] mt-8 mb-3">{block.text}</h4>;
+      return <h3 className="text-base font-semibold text-[#c9a84c] mt-8 mb-3">{block.text}</h3>;
     case "h5":
       return (
-        <h5 className="text-[11px] font-bold text-white/45 uppercase tracking-[0.18em] mt-8 mb-2">
+        <h3 className="text-[11px] font-bold text-white/45 uppercase tracking-[0.18em] mt-8 mb-2">
           {block.text}
-        </h5>
+        </h3>
       );
     case "p":
       return <p className="text-white/60 leading-[1.8] mb-5"><RichText text={block.text} /></p>;
