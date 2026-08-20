@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
@@ -132,20 +133,12 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
   const { slug } = await params;
   const dest = getDestination(slug);
 
-  if (!dest) {
-    return (
-      <>
-        <Navbar />
-        <main className="pt-20 min-h-screen bg-[#050505] flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="font-display text-4xl text-white mb-4">Destination not found</h1>
-            <Link href="/transfers" className="text-gold-400 hover:text-gold-300">View all transfers</Link>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
+  // notFound(), not a rendered "not found" page. This returned HTTP 200 with a
+  // page saying the destination did not exist, which is a soft 404: every
+  // invented slug under /transfers/ was a crawlable URL, and since the metadata
+  // fallback sets no canonical they all inherited the homepage's. /fleet and
+  // /blog already do this correctly.
+  if (!dest) notFound();
 
   // One resolution, from the same authority that quotes a booking.
   const prices = await getPlacePrices(dest.coordinates.lat, dest.coordinates.lng, dest.distance_km);

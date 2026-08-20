@@ -37,7 +37,11 @@ const config: Config = {
           200: "#e4e4e4",
           300: "#c8c8c8",
           400: "#9a9a9a",
-          500: "#6b6b6b",
+          // #6b6b6b failed WCAG AA on every background this site uses — 3.54:1
+          // on the lightest against the 4.5 minimum for body text — and it is
+          // the colour of 251 pieces of small print. #858585 clears it at
+          // 5.12:1 on the worst case and reads as the same muted grey.
+          500: "#858585",
           600: "#3d3d3d",
           700: "#282828",
           800: "#1a1a1a",
