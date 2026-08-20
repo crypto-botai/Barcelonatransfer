@@ -102,7 +102,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
           return (
             <li key={s.key} className="flex-1 min-w-0">
               <div className={`h-1 rounded-full mb-2 ${done ? "bg-gold-500" : "bg-white/[0.08]"}`} />
-              <p className={`text-[10px] leading-tight truncate ${active ? "text-gold-300" : done ? "text-dark-300" : "text-dark-600"}`}>
+              <p className={`text-[10px] leading-tight truncate ${active ? "text-gold-300" : done ? "text-dark-300" : "text-dark-500"}`}>
                 {t(s.labelKey)}
               </p>
             </li>
@@ -135,7 +135,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
             </>
           ) : (
             <>
-              <MapPin size={24} className="text-dark-600 mx-auto mb-2" />
+              <MapPin size={24} className="text-dark-500 mx-auto mb-2" />
               <p className="text-white text-sm font-medium">{t("mapNotActive")}</p>
               <p className="text-dark-400 text-xs mt-1 leading-relaxed">
                 {t("mapNotActiveBody")}
@@ -184,7 +184,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
         </div>
       )}
 
-      <p className="text-center text-dark-600 text-[11px]">
+      <p className="text-center text-dark-500 text-[11px]">
         {t("reference")} {booking.code} · {t("needHelp")} +34 635 383 712
       </p>
     </div>

@@ -127,7 +127,7 @@ export default function TermsPage() {
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">11. Contact</h2>
-                  <p>Elite BCN Transfers · Barcelona, Spain · <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300">{COMPANY.email}</a> · +34 635 383 712</p>
+                  <p>Elite BCN Transfers · Barcelona, Spain · <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40">{COMPANY.email}</a> · +34 635 383 712</p>
                 </div>
 
               </div>

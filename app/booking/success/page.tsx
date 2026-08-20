@@ -129,7 +129,7 @@ function SuccessInner() {
             }
           </p>
           {attempts > 8 && (
-            <p className="text-dark-600 text-xs mt-3">
+            <p className="text-dark-500 text-xs mt-3">
               If you&apos;ve already paid, your booking is confirmed. This page will update automatically.
             </p>
           )}
@@ -376,7 +376,7 @@ function SuccessInner() {
                 <MessageCircle size={14} />
                 Problems? Pay via WhatsApp instead
               </a>
-              <Link href="/" className="text-xs text-dark-600 hover:text-dark-400 text-center transition-colors">
+              <Link href="/" className="text-xs text-dark-500 hover:text-dark-400 text-center transition-colors">
                 {t("backHome")}
               </Link>
             </div>

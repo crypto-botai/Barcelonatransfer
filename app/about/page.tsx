@@ -133,15 +133,15 @@ export default function AboutPage() {
                 <div className="space-y-3 text-sm">
                   <p className="text-dark-400">
                     <span className="text-dark-200">Email: </span>
-                    <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300">{COMPANY.email}</a>
+                    <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40">{COMPANY.email}</a>
                   </p>
                   <p className="text-dark-400">
                     <span className="text-dark-200">Phone: </span>
-                    <a href="tel:+34635383712" className="text-gold-400 hover:text-gold-300">+34 635 383 712</a>
+                    <a href="tel:+34635383712" className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40">+34 635 383 712</a>
                   </p>
                   <p className="text-dark-400">
                     <span className="text-dark-200">WhatsApp: </span>
-                    <a href="https://wa.me/34635383712" className="text-gold-400 hover:text-gold-300">+34 635 383 712</a>
+                    <a href="https://wa.me/34635383712" className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40">+34 635 383 712</a>
                   </p>
                   <p className="text-dark-400">
                     <span className="text-dark-200">Location: </span> Barcelona, Spain

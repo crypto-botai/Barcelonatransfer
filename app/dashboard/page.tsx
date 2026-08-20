@@ -136,7 +136,7 @@ export default function DashboardOverview() {
               <UpcomingBookingCard booking={stats.nextBooking as Parameters<typeof UpcomingBookingCard>[0]["booking"]} />
             ) : (
               <div className="glass-card rounded-2xl p-8 text-center border border-white/[0.06]">
-                <Plane size={36} className="text-dark-600 mx-auto mb-3" />
+                <Plane size={36} className="text-dark-500 mx-auto mb-3" />
                 <p className="text-white font-semibold mb-1">No Upcoming Trips</p>
                 <p className="text-dark-400 text-sm mb-5">Ready for your next luxury journey?</p>
                 <Link href="/book" className="btn-gold inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold">
@@ -178,7 +178,7 @@ export default function DashboardOverview() {
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-gold-400 text-sm font-semibold">€{b.totalAmount.toFixed(0)}</p>
-                      <ChevronRight size={12} className="text-dark-600 group-hover:text-dark-400 ml-auto transition-colors" />
+                      <ChevronRight size={12} className="text-dark-500 group-hover:text-dark-400 ml-auto transition-colors" />
                     </div>
                   </Link>
                 ))}

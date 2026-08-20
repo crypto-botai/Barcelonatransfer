@@ -241,7 +241,7 @@ function BookingsContent() {
         </div>
       ) : paginated.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center border border-white/[0.06]">
-          <Calendar size={40} className="text-dark-600 mx-auto mb-3" />
+          <Calendar size={40} className="text-dark-500 mx-auto mb-3" />
           <p className="text-white font-semibold mb-1">No bookings found</p>
           <p className="text-dark-400 text-sm mb-5">{search ? "Try a different search term." : "You have no bookings in this category."}</p>
           <Link href="/book" className="btn-gold inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold">
@@ -374,7 +374,7 @@ function BookingsContent() {
                               <Pencil size={10} /> Edit Pickup
                             </button>
                           ) : (
-                            <span className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border border-white/[0.04] text-dark-600 cursor-not-allowed" title="Pickup address locked within 8 hours">
+                            <span className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border border-white/[0.04] text-dark-500 cursor-not-allowed" title="Pickup address locked within 8 hours">
                               <Lock size={10} /> Pickup Locked
                             </span>
                           )}

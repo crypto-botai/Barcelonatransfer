@@ -142,7 +142,7 @@ export default async function AdminPage() {
             </div>
             <p className={`font-display text-2xl font-semibold ${color}`}>{value}</p>
             <p className="text-dark-400 text-xs mt-1">{label}</p>
-            <p className="text-dark-600 text-[11px] mt-0.5">{sub}</p>
+            <p className="text-dark-500 text-[11px] mt-0.5">{sub}</p>
           </div>
         ))}
       </div>
@@ -259,7 +259,7 @@ export default async function AdminPage() {
                   <td className="py-3 px-4 text-sm text-white">{b.guestName ?? b.guestEmail ?? "—"}</td>
                   <td className="py-3 px-4 text-xs text-dark-400 max-w-[180px]">
                     <p className="truncate">{b.pickupAddress}</p>
-                    {b.dropoffAddress && <p className="truncate text-dark-600">→ {b.dropoffAddress}</p>}
+                    {b.dropoffAddress && <p className="truncate text-dark-500">→ {b.dropoffAddress}</p>}
                   </td>
                   <td className="py-3 px-4 text-xs text-dark-400 whitespace-nowrap">
                     {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", })}

@@ -97,7 +97,7 @@ export default function NotificationsList({
 
       {items.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center border border-white/[0.06]">
-          <Bell size={36} className="text-dark-600 mx-auto mb-3" />
+          <Bell size={36} className="text-dark-500 mx-auto mb-3" />
           <p className="text-white font-semibold">All caught up</p>
           <p className="text-dark-400 text-sm mt-1">
             Updates about your transfers will appear here.

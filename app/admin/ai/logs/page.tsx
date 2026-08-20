@@ -126,9 +126,9 @@ export default function LogsPage() {
                     <p className="text-white/90 text-sm">{log.message}</p>
                     <div className="flex items-center gap-3 mt-1">
                       <span className="text-dark-500 text-[10px] capitalize">{log.agentName}</span>
-                      {log.tokensUsed > 0 && <span className="text-dark-600 text-[10px]">{log.tokensUsed} tok</span>}
-                      {log.costCents > 0 && <span className="text-dark-600 text-[10px]">€{(log.costCents/100).toFixed(4)}</span>}
-                      {log.durationMs > 0 && <span className="text-dark-600 text-[10px]">{log.durationMs}ms</span>}
+                      {log.tokensUsed > 0 && <span className="text-dark-500 text-[10px]">{log.tokensUsed} tok</span>}
+                      {log.costCents > 0 && <span className="text-dark-500 text-[10px]">€{(log.costCents/100).toFixed(4)}</span>}
+                      {log.durationMs > 0 && <span className="text-dark-500 text-[10px]">{log.durationMs}ms</span>}
                     </div>
                   </div>
                   <span className="text-dark-700 text-[10px] flex-shrink-0 font-mono">

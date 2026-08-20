@@ -542,7 +542,7 @@ function DriverRow({ d, onUpdate }: { d: Driver; onUpdate: () => void }) {
                         <span className="text-xs text-dark-400">
                           {w.method === "BIZUM" ? w.bizumPhone : (w.bankIban ?? w.bankName ?? "—")}
                         </span>
-                        <span className="text-xs text-dark-600">
+                        <span className="text-xs text-dark-500">
                           {new Date(w.createdAt).toLocaleDateString("en-GB")}
                         </span>
                       </div>

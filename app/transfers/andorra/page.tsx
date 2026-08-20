@@ -69,7 +69,7 @@ export default function AndorraTransferPage() {
           <div className="container mx-auto px-4 text-center relative z-10">
             <div className="flex justify-center mb-4">
               <Link href="/transfers" className="text-dark-400 text-sm hover:text-gold-400 transition-colors">All Destinations</Link>
-              <ChevronRight size={14} className="text-dark-600 mx-2 mt-0.5" />
+              <ChevronRight size={14} className="text-dark-500 mx-2 mt-0.5" />
               <span className="text-gold-400 text-sm">Andorra</span>
             </div>
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold-500/30 bg-gold-500/5 text-gold-400 text-xs tracking-[0.2em] uppercase font-medium mb-6">

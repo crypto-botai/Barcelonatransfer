@@ -115,7 +115,7 @@ export default function EmailLogsPage() {
                 <tr><td colSpan={5} className="px-4 py-8 text-center text-dark-400">Loading…</td></tr>
               ) : logs.length === 0 ? (
                 <tr><td colSpan={5} className="px-4 py-8 text-center text-dark-400">
-                  <Mail size={24} className="mx-auto mb-2 text-dark-600" />
+                  <Mail size={24} className="mx-auto mb-2 text-dark-500" />
                   No email logs yet
                 </td></tr>
               ) : logs.map((log) => (

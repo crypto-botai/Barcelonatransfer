@@ -172,7 +172,7 @@ export default async function AgentReportsPage() {
               ].map((s) => (
                 <div key={s.label} className="bg-dark-900 px-4 py-3">
                   <p className={`text-lg font-display ${s.color}`}>{s.value}</p>
-                  <p className="text-dark-600 text-[10px] uppercase tracking-wider mt-0.5">{s.label}</p>
+                  <p className="text-dark-500 text-[10px] uppercase tracking-wider mt-0.5">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -183,9 +183,9 @@ export default async function AgentReportsPage() {
                 <Zap size={12} className="text-[#c9a84c]" />
                 <span className="text-dark-500 text-xs">Primary provider:</span>
                 <span className="text-white text-xs font-mono">{providerConfig.provider}</span>
-                <span className="text-dark-600 text-xs">·</span>
+                <span className="text-dark-500 text-xs">·</span>
                 <span className="text-dark-400 text-xs font-mono">{providerConfig.model}</span>
-                <span className="text-dark-600 text-xs">·</span>
+                <span className="text-dark-500 text-xs">·</span>
                 <KeyHealthBadge envKey={providerConfig.envKey} configured={providerConfig.configured} />
               </div>
             )}
@@ -196,7 +196,7 @@ export default async function AgentReportsPage() {
                 <div className="flex items-center gap-2 mb-1">
                   <Database size={11} className="text-purple-400" />
                   <span className="text-[10px] text-dark-500 uppercase tracking-wider">Latest memory</span>
-                  <span className="text-dark-600 text-[10px]">{timeAgo(latestMemory.createdAt)}</span>
+                  <span className="text-dark-500 text-[10px]">{timeAgo(latestMemory.createdAt)}</span>
                 </div>
                 <p className="text-white text-xs font-medium">{latestMemory.title}</p>
                 <p className="text-dark-500 text-[11px] mt-0.5 line-clamp-2">{latestMemory.content.slice(0, 200)}</p>
@@ -210,15 +210,15 @@ export default async function AgentReportsPage() {
                 <span className="text-[10px] text-dark-500 uppercase tracking-wider">Recent activity</span>
               </div>
               {recentLogs.length === 0 ? (
-                <p className="text-dark-600 text-xs py-2">No activity yet. Run this agent to see logs.</p>
+                <p className="text-dark-500 text-xs py-2">No activity yet. Run this agent to see logs.</p>
               ) : (
                 <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
                   {recentLogs.map((log, i) => (
                     <div key={i} className="flex items-start gap-2 text-[11px] font-mono">
-                      <span className="text-dark-600 flex-shrink-0 w-20 text-right">{timeAgo(log.createdAt)}</span>
+                      <span className="text-dark-500 flex-shrink-0 w-20 text-right">{timeAgo(log.createdAt)}</span>
                       <span className={`flex-shrink-0 w-24 ${LOG_LEVEL_COLOR[log.level ?? "info"] ?? "text-dark-400"}`}>{log.action}</span>
                       <span className="text-dark-400 truncate">{log.message}</span>
-                      {log.durationMs ? <span className="text-dark-600 flex-shrink-0">{formatMs(log.durationMs)}</span> : null}
+                      {log.durationMs ? <span className="text-dark-500 flex-shrink-0">{formatMs(log.durationMs)}</span> : null}
                     </div>
                   ))}
                 </div>
@@ -263,7 +263,7 @@ export default async function AgentReportsPage() {
                   <span className="text-white text-xs font-medium capitalize">{p.agent}</span>
                 </div>
                 <p className="text-dark-400 text-[10px] font-mono">{p.provider}</p>
-                <p className="text-dark-600 text-[10px] font-mono truncate">{p.envKey}</p>
+                <p className="text-dark-500 text-[10px] font-mono truncate">{p.envKey}</p>
                 {!p.configured && (
                   <p className="text-red-400 text-[10px] mt-0.5">⚠ Key not configured</p>
                 )}

@@ -75,7 +75,7 @@ function BlockRenderer({ block }: { block: Block }) {
       return <h3 className="text-base font-semibold text-[#c9a84c] mt-8 mb-3">{block.text}</h3>;
     case "h5":
       return (
-        <h3 className="text-[11px] font-bold text-white/45 uppercase tracking-[0.18em] mt-8 mb-2">
+        <h3 className="text-[11px] font-bold text-white/70 uppercase tracking-[0.18em] mt-8 mb-2">
           {block.text}
         </h3>
       );
@@ -151,7 +151,7 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
         <article>
           <header className="container mx-auto px-4 pt-12 pb-8 max-w-3xl">
             <nav className="flex items-center gap-2 text-sm mb-7" aria-label="Breadcrumb">
-              <Link href="/blog" className="text-white/35 hover:text-[#c9a84c] transition-colors">Guides</Link>
+              <Link href="/blog" className="text-white/55 hover:text-[#c9a84c] transition-colors">Guides</Link>
               <ChevronRight size={13} className="text-white/20" />
               <span className="text-[#c9a84c] truncate">{article.season}</span>
             </nav>
@@ -160,9 +160,9 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
               {article.title}
             </h1>
 
-            <p className="text-white/50 text-lg leading-relaxed mb-7">{article.excerpt}</p>
+            <p className="text-white/70 text-lg leading-relaxed mb-7">{article.excerpt}</p>
 
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-white/35 pb-8 border-b border-white/[0.07]">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-white/55 pb-8 border-b border-white/[0.07]">
               <span className="flex items-center gap-1.5">
                 <Calendar size={12} />
                 <time dateTime={article.publishedAt}>
@@ -182,13 +182,13 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
               <DestinationThumb article={article} priority sizes="(max-width: 1024px) 100vw, 900px" />
             </div>
             {article.credit && (
-              <p className="text-white/25 text-[11px] mt-2.5 text-right">
+              <p className="text-white/55 text-[11px] mt-2.5 text-right">
                 Photo:{" "}
                 <a
                   href={article.credit.source}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
-                  className="hover:text-white/45 underline underline-offset-2 transition-colors"
+                  className="hover:text-white/70 underline underline-offset-2 transition-colors"
                 >
                   {article.credit.author}
                 </a>{" "}
@@ -211,7 +211,7 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
               <h2 className="font-display text-2xl sm:text-3xl text-white mt-3 mb-3">
                 Book your transfer to {article.bookDestination}
               </h2>
-              <p className="text-white/50 leading-relaxed mb-6">
+              <p className="text-white/70 leading-relaxed mb-6">
                 Private, door-to-door, with a fixed price agreed before you travel.
                 {fromPrice ? <> From <strong className="text-[#c9a84c] font-semibold">€{fromPrice}</strong> per vehicle from El Prat Airport, excluding VAT and tolls.</> : null}
               </p>
@@ -255,7 +255,7 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
                       <h3 className="text-white text-sm font-semibold leading-snug group-hover:text-[#c9a84c] transition-colors mb-2">
                         {r.title}
                       </h3>
-                      <span className="text-white/30 text-xs flex items-center gap-1.5">
+                      <span className="text-white/55 text-xs flex items-center gap-1.5">
                         <Clock size={11} /> {readMinutes(r)} min read
                       </span>
                     </div>

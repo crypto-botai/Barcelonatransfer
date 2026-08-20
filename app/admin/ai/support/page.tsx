@@ -85,7 +85,7 @@ export default function SupportPage() {
                     {log.escalated && (
                       <span className="text-[10px] bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded-full">Escalated</span>
                     )}
-                    <span className="text-dark-600 text-xs">€{(log.costCents / 100).toFixed(4)}</span>
+                    <span className="text-dark-500 text-xs">€{(log.costCents / 100).toFixed(4)}</span>
                   </div>
                 </button>
 
@@ -99,7 +99,7 @@ export default function SupportPage() {
                       <p className="text-[10px] text-dark-500 uppercase tracking-wider mb-1">AI Reply</p>
                       <p className="text-white/80 text-sm whitespace-pre-wrap">{log.assistantReply}</p>
                     </div>
-                    <div className="text-dark-600 text-xs">
+                    <div className="text-dark-500 text-xs">
                       Session: <span className="font-mono">{log.sessionId}</span>
                     </div>
                   </div>

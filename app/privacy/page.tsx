@@ -115,7 +115,7 @@ export default function PrivacyPage() {
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">10. Contact</h2>
-                  <p>For any privacy-related queries: <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300">{COMPANY.email}</a></p>
+                  <p>For any privacy-related queries: <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40">{COMPANY.email}</a></p>
                 </div>
 
               </div>

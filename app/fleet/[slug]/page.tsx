@@ -178,9 +178,9 @@ export default async function FleetVehiclePage(
         <div className="bg-[#050505] border-b border-white/[0.05] py-3">
           <div className="container mx-auto px-4 flex items-center gap-2 text-sm text-dark-400">
             <Link href="/" className="hover:text-gold-400 transition-colors">Home</Link>
-            <ChevronRight size={13} className="text-dark-600" />
+            <ChevronRight size={13} className="text-dark-500" />
             <Link href="/fleet" className="hover:text-gold-400 transition-colors">Fleet</Link>
-            <ChevronRight size={13} className="text-dark-600" />
+            <ChevronRight size={13} className="text-dark-500" />
             <span className="text-gold-400">{vehicle.label}</span>
           </div>
         </div>

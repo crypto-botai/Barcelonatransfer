@@ -364,7 +364,7 @@ export default function ApiKeysPage() {
           >
             {PROVIDER_LABELS[p]}
             {p !== "all" && (
-              <span className="ml-2 text-xs text-dark-600">
+              <span className="ml-2 text-xs text-dark-500">
                 {keys.filter(k => k.provider === p).length}
               </span>
             )}
@@ -383,9 +383,9 @@ export default function ApiKeysPage() {
           </div>
         ) : shown.length === 0 ? (
           <div className="text-center py-16 space-y-2">
-            <Key size={28} className="text-dark-600 mx-auto" />
+            <Key size={28} className="text-dark-500 mx-auto" />
             <p className="text-dark-400 text-sm">No keys yet</p>
-            <p className="text-dark-600 text-xs">Add a key above or click "Seed from env" to import from environment variables</p>
+            <p className="text-dark-500 text-xs">Add a key above or click "Seed from env" to import from environment variables</p>
           </div>
         ) : (
           <table className="w-full">

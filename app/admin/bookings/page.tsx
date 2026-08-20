@@ -234,7 +234,7 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
                   className="input-luxury w-full px-3 py-2 rounded-lg text-sm" />
               </div>
               <div>
-                <label className="text-xs text-dark-400 block mb-1">Driver Payment (€) <span className="text-dark-600">· admin only</span></label>
+                <label className="text-xs text-dark-400 block mb-1">Driver Payment (€) <span className="text-dark-500">· admin only</span></label>
                 <input type="number" step="0.01" value={driverAmount}
                   onChange={(e) => setDriverAmount(e.target.value)}
                   placeholder="e.g. 40.00"
@@ -331,16 +331,16 @@ function DeletedBookingRow({ b, onRestore }: { b: Booking; onRestore: (id: strin
       <td className="py-3 px-3 text-xs font-mono text-dark-500 tracking-widest line-through">{b.confirmationCode}</td>
       <td className="py-3 px-3">
         <p className="text-sm text-dark-400 whitespace-nowrap">{b.guestName ?? "—"}</p>
-        <p className="text-xs text-dark-600 truncate max-w-[120px]">{b.guestEmail}</p>
+        <p className="text-xs text-dark-500 truncate max-w-[120px]">{b.guestEmail}</p>
       </td>
       <td className="hidden md:table-cell py-3 px-3 text-xs text-dark-500 whitespace-nowrap">{b.guestPhone ?? "—"}</td>
       <td className="hidden sm:table-cell py-3 px-3 text-xs text-dark-500 max-w-[120px]">
         <p className="truncate">{b.pickupAddress}</p>
-        <p className="truncate text-dark-600">→ {b.dropoffAddress}</p>
+        <p className="truncate text-dark-500">→ {b.dropoffAddress}</p>
       </td>
       <td className="py-3 px-3 text-xs text-dark-500 whitespace-nowrap">
         {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", day:"2-digit", month:"short" })}<br />
-        <span className="text-dark-600">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { timeZone: "Europe/Madrid", hour:"2-digit", minute:"2-digit" })}</span>
+        <span className="text-dark-500">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { timeZone: "Europe/Madrid", hour:"2-digit", minute:"2-digit" })}</span>
       </td>
       <td className="hidden lg:table-cell py-3 px-3 text-xs text-dark-500 whitespace-nowrap">{b.vehicleClass.replace(/_/g, " ")}</td>
       <td className="py-3 px-3 text-sm text-dark-500 font-semibold whitespace-nowrap">{formatCurrency(b.totalAmount)}</td>
@@ -563,18 +563,18 @@ export default function AdminBookingsPage() {
                         <td className="hidden md:table-cell py-3 px-3 text-xs text-dark-400 whitespace-nowrap">{b.guestPhone ?? "—"}</td>
                         <td className="hidden sm:table-cell py-3 px-3 text-xs text-dark-400 max-w-[120px]">
                           <p className="truncate">{b.pickupAddress}</p>
-                          <p className="truncate text-dark-600">→ {b.dropoffAddress}</p>
+                          <p className="truncate text-dark-500">→ {b.dropoffAddress}</p>
                         </td>
                         <td className="py-3 px-3 text-xs text-dark-400 whitespace-nowrap">
                           {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", day:"2-digit", month:"short" })}<br />
-                          <span className="text-dark-600">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { timeZone: "Europe/Madrid", hour:"2-digit", minute:"2-digit" })}</span>
+                          <span className="text-dark-500">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { timeZone: "Europe/Madrid", hour:"2-digit", minute:"2-digit" })}</span>
                         </td>
                         <td className="hidden lg:table-cell py-3 px-3 text-xs text-dark-400 whitespace-nowrap">{b.vehicleClass.replace(/_/g, " ")}</td>
                         <td className="py-3 px-3 text-sm text-gold-400 font-semibold whitespace-nowrap">{formatCurrency(b.totalAmount)}</td>
                         <td className="hidden lg:table-cell py-3 px-3 text-sm whitespace-nowrap">
                           {b.driverAmount != null
                             ? <span className="text-green-400">{formatCurrency(b.driverAmount)}</span>
-                            : <span className="text-dark-600">—</span>}
+                            : <span className="text-dark-500">—</span>}
                         </td>
                         <td className="py-3 px-3">
                           <span className={`status-badge ${STATUS_COLORS[b.status]}`}>{STATUS_LABELS[b.status]}</span>

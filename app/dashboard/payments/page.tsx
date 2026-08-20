@@ -102,7 +102,7 @@ export default function PaymentsPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center border border-white/[0.06]">
-          <CreditCard size={36} className="text-dark-600 mx-auto mb-3" />
+          <CreditCard size={36} className="text-dark-500 mx-auto mb-3" />
           <p className="text-white font-semibold">No payments found</p>
         </div>
       ) : (
@@ -126,7 +126,7 @@ export default function PaymentsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-dark-500 text-xs font-mono">#{b.confirmationCode}</span>
-                  <span className="text-dark-600 text-xs">·</span>
+                  <span className="text-dark-500 text-xs">·</span>
                   <span className="text-dark-500 text-xs">{vehicleClassLabel(b.vehicleClass)}</span>
                 </div>
               </div>

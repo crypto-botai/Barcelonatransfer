@@ -113,7 +113,7 @@ export default function DashboardSidebar({ userName, memberTier = "Gold", notifi
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
         {!collapsed && (
-          <p className="text-dark-600 text-[10px] uppercase tracking-widest px-3 py-2 mt-2">Main Menu</p>
+          <p className="text-dark-500 text-[10px] uppercase tracking-widest px-3 py-2 mt-2">Main Menu</p>
         )}
         {NAV_ITEMS.map(({ label, href, icon: Icon }) => (
           <Link
@@ -141,7 +141,7 @@ export default function DashboardSidebar({ userName, memberTier = "Gold", notifi
 
         <div className="my-3 border-t border-white/[0.06]" />
         {!collapsed && (
-          <p className="text-dark-600 text-[10px] uppercase tracking-widest px-3 py-2">Account</p>
+          <p className="text-dark-500 text-[10px] uppercase tracking-widest px-3 py-2">Account</p>
         )}
 
         {NAV_BOTTOM.map(({ label, href, icon: Icon }) => (

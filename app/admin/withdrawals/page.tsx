@@ -111,7 +111,7 @@ export default function AdminWithdrawalsPage() {
                   <td className="py-3 px-4">
                     <p className="text-sm text-white">{w.driver.user.name ?? "—"}</p>
                     <p className="text-xs text-dark-500">{w.driver.user.email}</p>
-                    <p className="md:hidden text-xs text-dark-600 mt-0.5">
+                    <p className="md:hidden text-xs text-dark-500 mt-0.5">
                       {w.method === "BIZUM" ? w.bizumPhone : (w.bankIban ?? w.bankName ?? w.method)}
                     </p>
                   </td>

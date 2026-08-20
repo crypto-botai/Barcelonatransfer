@@ -136,7 +136,7 @@ export default function ActivityPage() {
       </div>
 
       {/* Log count */}
-      <p className="text-dark-600 text-[10px] mb-2 flex-shrink-0">{logs.length} entries · polling every 3s · last 200 kept</p>
+      <p className="text-dark-500 text-[10px] mb-2 flex-shrink-0">{logs.length} entries · polling every 3s · last 200 kept</p>
 
       {/* Feed */}
       <div className="flex-1 overflow-y-auto rounded-xl border border-white/[0.06] bg-dark-900 font-mono text-xs">
@@ -157,7 +157,7 @@ export default function ActivityPage() {
                 className={`flex items-start gap-3 px-4 py-2 hover:bg-white/[0.02] transition-colors border-l-2 ${LEVEL_STYLES[l.level] ?? LEVEL_STYLES.info}`}
               >
                 {/* Time */}
-                <span className="text-dark-600 text-[10px] pt-0.5 w-16 flex-shrink-0 tabular-nums">
+                <span className="text-dark-500 text-[10px] pt-0.5 w-16 flex-shrink-0 tabular-nums">
                   {fmt(l.createdAt)}
                 </span>
 
@@ -181,14 +181,14 @@ export default function ActivityPage() {
 
                 {/* Tokens */}
                 {l.tokensUsed > 0 && (
-                  <span className="text-dark-600 text-[10px] flex-shrink-0 pt-0.5 tabular-nums">
+                  <span className="text-dark-500 text-[10px] flex-shrink-0 pt-0.5 tabular-nums">
                     {l.tokensUsed.toLocaleString()}t
                   </span>
                 )}
 
                 {/* Duration */}
                 {l.durationMs > 0 && (
-                  <span className="text-dark-600 text-[10px] flex-shrink-0 pt-0.5 tabular-nums">
+                  <span className="text-dark-500 text-[10px] flex-shrink-0 pt-0.5 tabular-nums">
                     {l.durationMs < 1000 ? `${l.durationMs}ms` : `${(l.durationMs / 1000).toFixed(1)}s`}
                   </span>
                 )}

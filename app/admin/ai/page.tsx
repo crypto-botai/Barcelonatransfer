@@ -191,7 +191,7 @@ export default async function AiCommandCenterPage() {
                 <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[a.status] ?? "bg-dark-600"}`} />
                 <div className="flex-1 min-w-0">
                   <p className="text-white text-sm capitalize">{a.name}</p>
-                  <p className="text-dark-600 text-[10px]">
+                  <p className="text-dark-500 text-[10px]">
                     {a.lastRunAt ? `Last run: ${timeAgo(a.lastRunAt)}` : "Never run"}
                     {a.totalRuns > 0 ? ` · ${a.totalRuns} runs · ${Math.round(a.successRate)}% ok` : ""}
                   </p>
@@ -225,7 +225,7 @@ export default async function AiCommandCenterPage() {
                   : <Clock size={13} className="text-yellow-400 flex-shrink-0" />}
                 <div className="flex-1 min-w-0">
                   <p className="text-white text-xs capitalize">{t.agent?.name ?? "—"}</p>
-                  <p className="text-dark-600 text-[10px]">
+                  <p className="text-dark-500 text-[10px]">
                     {t.durationMs ? `${(t.durationMs / 1000).toFixed(1)}s` : "—"}
                     {t.error ? ` · ${t.error.slice(0, 40)}…` : ""}
                   </p>
@@ -233,7 +233,7 @@ export default async function AiCommandCenterPage() {
                 <span className={`text-[10px] flex-shrink-0 ${TASK_STATUS_STYLE[t.status] ?? "text-dark-500"}`}>
                   {t.status}
                 </span>
-                <span className="text-dark-600 text-[10px] flex-shrink-0 w-14 text-right">
+                <span className="text-dark-500 text-[10px] flex-shrink-0 w-14 text-right">
                   {timeAgo(t.createdAt)}
                 </span>
               </div>

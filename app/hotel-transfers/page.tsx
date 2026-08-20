@@ -95,7 +95,7 @@ export default function HotelTransfersPage() {
           <div className="container mx-auto px-4 text-center relative z-10 max-w-3xl">
             <div className="flex justify-center items-center gap-2 mb-6 text-sm text-dark-400">
               <Link href="/" className="hover:text-gold-400 transition-colors">Home</Link>
-              <ChevronRight size={14} className="text-dark-600" />
+              <ChevronRight size={14} className="text-dark-500" />
               <span className="text-gold-400">Hotel Transfers</span>
             </div>
             <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">
@@ -247,7 +247,7 @@ export default function HotelTransfersPage() {
               <Link href="/transfers/cruise-port" className="text-dark-400 hover:text-gold-400 transition-colors">Cruise Port Transfers</Link>
               <Link href="/corporate" className="text-dark-400 hover:text-gold-400 transition-colors">Corporate Travel</Link>
               <Link href="/vip-transportation" className="text-dark-400 hover:text-gold-400 transition-colors">VIP Transportation</Link>
-              <MapPin size={12} className="text-dark-600 self-center" />
+              <MapPin size={12} className="text-dark-500 self-center" />
               <Link href="/pricing" className="text-dark-400 hover:text-gold-400 transition-colors">Full Price List</Link>
             </div>
           </div>

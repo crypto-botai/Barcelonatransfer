@@ -141,7 +141,7 @@ export default function AdminFleetPage() {
         <div className="flex justify-center py-20"><Loader2 size={24} className="text-gold-500 animate-spin" /></div>
       ) : vehicles.length === 0 ? (
         <div className="glass-card rounded-2xl p-16 text-center">
-          <Car size={40} className="text-dark-600 mx-auto mb-4" />
+          <Car size={40} className="text-dark-500 mx-auto mb-4" />
           <p className="text-dark-400 mb-4">No vehicles in your fleet yet.</p>
           <button onClick={openAdd} className="btn-gold px-6 py-3 rounded-xl text-sm font-semibold">Add First Vehicle</button>
         </div>

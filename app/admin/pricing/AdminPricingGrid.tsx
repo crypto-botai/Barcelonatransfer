@@ -121,7 +121,7 @@ export default function AdminPricingGrid({ routes, settings }: Props) {
             </div>
           ))}
         </div>
-        <p className="text-dark-600 text-xs mt-3">Surcharge settings are read-only here. Edit them in <code>.env.local</code> or the DB directly.</p>
+        <p className="text-dark-500 text-xs mt-3">Surcharge settings are read-only here. Edit them in <code>.env.local</code> or the DB directly.</p>
       </div>
 
       {/* Route price tables */}

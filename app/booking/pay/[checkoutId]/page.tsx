@@ -168,13 +168,13 @@ function PayInner() {
         </div>
 
         {/* Security note */}
-        <div className="flex items-center justify-center gap-2 mt-5 text-dark-600 text-xs">
+        <div className="flex items-center justify-center gap-2 mt-5 text-dark-500 text-xs">
           <ShieldCheck size={13} />
           <span>256-bit SSL encrypted · Powered by SumUp</span>
         </div>
 
         {/* WhatsApp fallback */}
-        <p className="text-center text-xs text-dark-600 mt-3">
+        <p className="text-center text-xs text-dark-500 mt-3">
           Problems paying?{" "}
           <a
             href={`https://wa.me/34635383712?text=${encodeURIComponent("Hi! I need help with my Elite BCN payment.")}`}

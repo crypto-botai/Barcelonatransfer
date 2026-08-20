@@ -38,7 +38,7 @@ const STATUS_COLOR: Record<string, string> = {
   ERROR:   "text-red-400",
   WARNING: "text-yellow-400",
   PAUSED:  "text-dark-500",
-  OFFLINE: "text-dark-600",
+  OFFLINE: "text-dark-500",
 };
 
 const STATUS_BG: Record<string, string> = {
@@ -177,26 +177,26 @@ export default function AgentsPage() {
                     <div className="grid grid-cols-4 gap-3">
                       <div>
                         <p className="text-white text-sm font-medium">{a.totalRuns.toLocaleString()}</p>
-                        <p className="text-dark-600 text-[10px] uppercase tracking-wider">Runs</p>
+                        <p className="text-dark-500 text-[10px] uppercase tracking-wider">Runs</p>
                       </div>
                       <div>
                         <p className={`text-sm font-medium ${a.successRate >= 80 ? "text-green-400" : a.successRate >= 50 ? "text-yellow-400" : "text-red-400"}`}>
                           {a.totalRuns > 0 ? `${Math.round(a.successRate)}%` : "—"}
                         </p>
-                        <p className="text-dark-600 text-[10px] uppercase tracking-wider">Success</p>
+                        <p className="text-dark-500 text-[10px] uppercase tracking-wider">Success</p>
                       </div>
                       <div>
                         <p className="text-white text-sm font-medium">
                           {a.avgDurationMs ? `${(a.avgDurationMs / 1000).toFixed(1)}s` : "—"}
                         </p>
-                        <p className="text-dark-600 text-[10px] uppercase tracking-wider">Avg Time</p>
+                        <p className="text-dark-500 text-[10px] uppercase tracking-wider">Avg Time</p>
                       </div>
                       <div>
                         <p className="text-white text-sm font-medium flex items-center gap-1">
                           <Clock size={11} className="text-dark-500" />
                           {timeAgo(a.lastRunAt)}
                         </p>
-                        <p className="text-dark-600 text-[10px] uppercase tracking-wider">Last Run</p>
+                        <p className="text-dark-500 text-[10px] uppercase tracking-wider">Last Run</p>
                       </div>
                     </div>
                   </div>
@@ -213,7 +213,7 @@ export default function AgentsPage() {
                       ) : a.isEnabled ? (
                         <ToggleRight size={28} className="text-green-400 hover:text-green-300 transition-colors" />
                       ) : (
-                        <ToggleLeft size={28} className="text-dark-600 hover:text-dark-400 transition-colors" />
+                        <ToggleLeft size={28} className="text-dark-500 hover:text-dark-400 transition-colors" />
                       )}
                     </button>
 
@@ -249,7 +249,7 @@ export default function AgentsPage() {
                 {/* Task history mini-timeline */}
                 {a.tasks && a.tasks.length > 0 && (
                   <div className="border-t border-white/[0.04] px-5 py-3">
-                    <p className="text-dark-600 text-[10px] uppercase tracking-wider mb-2">Last {a.tasks.length} tasks</p>
+                    <p className="text-dark-500 text-[10px] uppercase tracking-wider mb-2">Last {a.tasks.length} tasks</p>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {a.tasks.map((t) => (
                         <div
@@ -258,7 +258,7 @@ export default function AgentsPage() {
                           className={`w-4 h-4 rounded-sm flex-shrink-0 ${TASK_STYLE[t.status] ?? "bg-dark-700"}`}
                         />
                       ))}
-                      <span className="text-dark-600 text-[10px] ml-1">
+                      <span className="text-dark-500 text-[10px] ml-1">
                         {a.tasks.filter(t => t.status === "COMPLETED").length}/{a.tasks.length} ok
                       </span>
                     </div>

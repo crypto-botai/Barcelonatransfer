@@ -136,7 +136,7 @@ export default function DayToursPage() {
           <div className="container mx-auto px-4 text-center relative z-10 max-w-3xl">
             <div className="flex justify-center items-center gap-2 mb-6 text-sm text-dark-400">
               <Link href="/" className="hover:text-gold-400 transition-colors">Home</Link>
-              <ChevronRight size={14} className="text-dark-600" />
+              <ChevronRight size={14} className="text-dark-500" />
               <span className="text-gold-400">Day Tours</span>
             </div>
             <span className="inline-block text-gold-500 text-xs tracking-[0.3em] uppercase font-medium mb-4">
@@ -181,7 +181,7 @@ export default function DayToursPage() {
                   <p className="text-dark-300 text-sm leading-relaxed mb-5 flex-1">{tour.highlight}</p>
                   <div className="flex flex-wrap gap-2 mb-5">
                     {tour.tags.map((tag) => (
-                      <span key={tag} className="text-[10px] px-2.5 py-1 rounded-full border border-gold-500/20 text-gold-500/70 bg-gold-500/5">
+                      <span key={tag} className="text-[10px] px-2.5 py-1 rounded-full border border-gold-500/20 text-gold-500 bg-gold-500/5">
                         {tag}
                       </span>
                     ))}

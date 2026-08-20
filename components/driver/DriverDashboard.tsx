@@ -322,7 +322,7 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
           <div className="glass-card rounded-2xl overflow-hidden">
             {filteredBookings.length === 0 ? (
               <div className="py-16 text-center">
-                <Car size={32} className="text-dark-600 mx-auto mb-3" />
+                <Car size={32} className="text-dark-500 mx-auto mb-3" />
                 <p className="text-dark-400">No rides in this category.</p>
               </div>
             ) : (
@@ -338,14 +338,14 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                               <StatusIcon size={10} />
                               {STATUS_LABELS[b.status as BookingStatus] ?? b.status.replace(/_/g, " ")}
                             </span>
-                            <span className="text-dark-600 text-xs font-mono">{b.confirmationCode}</span>
+                            <span className="text-dark-500 text-xs font-mono">{b.confirmationCode}</span>
                           </div>
                           <div className="flex items-start gap-2 text-sm text-dark-200 mb-1">
                             <MapPin size={13} className="text-gold-500 mt-0.5 flex-shrink-0" />
                             <span className="truncate">{b.pickupAddress}</span>
                           </div>
                           <div className="flex items-start gap-2 text-sm text-dark-400">
-                            <MapPin size={13} className="text-dark-600 mt-0.5 flex-shrink-0" />
+                            <MapPin size={13} className="text-dark-500 mt-0.5 flex-shrink-0" />
                             <span className="truncate">{b.dropoffAddress}</span>
                           </div>
                           <div className="flex items-center gap-3 mt-2 text-xs text-dark-500 flex-wrap">
@@ -360,7 +360,7 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                         <div className="flex flex-col items-end gap-2">
                           {b.driverAmount != null
                             ? <p className="font-display text-xl text-gold-400">{formatCurrency(b.driverAmount)}</p>
-                            : <p className="font-display text-xl text-dark-600">TBC</p>
+                            : <p className="font-display text-xl text-dark-500">TBC</p>
                           }
                         </div>
                       </div>
@@ -560,7 +560,7 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
 
               {withdrawals.length === 0 ? (
                 <div className="py-12 text-center">
-                  <Wallet size={28} className="text-dark-600 mx-auto mb-3" />
+                  <Wallet size={28} className="text-dark-500 mx-auto mb-3" />
                   <p className="text-dark-400 text-sm">No withdrawal requests yet.</p>
                 </div>
               ) : (
@@ -581,7 +581,7 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                               ? w.bizumPhone
                               : w.bankIban ?? w.bankName ?? "—"}
                           </p>
-                          <p className="text-dark-600 text-xs">
+                          <p className="text-dark-500 text-xs">
                             {new Date(w.createdAt).toLocaleDateString("en-GB")}
                           </p>
                         </div>

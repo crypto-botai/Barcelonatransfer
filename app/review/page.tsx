@@ -65,7 +65,7 @@ function ReviewInner() {
           <h2 className="font-display text-2xl text-white mb-3">Thank You!</h2>
           <div className="flex justify-center gap-1 mb-4">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} size={24} className={i < rating ? "text-gold-400 fill-gold-400" : "text-dark-600"} />
+              <Star key={i} size={24} className={i < rating ? "text-gold-400 fill-gold-400" : "text-dark-500"} />
             ))}
           </div>
           <p className="text-dark-400 text-sm mb-6">
@@ -108,7 +108,7 @@ function ReviewInner() {
                   className={`transition-colors ${
                     val <= (hover || rating)
                       ? "text-gold-400 fill-gold-400"
-                      : "text-dark-600"
+                      : "text-dark-500"
                   }`}
                 />
               </button>
@@ -129,7 +129,7 @@ function ReviewInner() {
         {/* Review text */}
         <div className="mb-6">
           <label className="text-xs text-dark-400 uppercase tracking-wider block mb-2 flex items-center gap-1.5">
-            <MessageSquare size={11} /> Comments <span className="text-dark-600 normal-case tracking-normal">(optional)</span>
+            <MessageSquare size={11} /> Comments <span className="text-dark-500 normal-case tracking-normal">(optional)</span>
           </label>
           <textarea
             rows={3}

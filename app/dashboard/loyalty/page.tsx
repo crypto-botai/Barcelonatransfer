@@ -83,8 +83,8 @@ export default function LoyaltyPage() {
                 />
               </div>
               <div className="flex justify-between mt-1">
-                <span className="text-dark-600 text-[10px]">€{data?.totalSpent.toFixed(0)}</span>
-                <span className="text-dark-600 text-[10px]">€{nextTier.threshold}</span>
+                <span className="text-dark-500 text-[10px]">€{data?.totalSpent.toFixed(0)}</span>
+                <span className="text-dark-500 text-[10px]">€{nextTier.threshold}</span>
               </div>
             </div>
           )}

@@ -84,7 +84,7 @@ export default function BlogIndexPage() {
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-white leading-tight mb-5">
               Where to Go <span className="text-gold-gradient">Beyond Barcelona</span>
             </h1>
-            <p className="text-white/45 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+            <p className="text-white/70 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
               Long-form guides to the destinations we drive to every week — what is actually
               worth seeing, when to go, and how to get there without losing half the day.
             </p>
@@ -108,14 +108,14 @@ export default function BlogIndexPage() {
                 <span className={`px-2.5 py-1 rounded-full border text-[10px] font-semibold uppercase tracking-wide ${SEASON_STYLE[featured.season]}`}>
                   {featured.season}
                 </span>
-                <span className="text-white/30 text-xs flex items-center gap-1.5">
+                <span className="text-white/55 text-xs flex items-center gap-1.5">
                   <Clock size={11} /> {readMinutes(featured)} min read
                 </span>
               </div>
               <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl text-white leading-snug mb-4 group-hover:text-[#c9a84c] transition-colors">
                 {featured.title}
               </h2>
-              <p className="text-white/45 leading-relaxed mb-6">{featured.excerpt}</p>
+              <p className="text-white/70 leading-relaxed mb-6">{featured.excerpt}</p>
               <span className="inline-flex items-center gap-2 text-[#c9a84c] text-sm font-semibold">
                 Read the guide
                 <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
@@ -129,7 +129,7 @@ export default function BlogIndexPage() {
           <div className="flex items-center gap-4 mb-8">
             <h2 className="font-display text-2xl text-white">All guides</h2>
             <div className="h-px flex-1 bg-white/[0.07]" />
-            <span className="text-white/30 text-sm">{BLOG_ARTICLES.length} articles</span>
+            <span className="text-white/55 text-sm">{BLOG_ARTICLES.length} articles</span>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -152,18 +152,18 @@ export default function BlogIndexPage() {
                   <h3 className="font-display text-lg text-white leading-snug group-hover:text-[#c9a84c] transition-colors">
                     {a.title}
                   </h3>
-                  <p className="text-white/40 text-sm leading-relaxed line-clamp-3 flex-1">{a.excerpt}</p>
+                  <p className="text-white/70 text-sm leading-relaxed line-clamp-3 flex-1">{a.excerpt}</p>
 
                   <div className="flex items-center justify-between pt-3 mt-auto border-t border-white/[0.06]">
-                    <span className="text-white/30 text-xs flex items-center gap-1.5">
+                    <span className="text-white/55 text-xs flex items-center gap-1.5">
                       <Clock size={11} /> {readMinutes(a)} min
                     </span>
                     {a.distanceKm ? (
-                      <span className="text-white/30 text-xs flex items-center gap-1.5">
+                      <span className="text-white/55 text-xs flex items-center gap-1.5">
                         <MapPin size={11} /> {a.distanceKm} km
                       </span>
                     ) : (
-                      <span className="text-white/30 text-xs">In the city</span>
+                      <span className="text-white/55 text-xs">In the city</span>
                     )}
                   </div>
                 </div>
@@ -176,7 +176,7 @@ export default function BlogIndexPage() {
         <section className="border-t border-white/[0.06] py-16 bg-[#080808]">
           <div className="container mx-auto px-4 text-center">
             <h2 className="font-display text-3xl text-white mb-4">Ready to go somewhere?</h2>
-            <p className="text-white/40 mb-8 max-w-xl mx-auto">
+            <p className="text-white/70 mb-8 max-w-xl mx-auto">
               Fixed price per vehicle to every destination in these guides, agreed before you travel.
             </p>
             <Link

@@ -120,12 +120,12 @@ export default function CookiesPage() {
                           <tr className="border-b border-white/[0.04]">
                             <td className="py-2 text-white">Google Maps</td>
                             <td className="py-2">Address autocomplete on booking form</td>
-                            <td className="py-2"><a href="https://policies.google.com/privacy" className="text-gold-400 hover:text-gold-300" target="_blank" rel="noreferrer">Google Privacy</a></td>
+                            <td className="py-2"><a href="https://policies.google.com/privacy" className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40" target="_blank" rel="noreferrer">Google Privacy</a></td>
                           </tr>
                           <tr>
                             <td className="py-2 text-white">SumUp</td>
                             <td className="py-2">Secure payment processing</td>
-                            <td className="py-2"><a href="https://sumup.com/privacy/" className="text-gold-400 hover:text-gold-300" target="_blank" rel="noreferrer">SumUp Privacy</a></td>
+                            <td className="py-2"><a href="https://sumup.com/privacy/" className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40" target="_blank" rel="noreferrer">SumUp Privacy</a></td>
                           </tr>
                         </tbody>
                       </table>
@@ -137,15 +137,15 @@ export default function CookiesPage() {
                   <h2 className="text-white font-display text-xl mb-3">Managing Cookies</h2>
                   <p>You can control cookies through your browser settings. Note that disabling essential cookies will prevent you from logging in or completing bookings.</p>
                   <ul className="list-disc pl-5 space-y-1 mt-3">
-                    <li><a href="https://support.google.com/chrome/answer/95647" className="text-gold-400 hover:text-gold-300" target="_blank" rel="noreferrer">Chrome cookie settings</a></li>
-                    <li><a href="https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer" className="text-gold-400 hover:text-gold-300" target="_blank" rel="noreferrer">Firefox cookie settings</a></li>
-                    <li><a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471" className="text-gold-400 hover:text-gold-300" target="_blank" rel="noreferrer">Safari cookie settings</a></li>
+                    <li><a href="https://support.google.com/chrome/answer/95647" className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40" target="_blank" rel="noreferrer">Chrome cookie settings</a></li>
+                    <li><a href="https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer" className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40" target="_blank" rel="noreferrer">Firefox cookie settings</a></li>
+                    <li><a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471" className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40" target="_blank" rel="noreferrer">Safari cookie settings</a></li>
                   </ul>
                 </div>
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">Contact</h2>
-                  <p>If you have questions about our use of cookies, please contact us at <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300">{COMPANY.email}</a>.</p>
+                  <p>If you have questions about our use of cookies, please contact us at <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40">{COMPANY.email}</a>.</p>
                 </div>
 
               </div>

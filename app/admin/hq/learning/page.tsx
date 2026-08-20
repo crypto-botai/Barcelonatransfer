@@ -106,7 +106,7 @@ export default async function LearningPage() {
               <div key={obs.id} className="px-4 py-3">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400">observation</span>
-                  <span className="text-dark-600 text-[10px] flex items-center gap-1">
+                  <span className="text-dark-500 text-[10px] flex items-center gap-1">
                     <Clock size={9} /> {timeAgo(obs.createdAt)}
                   </span>
                 </div>
@@ -155,7 +155,7 @@ function PendingCard({ item }: {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-2">
             <span className="text-[10px] font-semibold uppercase tracking-wider opacity-70">{meta.label}</span>
-            <span className="text-dark-600 text-[10px] flex items-center gap-1">
+            <span className="text-dark-500 text-[10px] flex items-center gap-1">
               <Clock size={9} /> {timeAgo(item.createdAt)}
             </span>
           </div>

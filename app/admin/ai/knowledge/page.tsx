@@ -255,8 +255,8 @@ function EditableEntry({
           <p className="text-dark-400 text-xs mt-1 line-clamp-2">{entry.answer}</p>
           <div className="flex items-center gap-3 mt-2">
             <span className="text-[10px] bg-purple-500/10 text-purple-400 px-1.5 py-0.5 rounded-full capitalize">{entry.category}</span>
-            <span className="text-dark-600 text-[10px]">{entry.language.toUpperCase()}</span>
-            <span className="text-dark-600 text-[10px]">{entry.usageCount} uses</span>
+            <span className="text-dark-500 text-[10px]">{entry.language.toUpperCase()}</span>
+            <span className="text-dark-500 text-[10px]">{entry.usageCount} uses</span>
             {!entry.isActive && <span className="text-[10px] bg-red-500/10 text-red-400 px-1.5 py-0.5 rounded-full">Inactive</span>}
           </div>
         </div>

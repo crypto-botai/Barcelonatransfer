@@ -98,7 +98,7 @@ export default function CostPage() {
                 {usage && (
                   <div className="text-right flex-shrink-0">
                     <p className="text-dark-400 text-xs">{usage.tokensUsed.toLocaleString()} tokens</p>
-                    <p className="text-dark-600 text-[10px]">{usage.calls} calls</p>
+                    <p className="text-dark-500 text-[10px]">{usage.calls} calls</p>
                   </div>
                 )}
               </div>

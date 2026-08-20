@@ -79,7 +79,7 @@ function Stars({ score }: { score: number }) {
         <Star
           key={n}
           size={12}
-          className={n <= Math.round(score) ? "text-gold-400 fill-gold-400" : "text-dark-600"}
+          className={n <= Math.round(score) ? "text-gold-400 fill-gold-400" : "text-dark-500"}
         />
       ))}
     </div>
@@ -277,7 +277,7 @@ export default function CostCalculatorClient() {
                     <span className="text-dark-500 text-xs">comfort</span>
                     {row.available && (
                       <>
-                        <span className="text-dark-600 text-xs">·</span>
+                        <span className="text-dark-500 text-xs">·</span>
                         <span className="text-dark-400 text-xs flex items-center gap-1">
                           <Clock size={11} /> {formatMin(row.durationMin)}
                         </span>
@@ -299,7 +299,7 @@ export default function CostCalculatorClient() {
                       </p>
                     </>
                   ) : (
-                    <p className="text-dark-600 text-sm">Not available</p>
+                    <p className="text-dark-500 text-sm">Not available</p>
                   )}
                 </div>
               </div>

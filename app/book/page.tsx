@@ -147,7 +147,7 @@ export default async function BookPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-dark-600 text-xs mt-4">
+          <p className="text-dark-500 text-xs mt-4">
             Prices shown are per vehicle, not per person. Full pricing available in the booking form above.
           </p>
         </div>

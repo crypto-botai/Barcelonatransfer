@@ -107,7 +107,7 @@ export default function DispatchBoard({
       {/* Unassigned first — this is the queue that needs action */}
       <section className="space-y-3">
         <h2 className="text-white text-sm font-medium flex items-center gap-2">
-          <AlertTriangle size={14} className={unassigned.length ? "text-amber-400" : "text-dark-600"} />
+          <AlertTriangle size={14} className={unassigned.length ? "text-amber-400" : "text-dark-500"} />
           Waiting for a driver
           <span className="text-dark-500 font-normal">({unassigned.length})</span>
         </h2>
@@ -169,7 +169,7 @@ export default function DispatchBoard({
                   <span>{d.jobsToday} job{d.jobsToday === 1 ? "" : "s"}</span>
                   {d.rating > 0 && <span>{d.rating.toFixed(1)}★</span>}
                   <span className="flex items-center gap-1">
-                    <CircleDot size={9} className={d.hasLocation ? "text-emerald-400" : "text-dark-600"} />
+                    <CircleDot size={9} className={d.hasLocation ? "text-emerald-400" : "text-dark-500"} />
                     {d.hasLocation ? "Location on" : "No location"}
                   </span>
                 </div>
@@ -231,7 +231,7 @@ function JobRow({
           </div>
 
           <p className="text-white text-sm mt-1.5 leading-snug">
-            {job.pickupAddress} <span className="text-dark-600">→</span> {job.dropoffAddress}
+            {job.pickupAddress} <span className="text-dark-500">→</span> {job.dropoffAddress}
           </p>
 
           <div className="flex items-center gap-3 mt-1.5 text-[11px] text-dark-500 flex-wrap">

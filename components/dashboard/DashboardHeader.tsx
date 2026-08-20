@@ -115,7 +115,7 @@ export default function DashboardHeader({ userName, memberTier = "Gold", notific
                 <div className="max-h-80 overflow-y-auto">
                   {notifications.length === 0 ? (
                     <div className="py-8 text-center">
-                      <Bell size={28} className="text-dark-600 mx-auto mb-2" />
+                      <Bell size={28} className="text-dark-500 mx-auto mb-2" />
                       <p className="text-dark-500 text-sm">No notifications yet</p>
                     </div>
                   ) : (
@@ -126,7 +126,7 @@ export default function DashboardHeader({ userName, memberTier = "Gold", notific
                           <div className={!n.read ? "" : "pl-4"}>
                             <p className="text-white text-xs font-medium">{n.title}</p>
                             <p className="text-dark-400 text-xs mt-0.5 line-clamp-2">{n.body}</p>
-                            <p className="text-dark-600 text-[10px] mt-1">
+                            <p className="text-dark-500 text-[10px] mt-1">
                               {new Date(n.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                             </p>
                           </div>

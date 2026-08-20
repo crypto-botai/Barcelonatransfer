@@ -69,7 +69,7 @@ export default function NewsletterForm({ source = "footer" }: { source?: string 
         </button>
       </div>
       {error && <p className="text-red-400 text-xs">{error}</p>}
-      <p className="text-dark-600 text-[10px]">No spam. Exclusive deals & Barcelona travel tips. Unsubscribe anytime.</p>
+      <p className="text-dark-500 text-[10px]">No spam. Exclusive deals & Barcelona travel tips. Unsubscribe anytime.</p>
     </form>
   );
 }

@@ -189,7 +189,7 @@ export default function RideTimeline({
                     ? <Check size={13} className="text-emerald-400 mt-0.5 flex-shrink-0" />
                     : <Circle size={13} className="text-dark-700 mt-0.5 flex-shrink-0" />}
                   <div className="flex-1 min-w-0 flex items-baseline justify-between gap-3">
-                    <span className={done ? "text-white text-sm" : "text-dark-600 text-sm"}>
+                    <span className={done ? "text-white text-sm" : "text-dark-500 text-sm"}>
                       {STAGE_META[s].label}
                     </span>
                     {ev && (

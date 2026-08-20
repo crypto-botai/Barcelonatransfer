@@ -202,7 +202,7 @@ export default function DriverRegisterPage() {
                 return (
                   <div key={field.key}>
                     <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">
-                      {field.label} <span className="text-dark-600 normal-case">(optional)</span>
+                      {field.label} <span className="text-dark-500 normal-case">(optional)</span>
                     </label>
                     <div
                       className={`relative flex items-center gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${

@@ -52,7 +52,7 @@ export default function SupportPage() {
               <p className="text-white text-sm font-medium group-hover:text-gold-400 transition-colors">{label}</p>
               <p className="text-dark-400 text-xs">{sub}</p>
             </div>
-            <ChevronRight size={14} className="text-dark-600 group-hover:text-gold-500 ml-auto transition-colors" />
+            <ChevronRight size={14} className="text-dark-500 group-hover:text-gold-500 ml-auto transition-colors" />
           </a>
         ))}
       </div>

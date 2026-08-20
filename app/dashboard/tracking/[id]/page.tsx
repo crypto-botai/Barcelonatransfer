@@ -91,7 +91,7 @@ export default function TrackingPage({ params }: { params: Promise<{ id: string 
   if (!booking) {
     return (
       <div className="p-6 text-center">
-        <AlertCircle size={40} className="text-dark-600 mx-auto mb-3" />
+        <AlertCircle size={40} className="text-dark-500 mx-auto mb-3" />
         <p className="text-white font-semibold">Booking not found</p>
         <Link href="/dashboard/bookings" className="text-gold-400 text-sm mt-2 inline-block">← Back to bookings</Link>
       </div>

@@ -68,7 +68,7 @@ export default function CostaDoradaTransferPage() {
           <div className="container mx-auto px-4 text-center relative z-10">
             <div className="flex justify-center mb-4">
               <Link href="/transfers" className="text-dark-400 text-sm hover:text-gold-400 transition-colors">All Destinations</Link>
-              <ChevronRight size={14} className="text-dark-600 mx-2 mt-0.5" />
+              <ChevronRight size={14} className="text-dark-500 mx-2 mt-0.5" />
               <span className="text-gold-400 text-sm">Costa Dorada</span>
             </div>
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold-500/30 bg-gold-500/5 text-gold-400 text-xs tracking-[0.2em] uppercase font-medium mb-6">
@@ -103,11 +103,11 @@ export default function CostaDoradaTransferPage() {
                 <thead>
                   <tr className="border-b border-white/[0.08] bg-dark-800">
                     <th className="text-left text-dark-400 font-medium p-4">Destination</th>
-                    <th className="text-center text-dark-400 font-medium p-3">Sedan<br /><span className="text-dark-600 font-normal text-xs">1–3 pax</span></th>
-                    <th className="text-center text-dark-400 font-medium p-3">Business<br /><span className="text-dark-600 font-normal text-xs">1–3 pax</span></th>
-                    <th className="text-center text-dark-400 font-medium p-3">Minivan<br /><span className="text-dark-600 font-normal text-xs">4–8 pax</span></th>
-                    <th className="text-center text-dark-400 font-medium p-3 text-gold-400">V-Class<br /><span className="text-dark-600 font-normal text-xs">7 pax</span></th>
-                    <th className="text-center text-dark-400 font-medium p-3">Minibus<br /><span className="text-dark-600 font-normal text-xs">9+ pax</span></th>
+                    <th className="text-center text-dark-400 font-medium p-3">Sedan<br /><span className="text-dark-500 font-normal text-xs">1–3 pax</span></th>
+                    <th className="text-center text-dark-400 font-medium p-3">Business<br /><span className="text-dark-500 font-normal text-xs">1–3 pax</span></th>
+                    <th className="text-center text-dark-400 font-medium p-3">Minivan<br /><span className="text-dark-500 font-normal text-xs">4–8 pax</span></th>
+                    <th className="text-center text-dark-400 font-medium p-3 text-gold-400">V-Class<br /><span className="text-dark-500 font-normal text-xs">7 pax</span></th>
+                    <th className="text-center text-dark-400 font-medium p-3">Minibus<br /><span className="text-dark-500 font-normal text-xs">9+ pax</span></th>
                   </tr>
                 </thead>
                 <tbody>

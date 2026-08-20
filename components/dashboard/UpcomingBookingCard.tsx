@@ -181,7 +181,7 @@ export default function UpcomingBookingCard({ booking }: { booking: Booking }) {
               <Loader2 size={16} className="text-dark-500 animate-spin" />
               <div>
                 <p className="text-dark-400 text-sm">Assigning driver…</p>
-                <p className="text-dark-600 text-xs mt-0.5">We&apos;ll notify you when assigned</p>
+                <p className="text-dark-500 text-xs mt-0.5">We&apos;ll notify you when assigned</p>
               </div>
             </div>
           )}

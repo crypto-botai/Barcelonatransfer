@@ -166,10 +166,10 @@ export default function MemoryPage() {
                 </span>
 
                 {/* Age */}
-                <span className="text-dark-600 text-[10px] flex-shrink-0 w-14 text-right">{timeAgo(m.createdAt)}</span>
+                <span className="text-dark-500 text-[10px] flex-shrink-0 w-14 text-right">{timeAgo(m.createdAt)}</span>
 
                 {/* Expiry */}
-                <span className="text-dark-600 text-[10px] flex-shrink-0 w-20 text-right">
+                <span className="text-dark-500 text-[10px] flex-shrink-0 w-20 text-right">
                   {m.expiresAt ? `exp ${timeAgo(m.expiresAt)}` : "no expiry"}
                 </span>
 
@@ -178,7 +178,7 @@ export default function MemoryPage() {
                   <button
                     onClick={(e) => { e.stopPropagation(); del(m.id); }}
                     disabled={deleting === m.id}
-                    className="text-dark-600 hover:text-red-400 transition-colors p-1"
+                    className="text-dark-500 hover:text-red-400 transition-colors p-1"
                     title="Delete"
                   >
                     {deleting === m.id ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}

@@ -130,7 +130,7 @@ export default function AlertsPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-white text-sm font-medium">{alert.title}</p>
                   <p className="text-dark-400 text-xs mt-0.5">{alert.message}</p>
-                  <p className="text-dark-600 text-[10px] mt-1.5">{new Date(alert.createdAt).toLocaleString("en-GB")}</p>
+                  <p className="text-dark-500 text-[10px] mt-1.5">{new Date(alert.createdAt).toLocaleString("en-GB")}</p>
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   {!alert.isRead && (
@@ -138,7 +138,7 @@ export default function AlertsPage() {
                       Read
                     </button>
                   )}
-                  <button onClick={() => dismiss(alert.id)} className="text-[11px] text-dark-600 hover:text-red-400 transition-colors px-2 py-1 rounded border border-white/[0.07]">
+                  <button onClick={() => dismiss(alert.id)} className="text-[11px] text-dark-500 hover:text-red-400 transition-colors px-2 py-1 rounded border border-white/[0.07]">
                     Dismiss
                   </button>
                 </div>

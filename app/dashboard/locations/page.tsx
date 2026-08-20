@@ -120,7 +120,7 @@ export default function LocationsPage() {
       {/* Locations list */}
       {locations.length === 0 ? (
         <div className="glass-card rounded-2xl p-10 text-center border border-white/[0.06]">
-          <MapPin size={36} className="text-dark-600 mx-auto mb-3" />
+          <MapPin size={36} className="text-dark-500 mx-auto mb-3" />
           <p className="text-white font-semibold mb-1">No saved addresses</p>
           <p className="text-dark-400 text-sm mb-5">Save your frequent locations for quick booking.</p>
           <button onClick={() => setAdding(true)} className="btn-gold inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold">

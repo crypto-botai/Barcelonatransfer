@@ -181,7 +181,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
             {/* Breadcrumb */}
             <div className="flex justify-center items-center gap-2 mb-4 text-sm">
               <Link href="/transfers" className="text-dark-400 hover:text-gold-400 transition-colors">All Destinations</Link>
-              <ChevronRight size={14} className="text-dark-600" />
+              <ChevronRight size={14} className="text-dark-500" />
               <span className="text-gold-400">{dest.name}</span>
             </div>
 

@@ -97,7 +97,7 @@ export default function AnalyticsPage() {
             </div>
             <p className={`font-display text-2xl ${color}`}>{value}</p>
             <p className="text-dark-400 text-xs mt-1">{label}</p>
-            <p className="text-dark-600 text-[11px] mt-0.5">{sub}</p>
+            <p className="text-dark-500 text-[11px] mt-0.5">{sub}</p>
           </div>
         ))}
       </div>

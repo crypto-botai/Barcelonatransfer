@@ -49,7 +49,7 @@ export default async function CompaniesPage() {
 
       {companies.length === 0 ? (
         <div className="glass-card rounded-2xl p-10 text-center border border-white/[0.06]">
-          <Building2 size={28} className="text-dark-600 mx-auto mb-3" />
+          <Building2 size={28} className="text-dark-500 mx-auto mb-3" />
           <p className="text-white font-medium">No corporate accounts yet</p>
           <p className="text-dark-400 text-sm mt-1 max-w-md mx-auto leading-relaxed">
             Add a company to give a client agreed rates, cost-centre reporting and one monthly

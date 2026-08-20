@@ -455,7 +455,7 @@ export default function BookFormClient() {
                   {bookingType === "HOURLY" && (
                     <div>
                       <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">
-                        Duration <span className="text-dark-600 normal-case tracking-normal">(minimum 4 hours)</span>
+                        Duration <span className="text-dark-500 normal-case tracking-normal">(minimum 4 hours)</span>
                       </label>
                       <div className="flex flex-wrap gap-2">
                         {HOURS_OPTIONS.map((h) => (
@@ -751,7 +751,7 @@ export default function BookFormClient() {
                     {(bookingType === "TRANSFER" || bookingType === "CORPORATE") && (
                       <div>
                         <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">
-                          Flight Number <span className="text-dark-600">(optional)</span>
+                          Flight Number <span className="text-dark-500">(optional)</span>
                         </label>
                         <div className="relative">
                           <Plane size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
@@ -765,7 +765,7 @@ export default function BookFormClient() {
 
                     <div>
                       <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">
-                        Additional Notes <span className="text-dark-600">(optional)</span>
+                        Additional Notes <span className="text-dark-500">(optional)</span>
                       </label>
                       <div className="relative">
                         <MessageSquare size={14} className="absolute left-3.5 top-3.5 text-gold-500/60 pointer-events-none" />
