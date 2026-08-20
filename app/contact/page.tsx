@@ -112,6 +112,55 @@ export default function ContactPage() {
             </div>
           </div>
         </section>
+
+        {/* Practical detail. The page was 43 words: two headings and a form. */}
+        <section className="py-16 bg-[#050505] border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display text-3xl text-white mb-6">
+              Getting a <span className="text-gold-gradient">fast answer</span>
+            </h2>
+            <div className="space-y-4 text-dark-300 leading-relaxed">
+              <p>
+                WhatsApp is the quickest way to reach us, and the right one if you are
+                travelling today &mdash; a driver who is already on the road, a flight that has just
+                been delayed, or a pickup you need to move by an hour. Email suits quotes,
+                invoices and anything with an attachment. Both are watched around the clock,
+                every day of the year.
+              </p>
+              <p>
+                If your message is about a booking that already exists, quote the confirmation
+                code from your email. If it is a new quote, the four things that let us answer
+                in one reply rather than three are: where you are being collected, where you are
+                going, the date and time, and how many passengers and suitcases are travelling.
+                For airport pickups, send the flight number too &mdash; we track the flight and adjust
+                the pickup to the actual landing time.
+              </p>
+              <h3 className="font-display text-xl text-white pt-4">Changing or cancelling</h3>
+              <p>
+                Plans change and that is fine. Cancel more than 24 hours before pickup and you
+                are refunded in full; inside 24 hours a 50% charge applies, and a no-show is
+                charged in full. Refunds go back to the card you paid with, normally within five
+                to seven working days. Moving a booking to a different time or date is free
+                whenever we can accommodate it &mdash; ask rather than cancelling and rebooking.
+              </p>
+              <h3 className="font-display text-xl text-white pt-4">Invoices and VAT</h3>
+              <p>
+                Quoted fares exclude VAT and tolls. If you need a proper invoice for expenses or
+                for your company&apos;s accounts, ask and we will issue one with 10% Spanish VAT
+                added and your company details on it. Tell us at the time of booking where
+                possible, as it is simpler than reissuing afterwards.
+              </p>
+              <h3 className="font-display text-xl text-white pt-4">Where we drive</h3>
+              <p>
+                Barcelona and the whole of Catalonia &mdash; the airport, the cruise terminals, Sants
+                station, the Costa Brava and Costa Dorada, Girona and Reus airports, PortAventura,
+                Montserrat and the ski resorts. We also run longer routes across the border and
+                into the Pyrenees, including Andorra and Lourdes. If the destination is not on the
+                site, ask; if we cannot do it well we will say so rather than take the booking.
+              </p>
+            </div>
+          </div>
+        </section>
       </main>
       <Footer />
     </>

@@ -87,6 +87,49 @@ export default function CorporatePage() {
             </div>
           </div>
         </section>
+
+        {/* How an account actually opens. The page listed six benefits and
+            stopped, which left the obvious next question unanswered. */}
+        <section className="py-16 bg-[#050505] border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display text-3xl text-white mb-6">
+              Opening an <span className="text-gold-gradient">account</span>
+            </h2>
+            <div className="space-y-4 text-dark-300 leading-relaxed">
+              <p>
+                There is no application process to sit through. Send us your company name, tax
+                number and billing address, tell us roughly how many transfers a month you expect
+                and which routes come up most often, and we will confirm terms in writing. Most
+                accounts are open and usable the same week.
+              </p>
+              <p>
+                Once the account exists, your team books the way everyone else does &mdash; online, by
+                email or over WhatsApp &mdash; but nothing is charged at the point of booking. Journeys
+                collect against the account and are invoiced together at the end of the month,
+                with every trip itemised: date, passenger, route, vehicle and fare. Spanish VAT at
+                10% is applied on the invoice, so the figures reconcile cleanly for your finance
+                team.
+              </p>
+              <h3 className="font-display text-xl text-white pt-4">Events and multiple vehicles</h3>
+              <p>
+                Conferences, roadshows and investor days need more coordination than a single
+                airport run, and they are worth flagging early. Tell us the arrival windows and
+                passenger counts and we will assign vehicles across the day rather than treating
+                each transfer as an unrelated booking. For large groups the Mercedes Sprinter
+                carries up to 16 passengers, and mixed fleets &mdash; a V-Class for principals with
+                minivans behind &mdash; are usually the right answer for a delegation.
+              </p>
+              <h3 className="font-display text-xl text-white pt-4">What stays the same</h3>
+              <p>
+                Corporate pricing is still fixed per vehicle and agreed before travel: no meter,
+                no peak-time multiplier, no airport supplement appearing at drop-off. Airport
+                pickups include 60 minutes of free waiting from the actual landing time, which
+                matters more for business travellers than anyone, and every journey is private
+                &mdash; we never combine bookings or put another company&apos;s passengers in your car.
+              </p>
+            </div>
+          </div>
+        </section>
       </main>
       <Footer />
     </>

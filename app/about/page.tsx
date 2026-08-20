@@ -154,6 +154,58 @@ export default function AboutPage() {
             </div>
           </div>
         </section>
+
+        {/* How the business actually operates. The page had a short story and a
+            values list, and said nothing about licensing or pricing. */}
+        <section className="py-16 bg-[#050505] border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display text-3xl text-white mb-6">
+              How we <span className="text-gold-gradient">operate</span>
+            </h2>
+            <div className="space-y-4 text-dark-300 leading-relaxed">
+              <p>
+                Elite BCN runs under a Spanish VTC licence, the permit required to carry
+                passengers by private hire in Spain. It is not the same as a taxi licence and the
+                difference is worth knowing: a VTC journey is booked in advance, priced in
+                advance, and cannot be hailed on the street. That is why we can quote a fixed fare
+                weeks ahead and hold it, and why there is no meter in the car.
+              </p>
+              <p>
+                Every fare is per vehicle rather than per seat, and it is the fare you pay. It does
+                not rise at night, at the weekend, during Mobile World Congress, or because the
+                Ronda Litoral is at a standstill. Tolls and VAT sit outside the quote &mdash; VAT is
+                added only when you ask for an invoice &mdash; and the extras that are genuinely
+                optional, like child seats or a name board at arrivals, are priced separately so
+                nobody pays for something they did not want.
+              </p>
+              <h3 className="font-display text-xl text-white pt-4">Private, always</h3>
+              <p>
+                We do not run shared shuttles. We never combine two bookings into one vehicle, and
+                we do not sell transfers seat by seat. When you book, the car is yours from your
+                pickup point to your destination, with no other passengers and no stops you did not
+                ask for. It is a deliberate limit on the business rather than a marketing line
+                &mdash; it is the reason we can promise a pickup time and keep it.
+              </p>
+              <h3 className="font-display text-xl text-white pt-4">Airport pickups</h3>
+              <p>
+                Arrivals are where transfers usually go wrong, so they get the most attention. We
+                track your flight by its number, so a delay moves your pickup rather than costing
+                you the booking, and an early landing is met early. Airport pickups include 60
+                minutes of free waiting from the moment the wheels touch down, which covers
+                passport control and baggage reclaim on all but the worst days at El Prat. City,
+                cruise port and station pickups include 15 minutes.
+              </p>
+              <h3 className="font-display text-xl text-white pt-4">The fleet</h3>
+              <p>
+                Seven vehicles, from a Toyota Corolla for a solo traveller to a 16-seat Mercedes
+                Sprinter for a group, with Tesla Model 3 and Mercedes EQE electric options in
+                between. We publish the passenger and luggage capacity of each one, because the
+                boot is more often the limit than the seats, and the wrong choice is discovered at
+                the kerb with nowhere to put a suitcase.
+              </p>
+            </div>
+          </div>
+        </section>
       </main>
       <Footer />
     </>

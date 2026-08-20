@@ -21,6 +21,22 @@ const SLUG_TO_CLASS: Record<string, FleetVehicle> = {
 
 const BASE = "https://www.elitebcn.info";
 
+/**
+ * The manufacturer, read off the vehicle itself.
+ *
+ * This was hardcoded to "Mercedes-Benz" for every vehicle, so the Product
+ * schema on /fleet/standard-sedan told Google a Toyota Corolla was a Mercedes,
+ * and the same on the Camry and the Tesla Model 3. Structured data that
+ * contradicts the visible page is a Google policy violation and puts the rich
+ * result on all seven pages at risk.
+ */
+function vehicleBrand(label: string): string {
+  const make = label.split(" ")[0];
+  // Mercedes vehicles are labelled "Mercedes ..." on site; the manufacturer's
+  // registered name — and the one schema.org consumers match on — is hyphenated.
+  return make === "Mercedes" ? "Mercedes-Benz" : make;
+}
+
 export function generateStaticParams() {
   return Object.keys(SLUG_TO_CLASS).map((slug) => ({ slug }));
 }
@@ -85,13 +101,52 @@ export default async function FleetVehiclePage(
 
   const minFare  = getFleetFromPrice(vehicleClass);
 
+  // Seats and boot space are separate limits, and the boot is usually the one
+  // that bites: the Tesla Model 3 seats four but takes two large cases, and the
+  // Vito seats eight but takes four. Saying so plainly here prevents the
+  // booking that arrives at the kerb with luggage that will not go in.
+  const bagsShortOfSeats = vehicle.largeBags < vehicle.maxPassengers;
+
+  const faqs: Array<{ q: string; a: string }> = [
+    {
+      q: `How much luggage fits in the ${vehicle.label}?`,
+      a: `The boot takes ${vehicle.largeBags} large ${vehicle.largeBags === 1 ? "suitcase" : "suitcases"} of ${BAG_SIZES.large.cm}, or ${vehicle.mediumBags} medium (${BAG_SIZES.medium.cm}) or ${vehicle.smallBags} small (${BAG_SIZES.small.cm}) bags. Cabin bags can travel on empty seats when the car is not full. If you are carrying more than that, book the next vehicle up rather than hoping it fits.`,
+    },
+    {
+      q: "Is the price per person or for the whole vehicle?",
+      a: `Every fare is for the vehicle, not per seat. One passenger and ${vehicle.maxPassengers} passengers pay the same €${minFare} on the same route. Prices exclude VAT and tolls; 10% VAT is added only if you ask for an invoice.`,
+    },
+    {
+      q: "What happens if my flight is delayed?",
+      a: "We track your flight by its number and move the pickup to the actual landing time at no charge. Airport pickups include 60 minutes of free waiting from touchdown, which covers passport control and baggage reclaim on all but the worst days. City, port and station pickups include 15 minutes.",
+    },
+    {
+      q: `Can I request child seats in the ${vehicle.label}?`,
+      a: "Yes. Baby seats (0–13 kg), child seats (9–18 kg) and boosters (15–36 kg) are €5 each, up to two per booking, and are fitted before your driver sets off. Add them at the extras step when you book so the seat is in the car on the day.",
+    },
+    {
+      q: "Is this a private transfer?",
+      a: `Yes. The ${vehicle.label} is yours for the journey — we never combine bookings, share the vehicle with other passengers, or sell it seat by seat. Your driver takes you from your pickup point to your destination and nowhere else.`,
+    },
+  ];
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map(({ q, a }) => ({
+      "@type": "Question",
+      name: q,
+      acceptedAnswer: { "@type": "Answer", text: a },
+    })),
+  };
+
   const schema = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: vehicle.label,
     description: vehicle.description,
     image: `${BASE}${vehicle.image}`,
-    brand: { "@type": "Brand", name: "Mercedes-Benz" },
+    brand: { "@type": "Brand", name: vehicleBrand(vehicle.label) },
     offers: {
       "@type": "Offer",
       price: String(minFare),
@@ -116,6 +171,7 @@ export default async function FleetVehiclePage(
       <Navbar />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <main className="pt-20">
         {/* Breadcrumb nav */}
@@ -280,6 +336,65 @@ export default async function FleetVehiclePage(
               </table>
             </div>
             <p className="text-dark-400 text-xs text-center mt-3">Fixed price per vehicle, excluding VAT and tolls. 10% VAT is added only if you request an invoice; tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet &amp; greet, child seats and other extras are optional and charged separately.</p>
+          </div>
+        </section>
+
+        {/* Choosing this vehicle */}
+        <section className="py-14 bg-dark-950 border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display text-3xl text-white mb-6">
+              Is the {vehicle.label} the <span className="text-gold-gradient">right choice</span>?
+            </h2>
+            <div className="space-y-4 text-dark-300 leading-relaxed">
+              <p>
+                The {vehicle.label} carries up to {vehicle.maxPassengers}{" "}
+                {vehicle.maxPassengers === 1 ? "passenger" : "passengers"} and takes{" "}
+                {vehicle.largeBags} large {vehicle.largeBags === 1 ? "suitcase" : "suitcases"}{" "}
+                in the boot. Those are two separate limits, and it is worth checking both before
+                you book.{" "}
+                {bagsShortOfSeats
+                  ? `Travelling ${vehicle.maxPassengers}-up with a large case each will not fit — the boot holds ${vehicle.largeBags}. Either travel lighter, or move up to a vehicle with more room behind the seats.`
+                  : `Boot space matches the seat count here, so a full car with a large case each is comfortable.`}
+              </p>
+              <p>
+                Your fare covers the whole vehicle. It does not change with the number of
+                passengers, it is agreed before you travel, and it does not move with traffic,
+                time of day or the route your driver takes — there is no meter running. Tolls and
+                VAT sit outside the quoted price, and VAT is only added if you request an invoice.
+              </p>
+              <p>
+                Every journey is private. We do not combine bookings or share the vehicle with
+                other passengers, so the {vehicle.label} goes from your pickup point to your
+                destination without detours. Your driver is a licensed professional working under
+                a Spanish VTC licence, and the car is cleaned between every transfer.
+              </p>
+              <p>
+                Booking takes about two minutes and confirms immediately — you will have your
+                driver&apos;s details before the day. If your plans change, tell us and we will move the
+                booking; if you need a child seat, a name board at arrivals or a stop on the way,
+                add it while booking so it is arranged in advance rather than negotiated at the kerb.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Questions */}
+        <section className="py-14 bg-[#050505] border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display text-3xl text-white mb-8">
+              {vehicle.label} — common <span className="text-gold-gradient">questions</span>
+            </h2>
+            <div className="space-y-4">
+              {faqs.map(({ q, a }) => (
+                <details key={q} className="group bg-dark-900 border border-white/[0.08] rounded-xl overflow-hidden">
+                  <summary className="cursor-pointer list-none p-5 flex items-center justify-between gap-4 text-white font-semibold hover:bg-white/[0.02] transition-colors">
+                    <h3 className="text-base font-semibold">{q}</h3>
+                    <ChevronRight size={18} className="text-gold-500 flex-shrink-0 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <p className="px-5 pb-5 text-dark-300 text-sm leading-relaxed">{a}</p>
+                </details>
+              ))}
+            </div>
           </div>
         </section>
 
