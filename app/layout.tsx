@@ -239,7 +239,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
             }}
           />
-          <DeferredAnalytics gaId={["G-E9QZFG5WZY", "G-PTFFJ19396"]} adsId="AW-18391666445" />
+          <DeferredAnalytics gaId="G-E9QZFG5WZY" adsId="AW-18391666445" />
           </I18nProvider>
         </AuthProvider>
       </body>
