@@ -35,13 +35,21 @@ describe("the published rating matches the profile", () => {
 });
 
 describe("every review is a real one", () => {
-  it("has an author, a rating, a date and text", () => {
+  it("has an author, a rating and a date", () => {
     for (const r of REVIEWS) {
-      expect(r.author.trim().length, `author on "${r.text.slice(0, 30)}"`).toBeGreaterThan(0);
+      expect(r.author.trim().length, `author on a ${r.rating}-star review`).toBeGreaterThan(0);
       expect(r.rating).toBeGreaterThanOrEqual(1);
       expect(r.rating).toBeLessThanOrEqual(5);
       expect(r.when.trim().length, `date on ${r.author}`).toBeGreaterThan(0);
-      expect(r.text.trim().length, `text from ${r.author}`).toBeGreaterThan(20);
+    }
+  });
+
+  it("either quotes real words or none — never a stub", () => {
+    // A rating with no comment is legitimate and is rendered as such. What must
+    // not happen is a few words invented to fill the space.
+    for (const r of REVIEWS) {
+      if (r.text === undefined) continue;
+      expect(r.text.trim().length, `text from ${r.author} is too short to be real`).toBeGreaterThan(20);
     }
   });
 
@@ -49,6 +57,7 @@ describe("every review is a real one", () => {
     // The same words under two names is the signature of a fabricated set.
     const seen = new Set<string>();
     for (const r of REVIEWS) {
+      if (!r.text) continue;
       const key = r.text.trim().toLowerCase();
       expect(seen.has(key), `duplicated review text under ${r.author}`).toBe(false);
       seen.add(key);

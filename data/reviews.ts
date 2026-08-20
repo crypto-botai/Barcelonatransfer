@@ -23,8 +23,14 @@ export interface Review {
   rating:   number;
   /** Relative age shown on the profile, e.g. "2 weeks ago". */
   when:     string;
-  /** The review text, verbatim. */
-  text:     string;
+  /**
+   * The review text, verbatim.
+   *
+   * Optional, because a rating with no words is a real thing a customer can
+   * leave and showing it as such is honest. Writing text and attributing it to
+   * them would not be.
+   */
+  text?:    string;
   /**
    * True only where the review is on the public Google profile and has been
    * checked against it. Anything else must be false — the tick is a claim
@@ -144,6 +150,15 @@ export const REVIEWS: Review[] = [
     rating:   5,
     when:     "2 weeks ago",
     text:     "Very good experience and it arrived on time 🚗",
+    verified: true,
+  },
+  {
+    // Five stars and no words. The rating is his; inventing a sentence and
+    // signing his name to it would be a fabricated review, which is the thing
+    // this file exists to prevent.
+    author:   "yousaf rockey",
+    rating:   5,
+    when:     "2 weeks ago",
     verified: true,
   },
 ];

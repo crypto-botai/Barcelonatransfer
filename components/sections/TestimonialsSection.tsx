@@ -85,7 +85,15 @@ export default function TestimonialsSection() {
                   ))}
                 </div>
 
-                <p className="text-dark-200 text-sm leading-relaxed flex-1">{r.text}</p>
+                {r.text ? (
+                  <p className="text-dark-200 text-sm leading-relaxed flex-1">{r.text}</p>
+                ) : (
+                  // A rating with no words. Said plainly rather than dressed up
+                  // with a sentence the reviewer never wrote.
+                  <p className="text-dark-400 text-sm italic flex-1">
+                    Rated {r.rating} out of 5 — no comment left.
+                  </p>
+                )}
 
                 <div className="flex items-center gap-3 mt-5 pt-4 border-t border-white/[0.06]">
                   <div className="w-9 h-9 rounded-full bg-gold-500/10 border border-gold-500/20 flex items-center justify-center flex-shrink-0">
