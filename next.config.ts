@@ -1,13 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Inline the page CSS into <style> tags instead of a render-blocking
-  // <link rel="stylesheet"> request. The stylesheet is ~15 KiB — small enough
-  // that inlining costs little HTML weight, and it was the only remaining
-  // render-blocking resource on the critical path (Lighthouse: ~160 ms of
-  // FCP/LCP delay waiting on the CSS round-trip before anything could paint).
   experimental: {
-    inlineCss: true,
+    // CSS was inlined into <style> to avoid a render-blocking stylesheet
+    // request. That was the right call when the bundle was ~15 KiB, which is
+    // what the note here used to say.
+    //
+    // It has since grown to 89 KB, and Next writes it into the RSC payload
+    // twice on top of the <style> tag — about 270 KB of CSS in every document,
+    // re-sent on every page and impossible to cache. A destination page went
+    // from 378 KB to 106 KB with this off.
+    //
+    // The cost is one render-blocking request on the first page. It is served
+    // gzipped at ~15 KB and then cached for the rest of the visit, which is the
+    // better trade for a site people browse several pages of.
+    inlineCss: false,
   },
   images: {
     remotePatterns: [
