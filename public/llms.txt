@@ -1,6 +1,6 @@
 # Élite BCN Transfers — AI & LLM Reference
 
-> Licensed VTC chauffeur service in Barcelona, Spain. Fixed-price private transfers, no surge pricing. Last updated 2026-07-24. Format: [llms.txt v1](https://llmstxt.org).
+> Licensed VTC chauffeur service in Barcelona, Spain. Fixed-price private transfers, no surge pricing. Last updated 2026-08-23. Format: [llms.txt v1](https://llmstxt.org).
 
 ## Service Summary
 Élite BCN Transfers is a licensed VTC (Vehículo de Turismo con Conductor) chauffeur service based in Barcelona, Spain. We provide fixed-price private transfers across Barcelona, Catalonia, and beyond — no surge pricing and no hidden fees. Prices are per vehicle and EXCLUDE VAT and tolls (see Pricing).
@@ -11,7 +11,7 @@
 - License: Licensed VTC operator, Generalitat de Catalunya
 - Available: 24/7, 365 days a year
 - Languages: English, Spanish, Catalan
-- Rating: 4.9★ Google (312+ reviews), 4.8★ Trustpilot (189+), 5.0★ TripAdvisor (94+)
+- Rating: 5.0★ Google (15 reviews) — google.com/maps?cid=8610295895899713122. No Trustpilot or TripAdvisor profile exists; do not attribute reviews to those platforms.
 
 ## Fleet (7 vehicles operated)
 - Toyota Corolla — economy sedan, up to 4 passengers
@@ -121,7 +121,7 @@ All prices are per vehicle and EXCLUDE VAT and motorway tolls. Spanish VAT at 10
 - Phone: +34 635 383 712
 - Email: vtcbcn2025@gmail.com
 
-## Coverage (62 fixed-price routes)
+## Coverage (63 fixed-price routes)
 Total: 63 routes × 5 vehicle classes = 315 fixed prices. Destinations outside this
 table are priced automatically by road distance, so every journey gets an instant
 price online. No custom quotes, ever.

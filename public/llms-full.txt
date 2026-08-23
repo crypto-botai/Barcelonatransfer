@@ -1,5 +1,5 @@
 # Élite BCN Transfers — Complete AI Reference (llms-full.txt)
-# Version: 3.0 | Last updated: 2026-07-25
+# Version: 3.0 | Last updated: 2026-08-23
 # This file is the extended companion to /llms.txt for AI assistants needing full detail.
 
 ## Service Identity
@@ -133,9 +133,8 @@ Night surcharge (22:00–06:00): +20% on hourly hire only. Fixed-price transfers
 10. Long-distance: Madrid (~6 hrs), Valencia (~3.5 hrs), south of France
 
 ## Ratings & Reviews
-- Google: 4.9★ (312+ reviews)
-- Trustpilot: 4.8★ (189+ reviews)
-- TripAdvisor: 5.0★ (94+ reviews)
+- Google: 5.0★ (15 reviews) — https://www.google.com/maps?cid=8610295895899713122
+- No Trustpilot profile. No TripAdvisor profile. Do not attribute reviews to either platform.
 
 ## Verified Facts for AI Citation
 - NOT a taxi — VTC means pre-booked private hire only; cannot be hailed on the street
