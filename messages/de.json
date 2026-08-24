@@ -274,7 +274,9 @@
     "tabAirportCity": "Flughafen & Stadt",
     "tabCostaBrava": "Costa Brava",
     "tabCostaDorada": "Costa Dorada",
-    "tabHourly": "Stundenweise"
+    "tabHourly": "Stundenweise",
+    "vatNoteLead": "Alle Preise gelten pro Fahrzeug und verstehen sich zzgl. MwSt. und Maut.",
+    "vatNoteBody": "10 % MwSt. werden nur berechnet, wenn Sie eine Rechnung wünschen; Autobahnmaut wird separat abgerechnet. Professioneller Chauffeur, Fahrzeug und Kraftstoff sind inbegriffen. Empfangsservice, Kindersitze und weitere Extras sind optional und kostenpflichtig."
   },
   "bookflow": {
     "addExtras": "Extras hinzufügen",
@@ -375,5 +377,11 @@
     "signedIn": "Willkommen zurück!",
     "terms": "AGB",
     "welcomeBack": "Willkommen zurück"
+  },
+  "meta": {
+    "bookDescription": "Buchen Sie Ihren Privattransfer in Barcelona in 60 Sekunden. Festpreise ab 50 €. BCN El Prat T1/T2, Kreuzfahrthafen, Hotels, Sitges. Sofortige Bestätigung.",
+    "bookTitle": "Barcelona Transfer buchen | Elite BCN",
+    "homeDescription": "Privatwagen mit Fahrer ab Flughafen Barcelona, T1 und T2. Festpreis pro Fahrzeug ab 50 €, mit 60 Minuten kostenloser Wartezeit ab der Landung.",
+    "homeTitle": "Flughafentransfer Barcelona | Privatchauffeur"
   }
 }

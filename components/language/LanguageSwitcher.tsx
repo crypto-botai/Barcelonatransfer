@@ -1,8 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, Check } from "lucide-react";
-import { SUPPORTED_LOCALES, LANGUAGE_META, type SupportedLocale } from "@/lib/i18n";
+import {
+  SUPPORTED_LOCALES,
+  LANGUAGE_META,
+  isLocalizedRoute,
+  localizedPath,
+  splitLocale,
+  type SupportedLocale,
+} from "@/lib/i18n";
 import { useI18n } from "@/components/language/I18nProvider";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +34,8 @@ import { cn } from "@/lib/utils";
  */
 export default function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   const { locale, setLocale } = useI18n();
+  const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const currentMeta = LANGUAGE_META[locale] ?? LANGUAGE_META.en;
@@ -45,9 +55,30 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
     };
   }, [open]);
 
+  /**
+   * On a page that exists in several languages, switching language changes the
+   * URL rather than just the React state.
+   *
+   * The old behaviour swapped the text in place and left the address bar
+   * alone, so a visitor reading the site in French had no French URL to copy,
+   * share or link to — and any link they did share opened in English. Moving
+   * the URL gives each language a real address.
+   *
+   * Pages that are not translated keep the in-place swap: the menu and footer
+   * change language while the English body text stays, which is the honest
+   * behaviour when only the chrome has been translated.
+   */
   const handleSelect = (l: SupportedLocale) => {
-    setLocale(l);
     setOpen(false);
+    const { path } = splitLocale(pathname || "/");
+    if (isLocalizedRoute(path)) {
+      // Remember the choice so untranslated pages visited afterwards still show
+      // this language in the chrome.
+      document.cookie = `NEXT_LOCALE=${l};path=/;max-age=31536000`;
+      router.push(localizedPath(l, path));
+      return;
+    }
+    setLocale(l);
   };
 
   return (

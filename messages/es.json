@@ -274,7 +274,9 @@
     "tabAirportCity": "Aeropuerto y ciudad",
     "tabCostaBrava": "Costa Brava",
     "tabCostaDorada": "Costa Dorada",
-    "tabHourly": "Por horas"
+    "tabHourly": "Por horas",
+    "vatNoteLead": "Todos los precios son fijos por vehículo y no incluyen IVA ni peajes.",
+    "vatNoteBody": "El 10 % de IVA se añade solo si solicita factura; los peajes de autopista se cobran aparte. El chófer profesional, el vehículo y el combustible están incluidos. El servicio de bienvenida, las sillas infantiles y otros extras son opcionales y se cobran aparte."
   },
   "bookflow": {
     "addExtras": "Añadir extras",
@@ -375,5 +377,11 @@
     "signedIn": "¡Bienvenido de nuevo!",
     "terms": "Términos",
     "welcomeBack": "Bienvenido de nuevo"
+  },
+  "meta": {
+    "bookDescription": "Reserva tu traslado privado en Barcelona en 60 segundos. Precios fijos desde 50 €. BCN El Prat T1/T2, puerto, hoteles y Sitges. Confirmación inmediata.",
+    "bookTitle": "Reserva tu traslado en Barcelona | Elite BCN",
+    "homeDescription": "Coche con chófer desde el aeropuerto de Barcelona, T1 y T2. Precio fijo por vehículo desde 50 €, con 60 minutos de espera gratuita tras aterrizar.",
+    "homeTitle": "Traslados Aeropuerto Barcelona | Chófer Privado"
   }
 }

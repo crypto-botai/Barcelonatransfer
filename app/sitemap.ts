@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import destinations from "@/data/destinations.json";
 import { BLOG_ARTICLES } from "@/lib/blog";
+import { PREFIXED_LOCALES, alternatesFor } from "@/lib/i18n";
 
 // Statically generated at build time and served straight from the CDN.
 //
@@ -21,7 +22,22 @@ const BASE = "https://www.elitebcn.info";
 // a stable date avoids unnecessary crawl budget waste.
 const LAST_UPDATED = new Date("2026-07-25T00:00:00.000Z");
 
+// The hreflang set shared by the homepage and its seven translations.
+// Declaring it in the sitemap as well as in the page head is what tells Google
+// these are language variants of one page rather than eight competing copies.
+const HOME_LANGUAGES = alternatesFor("/").languages;
+
 export default function sitemap(): MetadataRoute.Sitemap {
+  // The translated homepages. Until now they had no URL at all, so none of the
+  // seven languages could be crawled or ranked.
+  const localeHomes: MetadataRoute.Sitemap = PREFIXED_LOCALES.map((locale) => ({
+    url: `${BASE}/${locale}`,
+    lastModified: LAST_UPDATED,
+    changeFrequency: "weekly" as const,
+    priority: 0.9,
+    alternates: { languages: HOME_LANGUAGES },
+  }));
+
   const dynamicPages: MetadataRoute.Sitemap = destinations.map((d) => ({
     url: `${BASE}/transfers/${d.slug}`,
     lastModified: LAST_UPDATED,
@@ -38,7 +54,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     // ── Core pages (highest priority) ─────────────────────────────
-    { url: BASE,                        lastModified: LAST_UPDATED, changeFrequency: "weekly",  priority: 1.0  },
+    { url: BASE, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 1.0, alternates: { languages: HOME_LANGUAGES } },
+    ...localeHomes,
     { url: `${BASE}/blog`,              lastModified: LAST_UPDATED, changeFrequency: "weekly",  priority: 0.85 },
     { url: `${BASE}/book`,              lastModified: LAST_UPDATED, changeFrequency: "weekly",  priority: 0.95 },
     { url: `${BASE}/pricing`,           lastModified: LAST_UPDATED, changeFrequency: "weekly",  priority: 0.9  },
