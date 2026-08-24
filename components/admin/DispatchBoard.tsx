@@ -7,6 +7,7 @@ import {
   Briefcase, CheckCircle2, Loader2, MapPin, CircleDot,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { isAssignableDriver } from "@/lib/driver-roster";
 
 export interface DispatchJob {
   id: string; code: string; status: string; paymentStatus: string;
@@ -87,7 +88,10 @@ export default function DispatchBoard({
     }
   }
 
-  const available = drivers.filter((d) => d.status === "ONLINE" || d.status === "APPROVED");
+  // Was `ONLINE || APPROVED`, which hid every driver who was off duty or
+  // already on a ride — so a booking for next week could not be given to
+  // anyone who happened to be busy now. See lib/driver-roster.
+  const available = drivers.filter((d) => isAssignableDriver(d.status));
 
   return (
     <div className="p-4 sm:p-6 space-y-6">

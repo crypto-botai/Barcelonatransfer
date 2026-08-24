@@ -5,11 +5,12 @@ import { Search, CheckCircle2, XCircle, User, Loader2, X, Car, MapPin, Calendar,
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus, vehicleClassLabel } from "@/types";
 import { parseBookingMeta, formatExtraLine } from "@/lib/booking-meta";
+import { isAssignableDriver, driverAvailabilityLabel } from "@/lib/driver-roster";
 import toast from "react-hot-toast";
 import IssueInvoiceButton from "@/components/admin/IssueInvoiceButton";
 import RideTimeline from "@/components/admin/RideTimeline";
 
-type Driver = { id: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] };
+type Driver = { id: string; status: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] };
 
 type Booking = {
   id: string; confirmationCode: string;
@@ -215,6 +216,7 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
                 <option key={d.id} value={d.id}>
                   {d.user.name ?? "Unknown"} {d.user.phone ? `(${d.user.phone})` : ""}
                   {d.vehicles?.[0] ? ` · ${d.vehicles[0].make} ${d.vehicles[0].model}` : ""}
+                  {` · ${driverAvailabilityLabel(d.status)}`}
                 </option>
               ))}
             </select>
@@ -392,7 +394,10 @@ export default function AdminBookingsPage() {
     const res = await fetch("/api/admin/drivers");
     if (res.ok) {
       const all = await res.json();
-      setDrivers(all.filter((d: { status: string }) => d.status === "APPROVED"));
+      // Was `status === "APPROVED"`, which is a status a driver holds only
+      // until the first time they go online. Seven of eight drivers had left
+      // it and vanished from this list, leaving nobody to assign.
+      setDrivers(all.filter((d: { status: string }) => isAssignableDriver(d.status)));
     }
   };
 
