@@ -189,7 +189,8 @@
       "whatsapp": "Chat por WhatsApp",
       "location": "Barcelona, España · VTC Licenciado"
     },
-    "copyright": "Todos los derechos reservados. Operador VTC Licenciado — Barcelona, España."
+    "copyright": "Todos los derechos reservados. Operador VTC Licenciado — Barcelona, España.",
+    "languageHeading": "Idioma"
   },
   "common": {
     "loading": "Cargando…",

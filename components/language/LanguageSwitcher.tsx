@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, Check } from "lucide-react";
 import {
@@ -37,6 +38,13 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  // On a translated page, every entry in this menu is a real link to that
+  // page's other language. Elsewhere the menu stays a set of buttons that swap
+  // the chrome in place, because those pages have no other-language URL to
+  // point at yet.
+  const { path: currentPath } = splitLocale(pathname || "/");
+  const localizedHref = isLocalizedRoute(currentPath) ? currentPath : null;
   const ref = useRef<HTMLDivElement>(null);
   const currentMeta = LANGUAGE_META[locale] ?? LANGUAGE_META.en;
 
@@ -122,6 +130,48 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
             {SUPPORTED_LOCALES.map((l) => {
               const meta = LANGUAGE_META[l];
               const isActive = l === locale;
+              const rowClass = cn(
+                "w-full flex items-center gap-3 px-3.5 py-2.5 text-left transition-colors duration-150",
+                isActive
+                  ? "bg-gold-500/10 text-gold-400"
+                  : "text-dark-300 hover:bg-white/[0.04] hover:text-white"
+              );
+              const body = (
+                <>
+                  <span className="text-base leading-none">{meta.flag}</span>
+                  <span className="text-sm font-medium flex-1">{meta.native}</span>
+                  {isActive && <Check size={13} className="text-gold-500 flex-shrink-0" />}
+                </>
+              );
+
+              // A real anchor on a translated page, not a button.
+              //
+              // This menu was the only route to /fr, /de and the rest, and it
+              // navigated with router.push() from a click handler. Googlebot
+              // follows href attributes; it does not reliably click JavaScript
+              // buttons, so a crawl found every locale homepage orphaned —
+              // zero inbound links, reachable only via the sitemap. Next's
+              // Link renders a crawlable href and still navigates client-side.
+              if (localizedHref) {
+                return (
+                  <Link
+                    key={l}
+                    href={localizedPath(l, localizedHref)}
+                    role="option"
+                    aria-selected={isActive}
+                    hrefLang={l}
+                    onClick={() => {
+                      document.cookie = `NEXT_LOCALE=${l};path=/;max-age=31536000`;
+                      setOpen(false);
+                    }}
+                    style={{ touchAction: "manipulation" }}
+                    className={rowClass}
+                  >
+                    {body}
+                  </Link>
+                );
+              }
+
               return (
                 <button
                   key={l}
@@ -129,16 +179,9 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
                   aria-selected={isActive}
                   onClick={() => handleSelect(l)}
                   style={{ touchAction: "manipulation" }}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-3.5 py-2.5 text-left transition-colors duration-150",
-                    isActive
-                      ? "bg-gold-500/10 text-gold-400"
-                      : "text-dark-300 hover:bg-white/[0.04] hover:text-white"
-                  )}
+                  className={rowClass}
                 >
-                  <span className="text-base leading-none">{meta.flag}</span>
-                  <span className="text-sm font-medium flex-1">{meta.native}</span>
-                  {isActive && <Check size={13} className="text-gold-500 flex-shrink-0" />}
+                  {body}
                 </button>
               );
             })}

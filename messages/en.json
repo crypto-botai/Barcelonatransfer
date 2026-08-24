@@ -189,7 +189,8 @@
       "whatsapp": "WhatsApp Chat",
       "location": "Barcelona, Spain · Licensed VTC"
     },
-    "copyright": "All rights reserved. Licensed VTC Operator — Barcelona, Spain."
+    "copyright": "All rights reserved. Licensed VTC Operator — Barcelona, Spain.",
+    "languageHeading": "Language"
   },
   "common": {
     "loading": "Loading…",
