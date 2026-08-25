@@ -42,7 +42,7 @@ const costaBravaSchema = {
   name: "Barcelona to Costa Brava Private Transfer",
   description: "Luxury fixed-price private transfers from Barcelona to all Costa Brava resorts — Lloret de Mar, Tossa de Mar, Cadaqués, Roses and beyond.",
   url: "https://www.elitebcn.info/transfers/costa-brava",
-  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: "Costa Brava, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(COSTA_BRAVA_FROM), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };

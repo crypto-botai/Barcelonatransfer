@@ -44,7 +44,7 @@ const BLOG_SCHEMA = {
   name: "Elite BCN Travel Guides",
   description: "Destination guides and seasonal travel advice for Barcelona and Catalonia.",
   url: `${BASE_URL}/blog`,
-  publisher: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE_URL },
+  publisher: { "@id": "https://www.elitebcn.info/#organization" },
   blogPost: BLOG_ARTICLES.map((a) => ({
     "@type": "BlogPosting",
     headline: a.title,

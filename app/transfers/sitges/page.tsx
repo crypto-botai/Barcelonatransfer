@@ -5,6 +5,8 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
 import { ladderFor } from "@/lib/destination-pricing";
+import RouteFaqs from "@/components/transfers/RouteFaqs";
+import { ROUTE_FAQ_SPECS } from "@/lib/route-faqs";
 
 // Read from the price table, never restated. A repriced route reaches
 // this page, its schema and the checkout together, or reaches none.
@@ -38,7 +40,7 @@ const sitgesServiceSchema = {
   name: "Barcelona to Sitges Private Transfer",
   description: `Fixed-price private transfer from Barcelona Airport or City to Sitges. From €${LADDER.economy}. 35-minute journey, meet & greet, no surge pricing.`,
   url: "https://www.elitebcn.info/transfers/sitges",
-  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: "Sitges, Garraf, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(LADDER.economy), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -58,12 +60,7 @@ const SCHEMA = {
   "@type": "Service",
   name: "Barcelona Airport to Sitges Private Transfer",
   description: "Luxury fixed-price private transfer from Barcelona El Prat Airport to Sitges. Flight tracking and 60 min free wait at the airport; meet & greet €5.",
-  provider: {
-    "@type": "LocalBusiness",
-    name: "Elite BCN Transfers",
-    url: "https://www.elitebcn.info",
-    telephone: "+34635383712",
-  },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: [
     { "@type": "City", name: "Barcelona" },
     { "@type": "City", name: "Sitges" },
@@ -130,7 +127,7 @@ export default function SitgesTransferPage() {
                 { icon: Shield, title: `Fixed price €${LADDER.economy}`, body: "The price you see is the price you pay. No meter, no traffic surcharges, no hidden fees." },
                 { icon: Clock, title: "60 minutes free waiting", body: "Airport pickups include 60 free minutes from landing. Meet & greet inside arrivals with a name board is an optional €5 add-on." },
                 { icon: Star, title: "Real-time flight tracking", body: "We monitor your flight live. If it's delayed, your driver adjusts automatically — no extra charge." },
-                { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, bottled water, WiFi on request." },
+                { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, with WiFi in most cars." },
                 { icon: MapPin, title: "Door-to-door service", body: "Dropped directly at your Sitges hotel, villa, or address. No sharing, no stops, no detours." },
                 { icon: Shield, title: "Licensed VTC operator", body: "Fully licensed VTC (Vehículo de Turismo con Conductor) under Generalitat de Catalunya regulations." },
               ].map(({ icon: Icon, title, body }) => (
@@ -210,6 +207,10 @@ export default function SitgesTransferPage() {
         </section>
 
         {/* CTA */}
+        {/* The questions people ask before booking this route. The page
+            stopped at the price table and answered none of them. */}
+        <RouteFaqs spec={ROUTE_FAQ_SPECS["sitges"]} />
+
         <section className="py-16 bg-[#050505] border-t border-white/[0.06] text-center">
           <div className="container mx-auto px-4">
             <h2 className="font-display text-3xl text-white mb-4">Ready to book your Sitges transfer?</h2>

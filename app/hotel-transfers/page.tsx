@@ -51,7 +51,7 @@ const SCHEMA = {
   "@type": "Service",
   name: "Hotel Transfers Barcelona",
   serviceType: "Airport Hotel Transfer",
-  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: { "@type": "City", name: "Barcelona" },
   description:
     "Private luxury transfers between Barcelona Airport and all major Barcelona hotels. Fixed prices, flight monitoring, free 60-minute wait.",
@@ -169,7 +169,7 @@ export default function HotelTransfersPage() {
                 "60 minutes free waiting (airport)",
                 "15 minutes free waiting (hotels)",
                 "Meet & greet at arrivals",
-                "Bottled water on board",
+                "Air conditioning in every car",
                 "WiFi available on request",
                 "Child seats €5 per seat",
                 "Assistance with luggage",

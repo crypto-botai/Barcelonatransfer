@@ -37,7 +37,7 @@ const SCHEMA = {
   applicationCategory: "TravelApplication",
   operatingSystem: "Any",
   offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
-  author: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE },
+  author: { "@id": "https://www.elitebcn.info/#business" },
 };
 
 export default function TransferCostCalculatorPage() {

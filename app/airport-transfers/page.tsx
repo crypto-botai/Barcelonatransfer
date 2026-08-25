@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
-import { Plane, Anchor, Clock, Shield, Star, CheckCircle2 } from "lucide-react";
+import { Plane, Anchor, Clock, Shield, Star, CheckCircle2, ChevronRight, Luggage, Users } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
+import HubChildLinks from "@/components/transfers/HubChildLinks";
+import { airportChildren } from "@/lib/hub-children";
 
 const airportCityEco = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona_city")?.economy ?? 45;
 
@@ -25,7 +27,10 @@ const cheapestAirportFare = Math.min(...airportRoutes.map((r) => r.economy));
  */
 export const metadata: Metadata = {
   title: { absolute: "Private Barcelona Airport Transfer — BCN T1 & T2" },
-  description: "Your own car from Barcelona Airport arrivals, never a shared seat. Fixed fares from €50 to 33 published destinations across Catalonia and beyond.",
+  // Count and fare read from the price table, like the openGraph block below
+  // already did. This sentence said "from €50 to 33 published destinations"
+  // while the table held 37 — written when it was true and never revisited.
+  description: `Your own car from Barcelona Airport arrivals, never a shared seat. Fixed fares from €${cheapestAirportFare} to ${airportRoutes.length} published destinations across Catalonia and beyond.`,
   alternates: { canonical: "https://www.elitebcn.info/airport-transfers" },
   keywords: ["private barcelona airport transfer", "barcelona airport transfer", "bcn el prat private transfer", "barcelona airport t1 transfer", "barcelona airport t2 transfer"],
   openGraph: {
@@ -48,7 +53,7 @@ const AIRPORT_SCHEMA = {
   "@type": "Service",
   name: "Barcelona Airport Transfer — BCN El Prat",
   serviceType: "Airport Transfer",
-  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: { "@type": "Airport", name: "Barcelona El Prat Airport", iataCode: "BCN" },
   description: "Fixed-price private transfers from Barcelona El Prat Airport (T1 & T2). Flight tracking and 60 minutes of free waiting from landing. Meet & greet available as a paid extra.",
   url: "https://www.elitebcn.info/airport-transfers",
@@ -61,6 +66,41 @@ const AIRPORT_SCHEMA = {
     ],
   },
 };
+
+/**
+ * The questions that actually arrive by WhatsApp before a booking.
+ *
+ * No FAQPage markup: Google retired FAQ rich results for every site on
+ * 7 May 2026, so the schema buys nothing, and the answers are more useful as
+ * readable prose than as a snippet that no longer renders. Every figure below
+ * comes from the price table rather than from memory.
+ */
+const AIRPORT_FAQS: Array<{ q: string; a: string }> = [
+  {
+    q: "How much is a transfer from Barcelona Airport?",
+    a: `Fares start at €${cheapestAirportFare} per vehicle and are published for ${airportRoutes.length} destinations. The price is per car rather than per person, so a group pays once. The full table is on the pricing page, and every fare there is the fare the checkout charges.`,
+  },
+  {
+    q: "Which terminal will the driver meet me at?",
+    a: "The one your flight actually lands in. Your booking is tied to your flight number, so we know the terminal before you do — you do not need to tell us, and you should never take the inter-terminal shuttle to find the car.",
+  },
+  {
+    q: "What happens if my flight is delayed?",
+    a: "Nothing you need to do. We track the flight and move the pickup to the real landing time at no charge, however long the delay runs. The 60 minutes of free waiting are measured from touchdown, not from your original scheduled arrival.",
+  },
+  {
+    q: "Is this a shared shuttle?",
+    a: "No, and we do not sell one. Every booking is a private vehicle: no other passengers, no pooling, no seat-by-seat pricing and no detours to drop someone else. The car is yours from arrivals to the door.",
+  },
+  {
+    q: "Can I pay the driver in cash?",
+    a: "Yes. You can pay by card when you book, or in cash to the driver at the end of the journey. The amount is the same either way, and it is the amount you were quoted.",
+  },
+  {
+    q: "Do you cover destinations outside Barcelona?",
+    a: "Yes — the published list runs along both coasts, inland to Montserrat and Girona, and as far as Andorra and Lourdes. Anywhere without a published fare can still be quoted: send the address on WhatsApp and we will price it before you commit.",
+  },
+];
 
 export default function AirportTransfersPage() {
   return (
@@ -210,9 +250,102 @@ export default function AirportTransfersPage() {
                 for an invoice, and motorway tolls are charged separately on the routes that use them —
                 which mostly means the longer runs south and north rather than the short hop into the city.
               </p>
+
+              <h3 className="font-display text-2xl text-white pt-4">Finding your driver at T1 and T2</h3>
+              <p>
+                BCN El Prat has two terminals and they are not walkable from one another — a shuttle bus
+                runs between them, and it is where most missed pickups begin. Your booking is tied to your
+                flight number, so we know which terminal you land in before you do. You do not need to
+                tell us, and you should not move terminals to find the car.
+              </p>
+              <p>
+                Terminal 1 handles most full-service and long-haul carriers. Terminal 2 serves most
+                low-cost airlines and is split into sections A, B and C, which is worth knowing because
+                the arrivals halls are some distance apart. In both, the default is that your driver waits
+                at the designated meeting point outside, next to the taxi rank, where VTC cars are
+                permitted to stop. Your driver&apos;s name and mobile number are in your confirmation, so
+                you can call them directly rather than searching.
+              </p>
+              <p>
+                If you would rather be met inside with a name board — worth it with children, with a lot
+                of luggage, or on a first visit — add meet &amp; greet when you book. The driver comes
+                through to the arrivals hall and helps with the bags to the car.
+              </p>
+
+              <h3 className="font-display text-2xl text-white pt-4">Delays, early landings and waiting time</h3>
+              <p>
+                Every airport booking is tracked by flight number rather than by the time you typed in.
+                If you land forty minutes early the car is already there; if you are delayed by three
+                hours, the pickup moves with the flight and there is no rebooking and no surcharge.
+              </p>
+              <p>
+                Airport pickups include 60 minutes of free waiting measured from touchdown, not from your
+                scheduled time. That covers passport control and baggage reclaim on all but the worst
+                days at the busiest hours. Other pickups — a hotel, an address in town — include 15
+                minutes, because there is nothing unpredictable to absorb.
+              </p>
+
+              <h3 className="font-display text-2xl text-white pt-4">Choosing the right size of car</h3>
+              <p>
+                Seats and boot space are separate limits, and on an airport run the boot is almost always
+                the one that runs out first. Four adults with four large cases do not fit a saloon,
+                whatever the seat count says. Each car on the{" "}
+                <Link href="/fleet" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">fleet page</Link>{" "}
+                lists what it actually holds, and the{" "}
+                <Link href="/tools/transfer-cost-calculator" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">quote tool</Link>{" "}
+                will price the alternatives side by side.
+              </p>
+              <p>
+                Child, baby and booster seats are available on request and are fitted before the car
+                leaves. Ask for them when you book rather than on the day — they have to be in the
+                vehicle that is dispatched.
+              </p>
+            </div>
+
+            {/* Trust, stated as facts rather than badges. */}
+            <div className="max-w-3xl mx-auto grid sm:grid-cols-3 gap-4 mt-10">
+              {[
+                { icon: Plane, t: "Tracked by flight number", d: "The pickup follows the aircraft, not the time you typed in." },
+                { icon: Luggage, t: "Priced per vehicle", d: "A family of four pays once, not four times, and the luggage travels with you." },
+                { icon: Users, t: "Never a shared seat", d: "No pooling, no other passengers and no detours to drop them." },
+              ].map(({ icon: Icon, t, d }) => (
+                <div key={t} className="bg-dark-900 border border-white/[0.08] rounded-xl p-5">
+                  <Icon size={18} className="text-gold-500 mb-3" aria-hidden="true" />
+                  <p className="text-white text-sm font-medium mb-1.5">{t}</p>
+                  <p className="text-dark-400 text-sm leading-relaxed">{d}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
+
+        {/* FAQs. No FAQPage markup — see the note above AIRPORT_FAQS. */}
+        <section className="py-16 bg-dark-950 border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display text-3xl text-white mb-8">
+              Airport transfer <span className="text-gold-gradient">questions</span>
+            </h2>
+            <div className="space-y-4">
+              {AIRPORT_FAQS.map(({ q, a }) => (
+                <details key={q} className="group bg-dark-900 border border-white/[0.08] rounded-xl overflow-hidden">
+                  <summary className="cursor-pointer list-none p-5 flex items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors">
+                    <h3 className="text-white text-base font-semibold">{q}</h3>
+                    <ChevronRight size={18} className="text-gold-500 flex-shrink-0 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <p className="px-5 pb-5 text-dark-300 text-sm leading-relaxed">{a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* The hub's links down to the pages it covers. It named every airport
+            destination in prose and linked to four of them. */}
+        <HubChildLinks
+          heading="Every airport destination with a page"
+          intro="Each of these has its own page with the fixed fare, the journey time and what the run involves. Destinations without a page are still bookable and still priced — the full table is on the pricing page."
+          children={airportChildren()}
+        />
       </main>
       <Footer />
     </>

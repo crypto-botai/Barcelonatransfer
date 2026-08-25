@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { fleetSummary, amenitySentence } from "@/lib/fleet-facts";
 
 const FAQS = [
   {
@@ -19,7 +20,12 @@ const FAQS = [
   },
   {
     q: "What vehicles do you offer?",
-    a: "Our fleet includes the Mercedes EQE 300 Electric (executive sedan, up to 4 pax), Mercedes V-Class VIP (luxury 7-seat MPV for families & groups), Mercedes Vito (executive minivan, up to 8 pax), and Mercedes Sprinter (group minibus, up to 16 pax). All vehicles are under 3 years old, air-conditioned, and equipped with complimentary water and WiFi.",
+    // Derived from the catalogue. This answer used to name four Mercedes and
+    // stop, omitting both Toyotas and the Tesla — three of the seven cars, and
+    // the two that most bookings actually use. It also claimed every vehicle
+    // was "under 3 years old" with "complimentary water and WiFi": age is not
+    // recorded anywhere, water is listed on one car of seven, and WiFi on five.
+    a: `Our fleet is ${fleetSummary()}. ${amenitySentence()}`,
   },
   {
     q: "Can I cancel or modify my booking?",

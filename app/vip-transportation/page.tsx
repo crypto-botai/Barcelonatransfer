@@ -43,7 +43,7 @@ const SCHEMA = {
   "@type": "Service",
   name: "VIP Transportation Barcelona",
   serviceType: "VIP Chauffeur Service",
-  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: { "@type": "City", name: "Barcelona" },
   description:
     "Discreet, luxury VIP transportation for high-profile clients: private jet connections, gala arrivals, executive roadshows and red-carpet events.",
@@ -158,7 +158,7 @@ export default function VIPTransportationPage() {
               VIP-Ready <span className="text-gold-gradient">Fleet</span>
             </h2>
             <p className="text-dark-400 mb-10 max-w-xl mx-auto">
-              All vehicles are under 3 years old, professionally valeted before every journey, and
+              All vehicles are professionally valeted before every journey, and
               stocked with chilled water, phone chargers and noise-cancelling privacy screens on
               request.
             </p>
@@ -212,6 +212,53 @@ export default function VIPTransportationPage() {
         {/* CTA */}
         <section className="py-20 bg-[#050505] border-t border-white/[0.06] text-center">
           <div className="container mx-auto px-4 max-w-2xl">
+            <div className="max-w-3xl mx-auto text-left mb-14 space-y-4 text-dark-300 leading-relaxed">
+              <h3 className="font-display text-2xl text-white">What VIP actually means here</h3>
+              <p>
+                It means the vehicle, the discretion and the planning — not a badge. In practice the
+                difference between a standard transfer and a VIP one is the car that turns up, the
+                driver assigned to it, and how much of the journey is arranged before you arrive rather
+                than decided on the day.
+              </p>
+              <p>
+                The V-Class is the vehicle most of this work uses: captain seats facing one another,
+                privacy glass and room to hold a conversation or ignore everyone and work. For larger
+                parties the Vito and the Sprinter carry more people, and the{" "}
+                <Link href="/fleet" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">fleet page</Link>{" "}
+                lists exactly what each seats and holds.
+              </p>
+              <h3 className="font-display text-2xl text-white pt-4">Discretion, and what we do not do</h3>
+              <p>
+                Drivers on these bookings do not discuss passengers, itineraries or destinations with
+                anyone. We do not photograph vehicles with clients in them, we do not name clients in
+                marketing, and we do not publish testimonials that identify anyone. If you need a
+                confidentiality agreement in place before travelling, ask and we will sign one.
+              </p>
+              <p>
+                What we are not is a security operator. We do not provide close protection, armoured
+                vehicles or counter-surveillance, and we will tell you that rather than improvise. If
+                your requirement genuinely needs those things, you need a specialist firm — we work
+                alongside them regularly and the transport side integrates fine.
+              </p>
+              <h3 className="font-display text-2xl text-white pt-4">Multi-vehicle and recurring work</h3>
+              <p>
+                Delegations, production crews and events often need several cars moving on the same
+                schedule. That is arranged as one booking with one point of contact rather than as
+                separate reservations, so a delayed flight moves the whole group rather than half of
+                it. Billing can run through a{" "}
+                <Link href="/corporate" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">corporate account</Link>{" "}
+                with consolidated monthly invoicing instead of per-journey payment.
+              </p>
+              <p>
+                For a full day with an open itinerary, by-the-hour hire is usually the right structure
+                — see the{" "}
+                <Link href="/hourly" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">hourly page</Link>{" "}
+                for rates and minimums. For airport arrivals, the{" "}
+                <Link href="/airport-transfers" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">airport transfers page</Link>{" "}
+                covers how meeting points and flight tracking work at T1 and T2.
+              </p>
+            </div>
+
             <h2 className="font-display text-3xl text-white mb-4">Ready to Arrange VIP Transport?</h2>
             <p className="text-dark-400 mb-8">
               Contact us directly for bespoke VIP arrangements. We respond within 15 minutes.

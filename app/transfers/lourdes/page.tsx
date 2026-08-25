@@ -56,7 +56,7 @@ const serviceSchema = {
   name: "Barcelona to Lourdes Private Transfer",
   description: `Fixed-price private transfer from Barcelona and BCN El Prat Airport to the Sanctuary of Our Lady of Lourdes, France. From €${lourdesPrice} per vehicle. 415 km, approximately 6 hours.`,
   url: URL,
-  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: "Lourdes, Hautes-Pyrénées, France",
   offers: { "@type": "Offer", price: String(lourdesPrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };

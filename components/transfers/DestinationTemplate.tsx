@@ -40,7 +40,11 @@ export function destinationSchemas(d: DestinationSpec, fromPrice: number | null)
       name: `Barcelona to ${d.name} Private Transfer`,
       description: d.intro,
       url,
-      provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: BASE_URL, telephone: "+34635383712" },
+      // A reference to the one LocalBusiness the root layout declares, not a
+      // second copy of it. This template renders four destination pages, so an
+      // inline redeclaration here produced four anonymous businesses with a
+      // phone number and nothing else — no address, no hours, no sameAs.
+      provider: { "@id": `${BASE_URL}/#business` },
       areaServed: [{ "@type": "City", name: "Barcelona" }, { "@type": "Place", name: d.areaServed }],
       ...(fromPrice ? { offers: { "@type": "Offer", price: String(fromPrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" } } : {}),
     },
@@ -116,7 +120,7 @@ export default function DestinationTemplate({ d }: { d: DestinationSpec }) {
                 { icon: Shield, title: fromPrice ? `Fixed price from €${fromPrice}` : "Fixed price", body: "Agreed before you travel. No meter, no traffic surcharges. VAT and tolls are charged separately." },
                 { icon: Clock, title: "Where your driver waits", body: "At the designated meeting point outside, next to the taxi rank where reserved VTC cars may park. 60 minutes free waiting from your flight landing. A name board inside arrivals is a €5 extra." },
                 { icon: Star, title: "Real-time flight tracking", body: "We monitor your flight live. If it's delayed, your driver adjusts automatically — no extra charge." },
-                { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class, EQE 300 Electric and Vito. Air-conditioned, bottled water, WiFi on request." },
+                { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class, EQE 300 Electric and Vito. Air-conditioned, with WiFi in most cars." },
                 { icon: MapPin, title: "Door-to-door service", body: `Dropped directly at your ${d.name} hotel, villa or address. No sharing, no stops, no detours.` },
                 { icon: Shield, title: "Licensed VTC operator", body: "Fully licensed VTC under Generalitat de Catalunya regulations, with full passenger insurance." },
               ].map(({ icon: Icon, title, body }) => (

@@ -42,7 +42,7 @@ const costadoradaSchema = {
   name: "Barcelona to Costa Dorada Private Transfer",
   description: "Luxury fixed-price private transfers from Barcelona to all Costa Dorada resorts — Sitges, Tarragona, Salou, PortAventura, Cambrils and beyond.",
   url: "https://www.elitebcn.info/transfers/costa-dorada",
-  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: "Costa Dorada, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(COSTA_DORADA_FROM), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };

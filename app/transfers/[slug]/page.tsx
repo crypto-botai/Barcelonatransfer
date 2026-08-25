@@ -121,12 +121,7 @@ function buildSchema(dest: Destination, prices: ResolvedPlacePrices | null) {
     "@type": "Service",
     name: `Barcelona Airport to ${dest.name} Private Transfer`,
     description: dest.description,
-    provider: {
-      "@type": "LocalBusiness",
-      name: "Elite BCN Transfers",
-      url: BASE,
-      telephone: "+34635383712",
-    },
+    provider: { "@id": "https://www.elitebcn.info/#business" },
     areaServed: [
       { "@type": "City", name: "Barcelona" },
       { "@type": "Place", name: dest.name },
@@ -293,7 +288,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                 {
                   icon: CheckCircle2,
                   title: "Premium vehicles",
-                  body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, water on board, child seats on request.",
+                  body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, child seats on request.",
                 },
                 {
                   icon: MapPin,

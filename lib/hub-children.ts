@@ -43,6 +43,29 @@ function fromDestinationType(type: string): HubChild[] {
     .sort((a, b) => a.label.localeCompare(b.label));
 }
 
+/**
+ * Every airport destination that has a page of its own.
+ *
+ * /airport-transfers named 37 destinations in prose and linked down to four of
+ * them, which made it a hub in name only: the page introduced pages twice its
+ * own length and sent almost no authority to any of them. Derived from the same
+ * route table the prose count comes from, so the list and the number cannot
+ * disagree. Destinations without a page resolve to null and are not linked.
+ */
+export function airportChildren(): HubChild[] {
+  const seen = new Set<string>();
+  const out: HubChild[] = [];
+  for (const r of ROUTES) {
+    if (r.from !== "airport") continue;
+    const href = routePageHref(r.from, r.to);
+    if (!href || seen.has(href)) continue;
+    seen.add(href);
+    const label = r.label.includes("⇄") ? r.label.split("⇄").pop()!.trim() : r.label;
+    out.push({ href, label });
+  }
+  return out.sort((a, b) => a.label.localeCompare(b.label));
+}
+
 /** Costa Brava destinations that have a page. Fewer than the coast has towns. */
 export function costaBravaChildren(): HubChild[] {
   return fromRouteCategory("costa-brava");

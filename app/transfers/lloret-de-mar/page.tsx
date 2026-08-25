@@ -50,7 +50,7 @@ const SERVICE_SCHEMA = {
   name: "Barcelona to Lloret de Mar Private Transfer",
   description: `Luxury fixed-price private transfer from Barcelona (city or El Prat Airport) to Lloret de Mar, Costa Brava. From €${LADDER.economy}. Flight tracking and 60 min free wait at the airport; meet & greet €5.`,
   url: `${BASE}/transfers/lloret-de-mar`,
-  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: BASE, telephone: "+34635383712" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: [
     { "@type": "City", name: "Barcelona" },
     { "@type": "City", name: "Lloret de Mar" },
@@ -142,7 +142,7 @@ export default function LloretDeMarTransferPage() {
                 { icon: Shield, title: `Fixed price €${LADDER.economy}`, body: "The price you see is the price you pay. No meter, no traffic surcharges, no hidden fees." },
                 { icon: Clock, title: "Where your driver waits", body: "At the designated meeting point outside the terminal, next to the taxi rank, or at your Barcelona address. 60 minutes free waiting from your flight landing. A name board inside arrivals is a €5 extra." },
                 { icon: Star, title: "Real-time flight tracking", body: "We monitor your flight live. If it's delayed, your driver adjusts automatically — no extra charge." },
-                { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, bottled water, WiFi on request." },
+                { icon: CheckCircle2, title: "Premium vehicles", body: "Mercedes V-Class (7 pax), EQE 300 Electric & Vito (8 pax). Air-conditioned, with WiFi in most cars." },
                 { icon: MapPin, title: "Door-to-door service", body: "Dropped directly at your Lloret de Mar hotel, villa, or address. No sharing, no stops, no detours." },
                 { icon: Shield, title: "Licensed VTC operator", body: "Fully licensed VTC (Vehículo de Turismo con Conductor) under Generalitat de Catalunya regulations." },
               ].map(({ icon: Icon, title, body }) => (

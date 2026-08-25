@@ -85,6 +85,21 @@ const RELEASES: ReadonlyArray<{ date: string; paths: readonly string[] }> = [
       "/transfers/primavera-sound-2026", "/transfers/f1-spanish-grand-prix",
     ],
   },
+  {
+    // Four new commercial route pages for zones that were priced but pageless,
+    // plus the hubs and the price table that gained links down to them.
+    date: "2026-08-26",
+    paths: [
+      "/transfers/la-roca-village",
+      "/transfers/sants-station",
+      "/transfers/vilanova",
+      "/transfers/begur",
+      "/airport-transfers",
+      "/transfers/costa-brava",
+      "/transfers/costa-dorada",
+      "/pricing",
+    ],
+  },
 ];
 
 /** path -> date, flattened once. A later release wins if a path repeats. */
@@ -168,6 +183,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // The airport-to-city-centre run: the most searched route on the site, and
     // until now the only major one without a page of its own.
     { url: `${BASE}/transfers/barcelona-city-centre`, lastModified: lastMod("/transfers/barcelona-city-centre"), changeFrequency: "monthly", priority: 0.9 },
+    // Four zones that carried a published fare and had no page at all, so their
+    // /pricing rows linked nowhere. La Roca and Sants have real standalone
+    // demand; Begur and Vilanova are spokes off the two coast hubs.
+    { url: `${BASE}/transfers/la-roca-village`, lastModified: lastMod("/transfers/la-roca-village"), changeFrequency: "monthly", priority: 0.9 },
+    { url: `${BASE}/transfers/sants-station`, lastModified: lastMod("/transfers/sants-station"), changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/transfers/vilanova`,      lastModified: lastMod("/transfers/vilanova"), changeFrequency: "monthly", priority: 0.75 },
+    { url: `${BASE}/transfers/begur`,         lastModified: lastMod("/transfers/begur"), changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/transfers/sitges`,        lastModified: lastMod("/transfers/sitges"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/transfers/girona`,        lastModified: lastMod("/transfers/girona"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/transfers/montserrat`,    lastModified: lastMod("/transfers/montserrat"), changeFrequency: "monthly", priority: 0.8  },

@@ -42,7 +42,7 @@ const andorraServiceSchema = {
   name: "Barcelona to Andorra Private Transfer",
   description: `Fixed-price private transfer from Barcelona Airport to Andorra la Vella. From €${andorraPrice}. 3-hour Pyrenean journey. Ski season and shopping specialist.`,
   url: "https://www.elitebcn.info/transfers/andorra",
-  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: "Andorra la Vella, Andorra",
   offers: { "@type": "Offer", price: String(andorraPrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };

@@ -29,7 +29,7 @@ const CORPORATE_SCHEMA = {
   "@type": "Service",
   name: "Corporate Chauffeur Barcelona",
   serviceType: "Corporate Chauffeur Service",
-  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: { "@type": "City", name: "Barcelona", sameAs: "https://www.wikidata.org/wiki/Q1492" },
   description: "Dedicated corporate chauffeur accounts in Barcelona for executive airport transfers, roadshows, board meetings and MICE events. Monthly invoicing available.",
   url: "https://www.elitebcn.info/corporate",

@@ -5,11 +5,14 @@ import FleetSection from "@/components/sections/FleetSection";
 import Link from "next/link";
 import { SHARED_OG } from "@/lib/seo";
 import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+import { VEHICLE_CATALOG, BAG_SIZES } from "@/types";
+import { fleetPagePath } from "@/lib/fleet-pages";
+import { amenitySentence, FLEET_FACTS } from "@/lib/fleet-facts";
 
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Fleet — Mercedes V-Class & Tesla | Elite BCN" },
   description:
-    "Barcelona private transfer fleet: Mercedes V-Class, EQE 300 Electric, Tesla Model 3 & Vito. All under 3 years old, WiFi, water. Fixed prices.",
+    "Barcelona private transfer fleet: Mercedes V-Class, EQE 300 Electric, Tesla Model 3 & Vito. Seven cars, fixed prices, per vehicle not per seat.",
   alternates: { canonical: "https://www.elitebcn.info/fleet" },
   keywords: ["barcelona transfer fleet", "mercedes v-class barcelona", "tesla model 3 barcelona transfer", "luxury chauffeur barcelona fleet"],
   openGraph: {
@@ -97,12 +100,130 @@ export default function FleetPage() {
               Luxury Vehicle <span className="text-gold-gradient">Fleet Barcelona</span>
             </h1>
             <p className="text-dark-400 max-w-2xl mx-auto">
-              From executive sedans to VIP minivans — every vehicle in our fleet is professionally maintained, less than 3 years old, and equipped with premium amenities.
+              From economy saloons to a sixteen-seat minibus — seven vehicles, each with a published
+              capacity and a published fare. Every car lists what it actually carries, because seats and
+              boot space run out at different points.
             </p>
           </div>
         </section>
 
         <FleetSection />
+
+        {/* ── Choosing between them ────────────────────────────────
+            The hub introduced seven cars and gave a reader nothing to
+            decide with. Every figure below is read from VEHICLE_CATALOG,
+            so a change to a car reaches this page with it. */}
+        <section className="py-16 bg-[#050505] border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display text-3xl text-white mb-6">
+              How to choose the <span className="text-gold-gradient">right car</span>
+            </h2>
+            <div className="space-y-4 text-dark-300 leading-relaxed">
+              <p>
+                Seats and boot space are separate limits, and they run out at different points.
+                Four adults fit comfortably in a saloon; four adults with four large suitcases do
+                not, whatever the seat count says. On an airport run the boot is almost always the
+                constraint that bites first, which is why every car below lists both numbers.
+              </p>
+              <p>
+                A large case here means {BAG_SIZES.large.cm}. If your group is at the edge of a
+                vehicle&apos;s seating, book one size up — the difference in fare is usually smaller
+                than people expect, and it is the difference between a comfortable journey and a
+                case on someone&apos;s lap for forty minutes.
+              </p>
+              <p>
+                The price is per vehicle, not per person. A family of four pays the vehicle fare
+                once rather than four times, so the larger cars are often better value per head than
+                they look. Every route fare is published on the{" "}
+                <Link href="/pricing" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">pricing page</Link>,
+                and the{" "}
+                <Link href="/tools/transfer-cost-calculator" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">quote tool</Link>{" "}
+                will price two vehicles side by side.
+              </p>
+            </div>
+
+            <h3 className="text-white font-semibold mt-10 mb-4">Capacity at a glance</h3>
+            <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-dark-900">
+              <table className="w-full text-sm">
+                <caption className="sr-only">
+                  Every vehicle in the fleet with its passenger and luggage capacity
+                </caption>
+                <thead>
+                  <tr className="border-b border-white/[0.08] bg-dark-800">
+                    <th scope="col" className="text-left p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Vehicle</th>
+                    <th scope="col" className="text-center p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Passengers</th>
+                    <th scope="col" className="text-center p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Large cases</th>
+                    <th scope="col" className="text-left p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Suited to</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {VEHICLE_CATALOG.map((v) => (
+                    <tr key={v.class} className="border-b border-white/[0.04] last:border-0 align-top">
+                      <td className="p-3.5">
+                        <Link href={fleetPagePath(v.class)} className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/30">
+                          {v.label}
+                        </Link>
+                      </td>
+                      <td className="p-3.5 text-center text-dark-300">{v.maxPassengers}</td>
+                      <td className="p-3.5 text-center text-dark-300">{v.largeBags}</td>
+                      <td className="p-3.5 text-dark-300">{v.badge}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-dark-400 text-xs mt-3">
+              {amenitySentence()} WiFi is listed on {FLEET_FACTS.wifiCount} of the{" "}
+              {FLEET_FACTS.total} — the exceptions are the V-Class and the Sprinter.
+            </p>
+
+            <h3 className="text-white font-semibold mt-10 mb-4">What the classes mean in practice</h3>
+            <div className="space-y-4 text-dark-300 leading-relaxed">
+              <p>
+                <strong className="text-white">Economy and Business saloons</strong> cover the great
+                majority of transfers: one to three passengers with normal luggage. The difference
+                between them is comfort and finish rather than capacity, so if the boot is enough,
+                the cheaper car does the same job.
+              </p>
+              <p>
+                <strong className="text-white">Electric</strong> — the Tesla Model 3 and the Mercedes
+                EQE 300 — are the same size class as the saloons and cost the same or a little more.
+                Worth asking for if you would rather not arrive after an hour of diesel.
+              </p>
+              <p>
+                <strong className="text-white">Minivans</strong> are the honest answer for families
+                and for groups with holiday luggage. The Vito takes more people, the V-Class fewer
+                but in considerably more comfort, with captain seats and room to face one another.
+              </p>
+              <p>
+                <strong className="text-white">The Sprinter</strong> is for groups the cars cannot
+                take — up to sixteen with a separate luggage hold. For anything larger, or for
+                several vehicles moving together, the{" "}
+                <Link href="/corporate" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">corporate page</Link>{" "}
+                covers how group bookings are handled.
+              </p>
+              <p>
+                By-the-hour hire is available on every vehicle from €{HOURLY_RATES.ECONOMY} an hour
+                with a {MIN_HOURLY_HOURS.ECONOMY}-hour minimum, which is usually better value than
+                separate transfers once a day involves three or more stops. The{" "}
+                <Link href="/hourly" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">hourly chauffeur page</Link>{" "}
+                has the full rates.
+              </p>
+            </div>
+
+            <h3 className="text-white font-semibold mt-10 mb-4">Child seats and extras</h3>
+            <p className="text-dark-300 leading-relaxed">
+              Child, baby and booster seats are available on every vehicle and are fitted before the
+              car is dispatched, so they have to be requested when you book rather than on the day.
+              They are a paid extra, not included. Meet and greet with a name board inside arrivals
+              is also optional — the{" "}
+              <Link href="/faq" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">FAQ</Link>{" "}
+              lists what each extra costs, and the{" "}
+              <Link href="/about" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">about page</Link>{" "}
+              covers how we operate.
+            </p>
+          </div>
+        </section>
 
         {/* CTA */}
         <section className="py-16 bg-dark-950">

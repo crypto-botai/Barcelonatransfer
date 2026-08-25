@@ -84,6 +84,12 @@ export default async function BookPage() {
 
       <Navbar />
 
+      {/* The one page on the site with no <main>.
+          It is also the most linked-to page by a wide margin, which made it the
+          worst place to omit the landmark: assistive technology and agent
+          browsers both use <main> to skip the navigation and find the content,
+          and "skip to main content" had nothing to skip to here. */}
+      <main>
       {/* Hero / H1 */}
       <div className="pt-20 pb-6 bg-[#050505]">
         <div className="container mx-auto px-4 max-w-3xl text-center">
@@ -171,6 +177,7 @@ export default async function BookPage() {
           </dl>
         </div>
       </section>
+      </main>
     </>
   );
 }

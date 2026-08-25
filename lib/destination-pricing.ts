@@ -154,6 +154,12 @@ export const SLUG_TO_ZONE: Record<string, string> = {
   "tossa-de-mar":  "tossa",
   salou:           "salou",
   castelldefels:   "castelldefels",
+  // Added 26 Aug: four zones that carried a published fare and had no page, so
+  // routePageHref() returned null and their /pricing rows linked nowhere.
+  "la-roca-village": "la_roca",
+  "sants-station":   "sants",
+  vilanova:          "vilanova",
+  begur:             "begur",
 };
 
 /** The five price columns for one route, in display order. */
@@ -254,6 +260,20 @@ const ZONE_TO_PAGE: Record<string, string> = {
  * travelled to.
  */
 export function routePageHref(fromKey: string, toKey: string): string | null {
-  const page = ZONE_TO_PAGE[toKey] ?? ZONE_TO_PAGE[fromKey];
+  // Only the destination end. There used to be a `?? ZONE_TO_PAGE[fromKey]`
+  // fallback here, from when barcelona_city had no page of its own and the
+  // origin was the only end that could resolve. Once /transfers/barcelona-city-centre
+  // was published, that fallback started firing on every route whose
+  // destination has no page — and sending it to the origin instead.
+  //
+  // The result was live on two hubs and in the price table: a link reading
+  // "Calella" pointing at /transfers/barcelona-city-centre, and another reading
+  // "Cubelles" pointing at the same place. That is worse than no link. It tells
+  // a reader the page is about their town when it is not, and it tells Google
+  // that /transfers/barcelona-city-centre is about Calella.
+  //
+  // A destination with no page is now simply not linked, which is what the
+  // comment above ZONE_TO_PAGE always said should happen.
+  const page = ZONE_TO_PAGE[toKey];
   return page ? `/transfers/${page}` : null;
 }

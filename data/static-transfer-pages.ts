@@ -28,4 +28,11 @@ export const STATIC_TRANSFER_PAGES: StaticTransferPage[] = [
   { slug: "tossa-de-mar", name: "Tossa de Mar",               type: "route", distance_km: 90,  prices: { sedan: 110 } },
   { slug: "salou",        name: "Salou",                      type: "route", distance_km: 100, prices: { sedan: 150 } },
   { slug: "castelldefels", name: "Castelldefels",             type: "route", distance_km: 20,  prices: { sedan: 50 } },
+  // Added 26 Aug with the four commercial route pages. distance_km is the road
+  // distance from the airport; prices.sedan is not displayed — the nearby cards
+  // resolve the real fare through SLUG_TO_ZONE, which all four are now in.
+  { slug: "la-roca-village", name: "La Roca Village",          type: "route", distance_km: 50,  prices: { sedan: 105 } },
+  { slug: "sants-station",  name: "Barcelona Sants Station",   type: "route", distance_km: 14,  prices: { sedan: 50 } },
+  { slug: "vilanova",       name: "Vilanova i la Geltru",      type: "route", distance_km: 36,  prices: { sedan: 85 } },
+  { slug: "begur",          name: "Begur & Aiguablava",        type: "route", distance_km: 146, prices: { sedan: 200 } },
 ];

@@ -43,7 +43,7 @@ const cruisePortSchema = {
   name: "Barcelona Cruise Port Transfer",
   description: `Fixed-price private transfers to all Barcelona cruise terminals — World Trade Centre (WTC) and Moll Adossat (T-A to T-D). Vessel tracking included.`,
   url: "https://www.elitebcn.info/transfers/cruise-port",
-  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: "Barcelona, Spain",
   offers: { "@type": "Offer", price: String(cruisePrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
