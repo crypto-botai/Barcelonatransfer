@@ -96,13 +96,25 @@ function cheapestOf(...ladders: PricedVehicle[][]): number {
  * aggregateRating and no Review: Google does not accept self-serving review
  * markup, and the site publishes none anywhere.
  */
+interface AreaSpec {
+  /** schema.org type for the place: City, TrainStation, Place. */
+  type: string;
+  name: string;
+  /**
+   * Wikidata entity URI. Every other page on the site links its areaServed to
+   * one; these four launched without because the identifiers were not verified
+   * at the time. They are now — see the note at the top of this patch history.
+   */
+  sameAs?: string;
+}
+
 function schemaFor(
   slug: string,
   name: string,
   serviceName: string,
   description: string,
   price: number,
-  areaName: string,
+  area: AreaSpec,
 ) {
   const url = `${BASE}/transfers/${slug}`;
   return {
@@ -115,7 +127,11 @@ function schemaFor(
       url,
       serviceType: "Private transfer",
       provider: { "@id": `${BASE}/#business` },
-      areaServed: { "@type": "Place", name: areaName },
+      areaServed: {
+        "@type": area.type,
+        name: area.name,
+        ...(area.sameAs ? { sameAs: area.sameAs } : {}),
+      },
       offers: {
         "@type": "Offer",
         price: String(price),
@@ -248,7 +264,7 @@ const LA_ROCA: RouteLanding = {
     "Barcelona to La Roca Village Private Transfer",
     `Fixed-price private transfer to La Roca Village from central Barcelona (from €${laRocaCityFrom}) or Barcelona El Prat Airport (from €${laRocaAirportFrom}). About 35 km from the city, 35–45 minutes. Return and wait-and-return journeys available.`,
     laRocaCityFrom,
-    "La Roca del Vallès, Catalonia",
+    { type: "City", name: "La Roca del Vallès", sameAs: "https://www.wikidata.org/wiki/Q15439" },
   ),
 };
 
@@ -353,7 +369,7 @@ const SANTS: RouteLanding = {
     "Barcelona Airport to Sants Station Private Transfer",
     `Fixed-price private transfer between Barcelona El Prat Airport and Barcelona Sants railway station. From €${santsFrom} per vehicle, 13–15 km, about 20 minutes. Flight tracking and 60 minutes of free waiting from landing.`,
     santsFrom,
-    "Barcelona Sants, Barcelona, Catalonia",
+    { type: "TrainStation", name: "Barcelona Sants railway station", sameAs: "https://www.wikidata.org/wiki/Q800453" },
   ),
 };
 
@@ -458,7 +474,7 @@ const VILANOVA: RouteLanding = {
     "Barcelona to Vilanova i la Geltrú Private Transfer",
     `Fixed-price private transfer to Vilanova i la Geltrú from Barcelona El Prat Airport or central Barcelona. From €${vilanovaFrom} per vehicle, 36 km, about 40 minutes. Flight tracking and 60 minutes of free waiting from landing.`,
     vilanovaFrom,
-    "Vilanova i la Geltrú, Catalonia",
+    { type: "City", name: "Vilanova i la Geltrú", sameAs: "https://www.wikidata.org/wiki/Q15553" },
   ),
 };
 
@@ -565,7 +581,7 @@ const BEGUR: RouteLanding = {
     "Barcelona to Begur and Aiguablava Private Transfer",
     `Fixed-price private transfer to Begur and the Aiguablava coves from Barcelona El Prat Airport or central Barcelona. From €${begurFrom} per vehicle, 146 km, about 1 hour 45 minutes. Flight tracking and 60 minutes of free waiting from landing.`,
     begurFrom,
-    "Begur, Costa Brava, Catalonia",
+    { type: "City", name: "Begur", sameAs: "https://www.wikidata.org/wiki/Q13462" },
   ),
 };
 

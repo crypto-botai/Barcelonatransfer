@@ -7,6 +7,7 @@ import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 import HubChildLinks from "@/components/transfers/HubChildLinks";
 import { airportChildren } from "@/lib/hub-children";
+import { hubItemList } from "@/lib/hub-schema";
 
 const airportCityEco = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona_city")?.economy ?? 45;
 
@@ -102,9 +103,23 @@ const AIRPORT_FAQS: Array<{ q: string; a: string }> = [
   },
 ];
 
+/**
+ * What this hub contains, stated for machines as well as readers.
+ * Built from the same derived children the visible links use.
+ */
+const HUB_LIST = hubItemList({
+  name: "Barcelona Airport transfer destinations",
+  description: "Every BCN El Prat destination with a published fixed fare and a page of its own.",
+  url: "/airport-transfers",
+  children: airportChildren(),
+});
+
 export default function AirportTransfersPage() {
   return (
     <>
+      {HUB_LIST && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HUB_LIST) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(AIRPORT_SCHEMA) }} />
       <Navbar />
       <main className="pt-20">

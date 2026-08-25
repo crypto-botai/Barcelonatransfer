@@ -8,6 +8,7 @@ import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 import { cheapestOf } from "@/lib/destination-pricing";
+import { hubItemList } from "@/lib/hub-schema";
 
 // The region has no single route in the table; the headline is the
 // cheapest of the destinations this page actually names.
@@ -57,9 +58,23 @@ const costaBravaBreadcrumb = {
   ],
 };
 
+/**
+ * What this hub contains, stated for machines as well as readers.
+ * Built from the same derived children the visible links use.
+ */
+const HUB_LIST = hubItemList({
+  name: "Costa Brava transfer destinations",
+  description: "Costa Brava towns served by fixed-price private transfer from Barcelona.",
+  url: "/transfers/costa-brava",
+  children: costaBravaChildren(),
+});
+
 export default function CostaBravaTransferPage() {
   return (
     <>
+      {HUB_LIST && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HUB_LIST) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costaBravaSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costaBravaBreadcrumb) }} />
       <Navbar />

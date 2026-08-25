@@ -5,6 +5,7 @@ import BookFormClient from "./BookFormClient";
 import { getPublicRoutes } from "@/lib/pricing-service";
 import { ROUTES } from "@/lib/pricing";
 import { faqPage, transferService } from "@/lib/schema";
+import { simpleBreadcrumb } from "@/lib/hub-schema";
 
 // Static metadata is generated at build time and cannot await the database, so
 // the "from" figure in the meta description comes from the canonical matrix —
@@ -54,6 +55,10 @@ const BOOK_FAQ = [
 ] as const;
 
 // Airport & City routes for the SSR price table (Google can index these without JS)
+// This page sits under the root and never said so. Thirteen pages had no
+// BreadcrumbList; eight were homepages, which correctly need none.
+const BREADCRUMB = simpleBreadcrumb([{ name: "Book a Transfer", path: "/book" }]);
+
 export default async function BookPage() {
   // Read the same database-backed source the homepage and /pricing use.
   // This table previously read the hardcoded ROUTES fallback, so any price
@@ -79,6 +84,7 @@ export default async function BookPage() {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 

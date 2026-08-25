@@ -7,6 +7,8 @@ import { SHARED_OG } from "@/lib/seo";
 import { SOCIAL_PROOF } from "@/lib/company-facts";
 import destinations from "@/data/destinations.json";
 import { getDestinationPrices, SLUG_TO_ZONE } from "@/lib/destination-pricing";
+import { hubItemList } from "@/lib/hub-schema";
+import { allDestinationChildren } from "@/lib/hub-children";
 
 /**
  * Full index of the programmatic destination pages, grouped by type.
@@ -201,6 +203,17 @@ const DESTINATIONS = [
   },
 ];
 
+/**
+ * Every destination this hub covers, stated rather than inferred from
+ * the anchor tags. This is the top of the destination tree.
+ */
+const HUB_LIST = hubItemList({
+  name: "Barcelona private transfer destinations",
+  description: "Every destination served by fixed-price private transfer from Barcelona and BCN El Prat Airport.",
+  url: "/transfers",
+  children: allDestinationChildren(),
+});
+
 export default async function TransfersHubPage() {
   // Prices come from the same table that quotes a booking, so a card can no
   // longer advertise a fare the checkout will not honour.
@@ -215,6 +228,9 @@ export default async function TransfersHubPage() {
 
   return (
     <>
+      {HUB_LIST && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HUB_LIST) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(transfersHubSchema) }} />
       <Navbar />
       <main className="pt-20">

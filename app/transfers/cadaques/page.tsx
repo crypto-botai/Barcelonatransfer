@@ -65,7 +65,7 @@ const FAQS = [
   },
   {
     q: "How much does a private transfer from Barcelona to Cadaqués cost?",
-    a: `A fixed-price private transfer from Barcelona to Cadaqués starts from €${LADDER.economy} for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €260, and a Mercedes V-Class for groups up to 7 is €310. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing, with no surcharge for the longer mountain approach. Meet & greet is an optional €5 extra.`,
+    a: `A fixed-price private transfer from Barcelona to Cadaqués starts from €${LADDER.economy} for an Economy sedan (Toyota Corolla, 1–3 passengers). A Business sedan (EQE 300 Electric or Tesla Model 3) is €${LADDER.business}, and a Mercedes V-Class for groups up to 7 is €${LADDER.vclass}. Prices exclude VAT and tolls: 10% VAT is added only if you request an invoice, and motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing, with no surcharge for the longer mountain approach. Meet & greet is an optional €5 extra.`,
   },
   {
     q: "Can Elite BCN transfer us onward from Cadaqués to Girona Airport or back to Barcelona?",

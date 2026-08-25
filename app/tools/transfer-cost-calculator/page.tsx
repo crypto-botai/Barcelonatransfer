@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CostCalculatorClient from "./CostCalculatorClient";
 import { SHARED_OG } from "@/lib/seo";
+import { simpleBreadcrumb } from "@/lib/hub-schema";
 
 const BASE = "https://www.elitebcn.info";
 
@@ -40,9 +41,16 @@ const SCHEMA = {
   author: { "@id": "https://www.elitebcn.info/#business" },
 };
 
+// This page sits under the root and never said so. Thirteen pages had no
+// BreadcrumbList; eight were homepages, which correctly need none.
+// One level, not two: there is no /tools index page, so a "Tools" crumb would
+// point at this same URL and claim a parent that does not exist.
+const BREADCRUMB = simpleBreadcrumb([{ name: "Transfer Cost Calculator", path: "/tools/transfer-cost-calculator" }]);
+
 export default function TransferCostCalculatorPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
       <Navbar />
 

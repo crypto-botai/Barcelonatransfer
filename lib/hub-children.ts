@@ -66,6 +66,32 @@ export function airportChildren(): HubChild[] {
   return out.sort((a, b) => a.label.localeCompare(b.label));
 }
 
+/**
+ * Every destination page on the site, for the top-level /transfers hub.
+ *
+ * Combines the programmatic entries in destinations.json with the hand-built
+ * pages, deduplicated by href, so the hub's ItemList covers what the hub
+ * actually links to rather than one of the two sources.
+ */
+export function allDestinationChildren(): HubChild[] {
+  const seen = new Set<string>();
+  const out: HubChild[] = [];
+  for (const c of [
+    ...fromDestinationType("route"),
+    ...fromDestinationType("hotel"),
+    ...fromDestinationType("cruise"),
+    ...fromDestinationType("event"),
+    ...airportChildren(),
+    ...costaBravaChildren(),
+    ...costaDoradaChildren(),
+  ]) {
+    if (seen.has(c.href)) continue;
+    seen.add(c.href);
+    out.push(c);
+  }
+  return out.sort((a, b) => a.label.localeCompare(b.label));
+}
+
 /** Costa Brava destinations that have a page. Fewer than the coast has towns. */
 export function costaBravaChildren(): HubChild[] {
   return fromRouteCategory("costa-brava");

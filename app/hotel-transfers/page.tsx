@@ -7,10 +7,18 @@ import { hotelChildren } from "@/lib/hub-children";
 import { MapPin, Clock, Shield, Star, ChevronRight, CheckCircle2 } from "lucide-react";
 import { ROUTES as PRICING_ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
+import { hubItemList } from "@/lib/hub-schema";
 
 const BASE = "https://www.elitebcn.info";
 
 // Base airport→city Economy price from the single source of truth
+/**
+ * Journeys that start and end inside Barcelona — hotel to hotel, hotel to Sants.
+ * These two rows read "from €35" against a table price of €50. Derived now.
+ */
+const cityToCityPrice =
+  PRICING_ROUTES.find((r) => r.from === "barcelona_city" && r.to === "barcelona_city")?.economy ?? null;
+
 const airportCityPrice = PRICING_ROUTES.find(
   (r) => r.from === "airport" && r.to === "barcelona_city"
 )?.economy ?? 45;
@@ -71,8 +79,8 @@ const HOTEL_ROUTES = [
   { from: "BCN Airport", to: "W Barcelona, Hotel Arts",                       price: `€${airportCityPrice}`, duration: "20–25 min" },
   { from: "BCN Airport", to: "Mandarin Oriental, El Palace, Majestic",        price: `€${airportCityPrice}`, duration: "20 min" },
   { from: "Hotel",       to: "Cruise Port (Terminals A–F)",                   price: `€${airportCityPrice}`, duration: "15–25 min" },
-  { from: "Hotel",       to: "Hotel (any area)",                              price: "from €35",              duration: "Varies" },
-  { from: "Hotel",       to: "Train station (Sants, Passeig de Gràcia)",      price: "from €35",              duration: "10–20 min" },
+  { from: "Hotel",       to: "Hotel (any area)",                              price: cityToCityPrice ? `from €${cityToCityPrice}` : "Quoted on request", duration: "Varies" },
+  { from: "Hotel",       to: "Train station (Sants, Passeig de Gràcia)",      price: cityToCityPrice ? `from €${cityToCityPrice}` : "Quoted on request", duration: "10–20 min" },
 ];
 
 const HOTELS = [
@@ -83,9 +91,23 @@ const HOTELS = [
   "Almanac Barcelona", "The Serras Hotel", "Hotel 1898",
 ];
 
+/**
+ * What this hub contains, stated for machines as well as readers.
+ * Built from the same derived children the visible links use.
+ */
+const HUB_LIST = hubItemList({
+  name: "Barcelona hotel transfer pages",
+  description: "Barcelona hotels with a dedicated airport pickup page and published fare.",
+  url: "/hotel-transfers",
+  children: hotelChildren(),
+});
+
 export default function HotelTransfersPage() {
   return (
     <>
+      {HUB_LIST && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HUB_LIST) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
       <Navbar />

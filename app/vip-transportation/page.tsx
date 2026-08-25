@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { Star, Shield, Phone, Clock, MapPin, ChevronRight } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
+import { lookupPriceByFleetVehicle } from "@/lib/fixed-prices";
 
 const BASE = "https://www.elitebcn.info";
 
@@ -83,6 +84,17 @@ const SERVICES = [
   },
 ];
 
+/**
+ * Per-car fares for the airport run, read from the table rather than typed.
+ * The three figures below were hand-written and drifted: see the note at the
+ * call site.
+ */
+const VIP_FROM = {
+  V_CLASS: lookupPriceByFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", "V_CLASS"),
+  EQE_300: lookupPriceByFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", "EQE_300"),
+  VITO: lookupPriceByFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", "VITO"),
+} as const;
+
 export default function VIPTransportationPage() {
   return (
     <>
@@ -158,15 +170,17 @@ export default function VIPTransportationPage() {
               VIP-Ready <span className="text-gold-gradient">Fleet</span>
             </h2>
             <p className="text-dark-400 mb-10 max-w-xl mx-auto">
-              All vehicles are professionally valeted before every journey, and
-              stocked with chilled water, phone chargers and noise-cancelling privacy screens on
-              request.
+              All vehicles are professionally valeted before every journey. Privacy glass is
+              fitted to the V-Class; what each car carries is listed on its own page.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
               {[
-                { name: "Mercedes V-Class VIP", detail: "Up to 7 pax · Luxury MPV · Groups & families", from: "€70" },
-                { name: "Mercedes EQE 300 Electric", detail: "Executive sedan · 1–4 pax · Airport meetings", from: "€55" },
-                { name: "Mercedes Vito", detail: "Executive minivan · Up to 8 pax · Large groups", from: "€65" },
+                // Read from the price table. These were typed by hand and two of
+                // the three under-quoted the fare the checkout charges: the
+                // V-Class at €70 against €75, the EQE at €55 against €65.
+                { name: "Mercedes V-Class VIP", detail: "Up to 7 pax · Luxury MPV · Groups & families", from: `€${VIP_FROM.V_CLASS}` },
+                { name: "Mercedes EQE 300 Electric", detail: "Executive sedan · 1–4 pax · Airport meetings", from: `€${VIP_FROM.EQE_300}` },
+                { name: "Mercedes Vito", detail: "Executive minivan · Up to 8 pax · Large groups", from: `€${VIP_FROM.VITO}` },
               ].map((v) => (
                 <div key={v.name} className="bg-dark-900 border border-white/[0.08] rounded-xl p-6">
                   <p className="text-white font-semibold mb-1">{v.name}</p>

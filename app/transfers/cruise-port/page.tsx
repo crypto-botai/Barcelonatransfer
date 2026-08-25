@@ -8,6 +8,7 @@ import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight, Anchor } from 
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 import { ladderFor } from "@/lib/destination-pricing";
+import { hubItemList } from "@/lib/hub-schema";
 
 const cruiseLadder = ladderFor("cruise", "airport")!;
 
@@ -58,9 +59,23 @@ const cruisePortBreadcrumb = {
   ],
 };
 
+/**
+ * What this hub contains, stated for machines as well as readers.
+ * Built from the same derived children the visible links use.
+ */
+const HUB_LIST = hubItemList({
+  name: "Barcelona cruise line transfer pages",
+  description: "Cruise lines calling at Barcelona with a dedicated transfer page.",
+  url: "/transfers/cruise-port",
+  children: cruiseLineChildren(),
+});
+
 export default function CruisePortTransferPage() {
   return (
     <>
+      {HUB_LIST && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HUB_LIST) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(cruisePortSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(cruisePortBreadcrumb) }} />
       <Navbar />
