@@ -127,6 +127,80 @@ export default function CorporatePage() {
                 matters more for business travellers than anyone, and every journey is private
                 &mdash; we never combine bookings or put another company&apos;s passengers in your car.
               </p>
+
+              <h3 className="font-display text-xl text-white pt-4">The journeys accounts actually use</h3>
+              <p>
+                Most corporate volume is the airport, in both directions. Arrivals are tracked by
+                flight number so a delayed inbound does not strand anyone and does not generate a
+                no-show charge; departures are timed backwards from the flight. The{" "}
+                <Link href="/airport-transfers" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  airport transfers page
+                </Link>{" "}
+                covers how meeting points work at T1 and T2.
+              </p>
+              <p>
+                After that it is usually the rail station and the conference venues. Transfers to{" "}
+                <Link href="/transfers/sants-station" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  Barcelona Sants
+                </Link>{" "}
+                come up constantly for teams travelling on to Madrid or Valencia, and days built
+                around several meetings are better booked as{" "}
+                <Link href="/hourly" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  by-the-hour hire
+                </Link>{" "}
+                than as separate transfers &mdash; one driver, one car, and the itinerary can change
+                during the day without repricing.
+              </p>
+              <p>
+                Client entertainment tends to run out of the city: a{" "}
+                <Link href="/transfers/montserrat" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  Montserrat
+                </Link>{" "}
+                morning, an afternoon in the wine country, or a run up to{" "}
+                <Link href="/transfers/la-roca-village" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  La Roca Village
+                </Link>{" "}
+                for visiting delegates with an afternoon free. Where discretion matters more than
+                logistics &mdash; principals, media-sensitive visits, anything under an NDA &mdash;
+                the{" "}
+                <Link href="/vip-transportation" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  VIP transport page
+                </Link>{" "}
+                sets out what we do and, as importantly, what we do not.
+              </p>
+
+              <h3 className="font-display text-xl text-white pt-4">Questions finance teams ask</h3>
+              <p>
+                <strong className="text-white">Is there a minimum spend or a monthly fee?</strong>{" "}
+                No. There is no retainer and no minimum. An account that runs two transfers one
+                month and forty the next is billed for exactly that.
+              </p>
+              <p>
+                <strong className="text-white">Can we get a single invoice per cost centre?</strong>{" "}
+                Yes. Tell us how you need journeys grouped &mdash; by department, by project code,
+                by visiting company &mdash; and the monthly invoice is split that way, with each
+                trip itemised underneath.
+              </p>
+              <p>
+                <strong className="text-white">What are the payment terms?</strong>{" "}
+                Invoiced monthly in arrears, payable by transfer. Terms are confirmed in writing
+                when the account opens rather than assumed, and they do not change without notice.
+              </p>
+              <p>
+                <strong className="text-white">Who do we contact when something changes at
+                short notice?</strong>{" "}
+                A named person, not a queue. Flight changes, extra passengers and cancelled
+                meetings are normal and are handled on WhatsApp or by phone at any hour &mdash;
+                the number is on the{" "}
+                <Link href="/contact" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  contact page
+                </Link>
+                , and the{" "}
+                <Link href="/faq" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  FAQ
+                </Link>{" "}
+                covers cancellation and waiting time in detail.
+              </p>
             </div>
           </div>
         </section>

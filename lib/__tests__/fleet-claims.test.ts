@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import fg from "fast-glob";
 import { VEHICLE_CATALOG } from "@/types";
 import { FLEET_FACTS, amenitySentence, fleetSummary } from "@/lib/fleet-facts";
+import { COMPANY_FACTS } from "@/lib/company-facts";
+import { GOOGLE_PROFILE } from "@/data/reviews";
 
 /**
  * Amenity claims have to be true of the fleet, not of one car in it.
@@ -26,6 +28,12 @@ const SOURCES = [
   ...fg.sync("app/**/*.tsx", { ignore: ["**/node_modules/**"] }),
   ...fg.sync("components/**/*.tsx"),
   ...fg.sync("lib/**/*.ts", { ignore: ["lib/__tests__/**", "lib/fleet-facts.ts"] }),
+  // The locale files, which is where this hid longest. fleet.subtitle read
+  // "Every vehicle under 3 years old" in all eight languages and renders
+  // through FleetSection on /fleet and on all seven locale homepages — nine
+  // live pages a sweep of .tsx and .ts could never see. It survived the first
+  // pass of this very test for exactly that reason.
+  ...fg.sync("messages/*.json"),
 ];
 
 /** Comment lines are documentation, not claims made to a reader. */
@@ -58,8 +66,23 @@ describe("the catalogue is the source for what the fleet offers", () => {
 });
 
 describe("no page makes a claim the catalogue does not support", () => {
-  it("nothing states a vehicle age", () => {
-    const re = /(under|less than|no more than)\s+\w+\s+years?\s+old|\b\d\s*years?\s+old\b/i;
+  it("nothing states a vehicle age, in any language", () => {
+    // Match the shape rather than the English wording: a small number beside
+    // that language's word for "years". The claim was translated eight times.
+    const re = new RegExp(
+      [
+        String.raw`(under|less than|no more than)\s+\w+\s+years?\s+old`,
+        String.raw`\b\d\s*years?\s+old\b`,
+        String.raw`menos de \d+ años`,
+        String.raw`moins de \d+ ans`,
+        String.raw`unter \d+ Jahren`,
+        String.raw`meno di \d+ anni`,
+        String.raw`младше \d+ лет`,
+        String.raw`车龄[^\n]{0,8}\d+年`,
+        String.raw`أقل من \d+ سنوات`,
+      ].join("|"),
+      "i",
+    );
     const offenders = SOURCES.filter((f) => re.test(prose(f)));
     expect(offenders).toEqual([]);
   });
@@ -101,5 +124,41 @@ describe("the derived sentences describe the real fleet", () => {
     if (!FLEET_FACTS.wifiUniversal) {
       expect(s).toMatch(new RegExp(`${FLEET_FACTS.wifiCount} of the ${FLEET_FACTS.total}`));
     }
+  });
+});
+
+describe("the locale files state no rating and no review count", () => {
+  /**
+   * hero.badges.rating read "4.9★ Rating" in all eight languages while the
+   * real Google profile held 5.0, and the review count on the same badge was
+   * already derived from that profile — so the homepage showed a fabricated
+   * rating beside an accurate count, in eight languages.
+   *
+   * A figure that lives in a translation cannot be kept in step with its
+   * source. These check that none does: the numbers come from
+   * COMPANY_FACTS and the locale files carry only the words around them.
+   */
+  const LOCALES = fg.sync("messages/*.json");
+
+  it("finds the locale files", () => {
+    expect(LOCALES.length).toBe(8);
+  });
+
+  it("no locale file contains a star rating", () => {
+    const offenders = LOCALES.filter((f) => /[0-9][.,][0-9]\s*★|★\s*[0-9]/.test(readFileSync(f, "utf-8")));
+    expect(offenders).toEqual([]);
+  });
+
+  it("no locale file states a review count", () => {
+    const re = /"[^"]*\b\d{2,}\s*(reviews|reseñas|avis|Bewertungen|recensioni|отзывов|条评价|تقييم)[^"]*"/i;
+    const offenders = LOCALES.filter((f) => re.test(readFileSync(f, "utf-8")));
+    expect(offenders).toEqual([]);
+  });
+
+  it("the rating shown on the hero is the profile's, to one decimal", () => {
+    const hero = readFileSync("components/sections/HeroSection.tsx", "utf-8");
+    expect(hero).toMatch(/COMPANY_FACTS\.ratingDisplay/);
+    expect(COMPANY_FACTS.ratingDisplay).toBe(`${GOOGLE_PROFILE.rating.toFixed(1)}★`);
+    expect(COMPANY_FACTS.totalReviewCount).toBe(GOOGLE_PROFILE.count);
   });
 });

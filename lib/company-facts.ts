@@ -55,7 +55,9 @@ export const COMPANY_FACTS = {
   googleReviewCount:   SOCIAL_PROOF.google.count,
   totalReviewCount:    totalReviews(),
   rating:              SOCIAL_PROOF.google.rating,
-  ratingDisplay:       `${SOCIAL_PROOF.google.rating}★`,
+  // toFixed(1) so a whole number keeps its decimal: `${5.0}` renders as
+  // "5" in a template literal, and "5★" reads as a rounded-up 4.5.
+  ratingDisplay:       `${SOCIAL_PROOF.google.rating.toFixed(1)}★`,
   transfersDisplay:    OPERATIONS.transfersDisplay,
   yearsDisplay:        `${yearsActive()}+`,
   totalReviewsDisplay: `${totalReviews()}`,
