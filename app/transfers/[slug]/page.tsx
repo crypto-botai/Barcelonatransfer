@@ -72,6 +72,44 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
+/**
+ * The service hub a destination belongs to.
+ *
+ * Chosen from the record's own `type`, not from words in its name: a page is a
+ * hotel page because destinations.json says so, and mataro-transfer is a Costa
+ * Brava route because it is one, not because its slug contains a coast name.
+ * The nine `route` records span both coasts and four long-distance runs, so
+ * they are curated individually rather than guessed.
+ *
+ * Each returns its own lead-in sentence, so the 43 pages do not all carry an
+ * identical anchor.
+ */
+const ROUTE_HUBS: Record<string, { href: string; anchor: string; lead: string }> = {
+  "salou-transfer":     { href: "/transfers/costa-dorada", anchor: "our Costa Dorada transfers", lead: "Salou sits on the Costa Dorada, and the same fixed prices cover the whole coast — see" },
+  "reus-airport":       { href: "/transfers/costa-dorada", anchor: "the Costa Dorada routes", lead: "Reus serves the Costa Dorada resorts, all of which have a published fare — see" },
+  "mataro-transfer":    { href: "/transfers/costa-brava",  anchor: "our Costa Brava routes", lead: "Mataró is the gateway to the Maresme and the Costa Brava beyond it — see" },
+  "girona-airport":     { href: "/transfers/costa-brava",  anchor: "Costa Brava transfers", lead: "Girona airport is the closest to the northern beach towns — see" },
+  "terrassa-transfer":  { href: "/airport-transfers",      anchor: "how airport transfers work", lead: "This route starts at BCN El Prat like every other airport run — read" },
+  "lleida-transfer":    { href: "/airport-transfers",      anchor: "our airport transfer service", lead: "Long-distance routes are booked the same way as any airport pickup — see" },
+  "madrid-transfer":    { href: "/airport-transfers",      anchor: "what an airport transfer includes", lead: "Flight tracking and free waiting apply here as on any arrival — see" },
+  "valencia-transfer":  { href: "/airport-transfers",      anchor: "our airport pickup service", lead: "Long-distance journeys begin at arrivals like any other — see" },
+  "perpignan-transfer": { href: "/airport-transfers",      anchor: "airport transfers from BCN", lead: "Cross-border routes start at BCN El Prat — see" },
+};
+
+const TYPE_HUBS: Record<string, { href: string; anchor: string; lead: string }> = {
+  hotel:  { href: "/hotel-transfers",        anchor: "how hotel transfers work", lead: "Door-to-door drop-off applies at every Barcelona hotel we serve — read" },
+  cruise: { href: "/transfers/cruise-port",  anchor: "our cruise terminal transfers", lead: "All Barcelona sailings depart from Moll Adossat or the World Trade Centre — see" },
+  event:  { href: "/airport-transfers",      anchor: "our airport transfer service", lead: "Getting to the venue starts with the arrival itself — see" },
+};
+
+function serviceHubFor(dest: Destination): { href: string; anchor: string; lead: string } {
+  return (
+    ROUTE_HUBS[dest.slug] ??
+    TYPE_HUBS[dest.type] ??
+    { href: "/transfers", anchor: "every destination we cover", lead: "This is one of many published routes — see" }
+  );
+}
+
 function buildSchema(dest: Destination, prices: ResolvedPlacePrices | null) {
   // Schema states the fare the checkout will charge, or states none at all.
   // The stale figures in destinations.json are never a fallback: publishing an
@@ -145,6 +183,7 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
   const sedan  = prices?.economy ?? null;
   const isFixed = prices?.basis !== "distance";
   const { serviceSchema, breadcrumbSchema, faqSchema } = buildSchema(dest, prices);
+  const HUB = serviceHubFor(dest);
   // "nearby" slugs can point either at a programmatic destinations.json entry or at one
   // of the hand-built static pages (girona, sitges, costa-brava, ...) — check both so a
   // valid reference never silently disappears from the related-destinations grid.
@@ -381,6 +420,23 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ── The service hub this destination belongs to ──
+            These 43 pages linked to /transfers, three siblings and the booking
+            CTA, and to no service hub at all: a hotel page never reached
+            /hotel-transfers, a cruise page never reached the cruise-port hub.
+            One sentence here connects every one of them to the page that
+            should own it. */}
+        <section className="py-10 bg-dark-950 border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <p className="text-dark-300 leading-relaxed">
+              {HUB.lead}{" "}
+              <Link href={HUB.href} className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40">
+                {HUB.anchor}
+              </Link>.
+            </p>
           </div>
         </section>
 

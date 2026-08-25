@@ -285,7 +285,13 @@ export default async function TransfersHubPage() {
               busiest of them all is the run{" "}
               <Link href="/transfers/barcelona-city-centre" className="text-gold-400 hover:text-gold-300">
                 from the airport into the city centre
-              </Link>.
+              </Link>. If you are still deciding where to go, our{" "}
+              {/* /blog had no in-content inbound link at all, so none of the
+                  thirteen guides could be reached by reading the site. */}
+              <Link href="/blog" className="text-gold-400 hover:text-gold-300">
+                destination guides
+              </Link>{" "}
+              cover what is worth the drive.
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">

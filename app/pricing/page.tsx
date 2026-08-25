@@ -83,7 +83,7 @@ export default async function PricingPage() {
           <div className="container mx-auto px-4 pt-8 flex justify-center">
             <CurrencySwitcher />
           </div>
-          <PricingSection routes={routes} />
+          <PricingSection routes={routes} allTabs />
         </CurrencyProvider>
       </main>
       <Footer />

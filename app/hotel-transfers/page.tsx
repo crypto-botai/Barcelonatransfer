@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import HubChildLinks from "@/components/transfers/HubChildLinks";
+import { hotelChildren } from "@/lib/hub-children";
 import { MapPin, Clock, Shield, Star, ChevronRight, CheckCircle2 } from "lucide-react";
 import { ROUTES as PRICING_ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
@@ -252,6 +254,15 @@ export default function HotelTransfersPage() {
             </div>
           </div>
         </section>
+
+        {/* The hub named hotels in prose and linked to none of their pages.
+            Each of the twenty has pickup detail specific to that property,
+            which is exactly what someone booking to it wants. */}
+        <HubChildLinks
+          heading="Barcelona hotels with their own pickup page"
+          intro="Where the driver waits differs by property — a Passeig de Gràcia entrance is not a Barceloneta forecourt. These have the detail for their address."
+          children={hotelChildren()}
+        />
       </main>
 
       <Footer />

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import HubChildLinks from "@/components/transfers/HubChildLinks";
+import { cruiseLineChildren } from "@/lib/hub-children";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight, Anchor } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
@@ -222,6 +224,15 @@ export default function CruisePortTransferPage() {
             </Link>
           </div>
         </section>
+
+        {/* Links down to the destinations this hub covers. The hub had
+            two in-content outbound links and named its towns in prose
+            without linking any of them. */}
+        <HubChildLinks
+          heading="Transfers by cruise line"
+          intro="Terminal, meeting point and embarkation timing differ by line, so each has its own page."
+          children={cruiseLineChildren()}
+        />
       </main>
       <Footer />
     </>

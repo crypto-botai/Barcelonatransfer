@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import HubChildLinks from "@/components/transfers/HubChildLinks";
+import { costaDoradaChildren } from "@/lib/hub-children";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
@@ -201,6 +203,15 @@ export default function CostaDoradaTransferPage() {
             </Link>
           </div>
         </section>
+
+        {/* Links down to the destinations this hub covers. The hub had
+            two in-content outbound links and named its towns in prose
+            without linking any of them. */}
+        <HubChildLinks
+          heading="Costa Dorada destinations we price"
+          intro="Journey times, vehicle options and the fixed fare for each. Anywhere on the coast without its own page is still priced in the table."
+          children={costaDoradaChildren()}
+        />
       </main>
       <Footer />
     </>

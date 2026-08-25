@@ -226,3 +226,34 @@ export function cheapestOf(
     .filter((n): n is number => typeof n === "number" && n > 0);
   return fares.length ? Math.min(...fares) : null;
 }
+
+/**
+ * Pricing zone → the destination page that covers it.
+ *
+ * Inverts SLUG_TO_ZONE and adds the three zones whose page slug does not follow
+ * from the zone name. Zones absent here have no page: the price row for them
+ * stays unlinked rather than pointing somewhere that does not exist.
+ */
+const ZONE_TO_PAGE: Record<string, string> = {
+  ...Object.fromEntries(Object.entries(SLUG_TO_ZONE).map(([slug, zone]) => [zone, slug])),
+  barcelona_city: "barcelona-city-centre",
+  girona_city:    "girona",
+  mataro:         "mataro-transfer",
+};
+
+/**
+ * The destination page for a priced route, or null when none exists.
+ *
+ * The price table lists 73 routes and linked none of them: /pricing had exactly
+ * one outbound in-content link, to /book. A reader comparing fares is the
+ * reader most likely to want the route detail, and those route pages were among
+ * the least supported on the site.
+ *
+ * Routes are bidirectional, so either end may be the destination. The "to" end
+ * is tried first, which puts the airport-origin rows on the place being
+ * travelled to.
+ */
+export function routePageHref(fromKey: string, toKey: string): string | null {
+  const page = ZONE_TO_PAGE[toKey] ?? ZONE_TO_PAGE[fromKey];
+  return page ? `/transfers/${page}` : null;
+}

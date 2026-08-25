@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Users, Briefcase, ChevronRight, Zap, Star } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
 import { VEHICLE_CATALOG, vehicleBadgeClass, BAG_SIZES } from "@/types";
+import { fleetPagePath } from "@/lib/fleet-pages";
 import { formatCurrency } from "@/lib/utils";
 import { getFleetFromPrice } from "@/lib/pricing";
 
@@ -49,7 +50,15 @@ function FleetCardInner({
       <div className="flex flex-col flex-1 p-5 gap-3.5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <Name className="font-display text-[1.1rem] text-white leading-snug">{vehicle.label}</Name>
+            {/* The vehicle name links to its own page. Six of the seven detail
+                pages had no in-content inbound link anywhere on the site, from
+                the very hub that introduces them. Using the name as the anchor
+                means all seven links read differently. */}
+            <Name className="font-display text-[1.1rem] text-white leading-snug">
+              <Link href={fleetPagePath(vehicle.class)} className="hover:text-[#c9a84c] transition-colors">
+                {vehicle.label}
+              </Link>
+            </Name>
             <p className="text-white/60 text-xs mt-0.5 truncate">{vehicle.models[0]}</p>
           </div>
           <div className="text-right shrink-0">
