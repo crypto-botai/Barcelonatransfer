@@ -2,33 +2,32 @@
 // All builders return plain objects ready for JSON.stringify().
 // Import here; never hand-write JSON-LD in page files.
 
-import { COMPANY, SOCIAL_PROOF, totalReviews } from "@/lib/company-facts";
+import { COMPANY } from "@/lib/company-facts";
 
 const SITE = "https://www.elitebcn.info";
 
 // ── Base organisation reference ─────────────────────────────────────────────
+/**
+ * A reference to the one business entity, for use as `provider` on Service and
+ * Product nodes.
+ *
+ * This used to redeclare the business under its own "@id" of "/#org", giving
+ * the company a third identity alongside "/#organization" and "/#business" in
+ * the root layout. To a machine those are three separate entities, so the
+ * address attached to one, the reviews to another and the social profiles to a
+ * third — which is the opposite of the entity consolidation that helps a local
+ * business rank. A bare @id reference resolves against the full node the root
+ * layout renders on every page.
+ *
+ * It also carried an aggregateRating built from the real Google figures, and it
+ * was live on /book. The numbers were true, but reviews about a business,
+ * published on that business's own site, are self-serving under Google's
+ * structured data policy: ineligible for rich results, and a manual-action risk
+ * for no gain. The reviews stay on the page for people to read, where they do
+ * their actual job.
+ */
 export function organisationRef() {
-  return {
-    "@type": "LocalBusiness",
-    "@id":   `${SITE}/#org`,
-    name:    COMPANY.legalName,
-    url:     SITE,
-    telephone: COMPANY.phone,
-    email:   COMPANY.email,
-    address: {
-      "@type":           "PostalAddress",
-      addressLocality:   COMPANY.city,
-      addressRegion:     COMPANY.region,
-      addressCountry:    COMPANY.country,
-    },
-    aggregateRating: {
-      "@type":       "AggregateRating",
-      ratingValue:   SOCIAL_PROOF.google.rating,
-      reviewCount:   totalReviews(),
-      bestRating:    5,
-      worstRating:   1,
-    },
-  } as const;
+  return { "@id": `${SITE}/#business` } as const;
 }
 
 // ── BreadcrumbList ──────────────────────────────────────────────────────────

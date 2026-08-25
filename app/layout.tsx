@@ -12,6 +12,7 @@ import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import MobileBookBar from "@/components/layout/MobileBookBar";
 import DeferredAnalytics from "@/components/layout/DeferredAnalytics";
 import { buildOfferCatalog } from "@/lib/offer-catalog";
+import { SUPPORTED_LOCALES } from "@/lib/i18n";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -60,8 +61,11 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "https://www.elitebcn.info",
-    // No URL-based locale routing exists — all locales share the same URL.
-    // x-default tells Google this URL is the canonical for all languages.
+    // Locale routing now exists: app/[locale] publishes /es, /fr, /de, /it,
+    // /ru, /zh and /ar, and app/page.tsx emits the full hreflang set for the
+    // homepage. This default only applies to pages that set no alternates of
+    // their own; every page currently sets its own canonical, which replaces
+    // this block entirely, so no page inherits a stray x-default.
     languages: { "x-default": "https://www.elitebcn.info" },
   },
 };
@@ -83,11 +87,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             an origin the page does not request early wastes a connection slot.
             dns-prefetch is the cheap equivalent for a later, deferred request. */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        {/* Geo meta tags for local SEO — BCN El Prat Airport is primary service location */}
+        {/* Geo meta for local SEO — the premises, not the airport.
+            These named El Prat and carried its coordinates, the same false
+            location the JSON-LD address had. Where the business operates is
+            stated in areaServed and across the route pages; this says where it
+            is. Coordinates geocoded from Carrer de Llull 465. */}
         <meta name="geo.region" content="ES-CT" />
-        <meta name="geo.placename" content="Barcelona El Prat Airport, Catalonia, Spain" />
-        <meta name="geo.position" content="41.2974;2.0833" />
-        <meta name="ICBM" content="41.2974, 2.0833" />
+        <meta name="geo.placename" content="Barcelona, Catalonia, Spain" />
+        <meta name="geo.position" content="41.4131552;2.2178314" />
+        <meta name="ICBM" content="41.4131552, 2.2178314" />
         {/* Primary @graph schema — Organization + TaxiService + WebSite */}
         <script
           type="application/ld+json"
@@ -105,18 +113,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   email: COMPANY.email,
                   foundingDate: "2018",
                   description: "Barcelona's premier luxury private transfer company. Fixed-price airport transfers, VIP travel, executive transport.",
+                  // Same premises as the LocalBusiness node below. This carried
+                  // postcode 08001 — central Barcelona, and not where the
+                  // business is — while that node claimed 08820 at the airport.
+                  // One company cannot be in two municipalities, and Google read
+                  // both on every page.
                   address: {
                     "@type": "PostalAddress",
+                    streetAddress: "Carrer de Llull 465",
                     addressLocality: "Barcelona",
                     addressRegion: "Catalonia",
-                    postalCode: "08001",
+                    postalCode: "08019",
                     addressCountry: "ES",
                   },
                   contactPoint: {
                     "@type": "ContactPoint",
                     telephone: "+34635383712",
                     contactType: "customer service",
-                    availableLanguage: ["English", "Spanish", "Catalan"],
+                    // Read from the locale list. This said English, Spanish and
+                    // Catalan — the site publishes eight languages and Catalan
+                    // is not one of them.
+                    availableLanguage: [...SUPPORTED_LOCALES],
                     hoursAvailable: { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], opens: "00:00", closes: "23:59" },
                   },
                   // Profiles that actually belong to this business. The last
@@ -136,7 +153,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   "@type": ["TaxiService", "LocalBusiness", "LimousineBusiness"],
                   "@id": "https://www.elitebcn.info/#business",
                   name: "Elite BCN Transfers",
-                  alternateName: ["Elite BCN", "Elite BCN", "Elite Barcelona Transfers", "VTC Barcelona"],
+                  alternateName: ["Elite BCN", "Elite Barcelona Transfers", "VTC Barcelona"],
                   description: "Luxury private airport transfers in Barcelona. Fixed prices from €50. Mercedes V-Class & EQE 300 Electric. No surge pricing. Available 24/7. BCN El Prat T1/T2, cruise port, hotels, all Costa Daurada destinations.",
                   url: "https://www.elitebcn.info",
                   telephone: "+34635383712",
@@ -147,15 +164,47 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   openingHours: "Mo-Su 00:00-24:00",
                   image: "https://www.elitebcn.info/opengraph-image",
                   logo: "https://www.elitebcn.info/opengraph-image",
+                  // The registered premises, confirmed by the owner on 25 Aug 2026.
+                  //
+                  // This said streetAddress "Barcelona El Prat Airport", postcode
+                  // 08820, with coordinates on the airport apron — which told
+                  // Google the business is located inside El Prat, a different
+                  // municipality from Barcelona. It is not: it operates from a
+                  // shop in Sant Martí. A location claim that disagrees with the
+                  // Google Business Profile works directly against map-pack
+                  // ranking, and a fabricated one risks the profile itself.
+                  //
+                  // Serving the airport is stated where it belongs: areaServed
+                  // below, and 37 airport routes across the site.
                   address: {
                     "@type": "PostalAddress",
-                    streetAddress: "Barcelona El Prat Airport",
+                    streetAddress: "Carrer de Llull 465",
                     addressLocality: "Barcelona",
                     addressRegion: "Catalonia",
-                    postalCode: "08820",
+                    postalCode: "08019",
                     addressCountry: "ES",
                   },
-                  geo: { "@type": "GeoCoordinates", latitude: 41.2974, longitude: 2.0833 },
+                  // Geocoded from the address above rather than typed by hand.
+                  geo: { "@type": "GeoCoordinates", latitude: 41.4131552, longitude: 2.2178314 },
+                  openingHoursSpecification: [
+                    {
+                      "@type": "OpeningHoursSpecification",
+                      dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+                      opens: "00:00",
+                      closes: "23:59",
+                    },
+                  ],
+                  // Eight languages are published on the site; saying so is a
+                  // real differentiator for an international arrivals market.
+                  knowsLanguage: [...SUPPORTED_LOCALES],
+                  // Also on this node, not only on the Organization above, so the
+                  // profiles and the business resolve as one entity.
+                  sameAs: [
+                    "https://www.instagram.com/elitebcn.info",
+                    "https://www.facebook.com/elitebcn.info",
+                    "https://www.tiktok.com/@elitebcn.info",
+                    "https://www.google.com/maps?cid=8610295895899713122",
+                  ],
                   areaServed: [
                     // Core cities
                     { "@type": "City", name: "Barcelona",       sameAs: "https://www.wikidata.org/wiki/Q1492"   },

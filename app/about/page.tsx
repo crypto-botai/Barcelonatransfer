@@ -44,22 +44,14 @@ const aboutSchema = {
         ],
       },
     },
-    {
-      "@type":       "Organization",
-      "@id":         "https://www.elitebcn.info/#organization",
-      name:          "Elite BCN Transfers",
-      url:           "https://www.elitebcn.info",
-      foundingDate:  "2018",
-      description:   "Licensed VTC private chauffeur service in Barcelona. Airport transfers, corporate travel, luxury fleet.",
-      logo:          { "@type": "ImageObject", url: "https://www.elitebcn.info/favicon.svg" },
-      contactPoint:  { "@type": "ContactPoint", telephone: "+34-635-383-712", contactType: "customer service", availableLanguage: ["English", "Spanish"] },
-      address: {
-        "@type":           "PostalAddress",
-        addressLocality:   "Barcelona",
-        addressRegion:     "Catalonia",
-        addressCountry:    "ES",
-      },
-    },
+    // A reference, not a second declaration.
+    //
+    // This page previously redeclared "/#organization" — the same @id the root
+    // layout already emits on every page — with a different address (no
+    // postcode), a differently formatted telephone number and a shorter
+    // language list. One entity described twice, differently, on one page.
+    // The layout's node is the canonical one; this simply points at it.
+    { "@id": "https://www.elitebcn.info/#organization" },
   ],
 };
 
