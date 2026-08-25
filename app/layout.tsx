@@ -20,11 +20,27 @@ const inter = Inter({
   display: "swap",
 });
 
+/**
+ * The variable font, not four static cuts.
+ *
+ * Listing weight: ["400","500","600","700"] makes next/font fetch a separate
+ * file per weight. Only some of them get a preload hint, so on production the
+ * odd one out — 18.8 KB, VeryHigh priority, no preload — arrived at 1,312 ms
+ * against an observed LCP of 1,335 ms. The heading painted in the fallback,
+ * then Playfair swapped in and reset the LCP candidate to the moment that font
+ * landed. That single late file was most of the gap between a 1.3 s paint and
+ * a 3.0 s reported LCP.
+ *
+ * Playfair Display is a variable font covering 400-900 continuously, so
+ * dropping the weight array yields one preloaded file that serves all four
+ * weights the site uses — font-medium, font-semibold, font-bold and the 400
+ * default on h1/h2 in globals.css. Fewer bytes, one fewer request, and the
+ * swap happens before the largest paint instead of after it.
+ */
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
