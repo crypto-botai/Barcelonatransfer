@@ -66,7 +66,11 @@ export default async function BookPage() {
     name: "Barcelona Airport Private Transfer",
     description: "Fixed-price luxury chauffeur transfers from Barcelona El Prat Airport (T1/T2) to city centre, hotels, cruise port, and Costa Daurada. Mercedes V-Class & EQE 300 Electric. Fixed price per vehicle.",
     url: "/book",
-    priceFrom: 45,
+    // Was a hardcoded 45 while the page itself showed €50, so the Service
+    // schema published a fare the checkout would not charge. fromPrice is
+    // already read from ROUTES a few lines above for the meta description;
+    // using it here means the two cannot disagree again.
+    priceFrom: fromPrice,
     fromCity: "El Prat de Llobregat",
     toCity: "Barcelona",
   });
