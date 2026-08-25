@@ -38,18 +38,33 @@ export default async function HomePage() {
     <>
       <ScrollReset />
       <Navbar />
+      {/* Everything below the hero is wrapped in .defer-render: the browser
+          skips layout and paint for these until they near the viewport. The
+          markup is unchanged, so the HTML a crawler receives is identical. */}
       <main>
         <HeroSection />
-        <ServicesSection />
-        <FleetSection />
-        <PricingSection routes={routes} />
+        <div className="defer-render">
+          <ServicesSection />
+        </div>
+        <div className="defer-render">
+          <FleetSection />
+        </div>
+        <div className="defer-render">
+          <PricingSection routes={routes} />
+        </div>
         {/* Reviews come straight after the price: the reader who has just seen
             what it costs is the one who wants to know whether it is any good.
             The explanation of how a transfer works sits below them — it answers
             questions somebody already interested will have. */}
-        <TestimonialsSection />
-        <HowItWorksSection />
-        <FAQSection />
+        <div className="defer-render">
+          <TestimonialsSection />
+        </div>
+        <div className="defer-render">
+          <HowItWorksSection />
+        </div>
+        <div className="defer-render">
+          <FAQSection />
+        </div>
       </main>
       <InstallPrompt />
       <Footer />
