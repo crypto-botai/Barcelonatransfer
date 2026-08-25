@@ -88,6 +88,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // ── Destination hub + static landing pages ─────────────────────
     { url: `${BASE}/transfers`,               lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
+    // The airport-to-city-centre run: the most searched route on the site, and
+    // until now the only major one without a page of its own.
+    { url: `${BASE}/transfers/barcelona-city-centre`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.9 },
     { url: `${BASE}/transfers/sitges`,        lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/transfers/girona`,        lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/transfers/montserrat`,    lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.8  },

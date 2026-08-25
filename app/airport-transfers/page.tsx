@@ -171,7 +171,13 @@ export default function AirportTransfersPage() {
               <h3 className="font-display text-2xl text-white">Where we go from the airport</h3>
               <p>
                 {airportRoutes.length} destinations have a published fixed price from BCN El Prat, starting
-                at €{cheapestAirportFare} for the city centre and reaching along both coasts and into the
+                at €{cheapestAirportFare} for{" "}
+                {/* Hub links down to the route page that owns this journey in
+                    detail; this page keeps the destination list. */}
+                <Link href="/transfers/barcelona-city-centre" className="text-gold-400 hover:text-gold-300">
+                  transfers into central Barcelona
+                </Link>{" "}
+                and reaching along both coasts and into the
                 Pyrenees. The price is per vehicle and set before you travel, so it does not move with
                 traffic, with the hour, or with how long the queue at passport control turns out to be.
               </p>

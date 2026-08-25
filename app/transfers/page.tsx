@@ -281,7 +281,11 @@ export default async function TransfersHubPage() {
             </h2>
             <p className="text-dark-400 text-sm text-center mb-10 max-w-2xl mx-auto">
               Fixed-price private transfers to {destinations.length} more hotels, cruise terminals,
-              venues and long-distance routes — each with its own prices and journey times.
+              venues and long-distance routes — each with its own prices and journey times. The
+              busiest of them all is the run{" "}
+              <Link href="/transfers/barcelona-city-centre" className="text-gold-400 hover:text-gold-300">
+                from the airport into the city centre
+              </Link>.
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
