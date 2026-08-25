@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { COMPANY } from "@/lib/company-facts";
-import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
 import I18nProvider from "@/components/language/I18nProvider";
 // WhatsApp only. The support centre also offered an AI concierge; the owner
@@ -293,17 +292,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <WhatsAppButton />
           <MobileBookBar />
-<Toaster
-            position="top-right"
-            toastOptions={{
-              style: {
-                background: "#1a1a1a",
-                color: "#fff",
-                border: "1px solid rgba(201,168,76,0.3)",
-                borderRadius: "8px",
-              },
-            }}
-          />
           <DeferredAnalytics gaId="G-E9QZFG5WZY" adsId="AW-18391666445" />
           </I18nProvider>
         </AuthProvider>
