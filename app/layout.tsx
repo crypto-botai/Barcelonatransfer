@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { COMPANY } from "@/lib/company-facts";
+// The Google Business Profile's own name, so the LocalBusiness below can
+// declare it as an alternate and Google can resolve the two to one business.
+import { GOOGLE_PROFILE } from "@/data/reviews";
 import AuthProvider from "@/components/layout/AuthProvider";
 import I18nProvider from "@/components/language/I18nProvider";
 // WhatsApp only. The support centre also offered an AI concierge; the owner
@@ -168,7 +171,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   "@type": ["TaxiService", "LocalBusiness", "LimousineBusiness"],
                   "@id": "https://www.elitebcn.info/#business",
                   name: "Elite BCN Transfers",
-                  alternateName: ["Elite BCN", "Elite Barcelona Transfers", "VTC Barcelona"],
+                  // GOOGLE_PROFILE.name is the Business Profile's exact name —
+                  // "Elite Barcelona Transfer", singular. The plural below is a
+                  // near-match, and a near-match does not resolve to the same
+                  // entity. Derived so renaming the profile updates both at once.
+                  alternateName: [
+                    "Elite BCN",
+                    GOOGLE_PROFILE.name,
+                    "Elite Barcelona Transfers",
+                    "VTC Barcelona",
+                  ],
                   description: "Luxury private airport transfers in Barcelona. Fixed prices from €50. Mercedes V-Class & EQE 300 Electric. No surge pricing. Available 24/7. BCN El Prat T1/T2, cruise port, hotels, all Costa Daurada destinations.",
                   url: "https://www.elitebcn.info",
                   telephone: "+34635383712",

@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { organisationRef } from "@/lib/schema";
+import { GOOGLE_PROFILE } from "@/data/reviews";
+import { COMPANY } from "@/lib/company-facts";
 
 /**
  * The site described itself to Google in four places and disagreed with itself
@@ -90,5 +92,33 @@ describe("no self-serving review markup", () => {
     expect(LAYOUT).not.toMatch(/aggregateRating/i);
     expect(LAYOUT).not.toMatch(/ratingValue/i);
     expect(ABOUT).not.toMatch(/aggregateRating/i);
+  });
+});
+
+describe("the site and the Google Business Profile resolve to one business", () => {
+  /**
+   * The profile is named "Elite Barcelona Transfer"; the site publishes
+   * "Elite BCN Transfers". Same company — BCN is the short form of Barcelona —
+   * but an entity resolver does not know that, and the list already held
+   * "Elite Barcelona Transfers" with an s, which is a near-match rather than a
+   * match.
+   *
+   * These check the link is real rather than that a particular string is
+   * present: the profile's own name must appear among the alternates, and the
+   * profile URL must appear in sameAs. Renaming the profile in data/reviews.ts
+   * updates the schema in the same edit, and this fails if it ever does not.
+   */
+  it("declares the Business Profile's exact name as an alternate", () => {
+    expect(LAYOUT).toMatch(/alternateName:\s*\[[^\]]*GOOGLE_PROFILE\.name/s);
+    expect(GOOGLE_PROFILE.name.trim().length).toBeGreaterThan(0);
+  });
+
+  it("points sameAs at the Business Profile it names", () => {
+    expect(LAYOUT).toContain(`maps?cid=${GOOGLE_PROFILE.cid}`);
+  });
+
+  it("publishes the same phone the profile should carry", () => {
+    // NAP: one phone, in one format, everywhere.
+    expect(LAYOUT).toContain(COMPANY.phone);
   });
 });
