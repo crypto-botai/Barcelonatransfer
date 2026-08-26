@@ -283,8 +283,10 @@ export default function AirportTransfersPage() {
               </p>
               <p>
                 If you would rather be met inside with a name board — worth it with children, with a lot
-                of luggage, or on a first visit — add meet &amp; greet when you book. The driver comes
-                through to the arrivals hall and helps with the bags to the car.
+                of luggage, or on a first visit — add{" "}
+                <Link href="/meet-and-greet" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">meet &amp; greet</Link>{" "}
+                when you book. The driver comes through to the arrivals hall and helps with the
+                bags to the car.
               </p>
 
               <h3 className="font-display text-2xl text-white pt-4">Delays, early landings and waiting time</h3>

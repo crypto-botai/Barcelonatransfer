@@ -1,6 +1,6 @@
 import {
   ShoppingBag, Train, Waves, Umbrella, Clock, MapPin, ShieldCheck,
-  Car, Luggage, Plane, CalendarClock, Route as RouteIcon,
+  Car, Luggage, Plane, CalendarClock, Route as RouteIcon, Mountain, Snowflake,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { lookupPriceByFleetVehicle, type ZoneCode } from "@/lib/fixed-prices";
@@ -585,7 +585,123 @@ const BEGUR: RouteLanding = {
   ),
 };
 
-export const ROUTE_LANDINGS: RouteLanding[] = [LA_ROCA, SANTS, VILANOVA, BEGUR];
+// ─────────────────────────────────────────────────────────────────────────────
+// Encamp
+//
+// 206.8 km by road, confirmed against the quote engine, which also confirms the
+// fixed Andorra fare applies: Encamp is a town rather than a ski station, and
+// lib/pricing.ts excludes it from SKI_STATION_NAMES for exactly that reason.
+// Journey time follows the Andorra page's published ~3 hours; Encamp sits a few
+// minutes further up the same valley road.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const encamp = ladder("BCN_AIRPORT", "ANDORRA");
+const encampFrom = cheapestOf(encamp);
+
+const ENCAMP: RouteLanding = {
+  slug: "encamp",
+  name: "Encamp",
+  h1: "Barcelona Airport to Encamp Transfer",
+  eyebrow: "Andorra · CG-2 valley",
+  EyebrowIcon: Mountain,
+  title: `Barcelona to Encamp Transfer — fixed €${encampFrom}`,
+  description: `Private transfer from BCN El Prat to Encamp, Andorra. Fixed €${encampFrom} per vehicle, 207 km, about 3 hours. Winter tyres in season, ski and board carriage included.`,
+  keywords: [
+    "barcelona to encamp transfer",
+    "encamp transfer barcelona airport",
+    "bcn airport to encamp",
+    "barcelona encamp private transfer",
+    "encamp andorra airport transfer",
+  ],
+  heroLead: `A private car from arrivals to your door in Encamp, without a change at Andorra la Vella. Fixed at €${encampFrom} per vehicle, agreed before you travel and unchanged by snow, traffic or the hour you land.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "207 km" },
+    { icon: Clock, k: "Journey", v: "about 3 hours" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${encampFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to Encamp by vehicle", vehicles: encamp },
+  ],
+  priceNote: "Encamp takes the standard Andorra fare because it is a town on the valley road, not a ski station. The stations themselves are priced by road distance — see the ski resorts page.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Skis, boards and boot bags carried at no extra charge",
+    "Door-to-door to any address in Encamp",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the C-16 Túnel del Cadí",
+    "Meet and greet with a name board",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "Andorra has no airport and no railway, so every arrival is by road. That narrows the choice to three.",
+  options: [
+    { name: "Private transfer", cost: `€${encampFrom} per vehicle`, time: "About 3 hours, door to door", best: "Groups, ski luggage, late arrivals, and anyone who does not want to change vehicles at Andorra la Vella" },
+    { name: "Scheduled coach", cost: "Per person, booked ahead", time: "Around 4 hours, plus the connection onward from Andorra la Vella", best: "Solo travellers with light luggage and a flexible arrival" },
+    { name: "Hire car", cost: "Rental, fuel, tolls and winter tyres", time: "Similar to a private transfer", best: "Stays where you want a car in Andorra for the whole week" },
+  ],
+  optionsNote: "The coach is the cheap option and it does the job — but it terminates at Andorra la Vella, so Encamp means a second leg with your bags at the end of a travel day. In winter that connection is the part that goes wrong. The [hire car](/fleet) is the real alternative for a long stay; for a week or less two fixed transfers usually cost less once tolls, fuel and winter tyres are counted.",
+  sections: [
+    {
+      h2: "Why Encamp is booked",
+      h2Accent: "separately",
+      paras: [
+        "Encamp sits on the CG-2, the single road that runs up the valley from Andorra la Vella towards the French border. Everything heading for the eastern side of the country passes through it, which makes it a common base — cheaper to stay in than the capital and closer to the slopes than most of it.",
+        "It also has a cable car link up to the Grandvalira ski area, which is why so many winter stays choose it over Andorra la Vella. If you are skiing, that connection is the reason to be here rather than twenty minutes further down the valley.",
+        "The transfer is priced as Andorra because Encamp is a town, not a resort. The ski stations above it are charged by road distance instead — the [Andorra ski resorts page](/transfers/andorra-ski-resorts) covers Pas de la Casa, Soldeu, Arinsal and Grandvalira, and explains why those are quoted rather than fixed.",
+      ],
+      cards: [
+        { icon: Snowflake, t: "Ski kit travels free", d: "Skis, boards and boot bags are carried at no extra charge. Tell us how many when you book." },
+        { icon: Clock, t: "No change at the capital", d: "One car from arrivals to the door, rather than a coach then a taxi." },
+        { icon: ShieldCheck, t: "The price is the price", d: "Snow, traffic and a delayed flight do not move a fixed fare." },
+      ],
+    },
+    {
+      h2: "Winter, and the drive",
+      h2Accent: "itself",
+      paras: [
+        "The route runs inland from Barcelona and climbs steadily for the last hour: motorway to Puigcerdà by way of the Túnel del Cadí, then mountain road up the valley. In good conditions it is about three hours from the terminal to Encamp.",
+        "In winter it can be longer, and that is the point of a fixed fare. Snow on the CG-2, a queue at the border post, or a slow run up from the tunnel all cost time and none of them cost you money — the figure agreed at booking is the figure charged.",
+        "Vehicles are equipped for the conditions the road actually has in season. If your flight lands late and the last coach has gone, the car is still there: we track the flight rather than the schedule.",
+      ],
+    },
+    {
+      h2: "Coming back, and",
+      h2Accent: "onward",
+      paras: [
+        "Book the return at the same time if you can. Departure pickups from Andorra are timed backwards from your flight and the drive is long enough that the margin matters — arranging it locally on the last morning is how people end up paying a premium for whatever car is free.",
+        "Staying elsewhere in the country first? [Andorra la Vella](/transfers/andorra) is the same fixed fare, and both are on the same road. A stop in one on the way to the other is straightforward to arrange rather than being two separate bookings.",
+        "The [airport transfers page](/airport-transfers) explains how pickups work at T1 and T2 and what happens when a flight is delayed. The fare above already includes flight tracking and 60 minutes of free waiting from landing.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona Airport to Encamp?", a: `Fixed at €${encampFrom} for the ${encamp[0].label}, per vehicle rather than per person, so a group of four pays once. Larger cars cost more and the full list is on this page. The price excludes VAT and tolls: 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long does the journey take?", a: "About 3 hours for the 207 km in good conditions. Allow longer in winter, when snow on the valley road and queues at the border both add time — neither of which changes what you pay." },
+    { q: "Is Encamp the same price as Andorra la Vella?", a: "Yes. Encamp is an ordinary Andorran town on the same valley road, so it takes the standard Andorra fare. The ski stations above it are different: those are priced by road distance and quoted at booking rather than fixed." },
+    { q: "Can you carry skis and snowboards?", a: "Yes, at no extra charge. Tell us how many sets when you book so the right vehicle is sent — ski bags take boot space rather than seats, and four passengers with four sets of kit need a larger car than four passengers with suitcases." },
+    { q: "What happens if my flight is delayed?", a: "We track your flight by its number and move the pickup to the actual landing time at no charge. Airport pickups include 60 minutes of free waiting from touchdown. On a route this long that matters more than usual: there is no later coach to fall back on." },
+    { q: "Do you go on to the ski stations from Encamp?", a: "Yes, but they are priced separately by road distance rather than at the Andorra fare — Grandvalira, Pas de la Casa, Soldeu and Arinsal are all quoted at booking. See the [ski resorts page](/transfers/andorra-ski-resorts) for how that works." },
+  ],
+  bookingLead: "Give us your flight number, the address in Encamp and how many passengers and ski bags are travelling. The price is confirmed before you pay and does not move afterwards — not for snow, not for a delay, not for the hour you land.",
+  ctaLead: `Fixed at €${encampFrom} per vehicle from BCN El Prat to Encamp.`,
+  cheapest: encampFrom,
+  ...schemaFor(
+    "encamp",
+    "Encamp",
+    "Barcelona Airport to Encamp Private Transfer",
+    `Fixed-price private transfer from Barcelona El Prat Airport to Encamp, Andorra. €${encampFrom} per vehicle, 207 km, about 3 hours. Flight tracking, 60 minutes free waiting, ski carriage included.`,
+    encampFrom,
+    // Q24269 is the parish, Q989558 the town inside it. The parish, on the same
+    // reasoning as Begur: a transfer serves the wider area, not one street.
+    { type: "City", name: "Encamp", sameAs: "https://www.wikidata.org/wiki/Q24269" },
+  ),
+};
+
+export const ROUTE_LANDINGS: RouteLanding[] = [LA_ROCA, SANTS, VILANOVA, BEGUR, ENCAMP];
 
 export function routeLanding(slug: string): RouteLanding | undefined {
   return ROUTE_LANDINGS.find((r) => r.slug === slug);

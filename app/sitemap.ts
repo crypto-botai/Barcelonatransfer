@@ -100,6 +100,18 @@ const RELEASES: ReadonlyArray<{ date: string; paths: readonly string[] }> = [
       "/pricing",
     ],
   },
+  {
+    // Pages built from the first twelve months of Search Console data, for
+    // demand that was already showing impressions with nothing targeting it.
+    date: "2026-08-26",
+    paths: [
+      "/transfers/encamp",
+      "/transfers/andorra-ski-resorts",
+      "/meet-and-greet",
+      "/transfers/andorra",
+      "/airport-transfers",
+    ],
+  },
 ];
 
 /** path -> date, flattened once. A later release wins if a path repeats. */
@@ -190,6 +202,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/transfers/sants-station`, lastModified: lastMod("/transfers/sants-station"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/transfers/vilanova`,      lastModified: lastMod("/transfers/vilanova"), changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/transfers/begur`,         lastModified: lastMod("/transfers/begur"), changeFrequency: "monthly", priority: 0.75 },
+    // Built 26 Aug against confirmed Search Console demand with no owning page:
+    // Encamp 115 impressions at position 46, the Andorra ski stations ~70
+    // between them, meet & greet 35 — all booking intent, all unranked.
+    { url: `${BASE}/transfers/encamp`,        lastModified: lastMod("/transfers/encamp"), changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/transfers/andorra-ski-resorts`, lastModified: lastMod("/transfers/andorra-ski-resorts"), changeFrequency: "monthly", priority: 0.8 },
+    { url: `${BASE}/meet-and-greet`,          lastModified: lastMod("/meet-and-greet"), changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE}/transfers/sitges`,        lastModified: lastMod("/transfers/sitges"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/transfers/girona`,        lastModified: lastMod("/transfers/girona"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/transfers/montserrat`,    lastModified: lastMod("/transfers/montserrat"), changeFrequency: "monthly", priority: 0.8  },

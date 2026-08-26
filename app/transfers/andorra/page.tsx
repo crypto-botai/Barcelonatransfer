@@ -152,10 +152,18 @@ export default function AndorraTransferPage() {
           </div>
         </section>
 
-        {/* Named destinations. Encamp in particular: it is the second most
-            searched Andorra term reaching this site and had no content at all,
-            while sharing the Andorra fare exactly. A section here beats a
-            separate page that would duplicate this one's price and route. */}
+        {/* Named destinations.
+
+            Encamp used to carry a full section here, on the reasoning that a
+            separate page would duplicate this one's price and route. The first
+            Search Console export changed the input: "barcelona to encamp
+            transfer" is the fourth-largest query cluster reaching this site at
+            115 impressions, all booking intent, and it deserves a page.
+
+            So the detail moved to /transfers/encamp and what stays here is a
+            pointer. Two pages chasing one query is why neither ranks — the same
+            thing that is currently happening to Sitges — and this page is about
+            Andorra la Vella and the country as a whole. */}
         <section className="py-16 bg-dark-950 border-b border-white/[0.06]">
           <div className="container mx-auto px-4 max-w-3xl">
             <h2 className="font-display text-3xl text-white mb-6">
@@ -175,7 +183,9 @@ export default function AndorraTransferPage() {
                 },
                 {
                   name: "Encamp",
-                  body: "Ten minutes further up the CG-2 from the capital, and the parish that reaches all the way to the French border. Encamp is where many winter visitors actually sleep: rooms cost less than in Soldeu or Pas de la Casa, and the Funicamp gondola climbs straight from the town into the Grandvalira ski area, so you can stay in the valley and still be on the snow early. The same fixed fare applies as to the capital.",
+                  body: "Ten minutes further up the CG-2, and a common winter base because a gondola climbs from the town straight into the Grandvalira ski area. The same fixed fare applies as to the capital.",
+                  href: "/transfers/encamp",
+                  linkLabel: "Encamp transfers in detail",
                 },
                 {
                   name: "Canillo, La Massana, Ordino, Sant Julià de Lòria",
@@ -184,11 +194,24 @@ export default function AndorraTransferPage() {
                 {
                   name: "The ski stations",
                   body: "Grandvalira and its sectors — Soldeu, El Tarter, Pas de la Casa, Grau Roig — and the Vallnord stations at Arinsal, Pal and Ordino-Arcalís all sit above the towns, further than the parish villages and on mountain roads. They are quoted by distance rather than at the Andorra fare, so ask us and we will confirm the price before you book.",
+                  href: "/transfers/andorra-ski-resorts",
+                  linkLabel: "Ski resort transfers and how they are priced",
                 },
-              ].map(({ name, body }) => (
+              ].map(({ name, body, href, linkLabel }: { name: string; body: string; href?: string; linkLabel?: string }) => (
                 <div key={name} className="border-l-2 border-gold-500/30 pl-5">
                   <h3 className="text-white font-medium mb-1.5">{name}</h3>
                   <p className="text-dark-400 text-sm leading-relaxed">{body}</p>
+                  {href && (
+                    // Two pages chasing one query is why neither ranks. The
+                    // detail lives on the page that owns the subject; this
+                    // points at it rather than competing with it.
+                    <Link
+                      href={href}
+                      className="inline-flex items-center gap-1 mt-2 text-gold-400 hover:text-gold-300 text-sm underline underline-offset-2 decoration-gold-400/40"
+                    >
+                      {linkLabel} <ChevronRight size={13} />
+                    </Link>
+                  )}
                 </div>
               ))}
             </div>
@@ -248,6 +271,8 @@ export default function AndorraTransferPage() {
                     // would be the same mistake that had them advertised at €240.
                     { route: "BCN Airport → Grandvalira ski resort", price: "Quoted by distance" },
                     { route: "BCN Airport → Vallnord ski resort", price: "Quoted by distance" },
+                    // Encamp takes the Andorra fare — it is a town, not a station.
+                    { route: "BCN Airport → Encamp", price: `€${andorraPrice}` },
                     { route: "Andorra la Vella → BCN Airport", price: `€${andorraPrice}` },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
