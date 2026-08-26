@@ -315,6 +315,36 @@ export default function AirportTransfersPage() {
                 leaves. Ask for them when you book rather than on the day — they have to be in the
                 vehicle that is dispatched.
               </p>
+
+                {/* Saying when we are the wrong choice.
+
+                    A chauffeur car is not the right answer for a solo traveller
+                    with one bag, and pretending otherwise costs more credibility
+                    than the fare is worth. The metered alternative is a service we
+                    also run, so the recommendation is honest about that rather than
+                    passing it off as neutral advice. */}
+                <h3 className="font-display text-2xl text-white pt-4">When a metered taxi is the better choice</h3>
+                <p>
+                  A private chauffeur earns its price on a group transfer, an early
+                  departure or a route where the boot matters. It does not earn it on a
+                  short hop into the city with one case. Barcelona taxi fares are
+                  regulated by the AMB, the meter is the same in every licensed cab, and
+                  for one or two passengers that is usually the cheaper way to travel.
+                </p>
+                <p>
+                  We run a booking service for exactly that at{" "}
+                  <a
+                    href="https://bcnairporttaxi.es/en"
+                    target="_blank"
+                    rel="noopener"
+                    className="text-gold-400 hover:text-gold-300 underline underline-offset-2"
+                  >
+                    BCNAirportTaxi
+                  </a>
+                  {" "}— a licensed taxi at the official meter rate, booked ahead so a
+                  driver is waiting rather than queuing at the rank. Same people, same
+                  standards, different vehicle and a different price.
+                </p>
             </div>
 
             {/* Trust, stated as facts rather than badges. */}
