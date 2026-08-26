@@ -44,11 +44,7 @@ export default function Footer() {
   ] as const;
 
   return (
-    // defer-render: the footer sits below the fold on every one of the 110
-    // pages and is a client component. content-visibility lets the browser skip
-    // its layout and paint until it is scrolled near. The markup is unchanged,
-    // so the links a crawler follows from here are exactly as before.
-    <footer className="defer-render bg-[#050505] border-t border-white/[0.06]">
+    <footer className="bg-[#050505] border-t border-white/[0.06]">
       {/* Newsletter bar */}
       <div className="border-b border-gold-500/15 bg-gradient-to-r from-transparent via-gold-500/5 to-transparent">
         <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-6">

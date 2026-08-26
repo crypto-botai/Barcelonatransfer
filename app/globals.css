@@ -95,18 +95,6 @@
     box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
   }
 
-  /* Skip layout and paint for a section until it nears the viewport.
-
-     The content stays in the DOM and in the server-rendered HTML — a crawler
-     sees exactly the same markup. Only the browser's rendering work is
-     deferred. `auto` on contain-intrinsic-size makes the browser remember the
-     real height after first render, so the scrollbar does not jump and CLS
-     stays at 0. */
-  .defer-render {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 900px;
-  }
-
   /* Gold border glow on hover */
   .gold-hover-border {
     border: 1px solid transparent;
