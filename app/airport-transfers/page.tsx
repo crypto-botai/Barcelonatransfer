@@ -339,7 +339,7 @@ export default function AirportTransfersPage() {
                     rel="noopener"
                     className="text-gold-400 hover:text-gold-300 underline underline-offset-2"
                   >
-                    BCNAirportTaxi
+                    Taxi Barcelona
                   </a>
                   {" "}— a licensed taxi at the official meter rate, booked ahead so a
                   driver is waiting rather than queuing at the rank. Same people, same

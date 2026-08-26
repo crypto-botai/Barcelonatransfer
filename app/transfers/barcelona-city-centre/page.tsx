@@ -372,7 +372,7 @@ export default function BarcelonaCityCentreTransferPage() {
                 rel="noopener"
                 className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40"
               >
-                Barcelona Airport Taxi
+                Taxi Barcelona
               </a>
               , a separate site we also run. It is a different service to this one: a metered
               fare rather than a price fixed in advance, and a licensed city taxi rather than a
