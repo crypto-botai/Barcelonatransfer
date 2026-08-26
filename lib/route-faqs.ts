@@ -11,32 +11,6 @@ import type { RouteFaqSpec } from "@/components/transfers/RouteFaqs";
  * own hero, so this section cannot disagree with the page it sits on.
  */
 export const ROUTE_FAQ_SPECS: Record<string, RouteFaqSpec> = {
-  sitges: {
-    zone: "sitges",
-    name: "Sitges",
-    distance: "35 km",
-    duration: "35 minutes",
-    faqs: [
-      {
-        q: "Will the driver take me to my hotel or apartment?",
-        a: "Yes. The fare is door to door to any address in Sitges, so a seafront hotel, an apartment in the old town or a villa in Vallpineda all cost the same. Give the full address when you book — the streets behind the front are narrow and one-way in places, and the exact number saves circling.",
-      },
-      {
-        q: "Is the train from the airport a better option?",
-        a: "If you are one or two people travelling light and landing in daylight, honestly yes — it is cheap and reasonably quick. It stops being the better option with two suitcases, a late flight, or accommodation uphill from the station, because the Rodalies line requires a change and the walk at the far end is the part nobody plans for.",
-      },
-      {
-        q: "Can you collect us during Carnival or Pride week?",
-        a: "Yes, and it is worth booking further ahead than usual. Sitges fills completely during both, road access into the centre is restricted on the busiest days, and your driver may need to drop you a short walk from the door. We will tell you if that applies to your address rather than discovering it on the night.",
-      },
-    ],
-    related: [
-      { href: "/transfers/vilanova", label: "Vilanova i la Geltrú, the next town along" },
-      { href: "/transfers/costa-dorada", label: "the wider Costa Dorada" },
-      { href: "/transfers/barcelona-city-centre", label: "central Barcelona" },
-    ],
-  },
-
   girona: {
     zone: "girona_airport",
     origin: "barcelona_city",

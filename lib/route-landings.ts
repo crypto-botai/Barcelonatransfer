@@ -701,7 +701,232 @@ const ENCAMP: RouteLanding = {
   ),
 };
 
-export const ROUTE_LANDINGS: RouteLanding[] = [LA_ROCA, SANTS, VILANOVA, BEGUR, ENCAMP];
+// ─────────────────────────────────────────────────────────────────────────────
+// Sitges
+//
+// 35 km and 35 minutes are the figures the previous page published and they are
+// consistent with the Garraf coast run; the fare is read from the table. Both
+// origins cost the same, so one ladder covers airport and city.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const sitges = ladder("BCN_AIRPORT", "SITGES");
+const sitgesFrom = cheapestOf(sitges);
+
+const SITGES: RouteLanding = {
+  slug: "sitges",
+  name: "Sitges",
+  h1: "Barcelona Airport to Sitges Transfer",
+  eyebrow: "Garraf coast · 35 km",
+  EyebrowIcon: Waves,
+  title: `Barcelona Airport to Sitges Transfer — from €${sitgesFrom}`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Sitges. Fixed €${sitgesFrom} per vehicle, 35 km, about 35 minutes, door to door. Compared honestly with the train, bus and taxi.`,
+  keywords: [
+    "barcelona airport to sitges transfer",
+    "sitges transfer",
+    "el prat to sitges",
+    "barcelona to sitges taxi cost",
+    "barcelona airport train to sitges",
+  ],
+  heroLead: `A private car from arrivals to your door in Sitges. Fixed at €${sitgesFrom} per vehicle — the same from the airport or from central Barcelona — with no change at the station and no walk at the far end.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "35 km" },
+    { icon: Clock, k: "Journey", v: "about 35 min" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${sitgesFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport or central Barcelona", caption: "Fixed fares from Barcelona to Sitges by vehicle", vehicles: sitges },
+  ],
+  priceNote: "Both origins cost the same on this route, so there is no supplement for starting at the airport rather than in town.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Door-to-door to any address in Sitges",
+    "Free cancellation up to 24 hours before",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the C-32",
+    "Meet and greet with a name board",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "People search for the train, the bus and the taxi fare before they book a transfer, so here is the comparison rather than a sales pitch.",
+  options: [
+    { name: "Private transfer", cost: `€${sitgesFrom} per vehicle`, time: "About 35 minutes, door to door", best: "Groups, families, holiday luggage, late arrivals, and accommodation away from the station" },
+    { name: "Rodalies R2 Sud train", cost: "Per person, the cheapest option by far", time: "Around an hour from the airport, with a change at El Prat or Sants", best: "One or two people with one bag each, arriving in daylight" },
+    { name: "Coach", cost: "Per person, timetabled", time: "Roughly an hour when it connects, longer when it does not", best: "Budget travel with time to spare" },
+    { name: "Taxi", cost: "Metered, plus an airport supplement", time: "Similar to a private transfer, plus the rank queue", best: "Off-peak arrivals, if you do not mind not knowing the total in advance" },
+  ],
+  optionsNote: "The train is genuinely cheaper and we will not pretend otherwise — if you are travelling light and landing in daylight, take it. It stops being the better option with two suitcases, a late flight, or an apartment up the hill behind the front, because the R2 needs a change and the walk at the far end is the part nobody plans for. A taxi costs roughly what a transfer costs on this distance, with the difference that you find out the number at the end rather than the beginning.",
+  sections: [
+    {
+      h2: "Where in Sitges you are",
+      h2Accent: "staying",
+      paras: [
+        "The fare is door to door to any address in the town, which matters here more than in most places. Sitges is compact but it is built on a slope: the seafront and Passeig de la Ribera are flat, the old town behind the church is narrow and stepped, and the residential areas at Vallpineda and Levantina sit well above the centre.",
+        "A station arrival leaves you at the top of the town with your luggage. Give the full address when you book — a hotel name, an apartment number, or the marina at Aiguadolç — and the driver takes you to it rather than to a drop-off point.",
+        "Some of the old-town streets are pedestrian or too narrow for a car. Where that is the case the driver gets as close as the road allows and helps with the bags the rest of the way, which is a short walk rather than a hill.",
+      ],
+      cards: [
+        { icon: MapPin, t: "Any address, one price", d: "Seafront, old town or up at Vallpineda — the fare does not change." },
+        { icon: Luggage, t: "No station stairs", d: "The R2 change and the climb from the station are the reason people book this." },
+        { icon: Clock, t: "Late arrivals fine", d: "Trains thin out in the evening. The car is timed to your flight." },
+      ],
+    },
+    {
+      h2: "Carnival, Pride and the",
+      h2Accent: "Film Festival",
+      paras: [
+        "Sitges fills completely three times a year, and each one changes how a transfer works. Carnival in February and Pride in June both close roads in the centre; the International Film Festival in October fills the hotels rather than the streets.",
+        "During Carnival and Pride the police close the seafront and several approaches to the old town for the parades. Your driver will get as close as the closures allow and tell you in advance if your address is inside a restricted zone — better to know before you land than to discover it with your luggage on a pavement.",
+        "Book earlier than usual for those dates. Availability tightens across the whole Garraf coast, and a fixed fare booked in advance is also protection against the surge pricing that everything else on the road does that week.",
+      ],
+    },
+    {
+      h2: "Combining Sitges with",
+      h2Accent: "the coast",
+      paras: [
+        "A common request is Sitges together with somewhere else on the same run — most often Tarragona, which sits an hour further down the same coast. Ask for it as one journey rather than two bookings and we will price the whole thing, which is normally less than two separate transfers.",
+        "The obvious neighbours are [Vilanova i la Geltrú](/transfers/vilanova), ten minutes further along and a quieter place to stay, and [Tarragona](/transfers/tarragona) with its Roman town. The whole stretch is priced in the same table, so the fares are directly comparable — the [Costa Dorada page](/transfers/costa-dorada) covers the run south.",
+        "If you are arriving by air, the [airport transfers page](/airport-transfers) explains how pickups work at T1 and T2 and what happens when a flight is delayed. The fare above already includes flight tracking and free waiting from landing.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a taxi from Barcelona Airport to Sitges?", a: `A taxi is metered with an airport supplement on top, so the total depends on traffic and the hour — you find out at the end of the journey. Our fixed fare for the same trip is €${sitgesFrom} for the ${sitges[0].label}, agreed before you travel and unchanged by the traffic. On this distance the two are usually close; the difference is knowing the number in advance.` },
+    { q: "How long does the transfer take?", a: "35 km and about 35 minutes in normal traffic on the C-32. Allow longer on summer weekends and during Carnival and Pride, when the coastal road and the town itself both back up." },
+    { q: "Is the train from Barcelona Airport to Sitges better?", a: "If you are one or two people travelling light and landing during the day, honestly yes — the Rodalies R2 Sud is much cheaper and reasonably quick. It needs a change, though, and it leaves you at the station rather than at your door, which is what tips the balance for families, late arrivals and anyone staying above the centre." },
+    { q: "How much is the transfer from Barcelona city centre?", a: `The same — €${sitgesFrom} for an economy sedan. There is no supplement for starting at the airport rather than in town, so a hotel pickup in Barcelona costs what an arrivals pickup costs.` },
+    { q: "Will the driver take me to my apartment?", a: "Yes. The fare covers any address in Sitges. Where a street is pedestrian or too narrow for a car, the driver gets as close as the road allows and helps with the bags the rest of the way." },
+    { q: "Is this a private car or a shared shuttle?", a: "Private. We never combine bookings, share the vehicle with other passengers or sell seats individually. The car is yours from arrivals to the door." },
+  ],
+  bookingLead: "Give us your flight number, the full address in Sitges and the number of passengers. The price is confirmed before you pay and does not move afterwards. If you are arriving during Carnival or Pride, say so — we will tell you whether your street is inside a closure.",
+  ctaLead: `Fixed at €${sitgesFrom} per vehicle from BCN El Prat or central Barcelona.`,
+  cheapest: sitgesFrom,
+  ...schemaFor(
+    "sitges",
+    "Sitges",
+    "Barcelona to Sitges Private Transfer",
+    `Fixed-price private transfer from Barcelona El Prat Airport or central Barcelona to Sitges. From €${sitgesFrom} per vehicle, 35 km, about 35 minutes, door to door.`,
+    sitgesFrom,
+    { type: "City", name: "Sitges", sameAs: "https://www.wikidata.org/wiki/Q15551" },
+  ),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Salou
+//
+// 100 km and about 1h10 are the figures the previous page published, consistent
+// with the AP-7 run down the Costa Daurada. The fare comes from the table.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const salou = ladder("BCN_AIRPORT", "SALOU");
+const salouFrom = cheapestOf(salou);
+
+const SALOU: RouteLanding = {
+  slug: "salou",
+  name: "Salou",
+  h1: "Barcelona Airport to Salou Transfer",
+  eyebrow: "Costa Daurada · PortAventura",
+  EyebrowIcon: Umbrella,
+  title: `Barcelona Airport to Salou Transfer — from €${salouFrom}`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Salou and PortAventura. Fixed €${salouFrom} per vehicle, 100 km, about 1 hour 10 minutes, door to door.`,
+  keywords: [
+    "barcelona to salou transfer",
+    "barcelona airport to salou",
+    "transfer barcelona salou",
+    "taxi barcelona to salou",
+    "salou portaventura airport transfer",
+  ],
+  heroLead: `A private car from arrivals to your hotel in Salou or to the PortAventura gates, in one run with no change. Fixed at €${salouFrom} per vehicle — the same from the airport or from central Barcelona.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "100 km" },
+    { icon: Clock, k: "Journey", v: "about 1h 10" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${salouFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport or central Barcelona", caption: "Fixed fares from Barcelona to Salou by vehicle", vehicles: salou },
+  ],
+  priceNote: "Both origins cost the same. The fare covers Salou, the PortAventura resort hotels and the park gates — they are minutes apart and priced together.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Door-to-door to any Salou address, resort hotel or the park gates",
+    "Free cancellation up to 24 hours before",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the AP-7",
+    "Meet and greet with a name board",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "A hundred kilometres is far enough that the alternatives stop being close. Here is the honest comparison.",
+  options: [
+    { name: "Private transfer", cost: `€${salouFrom} per vehicle`, time: "About 1 hour 10 minutes, door to door", best: "Families, groups, holiday luggage, and anyone going straight to a resort hotel" },
+    { name: "Train via Sants", cost: "Per person, plus getting to Sants first", time: "75–90 minutes on the train, plus the connection at each end", best: "Solo travellers staying near Salou station" },
+    { name: "Coach", cost: "Per person, timetabled", time: "Around two hours with the connection", best: "Budget travel, arriving in the middle of the day" },
+    { name: "Taxi", cost: "Metered, plus an airport supplement", time: "Similar to a private transfer", best: "Rarely, on this distance — see below" },
+  ],
+  optionsNote: "The train is cheap and perfectly good if you are one person with one bag and your hotel is near the station. It is a different proposition with a family: the airport is not on the line, so it means reaching Sants first, then the train, then a taxi at the Salou end, with luggage at every step. A taxi will do the whole run, but a metered fare over 100 km is the one number nobody can tell you in advance — which is the argument for a fixed price rather than a claim about theirs.",
+  sections: [
+    {
+      h2: "PortAventura, and where we",
+      h2Accent: "drop you",
+      paras: [
+        "The park sits about ten minutes inland from the resort, and the transfer covers both at the same fare. We drop at the park gates, at any of the PortAventura resort hotels, or at your own accommodation in Salou — say which when you book and the driver takes you there directly.",
+        "Return pickups at the end of a park day are worth arranging in advance. PortAventura runs late in season, the public connections thin out well before it closes, and a family at the gates at eleven at night is not in a good position to negotiate. Booking the return with the outbound fixes both the time and the price.",
+        "The [PortAventura page](/transfers/port-aventura) covers the park itself in more detail, including the resort hotels and what the drop-off looks like at the gates.",
+      ],
+      cards: [
+        { icon: Luggage, t: "Book for the boot", d: "A family fortnight is more luggage than four seats implies. One size up is usually right." },
+        { icon: Clock, t: "Late park pickups", d: "The park runs later than the trains. Arrange the return when you book." },
+        { icon: MapPin, t: "Hotel, park or town", d: "All the same fare — the resort and the town are minutes apart." },
+      ],
+    },
+    {
+      h2: "How long the drive actually",
+      h2Accent: "takes",
+      paras: [
+        "About an hour and ten minutes for the 100 km, almost all of it on the AP-7 and A-7 heading southwest. It is a straightforward motorway run rather than a mountain road, so the time is fairly predictable outside peak season.",
+        "Summer Saturdays are the exception. The Costa Daurada changes over on a Saturday and the motorway carries the whole coast's arrivals and departures at once; the same drive can take half an hour longer. A fixed fare means that costs you time and not money — the figure agreed at booking is the figure charged, whatever the AP-7 does.",
+        "Flights landing late are fine. We track the arrival by flight number rather than the time you typed in, and airport pickups include 60 minutes of free waiting from touchdown, which on a route with no late train is worth more than it sounds.",
+      ],
+    },
+    {
+      h2: "The rest of the",
+      h2Accent: "Costa Daurada",
+      paras: [
+        "Salou sits in the middle of a run of resorts that share one stretch of coast. Cambrils is ten minutes south with its fishing port and restaurants, La Pineda a few minutes north, and [Tarragona](/transfers/tarragona) with its Roman amphitheatre and UNESCO old town twenty minutes up the road.",
+        "Everything along that coast is priced in the same table, so if your stay involves more than one of them the fares are directly comparable rather than being quoted case by case. The [Costa Dorada page](/transfers/costa-dorada) covers the whole run.",
+        "Coming from further along the coast instead? [Sitges](/transfers/sitges) is halfway back towards Barcelona and often combined with this one on the same journey — ask and we will price it as a single trip rather than two.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona Airport to Salou?", a: `From €${salouFrom} for the ${salou[0].label}, fixed per vehicle rather than per person — so a family of four pays once. A minivan for a larger group is €${salou.find((v) => v.class === "VITO")?.price ?? salou[salou.length - 2].price}. The price excludes VAT and tolls: 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long does the transfer to Salou take?", a: "About 1 hour 10 minutes for the 100 km, on the AP-7 and A-7. Allow longer on summer Saturdays, which are changeover day for most of the coast and the busiest the motorway gets." },
+    { q: "Can you drop us at PortAventura rather than in Salou?", a: "Yes, at the same fare — the park gates, any of the resort hotels, or your accommodation in town. They are minutes apart and priced together. Tell us which when you book, and arrange the return at the same time if you are staying until the park closes." },
+    { q: "Is the train from Barcelona to Salou cheaper?", a: "Per person, yes. The catch is that the airport is not on the line: it means getting to Sants first, then the train, then usually a taxi at the Salou end. For one person with one bag that is fine. For a family with suitcases it is three changes with luggage, and the fixed fare covers the whole vehicle rather than each seat." },
+    { q: "What about a taxi?", a: `A taxi will make the journey, but the meter on a 100 km run is the one figure nobody can quote you in advance, and there is an airport supplement on top. Our fare is €${salouFrom} for an economy car, agreed before you travel. We would rather tell you the number at the start than at the end.` },
+    { q: "Do you carry pushchairs and child seats?", a: "Yes. Child, baby and booster seats are available on request and fitted before the car is dispatched, so ask when you book rather than on the day. Pushchairs travel in the boot — mention them when booking so the vehicle is sized for them alongside the cases." },
+  ],
+  bookingLead: "Give us your flight number, whether you are going to a Salou address, a resort hotel or the park gates, and how many passengers. The price is confirmed before you pay and does not move afterwards — not for traffic, not for a delayed flight, not for a summer Saturday.",
+  ctaLead: `Fixed at €${salouFrom} per vehicle from BCN El Prat or central Barcelona.`,
+  cheapest: salouFrom,
+  ...schemaFor(
+    "salou",
+    "Salou",
+    "Barcelona to Salou Private Transfer",
+    `Fixed-price private transfer from Barcelona El Prat Airport or central Barcelona to Salou and PortAventura. From €${salouFrom} per vehicle, 100 km, about 1 hour 10 minutes.`,
+    salouFrom,
+    { type: "City", name: "Salou", sameAs: "https://www.wikidata.org/wiki/Q662789" },
+  ),
+};
+
+export const ROUTE_LANDINGS: RouteLanding[] = [LA_ROCA, SANTS, VILANOVA, BEGUR, ENCAMP, SITGES, SALOU];
 
 export function routeLanding(slug: string): RouteLanding | undefined {
   return ROUTE_LANDINGS.find((r) => r.slug === slug);
