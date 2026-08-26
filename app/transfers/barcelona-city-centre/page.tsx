@@ -363,6 +363,23 @@ export default function BarcelonaCityCentreTransferPage() {
               is close to four Aerobús fares — and it goes to your door.
             </p>
 
+            <p className="text-dark-300 leading-relaxed">
+              If you would rather take an official Barcelona taxi &mdash; the black-and-yellow
+              cabs on the AMB meter &mdash; you can book one before you land at{" "}
+              <a
+                href="https://bcnairporttaxi.es/en"
+                target="_blank"
+                rel="noreferrer"
+                className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40"
+              >
+                Barcelona Airport Taxi
+              </a>
+              , a separate site we also run. It is a different service to this one: a metered
+              fare rather than a price fixed in advance, and a licensed city taxi rather than a
+              private chauffeur. For one or two people going a short distance into the centre it
+              is often the cheaper of the two.
+            </p>
+
             <div className="mt-8">
               <Link href="/book" className="btn-gold inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold">
                 Book a private transfer

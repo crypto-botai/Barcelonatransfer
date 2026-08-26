@@ -109,7 +109,8 @@ describe("the site and the Google Business Profile resolve to one business", () 
    * updates the schema in the same edit, and this fails if it ever does not.
    */
   it("declares the Business Profile's exact name as an alternate", () => {
-    expect(LAYOUT).toMatch(/alternateName:\s*\[[^\]]*GOOGLE_PROFILE\.name/s);
+    // No /s flag: [^\]]* already spans newlines, and the flag needs es2018+.
+    expect(LAYOUT).toMatch(/alternateName:\s*\[[^\]]*GOOGLE_PROFILE\.name/);
     expect(GOOGLE_PROFILE.name.trim().length).toBeGreaterThan(0);
   });
 
