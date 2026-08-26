@@ -369,7 +369,7 @@ export default function BarcelonaCityCentreTransferPage() {
               <a
                 href="https://bcnairporttaxi.es/en"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener"
                 className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40"
               >
                 Barcelona Airport Taxi
