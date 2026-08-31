@@ -1,0 +1,933 @@
+import {
+  ShoppingBag, Train, Waves, Umbrella, Clock, MapPin, ShieldCheck,
+  Car, Luggage, Plane, CalendarClock, Route as RouteIcon, Mountain, Snowflake,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { lookupPriceByFleetVehicle, type ZoneCode } from "@/lib/fixed-prices";
+import { VEHICLE_CATALOG, type VehicleInfo } from "@/types";
+
+/**
+ * The commercial route landing pages, as data.
+ *
+ * Four zones carried a published fare and had no page anywhere on the site:
+ * LA_ROCA, SANTS_STATION, VILANOVA and BEGUR. Every one of them was already
+ * bookable and already priced on /pricing — the price row simply pointed
+ * nowhere, because routePageHref() returns null for a zone with no page.
+ *
+ * A route only belongs here if it clears three tests, all of which these four
+ * pass and most of the remaining unpaged zones do not:
+ *
+ *   1. It is priced in the table, so nothing on the page has to be invented.
+ *   2. It is a destination people search for by name, not a village inside a
+ *      region already covered by a hub. Cubelles and Malgrat fail this; the
+ *      Costa Dorada and Costa Brava hubs are the right home for them.
+ *   3. There is something true and specific to say about the journey that does
+ *      not appear on any other page. A page that only restates the fare is thin
+ *      content whatever its word count.
+ *
+ * Prices are resolved through lookupPriceByFleetVehicle at module scope. No
+ * fare, ladder or "from €X" string in this file is typed by hand.
+ */
+
+const BASE = "https://www.elitebcn.info";
+
+export type PricedVehicle = VehicleInfo & { price: number };
+
+export interface RouteOption {
+  name: string;
+  cost: string;
+  time: string;
+  best: string;
+}
+
+export interface RouteSection {
+  h2: string;
+  h2Accent?: string;
+  paras: string[];
+  cards?: Array<{ icon: LucideIcon; t: string; d: string }>;
+}
+
+export interface RouteLanding {
+  slug: string;
+  name: string;
+  h1: string;
+  eyebrow: string;
+  EyebrowIcon: LucideIcon;
+  title: string;
+  description: string;
+  keywords: string[];
+  heroLead: string;
+  facts: Array<{ icon: LucideIcon; k: string; v: string }>;
+  priceTables: Array<{ heading: string; caption: string; vehicles: PricedVehicle[] }>;
+  priceNote: string;
+  included: string[];
+  excluded: string[];
+  options?: RouteOption[];
+  optionsIntro?: string;
+  optionsNote?: string;
+  sections: RouteSection[];
+  faqs: Array<{ q: string; a: string }>;
+  bookingLead: string;
+  ctaLead: string;
+  cheapest: number;
+  url: string;
+  serviceSchema: Record<string, unknown>;
+  breadcrumbSchema: Record<string, unknown>;
+}
+
+/** Every fleet car that has a fare on this leg, cheapest first in the table order. */
+function ladder(from: ZoneCode, to: ZoneCode): PricedVehicle[] {
+  return VEHICLE_CATALOG.map((v) => ({
+    ...v,
+    price: lookupPriceByFleetVehicle(from, to, v.class),
+  })).filter((v): v is PricedVehicle => v.price !== null);
+}
+
+function cheapestOf(...ladders: PricedVehicle[][]): number {
+  return Math.min(...ladders.flat().map((v) => v.price));
+}
+
+/**
+ * Service and BreadcrumbList markup, built once rather than per page.
+ *
+ * `provider` is a reference to the single business entity the root layout
+ * declares. Redeclaring the company would give it another identity, which is
+ * exactly the fragmentation the 25 Aug schema consolidation removed. No
+ * aggregateRating and no Review: Google does not accept self-serving review
+ * markup, and the site publishes none anywhere.
+ */
+interface AreaSpec {
+  /** schema.org type for the place: City, TrainStation, Place. */
+  type: string;
+  name: string;
+  /**
+   * Wikidata entity URI. Every other page on the site links its areaServed to
+   * one; these four launched without because the identifiers were not verified
+   * at the time. They are now — see the note at the top of this patch history.
+   */
+  sameAs?: string;
+}
+
+function schemaFor(
+  slug: string,
+  name: string,
+  serviceName: string,
+  description: string,
+  price: number,
+  area: AreaSpec,
+) {
+  const url = `${BASE}/transfers/${slug}`;
+  return {
+    url,
+    serviceSchema: {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: serviceName,
+      description,
+      url,
+      serviceType: "Private transfer",
+      provider: { "@id": `${BASE}/#business` },
+      areaServed: {
+        "@type": area.type,
+        name: area.name,
+        ...(area.sameAs ? { sameAs: area.sameAs } : {}),
+      },
+      offers: {
+        "@type": "Offer",
+        price: String(price),
+        priceCurrency: "EUR",
+        availability: "https://schema.org/InStock",
+        url: `${BASE}/book`,
+        priceSpecification: {
+          "@type": "UnitPriceSpecification",
+          price,
+          priceCurrency: "EUR",
+          unitText: "per vehicle",
+        },
+      },
+    },
+    breadcrumbSchema: {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: BASE },
+        { "@type": "ListItem", position: 2, name: "Transfers", item: `${BASE}/transfers` },
+        { "@type": "ListItem", position: 3, name, item: url },
+      ],
+    },
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// La Roca Village
+//
+// Distance and time are derived from figures the site already publishes rather
+// than invented: Mataró sits at 36 km / 38 min from the airport and Terrassa at
+// 40 km / 42 min (data/destinations.json), and the airport-to-city leg is
+// 12–18 km / 18–26 min across the twenty Barcelona hotels in the same file. The
+// village is beyond the city on the inland side, so the airport run is the city
+// run plus that leg. Stated as approximate ranges because that is what they are.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const laRocaCity = ladder("BARCELONA_CITY", "LA_ROCA");
+const laRocaAirport = ladder("BCN_AIRPORT", "LA_ROCA");
+const laRocaCityFrom = cheapestOf(laRocaCity);
+const laRocaAirportFrom = cheapestOf(laRocaAirport);
+
+const LA_ROCA: RouteLanding = {
+  slug: "la-roca-village",
+  name: "La Roca Village",
+  h1: "Barcelona to La Roca Village Transfer",
+  eyebrow: "La Roca del Vallès",
+  EyebrowIcon: ShoppingBag,
+  title: `Barcelona to La Roca Village Transfer — from €${laRocaCityFrom}`,
+  description: `Private car to La Roca Village from central Barcelona (€${laRocaCityFrom}) or BCN Airport (€${laRocaAirportFrom}). Fixed per vehicle, boot space for what you buy.`,
+  keywords: [
+    "barcelona to la roca village transfer",
+    "la roca village private transfer",
+    "la roca village from barcelona",
+    "barcelona airport to la roca village",
+    "la roca village shopping transport",
+  ],
+  heroLead: `A private car to the outlet and back, with a boot that stays yours for the day. Fixed at €${laRocaCityFrom} per vehicle from central Barcelona, or €${laRocaAirportFrom} direct from the airport — agreed before you travel, whatever you come back with.`,
+  facts: [
+    { icon: MapPin, k: "From the city", v: "about 35 km" },
+    { icon: Clock, k: "Journey", v: "35–45 min" },
+    { icon: Car, k: "Return trips", v: "Same car" },
+    { icon: ShieldCheck, k: "From", v: `€${laRocaCityFrom}` },
+  ],
+  priceTables: [
+    { heading: "From central Barcelona", caption: "Fixed fares from central Barcelona to La Roca Village by vehicle", vehicles: laRocaCity },
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to La Roca Village by vehicle", vehicles: laRocaAirport },
+  ],
+  priceNote: "The airport fare is higher because it is a longer run, and it includes flight tracking and 60 minutes of free waiting from landing.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Door-to-door pickup from any Barcelona address",
+    "Parking at the village",
+    "Free cancellation up to 24 hours before",
+    "One fixed price, whatever the traffic does",
+  ],
+  excluded: [
+    "The return journey, if you want one",
+    "Driver waiting time, quoted before you book",
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the route",
+  ],
+  optionsIntro: "A private car is not always the right answer. Here is when it is, and when it isn't.",
+  options: [
+    { name: "Private car", cost: `€${laRocaCityFrom} per vehicle from the city`, time: "35–45 minutes", best: "Groups, families, anyone expecting to leave with bags, and anyone who wants a fixed return time" },
+    { name: "Shopping coach", cost: "Per person, sold by the operator", time: "Around an hour each way, plus the wait for a departure", best: "One or two people travelling light who are happy to work around a timetable" },
+    { name: "Train, then local bus", cost: "Two separate per-person tickets", time: "Longest of the three, with a change and a walk", best: "Budget travellers with time and no luggage" },
+    { name: "Driving yourself", cost: "Car hire, fuel and parking", time: "Similar to a private car", best: "Trips where you already have a hire car for other reasons" },
+  ],
+  optionsNote: "If you are one person going to browse and coming back with a single bag, the coach is cheaper and perfectly good. The private car earns its price when there are three or four of you, when you are going with the intention of buying, or when you want to leave at a time you choose rather than one a timetable chooses for you.",
+  sections: [
+    {
+      h2: "The part everyone",
+      h2Accent: "underestimates",
+      paras: [
+        "Every other journey you take in Barcelona, you arrive and leave with the same bags. This is the one where you don't. People plan the outbound trip carefully and give no thought at all to carrying eight stiff paper bags back, which is how a good day ends badly at a coach stop.",
+        `Book by boot space rather than by seats. The [fleet page](/fleet) lists what each car actually holds — the ${laRocaCity[0].label} takes ${laRocaCity[0].largeBags} large cases, and the vans considerably more. For a dedicated shopping trip, one size up from your seating requirement is the right call and costs less than you would guess.`,
+        "If you want the same car for the way home, ask for a wait-and-return when you book. Your driver parks, you go and shop, and the car is where you left it when you are done — with your morning purchases already in the boot rather than on your arms. Longer waits are priced by the hour; the [hourly chauffeur page](/hourly) explains how that works.",
+      ],
+      cards: [
+        { icon: Luggage, t: "Book for the boot", d: "Seats and luggage are separate limits. On this trip the boot is the one that bites." },
+        { icon: Clock, t: "Leave when you want", d: "No last departure to run for and no queue at closing time." },
+        { icon: Car, t: "Same driver both ways", d: "The car stays yours, so shopping goes straight in as you go." },
+      ],
+    },
+    {
+      h2: "Combining it with the rest of your",
+      h2Accent: "trip",
+      paras: [
+        "La Roca sits on the inland road north of Barcelona, which puts it roughly on the way to several places people already travel to. If the outlet is one stop of a longer day, say so when you book and we will price the whole thing as one journey rather than as separate legs.",
+        "Common combinations are an airport pickup that stops at the village before the hotel — useful on an arrival day when the room is not ready — and a village stop on the way to or from [Girona](/transfers/girona) or the [Costa Brava](/transfers/costa-brava). For a full day with several stops, by-the-hour hire is usually cheaper than three point-to-point transfers.",
+        "Coming straight from a flight? The [airport transfers page](/airport-transfers) covers how pickups work at T1 and T2, and the fare above already includes flight tracking and free waiting from landing.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona to La Roca Village?", a: `From €${laRocaCityFrom} for the ${laRocaCity[0].label} from central Barcelona, and from €${laRocaAirportFrom} from BCN El Prat Airport. The fare is per vehicle rather than per person, so a family of four pays the same as one shopper. Larger cars cost more and the full list is on this page. The price excludes VAT and tolls: 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long does it take to get to La Roca Village?", a: "About 35 km from central Barcelona and 35–45 minutes in normal traffic. From the airport it is about 50 km and 45–60 minutes. Allow longer on Saturdays and during the sale periods, when the approach road backs up." },
+    { q: "Can the driver wait and bring us back?", a: "Yes. A wait-and-return keeps the same car and the same driver for the journey home, which means your shopping goes straight into a boot that is already yours and you are not queuing at closing time. Tell us roughly how long you want and we will quote it before you book — see the [hourly page](/hourly) for how by-the-hour hire is priced." },
+    { q: "Is there room in the car for what we buy?", a: `Boot space is the limit that matters on this trip, not seats. The ${laRocaCity[0].label} takes ${laRocaCity[0].largeBags} large cases; the larger vehicles take considerably more. If you are going specifically to shop, book one size up from what your group needs for seating — it costs a little more and removes the only real problem with this journey.` },
+    { q: "Can you collect us from the airport on the way into Barcelona?", a: `Yes, and it is a common request on arrival day. The airport pickup is priced separately at €${laRocaAirportFrom} because it is a longer run, and it includes 60 minutes of free waiting from landing plus flight tracking. Your cases travel with you and stay in the car while you shop.` },
+    { q: "Is this a private car or a shared shuttle?", a: "Private. We never combine bookings, share the vehicle with other passengers or sell seats individually. The car is yours for the whole journey, in both directions if you book the return." },
+  ],
+  bookingLead: "Give us the pickup address, the date and the number of passengers, and say whether you want the return. The price is confirmed before you pay and does not move afterwards. If you are not sure how long you will want at the village, book the outbound now and add the return later — most people do.",
+  ctaLead: `€${laRocaCityFrom} per vehicle from central Barcelona, €${laRocaAirportFrom} from the airport.`,
+  cheapest: laRocaCityFrom,
+  ...schemaFor(
+    "la-roca-village",
+    "La Roca Village",
+    "Barcelona to La Roca Village Private Transfer",
+    `Fixed-price private transfer to La Roca Village from central Barcelona (from €${laRocaCityFrom}) or Barcelona El Prat Airport (from €${laRocaAirportFrom}). About 35 km from the city, 35–45 minutes. Return and wait-and-return journeys available.`,
+    laRocaCityFrom,
+    { type: "City", name: "La Roca del Vallès", sameAs: "https://www.wikidata.org/wiki/Q15439" },
+  ),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Barcelona Sants station
+//
+// Sants is inside the city, so the distance is the site's own published city
+// range rather than a new figure: 12–18 km / 18–26 min across the twenty
+// Barcelona hotels in data/destinations.json. Sants sits at the near end of it,
+// between the Diagonal hotels at 12 km and the Eixample ones at 15–16 km.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const sants = ladder("BCN_AIRPORT", "SANTS_STATION");
+const santsFrom = cheapestOf(sants);
+
+const SANTS: RouteLanding = {
+  slug: "sants-station",
+  name: "Barcelona Sants Station",
+  h1: "Barcelona Airport to Sants Station Transfer",
+  eyebrow: "BCN El Prat · T1 & T2",
+  EyebrowIcon: Train,
+  title: `Barcelona Airport to Sants Station — from €${santsFrom}`,
+  description: `Private transfer from BCN El Prat to Barcelona Sants station. Fixed €${santsFrom} per vehicle, 60 minutes free waiting from landing, cases to the door.`,
+  keywords: [
+    "barcelona airport to sants station",
+    "bcn airport to sants transfer",
+    "barcelona sants station transfer",
+    "airport to sants train station taxi",
+    "barcelona sants ave connection transfer",
+  ],
+  heroLead: `A private car from arrivals to the station door, timed around your train rather than a timetable. Fixed at €${santsFrom} per vehicle, with 60 minutes of free waiting from the moment you land.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "13–15 km" },
+    { icon: Clock, k: "Journey", v: "about 20 min" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "From", v: `€${santsFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to Barcelona Sants station by vehicle", vehicles: sants },
+  ],
+  priceNote: "Sants is one of the closer city destinations to the airport, and the fare is the standard airport-to-city rate rather than a supplement.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Parking and airport access fees",
+    "Help with cases to the station entrance",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls, on routes that use them",
+    "Meet and greet with a name board",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "Sants is well served by public transport, and for some travellers that is genuinely the better choice. Here is the honest comparison.",
+  options: [
+    { name: "Private transfer", cost: `€${santsFrom} per vehicle`, time: "About 20 minutes, door to door", best: "Tight rail connections, groups, heavy luggage, or arriving late at night" },
+    { name: "Rodalies R2 Nord train", cost: "Per person, cheapest option", time: "About 25 minutes, from T2 only", best: "Solo travellers landing at T2 with one bag and time in hand" },
+    { name: "Aerobús to Plaça Espanya", cost: "Per person", time: "About 25 minutes, plus a metro hop or a walk", best: "Travelling light and not in a hurry" },
+    { name: "Taxi", cost: "Metered, plus an airport supplement", time: "Similar to a private transfer, plus the rank queue", best: "Arriving off-peak with no wait at the rank" },
+  ],
+  optionsNote: "The R2 Nord train is cheap and quick, but it runs from T2 only — if you land at T1 you first take the shuttle bus between terminals, which is where connections get eaten. If your train south or to Madrid leaves within two hours of landing, the fixed transfer is the one that does not depend on how long passport control takes.",
+  sections: [
+    {
+      h2: "Making a train connection",
+      h2Accent: "safely",
+      paras: [
+        "This is the journey where the margin matters more than the price. A missed long-distance train is not a delay, it is a new ticket, and the gap between a comfortable connection and a lost one is usually twenty minutes of airport queue nobody planned for.",
+        "We track your flight by number and move the pickup to the actual landing time, so a delayed flight does not mean a driver who has already left. Airport pickups include 60 minutes of free waiting from touchdown, which covers passport control and baggage reclaim on all but the worst days. Tell us your train departure time when you book and the driver will know what the journey is for.",
+        "If your connection is genuinely tight, say so. It changes nothing about the price, but it changes how the driver plans the route and where they drop you — Sants has entrances on more than one side, and the right one saves several minutes with a case.",
+      ],
+      cards: [
+        { icon: CalendarClock, t: "Give us the train time", d: "The driver plans the route around your departure, not just your pickup." },
+        { icon: Plane, t: "Delays are tracked", d: "Pickup moves to your real landing time at no extra charge." },
+        { icon: Luggage, t: "Cases to the door", d: "Dropped at the station entrance, not at a stop several minutes away." },
+      ],
+    },
+    {
+      h2: "Where Sants fits in your",
+      h2Accent: "journey",
+      paras: [
+        "Sants is Barcelona's main intercity rail station and the point most travellers pass through on the way somewhere else — high-speed services south and west, regional trains along both coasts, and the metro lines that feed the rest of the city.",
+        "That makes it a common first or last stop rather than a destination. If you are heading into town afterwards instead, the [Barcelona city centre transfer](/transfers/barcelona-city-centre) covers the door-to-door run to any central address for the same fixed fare. If you are travelling on to the coast, the [Costa Dorada](/transfers/costa-dorada) and [Costa Brava](/transfers/costa-brava) pages list the road fares, which for a group are often close to four rail tickets.",
+        "Coming the other way — leaving Barcelona and needing to be at the airport for a flight — the same fare applies in reverse. The [airport transfers page](/airport-transfers) explains how departure pickups are timed.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona Airport to Sants station?", a: `From €${santsFrom} for the ${sants[0].label}, fixed per vehicle rather than per person. Larger cars cost more and the full list is on this page. The price excludes VAT and tolls: 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long does the journey take?", a: "13–15 km and about 20 minutes in normal traffic. Allow longer between 8–9am and 5–7pm, and on days with a major event at the Fira, which sits between the airport and the station." },
+    { q: "How much time should I leave before my train?", a: "Beyond the journey itself, leave enough time to find your platform and clear the security check that long-distance services use. Give us your train departure time when you book and we will set the pickup to suit it — the transfer itself is the predictable part, so the buffer is for the station, not the road." },
+    { q: "What happens if my flight is delayed?", a: "We track your flight by its number and move the pickup to the actual landing time at no charge. Airport pickups include 60 minutes of free waiting from touchdown. If a delay means you will miss your train, tell us and we will discuss the options — including running you on to your destination by road." },
+    { q: "Can you collect me from Sants and take me to the airport?", a: "Yes, at the same fixed fare in the opposite direction. Departure pickups are timed from your flight, so give us the flight number when you book and we will work backwards from it." },
+    { q: "Is this a private car or a shared shuttle?", a: "Private. We never combine bookings, share the vehicle with other passengers or sell seats individually. The car is yours from arrivals to the station." },
+  ],
+  bookingLead: "Give us your flight number, your train departure time if you have one, and the number of passengers. The price is confirmed before you pay and does not move afterwards, whatever the traffic or the delay does.",
+  ctaLead: `Fixed at €${santsFrom} per vehicle from BCN El Prat to Barcelona Sants.`,
+  cheapest: santsFrom,
+  ...schemaFor(
+    "sants-station",
+    "Barcelona Sants Station",
+    "Barcelona Airport to Sants Station Private Transfer",
+    `Fixed-price private transfer between Barcelona El Prat Airport and Barcelona Sants railway station. From €${santsFrom} per vehicle, 13–15 km, about 20 minutes. Flight tracking and 60 minutes of free waiting from landing.`,
+    santsFrom,
+    { type: "TrainStation", name: "Barcelona Sants railway station", sameAs: "https://www.wikidata.org/wiki/Q800453" },
+  ),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vilanova i la Geltrú
+//
+// 36 km by road is recorded in lib/fixed-prices.ts against the route itself,
+// where it was used to set the fare between Sitges (30 km) and Cubelles (41 km).
+// Journey time follows the site's own Mataró figure, which is 36 km / 38 min.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const vilanovaAirport = ladder("BCN_AIRPORT", "VILANOVA");
+const vilanovaCity = ladder("BARCELONA_CITY", "VILANOVA");
+const vilanovaFrom = cheapestOf(vilanovaAirport, vilanovaCity);
+
+const VILANOVA: RouteLanding = {
+  slug: "vilanova",
+  name: "Vilanova i la Geltrú",
+  h1: "Barcelona Airport to Vilanova i la Geltrú Transfer",
+  eyebrow: "Garraf coast",
+  EyebrowIcon: Waves,
+  title: `Barcelona to Vilanova i la Geltrú Transfer — from €${vilanovaFrom}`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Vilanova i la Geltrú. Fixed €${vilanovaFrom} per vehicle, 36 km, about 40 minutes, door to door.`,
+  keywords: [
+    "barcelona airport to vilanova i la geltru",
+    "vilanova i la geltru transfer",
+    "bcn airport to vilanova taxi",
+    "vilanova private transfer barcelona",
+    "garraf coast airport transfer",
+  ],
+  heroLead: `A private car from arrivals to your door on the Garraf coast, one town beyond Sitges. Fixed at €${vilanovaFrom} per vehicle from either BCN El Prat or central Barcelona, with 60 minutes of free waiting from landing.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "36 km" },
+    { icon: Clock, k: "Journey", v: "about 40 min" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "From", v: `€${vilanovaFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to Vilanova i la Geltrú by vehicle", vehicles: vilanovaAirport },
+    { heading: "From central Barcelona", caption: "Fixed fares from central Barcelona to Vilanova i la Geltrú by vehicle", vehicles: vilanovaCity },
+  ],
+  priceNote: "Both origins cost the same on this route. The airport and the city are a similar distance from the Garraf coast, so we do not charge a supplement for one over the other.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Door-to-door to any address in Vilanova",
+    "Free cancellation up to 24 hours before",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the C-32",
+    "Meet and greet with a name board",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "Vilanova is on the coastal rail line, so the train is a real alternative. It depends almost entirely on your luggage and your arrival time.",
+  options: [
+    { name: "Private transfer", cost: `€${vilanovaFrom} per vehicle`, time: "About 40 minutes, door to door", best: "Groups, families, holiday luggage, late arrivals and anyone staying outside the centre" },
+    { name: "Rodalies R2 Sud train", cost: "Per person, cheapest option", time: "Around an hour from the airport, with a change", best: "Solo travellers with one bag arriving during the day" },
+    { name: "Taxi", cost: "Metered, plus an airport supplement", time: "Similar to a private transfer", best: "Arriving off-peak with no wait at the rank" },
+  ],
+  optionsNote: "The train is genuinely good value if you are travelling light and landing in daylight. It stops being the better option the moment you have two suitcases, a late flight, or an apartment that is a fifteen-minute walk uphill from the station — which describes a large share of the accommodation here.",
+  sections: [
+    {
+      h2: "One town beyond",
+      h2Accent: "Sitges",
+      paras: [
+        "Vilanova i la Geltrú sits on the Garraf coast just past Sitges, and the two are usually mentioned together — but they are different places to stay. Vilanova is a working coastal town with a fishing port and a long stretch of beach, rather than a resort, and accommodation here is generally larger and further apart than in Sitges.",
+        "That last part is why the transfer question comes up. Vilanova's apartments and villas are spread across a wide seafront and up into the streets behind it, which makes a door-to-door fare more useful than a station arrival. The price above is to any address in the town, not to a central drop-off point.",
+        "If you are choosing between the two, or staying in one and visiting the other, the [Sitges transfer page](/transfers/sitges) has the fares for that side. Both towns sit on the same road out of Barcelona, so a stop in one on the way to the other is straightforward to arrange.",
+      ],
+      cards: [
+        { icon: MapPin, t: "Any address in town", d: "Seafront, old town or the streets behind — one fare covers all of them." },
+        { icon: Luggage, t: "Built for holiday luggage", d: "No station stairs and no walk at the far end with a case." },
+        { icon: Umbrella, t: "Beach-season traffic", d: "The C-32 backs up on summer weekends. The fare does not move when it does." },
+      ],
+    },
+    {
+      h2: "Where it sits on the",
+      h2Accent: "coast",
+      paras: [
+        "Vilanova is the northern end of a run of coastal towns that continues south through Cubelles and Calafell towards Tarragona. Everything along that stretch is priced in the same table, so if your stay involves more than one of them the fares are directly comparable — the [Costa Dorada page](/transfers/costa-dorada) covers the whole run.",
+        "In the other direction it is a short hop back towards Barcelona, which makes day trips into the city practical without moving hotels. A return transfer costs the same as the outbound, and for a group it usually compares well with four or five rail tickets each way.",
+        "For arrivals, the [airport transfers page](/airport-transfers) explains how pickups work at T1 and T2 and what happens when a flight is delayed. The fare above already includes flight tracking and free waiting from landing.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona Airport to Vilanova i la Geltrú?", a: `From €${vilanovaFrom} for the ${vilanovaAirport[0].label}, fixed per vehicle rather than per person. The same fare applies from central Barcelona. Larger cars cost more and the full list is on this page. The price excludes VAT and tolls: 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long does the journey take?", a: "36 km and about 40 minutes in normal traffic. Allow longer on summer weekends, when the C-32 coastal motorway carries a lot of beach traffic in both directions." },
+    { q: "Will the driver take me to my apartment rather than the centre?", a: "Yes. The fare is door to door to any address in Vilanova, so a hotel, an apartment or a private villa all cost the same. Give the full address when you book — accommodation here is spread out, and the exact street matters more than it would in a smaller town." },
+    { q: "Is Vilanova the same as Sitges?", a: "No. They are neighbouring towns on the same coast, about ten minutes apart by road, and they are priced separately. Vilanova is larger and more residential; Sitges is the resort. See the [Sitges page](/transfers/sitges) for that route, or ask us to include a stop in one on the way to the other." },
+    { q: "What happens if my flight is delayed?", a: "We track your flight by its number and move the pickup to the actual landing time at no charge. Airport pickups include 60 minutes of free waiting from touchdown, which covers passport control and baggage reclaim on all but the worst days." },
+    { q: "Is this a private car or a shared shuttle?", a: "Private. We never combine bookings, share the vehicle with other passengers or sell seats individually. The car is yours from arrivals to your door." },
+  ],
+  bookingLead: "Give us your flight number, the full address in Vilanova and the number of passengers. The price is confirmed before you pay and does not move afterwards. If you are staying somewhere without an obvious street number, a landmark or the property name is usually enough.",
+  ctaLead: `Fixed at €${vilanovaFrom} per vehicle from BCN El Prat or central Barcelona.`,
+  cheapest: vilanovaFrom,
+  ...schemaFor(
+    "vilanova",
+    "Vilanova i la Geltrú",
+    "Barcelona to Vilanova i la Geltrú Private Transfer",
+    `Fixed-price private transfer to Vilanova i la Geltrú from Barcelona El Prat Airport or central Barcelona. From €${vilanovaFrom} per vehicle, 36 km, about 40 minutes. Flight tracking and 60 minutes of free waiting from landing.`,
+    vilanovaFrom,
+    { type: "City", name: "Vilanova i la Geltrú", sameAs: "https://www.wikidata.org/wiki/Q15553" },
+  ),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Begur & Aiguablava
+//
+// 146 km by road is recorded in lib/fixed-prices.ts against the route, where it
+// was used to set the fare between Palamós (132 km) and Figueres (155 km).
+// Journey time follows the site's own long-route figures: Girona airport is
+// 103 km / 68 min and Reus 112 km / 70 min (data/destinations.json), which puts
+// 146 km a little under two hours.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const begurAirport = ladder("BCN_AIRPORT", "BEGUR");
+const begurCity = ladder("BARCELONA_CITY", "BEGUR");
+const begurFrom = cheapestOf(begurAirport, begurCity);
+
+const BEGUR: RouteLanding = {
+  slug: "begur",
+  name: "Begur & Aiguablava",
+  h1: "Barcelona Airport to Begur & Aiguablava Transfer",
+  eyebrow: "Costa Brava",
+  EyebrowIcon: Umbrella,
+  title: `Barcelona to Begur & Aiguablava Transfer — from €${begurFrom}`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Begur and the Aiguablava coves. Fixed €${begurFrom} per vehicle, 146 km, about 1h45.`,
+  keywords: [
+    "barcelona airport to begur transfer",
+    "begur private transfer",
+    "aiguablava transfer barcelona",
+    "bcn airport to costa brava begur",
+    "begur villa transfer airport",
+  ],
+  heroLead: `A private car from arrivals to the coves, without a change, a connection or a hire-car desk. Fixed at €${begurFrom} per vehicle from either BCN El Prat or central Barcelona, with 60 minutes of free waiting from landing.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "146 km" },
+    { icon: Clock, k: "Journey", v: "about 1h 45" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "From", v: `€${begurFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to Begur and Aiguablava by vehicle", vehicles: begurAirport },
+    { heading: "From central Barcelona", caption: "Fixed fares from central Barcelona to Begur and Aiguablava by vehicle", vehicles: begurCity },
+  ],
+  priceNote: "Both origins cost the same. Aiguablava sits inside the Begur municipality, a few minutes down the same road, and takes the same fare as the town itself.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Door-to-door to any address in Begur or the coves",
+    "Free cancellation up to 24 hours before",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the AP-7",
+    "Meet and greet with a name board",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "This is far enough from Barcelona that the alternatives stop being close. Here is the honest comparison.",
+  options: [
+    { name: "Private transfer", cost: `€${begurFrom} per vehicle`, time: "About 1 hour 45 minutes, door to door", best: "Villa stays, families, groups, and anyone arriving with a full set of luggage" },
+    { name: "Bus to Palafrugell, then local", cost: "Per person, plus a second leg", time: "Three hours or more with the connection", best: "Solo budget travellers arriving in the middle of the day" },
+    { name: "Hire car", cost: "Rental, fuel, tolls and parking", time: "Similar to a private transfer, plus the desk queue", best: "Stays where you want a car for the whole week anyway" },
+  ],
+  optionsNote: "The hire car is the real alternative here, and for a two-week villa stay it often wins. For a shorter trip, or where the villa has parking you will not use, one fixed transfer each way is usually both cheaper and considerably less trouble than a week of Spanish motorway tolls and a fuel-policy argument at the desk.",
+  sections: [
+    {
+      h2: "Arriving on the northern",
+      h2Accent: "Costa Brava",
+      paras: [
+        "Begur is at the far end of the stretch of coast most Barcelona visitors never reach, and that distance is the whole point of the place — the coves below the town are reached by narrow roads that do not carry coach traffic. Aiguablava is one of them, four minutes down the same road, and it takes the same fare as the town.",
+        "The practical consequence is that public transport gets you close and then stops. Buses serve Palafrugell and the larger towns; the coves themselves are a local connection or a taxi at the far end, after a journey that already involved a change. With luggage, after a flight, that final leg is where the day goes wrong.",
+        "A door-to-door fare removes it. The car you get into at arrivals is the car that stops outside the villa, and the price is agreed before you travel regardless of what the AP-7 does on a July Saturday.",
+      ],
+      cards: [
+        { icon: RouteIcon, t: "No connection to miss", d: "One car the whole way, so a delayed flight costs you nothing downstream." },
+        { icon: Luggage, t: "Villa-sized luggage", d: "Book by boot space — a fortnight's bags for four rarely fits a saloon." },
+        { icon: Clock, t: "Arrive at any hour", d: "Late flights are fine. There is no last bus to plan around." },
+      ],
+    },
+    {
+      h2: "Villa stays and the",
+      h2Accent: "return leg",
+      paras: [
+        "Most bookings on this route are villa stays, which means two things practically. First, luggage is heavier than on a city break — book one vehicle size up from your seating requirement, because a fortnight's bags for four rarely fits a saloon boot. The [fleet page](/fleet) lists what each car actually holds.",
+        "Second, the return is worth booking at the same time. Departure pickups this far out are timed backwards from your flight, and the drive is long enough that the margin matters; leaving it to arrange locally on the last morning is how people end up paying a premium for a car found at short notice.",
+        "If you are touring rather than staying put, the wider [Costa Brava page](/transfers/costa-brava) lists the fares for the other towns along the coast, and [Girona](/transfers/girona) covers both the city and its airport — which for some routes is a shorter flight and a shorter drive than Barcelona.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona Airport to Begur?", a: `From €${begurFrom} for the ${begurAirport[0].label}, fixed per vehicle rather than per person. The same fare applies from central Barcelona, and to Aiguablava. Larger cars cost more and the full list is on this page. The price excludes VAT and tolls: 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long does the journey take?", a: "146 km and about 1 hour 45 minutes in normal traffic, most of it on the AP-7 motorway. Allow longer on summer Saturdays, which are changeover day for most villa lets on this coast." },
+    { q: "Do you go to Aiguablava and the other coves?", a: "Yes, at the same fare. Aiguablava sits inside the Begur municipality a few minutes down the same road, and the surrounding coves are covered by the same price. Give the villa name or the full address when you book — the roads down to the coves are narrow and the exact destination matters." },
+    { q: "Is a transfer better than hiring a car?", a: "It depends on your stay. For a fortnight where you want a car every day, hire usually wins. For a week or less, or where the plan is to stay near the coves, two fixed transfers are normally cheaper than rental plus fuel, tolls and parking — and there is no desk queue after a flight." },
+    { q: "Should I book the return at the same time?", a: "We recommend it. Departure pickups are timed backwards from your flight, and on a drive this long the margin matters. Booking both legs together also fixes the return price, rather than leaving it to be arranged locally on your last morning." },
+    { q: "Is this a private car or a shared shuttle?", a: "Private. We never combine bookings, share the vehicle with other passengers or sell seats individually. The car is yours from arrivals to the villa door." },
+  ],
+  bookingLead: "Give us your flight number, the villa or hotel address and the number of passengers, and say whether you want the return leg. The price is confirmed before you pay and does not move afterwards. If the address is hard to find, the property name and a nearby cove is usually enough for the driver to work with.",
+  ctaLead: `Fixed at €${begurFrom} per vehicle from BCN El Prat or central Barcelona.`,
+  cheapest: begurFrom,
+  ...schemaFor(
+    "begur",
+    "Begur & Aiguablava",
+    "Barcelona to Begur and Aiguablava Private Transfer",
+    `Fixed-price private transfer to Begur and the Aiguablava coves from Barcelona El Prat Airport or central Barcelona. From €${begurFrom} per vehicle, 146 km, about 1 hour 45 minutes. Flight tracking and 60 minutes of free waiting from landing.`,
+    begurFrom,
+    { type: "City", name: "Begur", sameAs: "https://www.wikidata.org/wiki/Q13462" },
+  ),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Encamp
+//
+// 206.8 km by road, confirmed against the quote engine, which also confirms the
+// fixed Andorra fare applies: Encamp is a town rather than a ski station, and
+// lib/pricing.ts excludes it from SKI_STATION_NAMES for exactly that reason.
+// Journey time follows the Andorra page's published ~3 hours; Encamp sits a few
+// minutes further up the same valley road.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const encamp = ladder("BCN_AIRPORT", "ANDORRA");
+const encampFrom = cheapestOf(encamp);
+
+const ENCAMP: RouteLanding = {
+  slug: "encamp",
+  name: "Encamp",
+  h1: "Barcelona Airport to Encamp Transfer",
+  eyebrow: "Andorra · CG-2 valley",
+  EyebrowIcon: Mountain,
+  title: `Barcelona to Encamp Transfer — fixed €${encampFrom}`,
+  description: `Private transfer from BCN El Prat to Encamp, Andorra. Fixed €${encampFrom} per vehicle, 207 km, about 3 hours. Winter tyres in season, ski and board carriage included.`,
+  keywords: [
+    "barcelona to encamp transfer",
+    "encamp transfer barcelona airport",
+    "bcn airport to encamp",
+    "barcelona encamp private transfer",
+    "encamp andorra airport transfer",
+  ],
+  heroLead: `A private car from arrivals to your door in Encamp, without a change at Andorra la Vella. Fixed at €${encampFrom} per vehicle, agreed before you travel and unchanged by snow, traffic or the hour you land.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "207 km" },
+    { icon: Clock, k: "Journey", v: "about 3 hours" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${encampFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to Encamp by vehicle", vehicles: encamp },
+  ],
+  priceNote: "Encamp takes the standard Andorra fare because it is a town on the valley road, not a ski station. The stations themselves are priced by road distance — see the ski resorts page.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Skis, boards and boot bags carried at no extra charge",
+    "Door-to-door to any address in Encamp",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the C-16 Túnel del Cadí",
+    "Meet and greet with a name board",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "Andorra has no airport and no railway, so every arrival is by road. That narrows the choice to three.",
+  options: [
+    { name: "Private transfer", cost: `€${encampFrom} per vehicle`, time: "About 3 hours, door to door", best: "Groups, ski luggage, late arrivals, and anyone who does not want to change vehicles at Andorra la Vella" },
+    { name: "Scheduled coach", cost: "Per person, booked ahead", time: "Around 4 hours, plus the connection onward from Andorra la Vella", best: "Solo travellers with light luggage and a flexible arrival" },
+    { name: "Hire car", cost: "Rental, fuel, tolls and winter tyres", time: "Similar to a private transfer", best: "Stays where you want a car in Andorra for the whole week" },
+  ],
+  optionsNote: "The coach is the cheap option and it does the job — but it terminates at Andorra la Vella, so Encamp means a second leg with your bags at the end of a travel day. In winter that connection is the part that goes wrong. The [hire car](/fleet) is the real alternative for a long stay; for a week or less two fixed transfers usually cost less once tolls, fuel and winter tyres are counted.",
+  sections: [
+    {
+      h2: "Why Encamp is booked",
+      h2Accent: "separately",
+      paras: [
+        "Encamp sits on the CG-2, the single road that runs up the valley from Andorra la Vella towards the French border. Everything heading for the eastern side of the country passes through it, which makes it a common base — cheaper to stay in than the capital and closer to the slopes than most of it.",
+        "It also has a cable car link up to the Grandvalira ski area, which is why so many winter stays choose it over Andorra la Vella. If you are skiing, that connection is the reason to be here rather than twenty minutes further down the valley.",
+        "The transfer is priced as Andorra because Encamp is a town, not a resort. The ski stations above it are charged by road distance instead — the [Andorra ski resorts page](/transfers/andorra-ski-resorts) covers Pas de la Casa, Soldeu, Arinsal and Grandvalira, and explains why those are quoted rather than fixed.",
+      ],
+      cards: [
+        { icon: Snowflake, t: "Ski kit travels free", d: "Skis, boards and boot bags are carried at no extra charge. Tell us how many when you book." },
+        { icon: Clock, t: "No change at the capital", d: "One car from arrivals to the door, rather than a coach then a taxi." },
+        { icon: ShieldCheck, t: "The price is the price", d: "Snow, traffic and a delayed flight do not move a fixed fare." },
+      ],
+    },
+    {
+      h2: "Winter, and the drive",
+      h2Accent: "itself",
+      paras: [
+        "The route runs inland from Barcelona and climbs steadily for the last hour: motorway to Puigcerdà by way of the Túnel del Cadí, then mountain road up the valley. In good conditions it is about three hours from the terminal to Encamp.",
+        "In winter it can be longer, and that is the point of a fixed fare. Snow on the CG-2, a queue at the border post, or a slow run up from the tunnel all cost time and none of them cost you money — the figure agreed at booking is the figure charged.",
+        "Vehicles are equipped for the conditions the road actually has in season. If your flight lands late and the last coach has gone, the car is still there: we track the flight rather than the schedule.",
+      ],
+    },
+    {
+      h2: "Coming back, and",
+      h2Accent: "onward",
+      paras: [
+        "Book the return at the same time if you can. Departure pickups from Andorra are timed backwards from your flight and the drive is long enough that the margin matters — arranging it locally on the last morning is how people end up paying a premium for whatever car is free.",
+        "Staying elsewhere in the country first? [Andorra la Vella](/transfers/andorra) is the same fixed fare, and both are on the same road. A stop in one on the way to the other is straightforward to arrange rather than being two separate bookings.",
+        "The [airport transfers page](/airport-transfers) explains how pickups work at T1 and T2 and what happens when a flight is delayed. The fare above already includes flight tracking and 60 minutes of free waiting from landing.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona Airport to Encamp?", a: `Fixed at €${encampFrom} for the ${encamp[0].label}, per vehicle rather than per person, so a group of four pays once. Larger cars cost more and the full list is on this page. The price excludes VAT and tolls: 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long does the journey take?", a: "About 3 hours for the 207 km in good conditions. Allow longer in winter, when snow on the valley road and queues at the border both add time — neither of which changes what you pay." },
+    { q: "Is Encamp the same price as Andorra la Vella?", a: "Yes. Encamp is an ordinary Andorran town on the same valley road, so it takes the standard Andorra fare. The ski stations above it are different: those are priced by road distance and quoted at booking rather than fixed." },
+    { q: "Can you carry skis and snowboards?", a: "Yes, at no extra charge. Tell us how many sets when you book so the right vehicle is sent — ski bags take boot space rather than seats, and four passengers with four sets of kit need a larger car than four passengers with suitcases." },
+    { q: "What happens if my flight is delayed?", a: "We track your flight by its number and move the pickup to the actual landing time at no charge. Airport pickups include 60 minutes of free waiting from touchdown. On a route this long that matters more than usual: there is no later coach to fall back on." },
+    { q: "Do you go on to the ski stations from Encamp?", a: "Yes, but they are priced separately by road distance rather than at the Andorra fare — Grandvalira, Pas de la Casa, Soldeu and Arinsal are all quoted at booking. See the [ski resorts page](/transfers/andorra-ski-resorts) for how that works." },
+  ],
+  bookingLead: "Give us your flight number, the address in Encamp and how many passengers and ski bags are travelling. The price is confirmed before you pay and does not move afterwards — not for snow, not for a delay, not for the hour you land.",
+  ctaLead: `Fixed at €${encampFrom} per vehicle from BCN El Prat to Encamp.`,
+  cheapest: encampFrom,
+  ...schemaFor(
+    "encamp",
+    "Encamp",
+    "Barcelona Airport to Encamp Private Transfer",
+    `Fixed-price private transfer from Barcelona El Prat Airport to Encamp, Andorra. €${encampFrom} per vehicle, 207 km, about 3 hours. Flight tracking, 60 minutes free waiting, ski carriage included.`,
+    encampFrom,
+    // Q24269 is the parish, Q989558 the town inside it. The parish, on the same
+    // reasoning as Begur: a transfer serves the wider area, not one street.
+    { type: "City", name: "Encamp", sameAs: "https://www.wikidata.org/wiki/Q24269" },
+  ),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sitges
+//
+// 35 km and 35 minutes are the figures the previous page published and they are
+// consistent with the Garraf coast run; the fare is read from the table. Both
+// origins cost the same, so one ladder covers airport and city.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const sitges = ladder("BCN_AIRPORT", "SITGES");
+const sitgesFrom = cheapestOf(sitges);
+
+const SITGES: RouteLanding = {
+  slug: "sitges",
+  name: "Sitges",
+  h1: "Barcelona Airport to Sitges Transfer",
+  eyebrow: "Garraf coast · 35 km",
+  EyebrowIcon: Waves,
+  title: `Barcelona Airport to Sitges Transfer — from €${sitgesFrom}`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Sitges. Fixed €${sitgesFrom} per vehicle, 35 km, about 35 minutes, door to door. Compared honestly with the train, bus and taxi.`,
+  keywords: [
+    "barcelona airport to sitges transfer",
+    "sitges transfer",
+    "el prat to sitges",
+    "barcelona to sitges taxi cost",
+    "barcelona airport train to sitges",
+  ],
+  heroLead: `A private car from arrivals to your door in Sitges. Fixed at €${sitgesFrom} per vehicle — the same from the airport or from central Barcelona — with no change at the station and no walk at the far end.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "35 km" },
+    { icon: Clock, k: "Journey", v: "about 35 min" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${sitgesFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport or central Barcelona", caption: "Fixed fares from Barcelona to Sitges by vehicle", vehicles: sitges },
+  ],
+  priceNote: "Both origins cost the same on this route, so there is no supplement for starting at the airport rather than in town.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Door-to-door to any address in Sitges",
+    "Free cancellation up to 24 hours before",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the C-32",
+    "Meet and greet with a name board",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "People search for the train, the bus and the taxi fare before they book a transfer, so here is the comparison rather than a sales pitch.",
+  options: [
+    { name: "Private transfer", cost: `€${sitgesFrom} per vehicle`, time: "About 35 minutes, door to door", best: "Groups, families, holiday luggage, late arrivals, and accommodation away from the station" },
+    { name: "Rodalies R2 Sud train", cost: "Per person, the cheapest option by far", time: "Around an hour from the airport, with a change at El Prat or Sants", best: "One or two people with one bag each, arriving in daylight" },
+    { name: "Coach", cost: "Per person, timetabled", time: "Roughly an hour when it connects, longer when it does not", best: "Budget travel with time to spare" },
+    { name: "Taxi", cost: "Metered, plus an airport supplement", time: "Similar to a private transfer, plus the rank queue", best: "Off-peak arrivals, if you do not mind not knowing the total in advance" },
+  ],
+  optionsNote: "The train is genuinely cheaper and we will not pretend otherwise — if you are travelling light and landing in daylight, take it. It stops being the better option with two suitcases, a late flight, or an apartment up the hill behind the front, because the R2 needs a change and the walk at the far end is the part nobody plans for. A taxi costs roughly what a transfer costs on this distance, with the difference that you find out the number at the end rather than the beginning.",
+  sections: [
+    {
+      h2: "Where in Sitges you are",
+      h2Accent: "staying",
+      paras: [
+        "The fare is door to door to any address in the town, which matters here more than in most places. Sitges is compact but it is built on a slope: the seafront and Passeig de la Ribera are flat, the old town behind the church is narrow and stepped, and the residential areas at Vallpineda and Levantina sit well above the centre.",
+        "A station arrival leaves you at the top of the town with your luggage. Give the full address when you book — a hotel name, an apartment number, or the marina at Aiguadolç — and the driver takes you to it rather than to a drop-off point.",
+        "Some of the old-town streets are pedestrian or too narrow for a car. Where that is the case the driver gets as close as the road allows and helps with the bags the rest of the way, which is a short walk rather than a hill.",
+      ],
+      cards: [
+        { icon: MapPin, t: "Any address, one price", d: "Seafront, old town or up at Vallpineda — the fare does not change." },
+        { icon: Luggage, t: "No station stairs", d: "The R2 change and the climb from the station are the reason people book this." },
+        { icon: Clock, t: "Late arrivals fine", d: "Trains thin out in the evening. The car is timed to your flight." },
+      ],
+    },
+    {
+      h2: "Carnival, Pride and the",
+      h2Accent: "Film Festival",
+      paras: [
+        "Sitges fills completely three times a year, and each one changes how a transfer works. Carnival in February and Pride in June both close roads in the centre; the International Film Festival in October fills the hotels rather than the streets.",
+        "During Carnival and Pride the police close the seafront and several approaches to the old town for the parades. Your driver will get as close as the closures allow and tell you in advance if your address is inside a restricted zone — better to know before you land than to discover it with your luggage on a pavement.",
+        "Book earlier than usual for those dates. Availability tightens across the whole Garraf coast, and a fixed fare booked in advance is also protection against the surge pricing that everything else on the road does that week.",
+      ],
+    },
+    {
+      h2: "Combining Sitges with",
+      h2Accent: "the coast",
+      paras: [
+        "A common request is Sitges together with somewhere else on the same run — most often Tarragona, which sits an hour further down the same coast. Ask for it as one journey rather than two bookings and we will price the whole thing, which is normally less than two separate transfers.",
+        "The obvious neighbours are [Vilanova i la Geltrú](/transfers/vilanova), ten minutes further along and a quieter place to stay, and [Tarragona](/transfers/tarragona) with its Roman town. The whole stretch is priced in the same table, so the fares are directly comparable — the [Costa Dorada page](/transfers/costa-dorada) covers the run south.",
+        "If you are arriving by air, the [airport transfers page](/airport-transfers) explains how pickups work at T1 and T2 and what happens when a flight is delayed. The fare above already includes flight tracking and free waiting from landing.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a taxi from Barcelona Airport to Sitges?", a: `A taxi is metered with an airport supplement on top, so the total depends on traffic and the hour — you find out at the end of the journey. Our fixed fare for the same trip is €${sitgesFrom} for the ${sitges[0].label}, agreed before you travel and unchanged by the traffic. On this distance the two are usually close; the difference is knowing the number in advance.` },
+    { q: "How long does the transfer take?", a: "35 km and about 35 minutes in normal traffic on the C-32. Allow longer on summer weekends and during Carnival and Pride, when the coastal road and the town itself both back up." },
+    { q: "Is the train from Barcelona Airport to Sitges better?", a: "If you are one or two people travelling light and landing during the day, honestly yes — the Rodalies R2 Sud is much cheaper and reasonably quick. It needs a change, though, and it leaves you at the station rather than at your door, which is what tips the balance for families, late arrivals and anyone staying above the centre." },
+    { q: "How much is the transfer from Barcelona city centre?", a: `The same — €${sitgesFrom} for an economy sedan. There is no supplement for starting at the airport rather than in town, so a hotel pickup in Barcelona costs what an arrivals pickup costs.` },
+    { q: "Will the driver take me to my apartment?", a: "Yes. The fare covers any address in Sitges. Where a street is pedestrian or too narrow for a car, the driver gets as close as the road allows and helps with the bags the rest of the way." },
+    { q: "Is this a private car or a shared shuttle?", a: "Private. We never combine bookings, share the vehicle with other passengers or sell seats individually. The car is yours from arrivals to the door." },
+  ],
+  bookingLead: "Give us your flight number, the full address in Sitges and the number of passengers. The price is confirmed before you pay and does not move afterwards. If you are arriving during Carnival or Pride, say so — we will tell you whether your street is inside a closure.",
+  ctaLead: `Fixed at €${sitgesFrom} per vehicle from BCN El Prat or central Barcelona.`,
+  cheapest: sitgesFrom,
+  ...schemaFor(
+    "sitges",
+    "Sitges",
+    "Barcelona to Sitges Private Transfer",
+    `Fixed-price private transfer from Barcelona El Prat Airport or central Barcelona to Sitges. From €${sitgesFrom} per vehicle, 35 km, about 35 minutes, door to door.`,
+    sitgesFrom,
+    { type: "City", name: "Sitges", sameAs: "https://www.wikidata.org/wiki/Q15551" },
+  ),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Salou
+//
+// 100 km and about 1h10 are the figures the previous page published, consistent
+// with the AP-7 run down the Costa Daurada. The fare comes from the table.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const salou = ladder("BCN_AIRPORT", "SALOU");
+const salouFrom = cheapestOf(salou);
+
+const SALOU: RouteLanding = {
+  slug: "salou",
+  name: "Salou",
+  h1: "Barcelona Airport to Salou Transfer",
+  eyebrow: "Costa Daurada · PortAventura",
+  EyebrowIcon: Umbrella,
+  title: `Barcelona Airport to Salou Transfer — from €${salouFrom}`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Salou and PortAventura. Fixed €${salouFrom} per vehicle, 100 km, about 1 hour 10 minutes, door to door.`,
+  keywords: [
+    "barcelona to salou transfer",
+    "barcelona airport to salou",
+    "transfer barcelona salou",
+    "taxi barcelona to salou",
+    "salou portaventura airport transfer",
+  ],
+  heroLead: `A private car from arrivals to your hotel in Salou or to the PortAventura gates, in one run with no change. Fixed at €${salouFrom} per vehicle — the same from the airport or from central Barcelona.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "100 km" },
+    { icon: Clock, k: "Journey", v: "about 1h 10" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${salouFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport or central Barcelona", caption: "Fixed fares from Barcelona to Salou by vehicle", vehicles: salou },
+  ],
+  priceNote: "Both origins cost the same. The fare covers Salou, the PortAventura resort hotels and the park gates — they are minutes apart and priced together.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Door-to-door to any Salou address, resort hotel or the park gates",
+    "Free cancellation up to 24 hours before",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the AP-7",
+    "Meet and greet with a name board",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "A hundred kilometres is far enough that the alternatives stop being close. Here is the honest comparison.",
+  options: [
+    { name: "Private transfer", cost: `€${salouFrom} per vehicle`, time: "About 1 hour 10 minutes, door to door", best: "Families, groups, holiday luggage, and anyone going straight to a resort hotel" },
+    { name: "Train via Sants", cost: "Per person, plus getting to Sants first", time: "75–90 minutes on the train, plus the connection at each end", best: "Solo travellers staying near Salou station" },
+    { name: "Coach", cost: "Per person, timetabled", time: "Around two hours with the connection", best: "Budget travel, arriving in the middle of the day" },
+    { name: "Taxi", cost: "Metered, plus an airport supplement", time: "Similar to a private transfer", best: "Rarely, on this distance — see below" },
+  ],
+  optionsNote: "The train is cheap and perfectly good if you are one person with one bag and your hotel is near the station. It is a different proposition with a family: the airport is not on the line, so it means reaching Sants first, then the train, then a taxi at the Salou end, with luggage at every step. A taxi will do the whole run, but a metered fare over 100 km is the one number nobody can tell you in advance — which is the argument for a fixed price rather than a claim about theirs.",
+  sections: [
+    {
+      h2: "PortAventura, and where we",
+      h2Accent: "drop you",
+      paras: [
+        "The park sits about ten minutes inland from the resort, and the transfer covers both at the same fare. We drop at the park gates, at any of the PortAventura resort hotels, or at your own accommodation in Salou — say which when you book and the driver takes you there directly.",
+        "Return pickups at the end of a park day are worth arranging in advance. PortAventura runs late in season, the public connections thin out well before it closes, and a family at the gates at eleven at night is not in a good position to negotiate. Booking the return with the outbound fixes both the time and the price.",
+        "The [PortAventura page](/transfers/port-aventura) covers the park itself in more detail, including the resort hotels and what the drop-off looks like at the gates.",
+      ],
+      cards: [
+        { icon: Luggage, t: "Book for the boot", d: "A family fortnight is more luggage than four seats implies. One size up is usually right." },
+        { icon: Clock, t: "Late park pickups", d: "The park runs later than the trains. Arrange the return when you book." },
+        { icon: MapPin, t: "Hotel, park or town", d: "All the same fare — the resort and the town are minutes apart." },
+      ],
+    },
+    {
+      h2: "How long the drive actually",
+      h2Accent: "takes",
+      paras: [
+        "About an hour and ten minutes for the 100 km, almost all of it on the AP-7 and A-7 heading southwest. It is a straightforward motorway run rather than a mountain road, so the time is fairly predictable outside peak season.",
+        "Summer Saturdays are the exception. The Costa Daurada changes over on a Saturday and the motorway carries the whole coast's arrivals and departures at once; the same drive can take half an hour longer. A fixed fare means that costs you time and not money — the figure agreed at booking is the figure charged, whatever the AP-7 does.",
+        "Flights landing late are fine. We track the arrival by flight number rather than the time you typed in, and airport pickups include 60 minutes of free waiting from touchdown, which on a route with no late train is worth more than it sounds.",
+      ],
+    },
+    {
+      h2: "The rest of the",
+      h2Accent: "Costa Daurada",
+      paras: [
+        "Salou sits in the middle of a run of resorts that share one stretch of coast. Cambrils is ten minutes south with its fishing port and restaurants, La Pineda a few minutes north, and [Tarragona](/transfers/tarragona) with its Roman amphitheatre and UNESCO old town twenty minutes up the road.",
+        "Everything along that coast is priced in the same table, so if your stay involves more than one of them the fares are directly comparable rather than being quoted case by case. The [Costa Dorada page](/transfers/costa-dorada) covers the whole run.",
+        "Coming from further along the coast instead? [Sitges](/transfers/sitges) is halfway back towards Barcelona and often combined with this one on the same journey — ask and we will price it as a single trip rather than two.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona Airport to Salou?", a: `From €${salouFrom} for the ${salou[0].label}, fixed per vehicle rather than per person — so a family of four pays once. A minivan for a larger group is €${salou.find((v) => v.class === "VITO")?.price ?? salou[salou.length - 2].price}. The price excludes VAT and tolls: 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long does the transfer to Salou take?", a: "About 1 hour 10 minutes for the 100 km, on the AP-7 and A-7. Allow longer on summer Saturdays, which are changeover day for most of the coast and the busiest the motorway gets." },
+    { q: "Can you drop us at PortAventura rather than in Salou?", a: "Yes, at the same fare — the park gates, any of the resort hotels, or your accommodation in town. They are minutes apart and priced together. Tell us which when you book, and arrange the return at the same time if you are staying until the park closes." },
+    { q: "Is the train from Barcelona to Salou cheaper?", a: "Per person, yes. The catch is that the airport is not on the line: it means getting to Sants first, then the train, then usually a taxi at the Salou end. For one person with one bag that is fine. For a family with suitcases it is three changes with luggage, and the fixed fare covers the whole vehicle rather than each seat." },
+    { q: "What about a taxi?", a: `A taxi will make the journey, but the meter on a 100 km run is the one figure nobody can quote you in advance, and there is an airport supplement on top. Our fare is €${salouFrom} for an economy car, agreed before you travel. We would rather tell you the number at the start than at the end.` },
+    { q: "Do you carry pushchairs and child seats?", a: "Yes. Child, baby and booster seats are available on request and fitted before the car is dispatched, so ask when you book rather than on the day. Pushchairs travel in the boot — mention them when booking so the vehicle is sized for them alongside the cases." },
+  ],
+  bookingLead: "Give us your flight number, whether you are going to a Salou address, a resort hotel or the park gates, and how many passengers. The price is confirmed before you pay and does not move afterwards — not for traffic, not for a delayed flight, not for a summer Saturday.",
+  ctaLead: `Fixed at €${salouFrom} per vehicle from BCN El Prat or central Barcelona.`,
+  cheapest: salouFrom,
+  ...schemaFor(
+    "salou",
+    "Salou",
+    "Barcelona to Salou Private Transfer",
+    `Fixed-price private transfer from Barcelona El Prat Airport or central Barcelona to Salou and PortAventura. From €${salouFrom} per vehicle, 100 km, about 1 hour 10 minutes.`,
+    salouFrom,
+    { type: "City", name: "Salou", sameAs: "https://www.wikidata.org/wiki/Q662789" },
+  ),
+};
+
+export const ROUTE_LANDINGS: RouteLanding[] = [LA_ROCA, SANTS, VILANOVA, BEGUR, ENCAMP, SITGES, SALOU];
+
+export function routeLanding(slug: string): RouteLanding | undefined {
+  return ROUTE_LANDINGS.find((r) => r.slug === slug);
+}

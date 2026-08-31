@@ -48,7 +48,15 @@ export default function TestimonialsSection() {
               evidence. GOOGLE_PROFILE.count still governs how many may be
               listed, and still feeds the structured data, where a count is
               required to be accurate rather than hidden. */}
-          <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl border border-gold-500/20 bg-gold-500/[0.04]">
+          {/* A link, not a card. The profile was referenced in structured data
+              on every page and nowhere a reader could click — and it is also
+              where the next review comes from. */}
+          <a
+            href={`https://www.google.com/maps?cid=${GOOGLE_PROFILE.cid}`}
+            target="_blank"
+            rel="noreferrer"
+            className="group inline-flex items-center gap-3 px-5 py-3 rounded-2xl border border-gold-500/20 bg-gold-500/[0.04] hover:border-gold-500/40 hover:bg-gold-500/[0.07] transition-colors"
+          >
             <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0">
               <span className="font-display text-[#4285F4] text-base font-bold leading-none">G</span>
             </span>
@@ -63,9 +71,12 @@ export default function TestimonialsSection() {
                   ))}
                 </span>
               </div>
-              <p className="text-dark-400 text-xs mt-0.5">Rated on Google</p>
+              <p className="text-gold-400 text-xs mt-0.5 flex items-center gap-1">
+                Read our reviews on Google
+                <ChevronRight size={11} className="transition-transform group-hover:translate-x-0.5" />
+              </p>
             </div>
-          </div>
+          </a>
         </div>
 
         {/* Reviews */}

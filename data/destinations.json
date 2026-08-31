@@ -6,10 +6,6 @@
     "area": "Barceloneta",
     "distance_km": 18,
     "duration_min": 25,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3786,
       "lng": 2.19
@@ -28,7 +24,7 @@
       },
       {
         "q": "How much does a private transfer from Barcelona Airport to W Barcelona Hotel cost?",
-        "a": "A fixed-price private transfer from Barcelona Airport to the W Barcelona Hotel starts from €45 for a Mercedes EQE 300 Electric (up to 3 passengers). A EQE 300 Electric is €55 and a Mercedes V-Class for groups up to 7 costs €65. Prices exclude VAT and tolls. Airport pickups include 60 minutes of free waiting from landing; meet & greet is an optional €5 extra."
+        "a": "A fixed-price private transfer from Barcelona Airport to the W Barcelona Hotel starts from €50 for a Toyota Corolla (up to 3 passengers). A Mercedes EQE 300 Electric is €65 and a Mercedes V-Class for groups up to 7 costs €75. Prices exclude VAT and tolls. Airport pickups include 60 minutes of free waiting from landing; meet & greet is an optional €5 extra."
       },
       {
         "q": "Can Elite BCN transfer us to the W Barcelona Hotel with surf or sports equipment?",
@@ -48,10 +44,6 @@
     "area": "Vila Olímpica",
     "distance_km": 17,
     "duration_min": 22,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.391,
       "lng": 2.1963
@@ -70,7 +62,7 @@
       },
       {
         "q": "What vehicles are available for the Hotel Arts Barcelona airport transfer?",
-        "a": "You can choose from a Mercedes EQE 300 Electric (1–4 pax, €45) or Mercedes V-Class MPV (1–7 pax, €65). All vehicles are less than 3 years old and air-conditioned with complimentary water on board."
+        "a": "You can choose from a Toyota Corolla (1–3 pax, €50), a Mercedes EQE 300 Electric (1–4 pax, €65) or a Mercedes V-Class MPV (1–7 pax, €75)."
       },
       {
         "q": "Does the Hotel Arts Barcelona transfer include meet & greet service?",
@@ -90,10 +82,6 @@
     "area": "Passeig de Gràcia",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3916,
       "lng": 2.1668
@@ -112,7 +100,7 @@
       },
       {
         "q": "Is the Mandarin Oriental Barcelona easy to reach by public transport?",
-        "a": "The hotel is well served by metro (Passeig de Gràcia L2/L3/L4), but from the airport this involves two changes, 40+ minutes of travel and is impractical with luggage. A private transfer is significantly more comfortable and costs from €45 fixed."
+        "a": "The hotel is well served by metro (Passeig de Gràcia L2/L3/L4), but from the airport this involves two changes, 40+ minutes of travel and is impractical with luggage. A private transfer is significantly more comfortable and costs from €50 fixed."
       },
       {
         "q": "What is the distance from Barcelona Airport to the Mandarin Oriental?",
@@ -132,10 +120,6 @@
     "area": "Eixample",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3896,
       "lng": 2.1678
@@ -154,7 +138,7 @@
       },
       {
         "q": "What luxury vehicles are available for the transfer to Hotel El Palace?",
-        "a": "Elite BCN operates Mercedes EQE 300 Electric, Mercedes Vito, and Mercedes V-Class MPVs. All vehicles are presented in immaculate condition, less than 3 years old. Prices start from €45 fixed — no meters, no surprises."
+        "a": "Elite BCN operates Mercedes EQE 300 Electric, Mercedes Vito and Mercedes V-Class MPVs, alongside Toyota sedans and a Mercedes Sprinter for larger groups. Prices start from €50 fixed — no meters, no surprises."
       },
       {
         "q": "Does Elite BCN offer return transfers from Hotel El Palace to Barcelona Airport?",
@@ -174,10 +158,6 @@
     "area": "Passeig de Gràcia",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3921,
       "lng": 2.1675
@@ -192,7 +172,7 @@
     "faqs": [
       {
         "q": "How do I get from Barcelona Airport to the Majestic Hotel?",
-        "a": "The most comfortable option is a private transfer with Elite BCN. Your chauffeur meets you in the arrivals hall with a name board, takes your luggage, and drives you directly to the Majestic Hotel in approximately 26 minutes. The fixed price is €45 for a sedan, no matter what the traffic is like."
+        "a": "The most comfortable option is a private transfer with Elite BCN. Your chauffeur meets you in the arrivals hall with a name board, takes your luggage, and drives you directly to the Majestic Hotel in approximately 26 minutes. The fixed price is €50 for a sedan, no matter what the traffic is like."
       },
       {
         "q": "Is there parking at the Majestic Hotel for a transfer drop-off?",
@@ -200,7 +180,7 @@
       },
       {
         "q": "Can I book a transfer from the Majestic Hotel to a cruise terminal?",
-        "a": "Absolutely. Elite BCN offers point-to-point transfers between any hotel and Barcelona's cruise terminals (Moll Adossat, World Trade Centre). The Majestic to cruise port transfer takes approximately 20 minutes and costs from €45."
+        "a": "Absolutely. Elite BCN offers point-to-point transfers between any hotel and Barcelona's cruise terminals (Moll Adossat, World Trade Centre). The Majestic to cruise port transfer takes approximately 20 minutes and costs from €50."
       }
     ],
     "nearby": [
@@ -216,10 +196,6 @@
     "area": "Eixample",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3896,
       "lng": 2.1632
@@ -234,11 +210,11 @@
     "faqs": [
       {
         "q": "What is the best way to get from Barcelona Airport to Cotton House Hotel?",
-        "a": "A private transfer with Elite BCN is the most comfortable option: fixed price from €45, door-to-door service, 26-minute journey. The Aerobus drops at Plaça de Catalunya (a 10-minute walk away) for €6.75, but with luggage a private transfer is far more practical."
+        "a": "A private transfer with Elite BCN is the most comfortable option: fixed price from €50, door-to-door service, 26-minute journey. The Aerobus drops at Plaça de Catalunya (a 10-minute walk away) for €6.75, but with luggage a private transfer is far more practical."
       },
       {
         "q": "How much does a taxi from Barcelona Airport to Cotton House Hotel cost?",
-        "a": "A metered taxi from BCN Airport to the Cotton House on Gran Via typically costs €25–€32 including the mandatory €4.50 airport supplement. With Elite BCN the fixed price is €45 and includes 60 min free waiting from landing and help with luggage. Meet & greet in arrivals with a name board is an optional €5 extra."
+        "a": "A metered taxi from BCN Airport to the Cotton House on Gran Via typically costs €25–€32 including the mandatory €4.50 airport supplement. With Elite BCN the fixed price is €50 and includes 60 min free waiting from landing and help with luggage. Meet & greet in arrivals with a name board is an optional €5 extra."
       },
       {
         "q": "Do you offer child seats for transfers to the Cotton House Hotel?",
@@ -258,10 +234,6 @@
     "area": "Gothic Quarter",
     "distance_km": 16,
     "duration_min": 23,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3834,
       "lng": 2.1766
@@ -300,10 +272,6 @@
     "area": "Eixample",
     "distance_km": 15,
     "duration_min": 22,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3931,
       "lng": 2.1645
@@ -342,10 +310,6 @@
     "area": "Gothic Quarter",
     "distance_km": 16,
     "duration_min": 23,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3836,
       "lng": 2.1756
@@ -360,7 +324,7 @@
     "faqs": [
       {
         "q": "How do I travel from Barcelona Airport to the Four Seasons Hotel Barcelona?",
-        "a": "The simplest way is a private transfer with Elite BCN: your driver meets you in arrivals with a name board, handles your luggage, and drives you directly to the Four Seasons at Passeig de Gràcia 2 in approximately 23 minutes. Fixed price from €45."
+        "a": "The simplest way is a private transfer with Elite BCN: your driver meets you in arrivals with a name board, handles your luggage, and drives you directly to the Four Seasons at Passeig de Gràcia 2 in approximately 23 minutes. Fixed price from €50."
       },
       {
         "q": "Is Las Ramblas pedestrianised? Can a car reach the Four Seasons?",
@@ -384,10 +348,6 @@
     "area": "Diagonal",
     "distance_km": 12,
     "duration_min": 18,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3912,
       "lng": 2.1388
@@ -402,7 +362,7 @@
     "faqs": [
       {
         "q": "How close is the Fairmont Rey Juan Carlos I to Barcelona Airport?",
-        "a": "The Fairmont Rey Juan Carlos I is one of the closest luxury hotels to BCN Airport at just 12 km. The private transfer takes approximately 18 minutes — the shortest transfer time of any central Barcelona five-star hotel. Fixed price €45."
+        "a": "The Fairmont Rey Juan Carlos I is one of the closest luxury hotels to BCN Airport at just 12 km. The private transfer takes approximately 18 minutes — the shortest transfer time of any central Barcelona five-star hotel. Fixed price €50."
       },
       {
         "q": "Is the Fairmont Rey Juan Carlos I near the Fira Gran Via convention centre?",
@@ -426,10 +386,6 @@
     "area": "Diagonal Mar",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.4057,
       "lng": 2.2127
@@ -452,7 +408,7 @@
       },
       {
         "q": "What public transport is available from the Hilton Diagonal Mar to Barcelona centre?",
-        "a": "The hotel is served by the T4 tram to Ciutadella/Vila Olímpica, connecting with the L4 metro. Journey time to the Gothic Quarter is around 25 minutes. However, for airport connections and late-night returns from the city, a private transfer from €45 is far more practical."
+        "a": "The hotel is served by the T4 tram to Ciutadella/Vila Olímpica, connecting with the L4 metro. Journey time to the Gothic Quarter is around 25 minutes. However, for airport connections and late-night returns from the city, a private transfer from €50 is far more practical."
       }
     ],
     "nearby": [
@@ -468,10 +424,6 @@
     "area": "Diagonal",
     "distance_km": 12,
     "duration_min": 18,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.394,
       "lng": 2.1362
@@ -494,7 +446,7 @@
       },
       {
         "q": "Can Elite BCN arrange a transfer from Sofia Hotel to the cruise port?",
-        "a": "Yes. The transfer from Sofia Hotel to Barcelona's Moll Adossat cruise terminals takes approximately 25 minutes (16 km). We recommend booking this transfer the day before embarkation. Fixed price from €45 regardless of luggage volume."
+        "a": "Yes. The transfer from Sofia Hotel to Barcelona's Moll Adossat cruise terminals takes approximately 25 minutes (16 km). We recommend booking this transfer the day before embarkation. Fixed price from €50 regardless of luggage volume."
       }
     ],
     "nearby": [
@@ -510,10 +462,6 @@
     "area": "Eixample",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3896,
       "lng": 2.1622
@@ -528,7 +476,7 @@
     "faqs": [
       {
         "q": "How do I reach Almanac Barcelona from the airport?",
-        "a": "The easiest way is a private transfer with Elite BCN. Your driver meets you in the arrivals hall with a name board and takes you directly to the Almanac on Gran Via in approximately 26 minutes. Fixed from €45 excluding VAT and tolls, including 60 min free waiting from landing. Meet & greet is an optional €5 extra."
+        "a": "The easiest way is a private transfer with Elite BCN. Your driver meets you in the arrivals hall with a name board and takes you directly to the Almanac on Gran Via in approximately 26 minutes. Fixed from €50 excluding VAT and tolls, including 60 min free waiting from landing. Meet & greet is an optional €5 extra."
       },
       {
         "q": "Is Almanac Barcelona walking distance from Gaudí's architecture?",
@@ -536,7 +484,7 @@
       },
       {
         "q": "Does Elite BCN charge extra for night-time transfers to Almanac Barcelona?",
-        "a": "No. Elite BCN's prices are fixed and do not change based on time of day, day of week, or traffic conditions. A 3 AM transfer to the Almanac costs exactly the same as a midday one. The fixed price from the airport is €45 for a sedan."
+        "a": "No. Elite BCN's prices are fixed and do not change based on time of day, day of week, or traffic conditions. A 3 AM transfer to the Almanac costs exactly the same as a midday one. The fixed price from the airport is €50 for a sedan."
       }
     ],
     "nearby": [
@@ -552,10 +500,6 @@
     "area": "Gothic Waterfront",
     "distance_km": 16,
     "duration_min": 23,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3795,
       "lng": 2.1808
@@ -594,10 +538,6 @@
     "area": "Las Ramblas",
     "distance_km": 16,
     "duration_min": 23,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3806,
       "lng": 2.1734
@@ -616,7 +556,7 @@
       },
       {
         "q": "What is the most convenient way to reach Hotel 1898 from BCN Airport?",
-        "a": "A private transfer with Elite BCN is the most direct option — 23 minutes, fixed price from €45. The Aerobus also stops at Plaça de Catalunya (5 minutes' walk away) for €6.75 per person, but with luggage a private transfer is far more comfortable and only marginally more expensive per person for groups of 3+."
+        "a": "A private transfer with Elite BCN is the most direct option — 23 minutes, fixed price from €50. The Aerobus also stops at Plaça de Catalunya (5 minutes' walk away) for €6.75 per person, but with luggage a private transfer is far more comfortable and only marginally more expensive per person for groups of 3+."
       },
       {
         "q": "Can I book a transfer from Hotel 1898 to Sitges for a day trip?",
@@ -636,10 +576,6 @@
     "area": "El Raval",
     "distance_km": 16,
     "duration_min": 24,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3797,
       "lng": 2.1673
@@ -658,7 +594,7 @@
       },
       {
         "q": "How do I get from the airport to Barceló Raval?",
-        "a": "A private transfer with Elite BCN collects you from BCN Airport arrivals and delivers you to the Barceló Raval in approximately 24 minutes. Fixed price from €45. The El Raval location is fully accessible by vehicle via the Ronda de Sant Antoni."
+        "a": "A private transfer with Elite BCN collects you from BCN Airport arrivals and delivers you to the Barceló Raval in approximately 24 minutes. Fixed price from €50. The El Raval location is fully accessible by vehicle via the Ronda de Sant Antoni."
       },
       {
         "q": "Is the MACBA museum walking distance from Barceló Raval?",
@@ -678,10 +614,6 @@
     "area": "Passeig de Gràcia",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3921,
       "lng": 2.1672
@@ -696,7 +628,7 @@
     "faqs": [
       {
         "q": "How do I get from Barcelona Airport to Hotel Condes de Barcelona?",
-        "a": "A private transfer with Elite BCN takes approximately 26 minutes from BCN Airport arrivals to the Hotel Condes on Passeig de Gràcia. Your driver meets you with a name board, handles luggage, and drops you directly at the hotel entrance. Fixed from €45."
+        "a": "A private transfer with Elite BCN takes approximately 26 minutes from BCN Airport arrivals to the Hotel Condes on Passeig de Gràcia. Your driver meets you with a name board, handles luggage, and drops you directly at the hotel entrance. Fixed from €50."
       },
       {
         "q": "Is Casa Batlló visible from the Hotel Condes de Barcelona?",
@@ -720,10 +652,6 @@
     "area": "Vila Olímpica",
     "distance_km": 17,
     "duration_min": 22,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3888,
       "lng": 2.2003
@@ -762,10 +690,6 @@
     "area": "Eixample",
     "distance_km": 16,
     "duration_min": 25,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3921,
       "lng": 2.1611
@@ -784,7 +708,7 @@
       },
       {
         "q": "What is the cost of the airport transfer to Ayre Hotel Rosellón?",
-        "a": "A private transfer from BCN Airport to the Ayre Hotel Rosellón costs from €45 fixed for a Mercedes EQE 300 Electric (up to 3 passengers). A Mercedes V-Class for groups up to 7 is €65. All prices include luggage handling and 60 minutes free waiting from landing. Meet & greet is an optional €5 extra."
+        "a": "A private transfer from BCN Airport to the Ayre Hotel Rosellón costs from €50 fixed for a Toyota Corolla (up to 3 passengers). A Mercedes EQE 300 Electric is €65 and a Mercedes V-Class for groups up to 7 is €75. All prices include luggage handling and 60 minutes free waiting from landing. Meet & greet is an optional €5 extra."
       },
       {
         "q": "Is the Ayre Hotel Rosellón good for the LGBT district (Gayxample)?",
@@ -804,10 +728,6 @@
     "area": "Eixample",
     "distance_km": 16,
     "duration_min": 26,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3912,
       "lng": 2.1619
@@ -822,7 +742,7 @@
     "faqs": [
       {
         "q": "How do I get from the airport to Nobu Hotel Barcelona?",
-        "a": "A private transfer with Elite BCN collects you from BCN Airport arrivals (terminal T1 or T2) and delivers you to the Nobu Hotel on Avinguda Diagonal in approximately 26 minutes. Fixed price from €45. Your driver is pre-briefed on hotel drop-off protocols and will handle all luggage."
+        "a": "A private transfer with Elite BCN collects you from BCN Airport arrivals (terminal T1 or T2) and delivers you to the Nobu Hotel on Avinguda Diagonal in approximately 26 minutes. Fixed price from €50. Your driver is pre-briefed on hotel drop-off protocols and will handle all luggage."
       },
       {
         "q": "Is Nobu Hotel Barcelona near the Passeig de Gràcia restaurants?",
@@ -846,10 +766,6 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3522,
       "lng": 2.1681
@@ -888,10 +804,6 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3535,
       "lng": 2.17
@@ -930,10 +842,6 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.354,
       "lng": 2.169
@@ -948,7 +856,7 @@
     "faqs": [
       {
         "q": "How do I get from Barcelona Airport to the Celebrity Cruises terminal?",
-        "a": "Elite BCN offers private transfers from BCN Airport (T1 and T2) to the Celebrity Cruises terminal at Moll Adossat. Your driver meets you in arrivals with a name board and delivers you to the check-in hall in approximately 20 minutes. Fixed from €45 per vehicle."
+        "a": "Elite BCN offers private transfers from BCN Airport (T1 and T2) to the Celebrity Cruises terminal at Moll Adossat. Your driver meets you in arrivals with a name board and delivers you to the check-in hall in approximately 20 minutes. Fixed from €50 per vehicle."
       },
       {
         "q": "Does Celebrity Cruises have a specific terminal at Barcelona Port?",
@@ -972,10 +880,6 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.353,
       "lng": 2.1675
@@ -1014,10 +918,6 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3518,
       "lng": 2.1695
@@ -1032,7 +932,7 @@
     "faqs": [
       {
         "q": "How do I reach the Princess Cruises terminal in Barcelona from the airport?",
-        "a": "The most seamless option is a private transfer with Elite BCN. Your driver meets you in the BCN Airport arrivals hall with a personalised sign, loads your luggage, and delivers you to the Princess Cruises terminal at Moll Adossat in approximately 20 minutes. Fixed from €45."
+        "a": "The most seamless option is a private transfer with Elite BCN. Your driver meets you in the BCN Airport arrivals hall with a personalised sign, loads your luggage, and delivers you to the Princess Cruises terminal at Moll Adossat in approximately 20 minutes. Fixed from €50."
       },
       {
         "q": "What is the baggage allowance on transfers to the Princess terminal?",
@@ -1056,10 +956,6 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3545,
       "lng": 2.166
@@ -1098,10 +994,6 @@
     "area": "Port of Barcelona — World Trade Centre",
     "distance_km": 15,
     "duration_min": 22,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.37,
       "lng": 2.18
@@ -1120,7 +1012,7 @@
       },
       {
         "q": "Is Elite BCN's service appropriate for Cunard passengers?",
-        "a": "Absolutely. Elite BCN operates premium Mercedes vehicles (EQE 300, V-Class, Vito) with professional, suited chauffeurs — entirely in keeping with Cunard's world-class standards. We treat every passenger as a VIP regardless of vehicle class. Complimentary water is provided on all journeys."
+        "a": "Absolutely. Elite BCN operates premium Mercedes vehicles (EQE 300, V-Class, Vito) with professional, suited chauffeurs — entirely in keeping with Cunard's world-class standards. We treat every passenger as a VIP regardless of vehicle class."
       },
       {
         "q": "Can Elite BCN provide a day tour of Barcelona for passengers on a Cunard port call?",
@@ -1140,10 +1032,6 @@
     "area": "Port of Barcelona — Moll Adossat",
     "distance_km": 14,
     "duration_min": 20,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.3525,
       "lng": 2.1688
@@ -1158,7 +1046,7 @@
     "faqs": [
       {
         "q": "How do I get from Barcelona Airport to the Carnival Cruise terminal?",
-        "a": "Book a private transfer with Elite BCN. Your driver meets you in BCN Airport arrivals with a name card, loads all luggage, and drives you directly to the Carnival terminal at Moll Adossat in approximately 20 minutes. Fixed from €45 per vehicle, not per person."
+        "a": "Book a private transfer with Elite BCN. Your driver meets you in BCN Airport arrivals with a name card, loads all luggage, and drives you directly to the Carnival terminal at Moll Adossat in approximately 20 minutes. Fixed from €50 per vehicle, not per person."
       },
       {
         "q": "What is the best vehicle for a family going on a Carnival cruise?",
@@ -1182,10 +1070,6 @@
     "area": "Fira Gran Via, L'Hospitalet de Llobregat",
     "distance_km": 7,
     "duration_min": 12,
-    "prices": {
-      "sedan": 35,
-      "mpv": 55
-    },
     "coordinates": {
       "lat": 41.3545,
       "lng": 2.1276
@@ -1224,10 +1108,6 @@
     "area": "Parc del Fòrum, Diagonal Mar",
     "distance_km": 15,
     "duration_min": 20,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.4095,
       "lng": 2.2199
@@ -1242,7 +1122,7 @@
     "faqs": [
       {
         "q": "How do I get from Barcelona Airport to Primavera Sound at Parc del Fòrum?",
-        "a": "A private transfer from BCN Airport to the Parc del Fòrum takes approximately 20 minutes (15 km) via the coastal Ronda Litoral. Fixed price from €45. Late-night festival returns (post-midnight) are available at the same price and can be booked in advance via our website or WhatsApp."
+        "a": "A private transfer from BCN Airport to the Parc del Fòrum takes approximately 20 minutes (15 km) via the coastal Ronda Litoral. Fixed price from €50. Late-night festival returns (post-midnight) are available at the same price and can be booked in advance via our website or WhatsApp."
       },
       {
         "q": "Can I get a late-night transfer back from Primavera Sound to my Barcelona hotel?",
@@ -1266,10 +1146,6 @@
     "area": "Montmeló",
     "distance_km": 28,
     "duration_min": 32,
-    "prices": {
-      "sedan": 55,
-      "mpv": 80
-    },
     "coordinates": {
       "lat": 41.5702,
       "lng": 2.2611
@@ -1288,7 +1164,7 @@
       },
       {
         "q": "How much does a private transfer to the F1 Spanish Grand Prix cost?",
-        "a": "A private transfer from BCN Airport to the Circuit de Barcelona-Catalunya starts from €55 for a Mercedes EQE 300 Electric (1–4 passengers). The Mercedes V-Class for groups up to 7 is €80. These prices are fixed regardless of race day traffic conditions."
+        "a": "A private transfer from BCN Airport to the Circuit de Barcelona-Catalunya starts from €98 for a Toyota Corolla (up to 3 passengers). A Mercedes EQE 300 Electric is €115 and the Mercedes V-Class for groups up to 7 is €147. This route is priced by road distance rather than from the fixed-route table. These prices are fixed regardless of race day traffic conditions."
       },
       {
         "q": "Can Elite BCN wait at the circuit and bring us back to Barcelona after the race?",
@@ -1308,10 +1184,6 @@
     "area": "Fira Montjuïc & Fira Gran Via",
     "distance_km": 10,
     "duration_min": 15,
-    "prices": {
-      "sedan": 40,
-      "mpv": 60
-    },
     "coordinates": {
       "lat": 41.3711,
       "lng": 2.1509
@@ -1350,10 +1222,6 @@
     "area": "Fira Gran Via, L'Hospitalet de Llobregat",
     "distance_km": 7,
     "duration_min": 12,
-    "prices": {
-      "sedan": 35,
-      "mpv": 55
-    },
     "coordinates": {
       "lat": 41.3545,
       "lng": 2.1276
@@ -1392,10 +1260,6 @@
     "area": "Port Olímpic",
     "distance_km": 17,
     "duration_min": 22,
-    "prices": {
-      "sedan": 45,
-      "mpv": 65
-    },
     "coordinates": {
       "lat": 41.391,
       "lng": 2.2009
@@ -1434,10 +1298,6 @@
     "area": "Valencia, Spain",
     "distance_km": 355,
     "duration_min": 215,
-    "prices": {
-      "sedan": 290,
-      "mpv": 380
-    },
     "coordinates": {
       "lat": 39.4699,
       "lng": -0.3763
@@ -1476,10 +1336,6 @@
     "area": "Madrid, Spain",
     "distance_km": 628,
     "duration_min": 335,
-    "prices": {
-      "sedan": 490,
-      "mpv": 620
-    },
     "coordinates": {
       "lat": 40.4168,
       "lng": -3.7038
@@ -1518,10 +1374,6 @@
     "area": "Perpignan, Occitanie, France",
     "distance_km": 188,
     "duration_min": 125,
-    "prices": {
-      "sedan": 185,
-      "mpv": 250
-    },
     "coordinates": {
       "lat": 42.6977,
       "lng": 2.8954
@@ -1560,10 +1412,6 @@
     "area": "Lleida, Catalonia",
     "distance_km": 172,
     "duration_min": 105,
-    "prices": {
-      "sedan": 165,
-      "mpv": 220
-    },
     "coordinates": {
       "lat": 41.6176,
       "lng": 0.62
@@ -1602,10 +1450,6 @@
     "area": "Reus, Tarragona",
     "distance_km": 112,
     "duration_min": 70,
-    "prices": {
-      "sedan": 110,
-      "mpv": 145
-    },
     "coordinates": {
       "lat": 41.1474,
       "lng": 1.1672
@@ -1644,10 +1488,6 @@
     "area": "Girona, Catalonia",
     "distance_km": 103,
     "duration_min": 68,
-    "prices": {
-      "sedan": 105,
-      "mpv": 140
-    },
     "coordinates": {
       "lat": 41.901,
       "lng": 2.7606
@@ -1686,10 +1526,6 @@
     "area": "Salou, Tarragona",
     "distance_km": 101,
     "duration_min": 70,
-    "prices": {
-      "sedan": 100,
-      "mpv": 135
-    },
     "coordinates": {
       "lat": 41.0751,
       "lng": 1.1461
@@ -1728,10 +1564,6 @@
     "area": "Mataró, Maresme",
     "distance_km": 36,
     "duration_min": 38,
-    "prices": {
-      "sedan": 55,
-      "mpv": 75
-    },
     "coordinates": {
       "lat": 41.5382,
       "lng": 2.4445
@@ -1770,10 +1602,6 @@
     "area": "Terrassa, Vallès Occidental",
     "distance_km": 40,
     "duration_min": 42,
-    "prices": {
-      "sedan": 60,
-      "mpv": 85
-    },
     "coordinates": {
       "lat": 41.5633,
       "lng": 2.0097

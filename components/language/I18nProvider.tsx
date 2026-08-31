@@ -119,13 +119,36 @@ export function useTranslations(namespace: Namespace) {
 }
 
 // ─── Provider ────────────────────────────────────────────────────────────────
-export default function I18nProvider({ children }: { children: ReactNode }) {
-  // Start with English — guarantees SSR HTML has real text, not keys.
-  // useEffect fires only on the client, after hydration is complete.
-  const [locale, setLocaleState] = useState<SupportedLocale>("en");
-  const [messages, setMessages] = useState<Messages>(enMsg);
+export default function I18nProvider({
+  children,
+  initialLocale,
+  initialMessages,
+}: {
+  children: ReactNode;
+  /**
+   * Set by the locale routes under app/[locale]. When present, the server has
+   * already rendered this page's HTML in that language and the URL says so.
+   *
+   * This is the whole point of the locale URLs: without a server-supplied
+   * locale the provider starts in English and only switches after hydration,
+   * so the HTML Google indexes is English no matter which language the visitor
+   * chose. A crawler that never runs the effect would have seen eight
+   * identical English pages.
+   */
+  initialLocale?: SupportedLocale;
+  initialMessages?: Messages;
+}) {
+  // Falls back to English, which guarantees SSR HTML has real text, not keys,
+  // on the pages that are not yet translated.
+  const [locale, setLocaleState] = useState<SupportedLocale>(initialLocale ?? "en");
+  const [messages, setMessages] = useState<Messages>(initialMessages ?? enMsg);
 
   useEffect(() => {
+    // The URL is the stronger signal. Somebody who asked for /fr wants French
+    // even if they once picked German here, and honouring the cookie would
+    // silently serve a language the address bar contradicts.
+    if (initialLocale) return;
+
     // Read stored preference from cookie (set by setLocale below)
     const cookie = document.cookie.split(";").find((c) => c.trim().startsWith("NEXT_LOCALE="));
     const stored = cookie?.split("=")?.[1]?.trim() as SupportedLocale | undefined;
@@ -135,7 +158,33 @@ export default function I18nProvider({ children }: { children: ReactNode }) {
       // the alternative is a flash of untranslated keys.
       loadMessages(stored).then(setMessages).catch(() => {});
     }
-  }, []);
+  }, [initialLocale]);
+
+  // Reflect a server-chosen locale on <html>.
+  //
+  // The root layout hardcodes lang="en" and is shared by every route, so a
+  // locale page cannot set the attribute during render — only the one root
+  // layout may emit <html>, and it is static. Applying it here keeps screen
+  // readers on the right pronunciation rules and, for Arabic, flips the page
+  // to right-to-left. hreflang is what tells Google the language, and that is
+  // emitted properly in the page metadata.
+  useEffect(() => {
+    if (!initialLocale) return;
+    // Someone who arrived from a French search result never touched the
+    // language menu, so without this the moment they clicked through to a page
+    // that is not translated the site would snap back to English on them.
+    document.cookie = `NEXT_LOCALE=${initialLocale};path=/;max-age=31536000`;
+    document.documentElement.lang = initialLocale;
+    document.documentElement.dir = RTL_LOCALES.includes(initialLocale) ? "rtl" : "ltr";
+    const meta = LANGUAGE_META[initialLocale];
+    if (meta?.font && !document.querySelector(`link[data-i18n-font="${initialLocale}"]`)) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = meta.font;
+      link.setAttribute("data-i18n-font", initialLocale);
+      document.head.appendChild(link);
+    }
+  }, [initialLocale]);
 
   function setLocale(newLocale: SupportedLocale) {
     setLocaleState(newLocale);

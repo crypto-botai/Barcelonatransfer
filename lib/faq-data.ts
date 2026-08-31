@@ -36,10 +36,10 @@ export const FAQ_GROUPS = [
   {
     group: "Vehicles & Fleet",
     items: [
-      { q: "What vehicles do you offer?", a: "Our fleet includes: Toyota Corolla/Camry (economy/business sedan, up to 4 pax), Tesla Model 3 (electric VIP), Mercedes EQE 300 Electric (executive sedan), Mercedes Vito (executive minivan, up to 7 pax), Mercedes V-Class (luxury 7-seat MPV), and Mercedes Sprinter (group minibus, up to 16 pax). All are under 3 years old." },
-      { q: "Are the vehicles clean and well-maintained?", a: "All vehicles are professionally cleaned and sanitised before every trip. Our fleet is maintained to the highest standards and all drivers carry fresh water, phone chargers, and sanitiser as standard." },
+      { q: "What vehicles do you offer?", a: "Our fleet includes: Toyota Corolla/Camry (economy/business sedan, up to 4 pax), Tesla Model 3 (electric VIP), Mercedes EQE 300 Electric (executive sedan), Mercedes Vito (executive minivan, up to 7 pax), Mercedes V-Class (luxury 7-seat MPV), and Mercedes Sprinter (group minibus, up to 16 pax)." },
+      { q: "Are the vehicles clean and well-maintained?", a: "All vehicles are professionally cleaned before every trip and serviced on schedule. If anything about the car is not right when it arrives, tell the driver or call us and we will deal with it." },
       { q: "Can I request a specific vehicle model?", a: "We'll do our best to accommodate specific model requests. Please add a note in the Special Requests field when booking, or contact us directly to confirm availability." },
-      { q: "Do your vehicles have WiFi?", a: "Yes. All vehicles in our fleet are equipped with complimentary 4G WiFi. Luxury and VIP vehicles additionally feature premium sound systems and USB-C charging points." },
+      { q: "Do your vehicles have WiFi?", a: "Most of them. WiFi is listed on five of the seven cars in the fleet — the exceptions are the V-Class and the Sprinter. Each vehicle page lists exactly what that car carries, so check there before booking if it matters to you." },
     ],
   },
   {

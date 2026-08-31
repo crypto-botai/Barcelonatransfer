@@ -37,7 +37,7 @@
       "years": "Años de Experiencia"
     },
     "badges": {
-      "rating": "Valoración 4.9★",
+      "rating": "Valoración Google",
       "ratingsSub": "reseñas",
       "vtc": "VTC Licenciado",
       "vtcSub": "Totalmente asegurado",
@@ -51,7 +51,7 @@
     "sectionLabel": "Nuestra Flota",
     "title": "Elige Tu",
     "titleAccent": "Vehículo de Lujo",
-    "subtitle": "Todos los vehículos con menos de 3 años, mantenidos con estándares de conserjería.",
+    "subtitle": "Cada coche indica cuántas plazas y cuánto equipaje admite.",
     "allVehicles": "Todos los Vehículos",
     "collectionLabel": "Colección Completa",
     "collectionTitle": "Cada Vehículo,",
@@ -189,7 +189,8 @@
       "whatsapp": "Chat por WhatsApp",
       "location": "Barcelona, España · VTC Licenciado"
     },
-    "copyright": "Todos los derechos reservados. Operador VTC Licenciado — Barcelona, España."
+    "copyright": "Todos los derechos reservados. Operador VTC Licenciado — Barcelona, España.",
+    "languageHeading": "Idioma"
   },
   "common": {
     "loading": "Cargando…",
@@ -274,7 +275,9 @@
     "tabAirportCity": "Aeropuerto y ciudad",
     "tabCostaBrava": "Costa Brava",
     "tabCostaDorada": "Costa Dorada",
-    "tabHourly": "Por horas"
+    "tabHourly": "Por horas",
+    "vatNoteLead": "Todos los precios son fijos por vehículo y no incluyen IVA ni peajes.",
+    "vatNoteBody": "El 10 % de IVA se añade solo si solicita factura; los peajes de autopista se cobran aparte. El chófer profesional, el vehículo y el combustible están incluidos. El servicio de bienvenida, las sillas infantiles y otros extras son opcionales y se cobran aparte."
   },
   "bookflow": {
     "addExtras": "Añadir extras",
@@ -375,5 +378,11 @@
     "signedIn": "¡Bienvenido de nuevo!",
     "terms": "Términos",
     "welcomeBack": "Bienvenido de nuevo"
+  },
+  "meta": {
+    "bookDescription": "Reserva tu traslado privado en Barcelona en 60 segundos. Precios fijos desde 50 €. BCN El Prat T1/T2, puerto, hoteles y Sitges. Confirmación inmediata.",
+    "bookTitle": "Reserva tu traslado en Barcelona | Elite BCN",
+    "homeDescription": "Coche con chófer desde el aeropuerto de Barcelona, T1 y T2. Precio fijo por vehículo desde 50 €, con 60 minutos de espera gratuita tras aterrizar.",
+    "homeTitle": "Traslados Aeropuerto Barcelona | Chófer Privado"
   }
 }

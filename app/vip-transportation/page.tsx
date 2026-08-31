@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { Star, Shield, Phone, Clock, MapPin, ChevronRight } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
+import { lookupPriceByFleetVehicle } from "@/lib/fixed-prices";
 
 const BASE = "https://www.elitebcn.info";
 
@@ -43,7 +44,7 @@ const SCHEMA = {
   "@type": "Service",
   name: "VIP Transportation Barcelona",
   serviceType: "VIP Chauffeur Service",
-  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: { "@type": "City", name: "Barcelona" },
   description:
     "Discreet, luxury VIP transportation for high-profile clients: private jet connections, gala arrivals, executive roadshows and red-carpet events.",
@@ -82,6 +83,17 @@ const SERVICES = [
     body: "Restaurant reservations, hotel upgrades, last-minute logistics. Our operations team is reachable 24/7 for your account.",
   },
 ];
+
+/**
+ * Per-car fares for the airport run, read from the table rather than typed.
+ * The three figures below were hand-written and drifted: see the note at the
+ * call site.
+ */
+const VIP_FROM = {
+  V_CLASS: lookupPriceByFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", "V_CLASS"),
+  EQE_300: lookupPriceByFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", "EQE_300"),
+  VITO: lookupPriceByFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", "VITO"),
+} as const;
 
 export default function VIPTransportationPage() {
   return (
@@ -158,15 +170,17 @@ export default function VIPTransportationPage() {
               VIP-Ready <span className="text-gold-gradient">Fleet</span>
             </h2>
             <p className="text-dark-400 mb-10 max-w-xl mx-auto">
-              All vehicles are under 3 years old, professionally valeted before every journey, and
-              stocked with chilled water, phone chargers and noise-cancelling privacy screens on
-              request.
+              All vehicles are professionally valeted before every journey. Privacy glass is
+              fitted to the V-Class; what each car carries is listed on its own page.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
               {[
-                { name: "Mercedes V-Class VIP", detail: "Up to 7 pax · Luxury MPV · Groups & families", from: "€70" },
-                { name: "Mercedes EQE 300 Electric", detail: "Executive sedan · 1–4 pax · Airport meetings", from: "€55" },
-                { name: "Mercedes Vito", detail: "Executive minivan · Up to 8 pax · Large groups", from: "€65" },
+                // Read from the price table. These were typed by hand and two of
+                // the three under-quoted the fare the checkout charges: the
+                // V-Class at €70 against €75, the EQE at €55 against €65.
+                { name: "Mercedes V-Class VIP", detail: "Up to 7 pax · Luxury MPV · Groups & families", from: `€${VIP_FROM.V_CLASS}` },
+                { name: "Mercedes EQE 300 Electric", detail: "Executive sedan · 1–4 pax · Airport meetings", from: `€${VIP_FROM.EQE_300}` },
+                { name: "Mercedes Vito", detail: "Executive minivan · Up to 8 pax · Large groups", from: `€${VIP_FROM.VITO}` },
               ].map((v) => (
                 <div key={v.name} className="bg-dark-900 border border-white/[0.08] rounded-xl p-6">
                   <p className="text-white font-semibold mb-1">{v.name}</p>
@@ -212,6 +226,53 @@ export default function VIPTransportationPage() {
         {/* CTA */}
         <section className="py-20 bg-[#050505] border-t border-white/[0.06] text-center">
           <div className="container mx-auto px-4 max-w-2xl">
+            <div className="max-w-3xl mx-auto text-left mb-14 space-y-4 text-dark-300 leading-relaxed">
+              <h3 className="font-display text-2xl text-white">What VIP actually means here</h3>
+              <p>
+                It means the vehicle, the discretion and the planning — not a badge. In practice the
+                difference between a standard transfer and a VIP one is the car that turns up, the
+                driver assigned to it, and how much of the journey is arranged before you arrive rather
+                than decided on the day.
+              </p>
+              <p>
+                The V-Class is the vehicle most of this work uses: captain seats facing one another,
+                privacy glass and room to hold a conversation or ignore everyone and work. For larger
+                parties the Vito and the Sprinter carry more people, and the{" "}
+                <Link href="/fleet" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">fleet page</Link>{" "}
+                lists exactly what each seats and holds.
+              </p>
+              <h3 className="font-display text-2xl text-white pt-4">Discretion, and what we do not do</h3>
+              <p>
+                Drivers on these bookings do not discuss passengers, itineraries or destinations with
+                anyone. We do not photograph vehicles with clients in them, we do not name clients in
+                marketing, and we do not publish testimonials that identify anyone. If you need a
+                confidentiality agreement in place before travelling, ask and we will sign one.
+              </p>
+              <p>
+                What we are not is a security operator. We do not provide close protection, armoured
+                vehicles or counter-surveillance, and we will tell you that rather than improvise. If
+                your requirement genuinely needs those things, you need a specialist firm — we work
+                alongside them regularly and the transport side integrates fine.
+              </p>
+              <h3 className="font-display text-2xl text-white pt-4">Multi-vehicle and recurring work</h3>
+              <p>
+                Delegations, production crews and events often need several cars moving on the same
+                schedule. That is arranged as one booking with one point of contact rather than as
+                separate reservations, so a delayed flight moves the whole group rather than half of
+                it. Billing can run through a{" "}
+                <Link href="/corporate" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">corporate account</Link>{" "}
+                with consolidated monthly invoicing instead of per-journey payment.
+              </p>
+              <p>
+                For a full day with an open itinerary, by-the-hour hire is usually the right structure
+                — see the{" "}
+                <Link href="/hourly" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">hourly page</Link>{" "}
+                for rates and minimums. For airport arrivals, the{" "}
+                <Link href="/airport-transfers" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">airport transfers page</Link>{" "}
+                covers how meeting points and flight tracking work at T1 and T2.
+              </p>
+            </div>
+
             <h2 className="font-display text-3xl text-white mb-4">Ready to Arrange VIP Transport?</h2>
             <p className="text-dark-400 mb-8">
               Contact us directly for bespoke VIP arrangements. We respond within 15 minutes.

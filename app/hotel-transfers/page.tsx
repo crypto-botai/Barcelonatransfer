@@ -2,13 +2,23 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import HubChildLinks from "@/components/transfers/HubChildLinks";
+import { hotelChildren } from "@/lib/hub-children";
 import { MapPin, Clock, Shield, Star, ChevronRight, CheckCircle2 } from "lucide-react";
 import { ROUTES as PRICING_ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
+import { hubItemList } from "@/lib/hub-schema";
 
 const BASE = "https://www.elitebcn.info";
 
 // Base airport→city Economy price from the single source of truth
+/**
+ * Journeys that start and end inside Barcelona — hotel to hotel, hotel to Sants.
+ * These two rows read "from €35" against a table price of €50. Derived now.
+ */
+const cityToCityPrice =
+  PRICING_ROUTES.find((r) => r.from === "barcelona_city" && r.to === "barcelona_city")?.economy ?? null;
+
 const airportCityPrice = PRICING_ROUTES.find(
   (r) => r.from === "airport" && r.to === "barcelona_city"
 )?.economy ?? 45;
@@ -49,7 +59,7 @@ const SCHEMA = {
   "@type": "Service",
   name: "Hotel Transfers Barcelona",
   serviceType: "Airport Hotel Transfer",
-  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: { "@type": "City", name: "Barcelona" },
   description:
     "Private luxury transfers between Barcelona Airport and all major Barcelona hotels. Fixed prices, flight monitoring, free 60-minute wait.",
@@ -69,8 +79,8 @@ const HOTEL_ROUTES = [
   { from: "BCN Airport", to: "W Barcelona, Hotel Arts",                       price: `€${airportCityPrice}`, duration: "20–25 min" },
   { from: "BCN Airport", to: "Mandarin Oriental, El Palace, Majestic",        price: `€${airportCityPrice}`, duration: "20 min" },
   { from: "Hotel",       to: "Cruise Port (Terminals A–F)",                   price: `€${airportCityPrice}`, duration: "15–25 min" },
-  { from: "Hotel",       to: "Hotel (any area)",                              price: "from €35",              duration: "Varies" },
-  { from: "Hotel",       to: "Train station (Sants, Passeig de Gràcia)",      price: "from €35",              duration: "10–20 min" },
+  { from: "Hotel",       to: "Hotel (any area)",                              price: cityToCityPrice ? `from €${cityToCityPrice}` : "Quoted on request", duration: "Varies" },
+  { from: "Hotel",       to: "Train station (Sants, Passeig de Gràcia)",      price: cityToCityPrice ? `from €${cityToCityPrice}` : "Quoted on request", duration: "10–20 min" },
 ];
 
 const HOTELS = [
@@ -81,9 +91,23 @@ const HOTELS = [
   "Almanac Barcelona", "The Serras Hotel", "Hotel 1898",
 ];
 
+/**
+ * What this hub contains, stated for machines as well as readers.
+ * Built from the same derived children the visible links use.
+ */
+const HUB_LIST = hubItemList({
+  name: "Barcelona hotel transfer pages",
+  description: "Barcelona hotels with a dedicated airport pickup page and published fare.",
+  url: "/hotel-transfers",
+  children: hotelChildren(),
+});
+
 export default function HotelTransfersPage() {
   return (
     <>
+      {HUB_LIST && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HUB_LIST) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
       <Navbar />
@@ -167,7 +191,7 @@ export default function HotelTransfersPage() {
                 "60 minutes free waiting (airport)",
                 "15 minutes free waiting (hotels)",
                 "Meet & greet at arrivals",
-                "Bottled water on board",
+                "Air conditioning in every car",
                 "WiFi available on request",
                 "Child seats €5 per seat",
                 "Assistance with luggage",
@@ -252,6 +276,15 @@ export default function HotelTransfersPage() {
             </div>
           </div>
         </section>
+
+        {/* The hub named hotels in prose and linked to none of their pages.
+            Each of the twenty has pickup detail specific to that property,
+            which is exactly what someone booking to it wants. */}
+        <HubChildLinks
+          heading="Barcelona hotels with their own pickup page"
+          intro="Where the driver waits differs by property — a Passeig de Gràcia entrance is not a Barceloneta forecourt. These have the detail for their address."
+          children={hotelChildren()}
+        />
       </main>
 
       <Footer />

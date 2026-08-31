@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import HubChildLinks from "@/components/transfers/HubChildLinks";
+import { costaBravaChildren } from "@/lib/hub-children";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 import { cheapestOf } from "@/lib/destination-pricing";
+import { hubItemList } from "@/lib/hub-schema";
 
 // The region has no single route in the table; the headline is the
 // cheapest of the destinations this page actually names.
@@ -40,7 +43,7 @@ const costaBravaSchema = {
   name: "Barcelona to Costa Brava Private Transfer",
   description: "Luxury fixed-price private transfers from Barcelona to all Costa Brava resorts — Lloret de Mar, Tossa de Mar, Cadaqués, Roses and beyond.",
   url: "https://www.elitebcn.info/transfers/costa-brava",
-  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: "Costa Brava, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(COSTA_BRAVA_FROM), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -55,9 +58,23 @@ const costaBravaBreadcrumb = {
   ],
 };
 
+/**
+ * What this hub contains, stated for machines as well as readers.
+ * Built from the same derived children the visible links use.
+ */
+const HUB_LIST = hubItemList({
+  name: "Costa Brava transfer destinations",
+  description: "Costa Brava towns served by fixed-price private transfer from Barcelona.",
+  url: "/transfers/costa-brava",
+  children: costaBravaChildren(),
+});
+
 export default function CostaBravaTransferPage() {
   return (
     <>
+      {HUB_LIST && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HUB_LIST) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costaBravaSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costaBravaBreadcrumb) }} />
       <Navbar />
@@ -188,6 +205,15 @@ export default function CostaBravaTransferPage() {
             </Link>
           </div>
         </section>
+
+        {/* Links down to the destinations this hub covers. The hub had
+            two in-content outbound links and named its towns in prose
+            without linking any of them. */}
+        <HubChildLinks
+          heading="Costa Brava destinations we price"
+          intro="Each of these has its own page with journey time, vehicle options and the fixed fare. The coast has more towns than pages; every one of them is still in the price table."
+          children={costaBravaChildren()}
+        />
       </main>
       <Footer />
     </>

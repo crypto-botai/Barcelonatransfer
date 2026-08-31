@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
+    "gen:llms": "npx --yes tsx scripts/generate-llms.mts",
     "dev": "next dev",
     "prebuild": "node scripts/check-images.mjs",
     "build": "prisma generate && next build",

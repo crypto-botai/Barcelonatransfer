@@ -41,7 +41,7 @@ const HOURLY_SCHEMA = {
   "@type": "Service",
   name: "Hourly Chauffeur Service Barcelona",
   serviceType: "Hourly Chauffeur Hire",
-  provider: { "@type": "Organization", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: { "@type": "City", name: "Barcelona", sameAs: "https://www.wikidata.org/wiki/Q1492" },
   description: "By-the-hour private chauffeur hire in Barcelona. Minimum 4 hours. Ideal for meetings, events, shopping, airport standby.",
   url: "https://www.elitebcn.info/hourly",
@@ -54,6 +54,33 @@ const HOURLY_SCHEMA = {
     ],
   },
 };
+
+/**
+ * Rates and minimums are read from the pricing module in the component below,
+ * so these answers cannot quote a figure the booking would not charge.
+ */
+const HOURLY_FAQS: Array<{ q: string; a: string }> = [
+  {
+    q: "Can the driver take us outside Barcelona?",
+    a: "Yes. Inside the hours you book the itinerary is yours, including trips out of the city. Tell us roughly where you are going when you book so the right vehicle is sent and tolls can be estimated — a day on the coast and a day of meetings in the Eixample are different jobs.",
+  },
+  {
+    q: "What happens if we run over the hours we booked?",
+    a: "Extra time is billed at the same hourly rate, and we will always try to accommodate it. It is not guaranteed, because the driver may have another booking after yours — which is why booking one hour more than you think you need is usually the cheaper decision.",
+  },
+  {
+    q: "Is the driver with us the whole time?",
+    a: "Yes. The same driver and the same car stay with you for the whole block, waiting between stops. You are not matched with a different vehicle for each leg, and your things can stay in the car between stops.",
+  },
+  {
+    q: "Is hourly hire cheaper than separate transfers?",
+    a: "It depends on the shape of the day. Three or more stops usually favours hourly hire; two fixed journeys with a long gap usually favours booking them as separate transfers. Send us the outline and we will tell you which is cheaper.",
+  },
+  {
+    q: "Do you charge a night surcharge?",
+    a: "On hourly hire, yes — 20% between 22:00 and 06:00. Fixed-price transfers carry no night surcharge at all, at any hour, which is another reason a late airport run is better booked as a transfer than by the hour.",
+  },
+];
 
 export default function HourlyPage() {
   return (
@@ -147,6 +174,81 @@ export default function HourlyPage() {
                 </Link>
                 . Tell us what the day looks like and we will say which way is cheaper.
               </p>
+            </div>
+
+            <h3 className="text-white font-semibold mt-10 mb-4">What the hourly rate covers</h3>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="bg-dark-900 border border-white/[0.08] rounded-xl p-5">
+                <p className="text-white text-sm font-medium mb-3">Included</p>
+                <ul className="space-y-2 text-dark-300 text-sm">
+                  <li>The car and the chauffeur for the whole block</li>
+                  <li>Fuel, and waiting time between stops</li>
+                  <li>As many stops as you want inside the hours booked</li>
+                  <li>Changes to the plan on the day, if the time allows</li>
+                </ul>
+              </div>
+              <div className="bg-dark-900 border border-white/[0.08] rounded-xl p-5">
+                <p className="text-white text-sm font-medium mb-3">Charged separately</p>
+                <ul className="space-y-2 text-dark-300 text-sm">
+                  <li>Hours beyond the block, billed at the same rate</li>
+                  <li>20% night surcharge between 22:00 and 06:00</li>
+                  <li>Motorway tolls and paid parking on the route</li>
+                  <li>10% VAT, only if you request an invoice</li>
+                </ul>
+              </div>
+            </div>
+
+            <h3 className="text-white font-semibold mt-10 mb-4">How many hours to book</h3>
+            <div className="space-y-4 text-dark-300 leading-relaxed">
+              <p>
+                Most people underestimate this, and running over is more expensive than booking the
+                extra hour up front because it disrupts the driver&apos;s next job. A half day in the
+                city is realistically four to five hours once you account for traffic between stops;
+                a full day out of town — Montserrat, the Penedès wine country, a stretch of coast —
+                is eight or more.
+              </p>
+              <p>
+                The clock starts at the pickup time you choose and ends when the driver drops you for
+                the last time, so it includes the time you spend inside places rather than only the
+                driving. If the day is genuinely open-ended, book the minimum and extend on the day:
+                we will always try to accommodate it, and you are only charged for what you use above
+                the block.
+              </p>
+              <p>
+                If your day is really two fixed journeys with a long gap between them, two
+                point-to-point transfers are usually cheaper than hiring the car for the gap. Send us
+                the outline and we will tell you which way costs less — including when that is the
+                option we earn less from.
+              </p>
+            </div>
+
+            <h3 className="text-white font-semibold mt-10 mb-4">Which vehicle</h3>
+            <p className="text-dark-300 leading-relaxed">
+              Every car in the fleet is available by the hour, and the rate follows the vehicle rather
+              than the itinerary. For business days the saloons are usually right; for a group, or for
+              a day where people will be getting in and out repeatedly with bags, the minivans earn
+              their difference. Capacities for all of them are on the{" "}
+              <Link href="/fleet" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                fleet page
+              </Link>
+              , and the{" "}
+              <Link href="/corporate" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                corporate page
+              </Link>{" "}
+              covers account billing if this is a regular arrangement rather than a one-off.
+            </p>
+
+            <h3 className="text-white font-semibold mt-10 mb-4">Common questions</h3>
+            <div className="space-y-4">
+              {HOURLY_FAQS.map(({ q, a }) => (
+                <details key={q} className="group bg-dark-900 border border-white/[0.08] rounded-xl overflow-hidden">
+                  <summary className="cursor-pointer list-none p-5 flex items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors">
+                    <h4 className="text-white text-base font-semibold">{q}</h4>
+                    <span aria-hidden="true" className="text-gold-500 flex-shrink-0 transition-transform group-open:rotate-90">&rsaquo;</span>
+                  </summary>
+                  <p className="px-5 pb-5 text-dark-300 text-sm leading-relaxed">{a}</p>
+                </details>
+              ))}
             </div>
           </div>
         </section>

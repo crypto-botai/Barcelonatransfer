@@ -37,7 +37,7 @@
       "years": "Years Active"
     },
     "badges": {
-      "rating": "4.9★ Rating",
+      "rating": "Google Rating",
       "ratingsSub": "reviews",
       "vtc": "Licensed VTC",
       "vtcSub": "Fully insured",
@@ -51,7 +51,7 @@
     "sectionLabel": "Our Fleet",
     "title": "Choose Your",
     "titleAccent": "Luxury Vehicle",
-    "subtitle": "Every vehicle under 3 years old, maintained to concierge standards.",
+    "subtitle": "Every car lists what it seats and what it carries.",
     "allVehicles": "All Vehicles",
     "collectionLabel": "Full Collection",
     "collectionTitle": "Every Vehicle,",
@@ -189,7 +189,8 @@
       "whatsapp": "WhatsApp Chat",
       "location": "Barcelona, Spain · Licensed VTC"
     },
-    "copyright": "All rights reserved. Licensed VTC Operator — Barcelona, Spain."
+    "copyright": "All rights reserved. Licensed VTC Operator — Barcelona, Spain.",
+    "languageHeading": "Language"
   },
   "common": {
     "loading": "Loading…",
@@ -274,7 +275,9 @@
     "tabAirportCity": "Airport & City",
     "tabCostaBrava": "Costa Brava",
     "tabCostaDorada": "Costa Dorada",
-    "tabHourly": "Hourly"
+    "tabHourly": "Hourly",
+    "vatNoteLead": "All prices are fixed per vehicle and exclude VAT and tolls.",
+    "vatNoteBody": "10% VAT is added only if you request an invoice; motorway tolls are charged separately. Professional chauffeur, vehicle and fuel are included. Meet & greet, child seats and other extras are optional and charged separately."
   },
   "bookflow": {
     "addExtras": "Add Extras",
@@ -375,5 +378,11 @@
     "signedIn": "Welcome back!",
     "terms": "Terms",
     "welcomeBack": "Welcome Back"
+  },
+  "meta": {
+    "bookDescription": "Book your Barcelona private transfer in 60 seconds. Fixed prices from €50. BCN El Prat T1/T2, cruise port, hotels, Sitges and Andorra. Instant confirmation.",
+    "bookTitle": "Book Your Barcelona Transfer | Elite BCN",
+    "homeDescription": "Private car and driver from Barcelona Airport, T1 and T2. Fixed price per vehicle from €50, with 60 minutes of free waiting from the moment you land.",
+    "homeTitle": "Elite BCN | Barcelona Airport Transfers & Private Chauffeur"
   }
 }

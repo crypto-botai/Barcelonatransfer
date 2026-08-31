@@ -21,6 +21,8 @@ import { getFleetFromPrice, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing
 import toast from "react-hot-toast";
 import { useTranslations } from "@/components/language/I18nProvider";
 import { pickupToUtc } from "@/lib/datetime";
+import PhoneField from "@/components/booking/PhoneField";
+import { isUsablePhone, splitE164 } from "@/lib/dial-codes";
 
 // Addresses use short non-ambiguous strings so resolveZone() always identifies
 // the correct zone — no province names that could shadow the city name.
@@ -339,7 +341,12 @@ export default function BookFormClient() {
   const step1Valid = !!data.pickupLat && !!data.date && !!data.time && (bookingType !== "TRANSFER" || !!data.dropoffLat);
   // Named for what it checks rather than which step it sits on, since the
   // contact fields have now moved a step earlier.
-  const contactValid = !!data.guestName && !!data.guestEmail && !!data.guestPhone;
+  // A phone number is only useful if someone can dial it. This read
+  // `!!data.guestPhone`, so one stray digit was enough to book a transfer —
+  // and the driver found that out at arrivals.
+  const phoneParts = splitE164(data.guestPhone ?? "");
+  const phoneValid = isUsablePhone(phoneParts.iso, phoneParts.national);
+  const contactValid = !!data.guestName && !!data.guestEmail && phoneValid;
 
   const handlePay = async () => {
     setSubmitting(true);
@@ -736,16 +743,13 @@ export default function BookFormClient() {
                             className="input-luxury w-full pl-10 pr-4 py-4 rounded-xl text-sm" />
                         </div>
                       </div>
-                      <div>
-                        <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">Phone *</label>
-                        <div className="relative">
-                          <Phone size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
-                          <input required type="tel" value={data.guestPhone ?? ""}
-                            onChange={(e) => setData((d) => ({ ...d, guestPhone: e.target.value }))}
-                            placeholder={t("phonePlaceholder")}
-                            className="input-luxury w-full pl-10 pr-4 py-4 rounded-xl text-sm" />
-                        </div>
-                      </div>
+                      {/* Country code is not optional here. A number with no
+                          country is not a number the dispatcher can ring. */}
+                      <PhoneField
+                        value={data.guestPhone ?? ""}
+                        onChange={(e164) => setData((d) => ({ ...d, guestPhone: e164 }))}
+                        placeholder={t("phonePlaceholder")}
+                      />
                     </div>
 
                     {(bookingType === "TRANSFER" || bookingType === "CORPORATE") && (

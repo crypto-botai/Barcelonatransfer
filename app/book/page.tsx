@@ -5,6 +5,7 @@ import BookFormClient from "./BookFormClient";
 import { getPublicRoutes } from "@/lib/pricing-service";
 import { ROUTES } from "@/lib/pricing";
 import { faqPage, transferService } from "@/lib/schema";
+import { simpleBreadcrumb } from "@/lib/hub-schema";
 
 // Static metadata is generated at build time and cannot await the database, so
 // the "from" figure in the meta description comes from the canonical matrix —
@@ -54,6 +55,10 @@ const BOOK_FAQ = [
 ] as const;
 
 // Airport & City routes for the SSR price table (Google can index these without JS)
+// This page sits under the root and never said so. Thirteen pages had no
+// BreadcrumbList; eight were homepages, which correctly need none.
+const BREADCRUMB = simpleBreadcrumb([{ name: "Book a Transfer", path: "/book" }]);
+
 export default async function BookPage() {
   // Read the same database-backed source the homepage and /pricing use.
   // This table previously read the hardcoded ROUTES fallback, so any price
@@ -66,7 +71,11 @@ export default async function BookPage() {
     name: "Barcelona Airport Private Transfer",
     description: "Fixed-price luxury chauffeur transfers from Barcelona El Prat Airport (T1/T2) to city centre, hotels, cruise port, and Costa Daurada. Mercedes V-Class & EQE 300 Electric. Fixed price per vehicle.",
     url: "/book",
-    priceFrom: 45,
+    // Was a hardcoded 45 while the page itself showed €50, so the Service
+    // schema published a fare the checkout would not charge. fromPrice is
+    // already read from ROUTES a few lines above for the meta description;
+    // using it here means the two cannot disagree again.
+    priceFrom: fromPrice,
     fromCity: "El Prat de Llobregat",
     toCity: "Barcelona",
   });
@@ -75,11 +84,18 @@ export default async function BookPage() {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <Navbar />
 
+      {/* The one page on the site with no <main>.
+          It is also the most linked-to page by a wide margin, which made it the
+          worst place to omit the landmark: assistive technology and agent
+          browsers both use <main> to skip the navigation and find the content,
+          and "skip to main content" had nothing to skip to here. */}
+      <main>
       {/* Hero / H1 */}
       <div className="pt-20 pb-6 bg-[#050505]">
         <div className="container mx-auto px-4 max-w-3xl text-center">
@@ -167,6 +183,7 @@ export default async function BookPage() {
           </dl>
         </div>
       </section>
+      </main>
     </>
   );
 }

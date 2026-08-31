@@ -37,7 +37,7 @@
       "years": "Années d'Expérience"
     },
     "badges": {
-      "rating": "Note 4.9★",
+      "rating": "Note Google",
       "ratingsSub": "avis",
       "vtc": "VTC Agréé",
       "vtcSub": "Entièrement assuré",
@@ -51,7 +51,7 @@
     "sectionLabel": "Notre Flotte",
     "title": "Choisissez Votre",
     "titleAccent": "Véhicule de Luxe",
-    "subtitle": "Chaque véhicule de moins de 3 ans, entretenu selon des standards hôteliers.",
+    "subtitle": "Chaque voiture indique son nombre de places et de bagages.",
     "allVehicles": "Tous les Véhicules",
     "collectionLabel": "Collection Complète",
     "collectionTitle": "Chaque Véhicule,",
@@ -189,7 +189,8 @@
       "whatsapp": "Chat WhatsApp",
       "location": "Barcelone, Espagne · VTC Agréé"
     },
-    "copyright": "Tous droits réservés. Opérateur VTC Agréé — Barcelone, Espagne."
+    "copyright": "Tous droits réservés. Opérateur VTC Agréé — Barcelone, Espagne.",
+    "languageHeading": "Langue"
   },
   "common": {
     "loading": "Chargement…",
@@ -274,7 +275,9 @@
     "tabAirportCity": "Aéroport et ville",
     "tabCostaBrava": "Costa Brava",
     "tabCostaDorada": "Costa Dorada",
-    "tabHourly": "À l’heure"
+    "tabHourly": "À l’heure",
+    "vatNoteLead": "Tous les prix sont fixes par véhicule et s'entendent hors TVA et péages.",
+    "vatNoteBody": "La TVA de 10 % n'est ajoutée que si vous demandez une facture ; les péages d'autoroute sont facturés séparément. Le chauffeur professionnel, le véhicule et le carburant sont inclus. L'accueil personnalisé, les sièges enfant et les autres options sont facultatifs et facturés séparément."
   },
   "bookflow": {
     "addExtras": "Ajouter des extras",
@@ -375,5 +378,11 @@
     "signedIn": "Bon retour !",
     "terms": "Conditions",
     "welcomeBack": "Bon retour"
+  },
+  "meta": {
+    "bookDescription": "Réservez votre transfert privé à Barcelone en 60 secondes. Prix fixes dès 50 €. BCN El Prat T1/T2, port de croisière, hôtels, Sitges. Confirmation immédiate.",
+    "bookTitle": "Réservez votre transfert à Barcelone | Elite BCN",
+    "homeDescription": "Voiture avec chauffeur depuis l'aéroport de Barcelone, T1 et T2. Prix fixe par véhicule dès 50 €, avec 60 minutes d'attente offertes après l'atterrissage.",
+    "homeTitle": "Transfert Aéroport Barcelone | Chauffeur Privé"
   }
 }

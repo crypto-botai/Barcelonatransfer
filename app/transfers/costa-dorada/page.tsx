@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import HubChildLinks from "@/components/transfers/HubChildLinks";
+import { costaDoradaChildren } from "@/lib/hub-children";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 import { cheapestOf } from "@/lib/destination-pricing";
+import { hubItemList } from "@/lib/hub-schema";
 
 // The region has no single route in the table; the headline is the
 // cheapest of the destinations this page actually names.
@@ -40,7 +43,7 @@ const costadoradaSchema = {
   name: "Barcelona to Costa Dorada Private Transfer",
   description: "Luxury fixed-price private transfers from Barcelona to all Costa Dorada resorts — Sitges, Tarragona, Salou, PortAventura, Cambrils and beyond.",
   url: "https://www.elitebcn.info/transfers/costa-dorada",
-  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: "Costa Dorada, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(COSTA_DORADA_FROM), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -55,9 +58,23 @@ const costadoradaBreadcrumb = {
   ],
 };
 
+/**
+ * What this hub contains, stated for machines as well as readers.
+ * Built from the same derived children the visible links use.
+ */
+const HUB_LIST = hubItemList({
+  name: "Costa Dorada transfer destinations",
+  description: "Costa Dorada towns served by fixed-price private transfer from Barcelona.",
+  url: "/transfers/costa-dorada",
+  children: costaDoradaChildren(),
+});
+
 export default function CostaDoradaTransferPage() {
   return (
     <>
+      {HUB_LIST && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HUB_LIST) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costadoradaSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costadoradaBreadcrumb) }} />
       <Navbar />
@@ -201,6 +218,15 @@ export default function CostaDoradaTransferPage() {
             </Link>
           </div>
         </section>
+
+        {/* Links down to the destinations this hub covers. The hub had
+            two in-content outbound links and named its towns in prose
+            without linking any of them. */}
+        <HubChildLinks
+          heading="Costa Dorada destinations we price"
+          intro="Journey times, vehicle options and the fixed fare for each. Anywhere on the coast without its own page is still priced in the table."
+          children={costaDoradaChildren()}
+        />
       </main>
       <Footer />
     </>

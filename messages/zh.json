@@ -37,7 +37,7 @@
       "years": "服务年限"
     },
     "badges": {
-      "rating": "4.9★ 评分",
+      "rating": "谷歌评分",
       "ratingsSub": "条评价",
       "vtc": "持牌VTC",
       "vtcSub": "全额保险",
@@ -51,7 +51,7 @@
     "sectionLabel": "我们的车队",
     "title": "选择您的",
     "titleAccent": "豪华座驾",
-    "subtitle": "所有车辆车龄不超过3年，按礼宾标准维护保养。",
+    "subtitle": "每辆车都标明可载人数与行李容量。",
     "allVehicles": "全部车辆",
     "collectionLabel": "完整系列",
     "collectionTitle": "每辆车型，",
@@ -189,7 +189,8 @@
       "whatsapp": "WhatsApp联系",
       "location": "西班牙巴塞罗那 · 持牌VTC"
     },
-    "copyright": "版权所有。持牌VTC运营商 — 西班牙巴塞罗那。"
+    "copyright": "版权所有。持牌VTC运营商 — 西班牙巴塞罗那。",
+    "languageHeading": "语言"
   },
   "common": {
     "loading": "加载中…",
@@ -274,7 +275,9 @@
     "tabAirportCity": "机场与市区",
     "tabCostaBrava": "布拉瓦海岸",
     "tabCostaDorada": "黄金海岸",
-    "tabHourly": "按小时"
+    "tabHourly": "按小时",
+    "vatNoteLead": "所有价格均按车辆固定计费，不含增值税和路桥费。",
+    "vatNoteBody": "仅在您索取发票时加收 10% 增值税；高速公路路桥费另行收取。专业司机、车辆及燃油费用已包含在内。接机举牌、儿童座椅及其他附加服务为可选项目，需另行付费。"
   },
   "bookflow": {
     "addExtras": "添加附加服务",
@@ -375,5 +378,11 @@
     "signedIn": "欢迎回来！",
     "terms": "条款",
     "welcomeBack": "欢迎回来"
+  },
+  "meta": {
+    "bookDescription": "60 秒预订巴塞罗那私人接送服务。固定价格 50 欧元起。机场 T1/T2、邮轮码头、酒店、锡切斯。即时确认，全天候服务。",
+    "bookTitle": "预订巴塞罗那接送服务 | Elite BCN",
+    "homeDescription": "巴塞罗那机场 T1、T2 专车接送，配专业司机。每车固定价格，50 欧元起，落地后享 60 分钟免费等候。",
+    "homeTitle": "巴塞罗那机场接送 | 私人司机服务"
   }
 }

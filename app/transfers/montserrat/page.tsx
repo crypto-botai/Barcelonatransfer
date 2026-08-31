@@ -5,6 +5,8 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
+import RouteFaqs from "@/components/transfers/RouteFaqs";
+import { ROUTE_FAQ_SPECS } from "@/lib/route-faqs";
 
 const airportPrice = ROUTES.find((r) => r.from === "airport" && r.to === "montserrat")?.economy ?? 85;
 const cityPrice    = ROUTES.find((r) => r.from === "barcelona_city" && r.to === "montserrat")?.economy ?? 115;
@@ -36,7 +38,7 @@ const montserratSchema = {
   name: "Barcelona Airport to Montserrat Transfer",
   description: `Fixed-price private transfer from Barcelona Airport (BCN El Prat) to Montserrat monastery. From €${airportPrice}. 50-minute journey.`,
   url: "https://www.elitebcn.info/transfers/montserrat",
-  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: "Montserrat, Catalonia, Spain",
   offers: { "@type": "Offer", price: String(airportPrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -162,6 +164,10 @@ export default function MontserratTransferPage() {
             <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet & greet, child seats and other extras are optional and charged separately.</p>
           </div>
         </section>
+
+        {/* The questions people ask before booking this route. The page
+            stopped at the price table and answered none of them. */}
+        <RouteFaqs spec={ROUTE_FAQ_SPECS["montserrat"]} />
 
         <section className="py-16 bg-[#050505] border-t border-white/[0.06] text-center">
           <div className="container mx-auto px-4">

@@ -71,7 +71,11 @@ Elite BCN Transfers is a licensed VTC (Vehículo de Turismo con Conductor) opera
 - **Mercedes Vito** — Executive minivan, up to 8 passengers
 - **Mercedes Sprinter** — Group minibus, up to 16 passengers
 
-All vehicles are: less than 3 years old, air-conditioned, equipped with complimentary water and WiFi, professionally chauffeured.
+All vehicles are air-conditioned and professionally chauffeured.
+AMENITIES: check the vehicle catalogue before promising anything. WiFi is listed on five of the seven
+cars, not all of them. Refreshments are listed on the EQE 300 alone. Never present either as a
+fleet-wide feature, and never state how old a vehicle is — that is recorded nowhere and cannot be
+checked, so any figure would be invented.
 
 ## CONTACT & BOOKING
 - WhatsApp: https://wa.me/34635383712

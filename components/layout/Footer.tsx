@@ -5,6 +5,7 @@ import { Mail, Phone, MessageCircle, MapPin, Instagram, Facebook } from "lucide-
 import { useTranslations } from "@/components/language/I18nProvider";
 import NewsletterForm from "@/components/marketing/NewsletterForm";
 import { COMPANY } from "@/lib/company-facts";
+import { SUPPORTED_LOCALES, LANGUAGE_META, localizedPath } from "@/lib/i18n";
 
 export default function Footer() {
   const t = useTranslations("footer");
@@ -216,6 +217,37 @@ export default function Footer() {
             </ul>
           </div>
         </div>
+      </div>
+
+      {/*
+        Language links.
+
+        The header's language menu only renders its options once opened, so
+        those links exist nowhere in the served HTML — a crawl found all seven
+        translated homepages orphaned, with zero inbound links, reachable only
+        through the sitemap. Googlebot follows hrefs; it does not open menus.
+        These anchors sit in the footer of every page, which is where a
+        multilingual site is expected to put them anyway.
+      */}
+      <div className="border-t border-white/[0.06]">
+        <nav aria-label="Language" className="container mx-auto px-4 py-5">
+          <p className="text-dark-400 text-xs mb-3">{t("languageHeading")}</p>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            {SUPPORTED_LOCALES.map((l) => (
+              <li key={l}>
+                <Link
+                  href={localizedPath(l, "/")}
+                  hrefLang={l}
+                  lang={l}
+                  className="text-xs text-dark-400 hover:text-gold-400 transition-colors"
+                >
+                  <span aria-hidden="true">{LANGUAGE_META[l].flag}</span>{" "}
+                  {LANGUAGE_META[l].native}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
 
       {/* Bottom */}

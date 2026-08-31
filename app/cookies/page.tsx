@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { COMPANY } from "@/lib/company-facts";
 import { SHARED_OG } from "@/lib/seo";
+import { simpleBreadcrumb } from "@/lib/hub-schema";
 
 export const metadata: Metadata = {
   title: { absolute: "Cookie Policy | Elite BCN Transfers" },
@@ -23,9 +24,14 @@ export const metadata: Metadata = {
   },
 };
 
+// This page sits under the root and never said so. Thirteen pages had no
+// BreadcrumbList; eight were homepages, which correctly need none.
+const BREADCRUMB = simpleBreadcrumb([{ name: "Cookie Policy", path: "/cookies" }]);
+
 export default function CookiesPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB) }} />
       <Navbar />
       <main className="pt-20">
         <section className="py-20 bg-[#050505] relative overflow-hidden">

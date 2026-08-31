@@ -41,19 +41,19 @@ const CONTACT_SCHEMA = {
   name: "Contact Elite BCN Transfers",
   url: "https://www.elitebcn.info/contact",
   description: "Contact Elite BCN Transfers 24/7 for bookings, enquiries and corporate accounts.",
-  mainEntity: {
-    "@type": "Organization",
-    name: "Elite BCN Transfers",
-    telephone: "+34635383712",
-    email: "vtcbcn2025@gmail.com",
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: "+34635383712",
-      contactType: "customer service",
-      availableLanguage: ["English", "Spanish", "Catalan"],
-      hoursAvailable: { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], opens: "00:00", closes: "23:59" },
-    },
-  },
+  // A reference, not a second copy of the company.
+  //
+  // This redeclared the Organization with its own telephone, email and
+  // contactPoint, which made /contact the fourth place the business described
+  // itself. It also claimed Catalan as an available language — a claim the
+  // 25 Aug data-accuracy work removed from the layout and from llms.txt,
+  // because the site does not publish in Catalan. The test that guards it only
+  // read app/layout.tsx, so this copy survived and kept saying it.
+  //
+  // The LocalBusiness node in the root layout carries the phone, the opening
+  // hours and knowsLanguage derived from SUPPORTED_LOCALES, and it ships on
+  // this page like every other. Pointing at it is both correct and unfalsifiable.
+  mainEntity: { "@id": "https://www.elitebcn.info/#business" },
   breadcrumb: {
     "@type": "BreadcrumbList",
     itemListElement: [

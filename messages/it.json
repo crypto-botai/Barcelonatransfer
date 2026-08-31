@@ -37,7 +37,7 @@
       "years": "Anni di Attività"
     },
     "badges": {
-      "rating": "Valutazione 4.9★",
+      "rating": "Valutazione Google",
       "ratingsSub": "recensioni",
       "vtc": "VTC Autorizzato",
       "vtcSub": "Completamente assicurato",
@@ -51,7 +51,7 @@
     "sectionLabel": "La Nostra Flotta",
     "title": "Scegli Il Tuo",
     "titleAccent": "Veicolo di Lusso",
-    "subtitle": "Ogni veicolo ha meno di 3 anni, mantenuto secondo gli standard del concierge.",
+    "subtitle": "Ogni auto indica i posti e i bagagli che può trasportare.",
     "allVehicles": "Tutti i Veicoli",
     "collectionLabel": "Collezione Completa",
     "collectionTitle": "Ogni Veicolo,",
@@ -189,7 +189,8 @@
       "whatsapp": "Chat WhatsApp",
       "location": "Barcellona, Spagna · VTC Autorizzato"
     },
-    "copyright": "Tutti i diritti riservati. Operatore VTC Autorizzato — Barcellona, Spagna."
+    "copyright": "Tutti i diritti riservati. Operatore VTC Autorizzato — Barcellona, Spagna.",
+    "languageHeading": "Lingua"
   },
   "common": {
     "loading": "Caricamento…",
@@ -274,7 +275,9 @@
     "tabAirportCity": "Aeroporto e città",
     "tabCostaBrava": "Costa Brava",
     "tabCostaDorada": "Costa Dorada",
-    "tabHourly": "A ore"
+    "tabHourly": "A ore",
+    "vatNoteLead": "Tutti i prezzi sono fissi per veicolo ed escludono IVA e pedaggi.",
+    "vatNoteBody": "L'IVA al 10% viene aggiunta solo se richiedi la fattura; i pedaggi autostradali sono addebitati separatamente. Autista professionista, veicolo e carburante sono inclusi. Accoglienza personalizzata, seggiolini per bambini e altri extra sono facoltativi e a pagamento."
   },
   "bookflow": {
     "addExtras": "Aggiungi extra",
@@ -375,5 +378,11 @@
     "signedIn": "Bentornato!",
     "terms": "Termini",
     "welcomeBack": "Bentornato"
+  },
+  "meta": {
+    "bookDescription": "Prenota il tuo transfer privato a Barcellona in 60 secondi. Prezzi fissi da 50 €. BCN El Prat T1/T2, porto crociere, hotel, Sitges. Conferma immediata.",
+    "bookTitle": "Prenota il tuo transfer a Barcellona | Elite BCN",
+    "homeDescription": "Auto con autista dall'aeroporto di Barcellona, T1 e T2. Prezzo fisso per veicolo da 50 €, con 60 minuti di attesa gratuita dall'atterraggio.",
+    "homeTitle": "Transfer Aeroporto Barcellona | Autista Privato"
   }
 }

@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import HubChildLinks from "@/components/transfers/HubChildLinks";
+import { cruiseLineChildren } from "@/lib/hub-children";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight, Anchor } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 import { ladderFor } from "@/lib/destination-pricing";
+import { hubItemList } from "@/lib/hub-schema";
 
 const cruiseLadder = ladderFor("cruise", "airport")!;
 
@@ -41,7 +44,7 @@ const cruisePortSchema = {
   name: "Barcelona Cruise Port Transfer",
   description: `Fixed-price private transfers to all Barcelona cruise terminals — World Trade Centre (WTC) and Moll Adossat (T-A to T-D). Vessel tracking included.`,
   url: "https://www.elitebcn.info/transfers/cruise-port",
-  provider: { "@type": "LocalBusiness", name: "Elite BCN Transfers", url: "https://www.elitebcn.info" },
+  provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: "Barcelona, Spain",
   offers: { "@type": "Offer", price: String(cruisePrice), priceCurrency: "EUR", availability: "https://schema.org/InStock" },
 };
@@ -56,9 +59,23 @@ const cruisePortBreadcrumb = {
   ],
 };
 
+/**
+ * What this hub contains, stated for machines as well as readers.
+ * Built from the same derived children the visible links use.
+ */
+const HUB_LIST = hubItemList({
+  name: "Barcelona cruise line transfer pages",
+  description: "Cruise lines calling at Barcelona with a dedicated transfer page.",
+  url: "/transfers/cruise-port",
+  children: cruiseLineChildren(),
+});
+
 export default function CruisePortTransferPage() {
   return (
     <>
+      {HUB_LIST && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HUB_LIST) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(cruisePortSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(cruisePortBreadcrumb) }} />
       <Navbar />
@@ -222,6 +239,15 @@ export default function CruisePortTransferPage() {
             </Link>
           </div>
         </section>
+
+        {/* Links down to the destinations this hub covers. The hub had
+            two in-content outbound links and named its towns in prose
+            without linking any of them. */}
+        <HubChildLinks
+          heading="Transfers by cruise line"
+          intro="Terminal, meeting point and embarkation timing differ by line, so each has its own page."
+          children={cruiseLineChildren()}
+        />
       </main>
       <Footer />
     </>

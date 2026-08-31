@@ -45,10 +45,23 @@ export const GOOGLE_PROFILE = {
   cid:    "8610295895899713122",
   rating: 5.0,
   /** Reviews on the profile. Update alongside the list below. */
-  count:  15,
+  count:  16,
 } as const;
 
 export const REVIEWS: Review[] = [
+  {
+    // TRUNCATED SOURCE. The profile screenshot this was taken from cut off
+    // mid-word at "Elite was very communicative, responding i…", so the text
+    // below stops at the last complete sentence. The remainder is the
+    // reviewer's and has not been reconstructed. To finish it, paste the full
+    // review from the Google profile over the string below — nothing else here
+    // needs to change.
+    author:   "Merritt Jackson",
+    rating:   5,
+    when:     "3 days ago",
+    text:     "We arrived from a Mediterranean cruise and needed transportation of family and luggage to our hotel, then for some sightseeing, back to our hotel, then to dinner and back.",
+    verified: true,
+  },
   {
     author:   "Bilal Irfan",
     rating:   5,

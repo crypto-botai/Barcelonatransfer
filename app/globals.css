@@ -80,11 +80,17 @@
     background-clip: text;
   }
 
-  /* Glass card */
+  /* Glass card.
+
+     No backdrop-filter. It was blur(20px), it appears 28 times on the homepage
+     alone, and it is one of the most expensive properties in CSS — each
+     instance makes the compositor snapshot and blur everything behind it.
+     Behind these cards is #050505 or bg-dark-950: solid, near-black. Blurring a
+     solid colour returns the same solid colour, so the cost bought nothing a
+     visitor could see. The translucent fill and the gold border, which are what
+     actually make the card read as glass, are untouched. */
   .glass-card {
     background: rgba(255,255,255,0.03);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(201,168,76,0.15);
     box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
   }

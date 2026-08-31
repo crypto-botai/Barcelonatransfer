@@ -7,6 +7,8 @@ import { SHARED_OG } from "@/lib/seo";
 import { SOCIAL_PROOF } from "@/lib/company-facts";
 import destinations from "@/data/destinations.json";
 import { getDestinationPrices, SLUG_TO_ZONE } from "@/lib/destination-pricing";
+import { hubItemList } from "@/lib/hub-schema";
+import { allDestinationChildren } from "@/lib/hub-children";
 
 /**
  * Full index of the programmatic destination pages, grouped by type.
@@ -201,6 +203,17 @@ const DESTINATIONS = [
   },
 ];
 
+/**
+ * Every destination this hub covers, stated rather than inferred from
+ * the anchor tags. This is the top of the destination tree.
+ */
+const HUB_LIST = hubItemList({
+  name: "Barcelona private transfer destinations",
+  description: "Every destination served by fixed-price private transfer from Barcelona and BCN El Prat Airport.",
+  url: "/transfers",
+  children: allDestinationChildren(),
+});
+
 export default async function TransfersHubPage() {
   // Prices come from the same table that quotes a booking, so a card can no
   // longer advertise a fare the checkout will not honour.
@@ -215,6 +228,9 @@ export default async function TransfersHubPage() {
 
   return (
     <>
+      {HUB_LIST && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HUB_LIST) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(transfersHubSchema) }} />
       <Navbar />
       <main className="pt-20">
@@ -281,7 +297,17 @@ export default async function TransfersHubPage() {
             </h2>
             <p className="text-dark-400 text-sm text-center mb-10 max-w-2xl mx-auto">
               Fixed-price private transfers to {destinations.length} more hotels, cruise terminals,
-              venues and long-distance routes — each with its own prices and journey times.
+              venues and long-distance routes — each with its own prices and journey times. The
+              busiest of them all is the run{" "}
+              <Link href="/transfers/barcelona-city-centre" className="text-gold-400 hover:text-gold-300">
+                from the airport into the city centre
+              </Link>. If you are still deciding where to go, our{" "}
+              {/* /blog had no in-content inbound link at all, so none of the
+                  thirteen guides could be reached by reading the site. */}
+              <Link href="/blog" className="text-gold-400 hover:text-gold-300">
+                destination guides
+              </Link>{" "}
+              cover what is worth the drive.
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">

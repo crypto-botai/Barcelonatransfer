@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import MobileDashboardNav from "@/components/dashboard/MobileDashboardNav";
+import ToastHost from "@/components/layout/ToastHost";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
@@ -77,6 +78,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </main>
       </div>
+      <ToastHost />
     </div>
   );
 }

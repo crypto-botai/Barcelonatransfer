@@ -8,6 +8,7 @@ import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import PriceCell from "@/components/pricing/PriceCell";
 import type { PublicRoute } from "@/lib/pricing-service";
 import { useTranslations } from "@/components/language/I18nProvider";
+import { routePageHref } from "@/lib/destination-pricing";
 
 const TAB_KEYS = ["tabAirportCity", "tabCostaDorada", "tabCostaBrava", "tabHourly"] as const;
 
@@ -18,7 +19,14 @@ const HOURLY_CARDS = [
   { label: "V-Class Luxury (7 pax)", price: HOURLY_RATES.LUXURY_MINIVAN, min: MIN_HOURLY_HOURS.LUXURY_MINIVAN },
 ];
 
-function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
+function PriceTable({ data, search, rowCta }: {
+  data: PublicRoute[];
+  search: string;
+  /** Per-row "Book" column. Off on /pricing: /book is the most linked
+   *  page on the site and the row already links the route name, which
+   *  is the link that carries topical meaning. */
+  rowCta: boolean;
+}) {
   const t = useTranslations("pricing");
   const filtered = data.filter((r) =>
     r.label.toLowerCase().includes(search.toLowerCase())
@@ -36,14 +44,28 @@ function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
             <th className="text-center py-3 px-3 text-xs text-dark-400 tracking-wider uppercase font-medium">Minibus<br /><span className="text-dark-400 normal-case">9+ pax</span></th>
             {/* Screen-reader-only header: an empty <th> leaves every cell in the
                 Book column headerless, which fails the td-has-header audit. */}
-            <th className="py-3 px-4"><span className="sr-only">Book</span></th>
+            {rowCta && <th className="py-3 px-4"><span className="sr-only">Book</span></th>}
           </tr>
         </thead>
         <tbody>
-          {filtered.map((r) => (
+          {filtered.map((r) => {
+            // The route name links to its destination page where one exists.
+            // This table listed 73 routes and linked none of them — /pricing
+            // had a single in-content outbound link, to /book — while the route
+            // pages themselves were among the least supported on the site. The
+            // anchor is the route name already in the cell, so no two links
+            // share the same text.
+            const href = routePageHref(r.fromKey, r.toKey);
+            return (
             <tr key={r.slug} className="price-row border-b border-white/[0.04]">
               <td className="py-3.5 px-4 text-sm text-dark-200">
-                {r.label}
+                {href ? (
+                  <Link href={href} className="hover:text-gold-400 transition-colors">
+                    {r.label}
+                  </Link>
+                ) : (
+                  r.label
+                )}
                 {r.note && <span className="ml-2 text-xs text-dark-400">({r.note})</span>}
               </td>
               <PriceCell amount={r.economy}  />
@@ -51,19 +73,22 @@ function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
               <PriceCell amount={r.minivan} />
               <PriceCell amount={r.vclass} gold />
               <PriceCell amount={r.minibus} />
-              <td className="py-3.5 px-4">
-                <Link
-                  href="/book"
-                  className="text-xs text-gold-500/70 hover:text-gold-400 transition-colors whitespace-nowrap"
-                >
-                  {t("book")} →
-                </Link>
-              </td>
+              {rowCta && (
+                <td className="py-3.5 px-4">
+                  <Link
+                    href="/book"
+                    className="text-xs text-gold-500/70 hover:text-gold-400 transition-colors whitespace-nowrap"
+                  >
+                    {t("book")} →
+                  </Link>
+                </td>
+              )}
             </tr>
-          ))}
+            );
+          })}
           {filtered.length === 0 && (
             <tr>
-              <td colSpan={7} className="py-8 text-center text-dark-400 text-sm">
+              <td colSpan={rowCta ? 7 : 6} className="py-8 text-center text-dark-400 text-sm">
                 {t("noRoutes")}{" "}
                 <Link href="/book" className="text-gold-500 hover:text-gold-400">{t("noRoutesCta")}</Link>
               </td>
@@ -77,9 +102,12 @@ function PriceTable({ data, search }: { data: PublicRoute[]; search: string }) {
 
 interface Props {
   routes: PublicRoute[];
+  /** Render every tab, hiding the inactive ones. Set on /pricing so all 73
+   *  route rows and their links reach the served HTML. */
+  allTabs?: boolean;
 }
 
-export default function PricingSection({ routes }: Props) {
+export default function PricingSection({ routes, allTabs = false }: Props) {
   const t = useTranslations("pricing");
   const [tab,    setTab]    = useState(0);
   const [search, setSearch] = useState("");
@@ -144,10 +172,30 @@ export default function PricingSection({ routes }: Props) {
           </div>
 
           {/* Table */}
+          {/* On /pricing every table is rendered and the inactive ones hidden,
+              so all 73 route rows — and the links added to them — are in the
+              served HTML. Mounting only the active tab put 15 rows in the DOM
+              and left the other 58 reachable solely by clicking, which no
+              crawler does.
+
+              The homepage keeps the mount-on-demand behaviour: its table is a
+              teaser, it already carries an excessive-DOM warning, and adding
+              four hundred hidden cells there would trade a real cost for links
+              /pricing already provides. */}
           <div className="p-2">
-            {tab === 0 && <PriceTable data={airport} search={search} />}
-            {tab === 1 && <PriceTable data={dorada}  search={search} />}
-            {tab === 2 && <PriceTable data={brava}   search={search} />}
+            {allTabs ? (
+              <>
+                <div className={tab === 0 ? undefined : "hidden"}><PriceTable data={airport} search={search} rowCta={false} /></div>
+                <div className={tab === 1 ? undefined : "hidden"}><PriceTable data={dorada}  search={search} rowCta={false} /></div>
+                <div className={tab === 2 ? undefined : "hidden"}><PriceTable data={brava}   search={search} rowCta={false} /></div>
+              </>
+            ) : (
+              <>
+                {tab === 0 && <PriceTable data={airport} search={search} rowCta />}
+                {tab === 1 && <PriceTable data={dorada}  search={search} rowCta />}
+                {tab === 2 && <PriceTable data={brava}   search={search} rowCta />}
+              </>
+            )}
             {tab === 3 && (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 p-4">
                 {HOURLY_CARDS.map((h) => (
@@ -168,7 +216,11 @@ export default function PricingSection({ routes }: Props) {
           {/* Footer note */}
           <div className="p-5 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-dark-400 text-xs">
-              All prices are fixed per vehicle and <strong className="text-white">exclude VAT and tolls</strong>. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Professional chauffeur, vehicle and fuel are included. Meet &amp; greet, child seats and other extras are optional and charged separately.
+              {/* Translated, not hardcoded: this is the line that says VAT and
+                  tolls sit outside the fare, and it stayed in English on every
+                  locale page while the table around it changed language. */}
+              <strong className="text-white">{t("vatNoteLead")}</strong>{" "}
+              {t("vatNoteBody")}
             </p>
             <Link href="/book" className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">
               {t("getInstantPrice")} <ArrowRight size={12} />

@@ -129,8 +129,8 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
     dateModified: article.updatedAt,
     inLanguage: "en-GB",
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
-    author:    { "@type": "Organization", name: "Elite BCN Transfers", url: BASE_URL },
-    publisher: { "@type": "Organization", name: "Elite BCN Transfers", url: BASE_URL },
+    author: { "@id": "https://www.elitebcn.info/#organization" },
+    publisher: { "@id": "https://www.elitebcn.info/#organization" },
     keywords: article.keywords.join(", "),
   };
 
