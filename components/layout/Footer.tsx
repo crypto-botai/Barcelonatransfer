@@ -256,7 +256,12 @@ export default function Footer() {
           <p className="text-dark-400 text-xs">
             © {new Date().getFullYear()} Elite BCN Transfers. {t("copyright")}
           </p>
-          <div className="flex gap-5">
+          {/* Wraps, because six links in one unbreakable row measured 347px and
+              the narrowest phones still in use are 320. That put thirteen
+              pixels of the page off the right edge on every page carrying a
+              footer, and body's overflow-x: hidden turned it into content the
+              visitor could neither see nor scroll to. */}
+          <div className="flex flex-wrap justify-center sm:justify-end gap-x-5 gap-y-2">
             <Link href="/blog"         className="text-xs text-dark-400 hover:text-gold-400 transition-colors">Travel Guides</Link>
             <Link href="/faq"          className="text-xs text-dark-400 hover:text-gold-400 transition-colors">{t("legal.faq")}</Link>
             <Link href="/privacy"      className="text-xs text-dark-400 hover:text-dark-300 transition-colors">{t("legal.privacy")}</Link>
