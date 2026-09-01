@@ -173,10 +173,16 @@ export async function issueInvoice(input: IssueInput) {
   //
   // Older bookings, and any taken without the option ticked, are VAT-exclusive
   // and still have the VAT added on top.
+  // A tip is a voluntary gratuity, not consideration for the transport, so it
+  // is outside the scope of VAT and has no place on the invoice at all. It is
+  // taken off before the lines are worked out; leaving it in would both
+  // overstate the tax due and bill the driver's tip as though the business had
+  // earned it.
   const meta = parseBookingMeta(booking.specialRequests);
+  const invoiceable = Math.round((booking.totalAmount - meta.tipAmount) * 100) / 100;
   const { net, vat, gross } = meta.needsInvoice
-    ? splitGross(booking.totalAmount)
-    : vatBreakdown(booking.totalAmount);
+    ? splitGross(invoiceable)
+    : vatBreakdown(invoiceable);
 
   // Allocate the next number and write the row in one transaction so two
   // simultaneous requests cannot read the same "last" number. The unique

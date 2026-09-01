@@ -16,6 +16,7 @@ import { FLEET_TO_DB_CLASS, type VehicleClass, type FleetVehicle } from "@/types
 import { roadDistance, resolveEndpoint } from "@/lib/geo";
 import { extrasCostFor, resolveTier, type MemberTier } from "@/lib/loyalty";
 import { vatOn, wantsInvoice } from "@/lib/vat";
+import { clampTip } from "@/lib/tips";
 
 /**
  * Membership tier of whoever is booking.
@@ -68,6 +69,9 @@ const schema = z.object({
   flightNumber:    z.string().optional(),
   specialRequests: z.string().optional(),
   extras:          z.array(extraSchema).optional(),
+  // Bounds are enforced by clampTip against the fare, not here — a tip that is
+  // too large should quietly become no tip rather than 400 away a real booking.
+  tipAmount:       z.number().optional(),
   guestName:       z.string().min(2),
   guestEmail:      z.string().email(),
   guestPhone:      z.string().min(6),
@@ -261,7 +265,13 @@ export async function POST(req: NextRequest) {
     const netTotal = Math.round((discountable - couponDiscount) * 100) / 100;
     const invoiceRequested = wantsInvoice(body.extras);
     const vatAmount = invoiceRequested ? vatOn(netTotal) : 0;
-    const totalWithExtras = Math.round((netTotal + vatAmount) * 100) / 100;
+
+    // The tip is the one figure on the booking that genuinely is the customer's
+    // to name, so unlike the extras it cannot be recomputed from a catalogue —
+    // only bounds-checked, which is what clampTip does. It sits outside the
+    // taxable base and outside the discount: added last, after the VAT.
+    const tipAmount = clampTip(body.tipAmount, netTotal);
+    const totalWithExtras = Math.round((netTotal + vatAmount + tipAmount) * 100) / 100;
 
     // Encode booking metadata into specialRequests.
     //
@@ -286,6 +296,7 @@ export async function POST(req: NextRequest) {
       needsInvoice: invoiceRequested,
       netAmount:    netTotal,
       vatAmount,
+      tipAmount,
     };
     const metaPrefix = `[META]${JSON.stringify(metaObj)}[/META]\n`;
     const specialRequests = body.specialRequests

@@ -413,6 +413,16 @@ ${extrasLine ? `
             <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a; font-weight:bold;">${extrasLine}</span>
           </td>
         </tr>` : ""}
+${meta.tipAmount > 0 ? `
+        <tr>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Driver tip</span>
+          </td>
+          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#b39159; font-weight:bold;">&euro;${meta.tipAmount.toFixed(2)}</span>
+            <span style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#8a8a8a;"> &middot; included in the total</span>
+          </td>
+        </tr>` : ""}
 
         <tr>
           <td style="padding:14px 0; vertical-align:top;">
@@ -1171,6 +1181,7 @@ export async function sendDriverBookingDetailsEmail({
       <tr><td>Passengers</td><td>${passengers} pax · ${luggage} bags</td></tr>
       ${flightNumber ? `<tr><td>Flight</td><td>${flightNumber}</td></tr>` : ""}
       ${driverMeta.extras.length ? `<tr><td>Extras to bring</td><td><strong>${formatExtras(driverMeta.extras)}</strong></td></tr>` : ""}
+      ${driverMeta.tipAmount > 0 ? `<tr><td>Tip (already paid)</td><td><strong style="color:#c9a84c;">€${driverMeta.tipAmount.toFixed(2)}</strong></td></tr>` : ""}
       ${driverMeta.notes ? `<tr><td>Notes</td><td>${driverMeta.notes}</td></tr>` : ""}
     </table>
     ${driverAmount != null ? `

@@ -19,6 +19,7 @@ import {
 } from "@/types";
 import { getFleetFromPrice, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import { VAT_RATE, vatOn, wantsInvoice } from "@/lib/vat";
+import { TIP_PRESETS, tipForPercent, clampTip, MAX_TIP_ABSOLUTE } from "@/lib/tips";
 import toast from "react-hot-toast";
 import { useTranslations } from "@/components/language/I18nProvider";
 import { pickupToUtc } from "@/lib/datetime";
@@ -177,6 +178,11 @@ export default function BookFormClient() {
   const [couponError,   setCouponError]   = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
 
+  // A preset percentage, or null while a custom amount is being typed. Starts
+  // at 0 so nobody is tipped by default — an opt-out tip is a dark pattern.
+  const [tipPct,        setTipPct]        = useState<number | null>(0);
+  const [tipCustom,     setTipCustom]     = useState("");
+
   const sessionId    = useRef<string>("");
   const saveDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -293,7 +299,14 @@ export default function BookFormClient() {
   const netTotal     = Math.round(Math.max(0, subtotal - couponSaving) * 100) / 100;
   const invoiceAsked = wantsInvoice(data.extras);
   const vatAmount    = invoiceAsked ? vatOn(netTotal) : 0;
-  const grandTotal   = Math.round((netTotal + vatAmount) * 100) / 100;
+
+  // The tip is a percentage of the fare, never of the fare plus its VAT, and it
+  // is added after both — it is not taxable and not discountable. See lib/tips.
+  const tipAmount = tipPct !== null
+    ? tipForPercent(netTotal, tipPct)
+    : clampTip(tipCustom.replace(",", "."), netTotal);
+
+  const grandTotal   = Math.round((netTotal + vatAmount + tipAmount) * 100) / 100;
 
   const toggleExtra = (id: string) => {
     const catalog = EXTRAS_CATALOG.find((e) => e.id === id)!;
@@ -362,7 +375,12 @@ export default function BookFormClient() {
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, quote: finalQuote, couponCode: couponCode || undefined }),
+        body: JSON.stringify({
+          ...data,
+          quote: finalQuote,
+          couponCode: couponCode || undefined,
+          tipAmount,
+        }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Booking failed");
@@ -882,6 +900,70 @@ export default function BookFormClient() {
                   </div>
                 </div>
 
+                {/* Driver gratuity — optional, never preselected. */}
+                {quote && !needsManualQuote && netTotal > 0 && (
+                  <div className="glass-card rounded-2xl p-6 sm:p-8">
+                    <h2 className="font-display text-xl text-white mb-2">Tip your chauffeur</h2>
+                    <p className="text-dark-400 text-sm mb-5">
+                      Optional, and it goes to your driver in full. You can also tip in the car.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {TIP_PRESETS.map((pct) => (
+                        <button
+                          key={pct}
+                          type="button"
+                          onClick={() => { setTipPct(pct); setTipCustom(""); }}
+                          aria-pressed={tipPct === pct}
+                          className={cn(
+                            "px-4 py-2.5 rounded-xl border text-sm transition-all",
+                            tipPct === pct
+                              ? "border-gold-500/50 bg-gold-500/10 text-gold-400"
+                              : "border-white/[0.08] text-dark-300 hover:border-gold-500/25",
+                          )}
+                        >
+                          {pct === 0 ? "No tip" : `${pct}%`}
+                          {pct > 0 && (
+                            <span className="block text-[11px] text-dark-500 mt-0.5">
+                              {formatCurrency(tipForPercent(netTotal, pct))}
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                      <div
+                        className={cn(
+                          "flex items-center gap-1.5 px-3 rounded-xl border transition-all",
+                          tipPct === null
+                            ? "border-gold-500/50 bg-gold-500/10"
+                            : "border-white/[0.08]",
+                        )}
+                      >
+                        <span className="text-dark-400 text-sm">€</span>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          value={tipCustom}
+                          placeholder="Other"
+                          aria-label="Custom tip amount in euros"
+                          onFocus={() => setTipPct(null)}
+                          onChange={(e) => {
+                            // Digits and one separator only, so the field cannot
+                            // hold something clampTip would silently read as 0.
+                            const v = e.target.value.replace(/[^\d.,]/g, "");
+                            setTipCustom(v);
+                            setTipPct(null);
+                          }}
+                          className="w-20 bg-transparent py-2.5 text-sm text-white placeholder:text-dark-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    {tipPct === null && tipCustom !== "" && tipAmount === 0 && (
+                      <p className="text-dark-500 text-xs mt-3">
+                        Enter an amount between €1 and €{MAX_TIP_ABSOLUTE} to add a tip.
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {/* Price summary — shown inline once a quote is loaded */}
                 {quote && !needsManualQuote && (
                   <div className="glass-card rounded-2xl p-6">
@@ -927,6 +1009,12 @@ export default function BookFormClient() {
                             <span>{formatCurrency(vatAmount)}</span>
                           </div>
                         </>
+                      )}
+                      {tipAmount > 0 && (
+                        <div className="flex justify-between text-dark-400">
+                          <span>Driver tip{tipPct ? ` (${tipPct}%)` : ""}</span>
+                          <span>{formatCurrency(tipAmount)}</span>
+                        </div>
                       )}
                       <div className="border-t border-white/10 pt-3 flex justify-between items-end">
                         <span className="text-white font-semibold">{t("total")}</span>

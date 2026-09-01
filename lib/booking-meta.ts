@@ -36,6 +36,8 @@ export interface BookingMeta {
   netAmount:     number | null;
   /** VAT collected at booking. 0 when no invoice was requested. */
   vatAmount:     number;
+  /** Gratuity for the driver, included in totalAmount but never in the VAT base. */
+  tipAmount:     number;
   /** The customer's own note, with the metadata block removed. */
   notes:         string | null;
 }
@@ -52,6 +54,7 @@ const EMPTY: BookingMeta = {
   needsInvoice: false,
   netAmount: null,
   vatAmount: 0,
+  tipAmount: 0,
   notes: null,
 };
 
@@ -88,6 +91,7 @@ export function parseBookingMeta(specialRequests?: string | null): BookingMeta {
     needsInvoice:  raw.needsInvoice === true,
     netAmount:     typeof raw.netAmount === "number" ? raw.netAmount : null,
     vatAmount:     typeof raw.vatAmount === "number" ? raw.vatAmount : 0,
+    tipAmount:     typeof raw.tipAmount === "number" && raw.tipAmount > 0 ? raw.tipAmount : 0,
     notes,
   };
 }
