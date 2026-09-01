@@ -202,6 +202,14 @@ export interface ExtraOption {
   icon:        string;
   maxQty:      number;
   priceLabel:  string;
+  /**
+   * Charged as a percentage of the fare rather than as a fixed price.
+   *
+   * Only the invoice request uses this. Its `price` stays 0 so it adds nothing
+   * to the fixed extras subtotal, and the percentage is applied to the whole
+   * discounted fare instead — see lib/vat.ts.
+   */
+  percentOfSubtotal?: number;
 }
 
 export const EXTRAS_CATALOG: ExtraOption[] = [
@@ -209,7 +217,8 @@ export const EXTRAS_CATALOG: ExtraOption[] = [
   { id: "child_seat",    label: "Child Seat",             description: "For children 9–18 kg",        price: 5,  icon: "🧒", maxQty: 2, priceLabel: "€5 each" },
   { id: "booster_seat",  label: "Booster Seat",           description: "For children 15–36 kg",       price: 5,  icon: "🪑", maxQty: 2, priceLabel: "€5 each" },
   { id: "meet_greet",    label: "Meet & Greet",           description: "Driver meets you at arrivals", price: 5,  icon: "🤝", maxQty: 1, priceLabel: "€5" },
-  { id: "name_board",    label: "Name Board Sign",        description: "Personalised sign at pickup",  price: 5,  icon: "📋", maxQty: 1, priceLabel: "€5" },
+  { id: "name_board",    label: "Name Board",             description: "Your name on the driver's tablet at arrivals", price: 5,  icon: "📋", maxQty: 1, priceLabel: "€5" },
+  { id: "invoice_vat",   label: "I need an invoice",      description: "Adds 10% Spanish VAT — required for a company invoice", price: 0, percentOfSubtotal: 10, icon: "🧾", maxQty: 1, priceLabel: "+10% VAT" },
   { id: "extra_waiting", label: "Extra Waiting (30 min)", description: "Additional waiting time",      price: 25, icon: "⏱️", maxQty: 4, priceLabel: "€25 / 30 min" },
   { id: "pet_transport", label: "Pet Transport",          description: "Travel with your pet",         price: 20, icon: "🐾", maxQty: 2, priceLabel: "€20 each" },
   { id: "multi_stop",    label: "Multiple Stops",         description: "Additional stops en route",    price: 25, icon: "📍", maxQty: 3, priceLabel: "€25 each" },

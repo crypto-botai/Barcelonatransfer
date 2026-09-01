@@ -215,7 +215,7 @@ export default function FleetPage() {
             <p className="text-dark-300 leading-relaxed">
               Child, baby and booster seats are available on every vehicle and are fitted before the
               car is dispatched, so they have to be requested when you book rather than on the day.
-              They are a paid extra, not included. Meet and greet with a name board inside arrivals
+              They are a paid extra, not included. Meet and greet with your name on a tablet inside arrivals
               is also optional — the{" "}
               <Link href="/faq" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">FAQ</Link>{" "}
               lists what each extra costs, and the{" "}

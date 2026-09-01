@@ -298,7 +298,7 @@ export function rideConfirmedCard(o: {
           <div style="font-family:${SANS};font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:${GOLD};">Before you travel</div>
           <div style="font-family:${SANS};font-size:14px;line-height:24px;color:${TEXT};padding-top:12px;">
             Your chauffeur calls roughly 30 minutes before pick-up.<br>
-            For airport arrivals, they wait in the arrivals hall with a name board.<br>
+            For airport arrivals, they wait in the arrivals hall holding a tablet with your name.<br>
             Save our number in case plans change.
           </div>
         </td></tr>

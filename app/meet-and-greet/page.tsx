@@ -42,7 +42,7 @@ const airportFrom = Math.min(
 
 export const metadata: Metadata = {
   title: { absolute: `Barcelona Airport Meet & Greet Service — ${meetGreet.priceLabel}` },
-  description: `Book meet and greet at Barcelona Airport arrivals. Your driver waits inside with a name board and helps with the bags, ${meetGreet.priceLabel} on top of the transfer. 60 minutes free waiting is included either way.`,
+  description: `Book meet and greet at Barcelona Airport arrivals. Your driver waits inside holding a tablet with your name and helps with the bags, ${meetGreet.priceLabel} on top of the transfer. 60 minutes free waiting is included either way.`,
   alternates: { canonical: URL },
   keywords: [
     "barcelona airport meet and greet",
@@ -54,14 +54,14 @@ export const metadata: Metadata = {
   openGraph: {
     ...SHARED_OG,
     title: `Barcelona Airport Meet & Greet — ${meetGreet.priceLabel}`,
-    description: `Driver waits inside arrivals with a name board and helps with your luggage. ${meetGreet.priceLabel} added to any Barcelona airport transfer.`,
+    description: `Driver waits inside arrivals holding a tablet with your name and helps with your luggage. ${meetGreet.priceLabel} added to any Barcelona airport transfer.`,
     url: URL,
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona Airport meet and greet" }],
   },
   twitter: {
     card: "summary_large_image",
     title: `Barcelona Airport Meet & Greet — ${meetGreet.priceLabel}`,
-    description: `Met inside arrivals with a name board, ${meetGreet.priceLabel} on any transfer.`,
+    description: `Met inside arrivals with your name on a tablet, ${meetGreet.priceLabel} on any transfer.`,
     images: ["/opengraph-image"],
   },
 };
@@ -70,7 +70,7 @@ const SERVICE_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: "Barcelona Airport Meet and Greet",
-  description: `Meet and greet at Barcelona El Prat arrivals: the driver waits inside the terminal with a name board and assists with luggage to the vehicle. ${meetGreet.priceLabel} added to any airport transfer. All airport pickups include flight tracking and 60 minutes of free waiting from landing.`,
+  description: `Meet and greet at Barcelona El Prat arrivals: the driver waits inside the terminal holding a tablet with your name and assists with luggage to the vehicle. ${meetGreet.priceLabel} added to any airport transfer. All airport pickups include flight tracking and 60 minutes of free waiting from landing.`,
   url: URL,
   serviceType: "Airport meet and greet",
   provider: { "@id": `${BASE}/#business` },
@@ -113,7 +113,7 @@ const FAQS: Array<{ q: string; a: string }> = [
   },
   {
     q: "Is a name board the same thing?",
-    a: `Not quite, and they are priced separately. Meet and greet at ${meetGreet.priceLabel} is the driver coming inside to find you and helping with the bags. A name board at ${nameBoard.priceLabel} is the printed sign itself. Most people who want to be met inside want both, and you can add either or both when you book.`,
+    a: `Not quite, and they are priced separately. Meet and greet at ${meetGreet.priceLabel} is the driver coming inside to find you and helping with the bags. A name board at ${nameBoard.priceLabel} is your name displayed on the tablet the driver holds. Most people who want to be met inside want both, and you can add either or both when you book.`,
   },
   {
     q: "What if my flight is badly delayed?",
@@ -208,7 +208,7 @@ export default function MeetAndGreetPage() {
                 <tbody>
                   {[
                     ["Where the driver waits", "Designated meeting point outside, by the taxi rank", "Inside the arrivals hall, past baggage reclaim"],
-                    ["Name board", "No", "Yes, with your name on it"],
+                    ["Name board", "No", "Yes, shown on the driver's tablet"],
                     ["Luggage", "You bring it out to the car", "Driver takes it from you at the hall"],
                     ["Flight tracking", "Yes", "Yes"],
                     ["Free waiting from landing", "60 minutes", "60 minutes"],

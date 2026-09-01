@@ -30,6 +30,12 @@ export interface BookingMeta {
   extras:        BookingExtraLine[];
   extrasCost:    number;
   memberTier:    string | null;
+  /** True when the customer asked for an invoice and so was charged VAT. */
+  needsInvoice:  boolean;
+  /** Total before VAT. Null on bookings taken before VAT was collected up front. */
+  netAmount:     number | null;
+  /** VAT collected at booking. 0 when no invoice was requested. */
+  vatAmount:     number;
   /** The customer's own note, with the metadata block removed. */
   notes:         string | null;
 }
@@ -43,6 +49,9 @@ const EMPTY: BookingMeta = {
   extras: [],
   extrasCost: 0,
   memberTier: null,
+  needsInvoice: false,
+  netAmount: null,
+  vatAmount: 0,
   notes: null,
 };
 
@@ -74,6 +83,11 @@ export function parseBookingMeta(specialRequests?: string | null): BookingMeta {
     memberTier:    typeof raw.memberTier === "string" ? raw.memberTier : null,
     extras:        normaliseExtras(raw.extras),
     extrasCost:    typeof raw.extrasCost === "number" ? raw.extrasCost : 0,
+    // Bookings taken before VAT was collected at checkout carry neither field.
+    // They are VAT-exclusive, which is what these defaults say.
+    needsInvoice:  raw.needsInvoice === true,
+    netAmount:     typeof raw.netAmount === "number" ? raw.netAmount : null,
+    vatAmount:     typeof raw.vatAmount === "number" ? raw.vatAmount : 0,
     notes,
   };
 }
@@ -107,6 +121,15 @@ function normaliseExtras(value: unknown): BookingExtraLine[] {
 export function formatExtraLine(e: BookingExtraLine): string {
   const qty = e.quantity > 1 ? ` ×${e.quantity}` : "";
   const total = e.price * e.quantity;
+
+  // A percentage extra has no fixed price, so "included" would be wrong — the
+  // invoice request costs 10% of the fare, and reading it as free is the one
+  // way this line could mislead.
+  const known = EXTRAS_CATALOG.find((c) => c.id === e.id);
+  if (known?.percentOfSubtotal) {
+    return `${e.label} — +${known.percentOfSubtotal}%`;
+  }
+
   // A waived extra reads as included rather than as €0, which looks like a bug.
   const cost = total > 0 ? ` — €${total.toFixed(2)}` : " — included";
   return `${e.label}${qty}${cost}`;

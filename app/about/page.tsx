@@ -167,7 +167,7 @@ export default function AboutPage() {
                 not rise at night, at the weekend, during Mobile World Congress, or because the
                 Ronda Litoral is at a standstill. Tolls and VAT sit outside the quote &mdash; VAT is
                 added only when you ask for an invoice &mdash; and the extras that are genuinely
-                optional, like child seats or a name board at arrivals, are priced separately so
+                optional, like child seats or your name on a tablet at arrivals, are priced separately so
                 nobody pays for something they did not want.
               </p>
               <h3 className="font-display text-xl text-white pt-4">Private, always</h3>

@@ -18,6 +18,7 @@ import {
   type BookingType,
 } from "@/types";
 import { getFleetFromPrice, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+import { VAT_RATE, vatOn, wantsInvoice } from "@/lib/vat";
 import toast from "react-hot-toast";
 import { useTranslations } from "@/components/language/I18nProvider";
 import { pickupToUtc } from "@/lib/datetime";
@@ -286,7 +287,13 @@ export default function BookFormClient() {
   const extrasTotal  = (data.extras ?? []).reduce((s, e) => s + e.price * e.quantity, 0);
   const subtotal     = (quote?.totalAmount ?? 0) + extrasTotal;
   const couponSaving = couponPct > 0 ? Math.round((subtotal * couponPct / 100) * 100) / 100 : 0;
-  const grandTotal   = Math.round(Math.max(0, subtotal - couponSaving) * 100) / 100;
+  // Fares are quoted excluding VAT. The 10% is only charged to customers who
+  // ask for an invoice, and it goes on the discounted figure — VAT is due on
+  // what is actually paid, not on the list price before a coupon.
+  const netTotal     = Math.round(Math.max(0, subtotal - couponSaving) * 100) / 100;
+  const invoiceAsked = wantsInvoice(data.extras);
+  const vatAmount    = invoiceAsked ? vatOn(netTotal) : 0;
+  const grandTotal   = Math.round((netTotal + vatAmount) * 100) / 100;
 
   const toggleExtra = (id: string) => {
     const catalog = EXTRAS_CATALOG.find((e) => e.id === id)!;
@@ -909,10 +916,28 @@ export default function BookFormClient() {
                           <span>-{formatCurrency(couponSaving)}</span>
                         </div>
                       )}
+                      {vatAmount > 0 && (
+                        <>
+                          <div className="flex justify-between text-dark-400 border-t border-white/10 pt-2">
+                            <span>Subtotal excl. VAT</span>
+                            <span>{formatCurrency(netTotal)}</span>
+                          </div>
+                          <div className="flex justify-between text-dark-400">
+                            <span>VAT ({VAT_RATE}%)</span>
+                            <span>{formatCurrency(vatAmount)}</span>
+                          </div>
+                        </>
+                      )}
                       <div className="border-t border-white/10 pt-3 flex justify-between items-end">
                         <span className="text-white font-semibold">{t("total")}</span>
                         <span className="font-display text-xl text-gold-400">{formatCurrency(grandTotal)}</span>
                       </div>
+                      {vatAmount === 0 && (
+                        <p className="text-dark-500 text-xs pt-1">
+                          Excludes VAT. Tick &ldquo;I need an invoice&rdquo; above to add {VAT_RATE}% VAT and receive a
+                          full Spanish invoice.
+                        </p>
+                      )}
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-xs text-dark-500">
                       <span className="flex items-center gap-1"><Shield size={11} className="text-gold-500" /> Free cancellation 24h+</span>

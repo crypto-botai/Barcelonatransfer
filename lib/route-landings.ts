@@ -316,7 +316,7 @@ const SANTS: RouteLanding = {
   excluded: [
     "10% VAT — only if you request an invoice",
     "Motorway tolls, on routes that use them",
-    "Meet and greet with a name board",
+    "Meet and greet with your name on a tablet",
     "Child, baby and booster seats",
   ],
   optionsIntro: "Sants is well served by public transport, and for some travellers that is genuinely the better choice. Here is the honest comparison.",
@@ -422,7 +422,7 @@ const VILANOVA: RouteLanding = {
   excluded: [
     "10% VAT — only if you request an invoice",
     "Motorway tolls on the C-32",
-    "Meet and greet with a name board",
+    "Meet and greet with your name on a tablet",
     "Child, baby and booster seats",
   ],
   optionsIntro: "Vilanova is on the coastal rail line, so the train is a real alternative. It depends almost entirely on your luggage and your arrival time.",
@@ -529,7 +529,7 @@ const BEGUR: RouteLanding = {
   excluded: [
     "10% VAT — only if you request an invoice",
     "Motorway tolls on the AP-7",
-    "Meet and greet with a name board",
+    "Meet and greet with your name on a tablet",
     "Child, baby and booster seats",
   ],
   optionsIntro: "This is far enough from Barcelona that the alternatives stop being close. Here is the honest comparison.",
@@ -634,7 +634,7 @@ const ENCAMP: RouteLanding = {
   excluded: [
     "10% VAT — only if you request an invoice",
     "Motorway tolls on the C-16 Túnel del Cadí",
-    "Meet and greet with a name board",
+    "Meet and greet with your name on a tablet",
     "Child, baby and booster seats",
   ],
   optionsIntro: "Andorra has no airport and no railway, so every arrival is by road. That narrows the choice to three.",
@@ -748,7 +748,7 @@ const SITGES: RouteLanding = {
   excluded: [
     "10% VAT — only if you request an invoice",
     "Motorway tolls on the C-32",
-    "Meet and greet with a name board",
+    "Meet and greet with your name on a tablet",
     "Child, baby and booster seats",
   ],
   optionsIntro: "People search for the train, the bus and the taxi fare before they book a transfer, so here is the comparison rather than a sales pitch.",
@@ -860,7 +860,7 @@ const SALOU: RouteLanding = {
   excluded: [
     "10% VAT — only if you request an invoice",
     "Motorway tolls on the AP-7",
-    "Meet and greet with a name board",
+    "Meet and greet with your name on a tablet",
     "Child, baby and booster seats",
   ],
   optionsIntro: "A hundred kilometres is far enough that the alternatives stop being close. Here is the honest comparison.",

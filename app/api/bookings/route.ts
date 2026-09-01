@@ -15,6 +15,7 @@ import { withUniqueBookingCode } from "@/lib/booking-code";
 import { FLEET_TO_DB_CLASS, type VehicleClass, type FleetVehicle } from "@/types";
 import { roadDistance, resolveEndpoint } from "@/lib/geo";
 import { extrasCostFor, resolveTier, type MemberTier } from "@/lib/loyalty";
+import { vatOn, wantsInvoice } from "@/lib/vat";
 
 /**
  * Membership tier of whoever is booking.
@@ -243,7 +244,14 @@ export async function POST(req: NextRequest) {
     // could attach an extra at a negative price and pay less than the fare.
     const tier = await tierForUser(user?.id);
     const extrasCost = extrasCostFor(body.extras, tier);
-    const totalWithExtras = Math.round((serverTotal + extrasCost - couponDiscount) * 100) / 100;
+    // Fares are quoted excluding VAT; the 10% is charged only to customers who
+    // asked for an invoice, and on the discounted figure, because VAT is due on
+    // what is actually paid. Computed here rather than trusted from the client
+    // for the same reason the extras are: the request can say anything.
+    const netTotal = Math.round((serverTotal + extrasCost - couponDiscount) * 100) / 100;
+    const invoiceRequested = wantsInvoice(body.extras);
+    const vatAmount = invoiceRequested ? vatOn(netTotal) : 0;
+    const totalWithExtras = Math.round((netTotal + vatAmount) * 100) / 100;
 
     // Encode booking metadata into specialRequests.
     //
@@ -255,12 +263,19 @@ export async function POST(req: NextRequest) {
       ...e,
       price: extrasCostFor([{ ...e, quantity: 1 }], tier),
     }));
+    // netAmount and vatAmount are recorded here rather than on the booking row
+    // because the schema has no VAT columns. The invoice needs to know whether
+    // the total already includes VAT — if it does not know, it adds 10% to a
+    // figure that already had 10% added and bills the customer twice.
     const metaObj = {
       bookingType:  body.bookingType,
       durationHours: body.durationHours ?? null,
       extras:       pricedExtras,
       extrasCost,
       memberTier:   tier,
+      needsInvoice: invoiceRequested,
+      netAmount:    netTotal,
+      vatAmount,
     };
     const metaPrefix = `[META]${JSON.stringify(metaObj)}[/META]\n`;
     const specialRequests = body.specialRequests

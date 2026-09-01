@@ -50,7 +50,7 @@ const BOOK_FAQ = [
   { q: "What does the price include?",                a: "The fixed price covers the professional chauffeur, the vehicle and fuel, plus up to 60 minutes of free waiting after landing on airport pickups. No surge pricing, ever. VAT and tolls are NOT included: 10% VAT is added only if you request an invoice, and motorway tolls are charged separately where the route uses them. Meet & greet, child seats and other extras are optional and charged separately." },
   { q: "Can I cancel or change my booking?",          a: "Yes. Free cancellation up to 24 hours before pickup. Pickup address changes are free if made more than 8 hours before departure. Changes within those windows require a WhatsApp message to +34 635 383 712." },
   { q: "What if my flight is delayed?",               a: "We monitor all flights in real time. Your driver automatically adjusts to your actual landing time at no extra cost. The first 60 minutes after landing are always free." },
-  { q: "Where do you pick me up at the airport?",     a: "Your driver will be waiting in the Arrivals hall of your terminal (T1 or T2) holding a name board with your name. No need to call — just follow Arrivals signs." },
+  { q: "Where do you pick me up at the airport?",     a: "Your driver will be waiting in the Arrivals hall of your terminal (T1 or T2) holding a tablet showing your name. No need to call — just follow Arrivals signs." },
   { q: "Do you offer child seats?",                   a: "Yes. Baby seats and child booster seats are €5 per seat. Add them under Special Requests when booking and tell us your child's weight." },
 ] as const;
 

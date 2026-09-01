@@ -12,9 +12,13 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { parseBookingMeta } from "@/lib/booking-meta";
+import { VAT_RATE, splitGross } from "@/lib/vat";
 
-/** Spanish reduced rate for passenger transport. */
-export const VAT_RATE = 10;
+// Re-exported so existing importers of VAT_RATE from this module keep working;
+// lib/vat.ts is the definition, because the booking form needs the same rate
+// and cannot import anything that pulls in Prisma.
+export { VAT_RATE };
 
 export interface IssuerDetails {
   /**
@@ -155,13 +159,24 @@ export async function issueInvoice(input: IssueInput) {
 
   const booking = await prisma.booking.findUnique({
     where:  { id: input.bookingId },
-    select: { id: true, totalAmount: true, paymentStatus: true },
+    select: { id: true, totalAmount: true, paymentStatus: true, specialRequests: true },
   });
   if (!booking) throw new Error("Booking not found");
 
   const year   = new Date().getFullYear();
   const series = "A";
-  const { net, vat, gross } = vatBreakdown(booking.totalAmount);
+
+  // A booking made after the invoice option went live already collected the
+  // 10%, so totalAmount is gross and the lines have to be derived back out of
+  // it. Treating it as net here would add 10% a second time and issue a tax
+  // document for more than the customer's card was ever charged.
+  //
+  // Older bookings, and any taken without the option ticked, are VAT-exclusive
+  // and still have the VAT added on top.
+  const meta = parseBookingMeta(booking.specialRequests);
+  const { net, vat, gross } = meta.needsInvoice
+    ? splitGross(booking.totalAmount)
+    : vatBreakdown(booking.totalAmount);
 
   // Allocate the next number and write the row in one transaction so two
   // simultaneous requests cannot read the same "last" number. The unique
