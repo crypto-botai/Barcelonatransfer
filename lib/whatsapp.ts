@@ -137,12 +137,26 @@ export async function sendWhatsAppText(phone: string, text: string): Promise<boo
  * Imported lazily because lib/resend.ts imports this module; a top-level import
  * either way round would be a cycle.
  */
-export async function notifyAdmin(text: string): Promise<void> {
+export async function notifyAdmin(
+  text: string,
+  opts: {
+    /**
+     * Fall back to email when WhatsApp is unconfigured. Default true.
+     *
+     * Callers that already send the office their own email must pass false, or
+     * the same event arrives twice. That is exactly what happened when the
+     * fallback was introduced: the new-lead alert sends its own email and then
+     * called this, so one unpaid enquiry produced two identical messages.
+     */
+    emailFallback?: boolean;
+  } = {},
+): Promise<void> {
   const phoneId = process.env.WA_PHONE_ID;
   const token   = process.env.WA_TOKEN;
   const adminWA = process.env.WA_ADMIN_NUMBER ?? process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 
   if (!phoneId || !token || !adminWA) {
+    if (opts.emailFallback === false) return;
     try {
       const { sendAdminAlertEmail } = await import("@/lib/resend");
       const [first, ...rest] = text.split("\n");

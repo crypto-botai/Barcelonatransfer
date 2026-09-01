@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import { logEmail } from "@/lib/marketing";
 import { COMPANY } from "@/lib/company-facts";
-import { notifyAdminWhatsApp } from "@/lib/whatsapp";
+import { notifyAdmin } from "@/lib/whatsapp";
 import {
   emailDocument,
   bookingReceivedCard,
@@ -890,9 +890,12 @@ export async function sendAdminNewBookingAlert({
     throw err;
   }
 
-  // WhatsApp fallback — fires if WA_PHONE_ID + WA_TOKEN + WA_ADMIN_NUMBER are set.
-  void notifyAdminWhatsApp(
-    `🚗 New Booking ${confirmationCode}\n${guestName} · €${totalAmount.toFixed(2)}\n${pickupAddress} → ${dropoffAddress}\n${pickupDatetime}`
+  // WhatsApp only. The office has already been emailed a few lines above, so
+  // the email fallback is off — with it on, one booking sent two identical
+  // messages the moment WhatsApp was unconfigured, which it always has been.
+  void notifyAdmin(
+    `🚗 New Booking ${confirmationCode}\n${guestName} · €${totalAmount.toFixed(2)}\n${pickupAddress} → ${dropoffAddress}\n${pickupDatetime}`,
+    { emailFallback: false },
   );
 }
 
@@ -930,8 +933,10 @@ export async function sendNewLeadAlert({
     throw err;
   }
 
-  void notifyAdminWhatsApp(
+  // WhatsApp only — the email above already told the office about this lead.
+  void notifyAdmin(
     `\u{1F464} New lead — not paid yet\n${name}\n${phone}\n${pickup ?? ""} \u2192 ${dropoff ?? ""}\n${when ?? ""}`,
+    { emailFallback: false },
   );
 }
 

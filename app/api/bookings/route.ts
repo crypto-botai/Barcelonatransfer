@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
-import { sendAdminNewBookingAlert, sendBookingConfirmation, sendWelcomeEmail } from "@/lib/resend";
+import { sendBookingConfirmation, sendWelcomeEmail } from "@/lib/resend";
 import { redeemCoupon, validateCoupon } from "@/lib/marketing";
 import { calculateLastMinuteSurcharge, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, MIN_BOOKING_HOURS } from "@/lib/pricing";
 import { getQuote } from "@/lib/pricing-service";
@@ -403,7 +403,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Step 2c & 3: Send emails — awaited so Vercel doesn't kill them before response
-    const [confResult, adminResult] = await Promise.allSettled([
+    //
+    // The office is NOT told here. This point in the flow is a booking record
+    // that exists but has not been paid for, and it already generated a
+    // new-lead alert when the customer entered their details a step earlier.
+    // Alerting again here meant two emails about an unpaid booking, and then a
+    // third when the payment actually landed. The office is told once, from
+    // lib/payment-completion.ts, at the point the money arrives.
+    const [confResult] = await Promise.allSettled([
       sendBookingConfirmation({
         to:               body.guestEmail,
         name:             body.guestName,
@@ -416,24 +423,8 @@ export async function POST(req: NextRequest) {
         passengers:       body.passengers,
         bookingId:        booking.id,
       }),
-      sendAdminNewBookingAlert({
-        confirmationCode: booking.confirmationCode,
-        guestName:        body.guestName,
-        guestEmail:       body.guestEmail,
-        guestPhone:       body.guestPhone,
-        pickupAddress:    body.pickupAddress,
-        dropoffAddress:   body.dropoffAddress || `${body.bookingType} – ${body.durationHours ?? ""}h`,
-        pickupDatetime:   formatPickupDateTime(pickupDatetime),
-        vehicleClass:     body.vehicleClass,
-        totalAmount:      totalWithExtras,
-        passengers:       body.passengers,
-        luggage:          body.luggage,
-        flightNumber:     body.flightNumber,
-        specialRequests:  specialRequests,
-      }),
     ]);
     if (confResult.status === "rejected")  console.error("[bookings/confirmation-email]", confResult.reason);
-    if (adminResult.status === "rejected") console.error("[bookings/admin-alert-email]", adminResult.reason);
 
     // Step 4: Try to create SumUp checkout — if not configured, use WhatsApp fallback
     const sumupConfigured =
