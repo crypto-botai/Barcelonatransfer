@@ -120,16 +120,38 @@ export async function sendWhatsAppText(phone: string, text: string): Promise<boo
 }
 
 /**
- * Fire-and-forget admin booking alert via WhatsApp text message.
- * Uses the WA Cloud API freeform endpoint (works within 24 h session window).
- * Silently no-ops when WA_PHONE_ID / WA_TOKEN are not configured.
+ * Fire-and-forget operational alert to the office.
+ *
+ * WhatsApp where it is configured, email where it is not.
+ *
+ * The fallback is the point of this function. WhatsApp has never been
+ * configured on this deployment — WA_PHONE_ID and WA_TOKEN are unset — so the
+ * old version returned at its first line and dropped every alert it was handed.
+ * Flight delays, new leads and cancellations were all detected correctly and
+ * then went nowhere, which reads from the outside exactly like a feature that
+ * was never built.
+ *
+ * The subject is taken as the first line of the text, which is how every caller
+ * already writes these messages.
+ *
+ * Imported lazily because lib/resend.ts imports this module; a top-level import
+ * either way round would be a cycle.
  */
-export async function notifyAdminWhatsApp(text: string): Promise<void> {
+export async function notifyAdmin(text: string): Promise<void> {
   const phoneId = process.env.WA_PHONE_ID;
   const token   = process.env.WA_TOKEN;
   const adminWA = process.env.WA_ADMIN_NUMBER ?? process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 
-  if (!phoneId || !token || !adminWA) return;
+  if (!phoneId || !token || !adminWA) {
+    try {
+      const { sendAdminAlertEmail } = await import("@/lib/resend");
+      const [first, ...rest] = text.split("\n");
+      await sendAdminAlertEmail(first.trim() || "Operations alert", rest.join("\n").trim() || text);
+    } catch (e) {
+      console.warn("[alerts] admin email fallback failed:", (e as Error)?.message);
+    }
+    return;
+  }
 
   const to = toE164(adminWA);
   const body = JSON.stringify({
@@ -148,3 +170,12 @@ export async function notifyAdminWhatsApp(text: string): Promise<void> {
     }
   ).catch((e) => console.warn("[whatsapp] admin notify failed:", e?.message));
 }
+
+/**
+ * Former name, kept so the existing call sites keep working.
+ *
+ * The name is now inaccurate — it is no longer WhatsApp-only — but renaming it
+ * across a dozen call sites would be churn for no behavioural change. New code
+ * should call notifyAdmin.
+ */
+export const notifyAdminWhatsApp = notifyAdmin;

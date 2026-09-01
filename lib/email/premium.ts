@@ -333,6 +333,75 @@ export function rideConfirmedCard(o: {
   `);
 }
 
+// ─── 3b. Flight delayed ──────────────────────────────────────
+
+/**
+ * The delay, told to whoever needs it.
+ *
+ * Two audiences, one layout, different endings. The customer is being
+ * reassured — there is nothing for them to do and no extra charge. The driver
+ * is being given an instruction: be somewhere else, at a different time. The
+ * shared shell keeps the facts identical, which matters when the passenger
+ * quotes the landing time back to the driver at the barrier.
+ */
+export function flightDelayCard(o: {
+  audience: "customer" | "driver";
+  firstName: string;
+  flight: string;
+  when: string;
+  confirmationCode: string;
+  delayMinutes?: number | null;
+  /** Driver copy only. */
+  passenger?: string;
+  pickupAddress?: string;
+}): string {
+  const forDriver = o.audience === "driver";
+  const late = o.delayMinutes && o.delayMinutes > 0 ? `${o.delayMinutes} minutes late` : null;
+
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow(forDriver ? "Pick-up moved" : "Flight delayed")}
+      ${headline(forDriver
+        ? `Flight ${esc(o.flight)} is running late.`
+        : `Your flight is delayed, ${esc(o.firstName)}.`)}
+      ${paragraph(forDriver
+        ? "Your passenger will land later than planned. The pick-up moves with the flight — please collect at the new time."
+        : "We track your flight, so we already know. Your chauffeur has been given the new time and will be there when you land. There is nothing you need to do, and no extra charge.")}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
+        <tr><td style="padding:26px 28px;text-align:center;">
+          <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">New landing time</div>
+          <div style="font-family:${SERIF};font-size:27px;color:${GOLD};padding-top:11px;">${esc(o.when)}</div>
+          ${late ? `<div style="font-family:${SANS};font-size:12px;color:${LABEL};padding-top:9px;">${esc(late)}</div>` : ""}
+        </td></tr>
+      </table>
+    </td></tr>
+    ${sectionSpacer(12)}
+
+    <tr><td style="padding:0 44px;">
+      ${detailTable(
+        row("Flight", esc(o.flight)) +
+        (forDriver && o.passenger ? row("Passenger", esc(o.passenger)) : "") +
+        (forDriver && o.pickupAddress ? row("Pick-up", esc(o.pickupAddress)) : "") +
+        row("Reference", `<span style="letter-spacing:2px;color:${GOLD};">${esc(o.confirmationCode)}</span>`, true),
+      )}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;text-align:center;">
+      <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${LABEL};">
+        ${forDriver
+          ? "If this clashes with another job, tell dispatch now so it can be re-planned."
+          : `Anything changed at your end? Reply to this email or call <a href="tel:${PHONE_DIGITS}" style="color:${GOLD};text-decoration:none;">${PHONE}</a>.`}
+      </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
 // ─── 4. Driver assigned (customer) ───────────────────────────
 
 export function driverAssignedCard(o: {

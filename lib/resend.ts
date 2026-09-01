@@ -10,6 +10,7 @@ import {
   driverAssignedCard,
   paymentReceiptCard,
   rideCompleteCard,
+  flightDelayCard,
 } from "@/lib/email/premium";
 
 let _resend: Resend | undefined;
@@ -1402,4 +1403,109 @@ export async function sendTemporaryPassword({
     html,
   });
   await logEmail({ to, subject: "Your Elite BCN sign-in details", type: "TEMP_PASSWORD", resendId: id });
+}
+
+
+// ─── Admin operational alert ─────────────────────────────────
+
+/**
+ * An operational alert to the office, by email.
+ *
+ * These alerts have always gone out over WhatsApp, and WhatsApp has never been
+ * configured on this deployment — WA_PHONE_ID and WA_TOKEN are unset, so
+ * notifyAdminWhatsApp returned at its first line and every alert it was given
+ * was silently dropped. Flight delays, new leads and cancellations were all
+ * being raised correctly and then thrown away.
+ *
+ * Email is the channel that demonstrably works here, so it is the fallback.
+ * Deliberately plain: this is an operational alert read on a phone, and the
+ * only things that matter are the subject line and the few lines under it.
+ */
+export async function sendAdminAlertEmail(subject: string, text: string): Promise<void> {
+  const safe = esc(text).replace(/\n/g, "<br>");
+  const html = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background-color:#F0EFEC;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F0EFEC;">
+  <tr><td align="center" style="padding:28px 14px;">
+    <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:560px;max-width:560px;background-color:#FFFFFF;">
+      <tr><td style="background-color:#202329;padding:20px 26px;">
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:15px;letter-spacing:5px;color:#FFFFFF;">ELITE<span style="color:#B68D4C;">BCN</span></div>
+        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:#8E8E96;padding-top:7px;">Operations alert</div>
+      </td></tr>
+      <tr><td style="padding:26px;">
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:27px;color:#15151A;">${esc(subject)}</div>
+        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:23px;color:#4A4A52;padding-top:14px;">${safe}</div>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>`;
+
+  const id = await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject: `[Ops] ${subject}`, html });
+  await logEmail({ to: ADMIN_EMAIL, subject: `[Ops] ${subject}`, type: "ADMIN_ALERT", resendId: id });
+}
+
+// ─── Flight delay ────────────────────────────────────────────
+
+/**
+ * The delay, to the passenger.
+ *
+ * The sweep in lib/flights/sweep.ts detects the delay and calls notify(), whose
+ * email channel only fires when the caller hands it a sender — which nothing
+ * ever did. FLIGHT_DELAYED has listed "email" among its channels the whole
+ * time and never sent one. This is that sender.
+ */
+export async function sendFlightDelayEmail({
+  to, name, flight, when, confirmationCode, delayMinutes,
+}: {
+  to: string; name: string; flight: string; when: string;
+  confirmationCode: string; delayMinutes?: number | null;
+}) {
+  const html = emailDocument(
+    flightDelayCard({
+      audience:         "customer",
+      firstName:        name.split(" ")[0] || name,
+      flight,
+      when,
+      confirmationCode,
+      delayMinutes,
+    }),
+    `${flight} now lands ${when} — your chauffeur has been updated`,
+  );
+  const id = await sendEmail({
+    from: FROM, to,
+    subject: `Flight ${flight} delayed — new landing time ${when} | Elite BCN`,
+    html,
+  });
+  await logEmail({ to, subject: `Flight delayed — ${confirmationCode}`, type: "FLIGHT_DELAY", resendId: id });
+}
+
+/** The same delay, to the driver, as an instruction rather than reassurance. */
+export async function sendDriverFlightDelayEmail({
+  to, driverName, flight, when, confirmationCode, passenger, pickupAddress, delayMinutes,
+}: {
+  to: string; driverName: string; flight: string; when: string;
+  confirmationCode: string; passenger: string; pickupAddress: string;
+  delayMinutes?: number | null;
+}) {
+  const html = emailDocument(
+    flightDelayCard({
+      audience:         "driver",
+      firstName:        driverName.split(" ")[0] || driverName,
+      flight,
+      when,
+      confirmationCode,
+      delayMinutes,
+      passenger,
+      pickupAddress,
+    }),
+    `Pick-up moved — ${flight} now lands ${when}`,
+  );
+  const id = await sendEmail({
+    from: FROM, to,
+    subject: `Pick-up moved — ${flight} delayed | ${confirmationCode}`,
+    html,
+  });
+  await logEmail({ to, subject: `Driver flight delay — ${confirmationCode}`, type: "FLIGHT_DELAY_DRIVER", resendId: id });
 }

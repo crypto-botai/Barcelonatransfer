@@ -122,7 +122,12 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
    * makes that promise true.
    */
   FLIGHT_DELAYED_DRIVER: {
-    channels: ["inapp", "whatsapp", "push"],
+    // Email added because the other three do not reach a driver who is not
+    // looking at the portal: WhatsApp is unconfigured on this deployment, and
+    // push is recorded but not yet delivered. A driver who does not learn of a
+    // ninety-minute delay waits at arrivals for it, which is the exact cost
+    // this feature exists to avoid.
+    channels: ["inapp", "email", "whatsapp", "push"],
     copy: {
       en: { title: "Pickup moved — flight {{flight}} delayed", body: "Booking {{code}}: {{passenger}} now lands {{when}}. Collect from {{pickup}} at the new time." },
       es: { title: "Recogida aplazada — vuelo {{flight}} con retraso", body: "Reserva {{code}}: {{passenger}} aterriza ahora a las {{when}}. Recoger en {{pickup}} a la nueva hora." },

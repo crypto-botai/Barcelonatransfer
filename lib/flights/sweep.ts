@@ -14,7 +14,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { notify } from "@/lib/notifications/service";
-import { notifyAdminWhatsApp } from "@/lib/whatsapp";
+import { notifyAdmin } from "@/lib/whatsapp";
+import { sendFlightDelayEmail, sendDriverFlightDelayEmail } from "@/lib/resend";
 import { lookupFlight, isMaterialDelay, isFlightTrackingEnabled } from "./index";
 
 export interface SweepResult {
@@ -48,13 +49,16 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
     select: {
       id: true, userId: true, guestPhone: true, guestName: true, flightNumber: true,
       pickupDatetime: true, confirmationCode: true, pickupAddress: true,
+      // Both addresses are needed because notify()'s email channel only fires
+      // when the caller supplies a sender, and a sender needs somewhere to send.
+      guestEmail: true,
       // Needed to alert the driver, who has to physically be somewhere at a
       // different time than planned.
       driver: {
         select: {
           userId: true,
           whatsappNumber: true,
-          user: { select: { name: true, phone: true } },
+          user: { select: { name: true, phone: true, email: true } },
         },
       },
     },
@@ -111,6 +115,19 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
       // `when` lands in the audit details via notify(), which is what the
       // dedup check above reads on the next run.
       vars: { flight: status.flightNumber, when, code: b.confirmationCode },
+      // notify() lists "email" among this event's channels but skips it unless
+      // the caller hands it a sender, and none ever did — so the delay email
+      // has been configured and unsent since the sweep was written.
+      email: b.guestEmail && b.guestName
+        ? () => sendFlightDelayEmail({
+            to:               b.guestEmail!,
+            name:             b.guestName!,
+            flight:           status.flightNumber,
+            when,
+            confirmationCode: b.confirmationCode,
+            delayMinutes:     status.delayMinutes,
+          })
+        : undefined,
     });
 
     // ── 2. The assigned driver ───────────────────────────────────────────────
@@ -130,6 +147,18 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
           passenger: b.guestName ?? "Your passenger",
           pickup:    b.pickupAddress,
         },
+        email: b.driver.user.email
+          ? () => sendDriverFlightDelayEmail({
+              to:               b.driver!.user.email!,
+              driverName:       b.driver!.user.name ?? "there",
+              flight:           status.flightNumber,
+              when,
+              confirmationCode: b.confirmationCode,
+              passenger:        b.guestName ?? "Your passenger",
+              pickupAddress:    b.pickupAddress,
+              delayMinutes:     status.delayMinutes,
+            })
+          : undefined,
       });
     }
 
@@ -137,7 +166,7 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
     // A delay can collide with the driver's next job, which only a human can
     // re-plan. Fire-and-forget: an admin alert must never hold up telling the
     // customer and driver.
-    void notifyAdminWhatsApp(
+    void notifyAdmin(
       `Flight delay — booking ${b.confirmationCode.slice(0, 8).toUpperCase()}\n` +
       `${status.flightNumber} now lands ${when}` +
       (status.delayMinutes ? ` (${status.delayMinutes} min late)` : "") + `\n` +
