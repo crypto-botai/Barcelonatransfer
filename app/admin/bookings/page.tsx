@@ -9,6 +9,7 @@ import { isAssignableDriver, driverAvailabilityLabel } from "@/lib/driver-roster
 import toast from "react-hot-toast";
 import IssueInvoiceButton from "@/components/admin/IssueInvoiceButton";
 import RideTimeline from "@/components/admin/RideTimeline";
+import ArrivalPanel from "@/components/arrival/ArrivalPanel";
 
 type Driver = { id: string; status: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] };
 
@@ -187,6 +188,14 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
                   Member tier: <span className="text-gold-400">{meta.memberTier}</span>
                 </p>
               )}
+            </section>
+          )}
+
+          {/* What the passenger has reported between landing and the car. Only
+              on airport jobs, which is what a flight number identifies. */}
+          {booking.flightNumber && (
+            <section className="glass-card rounded-xl p-4">
+              <ArrivalPanel bookingId={booking.id} />
             </section>
           )}
 

@@ -270,6 +270,8 @@ export function newLeadCard(o: {
 export function rideConfirmedCard(o: {
   firstName: string; confirmationCode: string;
   pickupAddress: string; date: string; time: string; vehicle: string;
+  /** Passenger arrival link. Airport pick-ups only; omitted elsewhere. */
+  arrivalUrl?: string | null;
 }): string {
   const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Hello, my booking reference is ${o.confirmationCode}`)}`;
   return card(`
@@ -304,6 +306,26 @@ export function rideConfirmedCard(o: {
         </td></tr>
       </table>
     </td></tr>
+
+    ${o.arrivalUrl ? `
+    ${sectionSpacer(28)}
+    <tr><td style="padding:0 44px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid ${GOLD_EDGE};">
+        <tr><td style="padding:26px 26px 28px 26px;text-align:center;">
+          <div style="font-family:${SANS};font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:${GOLD};">On the day</div>
+          <div style="font-family:${SERIF};font-size:21px;line-height:29px;color:${TITLE};padding-top:10px;">Tell us when you land</div>
+          <div style="font-family:${SANS};font-size:14px;line-height:23px;color:${TEXT};padding-top:12px;">
+            One tap at passport control, at the baggage belt and when you set off for
+            the meeting point. Your chauffeur sees each one, so nobody has to call
+            anybody and the car is there as you arrive.
+          </div>
+          <div style="padding-top:20px;">${button(o.arrivalUrl, "Open My Arrival Page")}</div>
+          <div style="font-family:${SANS};font-size:11px;line-height:18px;color:${LABEL};padding-top:14px;">
+            No app, no sign-in, and no location tracking &mdash; only the steps you tap.
+          </div>
+        </td></tr>
+      </table>
+    </td></tr>` : ""}
 
     ${sectionSpacer(30)}
     <tr><td style="padding:0 44px;text-align:center;">${button(wa, "Contact Us")}</td></tr>

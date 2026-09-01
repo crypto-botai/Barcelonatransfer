@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPickupReminder } from "@/lib/resend";
+import { arrivalUrl } from "@/lib/arrival-token";
+
+/**
+ * The arrival link, or nothing if it cannot be signed.
+ *
+ * An unset NEXTAUTH_SECRET makes signing throw. That must not take down the
+ * whole reminder run — the reminder itself is far more important than the link
+ * inside it, so a failure here simply omits the section.
+ */
+function safeArrivalUrl(bookingId: string): string | null {
+  try {
+    return arrivalUrl(bookingId);
+  } catch {
+    return null;
+  }
+}
 import { notify } from "@/lib/notifications/service";
 import { sweepFlightDelays } from "@/lib/flights/sweep";
 import { reconcilePendingPayments } from "@/lib/payments/reconcile";
@@ -46,6 +62,10 @@ export async function POST(req: NextRequest) {
         pickupAddress:   b.pickupAddress,
         pickupDatetime:  formatPickupDateTime(b.pickupDatetime),
         vehicleClass:    b.vehicleClass,
+        // Only airport pick-ups get the arrival link: it exists to cover the
+        // walk from the aircraft to the car, and on a hotel pickup there is no
+        // such walk to report.
+        arrivalUrl:      b.flightNumber ? safeArrivalUrl(b.id) : null,
       });
       sent++;
 

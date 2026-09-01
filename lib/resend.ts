@@ -997,10 +997,12 @@ export async function sendAbandonedBookingEmail({
 
 // ─── Pickup Reminder ─────────────────────────────────────────
 export async function sendPickupReminder({
-  to, name, confirmationCode, pickupAddress, pickupDatetime, vehicleClass,
+  to, name, confirmationCode, pickupAddress, pickupDatetime, vehicleClass, arrivalUrl,
 }: {
   to: string; name: string; confirmationCode: string; pickupAddress: string;
   pickupDatetime: string; vehicleClass: string;
+  /** Passenger arrival link. Passed for airport pick-ups only. */
+  arrivalUrl?: string | null;
 }) {
   const { date, time } = splitDatetime(pickupDatetime);
   const html = emailDocument(
@@ -1011,6 +1013,7 @@ export async function sendPickupReminder({
       date,
       time,
       vehicle: vehicleName(vehicleClass),
+      arrivalUrl,
     }),
     `Your transfer is tomorrow — reference ${confirmationCode}`,
   );

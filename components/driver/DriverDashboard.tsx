@@ -15,6 +15,7 @@ import LocationSharing from "@/components/driver/LocationSharing";
 import FlightStatusBadge from "@/components/driver/FlightStatusBadge";
 import RideStageControl from "@/components/driver/RideStageControl";
 import NoShowPanel from "@/components/driver/NoShowPanel";
+import ArrivalPanel from "@/components/arrival/ArrivalPanel";
 import type { RideStage } from "@prisma/client";
 import toast from "react-hot-toast";
 
@@ -370,6 +371,12 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                           actually helps them. */}
                       {["DRIVER_ASSIGNED", "IN_PROGRESS"].includes(b.status) && (
                         <div className="mt-3 pt-3 border-t border-white/[0.04] space-y-3">
+                          {/* Where the passenger says they are. Only on airport
+                              jobs — it is the walk from the aircraft to the car
+                              that nobody can see, and a flight number is what
+                              tells us this is one of those. */}
+                          {b.flightNumber && <ArrivalPanel bookingId={b.id} />}
+
                           {b.rideStage && b.rideStage !== "COMPLETED" && (
                             <LocationSharing bookingId={b.id} active />
                           )}
