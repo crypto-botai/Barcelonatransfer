@@ -176,7 +176,7 @@ export const COAST_ARTICLES: BlogArticle[] = [
     title: "Lloret de Mar Beyond the Nightlife",
     excerpt:
       "The Costa Brava's best-known resort has a cliffside modernist garden, a medieval castle and a string of quiet coves that most visitors never find.",
-    metaTitle: "Lloret de Mar Guide — Gardens, Beaches & Coves | Elite BCN",
+    metaTitle: "Lloret de Mar: Gardens, Beaches & Coves | Elite BCN",
     metaDescription:
       "What to do in Lloret de Mar besides the nightlife: Santa Clotilde gardens, Sant Joan castle, the quieter coves, and how to get there from Barcelona.",
     keywords: ["things to do in lloret de mar", "lloret de mar", "santa clotilde gardens", "lloret beaches", "barcelona to lloret de mar"],
@@ -264,7 +264,7 @@ export const COAST_ARTICLES: BlogArticle[] = [
     title: "Cadaqués and the Dalí Coast",
     excerpt:
       "A whitewashed village at the end of a mountain road, the surrealist's house at Portlligat, and the raw geology of Cap de Creus.",
-    metaTitle: "Cadaqués & Dalí Guide — Portlligat, Cap de Creus | Elite BCN",
+    metaTitle: "Cadaqués & Dalí: Portlligat & Cap de Creus | Elite BCN",
     metaDescription:
       "Visiting Cadaqués: Dalí's house at Portlligat, the old town, Cap de Creus natural park, and how to reach this remote Costa Brava village.",
     keywords: ["things to do in cadaques", "cadaques", "dali house portlligat", "cap de creus", "cadaques from barcelona", "costa brava dali"],

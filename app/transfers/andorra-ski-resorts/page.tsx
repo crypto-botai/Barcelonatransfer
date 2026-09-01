@@ -44,7 +44,7 @@ const ANDORRA = ladderFor("andorra", "airport");
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Airport to Andorra Ski Resorts Transfer" },
   description:
-    "Private transfers from BCN El Prat to Grandvalira, Pas de la Casa, Soldeu and Arinsal. Priced by road distance and quoted before you book. Skis and boards carried free.",
+    "Private transfers from BCN El Prat to Grandvalira, Pas de la Casa, Soldeu and Arinsal. Quoted before you book, skis carried free.",
   alternates: { canonical: URL },
   keywords: [
     "barcelona to pas de la casa transfer",

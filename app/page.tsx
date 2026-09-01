@@ -15,7 +15,7 @@ import { SHARED_OG } from "@/lib/seo";
 import { alternatesFor } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: { absolute: "Elite BCN | Barcelona Airport Transfers & Private Chauffeur" },
+  title: { absolute: "Barcelona Airport Transfers & Private Chauffeur | Elite BCN" },
   description:
     "Private car and driver from Barcelona Airport, T1 and T2. Fixed price per vehicle from €50, with 60 minutes of free waiting from the moment you land.",
   // Canonical plus hreflang for all eight languages. Every locale must list

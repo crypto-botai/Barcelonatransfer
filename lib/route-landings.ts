@@ -719,7 +719,7 @@ const SITGES: RouteLanding = {
   eyebrow: "Garraf coast · 35 km",
   EyebrowIcon: Waves,
   title: `Barcelona Airport to Sitges Transfer — from €${sitgesFrom}`,
-  description: `Private transfer from BCN El Prat or central Barcelona to Sitges. Fixed €${sitgesFrom} per vehicle, 35 km, about 35 minutes, door to door. Compared honestly with the train, bus and taxi.`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Sitges. Fixed €${sitgesFrom} per vehicle, 35 km, about 35 minutes, door to door.`,
   keywords: [
     "barcelona airport to sitges transfer",
     "sitges transfer",

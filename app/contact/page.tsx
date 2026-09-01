@@ -9,7 +9,7 @@ import { SHARED_OG } from "@/lib/seo";
 export const metadata: Metadata = {
   title: { absolute: "Contact Elite BCN | 24/7 Transfer Support Barcelona" },
   description:
-    "Contact Elite BCN Transfers for bookings, support, or enquiries. Available 24/7 by phone, WhatsApp, or email. Barcelona's premier private chauffeur service.",
+    "Contact Elite BCN Transfers for bookings, support or enquiries. Available 24/7 by phone, WhatsApp or email.",
   alternates: { canonical: "https://www.elitebcn.info/contact" },
   keywords: ["contact elite bcn", "barcelona transfer contact", "chauffeur barcelona phone", "barcelona transfer whatsapp"],
   openGraph: {

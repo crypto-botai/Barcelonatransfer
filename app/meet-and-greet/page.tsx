@@ -42,7 +42,7 @@ const airportFrom = Math.min(
 
 export const metadata: Metadata = {
   title: { absolute: `Barcelona Airport Meet & Greet Service — ${meetGreet.priceLabel}` },
-  description: `Book meet and greet at Barcelona Airport arrivals. Your driver waits inside holding a tablet with your name and helps with the bags, ${meetGreet.priceLabel} on top of the transfer. 60 minutes free waiting is included either way.`,
+  description: `Meet and greet at Barcelona Airport arrivals: your driver waits inside with your name on a tablet and helps with the bags, ${meetGreet.priceLabel}.`,
   alternates: { canonical: URL },
   keywords: [
     "barcelona airport meet and greet",

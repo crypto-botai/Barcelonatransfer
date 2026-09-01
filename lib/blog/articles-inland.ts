@@ -9,7 +9,7 @@ export const INLAND_ARTICLES: BlogArticle[] = [
     title: "Montserrat: Catalonia's Sacred Mountain",
     excerpt:
       "A Benedictine monastery wedged into a wall of serrated rock, the Black Madonna, a boys' choir with a thousand-year history, and walking trails above the clouds.",
-    metaTitle: "Montserrat Day Trip Guide — Monastery & Trails | Elite BCN",
+    metaTitle: "Montserrat Day Trip: Monastery & Trails | Elite BCN",
     metaDescription:
       "How to visit Montserrat from Barcelona: the monastery, the Black Madonna, the Escolania choir, the best walking routes and when to go.",
     keywords: ["things to do in montserrat", "montserrat day trip", "montserrat monastery", "black madonna montserrat", "montserrat from barcelona", "montserrat hiking"],

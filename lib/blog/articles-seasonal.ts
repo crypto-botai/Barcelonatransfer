@@ -105,7 +105,7 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
     title: "Barcelona in Winter: What to Do When the Beach Closes",
     excerpt:
       "Mild days, empty museums, snow ninety minutes away and the best three months of the year to actually see the city properly.",
-    metaTitle: "Barcelona in Winter — What to Do & Where to Go | Elite BCN",
+    metaTitle: "Barcelona in Winter: What to Do & Where to Go | Elite BCN",
     metaDescription:
       "A winter guide to Barcelona and Catalonia: quiet museums, calçotada season, Pyrenean skiing, coastal walks and the best winter day trips.",
     keywords: ["barcelona in winter", "barcelona winter things to do", "calçotada", "skiing near barcelona", "barcelona december january february"],
@@ -298,7 +298,7 @@ export const SEASONAL_ARTICLES: BlogArticle[] = [
     title: "PortAventura World: A Family Day on the Costa Daurada",
     excerpt:
       "Six themed worlds, one of Europe's tallest roller coasters, a Ferrari-branded park next door and a beach fifteen minutes away.",
-    metaTitle: "PortAventura World Guide — Rides, Tickets & Tips | Elite BCN",
+    metaTitle: "PortAventura World: Rides, Tickets & Tips | Elite BCN",
     metaDescription:
       "Planning a day at PortAventura World: the six themed worlds, Ferrari Land, Caribe Aquatic Park, the best rides and how to get there from Barcelona.",
     keywords: ["things to do at portaventura", "portaventura world", "ferrari land", "portaventura from barcelona", "portaventura tips", "salou theme park"],

@@ -105,6 +105,62 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             an origin the page does not request early wastes a connection slot.
             dns-prefetch is the cheap equivalent for a later, deferred request. */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        {/* Speculation Rules — prefetch on hover, prerender on intent.
+            This site is browsed several pages deep: someone lands on a route
+            page, opens the fleet, compares a price, then books. Each of those
+            navigations paid a full document fetch. Prefetching at "moderate"
+            (roughly, hover) covers the common case cheaply; prerendering is
+            held to "conservative" (pointerdown) because a prerender runs the
+            whole page including its scripts, and doing that for every link the
+            cursor crosses would cost the user more than it saves.
+
+            /book is excluded from prerender deliberately. It mounts the booking
+            wizard and fires a quote request; prerendering it would issue quotes
+            for people who never open the page. */}
+        <script
+          type="speculationrules"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              prefetch: [
+                {
+                  source: "document",
+                  where: {
+                    and: [
+                      { href_matches: "/*" },
+                      { not: { href_matches: "/api/*" } },
+                      { not: { href_matches: "/admin/*" } },
+                      { not: { href_matches: "/driver/*" } },
+                      { not: { href_matches: "/dashboard/*" } },
+                      { not: { href_matches: "/auth/*" } },
+                      { not: { href_matches: "/arrival/*" } },
+                      { not: { href_matches: "/booking/*" } },
+                    ],
+                  },
+                  eagerness: "moderate",
+                },
+              ],
+              prerender: [
+                {
+                  source: "document",
+                  where: {
+                    and: [
+                      { href_matches: "/*" },
+                      { not: { href_matches: "/api/*" } },
+                      { not: { href_matches: "/admin/*" } },
+                      { not: { href_matches: "/driver/*" } },
+                      { not: { href_matches: "/dashboard/*" } },
+                      { not: { href_matches: "/auth/*" } },
+                      { not: { href_matches: "/arrival/*" } },
+                      { not: { href_matches: "/booking/*" } },
+                      { not: { href_matches: "/book" } },
+                    ],
+                  },
+                  eagerness: "conservative",
+                },
+              ],
+            }),
+          }}
+        />
         {/* Geo meta for local SEO — the premises, not the airport.
             These named El Prat and carried its coordinates, the same false
             location the JSON-LD address had. Where the business operates is

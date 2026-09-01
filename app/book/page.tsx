@@ -16,7 +16,7 @@ const fromPrice = ROUTES.find((r) => r.from === "airport" && r.to === "barcelona
 export const metadata: Metadata = {
   title: { absolute: "Book Your Barcelona Transfer | Elite BCN" },
   description:
-    `Book your Barcelona luxury transfer in 60 seconds. Fixed prices from €${fromPrice}. BCN El Prat T1/T2, cruise port, hotels, Sitges & Andorra. Instant confirmation 24/7.`,
+    `Book a Barcelona luxury transfer in 60 seconds. Fixed prices from €${fromPrice}. BCN El Prat T1/T2, cruise port, hotels, Sitges and Andorra.`,
   alternates: {
     canonical: "https://www.elitebcn.info/book",
   },
