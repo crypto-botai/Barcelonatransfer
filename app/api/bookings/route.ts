@@ -232,10 +232,6 @@ export async function POST(req: NextRequest) {
     const couponDiscountPct = couponResult?.valid
       ? (couponResult as { coupon?: { discountPct?: number } }).coupon?.discountPct ?? 0
       : 0;
-    const couponDiscount = couponDiscountPct > 0
-      ? Math.round(serverTotal * (couponDiscountPct / 100) * 100) / 100
-      : 0;
-
     // Priced server-side from EXTRAS_CATALOG, and with the booker's tier applied
     // so Gold's meet & greet is actually free rather than merely advertised.
     //
@@ -244,11 +240,25 @@ export async function POST(req: NextRequest) {
     // could attach an extra at a negative price and pay less than the fare.
     const tier = await tierForUser(user?.id);
     const extrasCost = extrasCostFor(body.extras, tier);
+
+    // The discount comes off the fare *and* the extras, which is what the
+    // booking form has always shown the customer.
+    //
+    // This used to take the percentage off the fare alone. With a coupon and any
+    // extra on the same booking the two disagreed, and always in the same
+    // direction: the form displayed a larger saving than the server applied, so
+    // the card was charged more than the total the customer had just agreed to.
+    // A 20% coupon on a €75 transfer with a €25 stop showed €80 and took €85.
+    const discountable = Math.round((serverTotal + extrasCost) * 100) / 100;
+    const couponDiscount = couponDiscountPct > 0
+      ? Math.round(discountable * (couponDiscountPct / 100) * 100) / 100
+      : 0;
+
     // Fares are quoted excluding VAT; the 10% is charged only to customers who
     // asked for an invoice, and on the discounted figure, because VAT is due on
     // what is actually paid. Computed here rather than trusted from the client
     // for the same reason the extras are: the request can say anything.
-    const netTotal = Math.round((serverTotal + extrasCost - couponDiscount) * 100) / 100;
+    const netTotal = Math.round((discountable - couponDiscount) * 100) / 100;
     const invoiceRequested = wantsInvoice(body.extras);
     const vatAmount = invoiceRequested ? vatOn(netTotal) : 0;
     const totalWithExtras = Math.round((netTotal + vatAmount) * 100) / 100;
