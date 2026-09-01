@@ -2,6 +2,15 @@ import { Resend } from "resend";
 import { logEmail } from "@/lib/marketing";
 import { COMPANY } from "@/lib/company-facts";
 import { notifyAdminWhatsApp } from "@/lib/whatsapp";
+import {
+  emailDocument,
+  bookingReceivedCard,
+  newLeadCard,
+  rideConfirmedCard,
+  driverAssignedCard,
+  paymentReceiptCard,
+  rideCompleteCard,
+} from "@/lib/email/premium";
 
 let _resend: Resend | undefined;
 function getResend(): Resend {
@@ -806,16 +815,21 @@ export async function sendBookingConfirmation({
   dropoffAddress: string; pickupDatetime: string; vehicleClass: string;
   totalAmount: number; passengers: number; bookingId?: string;
 }) {
-  const html = bookingConfirmationHtml({
-    confirmationCode,
-    clientFirstName: name.split(" ")[0],
-    pickupAddress,
-    dropoffAddress,
-    pickupDatetime,
-    vehicleClass,
-    passengers,
-    totalAmount,
-  });
+  const { date, time } = splitDatetime(pickupDatetime);
+  const html = emailDocument(
+    bookingReceivedCard({
+      firstName: name.split(" ")[0],
+      confirmationCode,
+      pickupAddress,
+      dropoffAddress,
+      date,
+      time,
+      vehicle: vehicleName(vehicleClass),
+      passengers,
+      totalAmount,
+    }),
+    `Your transfer is reserved — reference ${confirmationCode}`,
+  );
 
   const id = await sendEmail({ from: FROM, to, subject: `Booking Confirmed — ${confirmationCode} | Elite BCN`, html });
   await logEmail({ to, subject: `Booking Confirmed — ${confirmationCode}`, type: "CONFIRMATION", resendId: id, bookingId });
@@ -892,23 +906,10 @@ export async function sendNewLeadAlert({
 }) {
   const subject = `New lead — ${name} · ${phone}`;
   const wa = `https://wa.me/${phone.replace(/\D/g, "")}`;
-  const html = emailLayout(`
-    <h2>Someone is booking now</h2>
-    <p>They have entered their details but have not paid yet. Reaching them in
-       the next few minutes is the best chance of winning the booking.</p>
-    <table class="detail-table">
-      <tr><td>Name</td><td><strong>${esc(name)}</strong></td></tr>
-      <tr><td>Phone</td><td><a href="tel:${esc(phone)}" style="color:#c9a84c;">${esc(phone)}</a></td></tr>
-      <tr><td>WhatsApp</td><td><a href="${wa}" style="color:#25D366;">Message on WhatsApp</a></td></tr>
-      <tr><td>Email</td><td><a href="mailto:${esc(email)}" style="color:#c9a84c;">${esc(email)}</a></td></tr>
-      ${pickup  ? `<tr><td>Pick-up</td><td>${esc(pickup)}</td></tr>` : ""}
-      ${dropoff ? `<tr><td>Drop-off</td><td>${esc(dropoff)}</td></tr>` : ""}
-      ${when    ? `<tr><td>When</td><td>${esc(when)}</td></tr>` : ""}
-      ${passengers ? `<tr><td>Passengers</td><td>${esc(passengers)}</td></tr>` : ""}
-    </table>
-    <p style="color:#888;font-size:12px;">If they finish paying you will get the
-       usual booking confirmation as well.</p>
-  `);
+  const html = emailDocument(
+    newLeadCard({ name, email, phone, pickup, dropoff, when, passengers }),
+    `Unpaid enquiry from ${name} — ${phone}`,
+  );
 
   try {
     const id = await sendEmail({ from: FROM, to: ADMIN_EMAIL, replyTo: email, subject, html });
@@ -991,32 +992,20 @@ export async function sendPickupReminder({
   to: string; name: string; confirmationCode: string; pickupAddress: string;
   pickupDatetime: string; vehicleClass: string;
 }) {
-  const html = emailLayout(`
-    <h2>Your Transfer is Tomorrow</h2>
-    <p>Hi ${name},</p>
-    <p>This is a friendly reminder that your luxury transfer is scheduled for <strong style="color:#c9a84c;">tomorrow</strong>.</p>
-    <div class="code-box">
-      <p style="color:#888;font-size:11px;margin-bottom:8px;letter-spacing:3px;text-transform:uppercase;">Booking Reference</p>
-      <div class="code">${confirmationCode}</div>
-    </div>
-    <table class="detail-table">
-      <tr><td>Pick-up</td><td>${pickupAddress}</td></tr>
-      <tr><td>Date & Time</td><td>${pickupDatetime}</td></tr>
-      <tr><td>Vehicle</td><td>${vehicleClass.replace(/_/g, " ")}</td></tr>
-    </table>
-    <div class="divider"></div>
-    <p style="color:#c9a84c;font-size:14px;font-weight:bold;">💡 Tips for a smooth pickup:</p>
-    <ul style="margin-top:10px;padding-left:20px;color:#aaa;font-size:14px;line-height:2;">
-      <li>Your driver will contact you 30 minutes before pickup</li>
-      <li>For airport pickups, your driver will be in arrivals holding a name board</li>
-      <li>Save our WhatsApp in case you need to reach us</li>
-    </ul>
-    <div style="text-align:center;margin-top:20px;">
-      <a href="https://wa.me/34635383712" class="wa-btn">💬 Contact Driver via WhatsApp</a>
-    </div>
-  `);
+  const { date, time } = splitDatetime(pickupDatetime);
+  const html = emailDocument(
+    rideConfirmedCard({
+      firstName: name.split(" ")[0],
+      confirmationCode,
+      pickupAddress,
+      date,
+      time,
+      vehicle: vehicleName(vehicleClass),
+    }),
+    `Your transfer is tomorrow — reference ${confirmationCode}`,
+  );
 
-  const id = await sendEmail({ from: FROM, to, subject: `📍 Reminder: Your Elite BCN Transfer Tomorrow — ${confirmationCode}`, html });
+  const id = await sendEmail({ from: FROM, to, subject: `Your transfer is tomorrow — ${confirmationCode} | Elite BCN`, html });
   await logEmail({ to, subject: `Pickup reminder`, type: "REMINDER", resendId: id });
 }
 
@@ -1029,26 +1018,20 @@ export async function sendDriverAssignedEmail({
   driverPhone: string; vehicleMake: string; vehicleModel: string;
   licensePlate: string; pickupDatetime: string;
 }) {
-  const html = emailLayout(`
-    <h2>Your Chauffeur is Assigned</h2>
-    <p>Dear ${name},</p>
-    <p>Great news! Your professional chauffeur has been confirmed for your upcoming journey.</p>
-    <table class="detail-table" style="margin-top:20px;">
-      <tr><td>Driver</td><td>${driverName}</td></tr>
-      <tr><td>Phone</td><td>${driverPhone}</td></tr>
-      <tr><td>Vehicle</td><td>${vehicleMake} ${vehicleModel}</td></tr>
-      <tr><td>Plate</td><td>${licensePlate}</td></tr>
-      <tr><td>Pickup</td><td>${pickupDatetime}</td></tr>
-    </table>
-    <div style="text-align:center;margin-top:24px;">
-      <a href="tel:${driverPhone}" class="cta-btn">📞 Call Driver</a>
-    </div>
-    <div style="text-align:center;margin-top:10px;">
-      <a href="https://wa.me/${driverPhone.replace(/\D/g, '')}" class="wa-btn">💬 WhatsApp Driver</a>
-    </div>
-  `);
+  const html = emailDocument(
+    driverAssignedCard({
+      firstName: name.split(" ")[0],
+      confirmationCode,
+      driverName,
+      driverPhone,
+      vehicle: `${vehicleMake} ${vehicleModel}`,
+      licensePlate,
+      pickupDatetime,
+    }),
+    `Your chauffeur is confirmed — reference ${confirmationCode}`,
+  );
 
-  const id = await sendEmail({ from: FROM, to, subject: `🚗 Driver Assigned — ${confirmationCode} | Elite BCN`, html });
+  const id = await sendEmail({ from: FROM, to, subject: `Your chauffeur is confirmed — ${confirmationCode} | Elite BCN`, html });
   await logEmail({ to, subject: `Driver assigned`, type: "DRIVER_ASSIGNED", resendId: id });
 }
 
@@ -1059,23 +1042,14 @@ export async function sendReviewRequestEmail({
   to: string; name: string; confirmationCode: string; bookingId: string;
 }) {
   const reviewUrl = `${SITE_URL}/review?booking=${bookingId}`;
-  const html = emailLayout(`
-    <h2>How Was Your Journey?</h2>
-    <p>Dear ${name},</p>
-    <p>We hope your recent transfer with Elite BCN was exceptional. Your feedback helps us maintain our luxury standard of service.</p>
-    <p style="margin-top:12px;">It only takes 30 seconds — how would you rate your experience?</p>
-    <div style="text-align:center;margin:28px 0;">
-      <div style="font-size:36px;letter-spacing:8px;">⭐⭐⭐⭐⭐</div>
-      <div style="margin-top:16px;">
-        <a href="${reviewUrl}?rating=5" class="cta-btn">Leave a Review →</a>
-      </div>
-    </div>
-    <div class="divider"></div>
-    <p style="color:#888;font-size:13px;text-align:center;">Booking reference: <strong style="color:#c9a84c;">${confirmationCode}</strong></p>
-    <div style="text-align:center;margin-top:12px;">
-      <a href="https://wa.me/34635383712" class="wa-btn">💬 Contact Us</a>
-    </div>
-  `);
+  const html = emailDocument(
+    rideCompleteCard({
+      firstName: name.split(" ")[0],
+      confirmationCode,
+      reviewUrl,
+    }),
+    `How was your journey? — reference ${confirmationCode}`,
+  );
 
   const id = await sendEmail({ from: FROM, to, subject: `How was your Elite BCN experience? — ${confirmationCode}`, html });
   await logEmail({ to, subject: `Review request`, type: "REVIEW", resendId: id });
@@ -1090,17 +1064,22 @@ export async function sendPaymentConfirmationEmail({
   dropoffAddress: string | null; pickupDatetime: string; vehicleClass: string;
   totalAmount: number; passengers: number; bookingId: string; transactionId?: string;
 }) {
-  const html = bookingConfirmationHtml({
-    confirmationCode,
-    clientFirstName: name.split(" ")[0],
-    pickupAddress,
-    dropoffAddress,
-    pickupDatetime,
-    vehicleClass,
-    passengers,
-    totalAmount,
-  });
-  const id = await sendEmail({ from: FROM, to, subject: `Booking Confirmed — ${confirmationCode} | Elite BCN`, html });
+  const { date, time } = splitDatetime(pickupDatetime);
+  const html = emailDocument(
+    paymentReceiptCard({
+      firstName: name.split(" ")[0],
+      confirmationCode,
+      pickupAddress,
+      dropoffAddress: dropoffAddress ?? "—",
+      date,
+      time,
+      vehicle: vehicleName(vehicleClass),
+      passengers,
+      totalAmount,
+    }),
+    `Payment received — reference ${confirmationCode}`,
+  );
+  const id = await sendEmail({ from: FROM, to, subject: `Payment received — ${confirmationCode} | Elite BCN`, html });
   await logEmail({ to, subject: `Payment Confirmed — ${confirmationCode}`, type: "PAYMENT_CONFIRMATION", resendId: id, bookingId });
 }
 
