@@ -161,12 +161,12 @@ export async function writeReviews(
     },
   });
 
-  revalidateTag(TAG);
+  revalidateTag(TAG, {});
   return { ...cleaned, updatedAt: new Date().toISOString(), updatedBy: adminName };
 }
 
 /** Removes the stored set, returning the site to data/reviews.ts. */
 export async function resetReviews(): Promise<void> {
   await prisma.activityLog.deleteMany({ where: { entity: ENTITY, entityId: ENTITY_ID } });
-  revalidateTag(TAG);
+  revalidateTag(TAG, {});
 }
