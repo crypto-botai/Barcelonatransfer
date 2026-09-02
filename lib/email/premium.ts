@@ -459,9 +459,9 @@ export function paymentReceiptCard(o: {
 }): string {
   return card(`
     <tr><td style="padding:38px 44px 0 44px;">
-      ${eyebrow("Payment Received")}
-      ${headline("Your ride is paid in full.")}
-      ${paragraph(`Thank you, ${esc(o.firstName)}. This email is your receipt &mdash; no further action is needed.`)}
+      ${eyebrow("Booking Confirmed")}
+      ${headline(`Your transfer is confirmed, ${esc(o.firstName)}.`)}
+      ${paragraph("Paid in full, and this email is your receipt. Your chauffeur will be assigned shortly and you will hear from us again the day before you travel.")}
     </td></tr>
 
     ${sectionSpacer(30)}

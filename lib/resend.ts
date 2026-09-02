@@ -842,8 +842,8 @@ export async function sendBookingConfirmation({
     `Your transfer is reserved — reference ${confirmationCode}`,
   );
 
-  const id = await sendEmail({ from: FROM, to, subject: `Booking Confirmed — ${confirmationCode} | Elite BCN`, html });
-  await logEmail({ to, subject: `Booking Confirmed — ${confirmationCode}`, type: "CONFIRMATION", resendId: id, bookingId });
+  const id = await sendEmail({ from: FROM, to, subject: `Booking received — ${confirmationCode} | Elite BCN`, html });
+  await logEmail({ to, subject: `Booking received — ${confirmationCode}`, type: "CONFIRMATION", resendId: id, bookingId });
 }
 
 // ─── Admin Alert ─────────────────────────────────────────────
@@ -1098,7 +1098,7 @@ export async function sendPaymentConfirmationEmail({
     }),
     `Payment received — reference ${confirmationCode}`,
   );
-  const id = await sendEmail({ from: FROM, to, subject: `Payment received — ${confirmationCode} | Elite BCN`, html });
+  const id = await sendEmail({ from: FROM, to, subject: `Booking confirmed — ${confirmationCode} | Elite BCN`, html });
   await logEmail({ to, subject: `Payment Confirmed — ${confirmationCode}`, type: "PAYMENT_CONFIRMATION", resendId: id, bookingId });
 }
 

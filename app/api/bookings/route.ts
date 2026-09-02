@@ -402,29 +402,42 @@ export async function POST(req: NextRequest) {
       await redeemCoupon(body.couponCode, booking.id).catch(() => {});
     }
 
-    // Step 2c & 3: Send emails — awaited so Vercel doesn't kill them before response
+    // Nobody is emailed at this point.
     //
-    // The office is NOT told here. This point in the flow is a booking record
-    // that exists but has not been paid for, and it already generated a
-    // new-lead alert when the customer entered their details a step earlier.
-    // Alerting again here meant two emails about an unpaid booking, and then a
-    // third when the payment actually landed. The office is told once, from
-    // lib/payment-completion.ts, at the point the money arrives.
-    const [confResult] = await Promise.allSettled([
-      sendBookingConfirmation({
-        to:               body.guestEmail,
-        name:             body.guestName,
-        confirmationCode: booking.confirmationCode,
-        pickupAddress:    body.pickupAddress,
-        dropoffAddress:   body.dropoffAddress || body.bookingType,
-        pickupDatetime:   formatPickupDateTime(pickupDatetime),
-        vehicleClass:     body.vehicleClass,
-        totalAmount:      totalWithExtras,
-        passengers:       body.passengers,
-        bookingId:        booking.id,
-      }),
-    ]);
-    if (confResult.status === "rejected")  console.error("[bookings/confirmation-email]", confResult.reason);
+    // The office is not told, because this is a booking record that exists but
+    // has not been paid for, and the same customer already produced a new-lead
+    // alert a step earlier. It hears from lib/payment-completion.ts when the
+    // money arrives.
+    //
+    // The customer is not told either. This used to send them "Booking
+    // Confirmed" here and then a second email once they paid — so the word
+    // "confirmed" reached them before any money had, which is not true and is
+    // the one thing a confirmation email must be. The confirmation is now sent
+    // by lib/payment-completion.ts on payment.
+    //
+    // Except when there is no online payment to wait for. If SumUp is
+    // unreachable or unconfigured the customer is sent to a pending page and
+    // payment is arranged by hand, so nothing downstream would ever write to
+    // them. Those two paths send this instead — worded as a booking received
+    // and not as a confirmation.
+    const sendPendingBookingEmail = async () => {
+      try {
+        await sendBookingConfirmation({
+          to:               body.guestEmail,
+          name:             body.guestName,
+          confirmationCode: booking.confirmationCode,
+          pickupAddress:    body.pickupAddress,
+          dropoffAddress:   body.dropoffAddress || body.bookingType,
+          pickupDatetime:   formatPickupDateTime(pickupDatetime),
+          vehicleClass:     body.vehicleClass,
+          totalAmount:      totalWithExtras,
+          passengers:       body.passengers,
+          bookingId:        booking.id,
+        });
+      } catch (e) {
+        console.error("[bookings/pending-email]", e);
+      }
+    };
 
     // Step 4: Try to create SumUp checkout — if not configured, use WhatsApp fallback
     const sumupConfigured =
@@ -456,6 +469,10 @@ export async function POST(req: NextRequest) {
       } catch (sumupErr) {
         const errMsg = sumupErr instanceof Error ? sumupErr.message : String(sumupErr);
         console.error("[bookings] SumUp checkout failed:", errMsg);
+        // No checkout means no payment webhook, so this is the customer's only
+        // email. Awaited rather than fired and forgotten: the function returns
+        // immediately after, and Vercel can freeze the instance on the way out.
+        await sendPendingBookingEmail();
         return NextResponse.json({
           bookingId:    booking.id,
           checkoutUrl:  `/booking/success?booking_id=${booking.id}`,
@@ -467,7 +484,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Fallback: SumUp not configured — redirect to pending page
+    // Fallback: SumUp not configured — redirect to pending page. Payment is
+    // arranged by hand from here, so again this is the only email they get.
+    await sendPendingBookingEmail();
     return NextResponse.json({
       bookingId:    booking.id,
       checkoutUrl:  `/booking/success?booking_id=${booking.id}`,
