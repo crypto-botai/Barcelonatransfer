@@ -30,7 +30,7 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
   ELECTRIC_VIP:   { baseFare: 28,  pricePerKm: 1.80, pricePerMinute: 0.28, minimumFare: 60  },
   MINIVAN:        { baseFare: 30,  pricePerKm: 1.65, pricePerMinute: 0.28, minimumFare: 65  },
   LUXURY_MINIVAN: { baseFare: 50,  pricePerKm: 2.20, pricePerMinute: 0.40, minimumFare: 75  },
-  MINIBUS:        { baseFare: 70,  pricePerKm: 2.40, pricePerMinute: 0.50, minimumFare: 180 },
+  MINIBUS:        { baseFare: 70,  pricePerKm: 2.40, pricePerMinute: 0.50, minimumFare: 200 },
 };
 
 export const AIRPORT_SURCHARGE = 8;
@@ -86,7 +86,7 @@ export const VEHICLE_DISTANCE_MULTIPLIER: Record<string, number> = {
   BUSINESS: 1.17,
   MINIVAN:  1.23,
   VCLASS:   1.5,
-  MINIBUS:  2.1,
+  MINIBUS:  3.0,
 };
 
 /**

@@ -70,7 +70,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // the database returns, so the page and the checkout read the same figure,
     // and scripts/verify-live-prices.mts quotes every car on every route to
     // prove it.
-    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 200 },
     // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
     // the Business column below is €65, which is the EQE — the Business car —
     // so the EQE needs no per-car price of its own.
@@ -85,7 +85,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "Barcelona City", toLabel: "Barcelona City",
     category: "airport-city",
     note: "Within Barcelona city",
-    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 200 },
     // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
     // the Business column below is €65, which is the EQE — the Business car —
     // so the EQE needs no per-car price of its own.
@@ -96,7 +96,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "CRUISE_TERMINAL",
     fromLabel: "El Prat Airport", toLabel: "Cruise Terminal",
     category: "airport-city",
-    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 200 },
     // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
     // the Business column below is €65, which is the EQE — the Business car —
     // so the EQE needs no per-car price of its own.
@@ -108,7 +108,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "Cruise Terminal", toLabel: "Barcelona City",
     category: "airport-city",
     note: "City-centre traffic route",
-    prices: { ECONOMY: 60, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    prices: { ECONOMY: 60, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 200 },
     // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
     // the Business column below is €65, which is the EQE — the Business car —
     // so the EQE needs no per-car price of its own.
@@ -119,7 +119,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "SANTS_STATION",
     fromLabel: "El Prat Airport", toLabel: "Sants Station",
     category: "airport-city",
-    prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 85, MINIBUS: 155 },
+    prices: { ECONOMY: 50, BUSINESS: 60, MINIVAN: 65, VCLASS: 85, MINIBUS: 200 },
   },
   {
     slug: "bcn-airport-montserrat",
@@ -129,14 +129,14 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // Repriced on the owner's instruction, 7 Aug 2026.
     // Was 95 / 110 / 115 / 140 / 200.
     // Minibus set to keep the 1.43x ratio to V-Class the route already had.
-    prices: { ECONOMY: 110, BUSINESS: 140, MINIVAN: 145, VCLASS: 200, MINIBUS: 285 },
+    prices: { ECONOMY: 110, BUSINESS: 140, MINIVAN: 145, VCLASS: 200, MINIBUS: 400 },
   },
   {
     slug: "bcn-airport-andorra",
     from: "BCN_AIRPORT", to: "ANDORRA",
     fromLabel: "El Prat Airport", toLabel: "Andorra",
     category: "airport-city",
-    prices: { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 630 },
+    prices: { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 900 },
   },
   {
     slug: "bcn-airport-lourdes",
@@ -145,14 +145,14 @@ export const FIXED_ROUTES: FixedRoute[] = [
     category: "airport-city",
     // 415 km each way, ~5h55. A round trip is the driver's whole day, which is
     // what this price reflects rather than the distance alone.
-    prices: { ECONOMY: 750, BUSINESS: 875, MINIVAN: 925, VCLASS: 1125, MINIBUS: 1575 },
+    prices: { ECONOMY: 750, BUSINESS: 875, MINIVAN: 925, VCLASS: 1125, MINIBUS: 2250 },
   },
   {
     slug: "barcelona-city-lourdes",
     from: "BARCELONA_CITY", to: "LOURDES",
     fromLabel: "Barcelona City", toLabel: "Lourdes",
     category: "airport-city",
-    prices: { ECONOMY: 750, BUSINESS: 875, MINIVAN: 925, VCLASS: 1125, MINIBUS: 1575 },
+    prices: { ECONOMY: 750, BUSINESS: 875, MINIVAN: 925, VCLASS: 1125, MINIBUS: 2250 },
   },
   {
     slug: "bcn-airport-girona-airport",
@@ -161,7 +161,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     category: "airport-city",
     // +€25 vs. the Barcelona-City-origin twin — this pickup starts from the
     // airport, not the city, per explicit instruction.
-    prices: { ECONOMY: 165, BUSINESS: 180, MINIVAN: 195, VCLASS: 220, MINIBUS: 280 },
+    prices: { ECONOMY: 165, BUSINESS: 180, MINIVAN: 195, VCLASS: 220, MINIBUS: 400 },
   },
   {
     slug: "bcn-airport-girona-city",
@@ -171,7 +171,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // The Girona Airport ladder with €5 off Minivan and V-Class, per the
     // owner's instruction of 13 Aug 2026. Girona city is 4 km beyond the
     // airport but is the more commonly booked of the two.
-    prices: { ECONOMY: 165, BUSINESS: 180, MINIVAN: 190, VCLASS: 215, MINIBUS: 280 },
+    prices: { ECONOMY: 165, BUSINESS: 180, MINIVAN: 190, VCLASS: 215, MINIBUS: 400 },
   },
   {
     slug: "bcn-airport-la-roca",
@@ -179,7 +179,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "El Prat Airport", toLabel: "La Roca Village",
     category: "airport-city",
     // +€25 vs. the Barcelona-City-origin twin — airport pickup, not city.
-    prices: { ECONOMY: 105, BUSINESS: 125, MINIVAN: 135, VCLASS: 155, MINIBUS: 225 },
+    prices: { ECONOMY: 105, BUSINESS: 125, MINIVAN: 135, VCLASS: 155, MINIBUS: 300 },
   },
   // ── Airport → Costa Dorada (same prices as Barcelona City → Costa Dorada) ──
   {
@@ -187,7 +187,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "CASTELLDEFELS",
     fromLabel: "El Prat Airport", toLabel: "Castelldefels",
     category: "costa-dorada",
-    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 200 },
     // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
     // the Business column below is €65, which is the EQE — the Business car —
     // so the EQE needs no per-car price of its own.
@@ -198,7 +198,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "SITGES",
     fromLabel: "El Prat Airport", toLabel: "Sitges",
     category: "costa-dorada",
-    prices: { ECONOMY: 80, BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 },
+    prices: { ECONOMY: 80, BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 250 },
   },
   {
     slug: "bcn-airport-vilanova",
@@ -206,63 +206,63 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "El Prat Airport", toLabel: "Vilanova i la Geltrú",
     category: "costa-dorada",
     // 36 km by road, between Sitges (30 km, €80) and Cubelles (41 km, €90).
-    prices: { ECONOMY: 85, BUSINESS: 105, MINIVAN: 115, VCLASS: 140, MINIBUS: 205 },
+    prices: { ECONOMY: 85, BUSINESS: 105, MINIVAN: 115, VCLASS: 140, MINIBUS: 300 },
   },
   {
     slug: "bcn-airport-cubelles",
     from: "BCN_AIRPORT", to: "CUBELLES",
     fromLabel: "El Prat Airport", toLabel: "Cubelles",
     category: "costa-dorada",
-    prices: { ECONOMY: 90, BUSINESS: 110, MINIVAN: 120, VCLASS: 145, MINIBUS: 210 },
+    prices: { ECONOMY: 90, BUSINESS: 110, MINIVAN: 120, VCLASS: 145, MINIBUS: 300 },
   },
   {
     slug: "bcn-airport-calafell",
     from: "BCN_AIRPORT", to: "CALAFELL",
     fromLabel: "El Prat Airport", toLabel: "Calafell",
     category: "costa-dorada",
-    prices: { ECONOMY: 100, BUSINESS: 120, MINIVAN: 130, VCLASS: 155, MINIBUS: 220 },
+    prices: { ECONOMY: 100, BUSINESS: 120, MINIVAN: 130, VCLASS: 155, MINIBUS: 300 },
   },
   {
     slug: "bcn-airport-vendrell",
     from: "BCN_AIRPORT", to: "VENDRELL",
     fromLabel: "El Prat Airport", toLabel: "Vendrell",
     category: "costa-dorada",
-    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 165, MINIBUS: 230 },
+    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 165, MINIBUS: 350 },
   },
   {
     slug: "bcn-airport-tarragona",
     from: "BCN_AIRPORT", to: "TARRAGONA",
     fromLabel: "El Prat Airport", toLabel: "Tarragona",
     category: "costa-dorada",
-    prices: { ECONOMY: 150, BUSINESS: 180, MINIVAN: 190, VCLASS: 210, MINIBUS: 270 },
+    prices: { ECONOMY: 150, BUSINESS: 180, MINIVAN: 190, VCLASS: 210, MINIBUS: 400 },
   },
   {
     slug: "bcn-airport-la-pineda",
     from: "BCN_AIRPORT", to: "LA_PINEDA",
     fromLabel: "El Prat Airport", toLabel: "La Pineda",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   {
     slug: "bcn-airport-salou",
     from: "BCN_AIRPORT", to: "SALOU",
     fromLabel: "El Prat Airport", toLabel: "Salou",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   {
     slug: "bcn-airport-portaventura",
     from: "BCN_AIRPORT", to: "PORTAVENTURA",
     fromLabel: "El Prat Airport", toLabel: "PortAventura",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   {
     slug: "bcn-airport-cambrils",
     from: "BCN_AIRPORT", to: "CAMBRILS",
     fromLabel: "El Prat Airport", toLabel: "Cambrils",
     category: "costa-dorada",
-    prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 280 },
+    prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 450 },
   },
   {
     slug: "bcn-airport-reus-airport",
@@ -271,7 +271,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     category: "costa-dorada",
     // 92 km by road, in the same cluster as Salou, La Pineda and PortAventura,
     // all of which sit within 6 km of it and all of which cost €155.
-    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   // ── Airport → Costa Brava (same prices as Barcelona City → Costa Brava) ───
   {
@@ -279,77 +279,77 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "MATARO",
     fromLabel: "El Prat Airport", toLabel: "Mataró",
     category: "costa-brava",
-    prices: { ECONOMY: 90, BUSINESS: 110, MINIVAN: 120, VCLASS: 145, MINIBUS: 210 },
+    prices: { ECONOMY: 90, BUSINESS: 110, MINIVAN: 120, VCLASS: 145, MINIBUS: 300 },
   },
   {
     slug: "bcn-airport-calella",
     from: "BCN_AIRPORT", to: "CALELLA",
     fromLabel: "El Prat Airport", toLabel: "Calella",
     category: "costa-brava",
-    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 165, MINIBUS: 230 },
+    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 165, MINIBUS: 350 },
   },
   {
     slug: "bcn-airport-pineda-de-mar",
     from: "BCN_AIRPORT", to: "PINEDA_DE_MAR",
     fromLabel: "El Prat Airport", toLabel: "Pineda de Mar",
     category: "costa-brava",
-    prices: { ECONOMY: 115, BUSINESS: 135, MINIVAN: 150, VCLASS: 170, MINIBUS: 235 },
+    prices: { ECONOMY: 115, BUSINESS: 135, MINIVAN: 150, VCLASS: 170, MINIBUS: 350 },
   },
   {
     slug: "bcn-airport-santa-susanna",
     from: "BCN_AIRPORT", to: "SANTA_SUSANNA",
     fromLabel: "El Prat Airport", toLabel: "Santa Susanna",
     category: "costa-brava",
-    prices: { ECONOMY: 120, BUSINESS: 140, MINIVAN: 155, VCLASS: 175, MINIBUS: 240 },
+    prices: { ECONOMY: 120, BUSINESS: 140, MINIVAN: 155, VCLASS: 175, MINIBUS: 350 },
   },
   {
     slug: "bcn-airport-malgrat",
     from: "BCN_AIRPORT", to: "MALGRAT",
     fromLabel: "El Prat Airport", toLabel: "Malgrat de Mar",
     category: "costa-brava",
-    prices: { ECONOMY: 125, BUSINESS: 145, MINIVAN: 160, VCLASS: 180, MINIBUS: 245 },
+    prices: { ECONOMY: 125, BUSINESS: 145, MINIVAN: 160, VCLASS: 180, MINIBUS: 350 },
   },
   {
     slug: "bcn-airport-blanes",
     from: "BCN_AIRPORT", to: "BLANES",
     fromLabel: "El Prat Airport", toLabel: "Blanes",
     category: "costa-brava",
-    prices: { ECONOMY: 135, BUSINESS: 155, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 },
+    prices: { ECONOMY: 135, BUSINESS: 155, MINIVAN: 170, VCLASS: 195, MINIBUS: 400 },
   },
   {
     slug: "bcn-airport-lloret",
     from: "BCN_AIRPORT", to: "LLORET",
     fromLabel: "El Prat Airport", toLabel: "Lloret de Mar",
     category: "costa-brava",
-    prices: { ECONOMY: 145, BUSINESS: 165, MINIVAN: 180, VCLASS: 205, MINIBUS: 265 },
+    prices: { ECONOMY: 145, BUSINESS: 165, MINIVAN: 180, VCLASS: 205, MINIBUS: 400 },
   },
   {
     slug: "bcn-airport-tossa",
     from: "BCN_AIRPORT", to: "TOSSA",
     fromLabel: "El Prat Airport", toLabel: "Tossa de Mar",
     category: "costa-brava",
-    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   {
     slug: "bcn-airport-sagaro",
     from: "BCN_AIRPORT", to: "SAGARO",
     fromLabel: "El Prat Airport", toLabel: "S'Agaró",
     category: "costa-brava",
-    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   {
     slug: "bcn-airport-platja-daro",
     from: "BCN_AIRPORT", to: "PLATJA_DARO",
     fromLabel: "El Prat Airport", toLabel: "Platja d'Aro",
     category: "costa-brava",
-    prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 280 },
+    prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 450 },
   },
   {
     slug: "bcn-airport-palamos",
     from: "BCN_AIRPORT", to: "PALAMOS",
     fromLabel: "El Prat Airport", toLabel: "Palamós",
     category: "costa-brava",
-    prices: { ECONOMY: 185, BUSINESS: 205, MINIVAN: 225, VCLASS: 250, MINIBUS: 305 },
+    prices: { ECONOMY: 185, BUSINESS: 205, MINIVAN: 225, VCLASS: 250, MINIBUS: 500 },
   },
   {
     slug: "bcn-airport-begur",
@@ -359,42 +359,42 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // 146 km by road, between Palamós (132 km, €185) and Figueres (155 km,
     // €200). Aiguablava is a cove inside the Begur municipality, four minutes
     // down the same road, so it takes the same fare.
-    prices: { ECONOMY: 200, BUSINESS: 220, MINIVAN: 240, VCLASS: 265, MINIBUS: 320 },
+    prices: { ECONOMY: 200, BUSINESS: 220, MINIVAN: 240, VCLASS: 265, MINIBUS: 550 },
   },
   {
     slug: "bcn-airport-roses",
     from: "BCN_AIRPORT", to: "ROSES",
     fromLabel: "El Prat Airport", toLabel: "Roses",
     category: "costa-brava",
-    prices: { ECONOMY: 205, BUSINESS: 225, MINIVAN: 250, VCLASS: 270, MINIBUS: 325 },
+    prices: { ECONOMY: 205, BUSINESS: 225, MINIVAN: 250, VCLASS: 270, MINIBUS: 550 },
   },
   {
     slug: "bcn-airport-empuriabrava",
     from: "BCN_AIRPORT", to: "EMPURIABRAVA",
     fromLabel: "El Prat Airport", toLabel: "Empuriabrava",
     category: "costa-brava",
-    prices: { ECONOMY: 210, BUSINESS: 230, MINIVAN: 255, VCLASS: 275, MINIBUS: 330 },
+    prices: { ECONOMY: 210, BUSINESS: 230, MINIVAN: 255, VCLASS: 275, MINIBUS: 550 },
   },
   {
     slug: "bcn-airport-figueres",
     from: "BCN_AIRPORT", to: "FIGUERES",
     fromLabel: "El Prat Airport", toLabel: "Figueres",
     category: "costa-brava",
-    prices: { ECONOMY: 200, BUSINESS: 220, MINIVAN: 240, VCLASS: 265, MINIBUS: 320 },
+    prices: { ECONOMY: 200, BUSINESS: 220, MINIVAN: 240, VCLASS: 265, MINIBUS: 550 },
   },
   {
     slug: "bcn-airport-cadaques",
     from: "BCN_AIRPORT", to: "CADAQUES",
     fromLabel: "El Prat Airport", toLabel: "Cadaqués",
     category: "costa-brava",
-    prices: { ECONOMY: 240, BUSINESS: 280, MINIVAN: 285, VCLASS: 320, MINIBUS: 360 },
+    prices: { ECONOMY: 240, BUSINESS: 280, MINIVAN: 285, VCLASS: 320, MINIBUS: 650 },
   },
   {
     slug: "barcelona-city-la-roca",
     from: "BARCELONA_CITY", to: "LA_ROCA",
     fromLabel: "Barcelona City", toLabel: "La Roca Village",
     category: "airport-city",
-    prices: { ECONOMY: 80, BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 },
+    prices: { ECONOMY: 80, BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 250 },
   },
   {
     slug: "barcelona-city-montserrat",
@@ -405,14 +405,14 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // route. Was 115 / 130 / 155 / 175 / 240 — so Economy, Minivan and Minibus
     // fall here while V-Class rises. The owner confirmed this knowingly: the
     // city route previously cost more than the airport one.
-    prices: { ECONOMY: 110, BUSINESS: 140, MINIVAN: 145, VCLASS: 200, MINIBUS: 285 },
+    prices: { ECONOMY: 110, BUSINESS: 140, MINIVAN: 145, VCLASS: 200, MINIBUS: 400 },
   },
   {
     slug: "barcelona-city-girona-airport",
     from: "BARCELONA_CITY", to: "GIRONA_AIRPORT",
     fromLabel: "Barcelona City", toLabel: "Girona Airport",
     category: "airport-city",
-    prices: { ECONOMY: 140, BUSINESS: 170, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 },
+    prices: { ECONOMY: 140, BUSINESS: 170, MINIVAN: 170, VCLASS: 195, MINIBUS: 400 },
   },
   {
     slug: "barcelona-city-girona-city",
@@ -420,14 +420,14 @@ export const FIXED_ROUTES: FixedRoute[] = [
     fromLabel: "Barcelona City", toLabel: "Girona City",
     category: "airport-city",
     // As above: €5 off Minivan and V-Class against the Girona Airport ladder.
-    prices: { ECONOMY: 140, BUSINESS: 170, MINIVAN: 165, VCLASS: 190, MINIBUS: 255 },
+    prices: { ECONOMY: 140, BUSINESS: 170, MINIVAN: 165, VCLASS: 190, MINIBUS: 400 },
   },
   {
     slug: "barcelona-city-andorra",
     from: "BARCELONA_CITY", to: "ANDORRA",
     fromLabel: "Barcelona City", toLabel: "Andorra",
     category: "airport-city",
-    prices: { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 630 },
+    prices: { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 900 },
   },
   // ── Costa Dorada ──────────────────────────────────────────────────────────
   {
@@ -435,7 +435,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "CASTELLDEFELS",
     fromLabel: "Barcelona City", toLabel: "Castelldefels",
     category: "costa-dorada",
-    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 180 },
+    prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 200 },
     // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
     // the Business column below is €65, which is the EQE — the Business car —
     // so the EQE needs no per-car price of its own.
@@ -446,77 +446,77 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "SITGES",
     fromLabel: "Barcelona City", toLabel: "Sitges",
     category: "costa-dorada",
-    prices: { ECONOMY: 80, BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 200 },
+    prices: { ECONOMY: 80, BUSINESS: 100, MINIVAN: 110, VCLASS: 130, MINIBUS: 250 },
   },
   {
     slug: "barcelona-city-vilanova",
     from: "BARCELONA_CITY", to: "VILANOVA",
     fromLabel: "Barcelona City", toLabel: "Vilanova i la Geltrú",
     category: "costa-dorada",
-    prices: { ECONOMY: 85, BUSINESS: 105, MINIVAN: 115, VCLASS: 140, MINIBUS: 205 },
+    prices: { ECONOMY: 85, BUSINESS: 105, MINIVAN: 115, VCLASS: 140, MINIBUS: 300 },
   },
   {
     slug: "barcelona-city-cubelles",
     from: "BARCELONA_CITY", to: "CUBELLES",
     fromLabel: "Barcelona City", toLabel: "Cubelles",
     category: "costa-dorada",
-    prices: { ECONOMY: 90, BUSINESS: 110, MINIVAN: 120, VCLASS: 145, MINIBUS: 210 },
+    prices: { ECONOMY: 90, BUSINESS: 110, MINIVAN: 120, VCLASS: 145, MINIBUS: 300 },
   },
   {
     slug: "barcelona-city-calafell",
     from: "BARCELONA_CITY", to: "CALAFELL",
     fromLabel: "Barcelona City", toLabel: "Calafell",
     category: "costa-dorada",
-    prices: { ECONOMY: 100, BUSINESS: 120, MINIVAN: 130, VCLASS: 155, MINIBUS: 220 },
+    prices: { ECONOMY: 100, BUSINESS: 120, MINIVAN: 130, VCLASS: 155, MINIBUS: 300 },
   },
   {
     slug: "barcelona-city-vendrell",
     from: "BARCELONA_CITY", to: "VENDRELL",
     fromLabel: "Barcelona City", toLabel: "Vendrell",
     category: "costa-dorada",
-    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 165, MINIBUS: 230 },
+    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 165, MINIBUS: 350 },
   },
   {
     slug: "barcelona-city-tarragona",
     from: "BARCELONA_CITY", to: "TARRAGONA",
     fromLabel: "Barcelona City", toLabel: "Tarragona",
     category: "costa-dorada",
-    prices: { ECONOMY: 150, BUSINESS: 180, MINIVAN: 190, VCLASS: 210, MINIBUS: 270 },
+    prices: { ECONOMY: 150, BUSINESS: 180, MINIVAN: 190, VCLASS: 210, MINIBUS: 400 },
   },
   {
     slug: "barcelona-city-la-pineda",
     from: "BARCELONA_CITY", to: "LA_PINEDA",
     fromLabel: "Barcelona City", toLabel: "La Pineda",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   {
     slug: "barcelona-city-salou",
     from: "BARCELONA_CITY", to: "SALOU",
     fromLabel: "Barcelona City", toLabel: "Salou",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   {
     slug: "barcelona-city-portaventura",
     from: "BARCELONA_CITY", to: "PORTAVENTURA",
     fromLabel: "Barcelona City", toLabel: "PortAventura",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   {
     slug: "barcelona-city-cambrils",
     from: "BARCELONA_CITY", to: "CAMBRILS",
     fromLabel: "Barcelona City", toLabel: "Cambrils",
     category: "costa-dorada",
-    prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 280 },
+    prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 450 },
   },
   {
     slug: "barcelona-city-reus-airport",
     from: "BARCELONA_CITY", to: "REUS_AIRPORT",
     fromLabel: "Barcelona City", toLabel: "Reus Airport (REU)",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   // ── Costa Brava ───────────────────────────────────────────────────────────
   {
@@ -524,112 +524,112 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "MATARO",
     fromLabel: "Barcelona City", toLabel: "Mataró",
     category: "costa-brava",
-    prices: { ECONOMY: 90, BUSINESS: 110, MINIVAN: 120, VCLASS: 145, MINIBUS: 210 },
+    prices: { ECONOMY: 90, BUSINESS: 110, MINIVAN: 120, VCLASS: 145, MINIBUS: 300 },
   },
   {
     slug: "barcelona-city-calella",
     from: "BARCELONA_CITY", to: "CALELLA",
     fromLabel: "Barcelona City", toLabel: "Calella",
     category: "costa-brava",
-    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 165, MINIBUS: 230 },
+    prices: { ECONOMY: 110, BUSINESS: 130, MINIVAN: 145, VCLASS: 165, MINIBUS: 350 },
   },
   {
     slug: "barcelona-city-pineda-de-mar",
     from: "BARCELONA_CITY", to: "PINEDA_DE_MAR",
     fromLabel: "Barcelona City", toLabel: "Pineda de Mar",
     category: "costa-brava",
-    prices: { ECONOMY: 115, BUSINESS: 135, MINIVAN: 150, VCLASS: 170, MINIBUS: 235 },
+    prices: { ECONOMY: 115, BUSINESS: 135, MINIVAN: 150, VCLASS: 170, MINIBUS: 350 },
   },
   {
     slug: "barcelona-city-santa-susanna",
     from: "BARCELONA_CITY", to: "SANTA_SUSANNA",
     fromLabel: "Barcelona City", toLabel: "Santa Susanna",
     category: "costa-brava",
-    prices: { ECONOMY: 120, BUSINESS: 140, MINIVAN: 155, VCLASS: 175, MINIBUS: 240 },
+    prices: { ECONOMY: 120, BUSINESS: 140, MINIVAN: 155, VCLASS: 175, MINIBUS: 350 },
   },
   {
     slug: "barcelona-city-malgrat",
     from: "BARCELONA_CITY", to: "MALGRAT",
     fromLabel: "Barcelona City", toLabel: "Malgrat de Mar",
     category: "costa-brava",
-    prices: { ECONOMY: 125, BUSINESS: 145, MINIVAN: 160, VCLASS: 180, MINIBUS: 245 },
+    prices: { ECONOMY: 125, BUSINESS: 145, MINIVAN: 160, VCLASS: 180, MINIBUS: 350 },
   },
   {
     slug: "barcelona-city-blanes",
     from: "BARCELONA_CITY", to: "BLANES",
     fromLabel: "Barcelona City", toLabel: "Blanes",
     category: "costa-brava",
-    prices: { ECONOMY: 135, BUSINESS: 155, MINIVAN: 170, VCLASS: 195, MINIBUS: 255 },
+    prices: { ECONOMY: 135, BUSINESS: 155, MINIVAN: 170, VCLASS: 195, MINIBUS: 400 },
   },
   {
     slug: "barcelona-city-lloret",
     from: "BARCELONA_CITY", to: "LLORET",
     fromLabel: "Barcelona City", toLabel: "Lloret de Mar",
     category: "costa-brava",
-    prices: { ECONOMY: 145, BUSINESS: 165, MINIVAN: 180, VCLASS: 205, MINIBUS: 265 },
+    prices: { ECONOMY: 145, BUSINESS: 165, MINIVAN: 180, VCLASS: 205, MINIBUS: 400 },
   },
   {
     slug: "barcelona-city-tossa",
     from: "BARCELONA_CITY", to: "TOSSA",
     fromLabel: "Barcelona City", toLabel: "Tossa de Mar",
     category: "costa-brava",
-    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   {
     slug: "barcelona-city-sagaro",
     from: "BARCELONA_CITY", to: "SAGARO",
     fromLabel: "Barcelona City", toLabel: "S'Agaró",
     category: "costa-brava",
-    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 275 },
+    prices: { ECONOMY: 155, BUSINESS: 175, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
   },
   {
     slug: "barcelona-city-platja-daro",
     from: "BARCELONA_CITY", to: "PLATJA_DARO",
     fromLabel: "Barcelona City", toLabel: "Platja d'Aro",
     category: "costa-brava",
-    prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 280 },
+    prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 450 },
   },
   {
     slug: "barcelona-city-palamos",
     from: "BARCELONA_CITY", to: "PALAMOS",
     fromLabel: "Barcelona City", toLabel: "Palamós",
     category: "costa-brava",
-    prices: { ECONOMY: 185, BUSINESS: 205, MINIVAN: 225, VCLASS: 250, MINIBUS: 305 },
+    prices: { ECONOMY: 185, BUSINESS: 205, MINIVAN: 225, VCLASS: 250, MINIBUS: 500 },
   },
   {
     slug: "barcelona-city-begur",
     from: "BARCELONA_CITY", to: "BEGUR",
     fromLabel: "Barcelona City", toLabel: "Begur / Aiguablava",
     category: "costa-brava",
-    prices: { ECONOMY: 200, BUSINESS: 220, MINIVAN: 240, VCLASS: 265, MINIBUS: 320 },
+    prices: { ECONOMY: 200, BUSINESS: 220, MINIVAN: 240, VCLASS: 265, MINIBUS: 550 },
   },
   {
     slug: "barcelona-city-roses",
     from: "BARCELONA_CITY", to: "ROSES",
     fromLabel: "Barcelona City", toLabel: "Roses",
     category: "costa-brava",
-    prices: { ECONOMY: 205, BUSINESS: 225, MINIVAN: 250, VCLASS: 270, MINIBUS: 325 },
+    prices: { ECONOMY: 205, BUSINESS: 225, MINIVAN: 250, VCLASS: 270, MINIBUS: 550 },
   },
   {
     slug: "barcelona-city-empuriabrava",
     from: "BARCELONA_CITY", to: "EMPURIABRAVA",
     fromLabel: "Barcelona City", toLabel: "Empuriabrava",
     category: "costa-brava",
-    prices: { ECONOMY: 210, BUSINESS: 230, MINIVAN: 255, VCLASS: 275, MINIBUS: 330 },
+    prices: { ECONOMY: 210, BUSINESS: 230, MINIVAN: 255, VCLASS: 275, MINIBUS: 550 },
   },
   {
     slug: "barcelona-city-figueres",
     from: "BARCELONA_CITY", to: "FIGUERES",
     fromLabel: "Barcelona City", toLabel: "Figueres",
     category: "costa-brava",
-    prices: { ECONOMY: 200, BUSINESS: 220, MINIVAN: 240, VCLASS: 265, MINIBUS: 320 },
+    prices: { ECONOMY: 200, BUSINESS: 220, MINIVAN: 240, VCLASS: 265, MINIBUS: 550 },
   },
   {
     slug: "barcelona-city-cadaques",
     from: "BARCELONA_CITY", to: "CADAQUES",
     fromLabel: "Barcelona City", toLabel: "Cadaqués",
     category: "costa-brava",
-    prices: { ECONOMY: 240, BUSINESS: 280, MINIVAN: 285, VCLASS: 320, MINIBUS: 360 },
+    prices: { ECONOMY: 240, BUSINESS: 280, MINIVAN: 285, VCLASS: 320, MINIBUS: 650 },
   },
 ];
 
