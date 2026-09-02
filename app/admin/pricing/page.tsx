@@ -1,6 +1,7 @@
 import { getAdminRoutes, getPricingSettings } from "@/lib/pricing-service";
 import AdminPricingGrid from "./AdminPricingGrid";
 import SyncRoutesButton from "@/components/admin/SyncRoutesButton";
+import ApplyTablePricesButton from "@/components/admin/ApplyTablePricesButton";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,9 @@ export default async function AdminPricingPage() {
       </div>
       {/* Renders only when the code has routes the database has not got yet. */}
       <SyncRoutesButton />
+      {/* And this one when a route the database already has is priced
+          differently in code — the case the sync above deliberately ignores. */}
+      <ApplyTablePricesButton vehicleCode="MINIBUS" />
       <AdminPricingGrid routes={routes} settings={settings} />
     </div>
   );
