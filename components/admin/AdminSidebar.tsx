@@ -3,13 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import {
-  LayoutDashboard, CalendarCheck, Car, Users, DollarSign,
-  Settings, LogOut, ChevronRight, ChevronDown, Wallet, Clock,
-  Tag, Mail, BarChart2, TrendingUp, UserCheck, PieChart, Menu, X,
-  Building2, Brain, Activity, Bell, BookOpen, Zap, CreditCard,
-  FlaskConical, MessageSquare, Eye, Shield, Key, Radar,
-} from "lucide-react";
+import { LayoutDashboard, CalendarCheck, Car, Users, DollarSign, Settings, LogOut, ChevronRight, ChevronDown, Wallet, Clock, Tag, Mail, BarChart2, TrendingUp, UserCheck, PieChart, Menu, X, Building2, Brain, Activity, Bell, BookOpen, Zap, CreditCard, FlaskConical, MessageSquare, Eye, Shield, Key, Radar, Star } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +27,7 @@ const NAV: NavItem[] = [
   { icon: Wallet,          label: "Withdrawals", href: "/admin/withdrawals" },
   { icon: Car,             label: "Fleet",       href: "/admin/fleet" },
   { icon: DollarSign,      label: "Pricing",     href: "/admin/pricing" },
+  { icon: Star,            label: "Reviews",     href: "/admin/reviews" },
   { icon: Clock,           label: "Abandoned",   href: "/admin/abandoned" },
   { icon: Tag,             label: "Coupons",     href: "/admin/coupons" },
   { icon: Mail,            label: "Newsletter",  href: "/admin/newsletter" },

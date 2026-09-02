@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight, Star, BadgeCheck } from "lucide-react";
-import { REVIEWS, GOOGLE_PROFILE, initials } from "@/data/reviews";
+import { REVIEWS, GOOGLE_PROFILE, initials, type Review } from "@/data/reviews";
 
 /**
  * Real Google reviews.
@@ -18,7 +18,14 @@ import { REVIEWS, GOOGLE_PROFILE, initials } from "@/data/reviews";
  * checked against it. It is shown per review rather than blanket, so an entry
  * that has not been verified cannot borrow the credibility of one that has.
  */
-export default function TestimonialsSection() {
+export default function TestimonialsSection({
+  reviews = REVIEWS,
+  profile = GOOGLE_PROFILE,
+}: {
+  /** Live reviews from the admin panel. Falls back to data/reviews.ts. */
+  reviews?: readonly Review[];
+  profile?: { name: string; cid: string; rating: number; count: number };
+} = {}) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: "left" | "right") => {
@@ -28,7 +35,7 @@ export default function TestimonialsSection() {
     el.scrollBy({ left: dir === "right" ? cardWidth * 2 : -cardWidth * 2, behavior: "smooth" });
   };
 
-  if (REVIEWS.length === 0) return null;
+  if (reviews.length === 0) return null;
 
   return (
     <section className="py-20 bg-[#070707] border-t border-white/[0.06]">
@@ -45,14 +52,14 @@ export default function TestimonialsSection() {
 
           {/* The rating as it stands on the Google profile. The owner asked for
               no review total on the page — the reviews themselves are the
-              evidence. GOOGLE_PROFILE.count still governs how many may be
+              evidence. profile.count still governs how many may be
               listed, and still feeds the structured data, where a count is
               required to be accurate rather than hidden. */}
           {/* A link, not a card. The profile was referenced in structured data
               on every page and nowhere a reader could click — and it is also
               where the next review comes from. */}
           <a
-            href={`https://www.google.com/maps?cid=${GOOGLE_PROFILE.cid}`}
+            href={`https://www.google.com/maps?cid=${profile.cid}`}
             target="_blank"
             rel="noreferrer"
             className="group inline-flex items-center gap-3 px-5 py-3 rounded-2xl border border-gold-500/20 bg-gold-500/[0.04] hover:border-gold-500/40 hover:bg-gold-500/[0.07] transition-colors"
@@ -63,9 +70,9 @@ export default function TestimonialsSection() {
             <div className="text-left">
               <div className="flex items-center gap-1.5">
                 <span className="font-display text-xl text-white leading-none">
-                  {GOOGLE_PROFILE.rating.toFixed(1)}
+                  {profile.rating.toFixed(1)}
                 </span>
-                <span className="flex" role="img" aria-label={`Rated ${GOOGLE_PROFILE.rating} out of 5`}>
+                <span className="flex" role="img" aria-label={`Rated ${profile.rating} out of 5`}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} size={13} className="fill-gold-500 text-gold-500" />
                   ))}
@@ -85,7 +92,7 @@ export default function TestimonialsSection() {
             ref={scrollRef}
             className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 scrollbar-hide"
           >
-            {REVIEWS.map((r) => (
+            {reviews.map((r) => (
               <article
                 key={`${r.author}-${r.when}`}
                 className="snap-center flex-shrink-0 w-[300px] sm:w-[380px] glass-card rounded-2xl p-6 flex flex-col"
@@ -133,7 +140,7 @@ export default function TestimonialsSection() {
           </div>
 
           {/* Arrows appear only when there is more than one screen of cards. */}
-          {REVIEWS.length > 2 && (
+          {reviews.length > 2 && (
             <div className="flex justify-center gap-3 mt-6">
               <button
                 onClick={() => scroll("left")}

@@ -11,6 +11,7 @@ import HowItWorksSection from "@/components/sections/HowItWorksSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import FAQSection from "@/components/sections/FAQSection";
 import { getPublicRoutes } from "@/lib/pricing-service";
+import { readReviews } from "@/lib/reviews-store";
 import { SHARED_OG } from "@/lib/seo";
 import { alternatesFor } from "@/lib/i18n";
 
@@ -32,7 +33,9 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const routes = await getPublicRoutes();
+  // Both cached and tagged, so the homepage stays static between an admin
+  // saving a price or a review and the tag being flushed.
+  const [routes, reviewData] = await Promise.all([getPublicRoutes(), readReviews()]);
 
   return (
     <>
@@ -47,7 +50,7 @@ export default async function HomePage() {
             what it costs is the one who wants to know whether it is any good.
             The explanation of how a transfer works sits below them — it answers
             questions somebody already interested will have. */}
-        <TestimonialsSection />
+        <TestimonialsSection reviews={reviewData.reviews} profile={reviewData.profile} />
         <HowItWorksSection />
         <FAQSection />
       </main>
