@@ -1,6 +1,6 @@
 // i18n constants — used by I18nProvider, LanguageSwitcher, and locale-aware utils
 
-export const SUPPORTED_LOCALES = ["en", "es", "fr", "ar", "ru", "zh", "de", "it"] as const;
+export const SUPPORTED_LOCALES = ["en", "es", "fr", "ar", "ru", "zh", "de", "it", "pt"] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: SupportedLocale = "en";
 export const RTL_LOCALES: SupportedLocale[] = ["ar"];
@@ -14,6 +14,7 @@ export const LANGUAGE_META: Record<SupportedLocale, { native: string; flag: stri
   zh: { native: "中文",     flag: "🇨🇳", font: "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" },
   de: { native: "Deutsch",  flag: "🇩🇪" },
   it: { native: "Italiano", flag: "🇮🇹" },
+  pt: { native: "Português", flag: "🇵🇹" },
 };
 
 const COUNTRY_MAP: Record<string, SupportedLocale> = {
@@ -24,6 +25,10 @@ const COUNTRY_MAP: Record<string, SupportedLocale> = {
   CN: "zh", TW: "zh", HK: "zh", SG: "zh",
   DE: "de", AT: "de",
   IT: "it",
+  // Brazil maps here too: the wording is European Portuguese, which a
+  // Brazilian reader understands, and no Portuguese is far worse than the
+  // wrong variant of it.
+  PT: "pt", BR: "pt", AO: "pt", MZ: "pt",
 };
 
 export function localeFromCountry(countryCode: string): SupportedLocale | null {

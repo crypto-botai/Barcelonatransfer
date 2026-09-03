@@ -39,6 +39,7 @@ const LOADERS: Record<Exclude<SupportedLocale, "en">, () => Promise<{ default: u
   zh: () => import("@/messages/zh.json"),
   de: () => import("@/messages/de.json"),
   it: () => import("@/messages/it.json"),
+  pt: () => import("@/messages/pt.json"),
 };
 
 const CACHE = new Map<SupportedLocale, Messages>([["en", enMsg]]);

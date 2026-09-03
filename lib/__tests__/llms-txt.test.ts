@@ -85,7 +85,7 @@ describe("stated facts match the site's own data", () => {
     // The old files claimed Catalan, which the site does not publish.
     expect(text).not.toMatch(/Catalan/);
     expect(text).toMatch(/English, Spanish, French/);
-    expect(SUPPORTED_LOCALES.length).toBe(8);
+    expect(SUPPORTED_LOCALES.length).toBe(9);
   });
 
   it.each(FILES)("%s prices child seats and meet & greet as paid extras", (_name, text) => {

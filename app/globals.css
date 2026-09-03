@@ -39,24 +39,22 @@
     /* No scroll-snap on root — prevents sections from hijacking scroll */
     overflow-anchor: none;
 
-    /* Stops the layout viewport widening past the screen.
+    /* Matches the horizontal clip body already has.
      *
-     * body already clips horizontally, and body measures correctly at the
-     * device width. The root element did not: its scrollWidth read 575 on a
-     * 390-wide phone, because a fixed-position element is not clipped by an
-     * ancestor's overflow and so still counts towards the root's scroll area.
+     * Honest note on what this does and does not fix. The root element's
+     * scrollWidth reads 575 on a 390-wide phone while body correctly reads 390,
+     * and under mobile emulation that makes the layout viewport widen to 575 —
+     * which is what stops a tap reaching the language button in the header.
      *
-     * A mobile browser answers a document wider than the screen by widening
-     * the layout viewport to fit and scaling the result down. Everything then
-     * renders about a third smaller than it was laid out, and — this is what
-     * made it a bug rather than a blemish — a tap lands where the element used
-     * to be rather than where it now appears. The language menu was the worst
-     * of it: automated clicks on that button could not reach it at all, while
-     * calling click() on the element in script opened the menu instantly.
+     * This rule does NOT fix that. It was added on the theory that it would and
+     * the measurement did not move: fixed-position elements are not clipped by
+     * an ancestor's overflow, so whatever is widening the root is still doing
+     * it. The rule is kept only because clipping the root alongside the body is
+     * reasonable hardening in its own right.
      *
      * clip rather than hidden: hidden on the root creates a scroll container
-     * and forces overflow-y to auto, which breaks position: sticky further
-     * down the page. clip does the clipping without either side effect.
+     * and forces overflow-y to auto, which breaks position: sticky further down
+     * the page. clip clips without either side effect.
      */
     overflow-x: clip;
   }

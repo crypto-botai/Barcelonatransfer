@@ -1,0 +1,388 @@
+{
+  "nav": {
+    "services": "Serviços",
+    "fleet": "Frota",
+    "pricing": "Preços",
+    "transfers": "Transferes",
+    "airportTransfers": "Transferes de Aeroporto",
+    "corporateTravel": "Viagens de Empresa",
+    "hourlyChaufeur": "Motorista à Hora",
+    "about": "Sobre nós",
+    "contact": "Contacto",
+    "bookNow": "Reservar",
+    "signIn": "Entrar",
+    "dashboard": "Área Pessoal",
+    "mobileBook": "Reserve o Seu Transfer"
+  },
+  "hero": {
+    "badge": "O serviço de motorista privado nº 1 de Barcelona",
+    "title1": "Barcelona",
+    "title2": "Transferes Privados",
+    "title3": "de Luxo",
+    "description": "Serviço de motorista privado com Mercedes EQE 300 Electric, V-Class VIP, Tesla Model 3 e Vito. Transferes de aeroporto, viagens executivas e transporte VIP em Barcelona e em toda a Espanha.",
+    "trust": {
+      "meetGreet": "Receção Personalizada",
+      "flightMonitoring": "Monitorização de Voos",
+      "freeWaiting": "Espera Gratuita",
+      "fixedPrices": "Preços Fixos",
+      "support": "Apoio 24/7"
+    },
+    "cta": {
+      "book": "Reserve o Seu Transfer",
+      "fleet": "Ver a Nossa Frota"
+    },
+    "stats": {
+      "clients": "Transferes Realizados",
+      "rating": "Avaliação Google",
+      "years": "Anos de Atividade"
+    },
+    "badges": {
+      "rating": "Avaliação Google",
+      "ratingsSub": "avaliações",
+      "vtc": "VTC Licenciada",
+      "vtcSub": "Totalmente segurada",
+      "service": "Serviço 24/7",
+      "serviceSub": "Sempre disponível",
+      "transfers": "Mais de 5.000 Transferes",
+      "transfersSub": "Desde 2018"
+    }
+  },
+  "fleet": {
+    "sectionLabel": "A Nossa Frota",
+    "title": "Escolha o Seu",
+    "titleAccent": "Veículo de Luxo",
+    "subtitle": "Cada carro indica quantas pessoas leva e quanta bagagem transporta.",
+    "allVehicles": "Todos os Veículos",
+    "collectionLabel": "Coleção Completa",
+    "collectionTitle": "Todos os Veículos,",
+    "collectionAccent": "em Detalhe",
+    "from": "Desde",
+    "startingFrom": "A partir de",
+    "bookNow": "Reservar",
+    "reserveVehicle": "Reservar Este Veículo",
+    "reserveNow": "Reservar Agora",
+    "pax": "pax",
+    "bags": "malas",
+    "passengers": "passageiros",
+    "maxCapacity": "capacidade máxima",
+    "luggage": "bagagem",
+    "inclVat": "preço fixo · IVA e portagens não incluídos",
+    "pricingNote": "Preço fixo por veículo, sem IVA nem portagens. O IVA de 10% só é acrescentado se pedir fatura; as portagens são cobradas à parte. Motorista, veículo e combustível incluídos. Receção personalizada, cadeiras de criança e outros extras são opcionais e cobrados à parte."
+  },
+  "services": {
+    "label": "Os Nossos Serviços",
+    "title": "Serviços de Motorista",
+    "titleAccent": "Privado",
+    "subtitle": "Cada viagem pensada ao pormenor — da chegada ao aeroporto a passeios privados pela Catalunha e por Espanha.",
+    "learnMore": "Saber mais",
+    "features": {
+      "flightMonitoring": "Monitorização de Voos",
+      "freeWaiting": "Espera Gratuita",
+      "meetGreet": "Receção Personalizada",
+      "fixedPrices": "Preços Fixos",
+      "realTime": "Acompanhamento em tempo real",
+      "sixtyMin": "60 min nos aeroportos",
+      "nameBoard": "O seu nome no tablet do motorista",
+      "noSurge": "Sem preços dinâmicos, nunca"
+    },
+    "list": {
+      "airport": {
+        "title": "Transferes de Aeroporto",
+        "desc": "Receção personalizada com monitorização do voo em tempo real. 60 minutos de espera gratuitos."
+      },
+      "cruise": {
+        "title": "Transferes para o Porto de Cruzeiros",
+        "desc": "Serviço porta-a-navio no Terminal de Cruzeiros de Barcelona."
+      },
+      "executive": {
+        "title": "Motorista Executivo",
+        "desc": "Motorista profissional dedicado para reuniões de negócios e eventos de empresa."
+      },
+      "corporate": {
+        "title": "Contas de Empresa",
+        "desc": "Contas de empresa com frota prioritária, faturação e gestor dedicado."
+      },
+      "vipEvents": {
+        "title": "Eventos VIP",
+        "desc": "Transporte de luxo para casamentos, galas, rodagens e eventos privados."
+      },
+      "hourly": {
+        "title": "Motorista à Hora",
+        "desc": "O seu motorista privado à disposição — mínimo 4 horas, máxima flexibilidade."
+      },
+      "costaBrava": {
+        "title": "Transferes para a Costa Brava",
+        "desc": "Lloret de Mar, Platja d'Aro, Tossa, Cadaqués — toda a costa."
+      },
+      "costaDorada": {
+        "title": "Transferes para a Costa Dourada",
+        "desc": "Sitges, Salou, PortAventura e Tarragona com o máximo conforto."
+      },
+      "andorra": {
+        "title": "Transferes para Andorra",
+        "desc": "Transfer premium de Barcelona a Andorra — compras, esqui ou negócios."
+      },
+      "hotel": {
+        "title": "Transferes para Hotéis",
+        "desc": "Serviço de luxo porta-a-porta para todos os hotéis de 4 e 5 estrelas de Barcelona."
+      },
+      "vip": {
+        "title": "Transporte VIP",
+        "desc": "Serviço discreto e exclusivo para clientes que exigem privacidade absoluta."
+      },
+      "tours": {
+        "title": "Passeios Privados de Um Dia",
+        "desc": "Montserrat, La Roca Village, as vinhas de Girona e os museus de Dalí."
+      }
+    }
+  },
+  "footer": {
+    "tagline": "O melhor serviço de motorista privado de Barcelona. Motoristas profissionais, veículos premium, serviço impecável — 24 horas por dia, 365 dias por ano.",
+    "newsletter": {
+      "title": "Barcelona Travel Insider",
+      "subtitle": "Ofertas exclusivas, dicas de aeroporto e guias de viagem de luxo — grátis."
+    },
+    "cta": {
+      "title": "Pronto para o seu transfer de luxo?",
+      "subtitle": "Reserve online em 2 minutos. Confirmação imediata.",
+      "button": "Reservar Online"
+    },
+    "sections": {
+      "services": "Serviços",
+      "fleet": "Frota",
+      "destinations": "Destinos",
+      "staff": "Acesso da Equipa"
+    },
+    "links": {
+      "airportTransfers": "Transferes de Aeroporto",
+      "corporateTravel": "Viagens de Empresa",
+      "hourlyChaufeur": "Motorista à Hora",
+      "cruisePort": "Porto de Cruzeiros",
+      "vipTransportation": "Transporte VIP",
+      "privateTours": "Passeios Privados de Um Dia",
+      "standardSedan": "Toyota Corolla",
+      "luxurySedan": "EQE 300 Electric",
+      "executiveMinivan": "Monovolume Executiva",
+      "luxuryMinivan": "Monovolume de Luxo",
+      "groupMinibus": "Miniautocarro de Grupo",
+      "electricVehicle": "Tesla Model 3",
+      "barcelonaAirport": "Aeroporto de Barcelona",
+      "sitges": "Sitges",
+      "lloretDeMar": "Lloret de Mar",
+      "portAventura": "PortAventura",
+      "andorra": "Andorra",
+      "gironaAirport": "Aeroporto de Girona",
+      "tarragona": "Tarragona",
+      "cadaques": "Cadaqués",
+      "driverLogin": "Entrada de Motoristas",
+      "driverRegister": "Registo de Motoristas",
+      "adminLogin": "Entrada de Administração",
+      "hotelTransfers": "Transferes para Hotéis"
+    },
+    "legal": {
+      "faq": "Perguntas Frequentes",
+      "privacy": "Política de Privacidade",
+      "terms": "Termos e Condições",
+      "cookies": "Política de Cookies"
+    },
+    "contact": {
+      "whatsapp": "Falar por WhatsApp",
+      "location": "Barcelona, Espanha · VTC Licenciada"
+    },
+    "copyright": "Todos os direitos reservados. Operador VTC licenciado — Barcelona, Espanha.",
+    "languageHeading": "Idioma"
+  },
+  "common": {
+    "loading": "A carregar…",
+    "error": "Algo correu mal",
+    "tryAgain": "Tentar de Novo",
+    "close": "Fechar",
+    "or": "ou"
+  },
+  "routes": {
+    "allInclusive": "Todos os preços excluem IVA e portagens. Inclui 60 minutos de espera gratuita.",
+    "bookNow": "Reservar — desde {price} €",
+    "ctaSubtitle": "Confirmação imediata. Cancelamento gratuito até 24 horas antes da recolha.",
+    "ctaTitle": "Pronto para reservar o seu transfer para {name}?",
+    "distance": "{km} km",
+    "duration": "{min} minutos",
+    "eqe": "Mercedes EQE 300 Electric",
+    "faqTitle": "Perguntas frequentes",
+    "fixedPrice": "Preço fixo",
+    "fixedPriceDesc": "O preço que vê é o preço que paga. Sem preços dinâmicos, nunca.",
+    "flightTracking": "Acompanhamento de voo em tempo real",
+    "flightTrackingDesc": "Acompanhamos o seu voo em direto. Se atrasar, o motorista ajusta-se sem custo adicional.",
+    "heroSubtitle": "Transfer privado de luxo a partir do aeroporto BCN El Prat. Preço fixo, receção personalizada, sem preços dinâmicos.",
+    "heroTitle": "Transfer do Aeroporto de Barcelona para {name}",
+    "meetGreet": "Receção na zona de chegadas",
+    "meetGreetDesc": "O seu motorista espera na zona de chegadas com o seu nome no tablet.",
+    "mpv": "Mercedes V-Class (MPV)",
+    "paxLabel": "Passageiros",
+    "priceTable": "Preços para {name}",
+    "relatedTitle": "Transferes semelhantes",
+    "sedan": "Mercedes EQE 300 Electric",
+    "vehiclesAvail": "Veículos disponíveis"
+  },
+  "booking": {
+    "badgeAvailability": "Disponível 24/7",
+    "badgeFleet": "Frota Mercedes-Benz",
+    "badgeLanguages": "Português, Inglês e Espanhol",
+    "book": "Reservar",
+    "continueLabel": "Continuar",
+    "couldNotPrice": "Não conseguimos calcular o preço desta viagem — contacte-nos para um orçamento",
+    "date": "Data",
+    "dropoff": "Destino",
+    "dropoffPlaceholder": "Escolha uma zona ou escreva um destino",
+    "duration": "Duração",
+    "fixedPrice": "Preço Fixo",
+    "gettingPrice": "A calcular o seu preço…",
+    "headerEyebrow": "Reserva",
+    "headerSubtitle": "Orçamento imediato · Preço fixo · 24/7",
+    "headerTitle": "Planeie o seu transfer",
+    "kmJourney": "viagem de {km} km",
+    "passengers": "Passageiros",
+    "pax": "{n} pax",
+    "pickup": "Recolha",
+    "pickupPlaceholder": "Escolha uma zona, escreva uma morada ou hotel…",
+    "time": "Hora",
+    "timePlaceholder": "HH : MM",
+    "tripHourly": "À Hora",
+    "tripOneWay": "Só Ida",
+    "tripReturn": "Ida e Volta",
+    "vehicle": "Veículo",
+    "whatsappQuote": "Pedir Orçamento por WhatsApp",
+    "whereTo": "Para onde deseja ir?",
+    "yourPrice": "O Seu Preço"
+  },
+  "pricing": {
+    "book": "Reservar",
+    "bookHourly": "Reservar à Hora",
+    "colBook": "Reservar",
+    "colRoute": "Percurso",
+    "footnote": "Todos os preços são fixos por veículo e excluem IVA e portagens. Sem preços dinâmicos. Nunca.",
+    "getInstantPrice": "Obter Preço Imediato",
+    "guarantee1": "Sem preços dinâmicos",
+    "guarantee2": "Tarifa fixa garantida",
+    "guarantee3": "Cancelamento gratuito 24h",
+    "guarantee4": "Confirmação imediata",
+    "headingAccent": "Preços de Luxo",
+    "headingLead": "Transparência nos",
+    "minHours": "mín. {n}h",
+    "noRoutes": "Nenhum percurso encontrado.",
+    "noRoutesCta": "Obtenha um preço imediato para qualquer destino",
+    "perHour": "por hora",
+    "searchPlaceholder": "Procurar destino…",
+    "tabAirportCity": "Aeroporto e Cidade",
+    "tabCostaBrava": "Costa Brava",
+    "tabCostaDorada": "Costa Dourada",
+    "tabHourly": "À Hora",
+    "vatNoteLead": "Todos os preços são fixos por veículo e excluem IVA e portagens.",
+    "vatNoteBody": "O IVA de 10% só é acrescentado se pedir fatura; as portagens são cobradas à parte. Motorista profissional, veículo e combustível estão incluídos. Receção personalizada, cadeiras de criança e outros extras são opcionais e cobrados à parte."
+  },
+  "bookflow": {
+    "addExtras": "Adicionar Extras",
+    "apply": "Aplicar",
+    "back": "Voltar",
+    "bookingFailed": "A reserva falhou. Tente novamente.",
+    "confirm": "Confirmar",
+    "confirmBooking": "Confirmar Reserva",
+    "continueLabel": "Continuar",
+    "couponPlaceholder": "ELITE-XXXXXX",
+    "customQuote": "Orçamento personalizado",
+    "dateTime": "Data e Hora",
+    "dropoffPlaceholder": "Destino…",
+    "emailPlaceholder": "voce@email.com",
+    "enterCoupon": "Introduza um código promocional",
+    "enterEmailFirst": "Introduza o seu email acima para aplicar um código",
+    "flightPlaceholder": "ex.: IB3456 ou VY1234",
+    "haveCoupon": "Tem um código promocional?",
+    "invalidCoupon": "Código inválido",
+    "luggage": "Bagagem",
+    "minNotice": "As reservas exigem pelo menos 1 hora de antecedência. Para transferes urgentes, ligue para",
+    "namePlaceholder": "Como no documento de viagem",
+    "notesPlaceholder": "Alguma indicação para o seu motorista…",
+    "passengers": "Passageiros",
+    "pay": "Pagar",
+    "phonePlaceholder": "+351 9xx xxx xxx",
+    "pickupPlaceholder": "Aeroporto, hotel ou qualquer morada de Barcelona…",
+    "priceSummary": "Resumo do Preço",
+    "processing": "A processar…",
+    "quantity": "Quantidade:",
+    "quickIn90": "Daqui a 1,5 Horas",
+    "quickTomorrow2": "Amanhã às 14h",
+    "quickTomorrow9": "Amanhã às 9h",
+    "securePayment": "Pagamento seguro SumUp",
+    "step1": "Planeie a Sua Viagem",
+    "step2": "Veículo",
+    "step3": "Dados do Passageiro",
+    "total": "Total",
+    "transferPrice": "Preço do transfer",
+    "typeCorporate": "Empresa",
+    "typeCorporateDesc": "Reservas com conta de empresa",
+    "typeFullDay": "Dia Inteiro",
+    "typeFullDayDesc": "Aluguer de Dia Inteiro — 8 Horas",
+    "typeHourly": "À Hora",
+    "typeHourlyDesc": "Motorista durante 2 a 12 horas",
+    "typeTransfer": "Transfer",
+    "typeTransferDesc": "De ponto a ponto"
+  },
+  "success": {
+    "accountCreated": "Criámos uma conta para si",
+    "accountSaveNow": "Conta Criada — Guarde os Dados",
+    "alreadyPaid": "Já pagou? Verificar estado",
+    "backHome": "Voltar ao Início",
+    "checking": "A verificar…",
+    "confirmationCode": "Código de Confirmação",
+    "confirmed": "Reserva Confirmada!",
+    "confirmedBody": "O seu transfer de luxo está confirmado. Enviámos um email de confirmação.",
+    "connecting": "A ligar ao SumUp…",
+    "copied": "Copiado!",
+    "copyCredentials": "Copiar dados de acesso",
+    "email": "Email",
+    "password": "Palavra-passe",
+    "payNow": "Pagar Agora com SumUp",
+    "paymentError": "Não foi possível iniciar o pagamento. Contacte-nos.",
+    "paymentFailed": "Não foi possível criar o pagamento",
+    "paymentUnsuccessful": "Pagamento Não Concluído",
+    "received": "Reserva Recebida!",
+    "reference": "A Sua Referência",
+    "requestDocs": "Pedir recibo ou fatura",
+    "totalPaid": "Total Pago"
+  },
+  "track": {
+    "callDriver": "Ligar ao seu motorista",
+    "journeyCompleted": "Viagem concluída",
+    "mapNotActive": "Mapa em direto ainda não ativo",
+    "mapNotActiveBody": "A posição do seu motorista aparece aqui assim que iniciar a viagem.",
+    "needHelp": "Precisa de ajuda? WhatsApp",
+    "reference": "Referência da reserva",
+    "stageCompleted": "Concluída",
+    "stageConfirmed": "Confirmada",
+    "stageDriverAssigned": "Motorista atribuído",
+    "stageOnTheWay": "A caminho",
+    "thankYou": "Obrigado por viajar connosco.",
+    "title": "O seu transfer",
+    "whatsappDriver": "Enviar mensagem ao motorista por WhatsApp"
+  },
+  "auth": {
+    "badCredentials": "Email ou palavra-passe incorretos.",
+    "continueGoogle": "Continuar com Google",
+    "email": "Email",
+    "emailPlaceholder": "seu@email.com",
+    "orEmail": "ou entre com o email",
+    "password": "Palavra-passe",
+    "privacy": "Política de Privacidade",
+    "redirecting": "A redirecionar…",
+    "signIn": "Entrar",
+    "signInSubtitle": "Entre para gerir as suas reservas e a sua conta.",
+    "signedIn": "Bem-vindo de volta!",
+    "terms": "Termos",
+    "welcomeBack": "Bem-vindo de Volta"
+  },
+  "meta": {
+    "bookDescription": "Reserve o seu transfer privado em Barcelona em 60 segundos. Preços fixos desde 50 €. BCN El Prat T1/T2, porto de cruzeiros, hotéis, Sitges e Andorra. Confirmação imediata.",
+    "bookTitle": "Reserve o Seu Transfer em Barcelona | Elite BCN",
+    "homeDescription": "Carro com motorista a partir do Aeroporto de Barcelona, T1 e T2. Preço fixo por veículo desde 50 €, com 60 minutos de espera gratuita a partir da aterragem.",
+    "homeTitle": "Elite BCN | Transferes do Aeroporto de Barcelona e Motorista Privado"
+  }
+}
