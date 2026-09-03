@@ -19,8 +19,9 @@ import fr from "@/messages/fr.json";
 import itMessages from "@/messages/it.json";
 import ru from "@/messages/ru.json";
 import zh from "@/messages/zh.json";
+import pt from "@/messages/pt.json";
 
-const FILES: Record<string, Record<string, unknown>> = { ar, de, en, es, fr, it: itMessages, ru, zh };
+const FILES: Record<string, Record<string, unknown>> = { ar, de, en, es, fr, it: itMessages, pt, ru, zh };
 
 /**
  * The site was translated into eight languages that Google could not see: the

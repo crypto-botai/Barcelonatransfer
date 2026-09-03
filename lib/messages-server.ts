@@ -8,6 +8,7 @@ import en from "@/messages/en.json";
 import es from "@/messages/es.json";
 import fr from "@/messages/fr.json";
 import it from "@/messages/it.json";
+import pt from "@/messages/pt.json";
 import ru from "@/messages/ru.json";
 import zh from "@/messages/zh.json";
 
@@ -21,7 +22,7 @@ import zh from "@/messages/zh.json";
  * says. These imports are server-side only, so nothing here reaches the client
  * bundle.
  */
-const MESSAGES = { ar, de, en, es, fr, it, ru, zh } as const;
+const MESSAGES = { ar, de, en, es, fr, it, pt, ru, zh } as const;
 
 export type Messages = typeof en;
 

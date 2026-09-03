@@ -6,9 +6,10 @@ import de from "@/messages/de.json";
 import itMessages from "@/messages/it.json";
 import ru from "@/messages/ru.json";
 import zh from "@/messages/zh.json";
+import pt from "@/messages/pt.json";
 import ar from "@/messages/ar.json";
 
-const LOCALES: Record<string, unknown> = { es, fr, de, it: itMessages, ru, zh, ar };
+const LOCALES: Record<string, unknown> = { es, fr, de, it: itMessages, ru, zh, ar, pt };
 
 /** Flattens nested messages to dotted paths: { footer: { links: { a: "x" } } } -> "footer.links.a". */
 function flatten(obj: unknown, prefix = ""): Record<string, string> {
