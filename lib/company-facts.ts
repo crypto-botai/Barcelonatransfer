@@ -47,7 +47,7 @@ export const OPERATIONS = {
   supportHours:       "24/7",
 } as const;
 
-// Legacy alias kept for backward compatibility with HeroSection, StatsSection, etc.
+// Legacy alias kept for backward compatibility with HeroSection and others.
 export const COMPANY_FACTS = {
   foundedYear:         COMPANY.foundedYear,
   yearsInBusiness:     yearsActive(),

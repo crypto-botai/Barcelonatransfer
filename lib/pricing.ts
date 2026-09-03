@@ -14,7 +14,7 @@ import {
 // ─── Per-vehicle pricing constants ────────────────────────────────────────────
 //
 // DEFAULT_PRICING.pricePerKm and .pricePerMinute are for ADMIN USE ONLY
-// (price integrity estimates in lib/ai/priceCheck.ts).
+// (price integrity estimates, when those existed).
 // They must NEVER be used to calculate a price shown to a customer.
 // All customer prices come from the fixed ROUTES matrix via lookupFixedPrice().
 //
