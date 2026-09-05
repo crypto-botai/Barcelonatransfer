@@ -21,9 +21,16 @@ export default async function AdminPricingPage() {
       </div>
       {/* Renders only when the code has routes the database has not got yet. */}
       <SyncRoutesButton />
-      {/* And this one when a route the database already has is priced
-          differently in code — the case the sync above deliberately ignores. */}
-      <ApplyTablePricesButton vehicleCode="MINIBUS" />
+      {/* And these when a route the database already has is priced differently
+          in code — the case the sync above deliberately ignores.
+
+          One per vehicle, and each renders nothing unless that column actually
+          differs, so in the normal case none of them appear. It was minibus
+          only at first, which meant a change to any other column had no way of
+          reaching the database and simply sat in the code looking applied. */}
+      {(["ECONOMY", "BUSINESS", "MINIVAN", "VCLASS", "MINIBUS"] as const).map((code) => (
+        <ApplyTablePricesButton key={code} vehicleCode={code} />
+      ))}
       <AdminPricingGrid routes={routes} settings={settings} />
     </div>
   );

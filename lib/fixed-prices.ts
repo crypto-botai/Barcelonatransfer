@@ -136,7 +136,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "ANDORRA",
     fromLabel: "El Prat Airport", toLabel: "Andorra",
     category: "airport-city",
-    prices: { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 900 },
+    prices: { ECONOMY: 350, BUSINESS: 450, MINIVAN: 465, VCLASS: 550, MINIBUS: 1100 },
   },
   {
     slug: "bcn-airport-lourdes",
@@ -427,7 +427,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "ANDORRA",
     fromLabel: "Barcelona City", toLabel: "Andorra",
     category: "airport-city",
-    prices: { ECONOMY: 300, BUSINESS: 350, MINIVAN: 370, VCLASS: 450, MINIBUS: 900 },
+    prices: { ECONOMY: 350, BUSINESS: 450, MINIVAN: 465, VCLASS: 550, MINIBUS: 1100 },
   },
   // ── Costa Dorada ──────────────────────────────────────────────────────────
   {
