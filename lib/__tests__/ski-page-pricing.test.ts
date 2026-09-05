@@ -7,7 +7,7 @@ import { ladderFor } from "@/lib/destination-pricing";
  *
  * lib/pricing.ts classes them as ski stations and prices them by road distance
  * rather than at the Andorra fare. Asked directly, the quote engine returns
- * €491 for Pas de la Casa and €505 for Soldeu against Andorra's fixed €300 —
+ * €491 for Pas de la Casa and €505 for Soldeu against Andorra's fixed €350 —
  * so any single figure printed on that page is wrong for most readers. It has
  * happened before: these were once advertised at a flat €240, less than half
  * the real cost of the longer runs.

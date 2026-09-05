@@ -40,6 +40,7 @@ const COLS: VehicleCode[] = ["ECONOMY", "BUSINESS", "MINIVAN", "VCLASS", "MINIBU
 const ENGLISH_NAME: Record<(typeof SUPPORTED_LOCALES)[number], string> = {
   en: "English", es: "Spanish", fr: "French", de: "German",
   it: "Italian", ru: "Russian", zh: "Chinese", ar: "Arabic",
+  pt: "Portuguese",
 };
 const LANGUAGES = SUPPORTED_LOCALES.map((l) => ENGLISH_NAME[l]).join(", ");
 

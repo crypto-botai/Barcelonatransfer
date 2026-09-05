@@ -9,7 +9,7 @@ import {
 
 /**
  * Ski stations are charged as destinations outside Andorra, by the owner's
- * decision. The €300 Andorra fare covers Andorra la Vella and the valley towns;
+ * decision. The €350 Andorra fare covers Andorra la Vella and the valley towns;
  * the stations are further, higher, and an hour more on winter roads.
  */
 
@@ -36,7 +36,7 @@ describe("Andorran ski stations are not the Andorra fare", () => {
 
   it("catches Arinsal, which sits inside the Andorra radius", () => {
     // The one that was already mispriced: 8 km from Andorra la Vella, so the
-    // 12 km zone radius swallowed it and quoted EUR 300 on coordinates alone.
+    // 12 km zone radius swallowed it and quoted the Andorra fare on coordinates alone.
     expect(isSkiStation(undefined, 42.5720, 1.4850)).toBe(true);
     expect(detectZoneFromCoords(42.5720, 1.4850)).toBeNull();
   });
@@ -63,7 +63,7 @@ describe("Andorra proper keeps its fare", () => {
   it.each(TOWNS)("%s still resolves to the Andorra zone", (_l, address, lat, lng) => {
     expect(resolveZone(address)).toBe("andorra");
     expect(detectZoneFromCoords(lat, lng)).toBe("andorra");
-    expect(lookupFixedPriceByZone("airport", "andorra", "ECONOMY")).toBe(300);
+    expect(lookupFixedPriceByZone("airport", "andorra", "ECONOMY")).toBe(350);
   });
 
   it("leaves ordinary valley towns alone", () => {

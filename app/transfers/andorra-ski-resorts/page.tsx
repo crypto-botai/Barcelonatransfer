@@ -29,7 +29,7 @@ import { COMPANY } from "@/lib/company-facts";
  * NO FARE IS PRINTED HERE, and that is deliberate. lib/pricing.ts classes these
  * as ski stations and prices them by road distance rather than at the Andorra
  * fare; the live quote engine returns €491 for Pas de la Casa and €505 for
- * Soldeu against Andorra's fixed €300. A single number on this page would be
+ * Soldeu against Andorra's fixed €350. A single number on this page would be
  * wrong for most readers, and the last time these were advertised at a flat
  * figure it was €240 — less than half. The page sends people to the quote tool
  * instead, which is the only thing that knows.

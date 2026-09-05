@@ -2,6 +2,8 @@ import { SUPPORT_GUARDRAILS } from "@/lib/ai/guardrails";
 import { getPublicRoutes } from "@/lib/pricing-service";
 import { COMPANY } from "@/lib/company-facts";
 import { ladderFor } from "@/lib/destination-pricing";
+import { RETURN_LEG_SURCHARGES } from "@/lib/fixed-prices";
+import { ZONE_LABELS, ZONE_CODE_TO_KEY } from "@/lib/pricing";
 
 const LANG_MAP: Record<string, string> = {
   es: "Always reply in Spanish (Español).",
@@ -16,6 +18,29 @@ const LANG_MAP: Record<string, string> = {
 };
 
 
+/**
+ * The one journey that costs more in one direction than the other.
+ *
+ * Both pricing blocks tell the agent there are no surcharges on transfers,
+ * which was true until Andorra got a return fare. Without this the agent quotes
+ * the outbound figure for a ride home and is €20 short. Built from the same
+ * list the quote engine applies, so it cannot describe a surcharge that is not
+ * being charged, or miss one that is.
+ */
+function returnLegNote(): string {
+  if (!RETURN_LEG_SURCHARGES.length) return "";
+  const lines = RETURN_LEG_SURCHARGES.map((s) => {
+    const from = ZONE_LABELS[ZONE_CODE_TO_KEY[s.from]] ?? s.from;
+    const to   = ZONE_LABELS[ZONE_CODE_TO_KEY[s.to]]   ?? s.to;
+    return `- ${from} → ${to}: add €${s.amount} to the fare listed for that route.`;
+  });
+  return `
+
+RETURN LEG: these journeys cost more in the direction shown. The reverse direction is the listed price.
+${lines.join("
+")}`;
+}
+
 async function buildLivePricingSection(): Promise<string> {
   try {
     const routes = await getPublicRoutes();
@@ -26,7 +51,7 @@ async function buildLivePricingSection(): Promise<string> {
       (r) =>
         `- **${r.label}**: Economy €${r.economy} | Business €${r.business} | Minivan €${r.minivan} | V-Class €${r.vclass} | Minibus €${r.minibus}`,
     );
-    return `## LIVE PRICING (fixed per vehicle, EXCLUDING VAT and tolls — no surcharges on transfers)\n${lines.join("\n")}\n\nHourly hire: night surcharge (22:00–06:00) +20% applies to hourly rates only, not to fixed-price transfers.`;
+    return `## LIVE PRICING (fixed per vehicle, EXCLUDING VAT and tolls — no surcharges on transfers)\n${lines.join("\n")}\n\nHourly hire: night surcharge (22:00–06:00) +20% applies to hourly rates only, not to fixed-price transfers.${returnLegNote()}`;
   } catch {
     return buildFallbackPricing();
   }
@@ -51,7 +76,7 @@ function buildFallbackPricing(): string {
 - **Minivan** (4–8 pax): from €${l.minivan}
 - **V-Class** (7 pax): from €${l.vclass}
 - **Minibus** (9–16 pax): from €${l.minibus}
-All transfer prices are fixed. No night surcharge, no surge pricing, no airport fees.`;
+All transfer prices are fixed. No night surcharge, no surge pricing, no airport fees.${returnLegNote()}`;
 }
 
 export async function buildSupportSystemPrompt(kbText: string, language: string): Promise<string> {

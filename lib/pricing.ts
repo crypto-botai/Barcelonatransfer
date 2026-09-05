@@ -368,7 +368,7 @@ export function resolveZoneStrict(input: string): string | null {
 /**
  * Andorran ski stations, which do not take the Andorra fare.
  *
- * The €300 Andorra price is for Andorra la Vella and the valley towns around
+ * The €350 Andorra price is for Andorra la Vella and the valley towns around
  * it. The ski stations sit well beyond that — up the mountain, an hour further
  * on winter roads — and are charged as destinations outside Andorra, by
  * distance, per the owner's instruction.

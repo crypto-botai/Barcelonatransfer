@@ -714,3 +714,38 @@ export function lookupPriceByFleetVehicle(
   if (perCar !== undefined) return perCar;
   return lookupPriceByClass(from, to, FLEET_TO_DB_CLASS[fv]);
 }
+
+/**
+ * Extra charged on the leg that comes back out of a zone, on top of the price
+ * the table gives for that journey.
+ *
+ * Every lookup above this point is direction-blind on purpose: one row covers a
+ * journey and serves it both ways, so nobody pays more to reach the airport
+ * than to leave it. Andorra is the exception the owner asked for — the ride
+ * back is €20 more than the ride out.
+ *
+ * Keyed on the ORDERED pair, which is what makes it a return surcharge rather
+ * than a price rise: only a journey that starts in Andorra matches. Both ways
+ * home are listed, because a passenger coming back from Andorra is heading for
+ * the airport at least as often as for the city, and there is no reason the
+ * drive costs less for one than the other.
+ *
+ * Applied in getQuote() in lib/pricing-service.ts — the single path to a
+ * customer-facing price — so the figure the booking form shows and the figure
+ * the checkout takes are the same figure. It deliberately does NOT touch the
+ * route table or the marketing pages: those quote "from €350", which is the
+ * outbound fare and stays true.
+ */
+export const RETURN_LEG_SURCHARGES: ReadonlyArray<{
+  from:   ZoneCode;
+  to:     ZoneCode;
+  amount: number;
+}> = [
+  { from: "ANDORRA", to: "BARCELONA_CITY", amount: 20 },
+  { from: "ANDORRA", to: "BCN_AIRPORT",    amount: 20 },
+];
+
+/** The return surcharge for this ordered pair, or 0 when there is none. */
+export function returnLegSurcharge(from: ZoneCode, to: ZoneCode): number {
+  return RETURN_LEG_SURCHARGES.find((s) => s.from === from && s.to === to)?.amount ?? 0;
+}

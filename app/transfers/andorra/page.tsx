@@ -6,16 +6,26 @@ import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 import { ladderFor } from "@/lib/destination-pricing";
+import { returnLegSurcharge } from "@/lib/fixed-prices";
 
 const andorraLadder = ladderFor("andorra", "airport")!;
 
 const andorraPrice =
   ROUTES.find((r) => r.from === "barcelona_city" && r.to === "andorra")?.economy ?? 285;
 
+// The way back costs more than the way there, which is true of nothing else on
+// the site. Read from the same table the quote engine reads, so this row cannot
+// drift from what the checkout charges.
+const andorraReturnPrice =
+  andorraPrice + returnLegSurcharge("ANDORRA", "BCN_AIRPORT");
+
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Airport to Andorra Private Transfer | Elite BCN" },
-  description:
-    "Fixed €300 per car, Barcelona Airport to Andorra la Vella. Room for skis and boot bags, and we track your flight so a delay costs you nothing.",
+  // Read from the table rather than typed out. It was the last figure on this
+  // page still written by hand, so the September reprice moved everything else
+  // to €350 and left the meta description saying €300 — the one number Google
+  // shows a customer before they decide whether to click.
+  description: `Fixed €${andorraPrice} per car, Barcelona Airport to Andorra la Vella. Room for skis and boot bags, and we track your flight so a delay costs you nothing.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/andorra" },
   // Encamp (87 impressions, position 48.8) and the return leg (22) had no owner
   // anywhere on the site. Both are served by this page's fixed fare and are now
@@ -273,7 +283,9 @@ export default function AndorraTransferPage() {
                     { route: "BCN Airport → Vallnord ski resort", price: "Quoted by distance" },
                     // Encamp takes the Andorra fare — it is a town, not a station.
                     { route: "BCN Airport → Encamp", price: `€${andorraPrice}` },
-                    { route: "Andorra la Vella → BCN Airport", price: `€${andorraPrice}` },
+                    // The return leg is €20 more than the outbound, by the owner's
+                    // decision. It is the only row here that is not symmetric.
+                    { route: "Andorra la Vella → BCN Airport", price: `€${andorraReturnPrice}` },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.route}</td>

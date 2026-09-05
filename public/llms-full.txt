@@ -8,7 +8,7 @@
 - Operating since: 2018
 - Licence issuer: Generalitat de Catalunya
 - Operating hours: 24/7, 365 days a year
-- Website languages: English, Spanish, French, Arabic, Russian, Chinese, German, Italian
+- Website languages: English, Spanish, French, Arabic, Russian, Chinese, German, Italian, Portuguese
 - Phone: +34 635 383 712
 - WhatsApp: https://wa.me/34635383712
 - Email: vtcbcn2025@gmail.com
@@ -81,82 +81,82 @@ Individual cars priced below their class column:
 ## Full price table — BCN El Prat Airport (T1/T2) ⇄ destination
 | Destination                | Economy | Business | Minivan | V-Class | Minibus |
 |----------------------------|---------|----------|---------|---------|---------|
-| Barcelona City             | €50     | €65      | €65     | €75     | €180    |
-| Cruise Terminal            | €50     | €65      | €65     | €75     | €180    |
-| Sants Station              | €50     | €60      | €65     | €85     | €155    |
-| Montserrat                 | €110    | €140     | €145    | €200    | €285    |
-| Andorra                    | €300    | €350     | €370    | €450    | €630    |
-| Lourdes                    | €750    | €875     | €925    | €1125   | €1575   |
-| Girona Airport             | €165    | €180     | €195    | €220    | €280    |
-| Girona City                | €165    | €180     | €190    | €215    | €280    |
-| La Roca Village            | €105    | €125     | €135    | €155    | €225    |
-| Castelldefels              | €50     | €65      | €65     | €75     | €180    |
-| Sitges                     | €80     | €100     | €110    | €130    | €200    |
-| Vilanova i la Geltrú       | €85     | €105     | €115    | €140    | €205    |
-| Cubelles                   | €90     | €110     | €120    | €145    | €210    |
-| Calafell                   | €100    | €120     | €130    | €155    | €220    |
-| Vendrell                   | €110    | €130     | €145    | €165    | €230    |
-| Tarragona                  | €150    | €180     | €190    | €210    | €270    |
-| La Pineda                  | €155    | €175     | €195    | €215    | €275    |
-| Salou                      | €155    | €180     | €195    | €215    | €275    |
-| PortAventura               | €155    | €180     | €195    | €215    | €275    |
-| Cambrils                   | €160    | €180     | €200    | €220    | €280    |
-| Reus Airport (REU)         | €155    | €180     | €195    | €215    | €275    |
-| Mataró                     | €90     | €110     | €120    | €145    | €210    |
-| Calella                    | €110    | €130     | €145    | €165    | €230    |
-| Pineda de Mar              | €115    | €135     | €150    | €170    | €235    |
-| Santa Susanna              | €120    | €140     | €155    | €175    | €240    |
-| Malgrat de Mar             | €125    | €145     | €160    | €180    | €245    |
-| Blanes                     | €135    | €155     | €170    | €195    | €255    |
-| Lloret de Mar              | €145    | €165     | €180    | €205    | €265    |
-| Tossa de Mar               | €155    | €175     | €195    | €215    | €275    |
-| S'Agaró                    | €155    | €175     | €195    | €215    | €275    |
-| Platja d'Aro               | €160    | €180     | €200    | €220    | €280    |
-| Palamós                    | €185    | €205     | €225    | €250    | €305    |
-| Begur / Aiguablava         | €200    | €220     | €240    | €265    | €320    |
-| Roses                      | €205    | €225     | €250    | €270    | €325    |
-| Empuriabrava               | €210    | €230     | €255    | €275    | €330    |
-| Figueres                   | €200    | €220     | €240    | €265    | €320    |
-| Cadaqués                   | €240    | €280     | €285    | €320    | €360    |
+| Barcelona City             | €50     | €65      | €65     | €75     | €200    |
+| Cruise Terminal            | €50     | €65      | €65     | €75     | €200    |
+| Sants Station              | €50     | €60      | €65     | €85     | €200    |
+| Montserrat                 | €110    | €140     | €145    | €200    | €400    |
+| Andorra                    | €350    | €450     | €465    | €550    | €1100   |
+| Lourdes                    | €750    | €875     | €925    | €1125   | €2250   |
+| Girona Airport             | €165    | €180     | €195    | €220    | €400    |
+| Girona City                | €165    | €180     | €190    | €215    | €400    |
+| La Roca Village            | €105    | €125     | €135    | €155    | €300    |
+| Castelldefels              | €50     | €65      | €65     | €75     | €200    |
+| Sitges                     | €80     | €100     | €110    | €130    | €250    |
+| Vilanova i la Geltrú       | €85     | €105     | €115    | €140    | €300    |
+| Cubelles                   | €90     | €110     | €120    | €145    | €300    |
+| Calafell                   | €100    | €120     | €130    | €155    | €300    |
+| Vendrell                   | €110    | €130     | €145    | €165    | €350    |
+| Tarragona                  | €150    | €180     | €190    | €210    | €400    |
+| La Pineda                  | €155    | €175     | €195    | €215    | €450    |
+| Salou                      | €155    | €180     | €195    | €215    | €450    |
+| PortAventura               | €155    | €180     | €195    | €215    | €450    |
+| Cambrils                   | €160    | €180     | €200    | €220    | €450    |
+| Reus Airport (REU)         | €155    | €180     | €195    | €215    | €450    |
+| Mataró                     | €90     | €110     | €120    | €145    | €300    |
+| Calella                    | €110    | €130     | €145    | €165    | €350    |
+| Pineda de Mar              | €115    | €135     | €150    | €170    | €350    |
+| Santa Susanna              | €120    | €140     | €155    | €175    | €350    |
+| Malgrat de Mar             | €125    | €145     | €160    | €180    | €350    |
+| Blanes                     | €135    | €155     | €170    | €195    | €400    |
+| Lloret de Mar              | €145    | €165     | €180    | €205    | €400    |
+| Tossa de Mar               | €155    | €175     | €195    | €215    | €450    |
+| S'Agaró                    | €155    | €175     | €195    | €215    | €450    |
+| Platja d'Aro               | €160    | €180     | €200    | €220    | €450    |
+| Palamós                    | €185    | €205     | €225    | €250    | €500    |
+| Begur / Aiguablava         | €200    | €220     | €240    | €265    | €550    |
+| Roses                      | €205    | €225     | €250    | €270    | €550    |
+| Empuriabrava               | €210    | €230     | €255    | €275    | €550    |
+| Figueres                   | €200    | €220     | €240    | €265    | €550    |
+| Cadaqués                   | €240    | €280     | €285    | €320    | €650    |
 
 ## Full price table — Barcelona city ⇄ destination
 | Destination                | Economy | Business | Minivan | V-Class | Minibus |
 |----------------------------|---------|----------|---------|---------|---------|
-| Within Barcelona city      | €50     | €65      | €65     | €75     | €180    |
-| Lourdes                    | €750    | €875     | €925    | €1125   | €1575   |
-| La Roca Village            | €80     | €100     | €110    | €130    | €200    |
-| Montserrat                 | €110    | €140     | €145    | €200    | €285    |
-| Girona Airport             | €140    | €170     | €170    | €195    | €255    |
-| Girona City                | €140    | €170     | €165    | €190    | €255    |
-| Andorra                    | €300    | €350     | €370    | €450    | €630    |
-| Castelldefels              | €50     | €65      | €65     | €75     | €180    |
-| Sitges                     | €80     | €100     | €110    | €130    | €200    |
-| Vilanova i la Geltrú       | €85     | €105     | €115    | €140    | €205    |
-| Cubelles                   | €90     | €110     | €120    | €145    | €210    |
-| Calafell                   | €100    | €120     | €130    | €155    | €220    |
-| Vendrell                   | €110    | €130     | €145    | €165    | €230    |
-| Tarragona                  | €150    | €180     | €190    | €210    | €270    |
-| La Pineda                  | €155    | €175     | €195    | €215    | €275    |
-| Salou                      | €155    | €180     | €195    | €215    | €275    |
-| PortAventura               | €155    | €180     | €195    | €215    | €275    |
-| Cambrils                   | €160    | €180     | €200    | €220    | €280    |
-| Reus Airport (REU)         | €155    | €180     | €195    | €215    | €275    |
-| Mataró                     | €90     | €110     | €120    | €145    | €210    |
-| Calella                    | €110    | €130     | €145    | €165    | €230    |
-| Pineda de Mar              | €115    | €135     | €150    | €170    | €235    |
-| Santa Susanna              | €120    | €140     | €155    | €175    | €240    |
-| Malgrat de Mar             | €125    | €145     | €160    | €180    | €245    |
-| Blanes                     | €135    | €155     | €170    | €195    | €255    |
-| Lloret de Mar              | €145    | €165     | €180    | €205    | €265    |
-| Tossa de Mar               | €155    | €175     | €195    | €215    | €275    |
-| S'Agaró                    | €155    | €175     | €195    | €215    | €275    |
-| Platja d'Aro               | €160    | €180     | €200    | €220    | €280    |
-| Palamós                    | €185    | €205     | €225    | €250    | €305    |
-| Begur / Aiguablava         | €200    | €220     | €240    | €265    | €320    |
-| Roses                      | €205    | €225     | €250    | €270    | €325    |
-| Empuriabrava               | €210    | €230     | €255    | €275    | €330    |
-| Figueres                   | €200    | €220     | €240    | €265    | €320    |
-| Cadaqués                   | €240    | €280     | €285    | €320    | €360    |
+| Within Barcelona city      | €50     | €65      | €65     | €75     | €200    |
+| Lourdes                    | €750    | €875     | €925    | €1125   | €2250   |
+| La Roca Village            | €80     | €100     | €110    | €130    | €250    |
+| Montserrat                 | €110    | €140     | €145    | €200    | €400    |
+| Girona Airport             | €140    | €170     | €170    | €195    | €400    |
+| Girona City                | €140    | €170     | €165    | €190    | €400    |
+| Andorra                    | €350    | €450     | €465    | €550    | €1100   |
+| Castelldefels              | €50     | €65      | €65     | €75     | €200    |
+| Sitges                     | €80     | €100     | €110    | €130    | €250    |
+| Vilanova i la Geltrú       | €85     | €105     | €115    | €140    | €300    |
+| Cubelles                   | €90     | €110     | €120    | €145    | €300    |
+| Calafell                   | €100    | €120     | €130    | €155    | €300    |
+| Vendrell                   | €110    | €130     | €145    | €165    | €350    |
+| Tarragona                  | €150    | €180     | €190    | €210    | €400    |
+| La Pineda                  | €155    | €175     | €195    | €215    | €450    |
+| Salou                      | €155    | €180     | €195    | €215    | €450    |
+| PortAventura               | €155    | €180     | €195    | €215    | €450    |
+| Cambrils                   | €160    | €180     | €200    | €220    | €450    |
+| Reus Airport (REU)         | €155    | €180     | €195    | €215    | €450    |
+| Mataró                     | €90     | €110     | €120    | €145    | €300    |
+| Calella                    | €110    | €130     | €145    | €165    | €350    |
+| Pineda de Mar              | €115    | €135     | €150    | €170    | €350    |
+| Santa Susanna              | €120    | €140     | €155    | €175    | €350    |
+| Malgrat de Mar             | €125    | €145     | €160    | €180    | €350    |
+| Blanes                     | €135    | €155     | €170    | €195    | €400    |
+| Lloret de Mar              | €145    | €165     | €180    | €205    | €400    |
+| Tossa de Mar               | €155    | €175     | €195    | €215    | €450    |
+| S'Agaró                    | €155    | €175     | €195    | €215    | €450    |
+| Platja d'Aro               | €160    | €180     | €200    | €220    | €450    |
+| Palamós                    | €185    | €205     | €225    | €250    | €500    |
+| Begur / Aiguablava         | €200    | €220     | €240    | €265    | €550    |
+| Roses                      | €205    | €225     | €250    | €270    | €550    |
+| Empuriabrava               | €210    | €230     | €255    | €275    | €550    |
+| Figueres                   | €200    | €220     | €240    | €265    | €550    |
+| Cadaqués                   | €240    | €280     | €285    | €320    | €650    |
 
 ## Hourly chauffeur hire
 | Vehicle class    | Hourly rate | Minimum |

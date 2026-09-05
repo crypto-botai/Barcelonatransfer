@@ -29,7 +29,7 @@ import {
   distanceFare,
   KEY_TO_ZONE_CODE,
 } from "@/lib/pricing";
-import { FIXED_ROUTES } from "@/lib/fixed-prices";
+import { FIXED_ROUTES, returnLegSurcharge } from "@/lib/fixed-prices";
 import { haversineDistance } from "@/lib/utils";
 import type { VehicleClass, FleetVehicle } from "@/types";
 
@@ -307,17 +307,31 @@ export async function getQuote(input: QuoteInput): Promise<Quote> {
     return customRouteQuote(vehicleClass, distanceKm, durationMin);
   }
 
+  // The only direction-aware adjustment in the system. Everything above it
+  // matches a route both ways round; this looks at the ordered pair and charges
+  // the return leg out of Andorra €20 more than the way there.
+  //
+  // Folded into baseFare rather than given a field of its own. A new field
+  // would have to reach the Booking table to survive to the invoice, and that
+  // needs a migration this project has no path for — the schema is pushed, not
+  // migrated. The invoice prints baseFare as a single "Base fare" line that has
+  // always equalled the total on a fixed-price ride, and it still does.
+  const total = fixedPrice + returnLegSurcharge(
+    KEY_TO_ZONE_CODE[fromZone],
+    KEY_TO_ZONE_CODE[toZone],
+  );
+
   return {
     vehicleClass,
     distanceKm:          Math.round(distanceKm * 10) / 10,
     durationMin,
-    baseFare:            fixedPrice,
+    baseFare:            total,
     distanceFare:        0,
     airportSurcharge:    0,
     nightSurcharge:      0,
     lastMinuteSurcharge: 0,
     vatAmount:           0,
-    totalAmount:         fixedPrice,
+    totalAmount:         total,
     currency:            "EUR",
     isFixed:             true,
     isCustomRoute:       false,
