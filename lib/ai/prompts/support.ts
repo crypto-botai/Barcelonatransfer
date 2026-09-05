@@ -34,11 +34,10 @@ function returnLegNote(): string {
     const to   = ZONE_LABELS[ZONE_CODE_TO_KEY[s.to]]   ?? s.to;
     return `- ${from} → ${to}: add €${s.amount} to the fare listed for that route.`;
   });
-  return `
-
-RETURN LEG: these journeys cost more in the direction shown. The reverse direction is the listed price.
-${lines.join("
-")}`;
+  const intro =
+    "RETURN LEG: these journeys cost more in the direction shown. " +
+    "The reverse direction is the listed price.";
+  return ["", "", intro, ...lines].join("\n");
 }
 
 async function buildLivePricingSection(): Promise<string> {
