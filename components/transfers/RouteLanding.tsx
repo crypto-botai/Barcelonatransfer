@@ -245,7 +245,32 @@ export default function RouteLandingPage({ data }: { data: RouteLanding }) {
                 How the options actually <span className="text-gold-gradient">compare</span>
               </h2>
               {optionsIntro && <p className="text-dark-300 mb-8">{optionsIntro}</p>}
-              <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-dark-900">
+              {/* Four columns of prose need 375px and a phone gives them 356px,
+                  so "Best for" was cut mid-word on every row — and at 320px the
+                  Cost column went too. Removing the nowrap on the first column
+                  was not enough; prose this wide does not fit a phone as a
+                  table at all.
+
+                  So it is a table only from sm up. Below that each option is a
+                  block with its three facts labelled, which reads better on a
+                  phone than a table that has to be swiped sideways. One source
+                  list, rendered twice. */}
+              <div className="sm:hidden flex flex-col gap-3">
+                {options.map((o) => (
+                  <div key={o.name} className="rounded-xl border border-white/[0.08] bg-dark-900 p-4">
+                    <p className="text-white font-medium mb-2">{o.name}</p>
+                    <dl className="text-sm">
+                      <dt className="text-dark-400 text-xs uppercase tracking-wider">Cost</dt>
+                      <dd className="text-dark-300 mb-2">{o.cost}</dd>
+                      <dt className="text-dark-400 text-xs uppercase tracking-wider">Time</dt>
+                      <dd className="text-dark-300 mb-2">{o.time}</dd>
+                      <dt className="text-dark-400 text-xs uppercase tracking-wider">Best for</dt>
+                      <dd className="text-dark-300">{o.best}</dd>
+                    </dl>
+                  </div>
+                ))}
+              </div>
+              <div className="hidden sm:block overflow-x-auto rounded-xl border border-white/[0.08] bg-dark-900">
                 <table className="w-full text-sm">
                   <caption className="sr-only">Ways to make this journey, compared</caption>
                   <thead>
@@ -259,10 +284,6 @@ export default function RouteLandingPage({ data }: { data: RouteLanding }) {
                   <tbody>
                     {options.map((o) => (
                       <tr key={o.name} className="border-b border-white/[0.04] last:border-0 align-top">
-                        {/* whitespace-nowrap held this column at its longest
-                            name, which pushed "Best for" off a phone screen
-                            mid-word. The names are two words; letting them
-                            wrap costs nothing and buys the last column. */}
                         <td className="p-3.5 text-white">{o.name}</td>
                         <td className="p-3.5 text-dark-300">{o.cost}</td>
                         <td className="p-3.5 text-dark-300">{o.time}</td>
