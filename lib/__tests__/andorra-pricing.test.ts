@@ -154,10 +154,28 @@ describe("the return leg has somewhere to be read", () => {
   });
 
   it("tells the AI crawlers, whose files claim every route is symmetric", () => {
+    // The first version of this note said "add EUR 20 to the fare listed for
+    // that route", which only reaches the right answer if a model matches
+    // "Andorra" in the table to "Andorra la Vella" in a note fifty lines away,
+    // infers which direction the table prices, and does the arithmetic — while
+    // the section header's arrow tells it both directions cost the same. So the
+    // test is that the fare appears as a literal number, not as an instruction.
+    const outbound = lookupPriceByClass("BCN_AIRPORT", "ANDORRA", "ECONOMY")!;
+    const back = outbound + returnLegSurcharge("ANDORRA", "BCN_AIRPORT");
+
     for (const name of ["llms.txt", "llms-full.txt"]) {
       const text = readFileSync(join("public", name), "utf-8");
-      expect(text, name).toMatch(/Andorra la Vella to Barcelona City: add EUR 20/);
-      expect(text, name).toMatch(/Andorra la Vella to El Prat Airport: add EUR 20/);
+      for (const to of ["Barcelona City", "El Prat Airport"]) {
+        const line = text.split("
+").find((l) => l.startsWith(`- Andorra la Vella to ${to}:`));
+        expect(line, `${name}: no return line for ${to}`).toBeTruthy();
+        expect(line, `${name}: ${to} line must state the fare, not an adjustment`)
+          .toContain(`EUR ${back}`);
+        expect(line, `${name}: ${to} line must also give the outbound fare`)
+          .toContain(`EUR ${outbound}`);
+        expect(line, `${name}: ${to} line should point at the page`)
+          .toContain("/transfers/andorra-to-barcelona");
+      }
       // the unqualified claim must be gone
       expect(text, name).not.toMatch(/All routes (are )?bidirectional/);
     }
