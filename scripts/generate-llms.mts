@@ -20,9 +20,14 @@
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { FIXED_ROUTES, type FixedRoute, type VehicleCode } from "../lib/fixed-prices";
+import {
+  FIXED_ROUTES,
+  RETURN_LEG_SURCHARGES,
+  type FixedRoute,
+  type VehicleCode,
+} from "../lib/fixed-prices";
 import { VEHICLE_CATALOG, EXTRAS_CATALOG, BAG_SIZES } from "../types";
-import { HOURLY_RATES, MIN_HOURLY_HOURS } from "../lib/pricing";
+import { HOURLY_RATES, MIN_HOURLY_HOURS, ZONE_LABELS, ZONE_CODE_TO_KEY } from "../lib/pricing";
 import { COMPANY } from "../lib/company-facts";
 import { SUPPORTED_LOCALES } from "../lib/i18n";
 
@@ -54,6 +59,25 @@ function destLabel(r: FixedRoute): string {
 /** Routes leaving a given zone, in table order. */
 function routesFrom(zone: string): FixedRoute[] {
   return FIXED_ROUTES.filter((r) => r.from === zone);
+}
+
+/**
+ * The routes that cost more in one direction, as a list a model can quote.
+ *
+ * Both files assert that every route is bidirectional, which was true until
+ * Andorra got a return fare. Left alone, the assertion would be handed to
+ * GPTBot, ClaudeBot and PerplexityBot as fact, and the answer they give a
+ * customer would be EUR 20 under what the checkout takes.
+ *
+ * Built from the array getQuote() actually applies, so this cannot describe a
+ * surcharge that is not charged or miss one that is.
+ */
+function returnLegLines(): string {
+  return RETURN_LEG_SURCHARGES.map((s) => {
+    const from = ZONE_LABELS[ZONE_CODE_TO_KEY[s.from]] ?? s.from;
+    const to = ZONE_LABELS[ZONE_CODE_TO_KEY[s.to]] ?? s.to;
+    return `- ${from} to ${to}: add EUR ${s.amount} to the fare listed for that route.`;
+  }).join("\n");
 }
 
 function priceTable(rows: FixedRoute[]): string {
@@ -151,9 +175,14 @@ individually. Prices are per vehicle and EXCLUDE VAT and tolls.
 ${fleetLines()}
 
 ## Pricing
-Fixed per vehicle, EXCLUDING VAT and tolls. All routes are bidirectional:
-A→B costs the same as B→A. ${FIXED_ROUTES.length} fixed routes; destinations
-outside the table are priced by road distance.
+Fixed per vehicle, EXCLUDING VAT and tolls. Routes are bidirectional —
+A→B costs the same as B→A — apart from the return legs listed below.
+${FIXED_ROUTES.length} fixed routes; destinations outside the table are
+priced by road distance.
+
+Return legs that are NOT the same in both directions. The table below prices
+the journey INTO the destination; leaving costs more:
+${returnLegLines()}
 
 Where an individual car is priced below its class column:
 ${perCarNotes()}
@@ -241,7 +270,9 @@ ${VEHICLE_CATALOG.map((v, i) => `${i + 1}. ${v.label} — ${v.badge ?? "vehicle"
 - No surge pricing at night, on holidays, in bad weather or during events
 - Included: chauffeur, vehicle, fuel, airport fees, parking
 - Excluded: VAT (10%, added only when an invoice is requested) and motorway tolls
-- All routes bidirectional: A→B and B→A cost the same
+- Routes are bidirectional — A→B and B→A cost the same — with these exceptions,
+  where the table prices the journey INTO the destination and leaving costs more:
+${returnLegLines()}
 - Per vehicle, not per person
 
 Individual cars priced below their class column:

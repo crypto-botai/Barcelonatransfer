@@ -3,7 +3,11 @@ import {
   Car, Luggage, Plane, CalendarClock, Route as RouteIcon, Mountain, Snowflake,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { lookupPriceByFleetVehicle, type ZoneCode } from "@/lib/fixed-prices";
+import {
+  lookupPriceByFleetVehicle,
+  returnLegSurcharge,
+  type ZoneCode,
+} from "@/lib/fixed-prices";
 import { VEHICLE_CATALOG, type VehicleInfo } from "@/types";
 
 /**
@@ -85,6 +89,23 @@ function ladder(from: ZoneCode, to: ZoneCode): PricedVehicle[] {
 
 function cheapestOf(...ladders: PricedVehicle[][]): number {
   return Math.min(...ladders.flat().map((v) => v.price));
+}
+
+/**
+ * The same ladder for a leg that carries a return surcharge.
+ *
+ * ladder() reads the route table, which has no direction: one row prices a
+ * journey both ways. getQuote() adds the ordered-pair surcharge afterwards, so
+ * for the one leg that has one, a page built on ladder() alone would advertise
+ * a fare the checkout does not charge. This puts the page and the checkout back
+ * on the same number.
+ *
+ * Returns the plain ladder when the pair has no surcharge, so it is safe to
+ * reach for whenever a page is written around a named direction.
+ */
+function returnLadder(from: ZoneCode, to: ZoneCode): PricedVehicle[] {
+  const extra = returnLegSurcharge(from, to);
+  return ladder(from, to).map((v) => ({ ...v, price: v.price + extra }));
 }
 
 /**
@@ -926,7 +947,143 @@ const SALOU: RouteLanding = {
   ),
 };
 
-export const ROUTE_LANDINGS: RouteLanding[] = [LA_ROCA, SANTS, VILANOVA, BEGUR, ENCAMP, SITGES, SALOU];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Andorra to Barcelona — the return leg
+//
+// The one direction on the site that is not symmetric. The route table stores a
+// journey once and prices it the same both ways; RETURN_LEG_SURCHARGES in
+// lib/fixed-prices.ts is the single exception, and getQuote() applies it, so a
+// car leaving Andorra costs €20 more than the same car arriving. A page built
+// from the outbound ladder would therefore have advertised a fare the checkout
+// does not charge, which is the fault the whole pricing module exists to stop.
+//
+// It earns a page on the three tests at the top of this file: the fare is in
+// the table, "Andorra to Barcelona" is searched by name as its own journey
+// rather than as a footnote to the outbound one, and there is something true to
+// say that appears nowhere else — a departure leg is timed backwards from a
+// flight across 210 km of mountain road, which is a different problem from
+// being met at arrivals.
+//
+// Distance and journey time are the figures /transfers/andorra publishes for
+// the same road in the other direction.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const andorraReturn = returnLadder("ANDORRA", "BCN_AIRPORT");
+const andorraReturnFrom = cheapestOf(andorraReturn);
+const andorraOutboundFrom = cheapestOf(ladder("BCN_AIRPORT", "ANDORRA"));
+const andorraReturnExtra = andorraReturnFrom - andorraOutboundFrom;
+
+const ANDORRA_RETURN: RouteLanding = {
+  slug: "andorra-to-barcelona",
+  name: "Andorra to Barcelona",
+  h1: "Andorra to Barcelona Transfer",
+  eyebrow: "Andorra la Vella · CG-1 / N-145",
+  EyebrowIcon: Mountain,
+  title: `Andorra to Barcelona Transfer — fixed €${andorraReturnFrom}`,
+  description: `Private car from Andorra to Barcelona city or BCN El Prat Airport. Fixed €${andorraReturnFrom} per vehicle, 210 km, about 3 hours, timed backwards from your flight.`,
+  keywords: [
+    "andorra to barcelona transfer",
+    "andorra to barcelona airport",
+    "andorra la vella to bcn airport",
+    "private transfer andorra barcelona",
+    "andorra to barcelona taxi price",
+  ],
+  heroLead: `A private car from your door in Andorra to Barcelona city or the El Prat terminals. Fixed at €${andorraReturnFrom} per vehicle and timed backwards from your flight, so the margin on a three-hour mountain drive is ours to worry about rather than yours.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "210 km" },
+    { icon: Clock, k: "Journey", v: "about 3 hours" },
+    { icon: CalendarClock, k: "Pickup", v: "Timed to your flight" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${andorraReturnFrom}` },
+  ],
+  priceTables: [
+    {
+      heading: "From Andorra to Barcelona or BCN Airport",
+      caption: "Fixed fares from Andorra to Barcelona city or Barcelona El Prat Airport by vehicle",
+      vehicles: andorraReturn,
+    },
+  ],
+  priceNote: `The city and the airport cost the same from Andorra. The leg out of the country is €${andorraReturnExtra} more than the leg into it — €${andorraOutboundFrom} coming from Barcelona against €${andorraReturnFrom} going back — because a departure run is scheduled around your flight rather than around ours, and the car drives back to Barcelona afterwards. Every other route on the site costs the same in both directions.`,
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Pickup from any address in Andorra la Vella, Escaldes, Encamp or the valley towns",
+    "Departure time calculated backwards from your flight",
+    "Skis, boards and boot bags carried at no extra charge",
+    "Drop at T1 or T2 departures, or any address in Barcelona",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the C-16 Túnel del Cadí",
+    "Child, baby and booster seats",
+    "Stops on the way, which we are happy to arrange when you book",
+  ],
+  optionsIntro: "Andorra has no airport and no railway, so every departure is by road. The same three choices as arriving, with the clock running the other way.",
+  options: [
+    { name: "Private transfer", cost: `€${andorraReturnFrom} per vehicle`, time: "About 3 hours, door to terminal", best: "Anyone with a flight to catch, a group, or ski bags to move at the end of a week" },
+    { name: "Scheduled coach", cost: "Per person, booked ahead", time: "Around 4 hours to Barcelona, then the airport leg on top", best: "Flexible departures with light luggage and a long margin before the flight" },
+    { name: "Hire car", cost: "Rental, fuel, tolls and the one-way drop fee", time: "Similar to a private transfer", best: "Stays that already had a car for the week" },
+  ],
+  optionsNote: "Leaving is the harder direction to improvise. The coach runs to a timetable that was not written around your flight, and the last useful connection of the day is often earlier than people expect in winter. If the drive takes longer than planned a fixed transfer absorbs it — a coach connection you miss does not.",
+  sections: [
+    {
+      h2: "Timed backwards from",
+      h2Accent: "your flight",
+      paras: [
+        "Give us the flight number and we work the pickup out from it rather than asking you to guess. The drive is about three hours in good conditions, the desks want you at the terminal well before a long-haul departure, and the road down from the valley is the part of the journey with the least give in it.",
+        "That margin is where departures from Andorra go wrong. Snow on the CG-1, a queue at the border post, or a slow run down to the Túnel del Cadí all come out of the same buffer, so we build the buffer rather than leaving it to the morning.",
+        "If your flight moves, tell us and the pickup moves with it. The fare does not.",
+      ],
+      cards: [
+        { icon: CalendarClock, t: "We set the departure time", d: "Give us the flight number and the pickup is calculated backwards from it, including the check-in window." },
+        { icon: Snowflake, t: "Winter is priced in", d: "Snow on the valley road costs time, not money. A fixed fare is fixed in February too." },
+        { icon: Luggage, t: "Ski kit travels free", d: "Skis, boards and boot bags at no extra charge — tell us how many so the right car is sent." },
+      ],
+    },
+    {
+      h2: "Why the way back costs",
+      h2Accent: "more",
+      paras: [
+        `Coming from Barcelona the car is already where the work is. Going the other way it is not: a departure from Andorra means positioning a car up the valley for a time your flight chose, and driving it back to Barcelona afterwards. The €${andorraReturnExtra} is that, and nothing else — same car, same driver, same road.`,
+        `It is the only asymmetric fare on the site. Everywhere else a journey costs what it costs in either direction, which is why the price table lists routes with a ⇄ rather than an arrow. Andorra outbound is €${andorraOutboundFrom} from either the airport or the city; Andorra back to either is €${andorraReturnFrom}.`,
+        "The figure is fixed at booking like any other. It is not a surge, it does not move with the season, and it does not change if the drive takes four hours instead of three.",
+      ],
+    },
+    {
+      h2: "Where we pick up,",
+      h2Accent: "and where we drop",
+      paras: [
+        "Anywhere in the country: Andorra la Vella, Escaldes-Engordany, [Encamp](/transfers/encamp), Canillo, La Massana, Ordino, Sant Julià. All of them take the same fixed fare, because the drive is dominated by the 200 km to Barcelona rather than by the last few up the valley.",
+        "The ski stations are the exception, as they are in the other direction. Pas de la Casa, Soldeu, Grandvalira and Arinsal sit well above the valley towns and are priced by road distance instead — the [ski resorts page](/transfers/andorra-ski-resorts) explains why they are quoted rather than fixed.",
+        "At the Barcelona end we drop at T1 or T2 departures, at the cruise port, at Sants, or at any city address. If you are travelling out first, [Barcelona to Andorra](/transfers/andorra) is the same road at the outbound fare, and booking both legs together is the way to keep one price and one driver across the trip.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Andorra to Barcelona?", a: `Fixed at €${andorraReturnFrom} for the ${andorraReturn[0].label}, per vehicle rather than per person, so a group of four pays once. Larger cars cost more and the full list is on this page. Barcelona city and BCN Airport are the same price. The fare excludes VAT and tolls: 10% VAT is added only if you ask for an invoice.` },
+    { q: "Why is Andorra to Barcelona more than Barcelona to Andorra?", a: `It is €${andorraReturnExtra} more — €${andorraOutboundFrom} out, €${andorraReturnFrom} back. A departure run means positioning a car up the valley for a time your flight sets, and returning it to Barcelona afterwards. It is the only route on the site priced differently in each direction.` },
+    { q: "How long does the drive take?", a: "About 3 hours for the 210 km in good conditions. Winter can add to it — snow on the valley road and queues at the border are the usual reasons — which is why a departure pickup is timed with a margin rather than to the minute." },
+    { q: "What time will you collect me for my flight?", a: "We calculate it backwards from your flight: the drive, the check-in window for your airline and destination, and a margin for the mountain section. Give us the flight number when you book and we confirm the pickup time along with the price." },
+    { q: "Do you collect from the ski stations?", a: "Yes, but they are priced by road distance rather than at the Andorra fare — Grandvalira, Pas de la Casa, Soldeu and Arinsal are quoted at booking. The valley towns, including Encamp and Canillo, all take the fixed fare on this page." },
+    { q: "Can I book the outbound and the return together?", a: "Yes, and it is worth doing. The outbound from Barcelona is the lower fare, the return is the one above, and booking them together fixes both prices and keeps the same driver across the trip rather than leaving the departure to be arranged locally on your last morning." },
+  ],
+  bookingLead: "Give us your address in Andorra, your flight number and how many passengers and ski bags are travelling. We set the pickup time from the flight and confirm the price before you pay — it does not move afterwards, for snow or for anything else.",
+  ctaLead: `Fixed at €${andorraReturnFrom} per vehicle from Andorra to Barcelona or BCN El Prat.`,
+  cheapest: andorraReturnFrom,
+  ...schemaFor(
+    "andorra-to-barcelona",
+    "Andorra to Barcelona",
+    "Andorra to Barcelona Private Transfer",
+    `Fixed-price private transfer from Andorra to Barcelona city or Barcelona El Prat Airport. €${andorraReturnFrom} per vehicle, 210 km, about 3 hours, departure timed backwards from your flight.`,
+    andorraReturnFrom,
+    // The capital rather than the country: the pickup is a place, and /pricing
+    // already identifies Andorra la Vella by the same entity.
+    { type: "City", name: "Andorra la Vella", sameAs: "https://www.wikidata.org/wiki/Q1863" },
+  ),
+};
+
+export const ROUTE_LANDINGS: RouteLanding[] = [
+  LA_ROCA, SANTS, VILANOVA, BEGUR, ENCAMP, SITGES, SALOU, ANDORRA_RETURN,
+];
 
 export function routeLanding(slug: string): RouteLanding | undefined {
   return ROUTE_LANDINGS.find((r) => r.slug === slug);

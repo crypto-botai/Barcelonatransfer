@@ -30,9 +30,15 @@ individually. Prices are per vehicle and EXCLUDE VAT and tolls.
 - Mercedes Sprinter — Minibus, up to 16 passengers, 12 large cases (75 × 50 × 30 cm). Large Group, Air Conditioning, PA System, Luggage Hold, Reclining Seats.
 
 ## Pricing
-Fixed per vehicle, EXCLUDING VAT and tolls. All routes are bidirectional:
-A→B costs the same as B→A. 73 fixed routes; destinations
-outside the table are priced by road distance.
+Fixed per vehicle, EXCLUDING VAT and tolls. Routes are bidirectional —
+A→B costs the same as B→A — apart from the return legs listed below.
+73 fixed routes; destinations outside the table are
+priced by road distance.
+
+Return legs that are NOT the same in both directions. The table below prices
+the journey INTO the destination; leaving costs more:
+- Andorra la Vella to Barcelona City: add EUR 20 to the fare listed for that route.
+- Andorra la Vella to El Prat Airport: add EUR 20 to the fare listed for that route.
 
 Where an individual car is priced below its class column:
 - El Prat Airport ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €60

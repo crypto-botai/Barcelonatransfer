@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Search, ArrowRight } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+import { HOURLY_RATES, MIN_HOURLY_HOURS, returnSurchargeForRoute } from "@/lib/pricing";
 import PriceCell from "@/components/pricing/PriceCell";
 import type { PublicRoute } from "@/lib/pricing-service";
 import { useTranslations } from "@/components/language/I18nProvider";
@@ -56,6 +56,12 @@ function PriceTable({ data, search, rowCta }: {
             // anchor is the route name already in the cell, so no two links
             // share the same text.
             const href = routePageHref(r.fromKey, r.toKey);
+            // A row prices a journey, not a direction — hence the "⇄" in every
+            // label. One pair breaks that: leaving Andorra costs more than
+            // arriving. Saying so here is the difference between a table that
+            // is complete and one that shows the cheaper of two figures and
+            // lets the checkout produce the other.
+            const returnExtra = returnSurchargeForRoute(r.fromKey, r.toKey);
             return (
             <tr key={r.slug} className="price-row border-b border-white/[0.04]">
               <td className="py-3.5 px-4 text-sm text-dark-200">
@@ -67,6 +73,11 @@ function PriceTable({ data, search, rowCta }: {
                   r.label
                 )}
                 {r.note && <span className="ml-2 text-xs text-dark-400">({r.note})</span>}
+                {returnExtra && (
+                  <span className="ml-2 text-xs text-gold-500/80 whitespace-nowrap">
+                    +{formatCurrency(returnExtra.amount)} leaving {returnExtra.leavingLabel}
+                  </span>
+                )}
               </td>
               <PriceCell amount={r.economy}  />
               <PriceCell amount={r.business} />

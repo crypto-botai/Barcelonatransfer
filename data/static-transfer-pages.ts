@@ -35,4 +35,8 @@ export const STATIC_TRANSFER_PAGES: StaticTransferPage[] = [
   { slug: "sants-station",  name: "Barcelona Sants Station",   type: "route", distance_km: 14,  prices: { sedan: 50 } },
   { slug: "vilanova",       name: "Vilanova i la Geltru",      type: "route", distance_km: 36,  prices: { sedan: 85 } },
   { slug: "begur",          name: "Begur & Aiguablava",        type: "route", distance_km: 146, prices: { sedan: 200 } },
+  // The return leg, added 5 Sep. distance_km is the same road as /transfers/andorra.
+  // prices.sedan is not displayed — the nearby cards resolve the real fare — so the
+  // +20 EUR return surcharge is not expressible here and does not need to be.
+  { slug: "andorra-to-barcelona", name: "Andorra to Barcelona", type: "route", distance_km: 210, prices: { sedan: 370 } },
 ];

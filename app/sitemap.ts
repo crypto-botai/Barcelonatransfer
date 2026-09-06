@@ -112,6 +112,16 @@ const RELEASES: ReadonlyArray<{ date: string; paths: readonly string[] }> = [
       "/airport-transfers",
     ],
   },
+  {
+    // The return leg out of Andorra, which is the one journey on the site that
+    // costs more in one direction than the other and had no page saying so.
+    date: "2026-09-05",
+    paths: [
+      "/transfers/andorra-to-barcelona",
+      "/transfers/andorra",
+      "/pricing",
+    ],
+  },
 ];
 
 /** path -> date, flattened once. A later release wins if a path repeats. */
@@ -222,6 +232,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/transfers/castelldefels`, lastModified: lastMod("/transfers/castelldefels"), changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/transfers/tarragona`,     lastModified: lastMod("/transfers/tarragona"), changeFrequency: "monthly", priority: 0.8  },
     { url: `${BASE}/transfers/andorra`,       lastModified: lastMod("/transfers/andorra"), changeFrequency: "monthly", priority: 0.8  },
+    { url: `${BASE}/transfers/andorra-to-barcelona`, lastModified: lastMod("/transfers/andorra-to-barcelona"), changeFrequency: "monthly", priority: 0.8  },
     { url: `${BASE}/transfers/cruise-port`,   lastModified: lastMod("/transfers/cruise-port"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/transfers/port-aventura`, lastModified: lastMod("/transfers/port-aventura"), changeFrequency: "monthly", priority: 0.75 },
 

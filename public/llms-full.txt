@@ -67,7 +67,10 @@ binding one: check both before choosing a vehicle.
 - No surge pricing at night, on holidays, in bad weather or during events
 - Included: chauffeur, vehicle, fuel, airport fees, parking
 - Excluded: VAT (10%, added only when an invoice is requested) and motorway tolls
-- All routes bidirectional: A→B and B→A cost the same
+- Routes are bidirectional — A→B and B→A cost the same — with these exceptions,
+  where the table prices the journey INTO the destination and leaving costs more:
+- Andorra la Vella to Barcelona City: add EUR 20 to the fare listed for that route.
+- Andorra la Vella to El Prat Airport: add EUR 20 to the fare listed for that route.
 - Per vehicle, not per person
 
 Individual cars priced below their class column:

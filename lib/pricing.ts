@@ -5,6 +5,7 @@ import {
   lookupFixedPrice as lookupFixedPriceFn,
   lookupPriceByClass,
   lookupPriceByFleetVehicle,
+  returnLegSurcharge,
   VEHICLE_TO_PRICE_CLASS,
   DB_CLASS_TO_CODE,
   type VehicleCode,
@@ -541,6 +542,38 @@ function resolveVehicleCode(vc: string): VehicleCode | null {
 // Service-layer helper: DB VehicleClass → price column.
 export function vehicleCodeForClass(vc: VehicleClass): VehicleCode | null {
   return DB_CLASS_TO_CODE[vc] ?? null;
+}
+
+/**
+ * The return surcharge on a route, described in zone-key terms.
+ *
+ * The price table is bidirectional and the /pricing rows say so with a "⇄", so
+ * a row carries one figure for a journey that has two directions. That is right
+ * for every route but the Andorra pair, where leaving costs more than arriving.
+ * Without this the table would quietly show the cheaper of the two and the
+ * checkout would charge the other.
+ *
+ * Takes zone KEYS, which is what a route row holds, and returns the surcharge
+ * along with the end it applies when leaving — so a caller can say which
+ * direction is dearer rather than only that one of them is.
+ *
+ * Null when neither direction carries one, which is every route but two.
+ */
+export function returnSurchargeForRoute(
+  fromKey: string,
+  toKey: string,
+): { amount: number; leavingLabel: string } | null {
+  const from = KEY_TO_ZONE_CODE[fromKey];
+  const to = KEY_TO_ZONE_CODE[toKey];
+  if (!from || !to) return null;
+
+  const out = returnLegSurcharge(from, to);
+  if (out > 0) return { amount: out, leavingLabel: ZONE_LABELS[fromKey] ?? fromKey };
+
+  const back = returnLegSurcharge(to, from);
+  if (back > 0) return { amount: back, leavingLabel: ZONE_LABELS[toKey] ?? toKey };
+
+  return null;
 }
 
 // ─── Matrix lookup ────────────────────────────────────────────────────────────

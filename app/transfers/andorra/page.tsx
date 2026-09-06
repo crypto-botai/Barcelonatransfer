@@ -18,6 +18,8 @@ const andorraPrice =
 // drift from what the checkout charges.
 const andorraReturnPrice =
   andorraPrice + returnLegSurcharge("ANDORRA", "BCN_AIRPORT");
+const andorraReturnCityPrice =
+  andorraPrice + returnLegSurcharge("ANDORRA", "BARCELONA_CITY");
 
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Airport to Andorra Private Transfer | Elite BCN" },
@@ -283,9 +285,13 @@ export default function AndorraTransferPage() {
                     { route: "BCN Airport → Vallnord ski resort", price: "Quoted by distance" },
                     // Encamp takes the Andorra fare — it is a town, not a station.
                     { route: "BCN Airport → Encamp", price: `€${andorraPrice}` },
-                    // The return leg is €20 more than the outbound, by the owner's
-                    // decision. It is the only row here that is not symmetric.
+                    // The two return rows are €20 more than the outbound, by the
+                    // owner's decision, and are the only rows here that are not
+                    // symmetric. They were missing entirely: the table listed six
+                    // ways into Andorra and no way out, so the one direction whose
+                    // price a reader could not guess was the one not shown.
                     { route: "Andorra la Vella → BCN Airport", price: `€${andorraReturnPrice}` },
+                    { route: "Andorra la Vella → Barcelona city", price: `€${andorraReturnCityPrice}` },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.route}</td>
@@ -295,6 +301,7 @@ export default function AndorraTransferPage() {
                 </tbody>
               </table>
             </div>
+            <p className="text-dark-400 text-sm text-center mt-4">The two legs out of Andorra are €{andorraReturnPrice} rather than €{andorraPrice}, and are the only fares on the site that differ by direction — <Link href="/transfers/andorra-to-barcelona" className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40">Andorra to Barcelona</Link> explains why and covers the departure leg in full.</p>
             <p className="text-dark-500 text-xs text-center mt-4">Fixed price per vehicle, excl. VAT and tolls. 10% VAT is added only if you request an invoice; motorway tolls are charged separately. Airport pickups include 60 minutes of free waiting from landing; city, port and station pickups include 15 minutes. Meet & greet, child seats and other extras are optional and charged separately.</p>
           </div>
         </section>
