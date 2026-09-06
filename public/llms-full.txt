@@ -1,5 +1,5 @@
 # Elite BCN Transfers — Complete AI Reference (llms-full.txt)
-# Generated from live site data on 2026-08-25. Companion to /llms.txt.
+# Generated from live site data on 2026-09-05. Companion to /llms.txt.
 
 ## Service Identity
 - Legal name: Elite BCN Transfers
@@ -69,8 +69,8 @@ binding one: check both before choosing a vehicle.
 - Excluded: VAT (10%, added only when an invoice is requested) and motorway tolls
 - Routes are bidirectional — A→B and B→A cost the same — with these exceptions,
   where the table prices the journey INTO the destination and leaving costs more:
-- Andorra la Vella to Barcelona City: add EUR 20 to the fare listed for that route.
-- Andorra la Vella to El Prat Airport: add EUR 20 to the fare listed for that route.
+- Andorra la Vella to Barcelona City: EUR 370 (Economy, per vehicle). Barcelona City to Andorra la Vella is EUR 350. The journey out of Andorra la Vella costs EUR 20 more than the journey into it. Details: https://www.elitebcn.info/transfers/andorra-to-barcelona
+- Andorra la Vella to El Prat Airport: EUR 370 (Economy, per vehicle). El Prat Airport to Andorra la Vella is EUR 350. The journey out of Andorra la Vella costs EUR 20 more than the journey into it. Details: https://www.elitebcn.info/transfers/andorra-to-barcelona
 - Per vehicle, not per person
 
 Individual cars priced below their class column:

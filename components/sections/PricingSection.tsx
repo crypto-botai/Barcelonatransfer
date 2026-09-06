@@ -75,7 +75,13 @@ function PriceTable({ data, search, rowCta }: {
                 {r.note && <span className="ml-2 text-xs text-dark-400">({r.note})</span>}
                 {returnExtra && (
                   <span className="ml-2 text-xs text-gold-500/80 whitespace-nowrap">
-                    +{formatCurrency(returnExtra.amount)} leaving {returnExtra.leavingLabel}
+                    {returnExtra.page ? (
+                      <Link href={returnExtra.page} className="hover:text-gold-400 transition-colors underline underline-offset-2 decoration-gold-500/30">
+                        +{formatCurrency(returnExtra.amount)} leaving {returnExtra.leavingLabel}
+                      </Link>
+                    ) : (
+                      <>+{formatCurrency(returnExtra.amount)} leaving {returnExtra.leavingLabel}</>
+                    )}
                   </span>
                 )}
               </td>

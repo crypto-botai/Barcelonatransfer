@@ -65,6 +65,7 @@ const transfersHubSchema = {
     { "@type": "WebPage", name: "Barcelona to Girona Transfer",      url: "https://www.elitebcn.info/transfers/girona" },
     { "@type": "WebPage", name: "Barcelona to Tarragona Transfer",   url: "https://www.elitebcn.info/transfers/tarragona" },
     { "@type": "WebPage", name: "Barcelona to Andorra Transfer",     url: "https://www.elitebcn.info/transfers/andorra" },
+    { "@type": "WebPage", name: "Andorra to Barcelona Transfer",     url: "https://www.elitebcn.info/transfers/andorra-to-barcelona" },
     { "@type": "WebPage", name: "Barcelona to Lourdes Transfer",     url: "https://www.elitebcn.info/transfers/lourdes" },
     { "@type": "WebPage", name: "Barcelona Costa Brava Transfers",   url: "https://www.elitebcn.info/transfers/costa-brava" },
     { "@type": "WebPage", name: "Barcelona Cruise Port Transfer",    url: "https://www.elitebcn.info/transfers/cruise-port" },
@@ -307,7 +308,15 @@ export default async function TransfersHubPage() {
               <Link href="/blog" className="text-gold-400 hover:text-gold-300">
                 destination guides
               </Link>{" "}
-              cover what is worth the drive.
+              cover what is worth the drive. One journey is priced by direction rather than by
+              destination — the leg{" "}
+              {/* The return page had a single inbound link, from /transfers/andorra.
+                  A page nothing points at is a page Google has little reason to
+                  rank, and this index is where a reader looking for a route
+                  actually is. */}
+              <Link href="/transfers/andorra-to-barcelona" className="text-gold-400 hover:text-gold-300">
+                out of Andorra back to Barcelona
+              </Link>, which costs €20 more than the drive up.
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">

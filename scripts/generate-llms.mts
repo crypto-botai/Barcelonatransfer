@@ -76,8 +76,21 @@ function returnLegLines(): string {
   return RETURN_LEG_SURCHARGES.map((s) => {
     const from = ZONE_LABELS[ZONE_CODE_TO_KEY[s.from]] ?? s.from;
     const to = ZONE_LABELS[ZONE_CODE_TO_KEY[s.to]] ?? s.to;
-    return `- ${from} to ${to}: add EUR ${s.amount} to the fare listed for that route.`;
-  }).join("\n");
+    // The route table has one row per journey, either way round.
+    const route = FIXED_ROUTES.find(
+      (r) =>
+        (r.from === s.from && r.to === s.to) || (r.from === s.to && r.to === s.from),
+    );
+    if (!route) return "";
+    const there = route.prices.ECONOMY;
+    const back = there + s.amount;
+    const link = s.page ? ` Details: ${SITE}${s.page}` : "";
+    return (
+      `- ${from} to ${to}: EUR ${back} (Economy, per vehicle). ` +
+      `${to} to ${from} is EUR ${there}. ` +
+      `The journey out of ${from} costs EUR ${s.amount} more than the journey into it.${link}`
+    );
+  }).filter(Boolean).join("\n");
 }
 
 function priceTable(rows: FixedRoute[]): string {

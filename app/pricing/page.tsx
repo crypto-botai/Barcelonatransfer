@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PricingSection from "@/components/sections/PricingSection";
 import { getPublicRoutes } from "@/lib/pricing-service";
+import { returnLegSurcharge } from "@/lib/fixed-prices";
 import { getRates } from "@/lib/currency";
 import { CurrencyProvider } from "@/components/currency/CurrencyProvider";
 import CurrencySwitcher from "@/components/currency/CurrencySwitcher";
@@ -52,6 +53,10 @@ const PRICING_SCHEMA = {
       { "@type": "Offer", name: "BCN Airport → Lloret de Mar",         price: String(ladderFor("lloret", "airport")!.economy), priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
       { "@type": "Offer", name: "BCN Airport → Girona Airport",        price: String(ladderFor("girona_airport", "airport")!.economy), priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
       { "@type": "Offer", name: "BCN Airport → Andorra la Vella",      price: String(ladderFor("andorra", "airport")!.economy), priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
+      // The one journey that is not the same price both ways. Listing only
+      // the outbound would publish €350 as the Andorra fare in markup while
+      // the checkout takes €370 from anyone travelling home.
+      { "@type": "Offer", name: "Andorra la Vella → BCN Airport",      price: String(ladderFor("andorra", "airport")!.economy + returnLegSurcharge("ANDORRA", "BCN_AIRPORT")), priceCurrency: "EUR", priceValidUntil: "2027-12-31" },
     ],
   },
 };

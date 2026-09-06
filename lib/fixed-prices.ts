@@ -740,9 +740,11 @@ export const RETURN_LEG_SURCHARGES: ReadonlyArray<{
   from:   ZoneCode;
   to:     ZoneCode;
   amount: number;
+  /** The page that explains this surcharge, for surfaces that can link it. */
+  page?:  string;
 }> = [
-  { from: "ANDORRA", to: "BARCELONA_CITY", amount: 20 },
-  { from: "ANDORRA", to: "BCN_AIRPORT",    amount: 20 },
+  { from: "ANDORRA", to: "BARCELONA_CITY", amount: 20, page: "/transfers/andorra-to-barcelona" },
+  { from: "ANDORRA", to: "BCN_AIRPORT",    amount: 20, page: "/transfers/andorra-to-barcelona" },
 ];
 
 /** The return surcharge for this ordered pair, or 0 when there is none. */

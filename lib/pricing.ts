@@ -5,7 +5,7 @@ import {
   lookupFixedPrice as lookupFixedPriceFn,
   lookupPriceByClass,
   lookupPriceByFleetVehicle,
-  returnLegSurcharge,
+  RETURN_LEG_SURCHARGES,
   VEHICLE_TO_PRICE_CLASS,
   DB_CLASS_TO_CODE,
   type VehicleCode,
@@ -562,18 +562,21 @@ export function vehicleCodeForClass(vc: VehicleClass): VehicleCode | null {
 export function returnSurchargeForRoute(
   fromKey: string,
   toKey: string,
-): { amount: number; leavingLabel: string } | null {
+): { amount: number; leavingLabel: string; page?: string } | null {
   const from = KEY_TO_ZONE_CODE[fromKey];
   const to = KEY_TO_ZONE_CODE[toKey];
   if (!from || !to) return null;
 
-  const out = returnLegSurcharge(from, to);
-  if (out > 0) return { amount: out, leavingLabel: ZONE_LABELS[fromKey] ?? fromKey };
+  const hit =
+    RETURN_LEG_SURCHARGES.find((s) => s.from === from && s.to === to) ??
+    RETURN_LEG_SURCHARGES.find((s) => s.from === to && s.to === from);
+  if (!hit) return null;
 
-  const back = returnLegSurcharge(to, from);
-  if (back > 0) return { amount: back, leavingLabel: ZONE_LABELS[toKey] ?? toKey };
-
-  return null;
+  return {
+    amount: hit.amount,
+    leavingLabel: ZONE_LABELS[ZONE_CODE_TO_KEY[hit.from]] ?? hit.from,
+    page: hit.page,
+  };
 }
 
 // ─── Matrix lookup ────────────────────────────────────────────────────────────

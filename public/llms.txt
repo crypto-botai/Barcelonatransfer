@@ -1,7 +1,7 @@
 # Elite BCN Transfers — AI & LLM Reference
 
 > Licensed VTC chauffeur service in Barcelona, Spain. Fixed-price private
-> transfers, no surge pricing. Generated from the live pricing data on 2026-08-25.
+> transfers, no surge pricing. Generated from the live pricing data on 2026-09-05.
 > Format: [llms.txt v1](https://llmstxt.org).
 
 ## Service Summary
@@ -37,8 +37,8 @@ priced by road distance.
 
 Return legs that are NOT the same in both directions. The table below prices
 the journey INTO the destination; leaving costs more:
-- Andorra la Vella to Barcelona City: add EUR 20 to the fare listed for that route.
-- Andorra la Vella to El Prat Airport: add EUR 20 to the fare listed for that route.
+- Andorra la Vella to Barcelona City: EUR 370 (Economy, per vehicle). Barcelona City to Andorra la Vella is EUR 350. The journey out of Andorra la Vella costs EUR 20 more than the journey into it. Details: https://www.elitebcn.info/transfers/andorra-to-barcelona
+- Andorra la Vella to El Prat Airport: EUR 370 (Economy, per vehicle). El Prat Airport to Andorra la Vella is EUR 350. The journey out of Andorra la Vella costs EUR 20 more than the journey into it. Details: https://www.elitebcn.info/transfers/andorra-to-barcelona
 
 Where an individual car is priced below its class column:
 - El Prat Airport ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €60

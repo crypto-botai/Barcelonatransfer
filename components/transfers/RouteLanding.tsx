@@ -67,28 +67,38 @@ function PriceTable({
   vehicles: PricedVehicle[];
   caption: string;
 }) {
+  // Four columns need about 386px and a phone gives the container 356px, so the
+  // fare column — the one number the page exists to state — was cut to "€3" on
+  // a 390px screen and "€4" at 320px. It scrolled, but nothing said so, and a
+  // price a reader has to discover by swiping is a price they do not see.
+  //
+  // Below sm the passenger and luggage counts fold into a line under the
+  // vehicle name, which leaves two columns and no truncation at any width.
   return (
     <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-dark-900">
       <table className="w-full text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr className="border-b border-white/[0.08] bg-dark-800">
-            <th scope="col" className="text-left p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Vehicle</th>
-            <th scope="col" className="text-center p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Passengers</th>
-            <th scope="col" className="text-center p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Large cases</th>
-            <th scope="col" className="text-right p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Fixed fare</th>
+            <th scope="col" className="text-left p-3 sm:p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Vehicle</th>
+            <th scope="col" className="hidden sm:table-cell text-center p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Passengers</th>
+            <th scope="col" className="hidden sm:table-cell text-center p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Large cases</th>
+            <th scope="col" className="text-right p-3 sm:p-3.5 text-dark-400 font-medium text-xs uppercase tracking-wider">Fixed fare</th>
           </tr>
         </thead>
         <tbody>
           {vehicles.map((v) => (
             <tr key={v.class} className="border-b border-white/[0.04] last:border-0">
-              <td className="p-3.5">
+              <td className="p-3 sm:p-3.5">
                 <span className="text-white">{v.label}</span>
                 {v.badge && <span className="text-dark-400 text-xs ml-2">{v.badge}</span>}
+                <span className="block sm:hidden text-dark-400 text-xs mt-0.5">
+                  {v.maxPassengers} passengers · {v.largeBags} large cases
+                </span>
               </td>
-              <td className="p-3.5 text-center text-dark-300">{v.maxPassengers}</td>
-              <td className="p-3.5 text-center text-dark-300">{v.largeBags}</td>
-              <td className="p-3.5 text-right text-gold-400 font-semibold">€{v.price}</td>
+              <td className="hidden sm:table-cell p-3.5 text-center text-dark-300">{v.maxPassengers}</td>
+              <td className="hidden sm:table-cell p-3.5 text-center text-dark-300">{v.largeBags}</td>
+              <td className="p-3 sm:p-3.5 text-right text-gold-400 font-semibold whitespace-nowrap">€{v.price}</td>
             </tr>
           ))}
         </tbody>
@@ -100,7 +110,7 @@ function PriceTable({
 export default function RouteLandingPage({ data }: { data: RouteLanding }) {
   const {
     name, h1, eyebrow, EyebrowIcon, heroLead, facts,
-    priceTables, priceNote, included, excluded,
+    priceTables, priceHeading, priceNote, included, excluded,
     options, optionsIntro, optionsNote,
     sections, faqs, ctaLead, cheapest,
   } = data;
@@ -113,8 +123,15 @@ export default function RouteLandingPage({ data }: { data: RouteLanding }) {
 
       <main className="pt-20">
         <nav aria-label="Breadcrumb" className="container mx-auto px-4 pt-6">
+          {/* Matches breadcrumbSchema exactly — Home, Transfers, the page.
+              It used to show two crumbs labelled "All Destinations" while the
+              markup claimed three starting at Home, and Google treats a
+              BreadcrumbList that does not reflect the visible trail as a reason
+              to drop the breadcrumb result rather than show it. */}
           <ol className="flex items-center gap-2 text-xs text-dark-400">
-            <li><Link href="/transfers" className="hover:text-gold-400 transition-colors">All Destinations</Link></li>
+            <li><Link href="/" className="hover:text-gold-400 transition-colors">Home</Link></li>
+            <li aria-hidden="true"><ChevronRight size={12} /></li>
+            <li><Link href="/transfers" className="hover:text-gold-400 transition-colors">Transfers</Link></li>
             <li aria-hidden="true"><ChevronRight size={12} /></li>
             <li className="text-dark-300">{name}</li>
           </ol>
@@ -158,8 +175,21 @@ export default function RouteLandingPage({ data }: { data: RouteLanding }) {
         {/* ── Prices ───────────────────────────────────────────── */}
         <section className="py-14 bg-dark-950 border-y border-white/[0.06]">
           <div className="container mx-auto px-4 max-w-3xl">
+            {/* "Fixed prices to X" only reads as English while X is a place.
+                Andorra to Barcelona is a direction, and the default produced
+                "Fixed prices to Andorra to Barcelona" — so a page whose name is
+                a journey supplies its own heading. */}
             <h2 className="font-display text-3xl text-white mb-3">
-              Fixed prices to <span className="text-gold-gradient">{name}</span>
+              {priceHeading ? (
+                <>
+                  {priceHeading.lead}{" "}
+                  <span className="text-gold-gradient">{priceHeading.accent}</span>
+                </>
+              ) : (
+                <>
+                  Fixed prices to <span className="text-gold-gradient">{name}</span>
+                </>
+              )}
             </h2>
             <p className="text-dark-300 mb-8">
               Per vehicle, not per person. One passenger and a full car pay the same fare.
@@ -229,7 +259,11 @@ export default function RouteLandingPage({ data }: { data: RouteLanding }) {
                   <tbody>
                     {options.map((o) => (
                       <tr key={o.name} className="border-b border-white/[0.04] last:border-0 align-top">
-                        <td className="p-3.5 text-white whitespace-nowrap">{o.name}</td>
+                        {/* whitespace-nowrap held this column at its longest
+                            name, which pushed "Best for" off a phone screen
+                            mid-word. The names are two words; letting them
+                            wrap costs nothing and buys the last column. */}
+                        <td className="p-3.5 text-white">{o.name}</td>
                         <td className="p-3.5 text-dark-300">{o.cost}</td>
                         <td className="p-3.5 text-dark-300">{o.time}</td>
                         <td className="p-3.5 text-dark-300">{o.best}</td>

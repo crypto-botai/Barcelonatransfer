@@ -38,6 +38,10 @@ export default function Footer() {
     { key: "lloretDeMar",      href: "/transfers/lloret-de-mar" },
     { key: "portAventura",     href: "/transfers/port-aventura" },
     { key: "andorra",          href: "/transfers/andorra" },
+    // The return leg is a separate page with a separate fare. It carried one
+    // inbound link site-wide, which is not enough for Google to treat it as
+    // anything but an afterthought of the outbound page.
+    { key: "andorraReturn",    href: "/transfers/andorra-to-barcelona" },
     { key: "gironaAirport",    href: "/transfers/girona" },
     { key: "tarragona",        href: "/transfers/tarragona" },
     { key: "cadaques",         href: "/transfers/cadaques" },
