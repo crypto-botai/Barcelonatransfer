@@ -91,13 +91,24 @@ export interface RouteLanding {
 
 /** Every fleet car that has a fare on this leg, cheapest first in the table order. */
 function ladder(from: ZoneCode, to: ZoneCode): PricedVehicle[] {
-  return VEHICLE_CATALOG.map((v) => ({
-    ...v,
-    price: lookupPriceByFleetVehicle(from, to, v.class),
-    // undefined rather than null: the field is optional, and a route with no
-    // offer should carry no key at all rather than an empty one.
-    offer: offerForFleetVehicle(from, to, v.class) ?? undefined,
-  })).filter((v): v is PricedVehicle => v.price !== null);
+  // Built by hand rather than map().filter(). The filter used a
+  // `v is PricedVehicle` predicate to drop the unpriced cars and narrow
+  // `price` from `number | null`, and that predicate stopped being valid the
+  // moment an optional `offer` joined PricedVehicle: a type with an optional
+  // property is not assignable to one where the same key is required, so the
+  // narrowing silently fell away and the null came back with it.
+  //
+  // A guard and a push say the same thing without depending on that, and
+  // `offer` is omitted entirely rather than set to undefined, so a car with no
+  // offer carries no key at all.
+  const priced: PricedVehicle[] = [];
+  for (const v of VEHICLE_CATALOG) {
+    const price = lookupPriceByFleetVehicle(from, to, v.class);
+    if (price === null) continue;
+    const offer = offerForFleetVehicle(from, to, v.class);
+    priced.push(offer ? { ...v, price, offer } : { ...v, price });
+  }
+  return priced;
 }
 
 function cheapestOf(...ladders: PricedVehicle[][]): number {
