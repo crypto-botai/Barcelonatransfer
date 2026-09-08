@@ -206,7 +206,9 @@ export default function ApplyTablePricesButton({
 
       {rows.length > 0 && (
         <button
-          onClick={apply}
+          // Wrapped, not passed directly: apply() takes allowDecrease, and a
+          // bare onClick={apply} hands it the MouseEvent as that argument.
+          onClick={() => apply(false)}
           disabled={busy}
           className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gold-500/15 border border-gold-500/30 text-gold-300 hover:bg-gold-500/25 text-xs font-medium transition-colors disabled:opacity-40"
         >

@@ -166,8 +166,7 @@ describe("the return leg has somewhere to be read", () => {
     for (const name of ["llms.txt", "llms-full.txt"]) {
       const text = readFileSync(join("public", name), "utf-8");
       for (const to of ["Barcelona City", "El Prat Airport"]) {
-        const line = text.split("
-").find((l) => l.startsWith(`- Andorra la Vella to ${to}:`));
+        const line = text.split("\n").find((l) => l.startsWith(`- Andorra la Vella to ${to}:`));
         expect(line, `${name}: no return line for ${to}`).toBeTruthy();
         expect(line, `${name}: ${to} line must state the fare, not an adjustment`)
           .toContain(`EUR ${back}`);
