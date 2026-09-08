@@ -29,6 +29,13 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+# .env.production was tracked until 8 Sep 2026 and carried live credentials —
+# the database URL and password, NEXTAUTH_SECRET, the Google OAuth secret, and
+# the Resend and SumUp API keys. The pattern above only caught the ".local"
+# suffix, so the production file slipped through. The real values live in
+# Vercel's environment settings; nothing secret belongs in the repo.
+.env.production
+.env.*.production
 
 # vercel
 .vercel
