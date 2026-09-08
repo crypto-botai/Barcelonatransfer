@@ -17,7 +17,9 @@ export default function MobileBookBar() {
 
   return (
     <div
-      className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/[0.08]"
+      /* z-30 so the full-screen navigation drawer (z-40) covers it. At z-40 it
+         tied with the drawer and, being later in the DOM, painted over it. */
+      className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/[0.08]"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <Link

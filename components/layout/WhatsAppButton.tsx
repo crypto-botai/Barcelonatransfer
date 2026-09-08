@@ -38,7 +38,10 @@ export default function WhatsAppButton() {
   return (
     // Sits clear of the mobile price bar on the booking form, and drops to the
     // corner once there is room for it.
-    <div ref={ref} className="fixed bottom-20 right-6 lg:bottom-6 z-50 flex flex-col items-end gap-3">
+    /* z-[35]: above the mobile book bar (z-30), below the navigation drawer
+       (z-40). At z-50 it sat level with the navbar and floated on top of the
+       open mobile menu, covering the drawer's own Book CTA. */
+    <div ref={ref} className="fixed bottom-20 right-6 lg:bottom-6 z-[35] flex flex-col items-end gap-3">
       {open && (
         <div className="animate-menu-in glass-card rounded-2xl p-5 w-72 shadow-luxury">
           <div className="flex items-center gap-3 mb-4">
