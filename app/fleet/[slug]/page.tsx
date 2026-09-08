@@ -6,7 +6,7 @@ import { CheckCircle2, Users, Briefcase, Star, Shield, Clock, ChevronRight, Zap 
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { VEHICLE_CATALOG, vehicleBadgeClass, BAG_SIZES, type FleetVehicle } from "@/types";
-import { getFleetFromPrice, lookupFixedPriceByZone } from "@/lib/pricing";
+import { getFleetFromPrice, getFleetOffer, lookupFixedPriceByZone } from "@/lib/pricing";
 import { SHARED_OG, fitTitle, fitDescription } from "@/lib/seo";
 
 const SLUG_TO_CLASS: Record<string, FleetVehicle> = {
@@ -100,6 +100,7 @@ export default async function FleetVehiclePage(
   if (!vehicle) return notFound();
 
   const minFare  = getFleetFromPrice(vehicleClass);
+  const offer    = getFleetOffer(vehicleClass);
 
   // Seats and boot space are separate limits, and the boot is usually the one
   // that bites: the Tesla Model 3 seats four but takes two large cases, and the
@@ -239,8 +240,16 @@ export default async function FleetVehiclePage(
                   ))}
                 </div>
 
-                <div className="flex items-baseline gap-2 mb-6">
+                <div className="flex items-baseline flex-wrap gap-2 mb-6">
                   <span className="font-display text-4xl text-gold-400">from €{minFare}</span>
+                  {offer && (
+                    <>
+                      <span className="text-dark-400 text-xl line-through">€{offer.was}</span>
+                      <span className="px-2 py-0.5 rounded text-xs font-bold bg-emerald-400 text-black">
+                        −{offer.pctOff}% airport transfer offer
+                      </span>
+                    </>
+                  )}
                   <span className="text-dark-400 text-sm">fixed price · excl. VAT &amp; tolls</span>
                 </div>
 

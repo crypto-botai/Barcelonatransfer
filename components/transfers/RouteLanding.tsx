@@ -98,7 +98,17 @@ function PriceTable({
               </td>
               <td className="hidden sm:table-cell p-3.5 text-center text-dark-300">{v.maxPassengers}</td>
               <td className="hidden sm:table-cell p-3.5 text-center text-dark-300">{v.largeBags}</td>
-              <td className="p-3 sm:p-3.5 text-right text-gold-400 font-semibold whitespace-nowrap">€{v.price}</td>
+              <td className="p-3 sm:p-3.5 text-right whitespace-nowrap">
+                {v.offer && (
+                  <span className="text-dark-500 line-through mr-1.5 text-xs tabular-nums">€{v.offer.was}</span>
+                )}
+                <span className="text-gold-400 font-semibold tabular-nums">€{v.price}</span>
+                {v.offer && (
+                  <span className="ml-1.5 px-1 py-0.5 rounded text-[10px] font-bold bg-emerald-400 text-black align-middle">
+                    −{v.offer.pctOff}%
+                  </span>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

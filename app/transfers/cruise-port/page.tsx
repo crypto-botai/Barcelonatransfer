@@ -19,8 +19,11 @@ const hotelPort = ROUTES.find((r) => r.from === "cruise" && r.to === "barcelona_
   ?? ROUTES.find((r) => r.from === "barcelona_city" && r.to === "cruise")?.economy ?? 0;
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona Cruise Port Transfer — from €50" },
-  description: "Fixed €50 from the airport, €60 from a city hotel, to the WTC quays or Moll Adossat. Tell us your ship and the driver meets you at that terminal.",
+  // The other route where origin changes the fare. `hotelPort` above exists
+  // precisely because the city figure was once hand-typed as €35 against a
+  // real €60; restating either number here would reopen that hole.
+  title: { absolute: `Barcelona Cruise Port Transfer — from €${cruisePrice}` },
+  description: `Fixed €${cruisePrice} from the airport, €${hotelPort} from a city hotel, to the WTC quays or Moll Adossat. Tell us your ship and the driver meets you at that terminal.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/cruise-port" },
   keywords: ["barcelona cruise port transfer", "world trade centre transfer", "moll adossat transfer", "barcelona port taxi", "cruise ship transfer barcelona"],
   openGraph: {

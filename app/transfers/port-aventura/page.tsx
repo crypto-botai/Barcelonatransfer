@@ -5,7 +5,7 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
-import { ladderFor } from "@/lib/destination-pricing";
+import { ladderFor, ladderOffersFor } from "@/lib/destination-pricing";
 import RouteFaqs from "@/components/transfers/RouteFaqs";
 import { ROUTE_FAQ_SPECS } from "@/lib/route-faqs";
 
@@ -13,23 +13,33 @@ const LADDER = ladderFor("portaventura", "airport")!;
 
 const PA = ROUTES.find((r) => r.to === "portaventura")!;
 
+// PA above resolves to the airport row, which is the first PortAventura entry
+// in the table, so the offers must be read from the same origin or the page
+// would print the airport's fare beside the city's old price.
+const PA_OFFERS = ladderOffersFor("portaventura", "airport");
+
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona to PortAventura Transfer — from €155" },
+  // Every figure below is read, not typed. All six said €155 — the fare until
+  // the 8 Sep 2026 offer cut it to €140 — so the page would have advertised a
+  // price in Google that the checkout no longer charges. That is the drift
+  // lib/PRICING.md exists to prevent, and metadata is the one surface the
+  // structural test in price-surface.test.ts cannot see.
+  title: { absolute: `Barcelona to PortAventura Transfer — from €${LADDER.economy}` },
   description:
-    "Fixed €155 per vehicle to PortAventura World, door to door. The price covers the whole car rather than each seat, so a family pays once.",
+    `Fixed €${LADDER.economy} per vehicle to PortAventura World, door to door. The price covers the whole car rather than each seat, so a family pays once.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/port-aventura" },
   keywords: ["barcelona portaventura transfer", "portaventura theme park transfer", "barcelona portaventura world private transfer", "salou portaventura taxi"],
   openGraph: {
     ...SHARED_OG,
-    title: "Barcelona to PortAventura Transfer — from €155 | Fixed Price",
-    description: "Private transfer from Barcelona to PortAventura World from €155. Fixed price, family-friendly, all vehicle classes.",
+    title: `Barcelona to PortAventura Transfer — from €${LADDER.economy} | Fixed Price`,
+    description: `Private transfer from Barcelona to PortAventura World from €${LADDER.economy}. Fixed price, family-friendly, all vehicle classes.`,
     url: "https://www.elitebcn.info/transfers/port-aventura",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to PortAventura Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barcelona to PortAventura Transfer — from €155 | Fixed Price",
-    description: "Private transfer from Barcelona to PortAventura World from €155. Fixed price, family-friendly.",
+    title: `Barcelona to PortAventura Transfer — from €${LADDER.economy} | Fixed Price`,
+    description: `Private transfer from Barcelona to PortAventura World from €${LADDER.economy}. Fixed price, family-friendly.`,
     images: ["/opengraph-image"],
   },
 };
@@ -38,7 +48,9 @@ const paSchema = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: "Barcelona to PortAventura World Transfer",
-  description: "Fixed-price private transfer from Barcelona to PortAventura World, Ferrari Land and Caribe Aquatic Park. From €155 economy to €275 minibus.",
+  // The minibus figure was wrong independently of the reprice: the schema said
+  // €275 against a table fare of €450, and had done since before this change.
+  description: `Fixed-price private transfer from Barcelona to PortAventura World, Ferrari Land and Caribe Aquatic Park. From €${LADDER.economy} economy to €${LADDER.minibus} minibus.`,
   url: "https://www.elitebcn.info/transfers/port-aventura",
   provider: { "@id": "https://www.elitebcn.info/#business" },
   areaServed: "PortAventura, Salou, Tarragona, Spain",
@@ -98,7 +110,7 @@ export default function PortAventuraTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: "Fixed price from €155", body: "Single fixed price per vehicle, excluding VAT and tolls. No meter running, no extra charge for luggage." },
+                { icon: Shield, title: `Fixed price from €${PA.economy}`, body: "Single fixed price per vehicle, excluding VAT and tolls. No meter running, no extra charge for luggage." },
                 { icon: CheckCircle2, title: "Child seats available", body: "Baby and booster seats on request, €5 per seat — essential for families flying in with young children." },
                 { icon: Star, title: "Direct to theme park gate", body: "Drop-off at PortAventura main entrance, Ferrari Land entrance, or your on-site hotel lobby." },
                 { icon: Clock, title: "Meet & greet in arrivals", body: "Driver waits with your name board in the arrivals hall. 60 minutes free waiting from your flight landing." },
@@ -149,16 +161,26 @@ export default function PortAventuraTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { label: "Sedan (Economy)",    pax: "1–3 pax", price: PA.economy  },
-                    { label: "Business Sedan",     pax: "1–3 pax", price: PA.business },
-                    { label: "Minivan (Vito)",     pax: "4–8 pax", price: PA.minivan  },
-                    { label: "V-Class VIP",        pax: "7 pax",   price: PA.vclass   },
-                    { label: "Minibus",            pax: "9+ pax",  price: PA.minibus  },
+                    { label: "Sedan (Economy)",    pax: "1–3 pax", price: PA.economy,  offer: PA_OFFERS.economy  },
+                    { label: "Business Sedan",     pax: "1–3 pax", price: PA.business, offer: PA_OFFERS.business },
+                    { label: "Minivan (Vito)",     pax: "4–8 pax", price: PA.minivan,  offer: PA_OFFERS.minivan  },
+                    { label: "V-Class VIP",        pax: "7 pax",   price: PA.vclass,   offer: PA_OFFERS.vclass   },
+                    { label: "Minibus",            pax: "9+ pax",  price: PA.minibus,  offer: PA_OFFERS.minibus  },
                   ].map((row) => (
                     <tr key={row.label} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02]">
                       <td className="p-4 text-white">{row.label}</td>
                       <td className="p-4 text-dark-400">{row.pax}</td>
-                      <td className="p-4 text-gold-400 font-semibold text-right">€{row.price}</td>
+                      <td className="p-4 text-right whitespace-nowrap">
+                        {row.offer && (
+                          <span className="text-dark-500 line-through mr-2 text-xs tabular-nums">€{row.offer.was}</span>
+                        )}
+                        <span className="text-gold-400 font-semibold tabular-nums">€{row.price}</span>
+                        {row.offer && (
+                          <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-400 text-black align-middle">
+                            −{row.offer.pctOff}%
+                          </span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

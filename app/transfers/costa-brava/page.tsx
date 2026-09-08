@@ -18,8 +18,8 @@ const COSTA_BRAVA_FROM = cheapestOf(["blanes", "lloret", "tossa", "sagaro", "pla
 const COSTA_BRAVA = ROUTES.filter((r) => r.category === "costa-brava");
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona to Costa Brava Transfer — from €135" },
-  description: "Lloret, Tossa, Blanes, Palamós, Roses and Cadaqués, each with its own published fare from €135. Fixed per car, set before you travel.",
+  title: { absolute: `Barcelona to Costa Brava Transfer — from €${COSTA_BRAVA_FROM}` },
+  description: `Lloret, Tossa, Blanes, Palamós, Roses and Cadaqués, each with its own published fare from €${COSTA_BRAVA_FROM}. Fixed per car, set before you travel.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/costa-brava" },
   keywords: ["barcelona costa brava transfer"],
   openGraph: {

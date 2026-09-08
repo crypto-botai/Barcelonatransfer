@@ -14,9 +14,9 @@ const LADDER = ladderFor("cadaques", "airport")!;
 const BASE = "https://www.elitebcn.info";
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona to Cadaqués Transfer — from €240" },
+  title: { absolute: `Barcelona to Cadaqués Transfer — from €${LADDER.economy}` },
   description:
-    "Fixed €240 per vehicle over the Cap de Creus road to Cadaqués. No meter on the winding final approach, and the fare is set before you travel.",
+    `Fixed €${LADDER.economy} per vehicle over the Cap de Creus road to Cadaqués. No meter on the winding final approach, and the fare is set before you travel.`,
   alternates: { canonical: `${BASE}/transfers/cadaques` },
   keywords: ["barcelona cadaques transfer", "cadaques private car barcelona", "cadaques airport transfer", "costa brava transfer cadaques"],
   openGraph: {

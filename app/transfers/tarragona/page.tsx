@@ -4,7 +4,7 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
-import { ladderFor } from "@/lib/destination-pricing";
+import { ladderFor, ladderOffersFor } from "@/lib/destination-pricing";
 import RouteFaqs from "@/components/transfers/RouteFaqs";
 import { ROUTE_FAQ_SPECS } from "@/lib/route-faqs";
 
@@ -14,11 +14,25 @@ const portAventura = ladderFor("portaventura", "airport")!;
 // this page, its schema and the checkout together, or reaches none.
 const LADDER = ladderFor("tarragona", "airport")!;
 
+// The city ladder is a separate read since the 8 Sep 2026 offer, which priced
+// Business at €150 from the city against €160 from the airport. Every other
+// rung still matches, but Business no longer does, so a row saying "Barcelona →"
+// must not read the airport figure.
+const CITY = ladderFor("tarragona", "barcelona_city")!;
+
+const AIRPORT_OFFERS = ladderOffersFor("tarragona", "airport");
+const CITY_OFFERS    = ladderOffersFor("tarragona", "barcelona_city");
+const PA_OFFERS      = ladderOffersFor("portaventura", "airport");
+
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona to Tarragona Transfer — from €150" },
+  // Read, not typed: both of these said €150 for as long as it took the 8 Sep
+  // offer to cut the fare to €140, which is the drift lib/PRICING.md exists to
+  // stop. The structural test does not reach metadata strings, so this is the
+  // one place on the page that has to be got right by hand.
+  title: { absolute: `Barcelona to Tarragona Transfer — from €${LADDER.economy}` },
   description:
-    "Fixed €150 per car to Tarragona, Salou, La Pineda or PortAventura. Roman city and theme park on one route, priced per vehicle rather than per seat.",
+    `Fixed €${LADDER.economy} per car to Tarragona, Salou, La Pineda or PortAventura. Roman city and theme park on one route, priced per vehicle rather than per seat.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/tarragona" },
   keywords: ["barcelona tarragona transfer", "tarragona private car barcelona", "barcelona roman ruins transfer"],
   openGraph: {
@@ -151,15 +165,29 @@ export default function TarragonaTransferPage() {
                 </thead>
                 <tbody>
                   {[
-                    { route: "Barcelona → Tarragona (Economy sedan)",     price: `€${LADDER.economy}` },
-                    { route: "Barcelona → Tarragona (Business sedan)",    price: `€${LADDER.business}` },
-                    { route: "Barcelona → Tarragona (Minivan, 4–8 pax)", price: `€${LADDER.minivan}` },
-                    { route: "Barcelona → PortAventura / Salou",          price: `€${portAventura.economy}` },
-                    { route: "Tarragona → Barcelona (same fixed price)",  price: `€${LADDER.economy}` },
+                    // Economy, Minivan and V-Class cost the same from the city
+                    // and the airport, so those rows say "Barcelona" and read
+                    // either ladder. Business does not, and is split in two.
+                    { route: "Barcelona → Tarragona (Economy sedan)",           price: `€${CITY.economy}`,   offer: CITY_OFFERS.economy },
+                    { route: "Barcelona city → Tarragona (Business sedan)",     price: `€${CITY.business}`,  offer: CITY_OFFERS.business },
+                    { route: "El Prat Airport → Tarragona (Business sedan)",    price: `€${LADDER.business}`, offer: AIRPORT_OFFERS.business },
+                    { route: "Barcelona → Tarragona (Minivan, 4–8 pax)",       price: `€${CITY.minivan}`,   offer: CITY_OFFERS.minivan },
+                    { route: "Barcelona → PortAventura / Salou",                price: `€${portAventura.economy}`, offer: PA_OFFERS.economy },
+                    { route: "Tarragona → Barcelona (same fixed price)",        price: `€${CITY.economy}`,   offer: CITY_OFFERS.economy },
                   ].map((row) => (
                     <tr key={row.route} className="border-b border-white/[0.04] last:border-0">
                       <td className="p-4 text-white">{row.route}</td>
-                      <td className="p-4 text-gold-400 font-semibold text-right">{row.price}</td>
+                      <td className="p-4 text-right whitespace-nowrap">
+                        {row.offer && (
+                          <span className="text-dark-500 line-through mr-2 text-xs tabular-nums">€{row.offer.was}</span>
+                        )}
+                        <span className="text-gold-400 font-semibold tabular-nums">{row.price}</span>
+                        {row.offer && (
+                          <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-400 text-black align-middle">
+                            −{row.offer.pctOff}%
+                          </span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

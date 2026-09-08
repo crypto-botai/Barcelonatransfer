@@ -213,6 +213,65 @@ describe("no public page publishes a hand-typed fare", () => {
   });
 });
 
+describe("no page hand-types a fare into its metadata", () => {
+  /**
+   * The gap that let the PortAventura page advertise €155 in Google while the
+   * checkout charged €140.
+   *
+   * Every test above reads either JSX text or a schema `price` field. A title
+   * or description is neither: it is a plain string in an exported object, so
+   * six stale figures sat on that one page through a reprice without a single
+   * assertion noticing. The Tarragona page had two more.
+   *
+   * A double-quoted string is the tell. The correct form is a template
+   * literal reading the table — `from €${LADDER.economy}` — which cannot
+   * contain a literal digit after the euro sign.
+   */
+  const FEE_EXEMPT = new Set([
+    "5",   // child seat, meet & greet
+    "10",  // referral credit, and the VAT percentage written as €10 nowhere
+    "20",  // pet
+    "25",  // extra stop, further half hour of waiting
+  ]);
+
+  /**
+   * Just the exported metadata object, not the whole file.
+   *
+   * Body copy is already covered by the JSX-text test above, and legal and
+   * comparison pages legitimately quote figures that have no route behind
+   * them. Widening this beyond metadata turns it into noise.
+   */
+  function metadataBlock(src: string): string {
+    const start = src.indexOf("export const metadata");
+    if (start === -1) return "";
+    const end = src.indexOf("\n};", start);
+    const block = end === -1 ? src.slice(start) : src.slice(start, end);
+    // Comments out first. Several of these blocks explain in prose which stale
+    // figure they replaced — "the description said €300" — and a quoted
+    // example inside a comment is documentation, not a published price.
+    return block.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "");
+  }
+
+  it.each(publicPages())("%s reads any fare in its metadata", (page) => {
+    const src = metadataBlock(fs.readFileSync(page, "utf8"));
+    if (src === "") return;
+    // Double-quoted strings only: a template literal is the correct form and
+    // is what this test is steering people towards.
+    // Anchored within one line: a string literal cannot contain a raw newline,
+    // so allowing one lets the match run from a quote on one line to a quote
+    // on another and swallow whatever sits between them.
+    const literals = [...src.matchAll(/"[^"\n]*?€\s?(\d[\d.,]*)[^"\n]*"/g)]
+      .map((m) => m[1].replace(/[.,]+$/, ""))
+      .filter((v) => !FEE_EXEMPT.has(v));
+
+    expect(
+      literals,
+      `${page} hand-types €${literals.join(", €")} in a metadata string — read it from the route table ` +
+      `and use a template literal (see lib/PRICING.md)`,
+    ).toEqual([]);
+  });
+});
+
 describe("the sitewide offer catalogue is generated", () => {
   it("builds every offer from the table", async () => {
     const { buildOfferCatalog } = await import("../offer-catalog");

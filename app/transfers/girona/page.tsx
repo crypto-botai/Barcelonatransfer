@@ -17,9 +17,11 @@ const AIRPORT_LADDER = ladderFor("girona_airport", "airport")!;
 
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona to Girona Transfer — from €140" },
+  // Both figures read: this is one of the routes where the origin genuinely
+  // changes the fare, so the two must come from their own ladders.
+  title: { absolute: `Barcelona to Girona Transfer — from €${LADDER.economy}` },
   description:
-    "€140 from Barcelona city, €165 from the airport, to Girona or Girona-Costa Brava airport (GRO). Both fares fixed per vehicle and set before you book.",
+    `€${LADDER.economy} from Barcelona city, €${AIRPORT_LADDER.economy} from the airport, to Girona or Girona-Costa Brava airport (GRO). Both fares fixed per vehicle and set before you book.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/girona" },
   keywords: ["barcelona girona transfer", "barcelona girona airport transfer", "gro airport transfer", "girona costa brava transfer barcelona"],
   openGraph: {

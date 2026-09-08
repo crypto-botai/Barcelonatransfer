@@ -18,8 +18,8 @@ const COSTA_DORADA_FROM = cheapestOf(["castelldefels", "sitges", "cubelles", "ca
 const COSTA_DORADA = ROUTES.filter((r) => r.category === "costa-dorada");
 
 export const metadata: Metadata = {
-  title: { absolute: "Barcelona to Costa Dorada Transfer — from €50" },
-  description: "Sitges, Tarragona, Salou, PortAventura and Cambrils, each with a published fixed fare from €50. One price per car, whatever the traffic does.",
+  title: { absolute: `Barcelona to Costa Dorada Transfer — from €${COSTA_DORADA_FROM}` },
+  description: `Sitges, Tarragona, Salou, PortAventura and Cambrils, each with a published fixed fare from €${COSTA_DORADA_FROM}. One price per car, whatever the traffic does.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/costa-dorada" },
   keywords: ["barcelona costa dorada transfer", "airport salou transfer", "barcelona portaventura transfer", "salou private transfer"],
   openGraph: {

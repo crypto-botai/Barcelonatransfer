@@ -13,20 +13,21 @@ import FAQSection from "@/components/sections/FAQSection";
 import { getPublicRoutes } from "@/lib/pricing-service";
 import { readReviews } from "@/lib/reviews-store";
 import { SHARED_OG } from "@/lib/seo";
+import { CHEAPEST_FARE } from "@/lib/destination-pricing";
 import { alternatesFor } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Airport Transfers & Private Chauffeur | Elite BCN" },
   description:
-    "Private car and driver from Barcelona Airport, T1 and T2. Fixed price per vehicle from €50, with 60 minutes of free waiting from the moment you land.",
+    `Private car and driver from Barcelona Airport, T1 and T2. Fixed price per vehicle from €${CHEAPEST_FARE}, with 60 minutes of free waiting from the moment you land.`,
   // Canonical plus hreflang for all eight languages. Every locale must list
   // every other one, itself included, or Google discards the set.
   alternates: alternatesFor("/"),
   keywords: ["barcelona airport transfer", "barcelona private transfer", "bcn el prat transfer", "luxury chauffeur barcelona", "mercedes v class barcelona"],
   openGraph: {
     ...SHARED_OG,
-    title: "Elite BCN | Barcelona Airport Transfers — From €50",
-    description: "Barcelona's #1 luxury private transfer. Fixed prices from €50, no surge pricing. BCN El Prat T1/T2. Mercedes V-Class & EQE 300 Electric. Book 24/7.",
+    title: `Elite BCN | Barcelona Airport Transfers — From €${CHEAPEST_FARE}`,
+    description: `Barcelona's #1 luxury private transfer. Fixed prices from €${CHEAPEST_FARE}, no surge pricing. BCN El Prat T1/T2. Mercedes V-Class & EQE 300 Electric. Book 24/7.`,
     url: "https://www.elitebcn.info",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Luxury Private Transfer Barcelona Airport" }],
   },

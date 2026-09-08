@@ -50,6 +50,37 @@ export interface FixedRoute {
    * column.
    */
   vehicleOverrides?: Partial<Record<import("@/types").FleetVehicle, number>>;
+
+  /**
+   * The price a car USED to cost, for the cars currently on offer.
+   *
+   * Only ever a display figure: nothing quotes from it and nothing charges it.
+   * `vehicleOverrides` above is what the customer pays; this is the number shown
+   * struck through beside it, so a visitor can see the fare has come down rather
+   * than reading €55 and having nothing to compare it against.
+   *
+   * Kept in the table rather than in a component for the reason the whole file
+   * exists: a "was €60" typed into a card is a second place a price can live,
+   * and it would still say €60 long after the real fare moved.
+   *
+   * A "was" that is not above the current fare is not an offer, and
+   * lib/__tests__/per-car-pricing.test.ts fails the build over it.
+   */
+  vehicleOffers?: Partial<Record<import("@/types").FleetVehicle, number>>;
+
+  /**
+   * The same idea one level up: what a whole price COLUMN used to cost.
+   *
+   * A per-car offer cuts one car. This cuts a tier — every car reading that
+   * column moves together, which is what a reprice of a route looks like when
+   * the owner quotes it as a ladder ("sedan 140, business 150, van 180")
+   * rather than car by car.
+   *
+   * Display only, on the same terms as vehicleOffers: the fare charged is
+   * always `prices` above, and a "was" at or below it is dropped rather than
+   * shown as a saving of nothing.
+   */
+  priceOffers?: Partial<Record<VehicleCode, number>>;
 }
 
 export const FIXED_ROUTES: FixedRoute[] = [
@@ -59,11 +90,6 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "BARCELONA_CITY",
     fromLabel: "El Prat Airport", toLabel: "Barcelona City",
     category: "airport-city",
-    // Business is €65: the Mercedes EQE 300, which the owner made the Business
-    // car on 13 Aug 2026. It was €70 for a few hours between the take-higher
-    // reprice and that decision, and no car on the site charged €70 in the end.
-    // A future E-Class sits above Business at €70 as its own tier.
-    //
     // The three cars below DO have per-car prices, which is a mechanism that
     // once let a route charge €50 offline and €60 online. It cannot do that
     // again — lib/pricing-service.ts applies these overrides on top of whatever
@@ -71,10 +97,19 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // and scripts/verify-live-prices.mts quotes every car on every route to
     // prove it.
     prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 200 },
-    // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
-    // the Business column below is €65, which is the EQE — the Business car —
-    // so the EQE needs no per-car price of its own.
-    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60 },
+    // Priced on the owner's instruction, 8 Sep 2026: the Tesla to €55 and the
+    // EQE 300 to €60, both advertised as an offer against what they cost
+    // before. The reason given was bounce — visitors were reading the price and
+    // leaving — so the cut is deliberately on the two cars a customer compares
+    // when deciding whether this route is worth it, and on this route only.
+    //
+    // The Camry is unchanged at €60. The EQE now needs a per-car price for the
+    // first time: it used to be the Business car and read the €65 column
+    // directly, and that column stays €65 because the Minivan and every other
+    // Business-class caller still prices from it.
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 55, EQE_300: 60 },
+    // Display only — the fare each car charged before the 8 Sep offer.
+    vehicleOffers: { TESLA_M3: 60, EQE_300: 65 },
   },
   {
     // Point-to-point within Barcelona city. Priced identically to the
@@ -234,7 +269,17 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "TARRAGONA",
     fromLabel: "El Prat Airport", toLabel: "Tarragona",
     category: "costa-dorada",
-    prices: { ECONOMY: 150, BUSINESS: 180, MINIVAN: 190, VCLASS: 210, MINIBUS: 400 },
+    // Repriced on the owner's instruction, 8 Sep 2026, and advertised as an
+    // offer. Was 150 / 180 / 190 / 210. The Minibus is unchanged and carries no
+    // "was", so no badge appears against it.
+    //
+    // Business is €160 from the airport and €150 from the city — the owner
+    // asked for the two to differ, which they had not on any Costa Dorada route
+    // before. It makes this the third journey where the origin changes the
+    // fare, so a page quoting the wrong one now shows a wrong number: see the
+    // origin rule in lib/PRICING.md.
+    prices:      { ECONOMY: 140, BUSINESS: 160, MINIVAN: 180, VCLASS: 195, MINIBUS: 400 },
+    priceOffers: { ECONOMY: 150, BUSINESS: 180, MINIVAN: 190, VCLASS: 210 },
   },
   {
     slug: "bcn-airport-la-pineda",
@@ -248,21 +293,28 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BCN_AIRPORT", to: "SALOU",
     fromLabel: "El Prat Airport", toLabel: "Salou",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
+    // 8 Sep 2026 offer, on the Tarragona ladder. Was 155 / 180 / 195 / 215.
+    prices:      { ECONOMY: 140, BUSINESS: 160, MINIVAN: 180, VCLASS: 195, MINIBUS: 450 },
+    priceOffers: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215 },
   },
   {
     slug: "bcn-airport-portaventura",
     from: "BCN_AIRPORT", to: "PORTAVENTURA",
     fromLabel: "El Prat Airport", toLabel: "PortAventura",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
+    // 8 Sep 2026 offer, on the Tarragona ladder. Was 155 / 180 / 195 / 215.
+    prices:      { ECONOMY: 140, BUSINESS: 160, MINIVAN: 180, VCLASS: 195, MINIBUS: 450 },
+    priceOffers: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215 },
   },
   {
     slug: "bcn-airport-cambrils",
     from: "BCN_AIRPORT", to: "CAMBRILS",
     fromLabel: "El Prat Airport", toLabel: "Cambrils",
     category: "costa-dorada",
-    prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 450 },
+    // 8 Sep 2026 offer, on the Tarragona ladder. Was 160 / 180 / 200 / 220 —
+    // the deepest cut of the four, this route having been the dearest.
+    prices:      { ECONOMY: 140, BUSINESS: 160, MINIVAN: 180, VCLASS: 195, MINIBUS: 450 },
+    priceOffers: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220 },
   },
   {
     slug: "bcn-airport-reus-airport",
@@ -481,7 +533,9 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "TARRAGONA",
     fromLabel: "Barcelona City", toLabel: "Tarragona",
     category: "costa-dorada",
-    prices: { ECONOMY: 150, BUSINESS: 180, MINIVAN: 190, VCLASS: 210, MINIBUS: 400 },
+    // 8 Sep 2026 offer. Business is €150 here against €160 from the airport.
+    prices:      { ECONOMY: 140, BUSINESS: 150, MINIVAN: 180, VCLASS: 195, MINIBUS: 400 },
+    priceOffers: { ECONOMY: 150, BUSINESS: 180, MINIVAN: 190, VCLASS: 210 },
   },
   {
     slug: "barcelona-city-la-pineda",
@@ -495,21 +549,27 @@ export const FIXED_ROUTES: FixedRoute[] = [
     from: "BARCELONA_CITY", to: "SALOU",
     fromLabel: "Barcelona City", toLabel: "Salou",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
+    // 8 Sep 2026 offer. Business €150 from the city, €160 from the airport.
+    prices:      { ECONOMY: 140, BUSINESS: 150, MINIVAN: 180, VCLASS: 195, MINIBUS: 450 },
+    priceOffers: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215 },
   },
   {
     slug: "barcelona-city-portaventura",
     from: "BARCELONA_CITY", to: "PORTAVENTURA",
     fromLabel: "Barcelona City", toLabel: "PortAventura",
     category: "costa-dorada",
-    prices: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215, MINIBUS: 450 },
+    // 8 Sep 2026 offer. Business €150 from the city, €160 from the airport.
+    prices:      { ECONOMY: 140, BUSINESS: 150, MINIVAN: 180, VCLASS: 195, MINIBUS: 450 },
+    priceOffers: { ECONOMY: 155, BUSINESS: 180, MINIVAN: 195, VCLASS: 215 },
   },
   {
     slug: "barcelona-city-cambrils",
     from: "BARCELONA_CITY", to: "CAMBRILS",
     fromLabel: "Barcelona City", toLabel: "Cambrils",
     category: "costa-dorada",
-    prices: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220, MINIBUS: 450 },
+    // 8 Sep 2026 offer. Business €150 from the city, €160 from the airport.
+    prices:      { ECONOMY: 140, BUSINESS: 150, MINIVAN: 180, VCLASS: 195, MINIBUS: 450 },
+    priceOffers: { ECONOMY: 160, BUSINESS: 180, MINIVAN: 200, VCLASS: 220 },
   },
   {
     slug: "barcelona-city-reus-airport",
@@ -713,6 +773,75 @@ export function lookupPriceByFleetVehicle(
   const perCar = route.vehicleOverrides?.[fv];
   if (perCar !== undefined) return perCar;
   return lookupPriceByClass(from, to, FLEET_TO_DB_CLASS[fv]);
+}
+
+/** What a card shows when a car is on offer: the fare, the old fare, the saving. */
+export interface VehicleOffer {
+  /** The fare charged now — the same figure lookupPriceByFleetVehicle gives. */
+  now:    number;
+  /** The fare before the offer, shown struck through. Always above `now`. */
+  was:    number;
+  /** Whole-percent saving, for the badge. */
+  pctOff: number;
+}
+
+/**
+ * The offer running on one car on one route, or null when there is none.
+ *
+ * Derived, never stored: `now` is read back through the ordinary price lookup
+ * rather than being written down beside `was`. That is what stops a card
+ * advertising "€60 → €55" after the real fare has moved to €58 — there is no
+ * second copy of the current price to go stale.
+ *
+ * Returns null rather than a zero-saving offer when `was` has fallen to or
+ * below the fare, so a stale row degrades to no badge instead of to "save €0".
+ */
+export function offerForFleetVehicle(
+  from: ZoneCode,
+  to:   ZoneCode,
+  fv:   FleetVehicle,
+): VehicleOffer | null {
+  const route = FIXED_ROUTES.find(
+    (r) => (r.from === from && r.to === to) || (r.from === to && r.to === from)
+  );
+  if (!route) return null;
+
+  // A price of its own wins over the tier's, exactly as the fare lookup above
+  // resolves it — otherwise a car could show the column's old price beside its
+  // own current one and overstate the saving.
+  const was = route.vehicleOffers?.[fv] ?? route.priceOffers?.[VEHICLE_TO_PRICE_CLASS[fv]];
+  if (was === undefined) return null;
+
+  const now = lookupPriceByFleetVehicle(from, to, fv);
+  if (now === null || was <= now) return null;
+
+  return { now, was, pctOff: Math.round(((was - now) / was) * 100) };
+}
+
+/**
+ * The offer on a whole price column, or null when that column is not on offer.
+ *
+ * What a ladder on a destination page reads: those pages quote a tier — "Economy
+ * sedan €140" — rather than a named car, so they need the column's own before
+ * and after, not any one vehicle's.
+ */
+export function offerForColumn(
+  from: ZoneCode,
+  to:   ZoneCode,
+  code: VehicleCode,
+): VehicleOffer | null {
+  const route = FIXED_ROUTES.find(
+    (r) => (r.from === from && r.to === to) || (r.from === to && r.to === from)
+  );
+  if (!route) return null;
+
+  const was = route.priceOffers?.[code];
+  if (was === undefined) return null;
+
+  const now = route.prices[code];
+  if (was <= now) return null;
+
+  return { now, was, pctOff: Math.round(((was - now) / was) * 100) };
 }
 
 /**

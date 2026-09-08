@@ -174,10 +174,11 @@ describe("Fleet and DB class price parity", () => {
   const to    = ZONE_CODE_TO_KEY[pivot.to];
 
   // Cars whose fare is still the column, i.e. those with no per-car price.
-  // EQE_300 is back on this list: the owner made it the Business car, so the
-  // column is €65 and the car needs no price of its own.
+  // EQE_300 left this list on 8 Sep 2026: the offer gave it a per-car price of
+  // €60 against the €65 column, so it is now asserted below rather than here.
+  // LUXURY stays, being the DB class rather than the car — a caller holding
+  // only a VehicleClass cannot know which car it has and still reads €65.
   const sameCases: Array<[string, string]> = [
-    ["EQE_300",       "BUSINESS"],
     ["V_CLASS",       "VCLASS"],
     ["LUXURY",        "BUSINESS"],       // DB class, no per-car price of its own
     ["LUXURY_MINIVAN","VCLASS"],         // DB class: V-Class → VCLASS
@@ -189,6 +190,16 @@ describe("Fleet and DB class price parity", () => {
       const canonicalPrice = lookupFixedPrice(pivot.from, pivot.to, canonical as VehicleCode);
       expect(aliasPrice).toBe(canonicalPrice);
     });
+  });
+
+  it("EQE_300 resolves BELOW the Business column, being on offer", () => {
+    const car    = lookupFixedPriceByZone(from, to, "EQE_300");
+    const column = lookupFixedPrice(pivot.from, pivot.to, "BUSINESS");
+    expect(car).toBe(60);
+    expect(column).toBe(65);
+    // Cheaper than its column, never dearer: the direction that cannot
+    // surprise a customer upwards at the checkout.
+    expect(car!).toBeLessThan(column!);
   });
 });
 
@@ -204,16 +215,17 @@ describe("Per-route vehicle class overrides (BCN Airport → Barcelona City)", (
     expect(lookupFixedPrice("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(65);
   });
 
-  // The owner set per-car prices on 13 Aug 2026: Camry €60, Tesla €60,
-  // EQE €65. The class prices below are unchanged — the E-Class is a Business
-  // car with no per-car price and still pays the €70 column.
-  it("Tesla Model 3 costs €60 — Electric, below the €65 Business column", () => {
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "TESLA_M3")).toBe(60);
+  // Per-car prices, 13 Aug 2026: Camry €60, Tesla €60, EQE €65. The Tesla and
+  // the EQE were then cut to €55 and €60 for the 8 Sep offer; the Camry and
+  // every class column below are unchanged, which is what keeps the offer a
+  // per-car display change rather than a reprice of the route.
+  it("Tesla Model 3 costs €55 on offer — below the €65 Business column", () => {
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "TESLA_M3")).toBe(55);
     expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "ELECTRIC_VIP")).toBe(65);
   });
 
-  it("EQE 300 costs €65 straight from the column, being the Business car", () => {
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "EQE_300")).toBe(65);
+  it("EQE 300 costs €60 on offer, cut from the €65 column it used to read", () => {
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "EQE_300")).toBe(60);
     expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "LUXURY")).toBe(65);
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "LUXURY")).toBe(65);
   });

@@ -14,6 +14,7 @@ import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import MobileBookBar from "@/components/layout/MobileBookBar";
 import DeferredAnalytics from "@/components/layout/DeferredAnalytics";
 import { buildOfferCatalog } from "@/lib/offer-catalog";
+import { CHEAPEST_FARE } from "@/lib/destination-pricing";
 import { SUPPORTED_LOCALES } from "@/lib/i18n";
 
 const inter = Inter({
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
     template: "%s | Elite BCN Transfers",
   },
   description:
-    "Barcelona's #1 luxury private transfer. Fixed prices from €50 — no surge pricing, ever. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class, EQE 300 & Vito. Book 24/7.",
+    `Barcelona's #1 luxury private transfer. Fixed prices from €${CHEAPEST_FARE} — no surge pricing, ever. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class, EQE 300 & Vito. Book 24/7.`,
   authors: [{ name: "Elite BCN Transfers" }],
   creator: "Elite BCN Transfers",
   publisher: "Elite BCN Transfers",
@@ -62,7 +63,7 @@ export const metadata: Metadata = {
     locale: "en_GB",
     url: "https://www.elitebcn.info",
     siteName: "Elite BCN Transfers",
-    title: "Elite BCN | Luxury Airport Transfers Barcelona — Fixed Prices from €50",
+    title: `Elite BCN | Luxury Airport Transfers Barcelona — Fixed Prices from €${CHEAPEST_FARE}`,
     description:
       "Barcelona's premier luxury chauffeur service. Fixed-price airport transfers, VIP travel, executive transport. Mercedes V-Class & EQE 300 Electric. No surge pricing, ever.",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Luxury Private Transfer Barcelona Airport" }],
@@ -237,7 +238,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     "Elite Barcelona Transfers",
                     "VTC Barcelona",
                   ],
-                  description: "Luxury private airport transfers in Barcelona. Fixed prices from €50. Mercedes V-Class & EQE 300 Electric. No surge pricing. Available 24/7. BCN El Prat T1/T2, cruise port, hotels, all Costa Daurada destinations.",
+                  description: `Luxury private airport transfers in Barcelona. Fixed prices from €${CHEAPEST_FARE}. Mercedes V-Class & EQE 300 Electric. No surge pricing. Available 24/7. BCN El Prat T1/T2, cruise port, hotels, all Costa Daurada destinations.`,
                   url: "https://www.elitebcn.info",
                   telephone: "+34635383712",
                   email: COMPANY.email,

@@ -5,6 +5,8 @@ import {
   lookupFixedPrice as lookupFixedPriceFn,
   lookupPriceByClass,
   lookupPriceByFleetVehicle,
+  offerForFleetVehicle,
+  type VehicleOffer,
   RETURN_LEG_SURCHARGES,
   VEHICLE_TO_PRICE_CLASS,
   DB_CLASS_TO_CODE,
@@ -627,6 +629,17 @@ export function getFleetFromPrice(fv: FleetVehicle): number {
   // €60 and €70; reading the class here would have shown both at €70.
   const price   = lookupPriceByFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", fv);
   return price ?? DEFAULT_PRICING[dbClass]?.minimumFare ?? 0;
+}
+
+/**
+ * The offer on a car's headline "from" price, or null when it is not on offer.
+ *
+ * Reads the same route getFleetFromPrice does — airport ⇄ Barcelona city, the
+ * journey the "from €X" on every fleet card is quoting — so the struck-through
+ * figure always belongs to the fare printed next to it.
+ */
+export function getFleetOffer(fv: FleetVehicle): VehicleOffer | null {
+  return offerForFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", fv);
 }
 
 /**

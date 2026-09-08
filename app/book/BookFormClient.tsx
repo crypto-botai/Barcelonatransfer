@@ -17,7 +17,7 @@ import {
   type FleetVehicle, type VehicleClass, type BookingFormData, type QuoteResponse,
   type BookingType,
 } from "@/types";
-import { getFleetFromPrice, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+import { getFleetFromPrice, getFleetOffer, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import { VAT_RATE, vatOn, wantsInvoice } from "@/lib/vat";
 import { TIP_PRESETS, tipForPercent, clampTip, MAX_TIP_ABSOLUTE } from "@/lib/tips";
 import toast from "react-hot-toast";
@@ -629,6 +629,11 @@ export default function BookFormClient() {
                     // to the contact-us treatment.
                     const pricing = quote && sel && !needsManualQuote ? quote : null;
                     const minFare = getFleetFromPrice(v.class);
+                    // Belongs to the airport ⇄ city "from" fare only, so it is
+                    // rendered in that branch alone. Beside a live quote for
+                    // some other route it would be advertising a saving that
+                    // journey does not get.
+                    const offer = getFleetOffer(v.class);
                     const minHours = MIN_HOURLY_HOURS[dbClass] ?? 4;
                     const selectedHours = bookingType === "DAY_HIRE" ? 8 : Math.max(data.durationHours ?? 4, minHours);
                     const hourlyRate = bookingType === "HOURLY" || bookingType === "DAY_HIRE"
@@ -684,6 +689,17 @@ export default function BookFormClient() {
                                   <>
                                     <p className="font-display text-lg text-gold-400">{formatCurrency(hourlyRate)}</p>
                                     <p className="text-dark-500 text-[10px]">{formatCurrency(HOURLY_RATES[dbClass])}/h · {selectedHours}h</p>
+                                  </>
+                                ) : offer ? (
+                                  <>
+                                    <p className="text-xs">
+                                      <span className="text-dark-500">from </span>
+                                      <span className="text-gold-400 font-semibold">{formatCurrency(offer.now)}</span>
+                                      <span className="text-dark-500 line-through ml-1.5">{formatCurrency(offer.was)}</span>
+                                    </p>
+                                    <span className="inline-block mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-400 text-black">
+                                      −{offer.pctOff}%
+                                    </span>
                                   </>
                                 ) : (
                                   <p className="text-dark-500 text-xs">from {formatCurrency(minFare)}</p>

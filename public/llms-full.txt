@@ -1,5 +1,5 @@
 # Elite BCN Transfers — Complete AI Reference (llms-full.txt)
-# Generated from live site data on 2026-09-05. Companion to /llms.txt.
+# Generated from live site data on 2026-09-08. Companion to /llms.txt.
 
 ## Service Identity
 - Legal name: Elite BCN Transfers
@@ -69,12 +69,12 @@ binding one: check both before choosing a vehicle.
 - Excluded: VAT (10%, added only when an invoice is requested) and motorway tolls
 - Routes are bidirectional — A→B and B→A cost the same — with these exceptions,
   where the table prices the journey INTO the destination and leaving costs more:
-- Andorra la Vella to Barcelona City: EUR 370 (Economy, per vehicle). Barcelona City to Andorra la Vella is EUR 350. The journey out of Andorra la Vella costs EUR 20 more than the journey into it. Details: https://www.elitebcn.info/transfers/andorra-to-barcelona
-- Andorra la Vella to El Prat Airport: EUR 370 (Economy, per vehicle). El Prat Airport to Andorra la Vella is EUR 350. The journey out of Andorra la Vella costs EUR 20 more than the journey into it. Details: https://www.elitebcn.info/transfers/andorra-to-barcelona
+- Andorra to Barcelona City: EUR 370 (Economy, per vehicle). Barcelona City to Andorra is EUR 350. The journey out of Andorra costs EUR 20 more than the journey into it. Details: https://www.elitebcn.info/transfers/andorra-to-barcelona
+- Andorra to El Prat Airport: EUR 370 (Economy, per vehicle). El Prat Airport to Andorra is EUR 350. The journey out of Andorra costs EUR 20 more than the journey into it. Details: https://www.elitebcn.info/transfers/andorra-to-barcelona
 - Per vehicle, not per person
 
 Individual cars priced below their class column:
-- El Prat Airport ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €60
+- El Prat Airport ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €55, Mercedes EQE 300 = €60
 - Within Barcelona city: Toyota Camry = €60, Tesla Model 3 = €60
 - El Prat Airport ⇄ Cruise Terminal: Toyota Camry = €60, Tesla Model 3 = €60
 - Cruise Terminal ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €60
@@ -99,11 +99,11 @@ Individual cars priced below their class column:
 | Cubelles                   | €90     | €110     | €120    | €145    | €300    |
 | Calafell                   | €100    | €120     | €130    | €155    | €300    |
 | Vendrell                   | €110    | €130     | €145    | €165    | €350    |
-| Tarragona                  | €150    | €180     | €190    | €210    | €400    |
+| Tarragona                  | €140    | €160     | €180    | €195    | €400    |
 | La Pineda                  | €155    | €175     | €195    | €215    | €450    |
-| Salou                      | €155    | €180     | €195    | €215    | €450    |
-| PortAventura               | €155    | €180     | €195    | €215    | €450    |
-| Cambrils                   | €160    | €180     | €200    | €220    | €450    |
+| Salou                      | €140    | €160     | €180    | €195    | €450    |
+| PortAventura               | €140    | €160     | €180    | €195    | €450    |
+| Cambrils                   | €140    | €160     | €180    | €195    | €450    |
 | Reus Airport (REU)         | €155    | €180     | €195    | €215    | €450    |
 | Mataró                     | €90     | €110     | €120    | €145    | €300    |
 | Calella                    | €110    | €130     | €145    | €165    | €350    |
@@ -138,11 +138,11 @@ Individual cars priced below their class column:
 | Cubelles                   | €90     | €110     | €120    | €145    | €300    |
 | Calafell                   | €100    | €120     | €130    | €155    | €300    |
 | Vendrell                   | €110    | €130     | €145    | €165    | €350    |
-| Tarragona                  | €150    | €180     | €190    | €210    | €400    |
+| Tarragona                  | €140    | €150     | €180    | €195    | €400    |
 | La Pineda                  | €155    | €175     | €195    | €215    | €450    |
-| Salou                      | €155    | €180     | €195    | €215    | €450    |
-| PortAventura               | €155    | €180     | €195    | €215    | €450    |
-| Cambrils                   | €160    | €180     | €200    | €220    | €450    |
+| Salou                      | €140    | €150     | €180    | €195    | €450    |
+| PortAventura               | €140    | €150     | €180    | €195    | €450    |
+| Cambrils                   | €140    | €150     | €180    | €195    | €450    |
 | Reus Airport (REU)         | €155    | €180     | €195    | €215    | €450    |
 | Mataró                     | €90     | €110     | €120    | €145    | €300    |
 | Calella                    | €110    | €130     | €145    | €165    | €350    |
@@ -183,7 +183,7 @@ Individual cars priced below their class column:
 - Booster Seat — €5 each. For children 15–36 kg.
 - Meet & Greet — €5. Driver meets you at arrivals.
 - Name Board — €5. Your name on the driver's tablet at arrivals.
-- I need an invoice — +10% VAT. Adds 10% Spanish VAT — required for a company invoice.
+- I need an invoice — on request, no charge. Adds 10% Spanish VAT — required for a company invoice.
 - Extra Waiting (30 min) — €25 / 30 min. Additional waiting time.
 - Pet Transport — €20 each. Travel with your pet.
 - Multiple Stops — €25 each. Additional stops en route.

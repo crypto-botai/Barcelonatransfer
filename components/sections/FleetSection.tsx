@@ -7,7 +7,8 @@ import { useTranslations } from "@/components/language/I18nProvider";
 import { VEHICLE_CATALOG, vehicleBadgeClass, BAG_SIZES } from "@/types";
 import { fleetPagePath } from "@/lib/fleet-pages";
 import { formatCurrency } from "@/lib/utils";
-import { getFleetFromPrice } from "@/lib/pricing";
+import { getFleetFromPrice, getFleetOffer } from "@/lib/pricing";
+import type { VehicleOffer } from "@/lib/fixed-prices";
 
 function BadgeIcon({ badge }: { badge: string }) {
   if (badge === "Electric VIP") return <Zap size={12} className="flex-shrink-0" />;
@@ -19,17 +20,27 @@ function FleetCardInner({
   vehicle,
   t,
   price,
+  offer,
   asHeading,
 }: {
   vehicle: (typeof VEHICLE_CATALOG)[number];
   t: ReturnType<typeof useTranslations>;
   price: number;
+  offer: VehicleOffer | null;
   asHeading: boolean;
 }) {
   const Name = asHeading ? "h3" : "div";
   return (
     <div className="group flex flex-col h-full rounded-2xl overflow-hidden border border-white/[0.07] bg-[#0b0b0b] hover:border-[#c9a84c]/30 transition-colors duration-300">
       <div className="relative h-44 bg-[#080808] overflow-hidden">
+        {/* Sits opposite the class badge so the two never collide. Green
+            against a gold-and-black palette on purpose: it has to read as a
+            price cut at a glance, which is the whole reason it is here. */}
+        {offer && (
+          <span className="absolute top-3 left-3 z-20 px-2.5 py-1.5 rounded-full text-xs font-bold tracking-wide bg-emerald-400 text-black shadow-lg shadow-black/40">
+            −{offer.pctOff}%
+          </span>
+        )}
         {vehicle.badge && (
           <span className={`absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-lg shadow-black/40 ${vehicleBadgeClass(vehicle.badge)}`}>
             <BadgeIcon badge={vehicle.badge} />
@@ -64,6 +75,11 @@ function FleetCardInner({
           <div className="text-right shrink-0">
             <p className="text-[9px] text-white/50 uppercase tracking-widest">{t("from")}</p>
             <p className="font-display text-xl text-[#c9a84c] leading-tight">{formatCurrency(price)}</p>
+            {offer && (
+              <p className="text-[11px] leading-tight text-white/40 line-through tabular-nums">
+                {formatCurrency(offer.was)}
+              </p>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-5">
@@ -117,13 +133,14 @@ function FleetCard({
 }) {
   const t = useTranslations("fleet");
   const price = getFleetFromPrice(vehicle.class);
+  const offer = getFleetOffer(vehicle.class);
 
   // One card set serves both layouts: a snap-scroll item on mobile, a normal
   // grid cell from lg up. Rendering two separate sets doubled the fleet DOM
   // and emitted every vehicle heading twice.
   return (
     <div className="flex-shrink-0 w-[268px] snap-center lg:flex-shrink lg:w-auto lg:snap-align-none">
-      <FleetCardInner vehicle={vehicle} t={t} price={price} asHeading />
+      <FleetCardInner vehicle={vehicle} t={t} price={price} offer={offer} asHeading />
     </div>
   );
 }

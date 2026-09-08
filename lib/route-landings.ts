@@ -5,7 +5,9 @@ import {
 import type { LucideIcon } from "lucide-react";
 import {
   lookupPriceByFleetVehicle,
+  offerForFleetVehicle,
   returnLegSurcharge,
+  type VehicleOffer,
   type ZoneCode,
 } from "@/lib/fixed-prices";
 import { VEHICLE_CATALOG, type VehicleInfo } from "@/types";
@@ -35,7 +37,7 @@ import { VEHICLE_CATALOG, type VehicleInfo } from "@/types";
 
 const BASE = "https://www.elitebcn.info";
 
-export type PricedVehicle = VehicleInfo & { price: number };
+export type PricedVehicle = VehicleInfo & { price: number; offer?: VehicleOffer };
 
 export interface RouteOption {
   name: string;
@@ -92,6 +94,9 @@ function ladder(from: ZoneCode, to: ZoneCode): PricedVehicle[] {
   return VEHICLE_CATALOG.map((v) => ({
     ...v,
     price: lookupPriceByFleetVehicle(from, to, v.class),
+    // undefined rather than null: the field is optional, and a route with no
+    // offer should carry no key at all rather than an empty one.
+    offer: offerForFleetVehicle(from, to, v.class) ?? undefined,
   })).filter((v): v is PricedVehicle => v.price !== null);
 }
 
@@ -853,6 +858,9 @@ const SITGES: RouteLanding = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const salou = ladder("BCN_AIRPORT", "SALOU");
+// Separate since the 8 Sep 2026 offer: Business is €150 from the city against
+// €160 from the airport, so the two origins no longer share one table.
+const salouCity = ladder("BARCELONA_CITY", "SALOU");
 const salouFrom = cheapestOf(salou);
 
 const SALOU: RouteLanding = {
@@ -878,9 +886,10 @@ const SALOU: RouteLanding = {
     { icon: ShieldCheck, k: "Fixed", v: `€${salouFrom}` },
   ],
   priceTables: [
-    { heading: "From BCN El Prat Airport or central Barcelona", caption: "Fixed fares from Barcelona to Salou by vehicle", vehicles: salou },
+    { heading: "From central Barcelona", caption: "Fixed fares from central Barcelona to Salou by vehicle", vehicles: salouCity },
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to Salou by vehicle", vehicles: salou },
   ],
-  priceNote: "Both origins cost the same. The fare covers Salou, the PortAventura resort hotels and the park gates — they are minutes apart and priced together.",
+  priceNote: "Every car costs the same from either origin except the Mercedes EQE, which is €10 more from the airport. The fare covers Salou, the PortAventura resort hotels and the park gates — they are minutes apart and priced together.",
   included: [
     "Licensed chauffeur, vehicle and fuel",
     "Flight tracking, pickup moved to your landing time",

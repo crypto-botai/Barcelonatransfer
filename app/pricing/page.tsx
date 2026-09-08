@@ -8,24 +8,24 @@ import { getRates } from "@/lib/currency";
 import { CurrencyProvider } from "@/components/currency/CurrencyProvider";
 import CurrencySwitcher from "@/components/currency/CurrencySwitcher";
 import { SHARED_OG } from "@/lib/seo";
-import { ladderFor } from "@/lib/destination-pricing";
+import { ladderFor, CHEAPEST_FARE } from "@/lib/destination-pricing";
 
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Transfer Prices — Fixed Rates | Elite BCN" },
-  description: "Fixed prices for Barcelona airport, cruise port, Sitges, Andorra and more. From €50 per vehicle, excluding VAT and tolls. Extras charged separately.",
+  description: `Fixed prices for Barcelona airport, cruise port, Sitges, Andorra and more. From €${CHEAPEST_FARE} per vehicle, excluding VAT and tolls. Extras charged separately.`,
   alternates: { canonical: "https://www.elitebcn.info/pricing" },
   keywords: ["barcelona transfer prices", "barcelona airport transfer cost", "fixed price transfer barcelona", "private transfer rates barcelona"],
   openGraph: {
     ...SHARED_OG,
     title: "Barcelona Transfer Prices — Fixed Rates | Elite BCN",
-    description: "Fixed prices for luxury private transfers from Barcelona Airport. From €50. No hidden fees. Book online instantly.",
+    description: `Fixed prices for luxury private transfers from Barcelona Airport. From €${CHEAPEST_FARE}. No hidden fees. Book online instantly.`,
     url: "https://www.elitebcn.info/pricing",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona Transfer Fixed Prices" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Barcelona Transfer Prices — Fixed Rates | Elite BCN",
-    description: "Fixed prices for luxury private transfers from Barcelona Airport. From €50. No hidden fees. Book online instantly.",
+    description: `Fixed prices for luxury private transfers from Barcelona Airport. From €${CHEAPEST_FARE}. No hidden fees. Book online instantly.`,
     images: ["/opengraph-image"],
   },
 };

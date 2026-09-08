@@ -1,5 +1,20 @@
 import { getPublicRoutes } from "@/lib/pricing-service";
-import { detectZoneFromCoords, distanceFare, ROUTES } from "@/lib/pricing";
+import { detectZoneFromCoords, distanceFare, ROUTES, KEY_TO_ZONE_CODE } from "@/lib/pricing";
+import { FIXED_ROUTES, offerForColumn, type VehicleCode, type VehicleOffer } from "@/lib/fixed-prices";
+
+/**
+ * The cheapest published fare anywhere in the table.
+ *
+ * The one figure the sitewide headlines quote — "Fixed prices from €X" on the
+ * homepage, the root layout's metadata and its Organization schema, and the
+ * pricing page. All four had it typed by hand, which meant four places to
+ * update and four chances to miss one; the airport ⇄ city and Castelldefels
+ * Economy fares both sit at the minimum, so a cut to either moves it.
+ *
+ * Computed rather than pointed at one route, so it stays true even if the
+ * route that happens to be cheapest changes.
+ */
+export const CHEAPEST_FARE = Math.min(...FIXED_ROUTES.map((r) => r.prices.ECONOMY));
 
 /**
  * Prices for a destination page, read from the same authority that quotes a
@@ -207,6 +222,42 @@ export function ladderFor(
     minivan:  r.minivan,
     vclass:   r.vclass,
     minibus:  r.minibus,
+  };
+}
+
+/** The offer on each rung of a ladder. A rung not on offer is simply absent. */
+export interface LadderOffers {
+  economy?:  VehicleOffer;
+  business?: VehicleOffer;
+  minivan?:  VehicleOffer;
+  vclass?:   VehicleOffer;
+  minibus?:  VehicleOffer;
+}
+
+/**
+ * What each rung of `ladderFor()` used to cost, for the rungs on offer.
+ *
+ * Takes the same zone and origin as ladderFor and must be called with the same
+ * pair, or a page would print one origin's fare beside another's old price.
+ * Returns an empty object for a route with no offer, so a caller can render it
+ * unconditionally.
+ */
+export function ladderOffersFor(
+  zoneKey: string,
+  origin: "airport" | "barcelona_city" = "airport",
+): LadderOffers {
+  const from = KEY_TO_ZONE_CODE[origin];
+  const to   = KEY_TO_ZONE_CODE[zoneKey];
+  if (!from || !to) return {};
+
+  const rung = (code: VehicleCode) => offerForColumn(from, to, code) ?? undefined;
+
+  return {
+    economy:  rung("ECONOMY"),
+    business: rung("BUSINESS"),
+    minivan:  rung("MINIVAN"),
+    vclass:   rung("VCLASS"),
+    minibus:  rung("MINIBUS"),
   };
 }
 
