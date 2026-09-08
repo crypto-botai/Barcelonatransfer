@@ -388,6 +388,15 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
               Location — <span className="text-gold-gradient">{dest.name}</span>
             </h2>
             <div className="rounded-xl overflow-hidden border border-white/[0.08]" style={{ height: 360 }}>
+              {/* OpenStreetMap, not Google. This was a maps.google.com embed,
+                  which loaded Google on every destination page while the rest
+                  of the site — address search, road distance, the live driver
+                  map — already ran on OSM. Keyless either way; this one is
+                  simply the provider actually in use.
+
+                  A bbox rather than a zoom level, which is what this embed
+                  takes. Roughly ±3km of latitude, and wider in longitude
+                  because a degree of it is shorter this far north. */}
               <iframe
                 title={`Map of ${dest.name}`}
                 width="100%"
@@ -395,7 +404,12 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                 style={{ border: 0 }}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                src={`https://maps.google.com/maps?q=${dest.coordinates.lat},${dest.coordinates.lng}&z=14&output=embed`}
+                src={
+                  `https://www.openstreetmap.org/export/embed.html` +
+                  `?bbox=${dest.coordinates.lng - 0.06},${dest.coordinates.lat - 0.03}` +
+                  `,${dest.coordinates.lng + 0.06},${dest.coordinates.lat + 0.03}` +
+                  `&layer=mapnik&marker=${dest.coordinates.lat},${dest.coordinates.lng}`
+                }
               />
             </div>
           </div>

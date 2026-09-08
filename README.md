@@ -1,10 +1,10 @@
 # Elite BCN — Luxury Transfer Platform
 
-A full-stack luxury private transfer booking platform built with Next.js 15, TypeScript, Tailwind CSS, Framer Motion, Stripe, Supabase, and Google Maps.
+A full-stack luxury private transfer booking platform built with Next.js 15, TypeScript, Tailwind CSS, Framer Motion, Stripe, Supabase, and OpenStreetMap.
 
 ## Features
 
-- **Live price calculator** — Google Maps Distance Matrix + real-time fare engine
+- **Live price calculator** — OSRM road routing + real-time fare engine
 - **10 vehicle classes** — Economy to Minibus, all with accurate descriptions
 - **4-step booking flow** — Route → Vehicle → Details → Stripe Checkout
 - **Apple Pay & Google Pay** — via Stripe Payment Element
@@ -46,7 +46,7 @@ See `.env.example` for a complete list. Key services required:
 | Service | Purpose |
 |---------|---------|
 | **Supabase** | PostgreSQL database |
-| **Google Maps** | Places autocomplete + Distance Matrix |
+| **OpenStreetMap** | Nominatim address search + OSRM road distance — no key required |
 | **Stripe** | Payments (card, Apple Pay, Google Pay) |
 | **Resend** | Transactional emails |
 | **Google OAuth** | Social sign-in (optional) |
