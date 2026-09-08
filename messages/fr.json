@@ -12,7 +12,8 @@
     "bookNow": "Réserver",
     "signIn": "Connexion",
     "dashboard": "Tableau de Bord",
-    "mobileBook": "Réserver un Transfert"
+    "mobileBook": "Réserver un Transfert",
+    "menu": "Menu"
   },
   "hero": {
     "badge": "Le N°1 du Chauffeur de Luxe à Barcelone",
@@ -252,7 +253,8 @@
     "vehicle": "Véhicule",
     "whatsappQuote": "Devis par WhatsApp",
     "whereTo": "Où souhaitez-vous aller ?",
-    "yourPrice": "Votre prix"
+    "yourPrice": "Votre prix",
+    "stillNeeded": "Il manque encore"
   },
   "pricing": {
     "book": "Réserver",

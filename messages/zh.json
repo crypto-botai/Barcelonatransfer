@@ -12,7 +12,8 @@
     "bookNow": "立即预订",
     "signIn": "登录",
     "dashboard": "控制台",
-    "mobileBook": "预订接送"
+    "mobileBook": "预订接送",
+    "menu": "菜单"
   },
   "hero": {
     "badge": "巴塞罗那第一豪华司机服务",
@@ -252,7 +253,8 @@
     "vehicle": "车型",
     "whatsappQuote": "通过 WhatsApp 询价",
     "whereTo": "您想去哪里？",
-    "yourPrice": "您的价格"
+    "yourPrice": "您的价格",
+    "stillNeeded": "还需填写"
   },
   "pricing": {
     "book": "预订",

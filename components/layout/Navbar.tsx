@@ -46,6 +46,40 @@ export default function Navbar() {
 
   useEffect(() => { setMobile(false); }, [pathname]);
 
+  // Escape closes whichever layer is open, innermost first. Without it the
+  // only way out of the mobile drawer was to find the X, and the desktop
+  // dropdown could not be dismissed from the keyboard at all.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (dropdown) setDropdown(null);
+      else if (mobileOpen) setMobile(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [dropdown, mobileOpen]);
+
+  // The drawer is a fixed full-screen panel, so the page behind it stayed
+  // scrollable: flicking the menu scrolled the homepage underneath and closing
+  // it left the reader somewhere they never chose to be.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [mobileOpen]);
+
+  /**
+   * Marks the section you are in, not just an exact URL match.
+   *
+   * `pathname === href` lit the Fleet link on /fleet and went dark on
+   * /fleet/tesla-model-3 — the deeper you went, the less the nav told you.
+   * Hash links are skipped: "/#services" is the homepage, and treating it as a
+   * section would light it on every page.
+   */
+  const isCurrent = (href: string) =>
+    !href.includes("#") && (pathname === href || pathname.startsWith(`${href}/`));
+
   return (
     <>
       {/* No mount fade here. The navbar is above the fold on every page, and a
@@ -63,7 +97,12 @@ export default function Navbar() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group">
+            <Link
+              href="/"
+              aria-label="Elite BCN — home"
+              aria-current={pathname === "/" ? "page" : undefined}
+              className="flex items-center gap-2 group rounded-lg"
+            >
               <div className="w-8 h-8 border border-gold-500 rotate-45 flex items-center justify-center group-hover:bg-gold-500 transition-colors duration-300">
                 <div className="w-3 h-3 bg-gold-500 group-hover:bg-black transition-colors duration-300" />
               </div>
@@ -78,20 +117,32 @@ export default function Navbar() {
               {NAV_LINKS.map((link) => (
                 <li key={link.label} className="relative">
                   {link.children ? (
+                    /* Opens on hover for a mouse and on focus for a keyboard.
+                       It used to be onMouseEnter only, which meant the three
+                       links inside were unreachable by keyboard entirely, and
+                       on a touch screen the parent simply navigated away
+                       before the submenu could be seen. */
                     <div
                       className="relative"
                       onMouseEnter={() => setDropdown(link.label)}
                       onMouseLeave={() => setDropdown(null)}
+                      onFocus={() => setDropdown(link.label)}
+                      onBlur={(e) => {
+                        if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropdown(null);
+                      }}
                     >
                       <Link
                         href={link.href}
+                        aria-haspopup="true"
+                        aria-expanded={dropdown === link.label}
+                        aria-current={isCurrent(link.href) ? "page" : undefined}
                         className={cn(
                           "flex items-center gap-1 text-sm font-medium tracking-wider transition-colors duration-200",
-                          "text-dark-300 hover:text-gold-400"
+                          isCurrent(link.href) ? "text-gold-400" : "text-dark-300 hover:text-gold-400"
                         )}
                       >
                         {link.label}
-                        <ChevronDown size={14} className={cn(
+                        <ChevronDown size={14} aria-hidden className={cn(
                           "transition-transform duration-200",
                           dropdown === link.label && "rotate-180"
                         )} />
@@ -102,7 +153,12 @@ export default function Navbar() {
                             <Link
                               key={c.href}
                               href={c.href}
-                              className="block px-4 py-3 text-sm text-dark-300 hover:text-gold-400 hover:bg-gold-500/5 transition-colors border-b border-white/5 last:border-0"
+                              aria-current={isCurrent(c.href) ? "page" : undefined}
+                              onClick={() => setDropdown(null)}
+                              className={cn(
+                                "block px-4 py-3 text-sm hover:bg-gold-500/5 transition-colors border-b border-white/5 last:border-0",
+                                isCurrent(c.href) ? "text-gold-400" : "text-dark-300 hover:text-gold-400"
+                              )}
                             >
                               {c.label}
                             </Link>
@@ -113,9 +169,10 @@ export default function Navbar() {
                   ) : (
                     <Link
                       href={link.href}
+                      aria-current={isCurrent(link.href) ? "page" : undefined}
                       className={cn(
                         "text-sm font-medium tracking-wider transition-colors duration-200 hover:text-gold-400",
-                        pathname === link.href ? "text-gold-400" : "text-dark-300"
+                        isCurrent(link.href) ? "text-gold-400" : "text-dark-300"
                       )}
                     >
                       {link.label}
@@ -174,7 +231,12 @@ export default function Navbar() {
           opaque instead of blurred — a full-screen backdrop-blur is one of the
           most expensive things a phone can be asked to composite. */}
       {mobileOpen && (
-        <div className="animate-drawer-in fixed inset-0 z-40 bg-black flex flex-col pt-24 px-6 pb-8 overflow-y-auto">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("menu")}
+          className="animate-drawer-in fixed inset-0 z-40 bg-black flex flex-col pt-24 px-6 pb-8 overflow-y-auto"
+        >
             <nav className="flex flex-col gap-2">
               {NAV_LINKS.map((link, i) => (
                 <div
@@ -191,7 +253,11 @@ export default function Navbar() {
                         <Link
                           key={c.href}
                           href={c.href}
-                          className="block py-3 px-2 text-lg text-dark-200 hover:text-gold-400 transition-colors border-b border-white/5"
+                          aria-current={isCurrent(c.href) ? "page" : undefined}
+                          className={cn(
+                            "block py-3 px-2 text-lg transition-colors border-b border-white/5",
+                            isCurrent(c.href) ? "text-gold-400" : "text-dark-200 hover:text-gold-400"
+                          )}
                           onClick={() => setMobile(false)}
                         >
                           {c.label}
@@ -201,7 +267,11 @@ export default function Navbar() {
                   ) : (
                     <Link
                       href={link.href}
-                      className="block py-4 px-2 text-xl font-display text-white hover:text-gold-400 transition-colors border-b border-white/5"
+                      aria-current={isCurrent(link.href) ? "page" : undefined}
+                      className={cn(
+                        "block py-4 px-2 text-xl font-display transition-colors border-b border-white/5",
+                        isCurrent(link.href) ? "text-gold-400" : "text-white hover:text-gold-400"
+                      )}
                       onClick={() => setMobile(false)}
                     >
                       {link.label}

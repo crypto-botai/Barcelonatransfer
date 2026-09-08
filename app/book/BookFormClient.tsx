@@ -410,27 +410,46 @@ export default function BookFormClient() {
     <main className="min-h-screen bg-[#050505]">
       <div className="container mx-auto px-4 py-10 max-w-3xl pb-28 sm:pb-10">
 
-        {/* Step Indicator */}
-        <div className="flex items-center justify-center mb-10">
+        {/* Step Indicator.
+            A list, not a row of loose buttons: a screen reader now hears "Step
+            2 of 4, Vehicle, current step" instead of an unlabelled "2". Steps
+            ahead of the current one are genuinely disabled rather than merely
+            inert on click — they looked pressable and did nothing. */}
+        <nav aria-label={`Booking progress — step ${step} of ${STEPS.length}`} className="mb-10">
+          <ol className="flex items-center justify-center">
           {STEPS.map((s, i) => (
-            <div key={s.id} className="flex items-center">
-              <button onClick={() => step > s.id && setStep(s.id)} className="flex flex-col items-center gap-1">
+            <li key={s.id} className="flex items-center">
+              <button
+                onClick={() => step > s.id && setStep(s.id)}
+                disabled={step <= s.id}
+                aria-current={step === s.id ? "step" : undefined}
+                aria-label={
+                  `Step ${s.id} of ${STEPS.length}: ${s.label}` +
+                  (step > s.id ? " — completed, go back to this step" : step === s.id ? " — current step" : " — not yet reached")
+                }
+                className={cn(
+                  "flex flex-col items-center gap-1 rounded-lg p-1",
+                  // 44px minimum target on the ones you can actually press.
+                  step > s.id ? "cursor-pointer min-w-[44px]" : "cursor-default"
+                )}
+              >
                 <div className={cn(
                   "w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300",
                   step === s.id ? "step-active" : step > s.id ? "step-complete" : "step-pending"
                 )}>
-                  {step > s.id ? <CheckCircle2 size={16} /> : s.id}
+                  {step > s.id ? <CheckCircle2 size={16} aria-hidden /> : s.id}
                 </div>
-                <span className={cn("text-xs hidden sm:block transition-colors", step === s.id ? "text-gold-400" : "text-dark-500")}>
+                <span aria-hidden className={cn("text-xs hidden sm:block transition-colors", step === s.id ? "text-gold-400" : "text-dark-500")}>
                   {s.label}
                 </span>
               </button>
               {i < STEPS.length - 1 && (
-                <div className={cn("w-12 sm:w-20 h-px mx-2 transition-colors duration-500", step > s.id ? "bg-gold-500/40" : "bg-white/[0.06]")} />
+                <div aria-hidden className={cn("w-12 sm:w-20 h-px mx-2 transition-colors duration-500", step > s.id ? "bg-gold-500/40" : "bg-white/[0.06]")} />
               )}
-            </div>
+            </li>
           ))}
-        </div>
+          </ol>
+        </nav>
 
         <AnimatePresence mode="wait">
 

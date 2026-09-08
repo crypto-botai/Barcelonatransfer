@@ -12,7 +12,8 @@
     "bookNow": "Jetzt Buchen",
     "signIn": "Anmelden",
     "dashboard": "Dashboard",
-    "mobileBook": "Transfer Buchen"
+    "mobileBook": "Transfer Buchen",
+    "menu": "Menü"
   },
   "hero": {
     "badge": "Barcelonas Nr. 1 Luxus-Chauffeurservice",
@@ -252,7 +253,8 @@
     "vehicle": "Fahrzeug",
     "whatsappQuote": "Angebot per WhatsApp",
     "whereTo": "Wohin möchten Sie fahren?",
-    "yourPrice": "Ihr Preis"
+    "yourPrice": "Ihr Preis",
+    "stillNeeded": "Noch erforderlich"
   },
   "pricing": {
     "book": "Buchen",

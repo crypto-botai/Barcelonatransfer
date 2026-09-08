@@ -12,7 +12,8 @@
     "bookNow": "Reservar",
     "signIn": "Iniciar Sesión",
     "dashboard": "Panel",
-    "mobileBook": "Reservar Transfer"
+    "mobileBook": "Reservar Transfer",
+    "menu": "Menú"
   },
   "hero": {
     "badge": "El Servicio de Chófer de Lujo N.º 1 en Barcelona",
@@ -252,7 +253,8 @@
     "vehicle": "Vehículo",
     "whatsappQuote": "Pedir presupuesto por WhatsApp",
     "whereTo": "¿A dónde quiere ir?",
-    "yourPrice": "Su precio"
+    "yourPrice": "Su precio",
+    "stillNeeded": "Aún falta"
   },
   "pricing": {
     "book": "Reservar",

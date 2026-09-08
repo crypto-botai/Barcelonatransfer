@@ -12,7 +12,8 @@
     "bookNow": "Prenota Ora",
     "signIn": "Accedi",
     "dashboard": "Pannello",
-    "mobileBook": "Prenota il Transfer"
+    "mobileBook": "Prenota il Transfer",
+    "menu": "Menu"
   },
   "hero": {
     "badge": "Il Servizio di Autista di Lusso N°1 a Barcellona",
@@ -252,7 +253,8 @@
     "vehicle": "Veicolo",
     "whatsappQuote": "Preventivo su WhatsApp",
     "whereTo": "Dove desidera andare?",
-    "yourPrice": "Il suo prezzo"
+    "yourPrice": "Il suo prezzo",
+    "stillNeeded": "Ancora necessario"
   },
   "pricing": {
     "book": "Prenota",

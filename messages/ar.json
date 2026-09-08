@@ -12,7 +12,8 @@
     "bookNow": "احجز الآن",
     "signIn": "تسجيل الدخول",
     "dashboard": "لوحة التحكم",
-    "mobileBook": "احجز رحلتك"
+    "mobileBook": "احجز رحلتك",
+    "menu": "القائمة"
   },
   "hero": {
     "badge": "خدمة الشوفير الفاخرة الأولى في برشلونة",
@@ -252,7 +253,8 @@
     "vehicle": "المركبة",
     "whatsappQuote": "اطلب عرض سعر عبر واتساب",
     "whereTo": "إلى أين تريد الذهاب؟",
-    "yourPrice": "سعرك"
+    "yourPrice": "سعرك",
+    "stillNeeded": "لا يزال مطلوباً"
   },
   "pricing": {
     "book": "احجز",

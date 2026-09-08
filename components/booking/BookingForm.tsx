@@ -245,7 +245,7 @@ export default function BookingForm({ compact = false }: Props) {
                     "px-3.5 py-1.5 rounded-lg border text-sm font-medium transition-all",
                     hours === h
                       ? "border-[#c9a84c] bg-[#c9a84c]/10 text-[#c9a84c]"
-                      : "border-white/10 text-white/40 hover:border-[#c9a84c]/30 hover:text-white/70"
+                      : "border-white/10 text-dark-400 hover:border-[#c9a84c]/30 hover:text-white"
                   )}
                 >
                   {h}h
@@ -336,7 +336,7 @@ export default function BookingForm({ compact = false }: Props) {
             header would answer a tap, for three opacity transitions. */}
         <>
           {loading && (
-            <div className="animate-fade-in flex items-center justify-center gap-2 py-2 text-xs text-white/30">
+            <div className="animate-fade-in flex items-center justify-center gap-2 py-2 text-xs text-dark-500">
               <Loader2 size={13} className="animate-spin text-[#c9a84c]" />
               {t("gettingPrice")}
             </div>
@@ -351,12 +351,12 @@ export default function BookingForm({ compact = false }: Props) {
                     {t("fixedPrice")}
                   </p>
                   {quote.fromLabel ? (
-                    <p className="text-[11px] text-white/30 flex items-center gap-1 mt-0.5 truncate">
+                    <p className="text-[11px] text-dark-500 flex items-center gap-1 mt-0.5 truncate">
                       <MapPin size={9} className="text-[#c9a84c]/40 flex-shrink-0" />
                       {quote.fromLabel} → {quote.toLabel}
                     </p>
                   ) : isPerKm ? (
-                    <p className="text-[11px] text-white/30 flex items-center gap-1 mt-0.5">
+                    <p className="text-[11px] text-dark-500 flex items-center gap-1 mt-0.5">
                       <MapPin size={9} className="text-[#c9a84c]/40 flex-shrink-0" />
                       {t("kmJourney").replace("{km}", String(quote.distanceKm))}
                     </p>
@@ -386,14 +386,41 @@ export default function BookingForm({ compact = false }: Props) {
             <MessageCircle size={15} /> {t("whatsappQuote")}
           </a>
         ) : (
-          <button
-            onClick={handleContinue}
-            disabled={!canContinue}
-            className="btn-gold w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-35 disabled:cursor-not-allowed"
-          >
-            {t("continueLabel")}
-            <ArrowRight size={15} />
-          </button>
+          <>
+            <button
+              onClick={handleContinue}
+              disabled={!canContinue}
+              aria-describedby={!canContinue ? "booking-cta-hint" : undefined}
+              /* opacity-35 rendered the one button this form exists for as a
+                 dark smear on a dark card — indistinguishable from broken
+                 rather than from "not yet". Half opacity still reads as
+                 disabled while staying legible. */
+              className="btn-gold w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {t("continueLabel")}
+              <ArrowRight size={15} aria-hidden />
+            </button>
+            {/* Says what is missing instead of leaving the reader to guess
+                which of four fields is holding the button shut. Announced
+                politely so it does not interrupt while they are still typing. */}
+            {!canContinue && (
+              <p
+                id="booking-cta-hint"
+                aria-live="polite"
+                className="text-[11px] text-dark-500 text-center -mt-1"
+              >
+                {(() => {
+                  const missing = [
+                    !pickup.address && t("pickup"),
+                    !isHourly && !dropoff.address && t("dropoff"),
+                    !date && t("date"),
+                    !time && t("time"),
+                  ].filter(Boolean) as string[];
+                  return missing.length === 0 ? null : `${t("stillNeeded")}: ${missing.join(" · ")}`;
+                })()}
+              </p>
+            )}
+          </>
         )}
 
         {/* Footer trust bar */}

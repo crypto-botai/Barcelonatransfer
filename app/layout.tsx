@@ -356,9 +356,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* FAQPage schema is injected by app/faq/page.tsx only — not globally */}
       </head>
       <body className="min-h-screen bg-dark-950 antialiased">
+        {/* First thing in the tab order, invisible until focused. Every page
+            opens with a fixed navbar carrying up to ten links and a language
+            switcher, which a keyboard or screen-reader user had to walk
+            through on every single page before reaching the content. */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100]
+                     focus:px-4 focus:py-3 focus:rounded-lg focus:bg-gold-500 focus:text-black
+                     focus:font-semibold focus:shadow-lg"
+        >
+          Skip to content
+        </a>
         <AuthProvider>
           <I18nProvider>
-          {children}
+          {/* Skip-link target. A plain wrapper rather than a <main>, because
+              the pages bring their own <main> and nesting two landmarks would
+              be worse than none. tabIndex -1 so focus actually lands here when
+              the link is followed — without it several browsers move the
+              scroll position and leave focus behind in the navbar. */}
+          <div id="main" tabIndex={-1} className="outline-none">
+            {children}
+          </div>
           <WhatsAppButton />
           <MobileBookBar />
           <DeferredAnalytics gaId="G-E9QZFG5WZY" adsId="AW-18391666445" />

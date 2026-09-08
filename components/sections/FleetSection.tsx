@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
 import { Users, Briefcase, ChevronRight, Zap, Star } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
 import { VEHICLE_CATALOG, vehicleBadgeClass, BAG_SIZES } from "@/types";
@@ -32,7 +33,10 @@ function FleetCardInner({
   const Name = asHeading ? "h3" : "div";
   return (
     <div className="group flex flex-col h-full rounded-2xl overflow-hidden border border-white/[0.07] bg-[#0b0b0b] hover:border-[#c9a84c]/30 transition-colors duration-300">
-      <div className="relative h-44 bg-[#080808] overflow-hidden">
+      <div
+        className="relative h-44 overflow-hidden"
+        style={{ background: "radial-gradient(ellipse 70% 60% at 50% 45%, #17171a 0%, #0a0a0b 60%, #080808 100%)" }}
+      >
         {/* Sits opposite the class badge so the two never collide. Green
             against a gold-and-black palette on purpose: it has to read as a
             price cut at a glance, which is the whole reason it is here. */}
@@ -47,6 +51,13 @@ function FleetCardInner({
             {vehicle.badge}
           </span>
         )}
+        {/* NOTE: every file in public/fleet is PNG colour-type 2 — RGB with no
+            alpha — so each car carries an opaque pale studio backdrop that
+            reads as a grey rectangle on this near-black card. A CSS mask was
+            tried here and removed again: it can only feather the outer edge,
+            and the backdrop sits behind the car in the middle where a mask
+            must stay opaque. The fix is to re-export these with a transparent
+            background; nothing in the stylesheet can do it. */}
         <Image
           src={vehicle.image}
           alt={vehicle.label}
@@ -76,7 +87,7 @@ function FleetCardInner({
             <p className="text-[9px] text-white/50 uppercase tracking-widest">{t("from")}</p>
             <p className="font-display text-xl text-[#c9a84c] leading-tight">{formatCurrency(price)}</p>
             {offer && (
-              <p className="text-[11px] leading-tight text-white/40 line-through tabular-nums">
+              <p className="text-[11px] leading-tight text-dark-500 line-through tabular-nums">
                 {formatCurrency(offer.was)}
               </p>
             )}
@@ -110,11 +121,11 @@ function FleetCardInner({
           <Link
             href={`/book?vehicle=${vehicle.class}`}
             rel="nofollow"
-            className="group/btn flex items-center justify-between w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.07] text-sm text-white/45 hover:text-[#c9a84c] hover:border-[#c9a84c]/28 hover:bg-[#c9a84c]/[0.04] transition-all duration-300"
+            className="group/btn flex items-center justify-between w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.07] text-sm text-dark-300 hover:text-[#c9a84c] hover:border-[#c9a84c]/28 hover:bg-[#c9a84c]/[0.04] transition-all duration-300"
             tabIndex={asHeading ? 0 : -1}
           >
             <span className="font-medium">Reserve the {vehicle.label}</span>
-            <ChevronRight size={14} className="text-white/25 group-hover/btn:text-[#c9a84c] group-hover/btn:translate-x-0.5 transition-all duration-300" />
+            <ChevronRight size={14} aria-hidden className="text-dark-500 group-hover/btn:text-[#c9a84c] group-hover/btn:translate-x-0.5 transition-all duration-300" />
           </Link>
         </div>
       </div>
@@ -134,14 +145,40 @@ function FleetCard({
   const t = useTranslations("fleet");
   const price = getFleetFromPrice(vehicle.class);
   const offer = getFleetOffer(vehicle.class);
+  const still = useReducedMotion();
 
   // One card set serves both layouts: a snap-scroll item on mobile, a normal
   // grid cell from lg up. Rendering two separate sets doubled the fleet DOM
   // and emitted every vehicle heading twice.
+  //
+  // The reveal is per-card rather than a parent variant because the cards are
+  // laid out as a scroll-snap row on phones and a grid from lg — a single
+  // container stagger would fire for off-screen carousel items the reader has
+  // not swiped to yet. `once` so it plays on the way down and never again, and
+  // `whileInView` rather than a mount animation so nothing here is hidden
+  // before hydration; the hero learned that lesson for the whole site.
+  const reveal = still
+    ? undefined
+    : {
+        initial: { opacity: 0, y: 16, scale: 0.97 },
+        whileInView: { opacity: 1, y: 0, scale: 1 },
+        viewport: { once: true, amount: 0.25, margin: "0px 0px -40px 0px" },
+        transition: {
+          duration: 0.42,
+          // Slight overshoot. The design guidance calls for back.out(1.4);
+          // this is its cubic-bezier equivalent.
+          ease: [0.34, 1.26, 0.64, 1] as const,
+          delay: Math.min(index, 5) * 0.06,
+        },
+      };
+
   return (
-    <div className="flex-shrink-0 w-[268px] snap-center lg:flex-shrink lg:w-auto lg:snap-align-none">
+    <motion.div
+      {...reveal}
+      className="flex-shrink-0 w-[268px] snap-center lg:flex-shrink lg:w-auto lg:snap-align-none"
+    >
       <FleetCardInner vehicle={vehicle} t={t} price={price} offer={offer} asHeading />
-    </div>
+    </motion.div>
   );
 }
 

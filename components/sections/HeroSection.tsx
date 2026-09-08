@@ -72,7 +72,12 @@ export default function HeroSection() {
               <span className="text-white">{t("title3")}</span>
             </h1>
 
-            <p className="text-white/45 text-base sm:text-lg leading-relaxed mb-8 max-w-md">
+            {/* dark-400/500 rather than a white/NN opacity. On #050505,
+                white/45 measures 4.75:1 and white/35 only 3.2:1, under the 4.5
+                body-text minimum; the dark scale was already tuned for this
+                background — see the note on dark-500 in tailwind.config.ts —
+                so muted text reads the same and passes. */}
+            <p className="text-dark-400 text-base sm:text-lg leading-relaxed mb-8 max-w-md">
               {t("description")}
             </p>
 
@@ -81,9 +86,13 @@ export default function HeroSection() {
               {TRUST_PILLS.map((pill) => (
                 <span
                   key={pill}
-                  className="text-xs text-white/35 border border-white/[0.08] rounded-full px-3 py-1"
+                  className="inline-flex items-center gap-1.5 text-xs text-dark-500 border border-white/[0.08] rounded-full px-3 py-1"
                 >
-                  ✦ {pill}
+                  {/* Decorative, and marked so. It was a bare ✦ glyph, which a
+                      screen reader announces as "black four pointed star" in
+                      front of every pill. */}
+                  <span aria-hidden className="w-1 h-1 rounded-full bg-gold-500/70" />
+                  {pill}
                 </span>
               ))}
             </div>
@@ -116,7 +125,7 @@ export default function HeroSection() {
                   {i > 0 && <div className="w-px h-8 bg-white/[0.06]" />}
                   <div>
                     <p className="font-display text-2xl sm:text-3xl text-white">{s.value}</p>
-                    <p className="text-white/30 text-[11px] tracking-wider uppercase mt-1">{s.label}</p>
+                    <p className="text-dark-500 text-[11px] tracking-wider uppercase mt-1">{s.label}</p>
                   </div>
                 </div>
               ))}
@@ -141,7 +150,7 @@ export default function HeroSection() {
                 </div>
                 <div>
                   <p className="text-white text-sm font-medium leading-snug">{label}</p>
-                  <p className="text-white/30 text-xs">{sub}</p>
+                  <p className="text-dark-500 text-xs">{sub}</p>
                 </div>
               </div>
             ))}

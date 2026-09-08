@@ -12,7 +12,8 @@
     "bookNow": "Reservar",
     "signIn": "Entrar",
     "dashboard": "Área Pessoal",
-    "mobileBook": "Reserve o Seu Transfer"
+    "mobileBook": "Reserve o Seu Transfer",
+    "menu": "Menu"
   },
   "hero": {
     "badge": "O serviço de motorista privado nº 1 de Barcelona",
@@ -252,7 +253,8 @@
     "vehicle": "Veículo",
     "whatsappQuote": "Pedir Orçamento por WhatsApp",
     "whereTo": "Para onde deseja ir?",
-    "yourPrice": "O Seu Preço"
+    "yourPrice": "O Seu Preço",
+    "stillNeeded": "Ainda em falta"
   },
   "pricing": {
     "book": "Reservar",

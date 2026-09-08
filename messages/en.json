@@ -12,7 +12,8 @@
     "bookNow": "Book Now",
     "signIn": "Sign In",
     "dashboard": "Dashboard",
-    "mobileBook": "Book Your Transfer"
+    "mobileBook": "Book Your Transfer",
+    "menu": "Menu"
   },
   "hero": {
     "badge": "Barcelona's #1 Luxury Chauffeur Service",
@@ -252,7 +253,8 @@
     "vehicle": "Vehicle",
     "whatsappQuote": "WhatsApp for a Quote",
     "whereTo": "Where would you like to go?",
-    "yourPrice": "Your Price"
+    "yourPrice": "Your Price",
+    "stillNeeded": "Still needed"
   },
   "pricing": {
     "book": "Book",
