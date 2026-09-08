@@ -74,7 +74,7 @@ binding one: check both before choosing a vehicle.
 - Per vehicle, not per person
 
 Individual cars priced below their class column:
-- El Prat Airport ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €55, Mercedes EQE 300 = €60
+- El Prat Airport ⇄ Barcelona City: Toyota Camry = €55, Tesla Model 3 = €55, Mercedes EQE 300 = €60
 - Within Barcelona city: Toyota Camry = €60, Tesla Model 3 = €60
 - El Prat Airport ⇄ Cruise Terminal: Toyota Camry = €60, Tesla Model 3 = €60
 - Cruise Terminal ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €60

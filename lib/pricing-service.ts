@@ -150,10 +150,13 @@ const _getRoutesFromDB = unstable_cache(
   // that and leaves stale figures served for up to an hour.
   //
   // Bump the suffix when changing prices by direct database write, or call
-  // /api/cron/revalidate-pricing with the cron secret. Last bumped 13 Aug 2026,
-  // when the Business column went to €65 — the Mercedes EQE 300, which the
-  // owner made the Business car — by scripts/sync-db-prices.mts.
-  ["pricing-routes-v4"],
+  // /api/cron/revalidate-pricing with the cron secret. Last bumped 8 Sep 2026,
+  // when the Costa Dorada reprice — Tarragona, Salou, PortAventura and Cambrils
+  // onto one ladder — was written to the database as 32 price rows. The pages
+  // read the code table and showed the new fares immediately; the checkout
+  // reads through this cache and went on quoting the old ones, so the site
+  // advertised €140 to Tarragona and charged €150.
+  ["pricing-routes-v5"],
   { tags: ["pricing"], revalidate: 3600 }
 );
 

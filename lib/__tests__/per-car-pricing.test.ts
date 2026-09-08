@@ -51,7 +51,7 @@ const CITY_TIER = [OFFER_ROUTE, ...CITY_TIER_REST];
 
 // What each car costs on the offer route.
 const OFFER_PRICES: [FleetVehicle, number][] = [
-  ["CAMRY", 60],
+  ["CAMRY", 55],
   ["TESLA_M3", 55],
   ["EQE_300", 60],
 ];
@@ -100,10 +100,13 @@ describe("the owner's per-car prices", () => {
   });
 
   it("shows the per-car price on the fleet page", () => {
-    expect(getFleetFromPrice("CAMRY")).toBe(60);
-    // On offer.
+    // All three on offer.
+    expect(getFleetFromPrice("CAMRY")).toBe(55);
     expect(getFleetFromPrice("TESLA_M3")).toBe(55);
     expect(getFleetFromPrice("EQE_300")).toBe(60);
+    // The Camry stays above the Economy Corolla, which is what its Standard
+    // badge claims. Equal or below would make the tier meaningless.
+    expect(getFleetFromPrice("CAMRY")).toBeGreaterThan(getFleetFromPrice("COROLLA"));
     // Untouched.
     expect(getFleetFromPrice("COROLLA")).toBe(50);
     expect(getFleetFromPrice("SPRINTER")).toBe(180);
@@ -238,7 +241,7 @@ describe("the price does not change between the widget and the booking page", ()
   it("the cars with their own price are the ones that would have jumped", () => {
     // Regression evidence: each car quotes below the class column it sits in,
     // so losing the car in the handoff would raise the fare at the last step.
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "CAMRY")).toBe(60);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "CAMRY")).toBe(55);
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "BUSINESS")).toBe(65);
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "TESLA_M3")).toBe(55);
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "ELECTRIC_VIP")).toBe(65);
@@ -254,6 +257,11 @@ describe("the offer shown beside a fare", () => {
    * exists to prevent. These hold it to being a display of the real cut.
    */
   it("advertises the cut the table actually makes", () => {
+    const camry = offerForFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", "CAMRY")!;
+    expect(camry).not.toBeNull();
+    expect(camry.now).toBe(55);
+    expect(camry.was).toBe(60);
+
     const tesla = offerForFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", "TESLA_M3")!;
     expect(tesla).not.toBeNull();
     expect(tesla.now).toBe(55);
@@ -362,7 +370,7 @@ describe("the offer shown beside a fare", () => {
   });
 
   it("shows no offer on a car that has none", () => {
-    for (const car of ["COROLLA", "CAMRY", "VITO", "V_CLASS", "SPRINTER"] as FleetVehicle[]) {
+    for (const car of ["COROLLA", "VITO", "V_CLASS", "SPRINTER"] as FleetVehicle[]) {
       expect(
         offerForFleetVehicle("BCN_AIRPORT", "BARCELONA_CITY", car),
         car,

@@ -230,8 +230,8 @@ describe("Per-route vehicle class overrides (BCN Airport → Barcelona City)", (
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "LUXURY")).toBe(65);
   });
 
-  it("Camry costs €60 — Standard, below the column it is stored under", () => {
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "CAMRY")).toBe(60);
+  it("Camry costs €55 on offer — Standard, below the column it is stored under", () => {
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "CAMRY")).toBe(55);
     // Stored as BUSINESS, badged Standard. Only the per-car price separates it.
     expect(lookupPriceByClass("BCN_AIRPORT", "BARCELONA_CITY", "BUSINESS")).toBe(65);
   });

@@ -41,7 +41,7 @@ the journey INTO the destination; leaving costs more:
 - Andorra to El Prat Airport: EUR 370 (Economy, per vehicle). El Prat Airport to Andorra is EUR 350. The journey out of Andorra costs EUR 20 more than the journey into it. Details: https://www.elitebcn.info/transfers/andorra-to-barcelona
 
 Where an individual car is priced below its class column:
-- El Prat Airport ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €55, Mercedes EQE 300 = €60
+- El Prat Airport ⇄ Barcelona City: Toyota Camry = €55, Tesla Model 3 = €55, Mercedes EQE 300 = €60
 - Within Barcelona city: Toyota Camry = €60, Tesla Model 3 = €60
 - El Prat Airport ⇄ Cruise Terminal: Toyota Camry = €60, Tesla Model 3 = €60
 - Cruise Terminal ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €60

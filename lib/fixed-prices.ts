@@ -97,19 +97,22 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // and scripts/verify-live-prices.mts quotes every car on every route to
     // prove it.
     prices: { ECONOMY: 50, BUSINESS: 65, MINIVAN: 65, VCLASS: 75, MINIBUS: 200 },
-    // Priced on the owner's instruction, 8 Sep 2026: the Tesla to €55 and the
-    // EQE 300 to €60, both advertised as an offer against what they cost
-    // before. The reason given was bounce — visitors were reading the price and
-    // leaving — so the cut is deliberately on the two cars a customer compares
-    // when deciding whether this route is worth it, and on this route only.
+    // Priced on the owner's instruction, 8 Sep 2026: the Camry and the Tesla to
+    // €55 and the EQE 300 to €60, all three advertised as an offer against what
+    // they cost before. The reason given was bounce — visitors were reading the
+    // price and leaving — so the cut is on the cars a customer compares when
+    // deciding whether this route is worth it, and on this route only.
     //
-    // The Camry is unchanged at €60. The EQE now needs a per-car price for the
-    // first time: it used to be the Business car and read the €65 column
-    // directly, and that column stays €65 because the Minivan and every other
-    // Business-class caller still prices from it.
-    vehicleOverrides: { CAMRY: 60, TESLA_M3: 55, EQE_300: 60 },
+    // The Camry joined the cut in a later instruction, at the same €55 as the
+    // Tesla. It stays above the €50 Corolla, which is what its Standard badge
+    // says it is.
+    //
+    // The EQE needs a per-car price for the first time: it used to be the
+    // Business car and read the €65 column directly, and that column stays €65
+    // because the Minivan and every other Business-class caller prices from it.
+    vehicleOverrides: { CAMRY: 55, TESLA_M3: 55, EQE_300: 60 },
     // Display only — the fare each car charged before the 8 Sep offer.
-    vehicleOffers: { TESLA_M3: 60, EQE_300: 65 },
+    vehicleOffers: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
   },
   {
     // Point-to-point within Barcelona city. Priced identically to the
