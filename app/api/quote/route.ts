@@ -17,6 +17,13 @@ const schema = z.object({
   // the price falls back to the vehicle class, which is what it always was.
   fleetVehicle:    z.string().optional(),
   pickupDatetime:  z.string(),
+  /**
+   * Round trip: when the customer comes back. The return leg is the exact
+   * reverse of the outbound one, so no second address pair is needed — which
+   * is the whole point of the option, and the reason it takes a datetime
+   * rather than a set of coordinates.
+   */
+  returnDatetime:  z.string().optional(),
   passengers:      z.number().int().min(1).max(20).optional(),
   durationHours:   z.number().min(1).max(24).optional(),
   // Address text for text-based zone resolution (more reliable than coords alone)
@@ -84,26 +91,98 @@ export async function POST(req: NextRequest) {
       durationMin = route.durationMin;
     }
 
-    const quote = await getQuote({
+    // Validated against the catalogue rather than trusted: an unknown value
+    // simply prices as the vehicle class, never at a figure of the caller's
+    // choosing.
+    const fleetVehicle = body.fleetVehicle && body.fleetVehicle in FLEET_TO_DB_CLASS
+      ? (body.fleetVehicle as FleetVehicle)
+      : undefined;
+
+    /**
+     * One leg. Called twice for a round trip, the second time with the
+     * endpoints swapped and the return moment.
+     *
+     * Distance is passed in rather than measured again: the road back is the
+     * road out, and a second OSRM call would double the latency of every
+     * return quote to say the same number. It matters only for custom routes
+     * priced per km, where the difference is well inside the noise.
+     *
+     * getQuote is direction-aware — RETURN_LEG_SURCHARGES looks at the ordered
+     * pair — so swapping the endpoints is what makes the ride out of Andorra
+     * cost its €20 more, without this code knowing that rule exists.
+     */
+    const legQuote = (
+      a: { lat: number; lng: number; address?: string },
+      b: { lat: number; lng: number; address?: string },
+      when: Date,
+    ) => getQuote({
       // Pass the resolved coordinates through: zone detection falls back to
       // coordinates when the address text does not match a known zone, and it
       // cannot do that with 0,0 either.
-      pickupLat:   from?.lat ?? pickupLat,
-      pickupLng:   from?.lng ?? pickupLng,
-      dropoffLat:  to?.lat   ?? dropoffLat,
-      dropoffLng:  to?.lng   ?? dropoffLng,
+      pickupLat: a.lat, pickupLng: a.lng,
+      dropoffLat: b.lat, dropoffLng: b.lng,
       vehicleClass: vc,
-      // Validated against the catalogue rather than trusted: an unknown value
-      // simply prices as the vehicle class, never at a figure of the caller's
-      // choosing.
-      fleetVehicle: body.fleetVehicle && body.fleetVehicle in FLEET_TO_DB_CLASS
-        ? (body.fleetVehicle as FleetVehicle)
-        : undefined,
-      pickupDatetime: pickupDate,
+      fleetVehicle,
+      pickupDatetime: when,
       distanceKm, durationMin,
-      pickupAddress:  body.pickupAddress,
-      dropoffAddress: body.dropoffAddress,
+      pickupAddress:  a.address,
+      dropoffAddress: b.address,
     });
+
+    const outPoint = { lat: from?.lat ?? pickupLat,  lng: from?.lng ?? pickupLng,  address: body.pickupAddress };
+    const backPoint = { lat: to?.lat  ?? dropoffLat, lng: to?.lng   ?? dropoffLng, address: body.dropoffAddress };
+
+    const quote = await legQuote(outPoint, backPoint, pickupDate);
+
+    // ── Round trip ───────────────────────────────────────────────────────────
+    if (body.returnDatetime) {
+      const returnDate = new Date(body.returnDatetime);
+
+      if (isNaN(returnDate.getTime())) {
+        return NextResponse.json({ error: "Invalid return date" }, { status: 422 });
+      }
+      // A return before the outbound is not a round trip, and pricing it would
+      // quietly sell a journey that cannot happen.
+      if (returnDate <= pickupDate) {
+        return NextResponse.json(
+          { error: "The return must be after the outbound pickup" },
+          { status: 422 },
+        );
+      }
+
+      const back = await legQuote(backPoint, outPoint, returnDate);
+
+      // Either leg failing to price makes the whole trip unpriceable: quoting
+      // half a round trip is the mis-sell this feature exists to end.
+      if (quote.needsManualQuote || back.needsManualQuote) {
+        return NextResponse.json({
+          ...quote,
+          isReturn: true,
+          needsManualQuote: true,
+        });
+      }
+
+      const leg = (q: typeof quote, when: Date) => ({
+        baseFare:            q.baseFare,
+        airportSurcharge:    q.airportSurcharge,
+        nightSurcharge:      q.nightSurcharge,
+        lastMinuteSurcharge: q.lastMinuteSurcharge,
+        totalAmount:         q.totalAmount,
+        pickupDatetime:      when.toISOString(),
+        fromLabel:           q.fromLabel,
+        toLabel:             q.toLabel,
+      });
+
+      return NextResponse.json({
+        // The outbound leg still describes the top level, so every existing
+        // reader of this response keeps working; totalAmount is the pair.
+        ...quote,
+        isReturn:    true,
+        totalAmount: Math.round((quote.totalAmount + back.totalAmount) * 100) / 100,
+        outboundLeg: leg(quote, pickupDate),
+        returnLeg:   leg(back, returnDate),
+      });
+    }
 
     // Log every custom-route lookup so the admin knows which routes to add next
     if (quote.isCustomRoute) {

@@ -122,6 +122,33 @@ export interface QuoteResponse {
   toLabel?:            string;   // e.g. "Barcelona City"
   hourlyRate?:         number;
   hours?:              number;
+
+  /** Set when the quote covers a round trip. */
+  isReturn?:           boolean;
+  /**
+   * The two legs of a round trip, priced independently — each carries its own
+   * night, airport and last-minute surcharges, because they are two journeys
+   * on two dates and only the base fare is symmetrical.
+   *
+   * `totalAmount` above is the sum of both. The other top-level fields
+   * describe the outbound leg, so every existing reader of this response keeps
+   * working without knowing about return trips.
+   */
+  outboundLeg?:        QuoteLeg;
+  returnLeg?:          QuoteLeg;
+}
+
+/** One leg of a round trip. */
+export interface QuoteLeg {
+  baseFare:            number;
+  airportSurcharge:    number;
+  nightSurcharge:      number;
+  lastMinuteSurcharge?: number;
+  totalAmount:         number;
+  /** ISO string — the leg's own pickup moment. */
+  pickupDatetime:      string;
+  fromLabel?:          string;
+  toLabel?:            string;
 }
 
 export interface BookingFormData {
