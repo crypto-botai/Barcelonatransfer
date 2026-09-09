@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import {
   Calendar, Clock, Users, Zap, ArrowRight,
-  Loader2, MessageCircle, MapPin, RotateCcw, Timer,
+  Loader2, MessageCircle, MapPin, Timer,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VEHICLE_CATALOG, FLEET_TO_DB_CLASS, type FleetVehicle, type QuoteResponse } from "@/types";
@@ -55,9 +55,22 @@ const PICKUP_QUICK_ZONES: QuickZone[] = [
 
 type TripType = "oneway" | "return" | "hourly";
 
+/**
+ * "Return" is withheld until the round trip is actually built.
+ *
+ * The tab shipped, but `tripType === "return"` was read in exactly one place —
+ * to colour the selected button. It quoted the one-way fare, handed
+ * bookingType TRANSFER to /book, and created a single booking: a customer who
+ * chose Return was charged for one leg and driven one way. Showing the option
+ * is worse than not having it, so it is out of the list until the second leg
+ * is priced, stored and driveable.
+ *
+ * The TripType union and the tripReturn translations stay in all nine locales.
+ * Restoring this means putting the row back and re-importing RotateCcw from
+ * lucide-react, nothing more.
+ */
 const TRIP_TABS: { type: TripType; labelKey: string; icon: React.ElementType }[] = [
   { type: "oneway",  labelKey: "tripOneWay", icon: ArrowRight },
-  { type: "return",  labelKey: "tripReturn", icon: RotateCcw },
   { type: "hourly",  labelKey: "tripHourly", icon: Timer },
 ];
 
