@@ -178,7 +178,8 @@
       "driverLogin": "Acceso Conductor",
       "driverRegister": "Registro Conductor",
       "adminLogin": "Acceso Admin",
-      "hotelTransfers": "Traslados a hoteles"
+      "hotelTransfers": "Traslados a hoteles",
+      "andorraReturn": "Andorra a Barcelona"
     },
     "legal": {
       "faq": "Preguntas Frecuentes",

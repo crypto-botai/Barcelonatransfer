@@ -178,7 +178,8 @@
       "driverLogin": "Вход Водителя",
       "driverRegister": "Регистрация Водителя",
       "adminLogin": "Вход Администратора",
-      "hotelTransfers": "Трансферы к Отелю"
+      "hotelTransfers": "Трансферы к Отелю",
+      "andorraReturn": "Андорра — Барселона"
     },
     "legal": {
       "faq": "Вопросы и Ответы",

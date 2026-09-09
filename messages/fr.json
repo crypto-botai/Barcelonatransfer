@@ -178,7 +178,8 @@
       "driverLogin": "Accès Conducteur",
       "driverRegister": "Inscription Conducteur",
       "adminLogin": "Accès Admin",
-      "hotelTransfers": "Transferts Hôtel"
+      "hotelTransfers": "Transferts Hôtel",
+      "andorraReturn": "Andorre vers Barcelone"
     },
     "legal": {
       "faq": "FAQ",

@@ -178,7 +178,8 @@
       "driverLogin": "司机登录",
       "driverRegister": "司机注册",
       "adminLogin": "管理员登录",
-      "hotelTransfers": "酒店接送"
+      "hotelTransfers": "酒店接送",
+      "andorraReturn": "安道尔至巴塞罗那"
     },
     "legal": {
       "faq": "常见问题",
