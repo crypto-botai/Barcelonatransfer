@@ -18,6 +18,7 @@ import {
   type BookingType,
 } from "@/types";
 import { getFleetFromPrice, getFleetOffer, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+import { RETURN_TRIPS_ENABLED } from "@/lib/feature-flags";
 import { VAT_RATE, vatOn, wantsInvoice } from "@/lib/vat";
 import { TIP_PRESETS, tipForPercent, clampTip, MAX_TIP_ABSOLUTE } from "@/lib/tips";
 import toast from "react-hot-toast";
@@ -174,7 +175,7 @@ export default function BookFormClient() {
    * on when the widget handed a return over.
    */
   const [addReturn, setAddReturn] = useState(
-    Boolean(params.get("returnDate") && params.get("returnTime")),
+    RETURN_TRIPS_ENABLED && Boolean(params.get("returnDate") && params.get("returnTime")),
   );
 
   const [quote,         setQuote]         = useState<QuoteResponse | null>(null);
@@ -604,7 +605,7 @@ export default function BookFormClient() {
                         home is this one reversed, so the addresses above are
                         not asked for twice. Hourly and full-day hire have no
                         route to reverse, so the option does not appear. */}
-                    {(bookingType === "TRANSFER" || bookingType === "CORPORATE") && (
+                    {RETURN_TRIPS_ENABLED && (bookingType === "TRANSFER" || bookingType === "CORPORATE") && (
                       <div className="mt-3">
                         <button
                           type="button"

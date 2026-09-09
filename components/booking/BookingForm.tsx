@@ -7,6 +7,7 @@ import {
   Calendar, Clock, Users, Zap, ArrowRight,
   Loader2, MessageCircle, MapPin, RotateCcw, Timer,
 } from "lucide-react";
+import { RETURN_TRIPS_ENABLED } from "@/lib/feature-flags";
 import { cn } from "@/lib/utils";
 import { VEHICLE_CATALOG, FLEET_TO_DB_CLASS, type FleetVehicle, type QuoteResponse } from "@/types";
 import AddressAutocomplete, { type QuickZone } from "./AddressAutocomplete";
@@ -57,7 +58,11 @@ type TripType = "oneway" | "return" | "hourly";
 
 const TRIP_TABS: { type: TripType; labelKey: string; icon: React.ElementType }[] = [
   { type: "oneway",  labelKey: "tripOneWay", icon: ArrowRight },
-  { type: "return",  labelKey: "tripReturn", icon: RotateCcw },
+  // Return is built and tested; it appears once the database can store the
+  // second leg. See RETURN_TRIPS_ENABLED in lib/feature-flags.ts.
+  ...(RETURN_TRIPS_ENABLED
+    ? [{ type: "return" as const, labelKey: "tripReturn", icon: RotateCcw }]
+    : []),
   { type: "hourly",  labelKey: "tripHourly", icon: Timer },
 ];
 
