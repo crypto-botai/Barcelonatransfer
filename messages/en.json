@@ -255,7 +255,12 @@
     "whatsappQuote": "WhatsApp for a Quote",
     "whereTo": "Where would you like to go?",
     "yourPrice": "Your Price",
-    "stillNeeded": "Still needed"
+    "stillNeeded": "Still needed",
+    "returnHeading": "Your return journey",
+    "returnDate": "Return date",
+    "returnTime": "Return time",
+    "returnRoute": "Return route",
+    "returnAfterOutbound": "The return must be after your outbound pickup"
   },
   "pricing": {
     "book": "Book",

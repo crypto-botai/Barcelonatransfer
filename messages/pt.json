@@ -255,7 +255,12 @@
     "whatsappQuote": "Pedir Orçamento por WhatsApp",
     "whereTo": "Para onde deseja ir?",
     "yourPrice": "O Seu Preço",
-    "stillNeeded": "Ainda em falta"
+    "stillNeeded": "Ainda em falta",
+    "returnHeading": "A sua viagem de volta",
+    "returnDate": "Data de volta",
+    "returnTime": "Hora de volta",
+    "returnRoute": "Rota de volta",
+    "returnAfterOutbound": "A volta deve ser depois da recolha de ida"
   },
   "pricing": {
     "book": "Reservar",

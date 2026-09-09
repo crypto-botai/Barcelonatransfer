@@ -255,7 +255,12 @@
     "whatsappQuote": "Devis par WhatsApp",
     "whereTo": "Où souhaitez-vous aller ?",
     "yourPrice": "Votre prix",
-    "stillNeeded": "Il manque encore"
+    "stillNeeded": "Il manque encore",
+    "returnHeading": "Votre trajet retour",
+    "returnDate": "Date de retour",
+    "returnTime": "Heure de retour",
+    "returnRoute": "Itinéraire retour",
+    "returnAfterOutbound": "Le retour doit être après la prise en charge aller"
   },
   "pricing": {
     "book": "Réserver",

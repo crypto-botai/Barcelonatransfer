@@ -255,7 +255,12 @@
     "whatsappQuote": "اطلب عرض سعر عبر واتساب",
     "whereTo": "إلى أين تريد الذهاب؟",
     "yourPrice": "سعرك",
-    "stillNeeded": "لا يزال مطلوباً"
+    "stillNeeded": "لا يزال مطلوباً",
+    "returnHeading": "رحلة العودة",
+    "returnDate": "تاريخ العودة",
+    "returnTime": "وقت العودة",
+    "returnRoute": "مسار العودة",
+    "returnAfterOutbound": "يجب أن تكون العودة بعد موعد الذهاب"
   },
   "pricing": {
     "book": "احجز",

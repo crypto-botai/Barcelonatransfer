@@ -162,6 +162,16 @@ export interface BookingFormData {
   pickupDatetime:  string;
   date:            string;
   time:            string;
+  /**
+   * The leg home, on a round trip. Both present or both absent.
+   *
+   * Only a moment, never a second address pair: the return journey is the
+   * outbound one reversed, which is what lets a customer book both ways
+   * without entering the same two places twice. The server creates it as its
+   * own linked Booking so it can be assigned and driven separately.
+   */
+  returnDate?:     string;
+  returnTime?:     string;
   passengers:      number;
   luggage:         number;
   vehicleClass:    VehicleClass;

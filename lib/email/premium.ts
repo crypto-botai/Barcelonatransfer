@@ -186,6 +186,20 @@ export function bookingReceivedCard(o: {
   pickupAddress: string; dropoffAddress: string;
   date: string; time: string; vehicle: string;
   passengers: number; totalAmount: number;
+  /**
+   * The leg home, on a round trip.
+   *
+   * It has a booking and a reference of its own — it is driven separately and
+   * may have a different chauffeur — so both are named here. A customer who
+   * paid for two journeys and was sent confirmation of one would reasonably
+   * assume the return had not been booked.
+   */
+  returnLeg?: {
+    confirmationCode: string;
+    date: string; time: string;
+    pickupAddress: string; dropoffAddress: string;
+    totalAmount: number;
+  };
 }): string {
   const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Hello, my booking reference is ${o.confirmationCode}`)}`;
   return card(`
@@ -201,6 +215,7 @@ export function bookingReceivedCard(o: {
 
     <tr><td style="padding:0 44px;">
       ${detailTable(
+        (o.returnLeg ? row("Journey", "Outbound") : "") +
         row("Pick-up", esc(o.pickupAddress)) +
         row("Drop-off", esc(o.dropoffAddress)) +
         row("Date", `${esc(o.date)}${o.time ? ` &nbsp;&middot;&nbsp; ${esc(o.time)}` : ""}`) +
@@ -209,8 +224,26 @@ export function bookingReceivedCard(o: {
       )}
     </td></tr>
 
+    ${o.returnLeg ? `
+      ${sectionSpacer(18)}
+      <tr><td style="padding:0 44px;">
+        ${detailTable(
+          row("Journey", "Return") +
+          row("Reference", esc(o.returnLeg.confirmationCode)) +
+          row("Pick-up", esc(o.returnLeg.pickupAddress)) +
+          row("Drop-off", esc(o.returnLeg.dropoffAddress)) +
+          row("Date", `${esc(o.returnLeg.date)}${o.returnLeg.time ? ` &nbsp;&middot;&nbsp; ${esc(o.returnLeg.time)}` : ""}`) +
+          row("Vehicle", esc(o.vehicle), true),
+        )}
+      </td></tr>
+    ` : ""}
+
     ${sectionSpacer(28)}
-    <tr><td style="padding:0 44px;">${amountBar("Total", o.totalAmount, "excl. VAT &amp; tolls")}</td></tr>
+    <tr><td style="padding:0 44px;">${amountBar(
+      o.returnLeg ? "Total, both journeys" : "Total",
+      o.totalAmount,
+      "excl. VAT &amp; tolls",
+    )}</td></tr>
     ${sectionSpacer(32)}
 
     <tr><td style="padding:0 44px;text-align:center;">

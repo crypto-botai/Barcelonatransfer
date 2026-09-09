@@ -255,7 +255,12 @@
     "whatsappQuote": "Preventivo su WhatsApp",
     "whereTo": "Dove desidera andare?",
     "yourPrice": "Il suo prezzo",
-    "stillNeeded": "Ancora necessario"
+    "stillNeeded": "Ancora necessario",
+    "returnHeading": "Il tuo viaggio di ritorno",
+    "returnDate": "Data di ritorno",
+    "returnTime": "Ora di ritorno",
+    "returnRoute": "Percorso di ritorno",
+    "returnAfterOutbound": "Il ritorno deve essere successivo all'andata"
   },
   "pricing": {
     "book": "Prenota",

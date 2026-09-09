@@ -247,6 +247,23 @@ model Booking {
   // off; the full history lives in RideEvent.
   rideStage         RideStage?
   rideStageAt       DateTime?
+  // Round trip. The return leg is a Booking of its own pointing back at the
+  // outbound one, rather than a pair of extra columns here, because everything
+  // operational hangs off a booking row: a driver is assigned to one, a
+  // RideTracking follows one, RideEvent and rideStage describe one, and a
+  // booking is completed once. Two journeys on two dates with possibly two
+  // drivers cannot share a row and still be driveable.
+  //
+  // Each leg carries its own totalAmount — its own fare — so revenue summed
+  // over bookings stays correct. The single Payment for the pair hangs off the
+  // outbound leg and its amount is the sum of both, Payment.bookingId being
+  // unique so one checkout cannot cover two rows.
+  //
+  // Both sides nullable: a one-way booking, which is nearly all of them, has
+  // neither and behaves exactly as it did.
+  returnOfId        String?    @unique
+  returnOf          Booking?   @relation("RoundTrip", fields: [returnOfId], references: [id])
+  returnLeg         Booking?   @relation("RoundTrip")
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 

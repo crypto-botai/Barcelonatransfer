@@ -255,7 +255,12 @@
     "whatsappQuote": "Angebot per WhatsApp",
     "whereTo": "Wohin möchten Sie fahren?",
     "yourPrice": "Ihr Preis",
-    "stillNeeded": "Noch erforderlich"
+    "stillNeeded": "Noch erforderlich",
+    "returnHeading": "Ihre Rückfahrt",
+    "returnDate": "Rückfahrtdatum",
+    "returnTime": "Rückfahrtzeit",
+    "returnRoute": "Rückfahrtstrecke",
+    "returnAfterOutbound": "Die Rückfahrt muss nach der Hinfahrt liegen"
   },
   "pricing": {
     "book": "Buchen",

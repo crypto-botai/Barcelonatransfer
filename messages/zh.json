@@ -255,7 +255,12 @@
     "whatsappQuote": "通过 WhatsApp 询价",
     "whereTo": "您想去哪里？",
     "yourPrice": "您的价格",
-    "stillNeeded": "还需填写"
+    "stillNeeded": "还需填写",
+    "returnHeading": "您的返程",
+    "returnDate": "返程日期",
+    "returnTime": "返程时间",
+    "returnRoute": "返程路线",
+    "returnAfterOutbound": "返程时间必须晚于去程"
   },
   "pricing": {
     "book": "预订",

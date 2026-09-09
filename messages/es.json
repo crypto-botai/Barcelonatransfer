@@ -255,7 +255,12 @@
     "whatsappQuote": "Pedir presupuesto por WhatsApp",
     "whereTo": "¿A dónde quiere ir?",
     "yourPrice": "Su precio",
-    "stillNeeded": "Aún falta"
+    "stillNeeded": "Aún falta",
+    "returnHeading": "Su viaje de vuelta",
+    "returnDate": "Fecha de vuelta",
+    "returnTime": "Hora de vuelta",
+    "returnRoute": "Ruta de vuelta",
+    "returnAfterOutbound": "La vuelta debe ser posterior a la recogida de ida"
   },
   "pricing": {
     "book": "Reservar",

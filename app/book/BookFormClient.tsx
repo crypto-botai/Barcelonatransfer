@@ -149,6 +149,10 @@ export default function BookFormClient() {
     dropoffLng:      parseFloat(params.get("dLng") ?? "0"),
     date:            params.get("date")     ?? "",
     time:            params.get("time")     ?? "",
+    // Carried from the homepage widget so a round trip stays a round trip
+    // across the handoff.
+    returnDate:      params.get("returnDate") ?? "",
+    returnTime:      params.get("returnTime") ?? "",
     passengers:      parseInt(params.get("pax") ?? "2"),
     luggage:         0,
     durationHours:   4,
@@ -161,6 +165,17 @@ export default function BookFormClient() {
     specialRequests: "",
     extras:          [],
   });
+
+  /**
+   * Round trip on this page, not only when arriving from the homepage widget.
+   *
+   * "Book Now" in the navigation comes straight here, so without this the
+   * return option existed on one entry point and not the busiest one. Starts
+   * on when the widget handed a return over.
+   */
+  const [addReturn, setAddReturn] = useState(
+    Boolean(params.get("returnDate") && params.get("returnTime")),
+  );
 
   const [quote,         setQuote]         = useState<QuoteResponse | null>(null);
 
@@ -271,6 +286,12 @@ export default function BookFormClient() {
         body.dropoffLng = data.dropoffLng;
       }
       if (type === "HOURLY") body.durationHours = data.durationHours ?? 3;
+      // Without this the round trip is quoted as one leg on the very page
+      // where the customer pays — the price would rise at the checkout, which
+      // is the failure this whole flow exists to avoid.
+      if (data.returnDate && data.returnTime && (type === "TRANSFER" || type === "CORPORATE")) {
+        body.returnDatetime = `${data.returnDate}T${data.returnTime}`;
+      }
 
       const res = await fetch("/api/quote", {
         method: "POST",
@@ -281,7 +302,7 @@ export default function BookFormClient() {
     } catch { /* silent */ } finally {
       setLoadingQ(false);
     }
-  }, [data.pickupLat, data.pickupLng, data.dropoffLat, data.dropoffLng, data.date, data.time, data.passengers, data.durationHours, bookingType]);
+  }, [data.pickupLat, data.pickupLng, data.dropoffLat, data.dropoffLng, data.date, data.time, data.returnDate, data.returnTime, data.passengers, data.durationHours, bookingType]);
 
   useEffect(() => {
     if (hasPrefilledJourney && data.vehicleClass && data.pickupLat && data.date && data.time) {
@@ -358,7 +379,19 @@ export default function BookFormClient() {
     if (data.vehicleClass) fetchQuote(data.vehicleClass, undefined, data.fleetVehicle);
   };
 
-  const step1Valid = !!data.pickupLat && !!data.date && !!data.time && (bookingType !== "TRANSFER" || !!data.dropoffLat);
+  /**
+   * A return that is switched on must be complete and after the outbound.
+   *
+   * Without this the customer could advance with a return date and no time,
+   * be quoted for one leg all the way to the payment step, and only then have
+   * the server reject the booking — after they had entered their card.
+   */
+  const returnValid = !addReturn || (
+    !!data.returnDate && !!data.returnTime &&
+    new Date(`${data.returnDate}T${data.returnTime}`) > new Date(`${data.date}T${data.time}`)
+  );
+
+  const step1Valid = !!data.pickupLat && !!data.date && !!data.time && (bookingType !== "TRANSFER" || !!data.dropoffLat) && returnValid;
   // Named for what it checks rather than which step it sits on, since the
   // contact fields have now moved a step earlier.
   // A phone number is only useful if someone can dial it. This read
@@ -566,6 +599,87 @@ export default function BookFormClient() {
                         </select>
                       </div>
                     </div>
+
+                    {/* Round trip. Only a moment is asked for — the journey
+                        home is this one reversed, so the addresses above are
+                        not asked for twice. Hourly and full-day hire have no
+                        route to reverse, so the option does not appear. */}
+                    {(bookingType === "TRANSFER" || bookingType === "CORPORATE") && (
+                      <div className="mt-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = !addReturn;
+                            setAddReturn(next);
+                            // Clearing on the way off matters: a stale return
+                            // date left in state would be submitted and charged
+                            // for a trip the customer had just turned off.
+                            if (!next) setData((d) => ({ ...d, returnDate: "", returnTime: "" }));
+                          }}
+                          aria-pressed={addReturn}
+                          className={cn(
+                            "w-full flex items-center gap-2.5 px-4 py-3 rounded-xl border text-sm transition-all",
+                            addReturn
+                              ? "border-gold-500/40 bg-gold-500/[0.06] text-gold-300"
+                              : "border-white/10 text-dark-300 hover:border-gold-500/25 hover:text-white",
+                          )}
+                        >
+                          <span
+                            aria-hidden
+                            className={cn(
+                              "w-4 h-4 rounded border flex items-center justify-center flex-shrink-0",
+                              addReturn ? "bg-gold-500 border-gold-500" : "border-white/25",
+                            )}
+                          >
+                            {addReturn && <CheckCircle2 size={12} className="text-black" />}
+                          </span>
+                          <span className="font-medium">Add a return journey</span>
+                          <span className="text-dark-500 text-xs ml-auto">Same car, reversed</span>
+                        </button>
+
+                        {addReturn && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                            <div className="relative">
+                              <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none z-10" />
+                              <input
+                                type="date"
+                                aria-label="Return date"
+                                value={data.returnDate ?? ""}
+                                min={data.date || todayStr()}
+                                onChange={(e) => setData((d) => ({ ...d, returnDate: e.target.value }))}
+                                className="input-luxury w-full pl-9 pr-3 py-4 rounded-xl text-sm [color-scheme:dark]"
+                              />
+                            </div>
+                            <div className="relative">
+                              <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none z-10" />
+                              <select
+                                aria-label="Return time"
+                                value={data.returnTime ?? ""}
+                                onChange={(e) => setData((d) => ({ ...d, returnTime: e.target.value }))}
+                                className="input-luxury w-full pl-9 pr-3 py-4 rounded-xl text-sm appearance-none"
+                              >
+                                <option value="" className="bg-[#111]">Return time…</option>
+                                {TIME_SLOTS.map((slot) => (
+                                  <option key={slot} value={slot} className="bg-[#111]">{slot}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        )}
+
+                        {addReturn && data.dropoffAddress && data.pickupAddress && (
+                          <p className="text-[11px] text-dark-500 mt-2 leading-snug">
+                            Return: {data.dropoffAddress} → {data.pickupAddress}
+                          </p>
+                        )}
+                        {addReturn && data.returnDate && data.returnTime &&
+                          new Date(`${data.returnDate}T${data.returnTime}`) <= new Date(`${data.date}T${data.time}`) && (
+                          <p className="text-[11px] text-amber-400 mt-2" aria-live="polite">
+                            The return must be after your outbound pickup.
+                          </p>
+                        )}
+                      </div>
+                    )}
 
                     {/* Timing warnings */}
                     {data.date && data.time && hoursUntilPickup < 1 && (

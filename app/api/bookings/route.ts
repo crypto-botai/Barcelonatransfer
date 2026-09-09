@@ -61,6 +61,11 @@ const schema = z.object({
   dropoffLng:      z.number().default(0),
   date:            z.string(),
   time:            z.string(),
+  // Round trip. Only the moment is needed: the return leg is the exact reverse
+  // of the outbound one, which is the point of the option — the customer
+  // enters two addresses once, not twice.
+  returnDate:      z.string().optional(),
+  returnTime:      z.string().optional(),
   passengers:      z.number().int().min(1),
   luggage:         z.number().int().min(0),
   vehicleClass:    z.string(),
@@ -133,6 +138,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid date or time" }, { status: 422 });
     }
 
+    // Both halves or neither: a return time without a date is a half-filled
+    // form, and guessing which day they meant is not this endpoint's job.
+    const wantsReturn = Boolean(body.returnDate && body.returnTime);
+    if ((body.returnDate || body.returnTime) && !wantsReturn) {
+      return NextResponse.json({ error: "A return needs both a date and a time" }, { status: 422 });
+    }
+    // A return only makes sense on a journey between two places. HOURLY and
+    // DAY_HIRE have no route to reverse.
+    if (wantsReturn && body.bookingType !== "TRANSFER" && body.bookingType !== "CORPORATE") {
+      return NextResponse.json(
+        { error: "A return trip applies to transfers, not hourly hire" },
+        { status: 422 },
+      );
+    }
+
+    const returnDatetime = wantsReturn ? pickupToUtc(body.returnDate!, body.returnTime!) : null;
+    if (wantsReturn && !returnDatetime) {
+      return NextResponse.json({ error: "Invalid return date or time" }, { status: 422 });
+    }
+    if (returnDatetime && returnDatetime <= pickupDatetime) {
+      return NextResponse.json(
+        { error: "The return must be after the outbound pickup" },
+        { status: 422 },
+      );
+    }
+
     // Block bookings with < 1h notice
     const minsUntilPickup = (pickupDatetime.getTime() - Date.now()) / 60_000;
     if (minsUntilPickup < MIN_BOOKING_HOURS * 60) {
@@ -154,6 +185,12 @@ export async function POST(req: NextRequest) {
       distanceKm: 0, durationMin: 0,
       baseFare: 0, distanceFare: 0, airportSurcharge: 0, nightSurcharge: 0,
     };
+
+    // The leg home, when one was asked for. Its fare is added to the total the
+    // customer is charged, and its line items are stored on the second booking
+    // created for it further down.
+    let returnFare = 0;
+    let returnBreakdown: typeof breakdown | null = null;
 
     if (body.bookingType === "HOURLY" || body.bookingType === "DAY_HIRE") {
       const minH  = MIN_HOURLY_HOURS[vc] ?? 4;
@@ -221,6 +258,50 @@ export async function POST(req: NextRequest) {
         airportSurcharge: sq.airportSurcharge,
         nightSurcharge:   sq.nightSurcharge,
       };
+
+      // ── The leg home ─────────────────────────────────────────────────────
+      // Priced here rather than taken from body.quote for exactly the reason
+      // the outbound leg is: the request can say anything. Endpoints swapped
+      // and the return moment passed, so it picks up its own night and
+      // last-minute surcharges — and, leaving Andorra, its €20.
+      if (returnDatetime) {
+        const rq = await getQuote({
+          pickupLat:      to?.lat     ?? body.dropoffLat,
+          pickupLng:      to?.lng     ?? body.dropoffLng,
+          dropoffLat:     from?.lat   ?? body.pickupLat,
+          dropoffLng:     from?.lng   ?? body.pickupLng,
+          vehicleClass:   vc,
+          fleetVehicle:   body.fleetVehicle && body.fleetVehicle in FLEET_TO_DB_CLASS
+            ? (body.fleetVehicle as FleetVehicle)
+            : undefined,
+          pickupDatetime: returnDatetime,
+          // The road back is the road out; measured once above.
+          distanceKm:     measured.distanceKm,
+          durationMin:    measured.durationMin,
+          pickupAddress:  body.dropoffAddress || undefined,
+          dropoffAddress: body.pickupAddress  || undefined,
+        });
+
+        if (rq.needsManualQuote || rq.totalAmount <= 0) {
+          return NextResponse.json(
+            { error: "We could not price the return leg. Please contact us via WhatsApp." },
+            { status: 422 },
+          );
+        }
+
+        returnFare = rq.totalAmount;
+        returnBreakdown = {
+          distanceKm:       measured.distanceKm,
+          durationMin:      measured.durationMin,
+          baseFare:         rq.baseFare,
+          distanceFare:     rq.distanceFare,
+          airportSurcharge: rq.airportSurcharge,
+          nightSurcharge:   rq.nightSurcharge,
+        };
+        // Both legs are what the customer pays for, so both are in the figure
+        // the coupon, the VAT and the checkout are computed from.
+        serverBaseTotal = Math.round((serverBaseTotal + returnFare) * 100) / 100;
+      }
     }
 
     // Apply last-minute surcharge for HOURLY/DAY_HIRE (TRANSFER already has it from getQuote)
@@ -334,7 +415,11 @@ export async function POST(req: NextRequest) {
           distanceFare:     breakdown.distanceFare,
           airportSurcharge: breakdown.airportSurcharge,
           nightSurcharge:   breakdown.nightSurcharge,
-          totalAmount:      totalWithExtras,
+          // Each leg carries its own fare, so the two rows add up to the one
+          // amount charged. Putting the round-trip total on the outbound and
+          // the leg fare on the return would count the journey home twice in
+          // any report that sums bookings.
+          totalAmount:      Math.round((totalWithExtras - returnFare) * 100) / 100,
           status:           "PENDING",
           paymentStatus:    "PENDING",
         },
@@ -343,6 +428,73 @@ export async function POST(req: NextRequest) {
       const msg = dbErr instanceof Error ? dbErr.message : String(dbErr);
       console.error("[bookings] DB create failed:", msg, dbErr);
       return NextResponse.json({ error: `Could not save booking: ${msg}` }, { status: 500 });
+    }
+
+    // ── The return leg, as its own booking ───────────────────────────────────
+    //
+    // A second row rather than columns on the first, because everything
+    // operational hangs off a booking: a driver is assigned to one, RideEvent
+    // and rideStage describe one, and a booking is completed once. Two
+    // journeys on two dates cannot share a row and still be driveable.
+    //
+    // Extras, the coupon, VAT and the tip stay on the outbound leg — they are
+    // charged once for the trip, not once per direction.
+    let returnBooking: { id: string; confirmationCode: string } | null = null;
+    if (returnDatetime && returnBreakdown) {
+      try {
+        returnBooking = await withUniqueBookingCode((confirmationCode) => prisma.booking.create({
+          data: {
+            confirmationCode,
+            returnOfId:       booking.id,
+            userId:           user?.id ?? null,
+            guestName:        body.guestName,
+            guestEmail:       body.guestEmail,
+            guestPhone:       body.guestPhone,
+            // The reverse journey: what was the drop-off is now the pickup.
+            pickupAddress:    body.dropoffAddress,
+            pickupLat:        body.dropoffLat,
+            pickupLng:        body.dropoffLng,
+            dropoffAddress:   body.pickupAddress,
+            dropoffLat:       body.pickupLat,
+            dropoffLng:       body.pickupLng,
+            pickupDatetime:   returnDatetime,
+            passengers:       body.passengers,
+            luggage:          body.luggage,
+            vehicleClass:     body.vehicleClass as VehicleClass,
+            // A flight number belongs to the arrival, not to the ride home.
+            flightNumber:     null,
+            specialRequests:  `Return leg of booking ${booking.confirmationCode}.`,
+            distanceKm:       returnBreakdown.distanceKm,
+            durationMin:      Math.round(returnBreakdown.durationMin),
+            baseFare:         returnBreakdown.baseFare,
+            distanceFare:     returnBreakdown.distanceFare,
+            airportSurcharge: returnBreakdown.airportSurcharge,
+            nightSurcharge:   returnBreakdown.nightSurcharge,
+            totalAmount:      returnFare,
+            status:           "PENDING",
+            // The single checkout below covers both legs and is attached to the
+            // outbound one; this row is paid when that one is.
+            paymentStatus:    "PENDING",
+          },
+        }));
+      } catch (dbErr) {
+        // The outbound leg is already saved and the customer is mid-booking, so
+        // failing the whole request here would lose a paid-for journey. The
+        // trip is downgraded to one way, loudly, and the fare charged is
+        // corrected to match what was actually booked.
+        const msg = dbErr instanceof Error ? dbErr.message : String(dbErr);
+        console.error("[bookings] return leg create failed — booking stays one way:", msg, dbErr);
+        return NextResponse.json(
+          {
+            error:
+              "We saved your outbound journey but could not add the return leg. " +
+              "Please contact us on WhatsApp and we will add it without charge.",
+            bookingId: booking.id,
+            confirmationCode: booking.confirmationCode,
+          },
+          { status: 500 },
+        );
+      }
     }
 
     // Step 2: Auto-create user account for guest if not already registered
@@ -430,9 +582,19 @@ export async function POST(req: NextRequest) {
           dropoffAddress:   body.dropoffAddress || body.bookingType,
           pickupDatetime:   formatPickupDateTime(pickupDatetime),
           vehicleClass:     body.vehicleClass,
+          // The figure actually charged, which on a round trip covers both
+          // legs — the same number the customer agreed to at the checkout.
           totalAmount:      totalWithExtras,
           passengers:       body.passengers,
           bookingId:        booking.id,
+          returnLeg: returnBooking && returnDatetime ? {
+            confirmationCode: returnBooking.confirmationCode,
+            pickupDatetime:   formatPickupDateTime(returnDatetime),
+            // Reversed, which is what the customer is expecting to read.
+            pickupAddress:    body.dropoffAddress,
+            dropoffAddress:   body.pickupAddress,
+            totalAmount:      returnFare,
+          } : undefined,
         });
       } catch (e) {
         console.error("[bookings/pending-email]", e);

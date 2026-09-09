@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import {
   Calendar, Clock, Users, Zap, ArrowRight,
-  Loader2, MessageCircle, MapPin, Timer,
+  Loader2, MessageCircle, MapPin, RotateCcw, Timer,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VEHICLE_CATALOG, FLEET_TO_DB_CLASS, type FleetVehicle, type QuoteResponse } from "@/types";
@@ -55,22 +55,9 @@ const PICKUP_QUICK_ZONES: QuickZone[] = [
 
 type TripType = "oneway" | "return" | "hourly";
 
-/**
- * "Return" is withheld until the round trip is actually built.
- *
- * The tab shipped, but `tripType === "return"` was read in exactly one place —
- * to colour the selected button. It quoted the one-way fare, handed
- * bookingType TRANSFER to /book, and created a single booking: a customer who
- * chose Return was charged for one leg and driven one way. Showing the option
- * is worse than not having it, so it is out of the list until the second leg
- * is priced, stored and driveable.
- *
- * The TripType union and the tripReturn translations stay in all nine locales.
- * Restoring this means putting the row back and re-importing RotateCcw from
- * lucide-react, nothing more.
- */
 const TRIP_TABS: { type: TripType; labelKey: string; icon: React.ElementType }[] = [
   { type: "oneway",  labelKey: "tripOneWay", icon: ArrowRight },
+  { type: "return",  labelKey: "tripReturn", icon: RotateCcw },
   { type: "hourly",  labelKey: "tripHourly", icon: Timer },
 ];
 
@@ -94,6 +81,10 @@ export default function BookingForm({ compact = false }: Props) {
   const [dropoff,  setDropoff]  = useState({ address: "", lat: 0, lng: 0 });
   const [date,     setDate]     = useState("");
   const [time,     setTime]     = useState("");
+  // The leg home. Only a moment is collected — the route is the outbound one
+  // reversed, which is the whole point: two addresses entered once.
+  const [returnDate, setReturnDate] = useState("");
+  const [returnTime, setReturnTime] = useState("");
   const [pax,      setPax]      = useState(2);
   const [hours,    setHours]    = useState(4);
   const [vehicle,  setVehicle]  = useState<FleetVehicle>("EQE_300");
@@ -101,6 +92,10 @@ export default function BookingForm({ compact = false }: Props) {
   const [loading,  setLoading]  = useState(false);
 
   const isHourly = tripType === "hourly";
+  const isReturn = tripType === "return";
+  /** Both halves present, and after the outbound — the quote needs all three. */
+  const returnReady = isReturn && !!returnDate && !!returnTime
+    && new Date(`${returnDate}T${returnTime}`) > new Date(`${date}T${time}`);
 
   const fetchQuote = useCallback(async () => {
     if (!pickup.lat || !date || !time) return;
@@ -120,6 +115,9 @@ export default function BookingForm({ compact = false }: Props) {
       };
       if (!isHourly) { body.dropoffLat = dropoff.lat; body.dropoffLng = dropoff.lng; }
       if (isHourly)  { body.durationHours = hours; }
+      // Only once the return is complete and after the outbound. Sending a
+      // half-filled return would 422 on every keystroke while they fill it in.
+      if (returnReady) { body.returnDatetime = `${returnDate}T${returnTime}`; }
       const res = await fetch("/api/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -129,7 +127,7 @@ export default function BookingForm({ compact = false }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [pickup, dropoff, date, time, vehicle, pax, hours, isHourly]);
+  }, [pickup, dropoff, date, time, vehicle, pax, hours, isHourly, returnReady, returnDate, returnTime]);
 
   useEffect(() => {
     const t = setTimeout(fetchQuote, 600);
@@ -164,6 +162,13 @@ export default function BookingForm({ compact = false }: Props) {
     } else {
       params.set("hours", String(hours));
     }
+    // Carried through so /book opens on a round trip rather than losing the
+    // leg home at the handoff — the same mistake that once dropped which car
+    // had been chosen and re-quoted it five euros dearer.
+    if (returnReady) {
+      params.set("returnDate", returnDate);
+      params.set("returnTime", returnTime);
+    }
     router.push(`/book?${params}`);
   };
 
@@ -172,7 +177,10 @@ export default function BookingForm({ compact = false }: Props) {
   const needsManualQuote = quote != null && (quote.needsManualQuote === true || quote.totalAmount <= 0);
   // Distance-priced rather than read from the table — labelled differently.
   const isPerKm          = quote?.isCustomRoute === true && !needsManualQuote;
-  const canContinue    = !!pickup.address && !!date && !!time && (isHourly || !!dropoff.address);
+  const canContinue    = !!pickup.address && !!date && !!time && (isHourly || !!dropoff.address)
+    // A return trip is not bookable until the leg home has a valid moment,
+    // otherwise Continue would carry a half-specified journey to /book.
+    && (!isReturn || returnReady);
 
   return (
     <div className={cn(
@@ -303,6 +311,66 @@ export default function BookingForm({ compact = false }: Props) {
           </div>
         </div>
 
+        {/* Return date & time.
+            No second address pair: the journey home is this one reversed, so
+            asking for the addresses again would be asking the customer to type
+            what we already know. The summary line below spells out which way
+            round it runs, so nothing is silently assumed. */}
+        {isReturn && (
+          <div className="rounded-xl border border-[#c9a84c]/25 bg-[#c9a84c]/[0.04] p-3 space-y-3">
+            <p className="text-[11px] text-[#c9a84c] tracking-wide flex items-center gap-1.5">
+              <RotateCcw size={12} aria-hidden />
+              {t("returnHeading")}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="hero-return-date" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">{t("returnDate")}</label>
+                <div className="relative">
+                  <Calendar size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none z-10" />
+                  <input
+                    id="hero-return-date"
+                    type="date"
+                    value={returnDate}
+                    // Never before the outbound, so the impossible cannot be picked.
+                    min={date || todayStr()}
+                    onChange={(e) => setReturnDate(e.target.value)}
+                    className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm [color-scheme:dark]"
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="hero-return-time" className="block text-[10px] text-[#c9a84c]/70 uppercase tracking-[0.15em] font-semibold mb-1.5">{t("returnTime")}</label>
+                <div className="relative">
+                  <Clock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9a84c]/50 pointer-events-none z-10" />
+                  <select
+                    id="hero-return-time"
+                    value={returnTime}
+                    onChange={(e) => setReturnTime(e.target.value)}
+                    className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm appearance-none"
+                  >
+                    <option value="" className="bg-[#111]">{t("timePlaceholder")}</option>
+                    {TIME_SLOTS.map((slot) => (
+                      <option key={slot} value={slot} className="bg-[#111]">{slot}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+            {dropoff.address && pickup.address && (
+              <p className="text-[11px] text-dark-500 leading-snug">
+                {t("returnRoute")}: {dropoff.address} → {pickup.address}
+              </p>
+            )}
+            {/* Only once both halves are filled, so it does not scold someone
+                who has picked a date and not yet a time. */}
+            {returnDate && returnTime && !returnReady && (
+              <p className="text-[11px] text-amber-400" aria-live="polite">
+                {t("returnAfterOutbound")}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Passengers + Vehicle */}
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -428,6 +496,8 @@ export default function BookingForm({ compact = false }: Props) {
                     !isHourly && !dropoff.address && t("dropoff"),
                     !date && t("date"),
                     !time && t("time"),
+                    isReturn && !returnDate && t("returnDate"),
+                    isReturn && !returnTime && t("returnTime"),
                   ].filter(Boolean) as string[];
                   return missing.length === 0 ? null : `${t("stillNeeded")}: ${missing.join(" · ")}`;
                 })()}

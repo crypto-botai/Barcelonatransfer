@@ -640,13 +640,24 @@ function emailLayout(body: string): string {
 export async function sendBookingConfirmation({
   to, name, confirmationCode, pickupAddress, dropoffAddress,
   pickupDatetime, vehicleClass, totalAmount, passengers,
-  bookingId,
+  bookingId, returnLeg,
 }: {
   to: string; name: string; confirmationCode: string; pickupAddress: string;
   dropoffAddress: string; pickupDatetime: string; vehicleClass: string;
   totalAmount: number; passengers: number; bookingId?: string;
+  /** The second booking, when the customer booked a round trip. */
+  returnLeg?: {
+    confirmationCode: string;
+    pickupDatetime: string;
+    pickupAddress: string;
+    dropoffAddress: string;
+    totalAmount: number;
+  };
 }) {
   const { date, time } = splitDatetime(pickupDatetime);
+  const back = returnLeg
+    ? { ...returnLeg, ...splitDatetime(returnLeg.pickupDatetime) }
+    : undefined;
   const html = emailDocument(
     bookingReceivedCard({
       firstName: name.split(" ")[0],
@@ -658,11 +669,17 @@ export async function sendBookingConfirmation({
       vehicle: vehicleName(vehicleClass),
       passengers,
       totalAmount,
+      returnLeg: back,
     }),
-    `Your transfer is reserved — reference ${confirmationCode}`,
+    back
+      ? `Both journeys are reserved — references ${confirmationCode} and ${back.confirmationCode}`
+      : `Your transfer is reserved — reference ${confirmationCode}`,
   );
 
-  const id = await sendEmail({ from: FROM, to, subject: `Booking received — ${confirmationCode} | Elite BCN`, html });
+  const subject = back
+    ? `Return booking received — ${confirmationCode} | Elite BCN`
+    : `Booking received — ${confirmationCode} | Elite BCN`;
+  const id = await sendEmail({ from: FROM, to, subject, html });
   await logEmail({ to, subject: `Booking received — ${confirmationCode}`, type: "CONFIRMATION", resendId: id, bookingId });
 }
 

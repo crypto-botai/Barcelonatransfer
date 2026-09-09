@@ -255,7 +255,12 @@
     "whatsappQuote": "Запросить цену в WhatsApp",
     "whereTo": "Куда вы хотите поехать?",
     "yourPrice": "Ваша цена",
-    "stillNeeded": "Ещё нужно"
+    "stillNeeded": "Ещё нужно",
+    "returnHeading": "Обратная поездка",
+    "returnDate": "Дата возврата",
+    "returnTime": "Время возврата",
+    "returnRoute": "Обратный маршрут",
+    "returnAfterOutbound": "Обратная поездка должна быть позже поездки туда"
   },
   "pricing": {
     "book": "Забронировать",
