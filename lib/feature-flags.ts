@@ -9,24 +9,12 @@
 /**
  * Round trips: book the journey out and the journey home together.
  *
- * OFF until `Booking.returnOfId` exists in the production database.
+ * ON since 9 Sep 2026. `Booking.returnOfId`, its unique index and its foreign
+ * key were applied to the production database that day and verified by reading
+ * information_schema back.
  *
- * Everything else is in place and tested — the form, the two-leg quote, the
- * paired bookings, the confirmation email naming both references. Only the
- * column is missing, and creating the return leg without it throws: the
- * customer would enter both addresses, pick both dates, reach the payment step
- * and be told to use WhatsApp. They would not be charged, but they would have
- * done all the work for nothing, which is worse than not offering the option.
- *
- * The migration is additive and nullable, so it can be applied to the live
- * database while this is still false and nothing will notice:
- *
- *   npx vercel env pull .env.vercel-live --environment=production
- *   npx prisma migrate diff \
- *     --from-schema-datasource prisma/schema.prisma \
- *     --to-schema-datamodel   prisma/schema.prisma --script    # inspect first
- *   npx prisma db push
- *
- * Then set this to true and deploy. That is the whole release.
+ * Kept as a flag rather than deleted: it is the switch that turns the option
+ * off again without a revert, if a round trip ever misbehaves in a way that is
+ * quicker to stop than to diagnose.
  */
-export const RETURN_TRIPS_ENABLED = false;
+export const RETURN_TRIPS_ENABLED = true;
