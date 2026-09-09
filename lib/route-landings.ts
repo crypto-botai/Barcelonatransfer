@@ -170,6 +170,15 @@ function schemaFor(
       name: serviceName,
       description,
       url,
+      // Every one of these pages renders without a single <img>, so this was
+      // the one entity Google and the AI crawlers could read that had no
+      // picture attached either.
+      //
+      // The sitewide image, deliberately. Only app/opengraph-image.tsx and the
+      // blog have route-level ones — `${url}/opengraph-image` was tried here
+      // and 404s for every transfer page — and a schema image that does not
+      // resolve is worse than none, because it is a claim the crawler checks.
+      image: `${BASE}/opengraph-image`,
       serviceType: "Private transfer",
       provider: { "@id": `${BASE}/#business` },
       areaServed: {

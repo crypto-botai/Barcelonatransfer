@@ -10,7 +10,7 @@ import {
   type VehicleCode,
   type ZoneCode,
 } from "@/lib/fixed-prices";
-import { ROUTES, returnSurchargeForRoute } from "@/lib/pricing";
+import { ROUTES, returnSurchargeForRoute, ZONE_LABELS, ZONE_CODE_TO_KEY } from "@/lib/pricing";
 import { routeLanding } from "@/lib/route-landings";
 import { STATIC_TRANSFER_PAGES } from "@/data/static-transfer-pages";
 
@@ -166,7 +166,14 @@ describe("the return leg has somewhere to be read", () => {
     for (const name of ["llms.txt", "llms-full.txt"]) {
       const text = readFileSync(join("public", name), "utf-8");
       for (const to of ["Barcelona City", "El Prat Airport"]) {
-        const line = text.split("\n").find((l) => l.startsWith(`- Andorra la Vella to ${to}:`));
+        // The label is read, not restated. This asserted a literal "Andorra la
+        // Vella" while scripts/generate-llms.mts writes ZONE_LABELS.andorra,
+        // which is "Andorra" — so the test failed on the name while the fare,
+        // the direction and the link it actually cares about were all correct.
+        // Naming the zone in two places is the same mistake this file exists to
+        // catch about prices.
+        const andorra = ZONE_LABELS[ZONE_CODE_TO_KEY.ANDORRA] ?? "Andorra";
+        const line = text.split("\n").find((l) => l.startsWith(`- ${andorra} to ${to}:`));
         expect(line, `${name}: no return line for ${to}`).toBeTruthy();
         expect(line, `${name}: ${to} line must state the fare, not an adjustment`)
           .toContain(`EUR ${back}`);
