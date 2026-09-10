@@ -7,9 +7,11 @@ const DISALLOW = [
   "/api",
   "/auth/",
   "/booking/pay/",
-  "/booking/success",
-  "/booking/failed",
-  "/review",
+  // /booking/success, /booking/failed and /review used to be listed here as
+  // well, and each also sets robots: { index: false } in its own metadata. The
+  // two cancel out: a crawler that is disallowed never fetches the page, so it
+  // never sees the noindex, and a URL that gets shared can still be indexed
+  // from the link alone. Allowing the fetch is what makes the noindex bite.
 ];
 
 // Every bot listed explicitly must repeat the disallow list —

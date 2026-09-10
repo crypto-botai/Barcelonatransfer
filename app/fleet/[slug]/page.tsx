@@ -8,6 +8,7 @@ import Footer from "@/components/layout/Footer";
 import { VEHICLE_CATALOG, vehicleBadgeClass, BAG_SIZES, type FleetVehicle } from "@/types";
 import { getFleetFromPrice, getFleetOffer, lookupFixedPriceByZone } from "@/lib/pricing";
 import { SHARED_OG, fitTitle, fitDescription } from "@/lib/seo";
+import { vehicleBrand } from "@/lib/fleet-facts";
 
 const SLUG_TO_CLASS: Record<string, FleetVehicle> = {
   "standard-sedan":    "COROLLA",
@@ -20,22 +21,6 @@ const SLUG_TO_CLASS: Record<string, FleetVehicle> = {
 };
 
 const BASE = "https://www.elitebcn.info";
-
-/**
- * The manufacturer, read off the vehicle itself.
- *
- * This was hardcoded to "Mercedes-Benz" for every vehicle, so the Product
- * schema on /fleet/standard-sedan told Google a Toyota Corolla was a Mercedes,
- * and the same on the Camry and the Tesla Model 3. Structured data that
- * contradicts the visible page is a Google policy violation and puts the rich
- * result on all seven pages at risk.
- */
-function vehicleBrand(label: string): string {
-  const make = label.split(" ")[0];
-  // Mercedes vehicles are labelled "Mercedes ..." on site; the manufacturer's
-  // registered name — and the one schema.org consumers match on — is hyphenated.
-  return make === "Mercedes" ? "Mercedes-Benz" : make;
-}
 
 export function generateStaticParams() {
   return Object.keys(SLUG_TO_CLASS).map((slug) => ({ slug }));

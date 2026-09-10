@@ -4,10 +4,10 @@ import Footer from "@/components/layout/Footer";
 import FleetSection from "@/components/sections/FleetSection";
 import Link from "next/link";
 import { SHARED_OG } from "@/lib/seo";
-import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+import { HOURLY_RATES, MIN_HOURLY_HOURS, getFleetFromPrice } from "@/lib/pricing";
 import { VEHICLE_CATALOG, BAG_SIZES } from "@/types";
 import { fleetPagePath } from "@/lib/fleet-pages";
-import { amenitySentence, FLEET_FACTS } from "@/lib/fleet-facts";
+import { amenitySentence, FLEET_FACTS, vehicleBrand } from "@/lib/fleet-facts";
 
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Fleet — Mercedes V-Class & Tesla | Elite BCN" },
@@ -30,6 +30,8 @@ export const metadata: Metadata = {
   },
 };
 
+const BASE = "https://www.elitebcn.info";
+
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type":    "BreadcrumbList",
@@ -39,49 +41,61 @@ const breadcrumbSchema = {
   ],
 };
 
+/**
+ * The fleet as an ItemList of Vehicles.
+ *
+ * This was three hand-written Products — three of the seven cars, every one of
+ * them branded "Mercedes-Benz", each carrying an hourly rate as its `price`.
+ * Three things were wrong with that beyond the four missing cars.
+ *
+ * The number a consumer reads off an Offer is `price`, and €70 was the
+ * V-Class hourly rate: not a price anybody can pay, because hourly hire has a
+ * four-hour minimum, so the smallest real V-Class hourly booking is €280.
+ * Publishing €70 as the price of a V-Class invites a search result quoting a
+ * quarter of the true minimum.
+ *
+ * That figure also appears nowhere on this page. What /fleet does show, on
+ * every card, is the "from €X" fixed transfer fare — so that is what is marked
+ * up here, read from the same getFleetFromPrice() the cards use, as an
+ * AggregateOffer lowPrice because "from" is exactly what it means. Structured
+ * data that contradicts the visible page is a policy violation rather than an
+ * untidiness.
+ *
+ * The hourly spec was wrong on its own terms too. `referenceQuantity` is the
+ * quantity a price applies to, so `price: 70` with `referenceQuantity: 4 HUR`
+ * encoded seventy euros per four hours — a quarter of the real rate, stated in
+ * the other direction. Hourly hire is priced on /hourly, which is where that
+ * offer belongs.
+ *
+ * Vehicle rather than Product because a Vehicle is what these are. It is a
+ * subtype of Product, so nothing that consumed the old markup loses anything.
+ */
 const fleetSchema = {
   "@context": "https://schema.org",
   "@type": "ItemList",
   name: "Elite BCN Transfers Fleet",
   description: "Luxury private transfer fleet available in Barcelona — fixed prices, no surge pricing.",
-  itemListElement: [
-    {
-      "@type": "ListItem",
-      position: 1,
-      item: {
-        "@type": "Product",
-        name: "Mercedes V-Class — Luxury 7-Seat Minivan",
-        description: "7-seat luxury MPV ideal for groups and families. Perfect for airport transfers from Barcelona El Prat.",
-        image: "https://www.elitebcn.info/fleet/v-class-mercedes.png",
-        brand: { "@type": "Brand", name: "Mercedes-Benz" },
-        offers: { "@type": "Offer", price: String(HOURLY_RATES.LUXURY_MINIVAN), priceCurrency: "EUR", priceSpecification: { "@type": "UnitPriceSpecification", price: String(HOURLY_RATES.LUXURY_MINIVAN), priceCurrency: "EUR", unitCode: "HUR", referenceQuantity: { "@type": "QuantitativeValue", value: MIN_HOURLY_HOURS.LUXURY_MINIVAN, unitCode: "HUR" } }, availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
+  numberOfItems: VEHICLE_CATALOG.length,
+  itemListElement: VEHICLE_CATALOG.map((v, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "Vehicle",
+      name: v.label,
+      description: v.description,
+      image: `${BASE}${v.image}`,
+      url: `${BASE}${fleetPagePath(v.class)}`,
+      brand: { "@type": "Brand", name: vehicleBrand(v.label) },
+      vehicleSeatingCapacity: { "@type": "QuantitativeValue", value: v.maxPassengers },
+      offers: {
+        "@type": "AggregateOffer",
+        lowPrice: String(getFleetFromPrice(v.class)),
+        priceCurrency: "EUR",
+        availability: "https://schema.org/InStock",
+        url: `${BASE}/book`,
       },
     },
-    {
-      "@type": "ListItem",
-      position: 2,
-      item: {
-        "@type": "Product",
-        name: "Mercedes EQE 300 Electric — Executive Saloon",
-        description: "Premium all-electric executive saloon for airport transfers in Barcelona. Up to 4 passengers. Zero emissions.",
-        image: "https://www.elitebcn.info/fleet/eqe-300.png",
-        brand: { "@type": "Brand", name: "Mercedes-Benz" },
-        offers: { "@type": "Offer", price: String(HOURLY_RATES.BUSINESS), priceCurrency: "EUR", priceSpecification: { "@type": "UnitPriceSpecification", price: String(HOURLY_RATES.BUSINESS), priceCurrency: "EUR", unitCode: "HUR", referenceQuantity: { "@type": "QuantitativeValue", value: MIN_HOURLY_HOURS.BUSINESS, unitCode: "HUR" } }, availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
-      },
-    },
-    {
-      "@type": "ListItem",
-      position: 3,
-      item: {
-        "@type": "Product",
-        name: "Mercedes Vito — Executive 8-Seat Minivan",
-        description: "Executive minivan for groups up to 8 passengers. Spacious and practical for families and large groups.",
-        image: "https://www.elitebcn.info/fleet/mercedes-vito.png",
-        brand: { "@type": "Brand", name: "Mercedes-Benz" },
-        offers: { "@type": "Offer", price: String(HOURLY_RATES.MINIVAN), priceCurrency: "EUR", priceSpecification: { "@type": "UnitPriceSpecification", price: String(HOURLY_RATES.MINIVAN), priceCurrency: "EUR", unitCode: "HUR", referenceQuantity: { "@type": "QuantitativeValue", value: MIN_HOURLY_HOURS.MINIVAN, unitCode: "HUR" } }, availability: "https://schema.org/InStock", url: "https://www.elitebcn.info/book" },
-      },
-    },
-  ],
+  })),
 };
 
 export default function FleetPage() {

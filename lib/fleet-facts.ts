@@ -84,6 +84,27 @@ export function fleetSummary(): string {
     .join("; ");
 }
 
+/**
+ * The manufacturer, read off the vehicle itself.
+ *
+ * This was hardcoded to "Mercedes-Benz" for every vehicle, so the Product
+ * schema on /fleet/standard-sedan told Google a Toyota Corolla was a Mercedes,
+ * and the same on the Camry and the Tesla Model 3. Structured data that
+ * contradicts the visible page is a Google policy violation and puts the rich
+ * result on all seven pages at risk.
+ *
+ * It lives here rather than in the vehicle page because /fleet needs the same
+ * answer, and its markup hardcoded "Mercedes-Benz" too — it only avoided
+ * saying anything false because the three cars it happened to list are all
+ * Mercedes. One implementation, so a fourth car cannot reintroduce it.
+ */
+export function vehicleBrand(label: string): string {
+  const make = label.split(" ")[0];
+  // Mercedes vehicles are labelled "Mercedes ..." on site; the manufacturer's
+  // registered name — and the one schema.org consumers match on — is hyphenated.
+  return make === "Mercedes" ? "Mercedes-Benz" : make;
+}
+
 /** The per-car amenity line used on destination pages. */
 export function vehicleAmenityLine(): string {
   const names = CARS.slice(0, 3).map((v) => v.label).join(", ");

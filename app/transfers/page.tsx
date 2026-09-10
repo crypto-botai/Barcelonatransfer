@@ -317,6 +317,23 @@ export default async function TransfersHubPage() {
               <Link href="/transfers/andorra-to-barcelona" className="text-gold-400 hover:text-gold-300">
                 out of Andorra back to Barcelona
               </Link>, which costs €20 more than the drive up.
+              {/* Encamp and the ski stations are the only two transfer pages
+                  the index below cannot reach: both sit outside
+                  destinations.json because neither is priced from it, so the
+                  A–Z grid never saw them. They were reachable from
+                  /transfers/andorra and from route copy, but not from the page
+                  whose whole job is to list every destination. */}{" "}
+              Two Andorra pages sit outside the index below because they are
+              priced differently from everything in it —{" "}
+              <Link href="/transfers/encamp" className="text-gold-400 hover:text-gold-300">
+                Encamp
+              </Link>{" "}
+              takes the fixed Andorra fare, while the{" "}
+              <Link href="/transfers/andorra-ski-resorts" className="text-gold-400 hover:text-gold-300">
+                ski stations above it
+              </Link>{" "}
+              — Pas de la Casa, Soldeu, Arinsal and Grandvalira — are quoted by
+              road distance instead.
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
