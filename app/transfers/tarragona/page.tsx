@@ -7,6 +7,7 @@ import { SHARED_OG } from "@/lib/seo";
 import { ladderFor, ladderOffersFor } from "@/lib/destination-pricing";
 import RouteFaqs from "@/components/transfers/RouteFaqs";
 import { ROUTE_FAQ_SPECS } from "@/lib/route-faqs";
+import DestinationPhoto from "@/components/transfers/DestinationPhoto";
 
 const portAventura = ladderFor("portaventura", "airport")!;
 
@@ -106,6 +107,9 @@ export default function TarragonaTransferPage() {
             </Link>
           </div>
         </section>
+
+        {/* The place itself, credited as its licence requires. */}
+        <DestinationPhoto slug="tarragona" className="container mx-auto px-4 max-w-3xl mt-10" />
 
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">

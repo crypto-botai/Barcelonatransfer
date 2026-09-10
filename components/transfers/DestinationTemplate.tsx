@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { lookupFixedPriceByZone } from "@/lib/pricing";
 import { BASE_URL, breadcrumbSchema } from "@/lib/seo";
+import DestinationPhoto from "@/components/transfers/DestinationPhoto";
 
 export interface DestinationSpec {
   slug:        string;
@@ -108,6 +109,9 @@ export default function DestinationTemplate({ d }: { d: DestinationSpec }) {
             </Link>
           </div>
         </section>
+
+        {/* The place itself. Renders nothing where there is no photograph. */}
+        <DestinationPhoto slug={d.slug} className="container mx-auto px-4 max-w-3xl mt-10" />
 
         {/* Why book */}
         <section className="py-16 bg-dark-950">

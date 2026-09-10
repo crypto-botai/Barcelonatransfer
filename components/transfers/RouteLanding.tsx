@@ -8,6 +8,7 @@ import Footer from "@/components/layout/Footer";
 import { BAG_SIZES } from "@/types";
 import { COMPANY } from "@/lib/company-facts";
 import type { RouteLanding, PricedVehicle } from "@/lib/route-landings";
+import DestinationPhoto from "@/components/transfers/DestinationPhoto";
 
 /**
  * The shell every commercial route landing page renders through.
@@ -119,6 +120,7 @@ function PriceTable({
 
 export default function RouteLandingPage({ data }: { data: RouteLanding }) {
   const {
+    slug,
     name, h1, eyebrow, EyebrowIcon, heroLead, facts,
     priceTables, priceHeading, priceNote, included, excluded,
     options, optionsIntro, optionsNote,
@@ -181,6 +183,13 @@ export default function RouteLandingPage({ data }: { data: RouteLanding }) {
             </div>
           </div>
         </section>
+
+        {/* ── The place ────────────────────────────────────────────
+            Renders nothing for a route with no photograph, so pages like
+            Sants Station stay exactly as they were. Sits above the prices
+            because a reader deciding where to go wants to see the place
+            before the fare, and below the fold so it costs the hero nothing. */}
+        <DestinationPhoto slug={slug} className="container mx-auto px-4 max-w-3xl mt-10" />
 
         {/* ── Prices ───────────────────────────────────────────── */}
         <section className="py-14 bg-dark-950 border-y border-white/[0.06]">

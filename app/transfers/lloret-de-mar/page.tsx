@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MapPin, Clock, Shield, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { SHARED_OG } from "@/lib/seo";
 import { ladderFor } from "@/lib/destination-pricing";
+import DestinationPhoto from "@/components/transfers/DestinationPhoto";
 
 // Read from the price table, never restated. A repriced route reaches
 // this page, its schema and the checkout together, or reaches none.
@@ -130,6 +131,9 @@ export default function LloretDeMarTransferPage() {
             </Link>
           </div>
         </section>
+
+        {/* The place itself, credited as its licence requires. */}
+        <DestinationPhoto slug="lloret-de-mar" className="container mx-auto px-4 max-w-3xl mt-10" />
 
         {/* Why book */}
         <section className="py-16 bg-dark-950">

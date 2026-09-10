@@ -7,6 +7,7 @@ import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 import { ladderFor } from "@/lib/destination-pricing";
 import { returnLegSurcharge } from "@/lib/fixed-prices";
+import DestinationPhoto from "@/components/transfers/DestinationPhoto";
 
 const andorraLadder = ladderFor("andorra", "airport")!;
 
@@ -107,6 +108,9 @@ export default function AndorraTransferPage() {
             </Link>
           </div>
         </section>
+
+        {/* The place itself, credited as its licence requires. */}
+        <DestinationPhoto slug="andorra" className="container mx-auto px-4 max-w-3xl mt-10" />
 
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">

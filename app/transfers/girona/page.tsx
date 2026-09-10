@@ -7,6 +7,7 @@ import { SHARED_OG } from "@/lib/seo";
 import { ladderFor } from "@/lib/destination-pricing";
 import RouteFaqs from "@/components/transfers/RouteFaqs";
 import { ROUTE_FAQ_SPECS } from "@/lib/route-faqs";
+import DestinationPhoto from "@/components/transfers/DestinationPhoto";
 
 // Read from the price table, never restated. A repriced route reaches
 // this page, its schema and the checkout together, or reaches none.
@@ -95,6 +96,9 @@ export default function GironaTransferPage() {
             </Link>
           </div>
         </section>
+
+        {/* The place itself, credited as its licence requires. */}
+        <DestinationPhoto slug="girona" className="container mx-auto px-4 max-w-3xl mt-10" />
 
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">

@@ -7,6 +7,7 @@ import { ROUTES } from "@/lib/pricing";
 import { SHARED_OG } from "@/lib/seo";
 import RouteFaqs from "@/components/transfers/RouteFaqs";
 import { ROUTE_FAQ_SPECS } from "@/lib/route-faqs";
+import DestinationPhoto from "@/components/transfers/DestinationPhoto";
 
 const airportPrice = ROUTES.find((r) => r.from === "airport" && r.to === "montserrat")?.economy ?? 85;
 const cityPrice    = ROUTES.find((r) => r.from === "barcelona_city" && r.to === "montserrat")?.economy ?? 115;
@@ -88,6 +89,9 @@ export default function MontserratTransferPage() {
             </Link>
           </div>
         </section>
+
+        {/* The place itself, credited as its licence requires. */}
+        <DestinationPhoto slug="montserrat" className="container mx-auto px-4 max-w-3xl mt-10" />
 
         <section className="py-16 bg-dark-950">
           <div className="container mx-auto px-4">

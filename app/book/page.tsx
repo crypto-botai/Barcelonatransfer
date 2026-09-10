@@ -127,10 +127,35 @@ export default async function BookPage() {
         </div>
       </div>
 
-      {/* Booking form (client component) */}
+      {/* Booking form (client component).
+          The fallback is what actually ships in the HTML. BookFormClient calls
+          useSearchParams(), which takes this subtree out of server rendering,
+          so the first thing a visitor receives for the page the whole site
+          points at is whatever sits here — until React hydrates.
+          It used to be a bare spinner. On the connections these customers are
+          actually on — airport arrivals wifi, ship wifi before departure —
+          that is a blank wait with nothing to read and no sign a form is
+          coming. A skeleton of the real first step costs nothing extra and
+          shows the shape of what is loading. */}
       <Suspense fallback={
-        <div className="flex items-center justify-center py-24">
-          <div className="w-8 h-8 rounded-full border-2 border-[#c9a84c] border-t-transparent animate-spin" />
+        <div className="container mx-auto px-4 max-w-3xl" aria-hidden="true">
+          <div className="glass-card rounded-2xl p-6 sm:p-8">
+            <div className="h-7 w-52 rounded bg-white/[0.06] mb-6" />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="h-20 rounded-xl bg-white/[0.04] border border-white/[0.06]" />
+              ))}
+            </div>
+            <div className="h-3 w-28 rounded bg-white/[0.05] mb-2" />
+            <div className="h-14 rounded-xl bg-white/[0.04] border border-white/[0.06] mb-5" />
+            <div className="h-3 w-28 rounded bg-white/[0.05] mb-2" />
+            <div className="h-14 rounded-xl bg-white/[0.04] border border-white/[0.06] mb-5" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="h-14 rounded-xl bg-white/[0.04] border border-white/[0.06]" />
+              <div className="h-14 rounded-xl bg-white/[0.04] border border-white/[0.06]" />
+            </div>
+          </div>
+          <p className="sr-only">Loading the booking form.</p>
         </div>
       }>
         <BookFormClient />

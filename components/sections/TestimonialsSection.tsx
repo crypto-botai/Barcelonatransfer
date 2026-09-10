@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { ChevronLeft, ChevronRight, Star, BadgeCheck } from "lucide-react";
+import { ChevronLeft, ChevronRight, BadgeCheck } from "lucide-react";
+import StarRating, { StarSprite } from "@/components/reviews/StarRating";
 import { REVIEWS, GOOGLE_PROFILE, initials, type Review } from "@/data/reviews";
 
 /**
@@ -39,6 +40,8 @@ export default function TestimonialsSection({
 
   return (
     <section className="py-20 bg-[#070707] border-t border-white/[0.06]">
+      {/* The star shape, declared once for every rating on the page. */}
+      <StarSprite />
       <div className="container mx-auto px-4">
 
         {/* Heading */}
@@ -72,11 +75,7 @@ export default function TestimonialsSection({
                 <span className="font-display text-xl text-white leading-none">
                   {profile.rating.toFixed(1)}
                 </span>
-                <span className="flex" role="img" aria-label={`Rated ${profile.rating} out of 5`}>
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} size={13} className="fill-gold-500 text-gold-500" />
-                  ))}
-                </span>
+                <StarRating count={5} size={13} className="text-gold-500" />
               </div>
               <p className="text-gold-400 text-xs mt-0.5 flex items-center gap-1">
                 Read our reviews on Google
@@ -97,10 +96,8 @@ export default function TestimonialsSection({
                 key={`${r.author}-${r.when}`}
                 className="snap-center flex-shrink-0 w-[300px] sm:w-[380px] glass-card rounded-2xl p-6 flex flex-col"
               >
-                <div className="flex items-center gap-1 mb-3" role="img" aria-label={`Rated ${r.rating} out of 5`}>
-                  {Array.from({ length: r.rating }).map((_, i) => (
-                    <Star key={i} size={14} className="fill-gold-500 text-gold-500" />
-                  ))}
+                <div className="mb-3">
+                  <StarRating count={r.rating} size={14} className="text-gold-500" />
                 </div>
 
                 {r.text ? (
