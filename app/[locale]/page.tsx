@@ -78,6 +78,31 @@ export default async function LocalizedHomePage(
 
   return (
     <I18nProvider initialLocale={locale} initialMessages={messagesFor(locale)}>
+      {/*
+        Corrects <html lang> and, for Arabic, its direction.
+
+        The root layout hardcodes lang="en" and sets no dir at all, so every
+        one of these eight translated homepages was served as English to a
+        screen reader, and the Arabic page was laid out left-to-right with
+        Arabic text inside it. That mis-set direction is the most likely cause
+        of /ar being the only route on the site that fails Cumulative Layout
+        Shift — 0.122 against 0.000 nearly everywhere else.
+
+        Done as a blocking inline script rather than a React effect because it
+        has to happen before first paint; setting direction after hydration
+        would cause exactly the shift it is meant to prevent. <html> belongs to
+        the root layout and a nested route cannot re-render it, so the proper
+        fix is moving the whole app under a [locale] segment — a restructure,
+        not a patch. This corrects what a real visitor gets in the meantime;
+        crawlers already have the hreflang set.
+      */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            `document.documentElement.lang=${JSON.stringify(locale)};` +
+            (locale === "ar" ? `document.documentElement.dir="rtl";` : `document.documentElement.dir="ltr";`),
+        }}
+      />
       <ScrollReset />
       <Navbar />
       <main>

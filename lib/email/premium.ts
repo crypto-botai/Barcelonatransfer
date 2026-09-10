@@ -333,7 +333,12 @@ export function rideConfirmedCard(o: {
           <div style="font-family:${SANS};font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:${GOLD};">Before you travel</div>
           <div style="font-family:${SANS};font-size:14px;line-height:24px;color:${TEXT};padding-top:12px;">
             Your chauffeur calls roughly 30 minutes before pick-up.<br>
-            For airport arrivals, they wait in the arrivals hall holding a tablet with your name.<br>
+            <!-- This told every customer their driver waits in the arrivals
+                 hall with a name board. That is the Meet &amp; Greet extra; the
+                 standard pickup is outside, by the taxi rank. Anyone who had
+                 not paid the €5 was being sent to the wrong place by their own
+                 confirmation email, with the driver waiting outside. -->
+            For airport arrivals, they wait at the meeting point just outside your terminal, beside the taxi rank — or inside the arrivals hall with a name board if you added Meet &amp; Greet.<br>
             Save our number in case plans change.
           </div>
         </td></tr>

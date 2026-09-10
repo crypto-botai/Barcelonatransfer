@@ -17,7 +17,14 @@ export const FAQ_GROUPS = [
     group: "Booking & Reservations",
     items: [
       { q: "How do I book a transfer?", a: "You can book instantly online via our booking page — select your service type, enter pick-up and drop-off locations, choose your vehicle, and confirm. You'll receive an email confirmation immediately. You can also book via WhatsApp or phone." },
-      { q: "How far in advance should I book?", a: "We recommend booking at least 24 hours in advance to guarantee vehicle availability. For peak periods, weekends, or special events in Barcelona, booking 48–72 hours ahead is advisable. Last-minute bookings may be accommodated — contact us directly." },
+      // Stated to match what the booking system actually does. This read "at
+      // least 24 hours... last-minute bookings may be accommodated" and never
+      // mentioned the surcharge, while lib/pricing.ts has charged
+      // LAST_MINUTE_SURCHARGE_RATE on anything inside LAST_MINUTE_HOURS the
+      // whole time — so a customer booking three hours ahead was told nothing
+      // and then charged 15% more. /book's own FAQ had the correct figures;
+      // this page contradicted it.
+      { q: "How far in advance should I book?", a: "Book at least 4 hours before pickup to avoid the last-minute surcharge: bookings made inside 4 hours carry 15%, and we cannot accept a booking with less than 1 hour's notice. For peak periods, weekends or big events in Barcelona, 48–72 hours ahead is wiser — that is about availability rather than price." },
       { q: "Can I book for someone else?", a: "Absolutely. When booking you can enter the passenger's name, phone, and email separately. The driver will be briefed with the passenger's details and will greet them by name." },
       { q: "Is there a cancellation fee?", a: "Cancellations made more than 24 hours before the scheduled pickup are fully refunded. Cancellations within 24 hours may incur a 50% charge. No-shows are charged in full. Please contact us as early as possible if your plans change." },
       { q: "Can I modify my booking after confirmation?", a: "Yes — contact us by WhatsApp or email as soon as possible with the changes. We'll do our best to accommodate modifications to date, time, or destination. Changes are subject to availability." },
@@ -27,7 +34,13 @@ export const FAQ_GROUPS = [
     group: "Airport Transfers",
     items: [
       { q: "Do you track my flight for delays?", a: "Yes. We monitor your flight in real time using your flight number. If your flight is delayed, your driver will adjust their arrival time automatically — you will never be charged for flight delays." },
-      { q: "Where will the driver meet me at the airport?", a: "Your driver will be waiting in the arrivals hall at El Prat Airport (Terminal 1 or Terminal 2) holding a tablet showing your name. For Meet & Greet bookings, the driver will assist you from the baggage reclaim area." },
+      // This said the driver waits in the arrivals hall with a name board —
+      // which is the €5 Meet & Greet extra, as the Meet & Greet answer further
+      // down this same file correctly explains. The two contradicted each
+      // other, and the one a customer reads first was the one that would send
+      // them to the wrong place: waiting inside arrivals for a driver who is
+      // parked outside.
+      { q: "Where will the driver meet me at the airport?", a: "At the designated meeting point just outside your terminal at El Prat, next to the taxi rank where reserved VTC cars are allowed to wait. Your chauffeur calls you shortly before you land. If you would rather be met inside the arrivals hall with a name board and helped with your bags from baggage reclaim, add Meet & Greet for €5 when you book. Either way, airport pickups include 60 minutes of free waiting from your actual landing time." },
       { q: "How much free waiting time do I get at the airport?", a: "Airport pickups include 60 minutes of complimentary waiting, counted from the actual landing time. Every other pickup — a city address, the cruise port, Sants or another station — includes 15 minutes. After that, waiting is charged at €25 per 30 minutes." },
       { q: "Do you cover Girona Airport?", a: `Yes. We provide transfers to and from Girona–Costa Brava Airport (GRO). Fixed price from Barcelona El Prat Airport is €${eco('girona_airport')} for an Economy sedan. From Barcelona city, the price starts at €${eco('girona_airport', 'barcelona_city')}. Booking in advance is recommended.` },
       { q: "Do you serve all Costa Brava and Costa Daurada resorts?", a: `Yes. We cover all major resorts with fixed prices from Barcelona Airport: Lloret de Mar from €${eco('lloret')}, Tossa de Mar from €${eco('tossa')}, Salou from €${eco('salou')}, PortAventura from €${eco('portaventura')}, Cambrils from €${eco('cambrils')}, Sitges from €${eco('sitges')}. All routes are fixed-price per vehicle, excluding VAT and tolls.` },

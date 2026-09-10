@@ -225,7 +225,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   ],
                 },
                 {
-                  "@type": ["TaxiService", "LocalBusiness", "LimousineBusiness"],
+                  // "LimousineBusiness" was here and is not a schema.org type
+                  // — schema.org/LimousineBusiness returns 404. An
+                  // unrecognised @type is ignored rather than penalised, so it
+                  // was doing nothing; it also described the fleet badly, since
+                  // the same catalogue sells a Toyota Corolla at €50.
+                  // TaxiService is the accurate anchor for a licensed VTC
+                  // operator selling pre-booked fixed-price journeys.
+                  "@type": ["TaxiService", "LocalBusiness"],
                   "@id": "https://www.elitebcn.info/#business",
                   name: "Elite BCN Transfers",
                   // GOOGLE_PROFILE.name is the Business Profile's exact name —
