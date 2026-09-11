@@ -136,14 +136,27 @@ export function calculateLastMinuteSurcharge(totalBefore: number, pickupDatetime
   return 0;
 }
 
+/**
+ * Hourly hire, priced per car rather than per class.
+ *
+ * Every fleet vehicle maps to its own VehicleClass (see FLEET_TO_DB_CLASS), so
+ * a class-keyed table already addresses one car each and no per-car override
+ * layer is needed here, unlike fixed fares where the Camry and the EQE share a
+ * class and need one.
+ *
+ * The owner set these on 10 Sep 2026: Corolla 45, business saloon 50, Tesla
+ * Model 3 55, EQE 300 60, Vito 65, V-Class 75. The Sprinter stays at 160.
+ * These are the rates /api/quote and /api/bookings charge, which is why the
+ * published page reads them from here instead of printing its own numbers.
+ */
 export const HOURLY_RATES: Record<VehicleClass, number> = {
-  ECONOMY:        45,
-  BUSINESS:       50,
-  LUXURY:         65,
-  ELECTRIC_VIP:   65,
-  MINIVAN:        60,
-  LUXURY_MINIVAN: 70,
-  MINIBUS:       160,
+  ECONOMY:        45,   // Toyota Corolla
+  BUSINESS:       50,   // Toyota Camry, or the Lexus offered on hourly hire
+  ELECTRIC_VIP:   55,   // Tesla Model 3
+  LUXURY:         60,   // Mercedes EQE 300
+  MINIVAN:        65,   // Mercedes Vito
+  LUXURY_MINIVAN: 75,   // Mercedes V-Class
+  MINIBUS:       160,   // Mercedes Sprinter
 };
 
 export const MIN_HOURLY_HOURS: Record<VehicleClass, number> = {
@@ -155,6 +168,17 @@ export const MIN_HOURLY_HOURS: Record<VehicleClass, number> = {
   LUXURY_MINIVAN: 4,
   MINIBUS:        4,
 };
+
+/**
+ * Kilometres included in an hourly booking, on every vehicle.
+ *
+ * Hourly hire is sold for use in and around the city, and the rate covers the
+ * driving as well as the time up to this figure. Anything beyond it is quoted
+ * before travel rather than charged after, because there is no published
+ * excess rate to apply and inventing one would put a number on the site the
+ * booking system could not honour.
+ */
+export const HOURLY_INCLUDED_KM = 150;
 
 // ─── Zone keys and labels ─────────────────────────────────────────────────────
 
