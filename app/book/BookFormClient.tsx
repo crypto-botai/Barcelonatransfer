@@ -104,6 +104,33 @@ const stepVariants: Variants = {
 // Decelerating, so a step lands rather than stops.
 const STEP_TRANSITION = { duration: 0.28, ease: [0.16, 1, 0.3, 1] as const };
 
+/**
+ * Names what is still missing, next to the button that will not move.
+ *
+ * Both Continue buttons went to opacity-40 and cursor-not-allowed and said
+ * nothing about why. On a phone, where there is no cursor to change, the
+ * primary button of a booking funnel simply did nothing when tapped, and the
+ * commonest reason is a drop-off address that looks filled in because the
+ * text is there but was never resolved to coordinates.
+ *
+ * aria-live polite rather than assertive: the list rewrites itself on every
+ * keystroke, and assertive would interrupt a screen reader mid-field. The
+ * button points at it with aria-describedby so the reason is read out with
+ * the button rather than discovered separately.
+ */
+function joinList(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "";
+  return items.slice(0, -1).join(", ") + " and " + items[items.length - 1];
+}
+
+function StillNeeded({ id, items }: { id: string; items: string[] }) {
+  return (
+    <p id={id} aria-live="polite" className="text-dark-400 text-xs text-center mt-2 min-h-[1rem]">
+      {items.length > 0 ? `Still needed: ${joinList(items)}.` : ""}
+    </p>
+  );
+}
+
 const BOOKING_TYPES: { type: BookingType; label: string; icon: React.ElementType; desc: string }[] = [
   { type: "TRANSFER",  label: "Transfer",  icon: MapPin,     desc: "Airport, hotel, point-to-point" },
   { type: "HOURLY",    label: "By Hour",   icon: Timer,      desc: "Chauffeur for 2–12 hours" },
@@ -428,6 +455,22 @@ export default function BookFormClient() {
   const phoneParts = splitE164(data.guestPhone ?? "");
   const phoneValid = isUsablePhone(phoneParts.iso, phoneParts.national);
   const contactValid = !!data.guestName && !!data.guestEmail && phoneValid;
+
+  // Kept next to the booleans above so a new condition cannot be added to one
+  // without the other going stale in plain sight.
+  const step1Missing = [
+    !data.pickupLat && "a pick-up address picked from the suggestions",
+    bookingType === "TRANSFER" && !data.dropoffLat && "a drop-off address picked from the suggestions",
+    !data.date && "a date",
+    !data.time && "a pick-up time",
+    addReturn && !returnValid && "a return date and time after the outbound",
+  ].filter(Boolean) as string[];
+
+  const contactMissing = [
+    !data.guestName && "your name",
+    !data.guestEmail && "an email address",
+    !phoneValid && "a phone number we can dial",
+  ].filter(Boolean) as string[];
 
   const handlePay = async () => {
     setSubmitting(true);
@@ -755,9 +798,11 @@ export default function BookFormClient() {
                   </div>
 
                   <button onClick={goToStep2} disabled={!step1Valid}
+                    aria-describedby="step1-missing"
                     className="btn-gold w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed mt-2">
                     Continue <ArrowRight size={16} />
                   </button>
+                  <StillNeeded id="step1-missing" items={step1Missing} />
                 </div>
               </div>
             </motion.div>
@@ -1008,10 +1053,12 @@ export default function BookFormClient() {
                     <ArrowLeft size={16} /> Back
                   </button>
                   <button onClick={goToStep3} disabled={!contactValid}
+                    aria-describedby="contact-missing"
                     className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
                     See vehicles &amp; price <ArrowRight size={16} />
                   </button>
                 </div>
+                <StillNeeded id="contact-missing" items={contactMissing} />
               </div>
             </motion.div>
           )}

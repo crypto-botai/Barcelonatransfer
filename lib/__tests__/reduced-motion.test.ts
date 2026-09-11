@@ -102,3 +102,30 @@ describe("animated components", () => {
     expect(animated.some((f) => f.endsWith("MotionProvider.tsx"))).toBe(true);
   });
 });
+
+describe("booking form guidance", () => {
+  const FORM = readFileSync(join(ROOT, "app", "book", "BookFormClient.tsx"), "utf-8");
+
+  it("says what is missing instead of just greying the button out", () => {
+    // Both Continue buttons went to opacity-40 with no explanation. On a phone
+    // there is no cursor to change, so the primary button of the funnel simply
+    // did nothing when tapped.
+    expect(FORM).toContain("function StillNeeded");
+    expect(FORM).toContain("const step1Missing");
+    expect(FORM).toContain("const contactMissing");
+    expect(FORM).toContain("aria-describedby=\"step1-missing\"");
+    expect(FORM).toContain("aria-describedby=\"contact-missing\"");
+  });
+
+  it("announces the change without interrupting a screen reader mid-field", () => {
+    // The list rewrites on every keystroke, so assertive would talk over typing.
+    expect(FORM).toMatch(/aria-live="polite"/);
+    expect(FORM).not.toMatch(/aria-live="assertive"/);
+  });
+
+  it("explains every condition the buttons actually gate on", () => {
+    for (const cond of ["pickupLat", "dropoffLat", "data.date", "data.time", "guestName", "guestEmail", "phoneValid"]) {
+      expect(FORM.slice(FORM.indexOf("const step1Missing"), FORM.indexOf("].filter(Boolean) as string[];", FORM.indexOf("const contactMissing"))), cond).toContain(cond);
+    }
+  });
+});
