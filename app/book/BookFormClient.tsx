@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import Image from "next/image";
 import AddressAutocomplete, { type QuickZone } from "@/components/booking/AddressAutocomplete";
 import {
@@ -83,6 +83,27 @@ const STEPS = [
   { id: 3, label: "Vehicle & price" },
 ];
 
+/**
+ * Steps that move in the direction you sent them.
+ *
+ * Every step used to enter from the right and leave to the left whichever
+ * way you were going, so pressing Back played the same animation as pressing
+ * Continue. The motion said forward while the form went backward, which is
+ * the one thing a wizard's step animation exists to tell you. The sign of
+ * dir carries that now, and going back genuinely runs the other way.
+ *
+ * Under prefers-reduced-motion, MotionProvider drops the x travel and keeps
+ * the fade, so this costs a reduced-motion visitor nothing.
+ */
+const stepVariants: Variants = {
+  enter:  (dir: number) => ({ opacity: 0, x: dir * 24 }),
+  center: { opacity: 1, x: 0 },
+  exit:   (dir: number) => ({ opacity: 0, x: dir * -24 }),
+};
+
+// Decelerating, so a step lands rather than stops.
+const STEP_TRANSITION = { duration: 0.28, ease: [0.16, 1, 0.3, 1] as const };
+
 const BOOKING_TYPES: { type: BookingType; label: string; icon: React.ElementType; desc: string }[] = [
   { type: "TRANSFER",  label: "Transfer",  icon: MapPin,     desc: "Airport, hotel, point-to-point" },
   { type: "HOURLY",    label: "By Hour",   icon: Timer,      desc: "Chauffeur for 2–12 hours" },
@@ -139,6 +160,12 @@ export default function BookFormClient() {
   );
 
   const [step, setStep] = useState(hasPrefilledJourney ? 2 : 1);
+  // 1 going forward, -1 going back. Read by stepVariants via AnimatePresence.
+  const [stepDir, setStepDir] = useState(1);
+  const goToStep = useCallback((next: number) => {
+    setStepDir(next >= step ? 1 : -1);
+    setStep(next);
+  }, [step]);
 
   const [data, setData] = useState<Partial<BookingFormData>>({
     bookingType:     "TRANSFER",
@@ -370,13 +397,13 @@ export default function BookFormClient() {
       toast.error("Bookings require at least 1 hour notice. For urgent transfers, call +34 635 383 712.");
       return;
     }
-    setStep(2);
+    goToStep(2);
   };
 
   // Entering the vehicle step quotes immediately, so a price is on screen
   // without the customer having to pick a car first.
   const goToStep3 = () => {
-    setStep(3);
+    goToStep(3);
     if (data.vehicleClass) fetchQuote(data.vehicleClass, undefined, data.fleetVehicle);
   };
 
@@ -454,7 +481,7 @@ export default function BookFormClient() {
           {STEPS.map((s, i) => (
             <li key={s.id} className="flex items-center">
               <button
-                onClick={() => step > s.id && setStep(s.id)}
+                onClick={() => step > s.id && goToStep(s.id)}
                 disabled={step <= s.id}
                 aria-current={step === s.id ? "step" : undefined}
                 aria-label={
@@ -485,11 +512,11 @@ export default function BookFormClient() {
           </ol>
         </nav>
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" custom={stepDir}>
 
           {/* STEP 1: Journey */}
           {step === 1 && (
-            <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <motion.div key="s1" custom={stepDir} variants={stepVariants} initial="enter" animate="center" exit="exit" transition={STEP_TRANSITION}>
               <div className="glass-card rounded-2xl p-6 sm:p-8">
                 <h2 className="font-display text-2xl text-white mb-6">{t("step1")}</h2>
 
@@ -739,7 +766,7 @@ export default function BookFormClient() {
           {/* STEP 3a: Vehicle selection and price. Renders above the extras
               block below, which is also step 3. */}
           {step === 3 && (
-            <motion.div key="s3a" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <motion.div key="s3a" custom={stepDir} variants={stepVariants} initial="enter" animate="center" exit="exit" transition={STEP_TRANSITION}>
               <div className="space-y-4">
                 <div className="glass-card rounded-xl p-4 flex items-center justify-between">
                   <div>
@@ -892,7 +919,7 @@ export default function BookFormClient() {
               instruction, so a booking that is abandoned still carries a name
               and an email to follow up on. */}
           {step === 2 && (
-            <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <motion.div key="s2" custom={stepDir} variants={stepVariants} initial="enter" animate="center" exit="exit" transition={STEP_TRANSITION}>
               <div className="space-y-4">
                 <div className="glass-card rounded-2xl p-6 sm:p-8">
                   <h2 className="font-display text-2xl text-white mb-6">{t("step3")}</h2>
@@ -977,7 +1004,7 @@ export default function BookFormClient() {
                 </div>
 
                 <div className="flex gap-3">
-                  <button onClick={() => setStep(1)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
+                  <button onClick={() => goToStep(1)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
                     <ArrowLeft size={16} /> Back
                   </button>
                   <button onClick={goToStep3} disabled={!contactValid}
@@ -991,7 +1018,7 @@ export default function BookFormClient() {
 
           {/* STEP 3b: Extras, summary and payment — below the vehicle block. */}
           {step === 3 && (
-            <motion.div key="s3b" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <motion.div key="s3b" custom={stepDir} variants={stepVariants} initial="enter" animate="center" exit="exit" transition={STEP_TRANSITION}>
               <div className="space-y-4">
                 <div className="glass-card rounded-2xl p-6 sm:p-8">
                   <h2 className="font-display text-xl text-white mb-2">{t("addExtras")}</h2>
@@ -1221,7 +1248,7 @@ export default function BookFormClient() {
                 )}
 
                 <div className="flex gap-3">
-                  <button onClick={() => setStep(2)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
+                  <button onClick={() => goToStep(2)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">
                     <ArrowLeft size={16} /> Back
                   </button>
                   {needsManualQuote ? (

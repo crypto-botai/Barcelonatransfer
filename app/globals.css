@@ -139,7 +139,15 @@
     transform: translateY(-1px);
     box-shadow: 0 8px 30px rgba(201,168,76,0.45);
   }
-  .btn-gold:active { transform: translateY(0); }
+  /* A press should read as a press. This returned the button to its resting
+     position, so the only feedback for tapping was the loss of the hover lift,
+     which a touch device never showed in the first place: on a phone the
+     primary call to action acknowledged nothing at all. */
+  .btn-gold:active {
+    transform: translateY(1px) scale(0.985);
+    box-shadow: 0 2px 10px rgba(201,168,76,0.25);
+    transition-duration: 0.08s;
+  }
 
   /* Outline gold button */
   .btn-outline-gold {
@@ -152,6 +160,13 @@
     background: rgba(201,168,76,0.08);
     border-color: #c9a84c;
     box-shadow: 0 0 20px rgba(201,168,76,0.15);
+  }
+  /* Had no :active rule at all. Every Back button in the booking form is one
+     of these. */
+  .btn-outline-gold:active {
+    transform: translateY(1px) scale(0.985);
+    background: rgba(201,168,76,0.14);
+    transition-duration: 0.08s;
   }
 
   /* Section divider line */
@@ -287,10 +302,34 @@
 .animate-menu-in   { animation: menuIn 0.16s ease-out both; }
 .animate-drawer-in { animation: drawerIn 0.26s ease-in-out both; }
 
-/* Someone who has asked their phone to stop animating gets no animation. */
+/* Someone who has asked their phone to stop animating gets no animation.
+   This named two classes and left every other keyframe and transition on the
+   site running: the hero, the marquee, the card lifts, the progress bar. The
+   framer-motion side is handled once at the root by MotionProvider; this is
+   the half that lives in CSS, where there is no provider to inherit from.
+
+   Durations go to a hair above zero rather than to zero so that transitionend
+   and animationend still fire and nothing that waits on them hangs. Opacity is
+   deliberately left alone further down: fading is not what makes people ill,
+   and killing it makes content appear from nowhere. */
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Movement is the part that has to stop, so these lose their travel rather
+     than merely their timing. */
   .animate-menu-in,
   .animate-drawer-in { animation: none; }
+  .btn-gold:hover,
+  .btn-gold:active,
+  .btn-outline-gold:hover,
+  .btn-outline-gold:active { transform: none; }
 }
 
 /* ─── Page Transition ───────────────────────────────────── */

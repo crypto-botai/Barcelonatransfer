@@ -7,6 +7,7 @@ import { COMPANY } from "@/lib/company-facts";
 import { GOOGLE_PROFILE } from "@/data/reviews";
 import AuthProvider from "@/components/layout/AuthProvider";
 import I18nProvider from "@/components/language/I18nProvider";
+import MotionProvider from "@/components/layout/MotionProvider";
 // WhatsApp only. The support centre also offered an AI concierge; the owner
 // asked for the one channel their customers actually use and that they
 // answer themselves.
@@ -377,6 +378,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <AuthProvider>
           <I18nProvider>
+          <MotionProvider>
           {/* Skip-link target. A plain wrapper rather than a <main>, because
               the pages bring their own <main> and nesting two landmarks would
               be worse than none. tabIndex -1 so focus actually lands here when
@@ -388,6 +390,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <WhatsAppButton />
           <MobileBookBar />
           <DeferredAnalytics gaId="G-E9QZFG5WZY" adsId="AW-18391666445" />
+          </MotionProvider>
           </I18nProvider>
         </AuthProvider>
       </body>
