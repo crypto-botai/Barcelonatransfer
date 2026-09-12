@@ -3,59 +3,88 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Users, Clock, Star, ExternalLink } from "lucide-react";
+import { resolveZone } from "@/lib/pricing";
+import { ladderFor } from "@/lib/destination-pricing";
+import { TAXI, AEROBUS, METRO } from "@/lib/competing-fares";
 
 interface Destination {
   label: string;
   slug?: string;
   distanceKm: number;
   durationMin: number;
-  privateSedan: number;
-  privateMpv: number;
+  /**
+   * The pricing zone, when the label alone does not resolve to one. Most
+   * entries resolve through resolveZone(); the hotel entries name a hotel,
+   * which is not a zone, and are all in the city.
+   */
+  zone?: string;
+  /**
+   * Fallback figures for destinations with no row in the price table, which
+   * the booking prices by distance. These are estimates and are labelled as
+   * such on the page. They are never used for a destination the table knows:
+   * every one of these was once the only price shown, and fourteen of the
+   * twenty-three were wrong, all of them under what the checkout charged.
+   * Andorra showed 220 against a booked fare of 350.
+   */
+  estimateSedan?: number;
+  estimateMpv?: number;
   aerobusAvailable: boolean;
   metroAvailable: boolean;
 }
 
 const DESTINATIONS: Destination[] = [
-  { label: "Barcelona City Centre (Eixample/Las Ramblas)", distanceKm: 16, durationMin: 25, privateSedan: 45, privateMpv: 65, aerobusAvailable: true, metroAvailable: true },
-  { label: "W Barcelona Hotel / Barceloneta", slug: "w-barcelona-hotel", distanceKm: 18, durationMin: 25, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: true },
-  { label: "Hotel Arts Barcelona / Pullman Skipper", slug: "hotel-arts-barcelona", distanceKm: 17, durationMin: 22, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: true },
-  { label: "Passeig de Gràcia Hotels (Mandarin, Majestic…)", slug: "mandarin-oriental-barcelona", distanceKm: 16, durationMin: 26, privateSedan: 45, privateMpv: 65, aerobusAvailable: true, metroAvailable: true },
-  { label: "Fairmont / Sofia Hotel (Diagonal)", slug: "fairmont-rey-juan-carlos", distanceKm: 12, durationMin: 18, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: false },
-  { label: "Hilton Diagonal Mar / Parc del Fòrum", slug: "hilton-diagonal-mar", distanceKm: 14, durationMin: 20, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: true },
-  { label: "Barcelona Cruise Port (Moll Adossat)", slug: "msc-cruises-barcelona", distanceKm: 14, durationMin: 20, privateSedan: 45, privateMpv: 65, aerobusAvailable: false, metroAvailable: false },
-  { label: "Fira Gran Via (MWC / ISE)", slug: "mwc-2027-barcelona", distanceKm: 7, durationMin: 12, privateSedan: 35, privateMpv: 55, aerobusAvailable: false, metroAvailable: true },
-  { label: "Castelldefels", slug: "castelldefels", distanceKm: 20, durationMin: 22, privateSedan: 48, privateMpv: 68, aerobusAvailable: false, metroAvailable: false },
-  { label: "Sitges", distanceKm: 35, durationMin: 35, privateSedan: 65, privateMpv: 85, aerobusAvailable: false, metroAvailable: false },
-  { label: "Mataró", slug: "mataro-transfer", distanceKm: 36, durationMin: 38, privateSedan: 55, privateMpv: 75, aerobusAvailable: false, metroAvailable: false },
-  { label: "Terrassa", slug: "terrassa-transfer", distanceKm: 40, durationMin: 42, privateSedan: 60, privateMpv: 85, aerobusAvailable: false, metroAvailable: false },
-  { label: "Salou / PortAventura", slug: "salou-transfer", distanceKm: 101, durationMin: 70, privateSedan: 100, privateMpv: 135, aerobusAvailable: false, metroAvailable: false },
-  { label: "Reus Airport (REU)", slug: "reus-airport", distanceKm: 112, durationMin: 70, privateSedan: 110, privateMpv: 145, aerobusAvailable: false, metroAvailable: false },
-  { label: "Tarragona", distanceKm: 95, durationMin: 65, privateSedan: 95, privateMpv: 130, aerobusAvailable: false, metroAvailable: false },
-  { label: "Girona / Costa Brava", distanceKm: 100, durationMin: 65, privateSedan: 110, privateMpv: 145, aerobusAvailable: false, metroAvailable: false },
-  { label: "Girona Airport (GRO)", slug: "girona-airport", distanceKm: 103, durationMin: 68, privateSedan: 105, privateMpv: 140, aerobusAvailable: false, metroAvailable: false },
-  { label: "Montserrat", distanceKm: 58, durationMin: 50, privateSedan: 85, privateMpv: 110, aerobusAvailable: false, metroAvailable: false },
-  { label: "Andorra la Vella", distanceKm: 205, durationMin: 155, privateSedan: 220, privateMpv: 290, aerobusAvailable: false, metroAvailable: false },
-  { label: "Perpignan, France", slug: "perpignan-transfer", distanceKm: 188, durationMin: 125, privateSedan: 185, privateMpv: 250, aerobusAvailable: false, metroAvailable: false },
-  { label: "Lleida", slug: "lleida-transfer", distanceKm: 172, durationMin: 105, privateSedan: 165, privateMpv: 220, aerobusAvailable: false, metroAvailable: false },
-  { label: "Valencia", slug: "valencia-transfer", distanceKm: 355, durationMin: 215, privateSedan: 290, privateMpv: 380, aerobusAvailable: false, metroAvailable: false },
-  { label: "Madrid", slug: "madrid-transfer", distanceKm: 628, durationMin: 335, privateSedan: 490, privateMpv: 620, aerobusAvailable: false, metroAvailable: false },
+  { label: "Barcelona City Centre (Eixample/Las Ramblas)", distanceKm: 16, durationMin: 25, estimateSedan: 45, estimateMpv: 65, aerobusAvailable: true, metroAvailable: true },
+  { label: "W Barcelona Hotel / Barceloneta", slug: "w-barcelona-hotel", distanceKm: 18, durationMin: 25, estimateSedan: 45, estimateMpv: 65, aerobusAvailable: false, metroAvailable: true },
+  { label: "Hotel Arts Barcelona / Pullman Skipper", slug: "hotel-arts-barcelona", distanceKm: 17, durationMin: 22, estimateSedan: 45, estimateMpv: 65, aerobusAvailable: false, metroAvailable: true },
+  { label: "Passeig de Gràcia Hotels (Mandarin, Majestic…)", slug: "mandarin-oriental-barcelona", zone: "barcelona_city", distanceKm: 16, durationMin: 26, estimateSedan: 45, estimateMpv: 65, aerobusAvailable: true, metroAvailable: true },
+  { label: "Fairmont / Sofia Hotel (Diagonal)", slug: "fairmont-rey-juan-carlos", zone: "barcelona_city", distanceKm: 12, durationMin: 18, estimateSedan: 45, estimateMpv: 65, aerobusAvailable: false, metroAvailable: false },
+  { label: "Hilton Diagonal Mar / Parc del Fòrum", slug: "hilton-diagonal-mar", zone: "barcelona_city", distanceKm: 14, durationMin: 20, estimateSedan: 45, estimateMpv: 65, aerobusAvailable: false, metroAvailable: true },
+  { label: "Barcelona Cruise Port (Moll Adossat)", slug: "msc-cruises-barcelona", distanceKm: 14, durationMin: 20, estimateSedan: 45, estimateMpv: 65, aerobusAvailable: false, metroAvailable: false },
+  { label: "Fira Gran Via (MWC / ISE)", slug: "mwc-2027-barcelona", distanceKm: 7, durationMin: 12, estimateSedan: 35, estimateMpv: 55, aerobusAvailable: false, metroAvailable: true },
+  { label: "Castelldefels", slug: "castelldefels", distanceKm: 20, durationMin: 22, estimateSedan: 48, estimateMpv: 68, aerobusAvailable: false, metroAvailable: false },
+  { label: "Sitges", distanceKm: 35, durationMin: 35, estimateSedan: 65, estimateMpv: 85, aerobusAvailable: false, metroAvailable: false },
+  { label: "Mataró", slug: "mataro-transfer", distanceKm: 36, durationMin: 38, estimateSedan: 55, estimateMpv: 75, aerobusAvailable: false, metroAvailable: false },
+  { label: "Terrassa", slug: "terrassa-transfer", distanceKm: 40, durationMin: 42, estimateSedan: 60, estimateMpv: 85, aerobusAvailable: false, metroAvailable: false },
+  { label: "Salou / PortAventura", slug: "salou-transfer", distanceKm: 101, durationMin: 70, estimateSedan: 100, estimateMpv: 135, aerobusAvailable: false, metroAvailable: false },
+  { label: "Reus Airport (REU)", slug: "reus-airport", distanceKm: 112, durationMin: 70, estimateSedan: 110, estimateMpv: 145, aerobusAvailable: false, metroAvailable: false },
+  { label: "Tarragona", distanceKm: 95, durationMin: 65, estimateSedan: 95, estimateMpv: 130, aerobusAvailable: false, metroAvailable: false },
+  { label: "Girona / Costa Brava", distanceKm: 100, durationMin: 65, estimateSedan: 110, estimateMpv: 145, aerobusAvailable: false, metroAvailable: false },
+  { label: "Girona Airport (GRO)", slug: "girona-airport", distanceKm: 103, durationMin: 68, estimateSedan: 105, estimateMpv: 140, aerobusAvailable: false, metroAvailable: false },
+  { label: "Montserrat", distanceKm: 58, durationMin: 50, estimateSedan: 85, estimateMpv: 110, aerobusAvailable: false, metroAvailable: false },
+  { label: "Andorra la Vella", distanceKm: 205, durationMin: 155, estimateSedan: 220, estimateMpv: 290, aerobusAvailable: false, metroAvailable: false },
+  { label: "Perpignan, France", slug: "perpignan-transfer", distanceKm: 188, durationMin: 125, estimateSedan: 185, estimateMpv: 250, aerobusAvailable: false, metroAvailable: false },
+  { label: "Lleida", slug: "lleida-transfer", distanceKm: 172, durationMin: 105, estimateSedan: 165, estimateMpv: 220, aerobusAvailable: false, metroAvailable: false },
+  { label: "Valencia", slug: "valencia-transfer", distanceKm: 355, durationMin: 215, estimateSedan: 290, estimateMpv: 380, aerobusAvailable: false, metroAvailable: false },
+  { label: "Madrid", slug: "madrid-transfer", distanceKm: 628, durationMin: 335, estimateSedan: 490, estimateMpv: 620, aerobusAvailable: false, metroAvailable: false },
 ];
 
 type TariffType = "t1" | "t2";
 
-const TAXI = {
-  t1: { flagfall: 2.15, perKm: 1.13 },
-  t2: { flagfall: 2.90, perKm: 1.30 },
-};
-const AIRPORT_SUPPLEMENT = 4.50;
-const TAXI_MIN_FARE = 8.00;
-const AEROBUS_PER_PERSON = 6.75;
-const METRO_PER_PERSON = 5.15;
+// Third-party fares live in lib/competing-fares.ts with their sources and the
+// date they were checked. The figures that used to sit here were a tariff
+// year stale and told people to use a T-casual at the airport, where TMB does
+// not accept it.
+const AEROBUS_PER_PERSON = AEROBUS.single;
+const METRO_PER_PERSON = METRO.airportTicket;
 
 function calcTaxi(distanceKm: number, tariff: TariffType): number {
   const t = TAXI[tariff];
-  const raw = t.flagfall + distanceKm * t.perKm + AIRPORT_SUPPLEMENT;
-  return Math.max(raw, TAXI_MIN_FARE);
+  const raw = t.flagfall + distanceKm * t.perKm + TAXI.airportSupplement;
+  return Math.max(raw, TAXI.minimumRadioOrApp);
+}
+
+/**
+ * What we would actually charge, read from the same table the checkout reads.
+ *
+ * Sedan is the Economy column, the cheapest car on the route; MPV is the
+ * V-Class. A destination the table does not know falls back to the entry's
+ * estimate and says so.
+ */
+function companyFares(d: Destination): { sedan: number; mpv: number; fromTable: boolean } {
+  const zone = d.zone ?? resolveZone(d.label);
+  const ladder = zone ? ladderFor(zone, "airport") : null;
+  if (ladder) return { sedan: ladder.economy, mpv: ladder.vclass, fromTable: true };
+  return { sedan: d.estimateSedan ?? 0, mpv: d.estimateMpv ?? 0, fromTable: false };
 }
 
 function comfortScore(method: string): number {
@@ -105,24 +134,29 @@ export default function CostCalculatorClient() {
   const [tariff, setTariff] = useState<TariffType>("t1");
 
   const dest = DESTINATIONS[destIndex];
+  const fares = useMemo(() => companyFares(dest), [dest]);
 
   const rows: Row[] = useMemo(() => {
     const taxi = calcTaxi(dest.distanceKm, tariff);
     const vehicle = pax <= 3 ? "sedan" : "mpv";
-    const privatePrice = pax <= 3 ? dest.privateSedan : dest.privateMpv;
+    const privatePrice = pax <= 3 ? fares.sedan : fares.mpv;
 
     return [
       {
         method: "private-sedan",
-        label: "Private transfer (EQE 300 Electric)",
-        costPerVehicle: dest.privateSedan,
-        costPerPerson: dest.privateSedan / Math.min(pax, 3),
-        totalForGroup: pax <= 3 ? dest.privateSedan : dest.privateMpv,
+        // Labelled by what the price is. This said EQE 300 above a figure
+        // that was neither the EQE fare nor the Corolla fare.
+        label: "Private transfer (Toyota Corolla, from)",
+        costPerVehicle: fares.sedan,
+        costPerPerson: fares.sedan / Math.min(pax, 3),
+        totalForGroup: pax <= 3 ? fares.sedan : fares.mpv,
         durationMin: dest.durationMin,
         comfort: 5,
         available: true,
         highlight: true,
-        note: pax > 3 ? `V-Class (7 pax) — €${dest.privateMpv} total` : undefined,
+        note: pax > 3
+          ? `V-Class (7 pax) — €${fares.mpv} total${fares.fromTable ? "" : ", estimate"}`
+          : fares.fromTable ? undefined : "Estimate — exact fare confirmed at booking",
       },
       {
         method: "taxi",
@@ -148,17 +182,17 @@ export default function CostCalculatorClient() {
       },
       {
         method: "metro",
-        label: "Metro L9 Sud (T-Casual card)",
+        label: "Metro L9 Sud (Airport ticket)",
         costPerVehicle: null,
         costPerPerson: METRO_PER_PERSON,
         totalForGroup: dest.metroAvailable ? METRO_PER_PERSON * pax : 0,
         durationMin: dest.metroAvailable ? 40 + 15 : 0,
         comfort: 2,
         available: dest.metroAvailable,
-        note: dest.metroAvailable ? "To metro-served areas only — not door-to-door" : "Not available for this destination",
+        note: dest.metroAvailable ? "Airport ticket only, T-casual is not valid at the airport — not door-to-door" : "Not available for this destination",
       },
     ];
-  }, [dest, pax, tariff]);
+  }, [dest, fares, pax, tariff]);
 
   const bestValue = rows
     .filter((r) => r.available)
@@ -213,13 +247,13 @@ export default function CostCalculatorClient() {
             onClick={() => setTariff("t1")}
             className={`px-4 py-1.5 rounded-lg border transition-colors ${tariff === "t1" ? "border-gold-500/60 bg-gold-500/10 text-gold-400" : "border-white/10 text-dark-400 hover:border-white/20"}`}
           >
-            T-1 Day (Mon–Fri 08:00–21:59)
+            T-1 Day (Mon–Fri 08:00–20:00)
           </button>
           <button
             onClick={() => setTariff("t2")}
             className={`px-4 py-1.5 rounded-lg border transition-colors ${tariff === "t2" ? "border-gold-500/60 bg-gold-500/10 text-gold-400" : "border-white/10 text-dark-400 hover:border-white/20"}`}
           >
-            T-2 Night/Weekend
+            T-2 Night / Sat / holidays
           </button>
         </div>
 
@@ -326,8 +360,8 @@ export default function CostCalculatorClient() {
               </thead>
               <tbody>
                 {[
-                  { label: "Private EQE 300", prices: [1,2,3,4,6,7].map((n) => dest.privateSedan / Math.min(n, 4)) },
-                  { label: "Private V-Class", prices: [1,2,3,4,6,7].map((n) => dest.privateMpv / n) },
+                  { label: "Private sedan", prices: [1,2,3,4,6,7].map((n) => fares.sedan / Math.min(n, 3)) },
+                  { label: "Private V-Class", prices: [1,2,3,4,6,7].map((n) => fares.mpv / n) },
                   { label: `Taxi (${tariff.toUpperCase()})`, prices: [1,2,3,4,6,7].map((n) => calcTaxi(dest.distanceKm, tariff) * Math.ceil(n / 4) / n) },
                   ...(dest.aerobusAvailable ? [{ label: "Aerobus", prices: [1,2,3,4,6,7].map(() => AEROBUS_PER_PERSON) }] : []),
                   ...(dest.metroAvailable ? [{ label: "Metro", prices: [1,2,3,4,6,7].map(() => METRO_PER_PERSON) }] : []),
@@ -359,7 +393,7 @@ export default function CostCalculatorClient() {
               href={`/book?destination=${encodeURIComponent(dest.label)}`}
               className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-dark-950 font-semibold px-8 py-3 rounded-lg transition-colors"
             >
-              Book Private Transfer — €{pax <= 3 ? dest.privateSedan : dest.privateMpv}
+              Book Private Transfer — €{pax <= 3 ? fares.sedan : fares.mpv}
             </Link>
             {dest.slug && (
               <Link

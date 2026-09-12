@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CostCalculatorClient from "./CostCalculatorClient";
+import { TAXI, AEROBUS, METRO, AIRPORT_TRAIN, faresCheckedLabel } from "@/lib/competing-fares";
 import { SHARED_OG } from "@/lib/seo";
 import { simpleBreadcrumb } from "@/lib/hub-schema";
 
@@ -80,39 +81,76 @@ export default function TransferCostCalculatorPage() {
               How the <span className="text-gold-gradient">tariffs work</span>
             </h2>
             <div className="space-y-6 text-dark-300 text-sm leading-relaxed">
+              {/*
+                Every third-party figure below is read from lib/competing-fares,
+                which carries the source and the date each was checked. The
+                previous version of this section typed them in: the taxi tariff
+                was a year out of date on every number, the Aerobús was 70 cents
+                under, and the metro paragraph told readers to use a T-casual at
+                the airport, where TMB does not accept it, then quoted a single
+                fare that does not exist. The train, the cheapest option from
+                T2 and the one a traveller most often asks about, was missing.
+              */}
               <div>
-                <h3 className="text-white font-semibold mb-1">Barcelona Taxi — T-1 (Day rate)</h3>
+                <h3 className="text-white font-semibold mb-1">Barcelona taxi, {TAXI.t1.label} day tariff</h3>
                 <p>
-                  Applies weekdays (Monday–Friday) 08:00–21:59. Flagfall €2.15 + €1.13/km.
-                  All journeys from BCN Airport include a mandatory €4.50 airport supplement.
-                  Minimum fare approximately €8.00.
+                  {TAXI.t1.when}. Flagfall €{TAXI.t1.flagfall.toFixed(2)} plus €{TAXI.t1.perKm.toFixed(2)} per
+                  kilometre. Every journey starting or ending at the airport adds a €{TAXI.airportSupplement.toFixed(2)}
+                  supplement. A taxi booked by phone or app has a minimum fare of €{TAXI.minimumRadioOrApp.toFixed(2)}.
                 </p>
               </div>
               <div>
-                <h3 className="text-white font-semibold mb-1">Barcelona Taxi — T-2 (Night/Weekend rate)</h3>
+                <h3 className="text-white font-semibold mb-1">Barcelona taxi, {TAXI.t2.label} night and weekend tariff</h3>
                 <p>
-                  Applies evenings (22:00–07:59) and all day on weekends and public holidays.
-                  Flagfall €2.90 + €1.30/km + €4.50 airport supplement. Long journeys (Andorra,
-                  Valencia etc.) may involve additional highway tolls charged separately by the driver.
+                  {TAXI.t2.when}. Flagfall €{TAXI.t2.flagfall.toFixed(2)} plus €{TAXI.t2.perKm.toFixed(2)} per
+                  kilometre, with the same €{TAXI.airportSupplement.toFixed(2)} airport supplement. Long journeys
+                  such as Andorra or Valencia may add motorway tolls, charged by the driver.
                 </p>
               </div>
               <div>
-                <h3 className="text-white font-semibold mb-1">Aerobus</h3>
+                <h3 className="text-white font-semibold mb-1">Taxi between the airport and the cruise port</h3>
                 <p>
-                  €6.75 per person each way from either terminal (T1 or T2) to Plaça de Catalunya.
-                  Journey time approximately 35 minutes. Does not serve cruise port, Sitges, Girona,
-                  or any other destination — only central Barcelona.
+                  One fixed fare of €{TAXI.airportToCruiseFixed} between the airport and Moll Adossat, in either
+                  direction, under Tarifa 4. That is the figure to compare against a private transfer for a cruise
+                  connection, not the metered estimate above.
                 </p>
               </div>
               <div>
-                <h3 className="text-white font-semibold mb-1">Metro (L9 Sud)</h3>
+                <h3 className="text-white font-semibold mb-1">Aerobús</h3>
                 <p>
-                  €5.15 per person using a T-Casual 10-trip card (otherwise €11.35 single airport fare).
-                  Serves only central Barcelona stations. Involves luggage on escalators and up to
-                  40 minutes journey time. Not available for cruise terminals, Sitges, Girona, or any
-                  destination outside the metro network.
+                  €{AEROBUS.single.toFixed(2)} per person each way from either terminal to Plaça de Catalunya, or
+                  €{AEROBUS.return.toFixed(2)} return. About {AEROBUS.minutes} minutes. Serves central Barcelona
+                  only: not the cruise port, Sitges, Girona or anywhere else on this page.
                 </p>
               </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">Metro, L9 Sud</h3>
+                <p>
+                  €{METRO.airportTicket.toFixed(2)} per person with the Airport ticket, which is the only ticket
+                  the airport stations accept: a T-casual or any other integrated card will not open the barrier
+                  there. Up to {METRO.minutes} minutes to central stations, with luggage on escalators and a
+                  change for most destinations. Not available for the cruise port, Sitges, Girona or anywhere
+                  outside the metro network.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">Train, Rodalies {AIRPORT_TRAIN.line}</h3>
+                <p>
+                  The cheapest of the public options and the one most often overlooked. It runs from Aeroport
+                  station, which is at {AIRPORT_TRAIN.terminal}. About {AIRPORT_TRAIN.minutesToSants} minutes to Sants
+                  or Passeig de Gràcia, roughly every {AIRPORT_TRAIN.everyMinutes} minutes. It is priced as a standard
+                  Rodalies zone ticket from the station you board at, so we do not quote a single figure for it;
+                  the current fare is on the Rodalies site.
+                </p>
+              </div>
+              <p className="text-dark-500 text-xs pt-2 border-t border-white/[0.06]">
+                Third-party fares checked {faresCheckedLabel()} against{" "}
+                <a href={TAXI.source} rel="noopener noreferrer" target="_blank" className="underline underline-offset-2 hover:text-gold-400">{TAXI.sourceLabel}</a>,{" "}
+                <a href={AEROBUS.source} rel="noopener noreferrer" target="_blank" className="underline underline-offset-2 hover:text-gold-400">{AEROBUS.sourceLabel}</a>,{" "}
+                <a href={METRO.source} rel="noopener noreferrer" target="_blank" className="underline underline-offset-2 hover:text-gold-400">{METRO.sourceLabel}</a> and{" "}
+                <a href={AIRPORT_TRAIN.source} rel="noopener noreferrer" target="_blank" className="underline underline-offset-2 hover:text-gold-400">{AIRPORT_TRAIN.sourceLabel}</a>.
+                Our own fares are read live from the same price table the booking uses.
+              </p>
             </div>
           </div>
         </section>
