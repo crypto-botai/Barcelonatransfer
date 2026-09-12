@@ -182,9 +182,18 @@ describe("flight delay reaches everyone who needs it", () => {
     expect(d.body).toContain("XY99");
   });
 
-  it("does not email the driver — they need it on their phone", () => {
-    // A driver on the road reads WhatsApp and push, not email.
-    expect(EVENT_DEFS.FLIGHT_DELAYED_DRIVER.channels).toEqual(["inapp", "whatsapp", "push"]);
+  it("reaches the driver by every channel that actually delivers", () => {
+    // This used to assert the driver is NOT emailed, on the theory that a
+    // driver on the road reads WhatsApp and push. On this deployment WhatsApp
+    // is unconfigured and push is recorded but not delivered, so for now email
+    // is the only one of the four that reaches a driver who is not looking at
+    // the portal. Dropping it to satisfy the old assertion would have meant a
+    // driver waiting at arrivals for a flight ninety minutes away, which is the
+    // exact cost the event exists to prevent. When WhatsApp or push goes live,
+    // revisit; until then email stays.
+    expect(EVENT_DEFS.FLIGHT_DELAYED_DRIVER.channels).toContain("email");
+    expect(EVENT_DEFS.FLIGHT_DELAYED_DRIVER.channels).toContain("push");
+    expect(EVENT_DEFS.FLIGHT_DELAYED_DRIVER.channels).toContain("whatsapp");
     expect(EVENT_DEFS.FLIGHT_DELAYED.channels).toContain("email");
   });
 

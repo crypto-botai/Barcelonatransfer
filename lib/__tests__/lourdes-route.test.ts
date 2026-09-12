@@ -27,7 +27,8 @@ describe("Lourdes route", () => {
       expect(lookupFixedPriceByZone(origin, "lourdes", "BUSINESS")).toBe(875);
       expect(lookupFixedPriceByZone(origin, "lourdes", "MINIVAN")).toBe(925);
       expect(lookupFixedPriceByZone(origin, "lourdes", "LUXURY_MINIVAN")).toBe(1125);
-      expect(lookupFixedPriceByZone(origin, "lourdes", "MINIBUS")).toBe(1575);
+      // 2250 since the 2 Sep minibus reprice: double the V-Class, to the nearest 50.
+      expect(lookupFixedPriceByZone(origin, "lourdes", "MINIBUS")).toBe(2250);
     }
     // The return leg is the same journey and must not fall through to per-km.
     expect(lookupFixedPriceByZone("lourdes", "airport", "ECONOMY")).toBe(750);

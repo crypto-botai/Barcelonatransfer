@@ -90,7 +90,9 @@ describe("booking form motion", () => {
   });
 });
 
-describe("animated components", () => {
+// Walks and reads every .tsx under app/ and components/. Under a parallel
+// run that can pass vitest's 5 s default, which reads as a failure it is not.
+describe("animated components", { timeout: 30_000 }, () => {
   it("no longer depends on each file remembering the preference", () => {
     const animated = walk(join(ROOT, "app"))
       .concat(walk(join(ROOT, "components")))

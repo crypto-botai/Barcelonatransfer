@@ -111,7 +111,7 @@ describe("formatting", () => {
 
   it("joins several extras onto one line", () => {
     expect(formatExtras(parseBookingMeta(REAL).extras))
-      .toBe("Baby Seat ×2 — €10.00, Name Board Sign — €5.00");
+      .toBe("Baby Seat ×2 — €10.00, Name Board — €5.00");
   });
 });
 

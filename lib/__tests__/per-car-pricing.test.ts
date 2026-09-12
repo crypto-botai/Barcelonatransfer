@@ -109,7 +109,8 @@ describe("the owner's per-car prices", () => {
     expect(getFleetFromPrice("CAMRY")).toBeGreaterThan(getFleetFromPrice("COROLLA"));
     // Untouched.
     expect(getFleetFromPrice("COROLLA")).toBe(50);
-    expect(getFleetFromPrice("SPRINTER")).toBe(180);
+    // Short city runs are a flat 200 for the minibus since the 2 Sep reprice.
+    expect(getFleetFromPrice("SPRINTER")).toBe(200);
   });
 
   it("changes nothing on routes outside the city tier", () => {

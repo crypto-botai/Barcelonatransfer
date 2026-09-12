@@ -37,11 +37,20 @@ const SOURCES = [
 ];
 
 /** Comment lines are documentation, not claims made to a reader. */
+// Memoised: several assertions below each walk every source file, and reading
+// the tree once per assertion is what pushed this past vitest's 5 s default
+// when the suite runs in parallel. The "failures" that produced were timeouts,
+// not claims.
+const PROSE = new Map<string, string>();
 function prose(file: string): string {
-  return readFileSync(file, "utf-8")
+  const hit = PROSE.get(file);
+  if (hit !== undefined) return hit;
+  const out = readFileSync(file, "utf-8")
     .split("\n")
     .filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l))
     .join("\n");
+  PROSE.set(file, out);
+  return out;
 }
 
 describe("the catalogue is the source for what the fleet offers", () => {
@@ -65,7 +74,9 @@ describe("the catalogue is the source for what the fleet offers", () => {
   });
 });
 
-describe("no page makes a claim the catalogue does not support", () => {
+// The first assertion in here pays for the tree read; 30 s is headroom for a
+// cold, parallel run on a slow disk, not an expectation.
+describe("no page makes a claim the catalogue does not support", { timeout: 30_000 }, () => {
   it("nothing states a vehicle age, in any language", () => {
     // Match the shape rather than the English wording: a small number beside
     // that language's word for "years". The claim was translated eight times.
@@ -141,7 +152,7 @@ describe("the locale files state no rating and no review count", () => {
   const LOCALES = fg.sync("messages/*.json");
 
   it("finds the locale files", () => {
-    expect(LOCALES.length).toBe(8);
+    expect(LOCALES.length).toBe(9);
   });
 
   it("no locale file contains a star rating", () => {

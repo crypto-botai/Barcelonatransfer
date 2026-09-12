@@ -49,7 +49,7 @@ describe("Airport ⇄ Barcelona City is one consistent set of numbers", () => {
     expect(route!.business).toBe(65);
     expect(route!.minivan).toBe(65);
     expect(route!.vclass).toBe(75);
-    expect(route!.minibus).toBe(180);
+    expect(route!.minibus).toBe(200);
   });
 
   it("agrees with the class-aware lookup the booking engine quotes from", () => {
@@ -307,7 +307,7 @@ describe("Intentional price asymmetries", () => {
         MINIBUS:        lookupFixedPrice(from, "MONTSERRAT", "MINIBUS"),
       };
       expect(ladder, from).toEqual({
-        ECONOMY: 110, BUSINESS: 140, MINIVAN: 145, VCLASS: 200, MINIBUS: 285,
+        ECONOMY: 110, BUSINESS: 140, MINIVAN: 145, VCLASS: 200, MINIBUS: 400,
       });
       // A 16-seat minibus must never be priced at or below a 7-seat V-Class.
       expect(ladder.MINIBUS!, from).toBeGreaterThan(ladder.VCLASS!);

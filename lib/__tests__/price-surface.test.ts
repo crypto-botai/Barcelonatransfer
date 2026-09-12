@@ -390,7 +390,7 @@ describe("Business airport → Barcelona city is €65", () => {
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "ECONOMY")).toBe(50);
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "MINIVAN")).toBe(65);
     expect(lookupFixedPriceByZone("airport", "barcelona_city", "LUXURY_MINIVAN")).toBe(75);
-    expect(lookupFixedPriceByZone("airport", "barcelona_city", "MINIBUS")).toBe(180);
+    expect(lookupFixedPriceByZone("airport", "barcelona_city", "MINIBUS")).toBe(200);
   });
 
   it("keeps the AI's offline pricing block off a hand-typed fare", () => {
