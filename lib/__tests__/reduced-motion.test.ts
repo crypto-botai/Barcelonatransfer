@@ -131,3 +131,22 @@ describe("booking form guidance", () => {
     }
   });
 });
+
+describe("no page wider than the phone", () => {
+  /**
+   * The homepage measured 697 px wide on a 393 px phone and iOS Safari, which
+   * ignores overflow-x: hidden on the body, showed the whole site at 56%. The
+   * cause was an sr-only span (position: absolute) inside a horizontal scroller
+   * that was not positioned, so the span escaped the scroller and stretched the
+   * document. The rule below makes every scroller contain its own absolutes.
+   */
+  it("makes every horizontal scroller a containing block", () => {
+    expect(CSS).toMatch(/\.overflow-x-auto,\s*\.overflow-x-scroll\s*\{\s*position:\s*relative;\s*\}/);
+  });
+
+  it("keeps the root clip rather than hidden, so sticky keeps working", () => {
+    const html = CSS.slice(CSS.indexOf("  html {"), CSS.indexOf("  body {"));
+    expect(html).toContain("overflow-x: clip;");
+    expect(html).not.toMatch(/overflow-x:\s*hidden/);
+  });
+});

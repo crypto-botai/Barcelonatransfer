@@ -39,22 +39,11 @@
     /* No scroll-snap on root — prevents sections from hijacking scroll */
     overflow-anchor: none;
 
-    /* Matches the horizontal clip body already has.
-     *
-     * Honest note on what this does and does not fix. The root element's
-     * scrollWidth reads 575 on a 390-wide phone while body correctly reads 390,
-     * and under mobile emulation that makes the layout viewport widen to 575 —
-     * which is what stops a tap reaching the language button in the header.
-     *
-     * This rule does NOT fix that. It was added on the theory that it would and
-     * the measurement did not move: fixed-position elements are not clipped by
-     * an ancestor's overflow, so whatever is widening the root is still doing
-     * it. The rule is kept only because clipping the root alongside the body is
-     * reasonable hardening in its own right.
-     *
-     * clip rather than hidden: hidden on the root creates a scroll container
-     * and forces overflow-y to auto, which breaks position: sticky further down
-     * the page. clip clips without either side effect.
+    /* Root-level hardening only. This was added on the theory that it would
+     * stop the page widening on phones, and it did not: the cause was never a
+     * fixed-position element. See the containment rule further down, which is
+     * the fix. clip rather than hidden because hidden on the root creates a
+     * scroll container and breaks position: sticky further down the page.
      */
     overflow-x: clip;
   }
@@ -66,6 +55,34 @@
     overflow-x: hidden;
     /* Prevents content layout shift on mobile address bar resize */
     min-height: 100dvh;
+  }
+
+  /* Every horizontal scroller contains its own absolutely positioned children.
+   *
+   * On a 393 px phone the root scrollWidth read 697 and iOS Safari, which
+   * ignores overflow-x: hidden on the body, zoomed the whole site out to 56%
+   * to fit it. Every visitor on a phone saw the page like that, for months.
+   *
+   * The element doing it was one pixel wide and invisible: the sr-only
+   * "Book" header in the last column of the homepage pricing table. Tailwind's
+   * sr-only is position: absolute, and the table's overflow-x-auto wrapper was
+   * not positioned, so the span's containing block was the section behind it.
+   * The wrapper clipped the table but the span was never inside the wrapper to
+   * clip; it sat at x = 697 on the page and stretched the document to reach it.
+   *
+   * Making scroll containers positioned means anything absolute inside one
+   * belongs to it, which is what a scroll container should do anyway. There
+   * are thirty of these across the site and the same span pattern could land
+   * in any of them; this closes all thirty. Kept in the base layer so an
+   * explicit absolute, fixed or sticky utility on the same element still wins.
+   *
+   * Measured on the live site before and after injecting this rule alone:
+   * 697 to 387 on a 393 px viewport. Twelve other pages checked at 393 and
+   * 820 were already within width.
+   */
+  .overflow-x-auto,
+  .overflow-x-scroll {
+    position: relative;
   }
 
   /* Prevent tap highlight flash on mobile */
