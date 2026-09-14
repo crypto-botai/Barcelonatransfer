@@ -6,7 +6,7 @@ import InstallPrompt from "@/components/pwa/InstallPrompt";
 import ScrollReset from "@/components/layout/ScrollReset";
 import HeroSection from "@/components/sections/HeroSection";
 import ServicesSection from "@/components/sections/ServicesSection";
-import FleetSection from "@/components/sections/FleetSection";
+import FleetStage from "@/components/sections/FleetStage";
 import PricingSection from "@/components/sections/PricingSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import I18nProvider from "@/components/language/I18nProvider";
@@ -108,7 +108,7 @@ export default async function LocalizedHomePage(
       <main>
         <HeroSection />
         <ServicesSection />
-        <FleetSection />
+        <FleetStage />
         <PricingSection routes={routes} />
         {/*
           The reviews are real customer writing and stay in the language each

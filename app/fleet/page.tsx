@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import FleetSection from "@/components/sections/FleetSection";
+import FleetStage from "@/components/sections/FleetStage";
 import Link from "next/link";
 import { SHARED_OG } from "@/lib/seo";
 import { HOURLY_RATES, MIN_HOURLY_HOURS, getFleetFromPrice } from "@/lib/pricing";
@@ -121,7 +121,7 @@ export default function FleetPage() {
           </div>
         </section>
 
-        <FleetSection />
+        <FleetStage />
 
         {/* ── Choosing between them ────────────────────────────────
             The hub introduced seven cars and gave a reader nothing to

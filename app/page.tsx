@@ -5,7 +5,7 @@ import InstallPrompt from "@/components/pwa/InstallPrompt";
 import ScrollReset from "@/components/layout/ScrollReset";
 import HeroSection from "@/components/sections/HeroSection";
 import ServicesSection from "@/components/sections/ServicesSection";
-import FleetSection from "@/components/sections/FleetSection";
+import FleetStage from "@/components/sections/FleetStage";
 import PricingSection from "@/components/sections/PricingSection";
 import HowItWorksSection from "@/components/sections/HowItWorksSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
@@ -45,7 +45,7 @@ export default async function HomePage() {
       <main>
         <HeroSection />
         <ServicesSection />
-        <FleetSection />
+        <FleetStage />
         <PricingSection routes={routes} />
         {/* Reviews come straight after the price: the reader who has just seen
             what it costs is the one who wants to know whether it is any good.
