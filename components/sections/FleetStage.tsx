@@ -119,7 +119,11 @@ export default function FleetStage() {
   // the whole page jump down to the thumbnails. The owner reported it as a
   // glitch. It was.
   const stripRef = useRef<HTMLDivElement>(null);
+  const mounted = useRef(false);
   useEffect(() => {
+    // Nothing moves on first paint. The first car is already the first
+    // thumbnail, and a page should open where the visitor left the scrollbar.
+    if (!mounted.current) { mounted.current = true; return; }
     const strip = stripRef.current;
     const b = strip?.children[index] as HTMLElement | undefined;
     if (!strip || !b) return;
