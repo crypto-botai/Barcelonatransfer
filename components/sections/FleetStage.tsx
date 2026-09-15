@@ -112,10 +112,21 @@ export default function FleetStage() {
   }, [index, go]);
 
   // The filmstrip keeps the current car in view on narrow screens.
+  //
+  // This scrolls the strip itself, sideways, and nothing else. It used
+  // scrollIntoView, which is allowed to scroll every ancestor to reach the
+  // element, and on desktop the strip sits below the fold: changing car made
+  // the whole page jump down to the thumbnails. The owner reported it as a
+  // glitch. It was.
   const stripRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const b = stripRef.current?.children[index] as HTMLElement | undefined;
-    b?.scrollIntoView({ block: "nearest", inline: "center", behavior: reduce ? "auto" : "smooth" });
+    const strip = stripRef.current;
+    const b = strip?.children[index] as HTMLElement | undefined;
+    if (!strip || !b) return;
+    // Only a strip that actually scrolls needs moving; the desktop grid does not.
+    if (strip.scrollWidth <= strip.clientWidth + 1) return;
+    const left = b.offsetLeft - (strip.clientWidth - b.clientWidth) / 2;
+    strip.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
   }, [index, reduce]);
 
   return (

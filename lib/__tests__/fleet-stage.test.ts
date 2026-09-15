@@ -48,3 +48,14 @@ describe("fleet stage", () => {
     expect(SRC).toContain('aria-label="Next vehicle"');
   });
 });
+
+describe("changing car never moves the page", () => {
+  const SRC = readFileSync(join(process.cwd(), "components", "sections", "FleetStage.tsx"), "utf-8");
+  it("scrolls the filmstrip itself, not into view", () => {
+    // scrollIntoView may scroll every ancestor to reach the element; on
+    // desktop the strip is below the fold, so changing car dragged the whole
+    // page down to the thumbnails.
+    expect(SRC).not.toMatch(/\.scrollIntoView\(/);
+    expect(SRC).toContain("strip.scrollTo({ left:");
+  });
+});
