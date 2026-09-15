@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { Plane, Anchor, Briefcase, Building2, Theater, Clock, Waves, Sunset, Mountain, Hotel, Crown, Map, ArrowRight } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
 
@@ -10,6 +12,87 @@ const SERVICE_HREFS = [
   "/airport-transfers", "/transfers/cruise-port", "/corporate", "/corporate",
   "/vip-transportation", "/hourly", "/transfers/costa-brava", "/transfers/costa-dorada", "/transfers/andorra", "/hotel-transfers", "/vip-transportation", "/day-tours",
 ];
+
+/**
+ * One photograph per service, supplied by the owner. The six full frames are
+ * 1200×640; the other six were cut from a 3×2 sheet and are 548 wide, which
+ * still covers a 4-up grid cell at 1.4× on the widest layout.
+ */
+const SERVICE_IMAGES: Record<(typeof SERVICE_KEYS)[number], string> = {
+  airport: "/services/airport.webp",
+  cruise: "/services/cruise.webp",
+  executive: "/services/executive.webp",
+  corporate: "/services/corporate.webp",
+  vipEvents: "/services/vip-events.webp",
+  hourly: "/services/hourly.webp",
+  costaBrava: "/services/costa-brava.webp",
+  costaDorada: "/services/costa-dorada.webp",
+  andorra: "/services/andorra.webp",
+  hotel: "/services/hotel.webp",
+  vip: "/services/vip.webp",
+  tours: "/services/tours.webp",
+};
+
+const SIZES = "(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw";
+
+function ServiceCard({ index }: { index: number }) {
+  const t = useTranslations("services");
+  const still = useReducedMotion();
+  const key = SERVICE_KEYS[index];
+  const Icon = SERVICE_ICONS[index];
+  const title = t(`list.${key}.title`);
+
+  // Same per-card reveal the fleet grid used: `whileInView` so nothing is
+  // hidden before hydration, `once` so it never replays on the way back up.
+  const reveal = still
+    ? undefined
+    : {
+        initial: { opacity: 0, y: 18 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true, amount: 0.2, margin: "0px 0px -40px 0px" },
+        transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as const, delay: (index % 4) * 0.07 },
+      };
+
+  return (
+    <motion.div {...reveal} className="h-full">
+      <Link
+        href={SERVICE_HREFS[index]}
+        className="group relative block h-full overflow-hidden rounded-2xl border border-white/[0.08] bg-dark-900 transition-[border-color,box-shadow] duration-500 hover:border-gold-500/50 hover:shadow-[0_24px_60px_-24px_rgba(212,175,55,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
+      >
+        <div className="relative aspect-[4/3]">
+          <Image
+            src={SERVICE_IMAGES[key]}
+            alt={title}
+            fill
+            sizes={SIZES}
+            className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+          />
+          {/* Legibility scrim: clear at the top so the photo reads as
+              supplied, deepening to the section background under the text. */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/55 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-dark-950/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+          <div className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-xl border border-gold-500/30 bg-dark-950/60 backdrop-blur-sm">
+            <Icon size={16} className="text-gold-400" />
+          </div>
+
+          <div className="absolute inset-x-0 bottom-0 p-5">
+            <h3 className="font-display text-xl leading-tight text-white transition-colors duration-300 group-hover:text-gold-300">
+              {title}
+            </h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-white/70">
+              {t(`list.${key}.desc`)}
+            </p>
+            <div className="mt-3 flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-gold-400 transition-colors group-hover:text-gold-300">
+              <span>{t("learnMore")}</span>
+              <ArrowRight size={12} className="transition-transform duration-300 group-hover:translate-x-1" />
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}
 
 export default function ServicesSection() {
   const t = useTranslations("services");
@@ -37,35 +120,10 @@ export default function ServicesSection() {
           <div className="gold-divider mt-6" />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {SERVICE_KEYS.map((key, i) => {
-            const Icon = SERVICE_ICONS[i];
-            return (
-              <div key={key}>
-                <Link
-                  href={SERVICE_HREFS[i]}
-                  className="group glass-card gold-hover-border rounded-xl p-5 flex flex-col h-full hover:bg-white/[0.04] transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-gold-500/10 border border-gold-500/20 flex items-center justify-center mb-4 group-hover:bg-gold-500/15 transition-colors">
-                    <Icon size={18} className="text-gold-500" />
-                  </div>
-                  <h3 className="text-white font-medium mb-2 group-hover:text-gold-400 transition-colors">
-                    {t(`list.${key}.title`)}
-                  </h3>
-                  <p className="text-dark-400 text-sm leading-relaxed flex-1">
-                    {t(`list.${key}.desc`)}
-                  </p>
-                  {/* gold-500/60 measured 3.68:1 on the card background — a WCAG
-                      failure repeated across all 12 service cards. Full-opacity
-                      gold-400 clears 4.5:1 while keeping the same hover accent. */}
-                  <div className="flex items-center gap-1 mt-4 text-gold-400 group-hover:text-gold-300 transition-colors text-xs">
-                    <span>{t("learnMore")}</span>
-                    <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </Link>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+          {SERVICE_KEYS.map((key, i) => (
+            <ServiceCard key={key} index={i} />
+          ))}
         </div>
 
         {/* Feature pills */}
