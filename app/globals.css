@@ -349,6 +349,12 @@
   .btn-outline-gold:active { transform: none; }
 }
 
+/* The guest book's strip of notes. Two copies of the list sit side by side,
+   so travelling half the width lands exactly where it started. */
+@keyframes guestbook-drift {
+  to { transform: translateX(-50%); }
+}
+
 /* ─── Page Transition ───────────────────────────────────── */
 .page-enter { animation: fadeIn 0.4s ease-out; }
 

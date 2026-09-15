@@ -109,3 +109,24 @@ describe("initials", () => {
     expect(initials("   ")).toBe("?");
   });
 });
+
+describe("the guest book", () => {
+  const src = fs.readFileSync("components/sections/TestimonialsSection.tsx", "utf8");
+
+  it("shows no review total, as the owner asked", () => {
+    // The rating may appear; the count may only govern how many are listed.
+    const jsx = src.slice(src.indexOf("return ("));
+    expect(jsx).not.toMatch(/profile\.count/);
+    expect(jsx).not.toMatch(/reviews\.length\}/);
+  });
+
+  it("quotes only reviews that have words, and lists everyone", () => {
+    expect(src).toMatch(/reviews\.filter\(\(r\) => r\.text/);
+    expect(src).toContain("reviews.map((r)");
+  });
+
+  it("holds each quote, then moves on, unless the reader is on it", () => {
+    expect(src).toContain("HOLD_SECONDS");
+    expect(src).toMatch(/onMouseEnter=\{\(\) => setPaused\(true\)\}/);
+  });
+});
