@@ -18,14 +18,14 @@ interface BudgetData {
 
 // Static provider map (mirrors lib/ai/providers.ts AGENT_PROVIDER)
 const AGENT_PROVIDERS: Record<string, { label: string; model: string; tier: string }> = {
-  support:      { label: "Groq Llama",   model: "llama-3.1-8b-instant",       tier: "Free" },
-  booking:      { label: "Groq Llama",   model: "llama-3.1-8b-instant",       tier: "Free" },
-  orchestrator: { label: "Groq Llama",   model: "llama-3.1-8b-instant",       tier: "Free" },
-  health:       { label: "Groq Llama",   model: "llama-3.1-8b-instant",       tier: "Free" },
-  seo:          { label: "Groq Llama",   model: "llama-3.1-8b-instant",       tier: "Free" },
-  analytics:    { label: "Groq Llama",   model: "llama-3.1-8b-instant",       tier: "Free" },
-  marketing:    { label: "Gemini Flash", model: "gemini-2.0-flash-lite",      tier: "Free" },
-  knowledge:    { label: "Groq Llama",   model: "llama-3.1-8b-instant",       tier: "Free" },
+  support:      { label: "Groq",         model: "openai/gpt-oss-20b",       tier: "Free" },
+  booking:      { label: "Groq",         model: "openai/gpt-oss-20b",       tier: "Free" },
+  orchestrator: { label: "Groq",         model: "openai/gpt-oss-20b",       tier: "Free" },
+  health:       { label: "Groq",         model: "openai/gpt-oss-20b",       tier: "Free" },
+  seo:          { label: "Groq",         model: "openai/gpt-oss-20b",       tier: "Free" },
+  analytics:    { label: "Groq",         model: "openai/gpt-oss-20b",       tier: "Free" },
+  marketing:    { label: "Gemini Flash", model: "gemini-2.5-flash-lite",      tier: "Free" },
+  knowledge:    { label: "Groq",         model: "openai/gpt-oss-20b",       tier: "Free" },
 };
 
 export default function CostPage() {

@@ -218,27 +218,22 @@ export async function getKeyHealthSnapshot() {
 
 // ─── Key test ─────────────────────────────────────────────────────────────────
 
-const TEST_CONFIGS: Record<string, { url: string; model: string; extra?: Record<string, string> }> = {
-  groq: {
-    url:   "https://api.groq.com/openai/v1/chat/completions",
-    model: "llama-3.1-8b-instant",
-  },
-  gemini: {
-    url:   "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-    model: "gemini-2.0-flash-lite",
-  },
-  openrouter: {
-    url:   "https://openrouter.ai/api/v1/chat/completions",
-    model: "meta-llama/llama-3.2-3b-instruct:free",
-    extra: { "HTTP-Referer": "https://www.elitebcn.info", "X-Title": "Elite BCN" },
-  },
-};
+/** The request a key is tested with: the same endpoint, model and headers
+ *  the agents use, read from the provider catalogue so a model change there
+ *  is a model change here. Imported lazily because providers.ts imports this
+ *  file. */
+async function testConfig(provider: string): Promise<{ url: string; model: string; extra?: Record<string, string>; body?: Record<string, unknown> } | null> {
+  const { PROVIDERS } = await import("@/lib/ai/providers");
+  const p = PROVIDERS[provider];
+  if (!p) return null;
+  return { url: `${p.baseURL}/chat/completions`, model: p.model, extra: p.extraHeaders, body: p.extraBody };
+}
 
 export async function testRawKey(
   provider: string,
   rawKey:   string,
 ): Promise<{ ok: boolean; warning?: string; error?: string; latencyMs: number }> {
-  const cfg = TEST_CONFIGS[provider];
+  const cfg = await testConfig(provider);
   if (!cfg) return { ok: false, error: `Unknown provider: ${provider}`, latencyMs: 0 };
 
   const t0 = Date.now();
@@ -253,8 +248,9 @@ export async function testRawKey(
       body: JSON.stringify({
         model:       cfg.model,
         messages:    [{ role: "user", content: "Say OK" }],
-        max_tokens:  5,
+        max_tokens:  64,
         temperature: 0,
+        ...(cfg.body ?? {}),
       }),
       signal: AbortSignal.timeout(15_000),
     });
