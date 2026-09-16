@@ -136,7 +136,11 @@ describe("every surface that shows a booking reads the extras", () => {
   });
 
   it("the driver email names the extras it must bring", () => {
-    const src = fs.readFileSync("lib/resend.ts", "utf8");
-    expect(src).toMatch(/Extras to bring/);
+    // The sender passes the formatted extras into the card, and the card
+    // gives them a row of their own ("Bring").
+    const sender = fs.readFileSync("lib/resend.ts", "utf8");
+    expect(sender).toMatch(/extras:\s*driverMeta\.extras\.length \? formatExtras\(driverMeta\.extras\)/);
+    const card = fs.readFileSync("lib/email/premium.ts", "utf8");
+    expect(card).toMatch(/o\.extras \? row\("Bring"/);
   });
 });

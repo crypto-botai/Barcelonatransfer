@@ -11,6 +11,8 @@ import {
   paymentReceiptCard,
   rideCompleteCard,
   flightDelayCard,
+  driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard,
+  pickupChangedCard, adminPickupChangedCard,
 } from "@/lib/email/premium";
 
 let _resend: Resend | undefined;
@@ -66,6 +68,10 @@ const VEHICLE_NAMES: Record<string, string> = {
   LUXURY_MINIVAN: "Mercedes V-Class",
   MINIBUS:        "Mercedes Sprinter",
 };
+function firstNameOf(name: string): string {
+  return name.trim().split(/\s+/)[0] || "there";
+}
+
 function vehicleName(cls: string): string {
   return VEHICLE_NAMES[cls] ?? cls.replace(/_/g, " ");
 }
@@ -566,76 +572,6 @@ export function newsletterIssueHtml({
 }
 
 // ─── Shared HTML Layout ─────────────────────────────────────
-function emailLayout(body: string): string {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Elite BCN Transfers</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Georgia, 'Times New Roman', serif; background: #f0ebe0; }
-  .wrapper { max-width: 620px; margin: 0 auto; background: #0a0a0a; }
-  .header { background: linear-gradient(135deg,#0a0a0a 0%,#1a1600 100%); padding: 36px 40px 28px; text-align: center; border-bottom: 1px solid #c9a84c; }
-  .logo-mark { display: inline-flex; align-items: center; gap: 10px; }
-  .logo-diamond { width: 28px; height: 28px; border: 1.5px solid #c9a84c; transform: rotate(45deg); display: inline-flex; align-items: center; justify-content: center; }
-  .logo-inner { width: 10px; height: 10px; background: #c9a84c; }
-  .logo-text { font-size: 22px; letter-spacing: 6px; font-weight: 300; color: #fff; }
-  .logo-text span { color: #c9a84c; }
-  .tagline { color: #888; font-size: 11px; letter-spacing: 3px; margin-top: 8px; text-transform: uppercase; }
-  .body { padding: 36px 40px; color: #d0d0d0; font-size: 15px; line-height: 1.7; }
-  h2 { color: #c9a84c; font-size: 22px; margin-bottom: 10px; font-weight: 400; }
-  .divider { height: 1px; background: #1e1e1e; margin: 24px 0; }
-  .code-box { background: #0f0f0f; border: 1px solid #c9a84c; border-radius: 10px; padding: 24px; text-align: center; margin: 28px 0; }
-  .code { color: #c9a84c; font-size: 30px; letter-spacing: 8px; font-family: 'Courier New', monospace; font-weight: bold; }
-  .detail-table { width: 100%; border-collapse: collapse; }
-  .detail-table td { padding: 10px 0; border-bottom: 1px solid #1a1a1a; font-size: 14px; }
-  .detail-table td:first-child { color: #888; width: 38%; }
-  .detail-table td:last-child { color: #fff; text-align: right; }
-  .coupon-box { background: linear-gradient(135deg,#1a1200,#0f0f00); border: 1.5px solid #c9a84c; border-radius: 12px; padding: 24px; text-align: center; margin: 28px 0; }
-  .coupon-pct { font-size: 48px; color: #c9a84c; font-weight: bold; line-height: 1; }
-  .coupon-code-label { font-size: 11px; letter-spacing: 3px; color: #888; text-transform: uppercase; margin: 12px 0 6px; }
-  .coupon-code { font-size: 22px; letter-spacing: 6px; font-family: 'Courier New', monospace; color: #fff; background: #0a0a0a; border: 1px dashed #c9a84c; padding: 10px 20px; display: inline-block; border-radius: 6px; margin-bottom: 10px; }
-  .coupon-exp { font-size: 12px; color: #888; }
-  .cta-btn { display: inline-block; background: #c9a84c; color: #000 !important; padding: 14px 36px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: bold; letter-spacing: 1px; margin: 8px 0; }
-  .wa-btn { display: inline-block; background: #25D366; color: #fff !important; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-size: 14px; margin: 8px 0; }
-  .outline-btn { display: inline-block; background: transparent; color: #c9a84c !important; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-size: 14px; border: 1px solid #c9a84c; margin: 8px 0; }
-  .cred-box { background: #111; border: 1px solid #c9a84c; border-radius: 8px; padding: 20px; margin: 24px 0; }
-  .cred-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1e1e1e; font-size: 14px; }
-  .cred-label { color: #888; }
-  .cred-value { color: #fff; font-family: 'Courier New', monospace; }
-  .footer { background: #050505; padding: 24px 40px; text-align: center; color: #555; font-size: 12px; border-top: 1px solid #1a1a1a; }
-  .footer a { color: #888; text-decoration: none; }
-  .total-row { display: flex; justify-content: space-between; padding: 16px 0 0; }
-  .total-label { color: #c9a84c; font-size: 16px; }
-  .total-value { color: #c9a84c; font-size: 24px; font-weight: bold; }
-  @media (max-width: 480px) {
-    .body { padding: 24px 20px; }
-    .header { padding: 28px 20px 22px; }
-    .code { font-size: 22px; letter-spacing: 4px; }
-  }
-</style>
-</head>
-<body>
-<div class="wrapper">
-  <div class="header">
-    <div class="logo-mark">
-      <div class="logo-diamond"><div class="logo-inner"></div></div>
-      <div class="logo-text">ELITE<span>BCN</span></div>
-    </div>
-    <p class="tagline">Luxury Transfers · Barcelona</p>
-  </div>
-  <div class="body">${body}</div>
-  <div class="footer">
-    <p>© ${new Date().getFullYear()} Elite BCN Transfers · <a href="tel:+34635383712">+34 635 383 712</a> · <a href="mailto:${COMPANY.email}">${COMPANY.email}</a></p>
-    <p style="margin-top:6px;">Barcelona, Spain · Licensed VTC Operator · <a href="${SITE_URL}/privacy">Privacy Policy</a> · <a href="${SITE_URL}/terms">Terms</a></p>
-  </div>
-</div>
-</body>
-</html>`;
-}
-
 // ─── Booking Confirmation ────────────────────────────────────
 export async function sendBookingConfirmation({
   to, name, confirmationCode, pickupAddress, dropoffAddress,
@@ -946,23 +882,11 @@ export async function sendFailedPaymentEmail({
   to: string; name: string; confirmationCode: string; bookingId: string;
 }) {
   const retryUrl = `${SITE_URL}/booking/pay?booking_id=${bookingId}`;
-  const html = emailLayout(`
-    <h2>Payment Unsuccessful</h2>
-    <p>Dear ${name},</p>
-    <p>Unfortunately, your payment for booking <strong style="color:#c9a84c;">${confirmationCode}</strong> could not be processed.</p>
-    <p style="margin-top:12px;">Your booking is still saved — please retry to confirm your transfer.</p>
-    <div style="text-align:center;margin:28px 0;">
-      <a href="${retryUrl}" class="cta-btn">Retry Payment →</a>
-    </div>
-    <div class="divider"></div>
-    <p style="color:#888;font-size:13px;">Having trouble? Our team is available 24/7:</p>
-    <div style="text-align:center;margin-top:12px;">
-      <a href="https://wa.me/34635383712?text=Payment%20issue%20for%20${confirmationCode}" class="wa-btn">💬 WhatsApp Support</a>
-    </div>
-    <div class="divider"></div>
-    <p style="font-size:12px;color:#555;text-align:center;">Reference: <strong style="color:#c9a84c;">${confirmationCode}</strong> · No charge has been made to your account.</p>
-  `);
-  const id = await sendEmail({ from: FROM, to, subject: `⚠️ Payment Failed — ${confirmationCode} | Elite BCN`, html });
+  const html = emailDocument(
+    paymentFailedCard({ firstName: firstNameOf(name), confirmationCode, retryUrl }),
+    `Payment for ${confirmationCode} did not go through — nothing has been charged. Retry to confirm your transfer.`,
+  );
+  const id = await sendEmail({ from: FROM, to, subject: `Payment unsuccessful — ${confirmationCode} | Elite BCN`, html });
   await logEmail({ to, subject: `Payment failed — ${confirmationCode}`, type: "PAYMENT_FAILED", resendId: id, bookingId });
 }
 
@@ -972,26 +896,11 @@ export async function sendBookingCancelledEmail({
 }: {
   to: string; name: string; confirmationCode: string; pickupDatetime: string; totalAmount: number;
 }) {
-  const html = emailLayout(`
-    <h2>Booking Cancelled</h2>
-    <p>Dear ${name},</p>
-    <p>Your booking <strong style="color:#c9a84c;">${confirmationCode}</strong> has been successfully cancelled.</p>
-    <table class="detail-table" style="margin-top:20px;">
-      <tr><td>Reference</td><td>${confirmationCode}</td></tr>
-      <tr><td>Pickup Date</td><td>${pickupDatetime}</td></tr>
-    </table>
-    <div class="total-row">
-      <span class="total-label">Amount</span>
-      <span class="total-value">€${totalAmount.toFixed(2)}</span>
-    </div>
-    <div class="divider"></div>
-    <p style="color:#aaa;font-size:14px;">If a refund is applicable, it will be processed within 5–7 business days to your original payment method.</p>
-    <div style="text-align:center;margin-top:24px;display:flex;flex-direction:column;gap:10px;align-items:center;">
-      <a href="${SITE_URL}/book" class="cta-btn">Book a New Transfer →</a>
-      <a href="https://wa.me/34635383712" class="wa-btn">💬 Questions? Chat with Us</a>
-    </div>
-  `);
-  const id = await sendEmail({ from: FROM, to, subject: `Booking Cancelled — ${confirmationCode} | Elite BCN`, html });
+  const html = emailDocument(
+    bookingCancelledCard({ firstName: firstNameOf(name), confirmationCode, pickupDatetime, totalAmount, refund: "pending" }),
+    `Booking ${confirmationCode} has been cancelled.`,
+  );
+  const id = await sendEmail({ from: FROM, to, subject: `Booking cancelled — ${confirmationCode} | Elite BCN`, html });
   await logEmail({ to, subject: `Booking cancelled — ${confirmationCode}`, type: "CANCELLED", resendId: id });
 }
 
@@ -1009,39 +918,20 @@ export async function sendDriverBookingDetailsEmail({
   // The driver is the one who has to bring the child seat, so the extras go in
   // a row of their own rather than being stripped out with the metadata block.
   const driverMeta = parseBookingMeta(specialRequests);
-  const html = emailLayout(`
-    <h2>New Booking Assigned</h2>
-    <p>Hi ${driverName},</p>
-    <p>A new booking has been assigned to you. Please review the details below.</p>
-    <div class="code-box">
-      <p style="color:#888;font-size:11px;margin-bottom:8px;letter-spacing:3px;text-transform:uppercase;">Booking Reference</p>
-      <div class="code">${confirmationCode}</div>
-    </div>
-    <table class="detail-table">
-      <tr><td>Client</td><td>${guestName}</td></tr>
-      <tr><td>Client Phone</td><td><a href="tel:${guestPhone}" style="color:#c9a84c;">${guestPhone}</a></td></tr>
-      <tr><td>Pick-up</td><td>${pickupAddress}</td></tr>
-      <tr><td>Drop-off</td><td>${dropoffAddress || "—"}</td></tr>
-      <tr><td>Date & Time</td><td>${pickupDatetime}</td></tr>
-      <tr><td>Vehicle Class</td><td>${vehicleClass.replace(/_/g, " ")}</td></tr>
-      <tr><td>Passengers</td><td>${passengers} pax · ${luggage} bags</td></tr>
-      ${flightNumber ? `<tr><td>Flight</td><td>${flightNumber}</td></tr>` : ""}
-      ${driverMeta.extras.length ? `<tr><td>Extras to bring</td><td><strong>${formatExtras(driverMeta.extras)}</strong></td></tr>` : ""}
-      ${driverMeta.tipAmount > 0 ? `<tr><td>Tip (already paid)</td><td><strong style="color:#c9a84c;">€${driverMeta.tipAmount.toFixed(2)}</strong></td></tr>` : ""}
-      ${driverMeta.notes ? `<tr><td>Notes</td><td>${driverMeta.notes}</td></tr>` : ""}
-    </table>
-    ${driverAmount != null ? `
-    <div class="total-row">
-      <span class="total-label">Your Earnings</span>
-      <span class="total-value">€${driverAmount.toFixed(2)}</span>
-    </div>` : ""}
-    <div class="divider"></div>
-    <div style="text-align:center;margin-top:16px;display:flex;flex-direction:column;gap:10px;align-items:center;">
-      <a href="https://wa.me/${guestPhone.replace(/\D/g, "")}?text=Hello%2C%20I'm%20your%20Elite%20BCN%20driver%20for%20booking%20${confirmationCode}" class="wa-btn">💬 WhatsApp Client</a>
-      <a href="https://wa.me/34635383712" class="outline-btn" style="display:inline-block;">📞 Contact Dispatch</a>
-    </div>
-  `);
-  const id = await sendEmail({ from: FROM, to, subject: `📋 New Booking — ${confirmationCode} | Elite BCN`, html });
+  const html = emailDocument(
+    driverJobCard({
+      driverName, confirmationCode, guestName, guestPhone,
+      pickupAddress, dropoffAddress, pickupDatetime,
+      vehicle: vehicleName(vehicleClass),
+      passengers, luggage, flightNumber,
+      extras: driverMeta.extras.length ? formatExtras(driverMeta.extras) : null,
+      tipAmount: driverMeta.tipAmount,
+      notes: driverMeta.notes,
+      driverAmount,
+    }),
+    `${confirmationCode} · ${pickupDatetime} · ${pickupAddress}`,
+  );
+  const id = await sendEmail({ from: FROM, to, subject: `New job — ${confirmationCode} · ${pickupDatetime} | Elite BCN`, html });
   await logEmail({ to, subject: `Driver booking assigned — ${confirmationCode}`, type: "DRIVER_BOOKING", resendId: id });
 }
 
@@ -1069,24 +959,11 @@ export async function sendCancellationEmail({
 }: {
   to: string; name: string; confirmationCode: string; refundProcessed: boolean; totalAmount: number;
 }) {
-  const html = emailLayout(`
-    <h2>Booking Cancelled</h2>
-    <p>Dear ${esc(name)},</p>
-    <p>Your booking <strong style="color:#c9a84c;">${esc(confirmationCode)}</strong> has been cancelled.</p>
-    ${refundProcessed ? `
-    <div style="background:#0f2a1a;border:1px solid #2a6b3a;border-radius:6px;padding:16px;margin:20px 0;">
-      <p style="color:#4caf78;font-weight:600;margin:0 0 6px 0;">✓ Refund Initiated</p>
-      <p style="color:#aaa;font-size:13px;margin:0;">€${totalAmount.toFixed(2)} will be returned to your original payment method within 3–5 business days.</p>
-    </div>
-    ` : `
-    <p style="color:#aaa;font-size:14px;">No payment was charged for this booking, or a refund was not applicable under our policy.</p>
-    `}
-    <div style="text-align:center;margin-top:24px;display:flex;flex-direction:column;gap:10px;align-items:center;">
-      <a href="${SITE_URL}/book" class="cta-btn">Book a New Transfer →</a>
-      <a href="https://wa.me/34635383712" class="wa-btn">💬 Questions? Chat with Us</a>
-    </div>
-  `);
-  const id = await sendEmail({ from: FROM, to, subject: `Booking Cancelled — ${confirmationCode} | Elite BCN`, html });
+  const html = emailDocument(
+    bookingCancelledCard({ firstName: firstNameOf(name), confirmationCode, totalAmount, refund: refundProcessed ? "processed" : "none" }),
+    `Booking ${confirmationCode} has been cancelled.`,
+  );
+  const id = await sendEmail({ from: FROM, to, subject: `Booking cancelled — ${confirmationCode} | Elite BCN`, html });
   await logEmail({ to, subject: `Booking cancelled — ${confirmationCode}`, type: "CANCELLED", resendId: id });
 }
 
@@ -1097,19 +974,11 @@ export async function sendAdminCancellationAlert({
   totalAmount: number; refundProcessed: boolean;
   pickupDatetime: string; pickupAddress: string;
 }) {
-  const html = emailLayout(`
-    <h2>⚠ Booking Cancelled</h2>
-    <p>A customer has cancelled their booking.</p>
-    <table class="detail-table">
-      <tr><td>Booking</td><td>${esc(confirmationCode)}</td></tr>
-      <tr><td>Guest</td><td>${esc(guestName)} (${esc(guestEmail)})</td></tr>
-      <tr><td>Pickup</td><td>${esc(pickupAddress)}</td></tr>
-      <tr><td>Pickup Date</td><td>${esc(pickupDatetime)}</td></tr>
-      <tr><td>Amount</td><td>€${totalAmount.toFixed(2)}</td></tr>
-      <tr><td>Refund</td><td>${refundProcessed ? "✓ Processed automatically" : "⚠ Manual action may be needed"}</td></tr>
-    </table>
-  `);
-  await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject: `🚫 Booking Cancelled — ${confirmationCode}`, html });
+  const html = emailDocument(
+    adminCancellationCard({ confirmationCode, guestName, guestEmail, totalAmount, refundProcessed, pickupDatetime, pickupAddress }),
+    `${guestName} cancelled ${confirmationCode} (${pickupDatetime}) — refund ${refundProcessed ? "processed" : "not issued"}.`,
+  );
+  await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject: `Cancelled — ${confirmationCode} · ${pickupDatetime}`, html });
 }
 
 // ─── Pickup changed emails ────────────────────────────────────
@@ -1119,20 +988,11 @@ export async function sendPickupChangedEmail({
   to: string; name: string; confirmationCode: string;
   newPickupAddress: string; pickupDatetime: string;
 }) {
-  const html = emailLayout(`
-    <h2>Pickup Address Updated</h2>
-    <p>Dear ${esc(name)},</p>
-    <p>The pickup address for your booking <strong style="color:#c9a84c;">${esc(confirmationCode)}</strong> has been updated.</p>
-    <table class="detail-table" style="margin-top:20px;">
-      <tr><td>New Pickup</td><td>${esc(newPickupAddress)}</td></tr>
-      <tr><td>Date & Time</td><td>${esc(pickupDatetime)}</td></tr>
-    </table>
-    <p style="color:#aaa;font-size:13px;">Your driver will be directed to the new address. If you need further changes, please contact us at least 8 hours before pickup.</p>
-    <div style="text-align:center;margin-top:24px;">
-      <a href="https://wa.me/34635383712" class="wa-btn">💬 Contact Us on WhatsApp</a>
-    </div>
-  `);
-  const id = await sendEmail({ from: FROM, to, subject: `Pickup Updated — ${confirmationCode} | Elite BCN`, html });
+  const html = emailDocument(
+    pickupChangedCard({ firstName: firstNameOf(name), confirmationCode, newPickupAddress, pickupDatetime }),
+    `Pick-up for ${confirmationCode} is now ${newPickupAddress}.`,
+  );
+  const id = await sendEmail({ from: FROM, to, subject: `Pick-up updated — ${confirmationCode} | Elite BCN`, html });
   await logEmail({ to, subject: `Pickup changed — ${confirmationCode}`, type: "PICKUP_CHANGED", resendId: id });
 }
 
@@ -1142,19 +1002,11 @@ export async function sendAdminPickupChangedAlert({
   confirmationCode: string; guestName: string; guestEmail: string;
   oldPickupAddress: string; newPickupAddress: string; pickupDatetime: string;
 }) {
-  const html = emailLayout(`
-    <h2>📍 Pickup Address Changed</h2>
-    <p>A customer has updated their pickup address.</p>
-    <table class="detail-table">
-      <tr><td>Booking</td><td>${esc(confirmationCode)}</td></tr>
-      <tr><td>Guest</td><td>${esc(guestName)} (${esc(guestEmail)})</td></tr>
-      <tr><td>Old Pickup</td><td><span style="color:#e06c6c;">${esc(oldPickupAddress)}</span></td></tr>
-      <tr><td>New Pickup</td><td><span style="color:#4caf78;">${esc(newPickupAddress)}</span></td></tr>
-      <tr><td>Date & Time</td><td>${esc(pickupDatetime)}</td></tr>
-    </table>
-    <p style="color:#aaa;font-size:13px;">Please update the assigned driver if one has been notified.</p>
-  `);
-  await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject: `📍 Pickup Changed — ${confirmationCode}`, html });
+  const html = emailDocument(
+    adminPickupChangedCard({ confirmationCode, guestName, guestEmail, oldPickupAddress, newPickupAddress, pickupDatetime }),
+    `${guestName} moved pick-up for ${confirmationCode} to ${newPickupAddress}.`,
+  );
+  await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject: `Pick-up changed — ${confirmationCode} · ${pickupDatetime}`, html });
 }
 
 // ─── Newsletter Campaign ─────────────────────────────────────

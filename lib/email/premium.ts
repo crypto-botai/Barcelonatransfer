@@ -273,7 +273,7 @@ export function newLeadCard(o: {
 
   return card(`
     <tr><td style="padding:38px 44px 0 44px;">
-      ${eyebrow("Admin &middot; Unpaid Enquiry")}
+      ${eyebrow("Admin · Unpaid Enquiry")}
       ${headline("Someone is booking right now.")}
       ${paragraph("They have entered their details but have not paid. Calling within the next few minutes is the best chance of winning this booking.")}
     </td></tr>
@@ -558,6 +558,225 @@ export function rideCompleteCard(o: {
         Reference <span style="color:${GOLD};letter-spacing:2px;">${esc(o.confirmationCode)}</span><br>
         Something not right? Reply to this email and we will make it right.
       </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+// ─── 7. Job sheet (driver) ───────────────────────────────────
+
+/**
+ * The booking, to the chauffeur who will drive it.
+ *
+ * This was the last email still on the old dark gradient layout after the
+ * rest moved here, so a driver's inbox showed a different company from the
+ * customer's. Same card, same bands; the only things a driver needs at a
+ * glance — client, phone, where, when, what to bring — are the rows.
+ */
+export function driverJobCard(o: {
+  driverName: string; confirmationCode: string;
+  guestName: string; guestPhone: string;
+  pickupAddress: string; dropoffAddress?: string | null;
+  pickupDatetime: string; vehicle: string;
+  passengers: number; luggage: number;
+  flightNumber?: string | null;
+  extras?: string | null; tipAmount?: number; notes?: string | null;
+  driverAmount?: number | null;
+}): string {
+  const phoneDigits = o.guestPhone.replace(/\D/g, "");
+  const waGuest = `https://wa.me/${phoneDigits}?text=${encodeURIComponent(`Hello, I am your Elite BCN chauffeur for booking ${o.confirmationCode}.`)}`;
+  const waDispatch = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Dispatch — booking ${o.confirmationCode}`)}`;
+  const firstName = o.driverName.split(" ")[0] || o.driverName;
+
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Chauffeur · New Job")}
+      ${headline(`A booking is yours, ${esc(firstName)}.`)}
+      ${paragraph("Please read the details below and confirm you can take it. The client has already paid.")}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;">${referencePanel(o.confirmationCode, "Quote this reference with dispatch")}</td></tr>
+    ${sectionSpacer(12)}
+
+    <tr><td style="padding:0 44px;">
+      ${detailTable(
+        row("Client", `<strong style="font-weight:bold;">${esc(o.guestName)}</strong>`) +
+        row("Phone", `<a href="tel:${esc(o.guestPhone)}" style="color:${GOLD};text-decoration:none;">${esc(o.guestPhone)}</a>`) +
+        row("Pick-up", esc(o.pickupAddress)) +
+        row("Drop-off", esc(o.dropoffAddress || "—")) +
+        row("When", `<strong style="font-weight:bold;">${esc(o.pickupDatetime)}</strong>`) +
+        row("Vehicle", esc(o.vehicle)) +
+        row("Guests", `${o.passengers} pax &nbsp;&middot;&nbsp; ${o.luggage} bags`) +
+        (o.flightNumber ? row("Flight", `<span style="letter-spacing:1.5px;">${esc(o.flightNumber)}</span>`) : "") +
+        (o.extras ? row("Bring", `<strong style="font-weight:bold;color:${GOLD};">${esc(o.extras)}</strong>`) : "") +
+        (o.tipAmount && o.tipAmount > 0 ? row("Tip", `<span style="color:${GOLD};">&euro;${o.tipAmount.toFixed(2)}</span> <span style="color:${LABEL};">already paid by the client</span>`) : "") +
+        row("Notes", esc(o.notes || "—"), true),
+      )}
+    </td></tr>
+
+    ${o.driverAmount != null ? `
+      ${sectionSpacer(28)}
+      <tr><td style="padding:0 44px;">${amountBar("Your earnings", o.driverAmount)}</td></tr>
+    ` : ""}
+    ${sectionSpacer(32)}
+
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(waGuest, "Message The Client")}
+      <div style="padding-top:16px;">${secondaryLink(waDispatch, "Contact dispatch")}</div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+// ─── 8. Payment failed (customer) ────────────────────────────
+
+export function paymentFailedCard(o: {
+  firstName: string; confirmationCode: string; retryUrl: string;
+}): string {
+  const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Payment issue for booking ${o.confirmationCode}`)}`;
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Payment Unsuccessful")}
+      ${headline(`Your payment did not go through, ${esc(o.firstName)}.`)}
+      ${paragraph("Your booking is still saved and nothing has been charged. Retry below to confirm your transfer.")}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;">${referencePanel(o.confirmationCode, "No charge has been made to your account")}</td></tr>
+    ${sectionSpacer(32)}
+
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(o.retryUrl, "Retry Payment")}
+      <div style="padding-top:16px;">${secondaryLink(wa, "Having trouble? Message our team")}</div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+// ─── 9. Booking cancelled (customer) ─────────────────────────
+
+export function bookingCancelledCard(o: {
+  firstName: string; confirmationCode: string;
+  pickupDatetime?: string | null; totalAmount: number;
+  /** processed: refund sent · pending: may follow · none: nothing was charged or nothing is due */
+  refund: "processed" | "pending" | "none";
+}): string {
+  const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Question about cancelled booking ${o.confirmationCode}`)}`;
+  const refundLine =
+    o.refund === "processed" ? `&euro;${o.totalAmount.toFixed(2)} is on its way back to your original payment method and should arrive within 3&ndash;5 business days.` :
+    o.refund === "pending"   ? "If a refund applies under our policy, it will reach your original payment method within 5&ndash;7 business days." :
+                               "No payment was charged for this booking, or a refund was not applicable under our policy.";
+
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Booking Cancelled")}
+      ${headline(`Your booking has been cancelled, ${esc(o.firstName)}.`)}
+      ${paragraph(refundLine)}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;">
+      ${detailTable(
+        row("Reference", `<span style="letter-spacing:2px;color:${GOLD};">${esc(o.confirmationCode)}</span>`) +
+        (o.pickupDatetime ? row("Was booked for", esc(o.pickupDatetime)) : "") +
+        row("Amount", `&euro;${o.totalAmount.toFixed(2)}`, true),
+      )}
+    </td></tr>
+    ${sectionSpacer(32)}
+
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(`${SITE_URL}/book`, "Book a New Transfer")}
+      <div style="padding-top:16px;">${secondaryLink(wa, "Questions? Message our team")}</div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+// ─── 10. Booking cancelled (admin) ───────────────────────────
+
+export function adminCancellationCard(o: {
+  confirmationCode: string; guestName: string; guestEmail: string;
+  totalAmount: number; refundProcessed: boolean;
+  pickupDatetime: string; pickupAddress: string;
+}): string {
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Admin · Cancellation")}
+      ${headline("A customer has cancelled.")}
+      ${paragraph(o.refundProcessed
+        ? "The refund went through automatically. Nothing to do unless a chauffeur was already assigned."
+        : "No refund was issued automatically &mdash; check whether one is owed under the policy.")}
+    </td></tr>
+
+    ${sectionSpacer(28)}
+    <tr><td style="padding:0 44px;">
+      ${detailTable(
+        row("Booking", `<span style="letter-spacing:2px;color:${GOLD};">${esc(o.confirmationCode)}</span>`) +
+        row("Guest", `${esc(o.guestName)}<br><a href="mailto:${esc(o.guestEmail)}" style="color:${GOLD};text-decoration:none;">${esc(o.guestEmail)}</a>`) +
+        row("Pick-up", esc(o.pickupAddress)) +
+        row("Was booked for", esc(o.pickupDatetime)) +
+        row("Amount", `&euro;${o.totalAmount.toFixed(2)}`) +
+        row("Refund", o.refundProcessed ? "Processed automatically" : `<strong style="font-weight:bold;color:${GOLD};">Manual action may be needed</strong>`, true),
+      )}
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+// ─── 11. Pick-up changed (customer) ──────────────────────────
+
+export function pickupChangedCard(o: {
+  firstName: string; confirmationCode: string;
+  newPickupAddress: string; pickupDatetime: string;
+}): string {
+  const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Booking ${o.confirmationCode} — pick-up address`)}`;
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Pick-up Updated")}
+      ${headline(`Your pick-up address has changed, ${esc(o.firstName)}.`)}
+      ${paragraph("Your chauffeur will be directed to the new address. If you need anything else changed, please tell us at least 8 hours before pick-up.")}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;">
+      ${detailTable(
+        row("Reference", `<span style="letter-spacing:2px;color:${GOLD};">${esc(o.confirmationCode)}</span>`) +
+        row("New pick-up", `<strong style="font-weight:bold;">${esc(o.newPickupAddress)}</strong>`) +
+        row("Date", esc(o.pickupDatetime), true),
+      )}
+    </td></tr>
+    ${sectionSpacer(32)}
+
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(wa, "Message Our Team")}
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+// ─── 12. Pick-up changed (admin) ─────────────────────────────
+
+export function adminPickupChangedCard(o: {
+  confirmationCode: string; guestName: string; guestEmail: string;
+  oldPickupAddress: string; newPickupAddress: string; pickupDatetime: string;
+}): string {
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Admin · Pick-up Changed")}
+      ${headline("A customer moved their pick-up.")}
+      ${paragraph("If a chauffeur has already been sent the job, tell them the new address.")}
+    </td></tr>
+
+    ${sectionSpacer(28)}
+    <tr><td style="padding:0 44px;">
+      ${detailTable(
+        row("Booking", `<span style="letter-spacing:2px;color:${GOLD};">${esc(o.confirmationCode)}</span>`) +
+        row("Guest", `${esc(o.guestName)}<br><a href="mailto:${esc(o.guestEmail)}" style="color:${GOLD};text-decoration:none;">${esc(o.guestEmail)}</a>`) +
+        row("Was", `<span style="color:${LABEL};text-decoration:line-through;">${esc(o.oldPickupAddress)}</span>`) +
+        row("Now", `<strong style="font-weight:bold;">${esc(o.newPickupAddress)}</strong>`) +
+        row("Date", esc(o.pickupDatetime), true),
+      )}
     </td></tr>
     ${sectionSpacer(42)}
   `);
