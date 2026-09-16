@@ -120,9 +120,12 @@ describe("the guest book", () => {
     expect(jsx).not.toMatch(/reviews\.length\}/);
   });
 
-  it("quotes only reviews that have words, and lists everyone", () => {
+  it("quotes only reviews that have words, with no guest list beside them", () => {
     expect(src).toMatch(/reviews\.filter\(\(r\) => r\.text/);
-    expect(src).toContain("reviews.map((r)");
+    // The desktop list of every reviewer made the section far taller than
+    // its content; the owner asked for it to go.
+    expect(src).not.toContain('role="tablist"');
+    expect(src).not.toMatch(/lg:grid-cols-\[minmax/);
   });
 
   it("holds each quote, then moves on, unless the reader is on it", () => {

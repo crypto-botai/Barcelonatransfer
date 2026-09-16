@@ -14,9 +14,10 @@ const SERVICE_HREFS = [
 ];
 
 /**
- * One photograph per service, supplied by the owner. The six full frames are
- * 1200×640; the other six were cut from a 3×2 sheet and are 548 wide, which
- * still covers a 4-up grid cell at 1.4× on the widest layout.
+ * One photograph per service, supplied by the owner, shown above the text
+ * rather than under it. The six full frames are 1200×640; the other six were
+ * cut from a 3×2 sheet and are 548 wide, which still covers a 4-up grid cell
+ * at 1.4× on the widest layout.
  */
 const SERVICE_IMAGES: Record<(typeof SERVICE_KEYS)[number], string> = {
   airport: "/services/airport.webp",
@@ -57,9 +58,9 @@ function ServiceCard({ index }: { index: number }) {
     <motion.div {...reveal} className="h-full">
       <Link
         href={SERVICE_HREFS[index]}
-        className="group relative block h-full overflow-hidden rounded-2xl border border-white/[0.08] bg-dark-900 transition-[border-color,box-shadow] duration-500 hover:border-gold-500/50 hover:shadow-[0_24px_60px_-24px_rgba(212,175,55,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
+        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-dark-900 transition-[border-color,box-shadow] duration-500 hover:border-gold-500/50 hover:shadow-[0_24px_60px_-24px_rgba(212,175,55,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
       >
-        <div className="relative aspect-[4/3]">
+        <div className="relative aspect-[16/10] overflow-hidden">
           <Image
             src={SERVICE_IMAGES[key]}
             alt={title}
@@ -67,26 +68,24 @@ function ServiceCard({ index }: { index: number }) {
             sizes={SIZES}
             className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
           />
-          {/* Legibility scrim: clear at the top so the photo reads as
-              supplied, deepening to the section background under the text. */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/55 to-transparent" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-dark-950/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
+          {/* A hairline of the card background at the foot of the photo so it
+              sits into the card rather than ending on a hard edge. */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-dark-900 to-transparent" />
           <div className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-xl border border-gold-500/30 bg-dark-950/60 backdrop-blur-sm">
             <Icon size={16} className="text-gold-400" />
           </div>
+        </div>
 
-          <div className="absolute inset-x-0 bottom-0 p-5">
-            <h3 className="font-display text-xl leading-tight text-white transition-colors duration-300 group-hover:text-gold-300">
-              {title}
-            </h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-white/70">
-              {t(`list.${key}.desc`)}
-            </p>
-            <div className="mt-3 flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-gold-400 transition-colors group-hover:text-gold-300">
-              <span>{t("learnMore")}</span>
-              <ArrowRight size={12} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </div>
+        <div className="flex flex-1 flex-col p-5">
+          <h3 className="font-display text-xl leading-tight text-white transition-colors duration-300 group-hover:text-gold-300">
+            {title}
+          </h3>
+          <p className="mt-1.5 flex-1 text-sm leading-relaxed text-dark-400">
+            {t(`list.${key}.desc`)}
+          </p>
+          <div className="mt-4 flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-gold-400 transition-colors group-hover:text-gold-300">
+            <span>{t("learnMore")}</span>
+            <ArrowRight size={12} className="transition-transform duration-300 group-hover:translate-x-1" />
           </div>
         </div>
       </Link>

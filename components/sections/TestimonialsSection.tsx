@@ -12,9 +12,11 @@ import { REVIEWS, GOOGLE_PROFILE, initials, type Review } from "@/data/reviews";
  * Real Google reviews, one at a time, set large as a pull-quote with the
  * reviewer's initials in a gold monogram ring and the verified seal beside
  * their name. A thin gold line fills while each quote holds, then the next
- * rises in. The reader can move through them with the arrows, the keyboard,
- * or the guest list beside the quote, and the remaining reviews drift across
- * beneath as a strip of notes.
+ * rises in. The reader can move through them with the arrows or the
+ * keyboard, and the remaining reviews drift across beneath as a strip of
+ * notes. A guest list of every reviewer once stood beside the quote on
+ * desktop; sixteen rows made the section far taller than its content and the
+ * owner asked for it to go.
  *
  * Every word is the reviewer's own, in the language they wrote it, read from
  * data/reviews.ts or the live list the admin panel supplies. Nothing here is
@@ -59,7 +61,7 @@ export default function TestimonialsSection({
   profile?: { name: string; cid: string; rating: number; count: number };
 } = {}) {
   const reduce = useReducedMotion();
-  // Only reviews with words can be quoted; a stars-only review still appears in the guest list.
+  // Only reviews with words can be quoted; a stars-only review is not shown.
   const quoted = reviews.filter((r) => r.text && r.text.trim().length > 0);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -125,7 +127,7 @@ export default function TestimonialsSection({
           </a>
         </div>
 
-        <div ref={bookRef} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-10 lg:gap-16 items-start">
+        <div ref={bookRef} className="max-w-4xl">
           {/* The quote */}
           <div>
             <div
@@ -192,32 +194,6 @@ export default function TestimonialsSection({
             </div>
           </div>
 
-          {/* The guest list: everyone, including a reviewer who left stars and no words. */}
-          <div className="hidden lg:flex flex-col border-t border-[#c9a84c]/30" role="tablist" aria-label="Reviewers">
-            {reviews.map((r) => {
-              const qi = quoted.indexOf(r);
-              const selected = qi === index;
-              return (
-                <button
-                  key={`${r.author}-${r.when}`}
-                  type="button"
-                  role="tab"
-                  aria-selected={selected}
-                  disabled={qi < 0}
-                  onClick={() => go(qi)}
-                  className="relative grid grid-cols-[34px_minmax(0,1fr)_auto] gap-3.5 items-center py-3 border-b border-white/[0.08] text-left disabled:cursor-default"
-                >
-                  <span className={`absolute -left-4 top-0 bottom-0 w-px bg-gold-500 origin-top transition-transform duration-500 ${selected ? "scale-y-100" : "scale-y-0"}`} aria-hidden="true" />
-                  <span className={`grid place-items-center w-[34px] h-[34px] rounded-full border font-display text-[12px] transition-colors ${selected ? "border-[#c9a84c]/30 text-gold-300" : "border-white/[0.08] text-dark-500"}`} aria-hidden="true">{initials(r.author)}</span>
-                  <span className="min-w-0">
-                    <span className={`block text-[13px] truncate ${selected ? "text-white" : "text-dark-300"}`}>{r.author}</span>
-                    <span className="block text-[11px] text-dark-500">{r.when}</span>
-                  </span>
-                  <StarRating count={r.rating} size={11} className="text-gold-500" />
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         {/* The strip of notes: the quoted reviews drifting past, paused under the pointer. */}
