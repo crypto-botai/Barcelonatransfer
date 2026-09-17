@@ -69,6 +69,29 @@ export const authOptions: NextAuthOptions = {
           token.mustChangePassword = dbUser.mustChangePassword;
         }
       }
+      // The role can change under a live session: the office converts a
+      // customer account into a fleet company, or a customer deletes their
+      // account and registers again as something else. The token used to keep
+      // the role it was stamped with at sign-in until the person signed out,
+      // so the account looked unchanged. Re-read it from the database at most
+      // once a minute; the middleware and every panel read the token.
+      const checkedAt = (token.roleCheckedAt as number | undefined) ?? 0;
+      if (token.id && Date.now() - checkedAt > 60_000) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { role: true, mustChangePassword: true },
+        });
+        if (dbUser) {
+          token.role               = dbUser.role;
+          token.mustChangePassword = dbUser.mustChangePassword;
+        } else {
+          // The account is gone (deleted from its settings): make the token
+          // useless so the next request is treated as signed out.
+          token.role = undefined;
+          token.id = undefined;
+        }
+        token.roleCheckedAt = Date.now();
+      }
       // Re-fetch when session is updated (e.g. after password change)
       if (trigger === "update" && token.id) {
         const dbUser = await prisma.user.findUnique({

@@ -12,7 +12,10 @@ export async function middleware(req: NextRequest) {
     return res;
   }
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const rawToken = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  // A token whose account no longer exists (deleted from its own settings)
+  // has its id cleared by the jwt callback; treat it as signed out.
+  const token = rawToken && rawToken.id ? rawToken : null;
   const { pathname } = req.nextUrl;
 
   // ── Force password change for anyone issued a temporary one ──────
