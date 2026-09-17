@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Loader2, Mail, MessageCircle, PenLine, RefreshCw, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatCurrency } from "@/lib/utils";
+import { vehicleClassLabel } from "@/types";
 
 /**
  * Everyone who nearly booked, and the office's two ways of writing to them.
@@ -95,11 +96,21 @@ export default function AbandonedPage() {
               return (
                 <Row
                   key={b.id}
-                  title={`${b.guestName ?? "No name"} · ${b.guestEmail ?? ""}${b.guestPhone ? ` · ${b.guestPhone}` : ""}`}
-                  line={`${b.pickupAddress} → ${b.dropoffAddress} · ${when(b.pickupDatetime)} · ${b.passengers} pax · ${formatCurrency(b.totalAmount)}`}
-                  meta={`Ref ${b.confirmationCode} · created ${when(b.createdAt)}`}
-                  sent={b.recoveryEmailedAt}
+                  name={b.guestName ?? "No name"}
+                  email={b.guestEmail}
                   phone={b.guestPhone}
+                  fields={[
+                    ["Pick-up", b.pickupAddress],
+                    ["Drop-off", b.dropoffAddress],
+                    ["Date", when(b.pickupDatetime)],
+                    ["Guests", `${b.passengers} pax`],
+                    ["Vehicle", vehicleClassLabel(b.vehicleClass)],
+                    ["Price", formatCurrency(b.totalAmount)],
+                    ["Reference", b.confirmationCode],
+                    ["Created", when(b.createdAt)],
+                  ]}
+                  sent={b.recoveryEmailedAt}
+                  consent
                   busy={busy === t.to + b.id}
                   onResend={b.guestEmail ? () => resend(t) : undefined}
                   onNote={b.guestEmail ? () => setNote(t) : undefined}
@@ -114,15 +125,31 @@ export default function AbandonedPage() {
             {leads.map((l) => {
               const fd = l.formData ?? {};
               const t: Target = { to: l.email ?? "", name: l.name ?? "there", sessionId: l.sessionId, label: l.sessionId };
-              const q = (fd.quote as { totalAmount?: number } | undefined)?.totalAmount;
+              const q = (fd.quote as { totalAmount?: number } | undefined)?.totalAmount ?? fd.totalAmount;
+              const str = (k: string) => { const v = fd[k]; return v == null || v === "" ? null : String(v); };
+              const consent = fd.contactConsent === true;
               return (
                 <Row
                   key={l.sessionId}
-                  title={`${l.name ?? "No name"} · ${l.email ?? ""}${l.phone ? ` · ${l.phone}` : ""}`}
-                  line={fd.pickupAddress ? `${fd.pickupAddress}${fd.dropoffAddress ? ` → ${fd.dropoffAddress}` : ""}${fd.date ? ` · ${fd.date}${fd.time ? ` ${fd.time}` : ""}` : ""}${q ? ` · ${formatCurrency(Number(q))}` : ""}` : "No route entered yet"}
-                  meta={`Step ${l.step} · last seen ${when(l.lastActivity)} · ${fd.contactConsent === true ? "agreed to be contacted" : "did not tick the contact box: no automatic email"}`}
-                  sent={l.abandonedBooking?.emailSentAt ?? null}
+                  name={l.name ?? "No name"}
+                  email={l.email}
                   phone={l.phone}
+                  fields={[
+                    ["Type", str("bookingType") === "HOURLY" ? `By the hour${str("durationHours") ? ` · ${str("durationHours")} h` : ""}` : str("returnDate") ? "Return" : "One way"],
+                    ["Pick-up", str("pickupAddress") ?? "Not entered"],
+                    ["Drop-off", str("dropoffAddress")],
+                    ["Date", str("date") ? `${str("date")}${str("time") ? ` at ${str("time")}` : ""}` : null],
+                    ["Return", str("returnDate") ? `${str("returnDate")}${str("returnTime") ? ` at ${str("returnTime")}` : ""}` : null],
+                    ["Guests", str("passengers") ? `${str("passengers")} pax${str("luggage") ? `, ${str("luggage")} bags` : ""}` : null],
+                    ["Vehicle", str("fleetVehicle") ? vehicleClassLabel(str("fleetVehicle")!) : str("vehicleClass") ? vehicleClassLabel(str("vehicleClass")!) : null],
+                    ["Price quoted", q ? formatCurrency(Number(q)) : null],
+                    ["Flight", str("flightNumber")],
+                    ["Notes", str("specialRequests")],
+                    ["Reached", `step ${l.step} of 4`],
+                    ["Last seen", when(l.lastActivity)],
+                  ]}
+                  sent={l.abandonedBooking?.emailSentAt ?? null}
+                  consent={consent}
                   busy={busy === t.to + l.sessionId}
                   onResend={l.email ? () => resend(t) : undefined}
                   onNote={l.email ? () => setNote(t) : undefined}
@@ -163,21 +190,37 @@ function Empty({ text }: { text: string }) {
   return <div className="glass-card rounded-2xl p-10 text-center text-dark-400 text-sm">{text}</div>;
 }
 
-function Row({ title, line, meta, sent, phone, busy, onResend, onNote }: {
-  title: string; line: string; meta: string; sent: string | null; phone?: string | null; busy: boolean;
+function Row({ name, email, phone, fields, sent, consent, busy, onResend, onNote }: {
+  name: string; email: string | null; phone?: string | null;
+  fields: [string, string | null | undefined][];
+  sent: string | null; consent: boolean; busy: boolean;
   onResend?: () => void; onNote?: () => void;
 }) {
   return (
-    <div className="glass-card rounded-xl p-4 flex flex-wrap items-start justify-between gap-3">
-      <div className="min-w-0 flex-1">
-        <p className="text-white text-sm">{title}</p>
-        <p className="text-dark-300 text-xs mt-1">{line}</p>
-        <p className="text-dark-500 text-[11px] mt-1">{meta}</p>
-        <p className={`text-[11px] mt-1.5 inline-flex items-center gap-1 ${sent ? "text-green-400" : "text-amber-400"}`}>
-          <Mail size={11} /> {sent ? `Recovery email sent ${when(sent)}` : "Recovery email not sent yet (goes 15 min after they go quiet)"}
+    <div className="glass-card rounded-2xl p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-white font-medium text-base">{name}</p>
+          <p className="text-sm mt-0.5 flex flex-wrap gap-x-3 gap-y-1">
+            {email && <a href={`mailto:${email}`} className="text-gold-400 hover:underline break-all">{email}</a>}
+            {phone && <a href={`tel:${phone}`} className="text-dark-200 hover:text-white">{phone}</a>}
+          </p>
+        </div>
+        <p className={`text-[11px] inline-flex items-center gap-1 rounded-lg border px-2 py-1 ${sent ? "border-green-500/30 text-green-400 bg-green-500/10" : consent ? "border-amber-500/30 text-amber-300 bg-amber-500/10" : "border-white/10 text-dark-400"}`}>
+          <Mail size={11} /> {sent ? `Recovery email sent ${when(sent)}` : consent ? "Recovery email goes 15 min after they go quiet" : "No automatic email: contact box not ticked"}
         </p>
       </div>
-      <div className="flex flex-wrap gap-2">
+
+      <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm border-t border-white/[0.06] pt-4">
+        {fields.filter(([, v]) => v != null && v !== "").map(([k, v]) => (
+          <div key={k} className="grid grid-cols-[110px_minmax(0,1fr)] gap-2">
+            <dt className="text-[10px] uppercase tracking-[0.15em] text-dark-500 pt-0.5">{k}</dt>
+            <dd className="text-dark-100 break-words">{v}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div className="mt-4 flex flex-wrap gap-2">
         {phone && (
           <a href={`https://wa.me/${phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-xs hover:bg-green-500/15">
             <MessageCircle size={12} /> WhatsApp
