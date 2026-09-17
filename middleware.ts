@@ -40,8 +40,11 @@ export async function middleware(req: NextRequest) {
   ) {
     const res = NextResponse.next();
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
-    // Still enforce auth below — don't return here
-    if (pathname.startsWith("/admin") || pathname.startsWith("/driver") || pathname.startsWith("/partner") || pathname.startsWith("/dashboard")) {
+    // Still enforce auth below — don't return here. The two sign-up pages
+    // are the exception: a driver or a company registers before they have
+    // any login to be sent to.
+    const publicSignUp = pathname === "/driver/register" || pathname === "/partner/register";
+    if (!publicSignUp && (pathname.startsWith("/admin") || pathname.startsWith("/driver") || pathname.startsWith("/partner") || pathname.startsWith("/dashboard"))) {
       if (!token) {
         const loginUrl = req.nextUrl.clone();
         loginUrl.pathname = "/auth/login";

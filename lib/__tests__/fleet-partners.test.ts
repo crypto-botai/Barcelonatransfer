@@ -182,3 +182,11 @@ describe("choosing the kind of account", () => {
     expect(rd("app/api/partner/jobs/route.ts")).toContain("requirePartner({ allowInactive: true })");
   });
 });
+
+describe("sign-up pages are public", () => {
+  it("driver and company registration are not sent to the login page", () => {
+    const mw = rd("middleware.ts");
+    expect(mw).toContain('pathname === "/driver/register" || pathname === "/partner/register"');
+    expect(mw).toMatch(/if \(!publicSignUp && \(pathname\.startsWith\("\/admin"\)/);
+  });
+});
