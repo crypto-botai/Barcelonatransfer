@@ -120,13 +120,13 @@ describe("fleet partners", () => {
     const shell = rd("components/partner/PartnerShell.tsx");
     for (const href of ["/partner", "/partner/jobs", "/partner/drivers", "/partner/payments", "/partner/account"]) expect(shell).toContain(`"${href}"`);
     expect(shell).not.toContain('"/admin');
-    for (const p of ["app/partner/page.tsx", "app/partner/jobs/page.tsx", "app/partner/drivers/page.tsx", "app/partner/payments/page.tsx", "app/partner/account/page.tsx"]) {
+    for (const p of ["app/partner/(panel)/page.tsx", "app/partner/(panel)/jobs/page.tsx", "app/partner/(panel)/drivers/page.tsx", "app/partner/(panel)/payments/page.tsx", "app/partner/(panel)/account/page.tsx"]) {
       expect(rd(p)).not.toContain("/admin");
     }
   });
 
   it("uses no em-dash in the partner panel copy", () => {
-    for (const p of ["components/partner/PartnerShell.tsx", "components/partner/ui.tsx", "app/partner/page.tsx", "app/partner/jobs/page.tsx", "app/partner/drivers/page.tsx", "app/partner/payments/page.tsx", "app/partner/account/page.tsx"]) {
+    for (const p of ["components/partner/PartnerShell.tsx", "components/partner/ui.tsx", "app/partner/(panel)/page.tsx", "app/partner/(panel)/jobs/page.tsx", "app/partner/(panel)/drivers/page.tsx", "app/partner/(panel)/payments/page.tsx", "app/partner/(panel)/account/page.tsx"]) {
       expect(rd(p), p).not.toContain("—");
     }
   });
@@ -137,7 +137,7 @@ describe("deleting your own account", () => {
   it("is offered on the customer, driver and company portals", () => {
     expect(rd("app/dashboard/profile/page.tsx")).toContain('<DeleteAccountButton kind="customer" />');
     expect(rd("components/driver/DriverDashboard.tsx")).toContain('<DeleteAccountButton kind="driver" />');
-    expect(rd("app/partner/account/page.tsx")).toContain('<DeleteAccountButton kind="company" />');
+    expect(rd("app/partner/(panel)/account/page.tsx")).toContain('<DeleteAccountButton kind="company" />');
   });
   it("refuses admins and keeps bookings as records", () => {
     expect(api).toMatch(/u\.role === "ADMIN"\) return NextResponse\.json/);
@@ -151,5 +151,34 @@ describe("deleting your own account", () => {
   });
   it("needs the word DELETE typed", () => {
     expect(rd("components/account/DeleteAccountButton.tsx")).toContain('typed !== "DELETE"');
+  });
+});
+
+describe("choosing the kind of account", () => {
+  it("offers customer, driver and fleet company on sign-up and login", () => {
+    const chooser = rd("components/auth/AccountTypeChooser.tsx");
+    for (const h of ['"/auth/register"', '"/driver/register"', '"/partner/register"']) expect(chooser).toContain(h);
+    expect(rd("app/auth/register/page.tsx")).toContain('<AccountTypeChooser current="customer" />');
+    expect(rd("app/driver/register/page.tsx")).toContain('current="driver"');
+    expect(rd("app/partner/register/page.tsx")).toContain('current="partner"');
+    const login = rd("app/auth/login/page.tsx");
+    for (const h of ['href="/auth/register"', 'href="/driver/register"', 'href="/partner/register"']) expect(login).toContain(h);
+  });
+  it("a self-registered company starts inactive and the office is told", () => {
+    const api = rd("app/api/auth/partner-register/route.ts");
+    expect(api).toContain("active: false");
+    expect(api).toContain("sendAdminAlertEmail(");
+    expect(api).toContain('role: "PARTNER"');
+  });
+  it("the company sign-up is reachable without a session and outside the panel layout", () => {
+    expect(rd("middleware.ts")).toContain('!pathname.startsWith("/partner/register")');
+    expect(require("node:fs").existsSync(join(ROOT, "app/partner/(panel)/layout.tsx"))).toBe(true);
+    expect(require("node:fs").existsSync(join(ROOT, "app/partner/register/page.tsx"))).toBe(true);
+  });
+  it("an inactive company can look but not act", () => {
+    const lib = rd("lib/partner.ts");
+    expect(lib).toContain("if (!partner.active && !opts.allowInactive) return null;");
+    expect(rd("app/api/partner/jobs/[id]/dispatch/route.ts")).toContain("await requirePartner();");
+    expect(rd("app/api/partner/jobs/route.ts")).toContain("requirePartner({ allowInactive: true })");
   });
 });

@@ -60,7 +60,7 @@ export default function PartnersPage() {
                   <p className="text-dark-400 text-xs mt-0.5 truncate">{p.contactName} · {p.phone}</p>
                 </div>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full border flex-shrink-0 ${p.active ? "border-green-500/30 text-green-400 bg-green-500/10" : "border-white/10 text-dark-400"}`}>
-                  {p.active ? "Active" : "Suspended"}
+                  {p.active ? "Active" : "Awaiting activation"}
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2 mt-4 text-center">

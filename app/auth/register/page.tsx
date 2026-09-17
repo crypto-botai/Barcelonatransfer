@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Mail, Lock, User, Phone, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import AccountTypeChooser from "@/components/auth/AccountTypeChooser";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -50,7 +51,9 @@ export default function RegisterPage() {
         </Link>
 
         <h1 className="font-display text-2xl text-white mb-2">Create Account</h1>
-        <p className="text-dark-400 text-sm mb-7">Manage bookings, view history, and enjoy faster checkout.</p>
+        <p className="text-dark-400 text-sm mb-4">Choose the kind of account first.</p>
+        <div className="mb-6"><AccountTypeChooser current="customer" /></div>
+        <p className="text-dark-400 text-sm mb-5">A customer account: manage bookings, view history, and enjoy faster checkout.</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {[

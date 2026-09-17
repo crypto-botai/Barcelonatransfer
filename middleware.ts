@@ -70,7 +70,7 @@ export async function middleware(req: NextRequest) {
   // ── PARTNER routes ───────────────────────────────────────────
   // A fleet company's own panel. Nothing here routes into /admin, and an
   // admin does not land here either: the two are different jobs.
-  if (pathname.startsWith("/partner")) {
+  if (pathname.startsWith("/partner") && !pathname.startsWith("/partner/register")) {
     // Someone signed in as a customer or a driver who opens the company
     // panel is told why it will not open, rather than being dropped on a
     // dashboard that is not the one they wanted.

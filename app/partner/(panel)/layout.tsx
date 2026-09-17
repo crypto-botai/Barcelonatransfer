@@ -27,6 +27,8 @@ export default async function PartnerLayout({ children }: { children: React.Reac
   });
   if (!partner) redirect("/auth/login");
 
+  // Not yet activated by the office, or suspended: the panel is shown with a
+  // banner and nothing can be dispatched; the APIs refuse writes meanwhile.
   return (
     <PartnerShell company={partner.name} contact={partner.contactName} suspended={!partner.active}>
       {children}

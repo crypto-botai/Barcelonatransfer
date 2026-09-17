@@ -156,18 +156,15 @@ function LoginForm() {
 
           {/* Footer links */}
           <div className="mt-6 flex flex-col gap-2 text-center">
-            <p className="text-sm text-white/30">
-              New to Elite BCN?{" "}
-              <Link href="/auth/register" className="text-[#c9a84c] hover:text-[#e4c97e] transition-colors font-medium">
-                Create account
-              </Link>
+            <p className="text-sm text-white/30">New to Elite BCN? Sign up as</p>
+            <p className="text-sm">
+              <Link href="/auth/register" className="text-[#c9a84c] hover:text-[#e4c97e] transition-colors font-medium">Customer</Link>
+              <span className="text-white/20"> · </span>
+              <Link href="/driver/register" className="text-[#c9a84c] hover:text-[#e4c97e] transition-colors font-medium">Driver</Link>
+              <span className="text-white/20"> · </span>
+              <Link href="/partner/register" className="text-[#c9a84c] hover:text-[#e4c97e] transition-colors font-medium">Fleet company</Link>
             </p>
-            <p className="text-sm text-white/20">
-              Are you a driver?{" "}
-              <Link href="/driver/register" className="text-white/35 hover:text-white/60 transition-colors">
-                Driver registration
-              </Link>
-            </p>
+            <p className="text-xs text-white/20">One sign-in for all three; each account opens its own panel.</p>
           </div>
         </div>
 

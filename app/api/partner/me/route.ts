@@ -5,7 +5,7 @@ import { requirePartner } from "@/lib/partner";
 
 /** The company's own record: contact details and where to send its money. */
 export async function GET() {
-  const p = await requirePartner();
+  const p = await requirePartner({ allowInactive: true });
   if (!p) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   return NextResponse.json(p);
 }

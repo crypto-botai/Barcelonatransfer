@@ -24,12 +24,18 @@ const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
 
 // ─── Session ─────────────────────────────────────────────────
 
-export async function requirePartner() {
+/**
+ * The signed-in company. An inactive company (applied online and not yet
+ * approved, or suspended) may read its panel but not act: pass
+ * `{ allowInactive: true }` from read routes only.
+ */
+export async function requirePartner(opts: { allowInactive?: boolean } = {}) {
   const session = await getServerSession(authOptions);
   const u = session?.user as { id?: string; role?: string } | undefined;
   if (!session || u?.role !== "PARTNER" || !u.id) return null;
   const partner = await prisma.fleetPartner.findUnique({ where: { userId: u.id } });
-  if (!partner || !partner.active) return null;
+  if (!partner) return null;
+  if (!partner.active && !opts.allowInactive) return null;
   return partner;
 }
 

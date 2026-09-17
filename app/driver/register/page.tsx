@@ -9,6 +9,7 @@ import {
   Upload, FileText, Car, Image as ImageIcon, Shield, CheckCircle2
 } from "lucide-react";
 import toast from "react-hot-toast";
+import AccountTypeChooser from "@/components/auth/AccountTypeChooser";
 
 type UploadField = {
   key: "licenseFileUrl" | "vehiclePermitUrl" | "vehiclePhotoFront" | "vehiclePhotoBack" | "insuranceUrl";
@@ -111,6 +112,7 @@ export default function DriverRegisterPage() {
           <Car size={20} className="text-gold-500" />
           <h1 className="font-display text-2xl text-white">Driver Registration</h1>
         </div>
+        <div className="mb-4"><AccountTypeChooser current="driver" compact /></div>
         <p className="text-dark-400 text-sm mb-6">
           Join the Elite BCN driver network. Your account will be reviewed and approved by admin.
         </p>

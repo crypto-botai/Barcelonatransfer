@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePartner, createPartnerDriver } from "@/lib/partner";
 
 export async function GET() {
-  const p = await requirePartner();
+  const p = await requirePartner({ allowInactive: true });
   if (!p) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const drivers = await prisma.driver.findMany({
     where: { partnerId: p.id },

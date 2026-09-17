@@ -65,7 +65,7 @@ export default function PartnerDetailPage() {
           <p className="text-dark-400 mt-1">{p.contactName} · {p.email} · {p.phone}{p.taxId ? ` · ${p.taxId}` : ""}</p>
         </div>
         <button onClick={toggleActive} disabled={busy === "active"} className={`px-3 py-2 rounded-lg text-xs border ${p.active ? "border-red-500/30 text-red-400 hover:bg-red-500/10" : "border-green-500/30 text-green-400 hover:bg-green-500/10"}`}>
-          {p.active ? "Suspend company" : "Reactivate"}
+          {p.active ? "Suspend company" : "Activate company"}
         </button>
       </div>
 

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePartner, partnerBalance, requestPartnerWithdrawal } from "@/lib/partner";
 
 export async function GET() {
-  const p = await requirePartner();
+  const p = await requirePartner({ allowInactive: true });
   if (!p) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const [withdrawals, balance, ledger] = await Promise.all([
     prisma.partnerWithdrawal.findMany({ where: { partnerId: p.id }, orderBy: { createdAt: "desc" } }),

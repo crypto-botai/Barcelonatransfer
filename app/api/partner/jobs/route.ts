@@ -8,7 +8,7 @@ import { requirePartner } from "@/lib/partner";
  * the company sees its payout, and what it chose to show its driver.
  */
 export async function GET(req: NextRequest) {
-  const p = await requirePartner();
+  const p = await requirePartner({ allowInactive: true });
   if (!p) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const scope = req.nextUrl.searchParams.get("scope") ?? "all";

@@ -4,7 +4,7 @@ import { requirePartner, partnerBalance, partnerPeriodStats } from "@/lib/partne
 
 /** The numbers on the company's front page. */
 export async function GET() {
-  const p = await requirePartner();
+  const p = await requirePartner({ allowInactive: true });
   if (!p) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const now = new Date();
   const [periods, balance, incoming, next, driverCount] = await Promise.all([

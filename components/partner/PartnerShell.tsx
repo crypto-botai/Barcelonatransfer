@@ -86,7 +86,7 @@ export default function PartnerShell({
           </div>
           {suspended && (
             <div className="mb-5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-              This account is suspended. Jobs cannot be dispatched until Elite BCN reactivates it.
+              This account is not active yet. Elite BCN activates a new company after reviewing it; a suspended one after contact. Nothing can be dispatched meanwhile.
             </div>
           )}
           {children}
