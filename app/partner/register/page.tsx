@@ -18,6 +18,7 @@ export default function PartnerRegisterPage() {
   const router = useRouter();
   const [f, setF] = useState({ name: "", contactName: "", email: "", phone: "", password: "", taxId: "", address: "", fleetSize: "" });
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
   const field = "input-luxury w-full px-3 py-3 rounded-xl text-sm";
   const label = "block text-[10px] text-gold-500/80 uppercase tracking-[0.15em] font-semibold mb-1.5";
@@ -31,10 +32,13 @@ export default function PartnerRegisterPage() {
       const r = await fetch("/api/auth/partner-register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(f) });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error ?? "Could not create the account");
+      setError(null);
       toast.success("Application received. Sign in to see your panel; Elite BCN will activate it.");
       router.push("/auth/login?callbackUrl=/partner");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not create the account");
+      const msg = err instanceof Error ? err.message : "Could not create the account";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setBusy(false);
     }
@@ -72,9 +76,23 @@ export default function PartnerRegisterPage() {
           </div>
           <div><label className={label} htmlFor="p-addr">Address</label><input id="p-addr" className={field} value={f.address} onChange={set("address")} /></div>
 
+          {error && (
+            <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              {error}
+              {/already has an account/i.test(error) && (
+                <> To use this email for the company, sign in and delete that account from its settings first, or <Link href="/auth/login" className="underline">sign in</Link> if it is already the company.</>
+              )}
+            </p>
+          )}
           <button type="submit" disabled={!ready || busy} className="btn-gold w-full py-3.5 rounded-xl font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-40">
             {busy ? <Loader2 size={16} className="animate-spin" /> : <Building2 size={16} />} Create company account
           </button>
+          {!ready && (
+            <p className="text-center text-[11px] text-dark-500">
+              {f.password.length > 0 && f.password.length < 8 ? "Password needs at least 8 characters."
+                : "Company name, contact person, phone, email and a password of 8+ characters are needed."}
+            </p>
+          )}
         </form>
 
         <p className="mt-6 text-center text-sm text-white/30">
