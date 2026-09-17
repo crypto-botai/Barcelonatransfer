@@ -15,7 +15,10 @@ async function requireAdmin() {
 export async function GET(_req: NextRequest) {
   if (!await requireAdmin()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Company drivers belong to a fleet partner and are dispatched by that
+  // company, so they never appear on the office roster.
   const drivers = await prisma.driver.findMany({
+    where: { partnerId: null },
     orderBy: { createdAt: "desc" },
     include: {
       user: { select: { name: true, email: true, phone: true } },

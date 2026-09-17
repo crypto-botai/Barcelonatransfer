@@ -16,7 +16,13 @@ export interface DispatchJob {
   flightNumber: string | null; totalAmount: number;
   guestName: string | null; guestPhone: string | null;
   driverId: string | null; driverName: string | null;
+  /** Set when the office has sent the job to a fleet partner company. */
+  partnerId?: string | null; partnerName?: string | null; partnerPayout?: number | null;
+  /** The company has put one of its drivers on it. */
+  partnerDispatched?: boolean;
 }
+
+export interface DispatchPartner { id: string; name: string }
 
 export interface DispatchDriver {
   id: string; name: string; phone: string | null; status: string;
@@ -45,13 +51,7 @@ function timeLabel(iso: string) {
   return `${d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} ${time}`;
 }
 
-export default function DispatchBoard({
-  jobs: initialJobs,
-  drivers,
-}: {
-  jobs: DispatchJob[];
-  drivers: DispatchDriver[];
-}) {
+export default function DispatchBoard({ jobs: initialJobs, drivers, partners = [] }: { jobs: DispatchJob[]; drivers: DispatchDriver[]; partners?: DispatchPartner[] }) {
   const [jobs, setJobs] = useState(initialJobs);
   const [assigning, setAssigning] = useState<string | null>(null);
 
@@ -65,6 +65,25 @@ export default function DispatchBoard({
       urgent: un.filter((j) => hoursUntil(j.pickupDatetime) < 4).length,
     };
   }, [jobs]);
+
+  async function sendToPartner(jobId: string, partnerId: string, payout: number) {
+    setAssigning(jobId);
+    try {
+      const res = await fetch(`/api/admin/bookings/${jobId}/partner`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ partnerId, payout }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error ?? "Failed");
+      const name = partners.find((p) => p.id === partnerId)?.name ?? "Company";
+      setJobs((prev) => prev.map((j) => (j.id === jobId ? { ...j, partnerId, partnerName: name, partnerPayout: payout, partnerDispatched: false, driverId: null, driverName: null, status: "CONFIRMED" } : j)));
+      toast.success(`Sent to ${name}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed");
+    } finally {
+      setAssigning(null);
+    }
+  }
 
   async function assign(jobId: string, driverId: string) {
     if (!driverId) return;
@@ -131,6 +150,8 @@ export default function DispatchBoard({
                 drivers={available}
                 busy={assigning === j.id}
                 onAssign={(driverId) => assign(j.id, driverId)}
+                partners={partners}
+                onSendToPartner={(partnerId, payout) => sendToPartner(j.id, partnerId, payout)}
               />
             ))}
           </div>
@@ -200,13 +221,19 @@ function Stat({ label, value, tone }: { label: string; value: number; tone: "ok"
 }
 
 function JobRow({
-  job, drivers, busy, onAssign,
+  job, drivers, busy, onAssign, partners = [], onSendToPartner,
 }: {
   job: DispatchJob;
   drivers: DispatchDriver[];
   busy: boolean;
   onAssign: (driverId: string) => void;
+  partners?: DispatchPartner[];
+  onSendToPartner?: (partnerId: string, payout: number) => void;
 }) {
+  // Choosing a company in the picker opens a payout field; nothing is sent
+  // until the office confirms the number.
+  const [pendingPartner, setPendingPartner] = useState<string | null>(null);
+  const [payout, setPayout] = useState("");
   const h = hoursUntil(job.pickupDatetime);
   const soon = !job.driverId && h < 4;
   const unpaid = job.paymentStatus !== "PAID";
@@ -257,9 +284,30 @@ function JobRow({
         </div>
 
         <div className="flex-shrink-0">
-          {job.driverId ? (
+          {job.partnerId && !job.driverId ? (
+            <div className="text-right max-w-[11rem]">
+              <p className="text-sky-300 text-xs font-medium">{job.partnerName}</p>
+              <p className="text-dark-500 text-[10px] mt-0.5">Awaiting their driver · payout €{(job.partnerPayout ?? 0).toFixed(0)}</p>
+            </div>
+          ) : pendingPartner ? (
+            <div className="flex items-center gap-1.5">
+              <input
+                type="number" min={0} step="0.5" value={payout} onChange={(e) => setPayout(e.target.value)}
+                placeholder="Payout €" autoFocus
+                className="w-24 bg-white/[0.05] border border-white/[0.1] rounded-lg text-xs text-white px-2.5 py-2 focus:border-gold-500/50 outline-none"
+              />
+              <button
+                type="button"
+                disabled={!payout || busy}
+                onClick={() => { onSendToPartner?.(pendingPartner, parseFloat(payout)); setPendingPartner(null); setPayout(""); }}
+                className="text-xs px-2.5 py-2 rounded-lg bg-gold-500 text-black font-medium disabled:opacity-40"
+              >Send</button>
+              <button type="button" onClick={() => setPendingPartner(null)} className="text-xs text-dark-400 px-1.5">✕</button>
+            </div>
+          ) : job.driverId ? (
             <div className="text-right">
               <p className="text-emerald-400 text-xs font-medium">{job.driverName}</p>
+              {job.partnerName && <p className="text-dark-500 text-[10px]">via {job.partnerName}</p>}
               <Link href={`/dashboard/tracking/${job.id}`} className="text-dark-500 text-[10px] hover:text-white flex items-center gap-1 justify-end mt-0.5">
                 <MapPin size={9} /> Track
               </Link>
@@ -268,21 +316,36 @@ function JobRow({
             <div className="flex items-center gap-2 text-dark-400 text-xs px-3 py-2">
               <Loader2 size={13} className="animate-spin" /> Assigning…
             </div>
-          ) : drivers.length === 0 ? (
+          ) : drivers.length === 0 && partners.length === 0 ? (
             <p className="text-amber-400 text-[11px] max-w-[9rem] text-right">No driver is available</p>
           ) : (
             <select
               defaultValue=""
-              onChange={(e) => onAssign(e.target.value)}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v.startsWith("partner:")) { setPendingPartner(v.slice(8)); setPayout(""); }
+                else onAssign(v);
+              }}
               aria-label={`Assign a driver to booking ${job.code}`}
               className="bg-white/[0.05] border border-white/[0.1] rounded-lg text-xs text-white px-2.5 py-2 focus:border-gold-500/50 outline-none"
             >
               <option value="" disabled>Assign driver…</option>
-              {drivers.map((d) => (
-                <option key={d.id} value={d.id} className="bg-[#141310]">
-                  {d.name}{d.jobsToday ? ` (${d.jobsToday})` : ""}
-                </option>
-              ))}
+              {drivers.length > 0 && (
+                <optgroup label="Our drivers">
+                  {drivers.map((d) => (
+                    <option key={d.id} value={d.id} className="bg-[#141310]">
+                      {d.name}{d.jobsToday ? ` (${d.jobsToday})` : ""}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {partners.length > 0 && (
+                <optgroup label="Fleet companies">
+                  {partners.map((p) => (
+                    <option key={p.id} value={`partner:${p.id}`} className="bg-[#141310]">{p.name}</option>
+                  ))}
+                </optgroup>
+              )}
             </select>
           )}
         </div>

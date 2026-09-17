@@ -187,6 +187,12 @@ export function bookingReceivedCard(o: {
   date: string; time: string; vehicle: string;
   passengers: number; totalAmount: number;
   /**
+   * How the fare is settled, for bookings the office makes by hand. A website
+   * booking is paid at checkout and says nothing here. `line` is the sentence
+   * the customer reads; `payUrl` adds a pay-by-card button under it.
+   */
+  payment?: { line: string; payUrl?: string; paid?: boolean };
+  /**
    * The leg home, on a round trip.
    *
    * It has a booking and a reference of its own — it is driven separately and
@@ -242,8 +248,21 @@ export function bookingReceivedCard(o: {
     <tr><td style="padding:0 44px;">${amountBar(
       o.returnLeg ? "Total, both journeys" : "Total",
       o.totalAmount,
-      "excl. VAT &amp; tolls",
+      o.payment?.paid ? "paid, thank you" : "excl. VAT &amp; tolls",
     )}</td></tr>
+
+    ${o.payment ? `
+      ${sectionSpacer(18)}
+      <tr><td style="padding:0 44px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
+          <tr><td style="padding:20px 24px;${o.payment.payUrl ? "text-align:center;" : ""}">
+            <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">Payment</div>
+            <div style="font-family:${SANS};font-size:14px;line-height:22px;color:${TITLE};padding-top:8px;">${esc(o.payment.line)}</div>
+            ${o.payment.payUrl ? `<div style="padding-top:16px;">${button(o.payment.payUrl, "Pay by Card")}</div>` : ""}
+          </td></tr>
+        </table>
+      </td></tr>
+    ` : ""}
     ${sectionSpacer(32)}
 
     <tr><td style="padding:0 44px;text-align:center;">
@@ -777,6 +796,127 @@ export function adminPickupChangedCard(o: {
         row("Now", `<strong style="font-weight:bold;">${esc(o.newPickupAddress)}</strong>`) +
         row("Date", esc(o.pickupDatetime), true),
       )}
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+// ─── 13. Job for a fleet partner company ─────────────────────
+
+export function partnerJobCard(o: {
+  contactName: string; companyName: string; confirmationCode: string;
+  pickupAddress: string; dropoffAddress?: string | null; pickupDatetime: string;
+  vehicle: string; passengers: number; luggage: number; flightNumber?: string | null;
+  payout: number; panelUrl: string;
+}): string {
+  const firstName = o.contactName.split(" ")[0] || o.contactName;
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Fleet Partner · New Job")}
+      ${headline(`A job for ${esc(o.companyName)}, ${esc(firstName)}.`)}
+      ${paragraph("Elite BCN has sent this journey to your company. Open your dispatch panel to put one of your drivers on it.")}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;">${referencePanel(o.confirmationCode, "Quote this reference with Elite BCN dispatch")}</td></tr>
+    ${sectionSpacer(12)}
+
+    <tr><td style="padding:0 44px;">
+      ${detailTable(
+        row("Pick-up", esc(o.pickupAddress)) +
+        row("Drop-off", esc(o.dropoffAddress || "—")) +
+        row("When", `<strong style="font-weight:bold;">${esc(o.pickupDatetime)}</strong>`) +
+        row("Vehicle", esc(o.vehicle)) +
+        row("Guests", `${o.passengers} pax &nbsp;&middot;&nbsp; ${o.luggage} bags`) +
+        (o.flightNumber ? row("Flight", `<span style="letter-spacing:1.5px;">${esc(o.flightNumber)}</span>`, true) : row("Flight", "—", true)),
+      )}
+    </td></tr>
+
+    ${sectionSpacer(28)}
+    <tr><td style="padding:0 44px;">${amountBar("Your payout", o.payout, "on completion")}</td></tr>
+    ${sectionSpacer(32)}
+
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(o.panelUrl, "Open Dispatch Panel")}
+      <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${LABEL};padding-top:18px;">
+        The client's name and phone are shown in the panel, not in this email.
+      </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+// ─── 14. Partner dispatched a driver (admin) ─────────────────
+
+export function adminPartnerDispatchCard(o: {
+  companyName: string; confirmationCode: string;
+  pickupAddress: string; dropoffAddress?: string | null; pickupDatetime: string;
+  driverName: string; driverEmail?: string | null; driverPhone: string;
+  vehicleMake: string; vehicleModel: string; licensePlate: string;
+  payout: number; driverAmount?: number | null;
+}): string {
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Admin · Partner Dispatch")}
+      ${headline(`${esc(o.companyName)} has put a driver on ${esc(o.confirmationCode)}.`)}
+      ${paragraph("The customer has been sent the chauffeur's details under the Elite BCN name.")}
+    </td></tr>
+
+    ${sectionSpacer(28)}
+    <tr><td style="padding:0 44px;">
+      ${detailTable(
+        row("Driver", `<strong style="font-weight:bold;">${esc(o.driverName)}</strong>`) +
+        row("Phone", `<a href="tel:${esc(o.driverPhone)}" style="color:${GOLD};text-decoration:none;">${esc(o.driverPhone)}</a>`) +
+        (o.driverEmail ? row("Email", `<a href="mailto:${esc(o.driverEmail)}" style="color:${GOLD};text-decoration:none;">${esc(o.driverEmail)}</a>`) : "") +
+        row("Vehicle", `${esc(o.vehicleMake)} ${esc(o.vehicleModel)}`) +
+        row("Plate", `<span style="letter-spacing:1.5px;">${esc(o.licensePlate)}</span>`) +
+        row("Company", esc(o.companyName)) +
+        row("Pick-up", esc(o.pickupAddress)) +
+        row("Drop-off", esc(o.dropoffAddress || "—")) +
+        row("When", `<strong style="font-weight:bold;">${esc(o.pickupDatetime)}</strong>`) +
+        row("Payout", `&euro;${o.payout.toFixed(2)} <span style="color:${LABEL};">to the company</span>`) +
+        row("Driver sees", o.driverAmount != null ? `&euro;${o.driverAmount.toFixed(2)}` : "—", true),
+      )}
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+// ─── 15. Sign-in details ─────────────────────────────────────
+
+/**
+ * A temporary password for a new driver, partner or reset customer. The
+ * password is shown once; the account is flagged to change it at first
+ * sign-in, so this email stops working the moment they choose their own.
+ */
+export function credentialsCard(o: {
+  firstName: string; email: string; password: string; portalLabel: string; loginUrl: string;
+}): string {
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Your Sign-in Details")}
+      ${headline(`Welcome, ${esc(o.firstName)}.`)}
+      ${paragraph(`Here is your access to the Elite BCN ${esc(o.portalLabel)}. You will be asked to choose your own password the first time you sign in.`)}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
+        <tr><td style="padding:24px 28px;">
+          <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">Email</div>
+          <div style="font-family:${SANS};font-size:15px;color:${TITLE};padding-top:6px;">${esc(o.email)}</div>
+          <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};padding-top:18px;">Temporary password</div>
+          <div style="font-family:'Courier New',Courier,monospace;font-size:22px;letter-spacing:3px;color:${GOLD};padding-top:6px;">${esc(o.password)}</div>
+        </td></tr>
+      </table>
+    </td></tr>
+    ${sectionSpacer(32)}
+
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(o.loginUrl, "Sign In")}
+      <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${LABEL};padding-top:18px;">
+        This password is temporary. Please do not forward this email — anyone who reads it can sign in until you change it.
+      </div>
     </td></tr>
     ${sectionSpacer(42)}
   `);

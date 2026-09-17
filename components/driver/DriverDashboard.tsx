@@ -60,6 +60,8 @@ type DriverInfo = {
   totalRides: number;
   whatsappNumber: string | null;
   user: { name: string | null; email: string; phone: string | null };
+  /** Set for a fleet company's driver. They are paid by the company. */
+  partnerName?: string | null;
 };
 
 type Props = {
@@ -153,7 +155,7 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
     { id: "all",       label: "All Rides", count: bookings.length },
     { id: "completed", label: "Completed", count: completedCount },
     { id: "cancelled", label: "Cancelled", count: bookings.filter(b => b.status === "CANCELLED").length },
-    { id: "withdrawals",label: "Withdrawals", count: withdrawals.length },
+    ...(driver.partnerName ? [] : [{ id: "withdrawals" as Tab, label: "Withdrawals", count: withdrawals.length }]),
   ];
 
   const STATUS_ORDER: Record<string, number> = {
@@ -263,12 +265,14 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                 {driverStatus === "ONLINE" ? "Go Offline" : "Go Online"}
               </button>
             )}
-            <button
-              onClick={() => { setShowWithdrawForm(true); setTab("withdrawals"); }}
-              className="btn-gold flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold"
-            >
-              <Wallet size={15} /> Withdraw
-            </button>
+            {!driver.partnerName && (
+              <button
+                onClick={() => { setShowWithdrawForm(true); setTab("withdrawals"); }}
+                className="btn-gold flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold"
+              >
+                <Wallet size={15} /> Withdraw
+              </button>
+            )}
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-red-400/80 hover:text-red-400 hover:bg-red-500/10 border border-red-500/20 hover:border-red-500/40 transition-all"

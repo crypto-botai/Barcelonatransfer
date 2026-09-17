@@ -13,6 +13,7 @@ import {
   flightDelayCard,
   driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard,
   pickupChangedCard, adminPickupChangedCard,
+  partnerJobCard, adminPartnerDispatchCard, credentialsCard,
 } from "@/lib/email/premium";
 
 let _resend: Resend | undefined;
@@ -576,11 +577,13 @@ export function newsletterIssueHtml({
 export async function sendBookingConfirmation({
   to, name, confirmationCode, pickupAddress, dropoffAddress,
   pickupDatetime, vehicleClass, totalAmount, passengers,
-  bookingId, returnLeg,
+  bookingId, returnLeg, payment,
 }: {
   to: string; name: string; confirmationCode: string; pickupAddress: string;
   dropoffAddress: string; pickupDatetime: string; vehicleClass: string;
   totalAmount: number; passengers: number; bookingId?: string;
+  /** How the fare is settled, on a booking the office made by hand. */
+  payment?: { line: string; payUrl?: string; paid?: boolean };
   /** The second booking, when the customer booked a round trip. */
   returnLeg?: {
     confirmationCode: string;
@@ -606,6 +609,7 @@ export async function sendBookingConfirmation({
       passengers,
       totalAmount,
       returnLeg: back,
+      payment,
     }),
     back
       ? `Both journeys are reserved — references ${confirmationCode} and ${back.confirmationCode}`
@@ -1038,67 +1042,59 @@ export async function sendTemporaryPassword({
   to: string;
   name: string;
   password: string;
-  /** Which portal to point them at — drivers and customers land in different places. */
-  portal: "driver" | "customer";
+  /** Which portal to point them at — drivers, partners and customers land in different places. */
+  portal: "driver" | "customer" | "partner";
 }) {
-  const firstName = name.split(" ")[0] || "there";
-  const loginUrl  = `${SITE_URL}/auth/login`;
-  const what      = portal === "driver" ? "driver portal" : "account";
+  const firstName   = name.split(" ")[0] || "there";
+  const loginUrl    = `${SITE_URL}/auth/login`;
+  const portalLabel = portal === "driver" ? "driver portal" : portal === "partner" ? "fleet partner panel" : "account";
 
-  const html = `<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Your Elite BCN password</title></head>
-<body style="margin:0;padding:0;background:#efece5;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#efece5;padding:32px 12px;">
-<tr><td align="center">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:6px;overflow:hidden;">
-  <tr><td style="background:#0a0a0a;padding:28px 32px;">
-    <div style="font-family:Helvetica,Arial,sans-serif;font-size:19px;letter-spacing:3px;color:#ffffff;">ELITE<span style="color:#c9a96e;">BCN</span></div>
-  </td></tr>
-  <tr><td style="padding:32px;font-family:Helvetica,Arial,sans-serif;color:#222;">
-    <p style="margin:0 0 16px;font-size:16px;">Hello ${firstName},</p>
-    <p style="margin:0 0 22px;font-size:14px;line-height:1.65;color:#444;">
-      Here are your sign-in details for your Elite BCN ${what}. You will be asked
-      to choose your own password the first time you sign in.
-    </p>
+  const html = emailDocument(
+    credentialsCard({ firstName, email: to, password, portalLabel, loginUrl }),
+    "Your Elite BCN sign-in details — choose your own password at first sign-in.",
+  );
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f5f0;border-left:3px solid #c9a96e;border-radius:4px;margin:0 0 22px;">
-      <tr><td style="padding:18px 20px;font-family:Helvetica,Arial,sans-serif;">
-        <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#8a8578;">Email</p>
-        <p style="margin:0 0 14px;font-size:15px;color:#111;">${to}</p>
-        <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#8a8578;">Temporary password</p>
-        <p style="margin:0;font-size:20px;letter-spacing:2px;font-family:'Courier New',monospace;color:#111;"><strong>${password}</strong></p>
-      </td></tr>
-    </table>
-
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
-      <tr><td style="background:#0a0a0a;border-radius:4px;">
-        <a href="${loginUrl}" style="display:inline-block;padding:14px 34px;font-family:Helvetica,Arial,sans-serif;font-size:13px;letter-spacing:2px;color:#c9a96e;text-decoration:none;text-transform:uppercase;">Sign in</a>
-      </td></tr>
-    </table>
-
-    <p style="margin:0;font-size:12.5px;line-height:1.6;color:#777;">
-      This password is temporary. Please do not share this email — anyone who
-      reads it can sign in until you change the password.
-    </p>
-  </td></tr>
-  <tr><td style="padding:18px 32px;background:#faf9f6;font-family:Helvetica,Arial,sans-serif;font-size:11px;color:#999;">
-    Elite BCN Transfers · Barcelona · ${COMPANY.email}
-  </td></tr>
-</table>
-</td></tr></table>
-</body></html>`;
-
-  const id = await sendEmail({
-    from: FROM,
-    to,
-    subject: "Your Elite BCN sign-in details",
-    html,
-  });
+  const id = await sendEmail({ from: FROM, to, subject: "Your Elite BCN sign-in details", html });
   await logEmail({ to, subject: "Your Elite BCN sign-in details", type: "TEMP_PASSWORD", resendId: id });
 }
 
+// ─── Fleet partners ──────────────────────────────────────────
+
+/** A job sent to a partner company, with the payout the office set for it. */
+export async function sendPartnerJobEmail({
+  to, contactName, companyName, confirmationCode, pickupAddress, dropoffAddress,
+  pickupDatetime, vehicleClass, passengers, luggage, flightNumber, payout, panelUrl,
+}: {
+  to: string; contactName: string; companyName: string; confirmationCode: string;
+  pickupAddress: string; dropoffAddress?: string | null; pickupDatetime: string;
+  vehicleClass: string; passengers: number; luggage: number; flightNumber?: string | null;
+  payout: number; panelUrl: string;
+}) {
+  const html = emailDocument(
+    partnerJobCard({
+      contactName, companyName, confirmationCode, pickupAddress, dropoffAddress, pickupDatetime,
+      vehicle: vehicleName(vehicleClass), passengers, luggage, flightNumber, payout, panelUrl,
+    }),
+    `New job ${confirmationCode} · ${pickupDatetime} · payout €${payout.toFixed(2)}`,
+  );
+  const id = await sendEmail({ from: FROM, to, subject: `New job — ${confirmationCode} · ${pickupDatetime} | Elite BCN`, html });
+  await logEmail({ to, subject: `Partner job — ${confirmationCode}`, type: "PARTNER_JOB", resendId: id });
+}
+
+/** The office learns who a partner put on the job. */
+export async function sendAdminPartnerDispatchAlert(o: {
+  companyName: string; confirmationCode: string;
+  pickupAddress: string; dropoffAddress?: string | null; pickupDatetime: string;
+  driverName: string; driverEmail?: string | null; driverPhone: string;
+  vehicleMake: string; vehicleModel: string; licensePlate: string;
+  payout: number; driverAmount?: number | null;
+}) {
+  const html = emailDocument(
+    adminPartnerDispatchCard(o),
+    `${o.companyName} dispatched ${o.driverName} (${o.vehicleMake} ${o.vehicleModel}, ${o.licensePlate}) on ${o.confirmationCode}.`,
+  );
+  await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject: `Partner dispatch — ${o.confirmationCode} · ${o.driverName}`, html });
+}
 
 // ─── Admin operational alert ─────────────────────────────────
 

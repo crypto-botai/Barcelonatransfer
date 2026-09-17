@@ -15,6 +15,7 @@ export default async function DriverPage() {
     where:   { userId: user.id! },
     include: {
       user:  { select: { name: true, email: true, phone: true } },
+      partner: { select: { name: true } },
       bookings: {
         orderBy: { pickupDatetime: "desc" },
         take:    50,
@@ -83,6 +84,9 @@ export default async function DriverPage() {
           totalRides:   driver.totalRides,
           whatsappNumber: driver.whatsappNumber,
           user:         driver.user,
+          // A company driver is paid by their company, not by Elite BCN, so
+          // the withdrawals tab and button are hidden for them.
+          partnerName:  driver.partner?.name ?? null,
         }}
         // Flatten what the panel needs: when the driver tapped Arrived, and
         // whether a no-show has already been filed. The `as` cast below would

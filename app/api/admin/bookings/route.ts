@@ -7,6 +7,10 @@ import { type VehicleClass } from "@/types";
 import { sendBookingConfirmation, sendAdminNewBookingAlert } from "@/lib/resend";
 import { withUniqueBookingCode } from "@/lib/booking-code";
 import { parsePickupInput, formatPickupDateTime } from "@/lib/datetime";
+import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
+import { PAYMENT_METHODS, paymentLine } from "@/lib/payment-method";
+
+const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
 
 async function requireAdmin() {
   const s = await getServerSession(authOptions);
@@ -41,8 +45,9 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: "desc" },
     take: limit,
     include: {
-      driver: { include: { user: { select: { name: true, phone: true } } } },
-      user:   { select: { name: true, email: true } },
+      driver:  { include: { user: { select: { name: true, phone: true } } } },
+      user:    { select: { name: true, email: true } },
+      partner: { select: { name: true } },
     },
   });
 
@@ -67,7 +72,14 @@ const createSchema = z.object({
   specialRequests: z.string().optional(),
   totalAmount:     z.number().min(0),
   paymentStatus:   z.enum(["PENDING", "PAID", "FAILED"]).default("PENDING"),
+  // How the customer pays. Cash, WhatsApp and transfer are marked received by
+  // hand; a card link gets a checkout created here and a pay button in the
+  // confirmation. Optional so older callers keep working.
+  paymentMethod:   z.enum(PAYMENT_METHODS as [string, ...string[]]).optional(),
+  driverAmount:    z.number().min(0).optional(),
   notes:           z.string().optional(),
+  /** Off to record a booking silently, e.g. one already confirmed on WhatsApp. */
+  sendEmail:       z.boolean().default(true),
 });
 
 export async function POST(req: NextRequest) {
@@ -102,12 +114,38 @@ export async function POST(req: NextRequest) {
         flightNumber:    body.flightNumber,
         specialRequests: body.specialRequests,
         adminNotes:      body.notes,
+        driverAmount:    body.driverAmount,
         baseFare:        body.totalAmount,
         totalAmount:     body.totalAmount,
         status:          "CONFIRMED",
         paymentStatus:   body.paymentStatus,
+        paymentMethod:   body.paymentMethod as never,
+        paidAt:          body.paymentStatus === "PAID" ? new Date() : null,
+        paidMarkedBy:    body.paymentStatus === "PAID" ? (admin.name ?? admin.id ?? "admin") : null,
       },
     }));
+
+    // A card link needs a checkout to point at. Created here so the
+    // confirmation can carry the button; the SumUp webhook and the daily
+    // reconcile mark the booking paid when the customer uses it.
+    let payUrl: string | undefined;
+    if (body.paymentMethod === "CARD_LINK" && body.paymentStatus !== "PAID" && body.totalAmount > 0) {
+      try {
+        const checkout = await createSumUpCheckout({
+          bookingId:     booking.id,
+          amount:        body.totalAmount,
+          description:   `Elite BCN: ${body.pickupAddress} -> ${body.dropoffAddress || "transfer"}`,
+          customerEmail: body.guestEmail,
+        });
+        await prisma.booking.update({ where: { id: booking.id }, data: { stripeSessionId: checkout.id } });
+        payUrl = `${SITE_URL}${getSumUpCheckoutUrl(checkout.id, booking.id)}`;
+      } catch (e) {
+        console.error("[admin create booking] checkout:", e);
+      }
+    }
+    const payment = body.paymentMethod
+      ? { line: paymentLine(body.paymentMethod as never, body.paymentStatus === "PAID", body.totalAmount), payUrl, paid: body.paymentStatus === "PAID" }
+      : undefined;
 
     // Log activity
     await prisma.activityLog.create({
@@ -122,7 +160,7 @@ export async function POST(req: NextRequest) {
     }).catch(() => {});
 
     // Notify customer
-    sendBookingConfirmation({
+    if (body.sendEmail) sendBookingConfirmation({
       to:               body.guestEmail,
       name:             body.guestName,
       confirmationCode: booking.confirmationCode,
@@ -133,6 +171,7 @@ export async function POST(req: NextRequest) {
       totalAmount:      body.totalAmount,
       passengers:       body.passengers,
       bookingId:        booking.id,
+      payment,
     }).catch(e => console.error("[resend] admin create booking confirmation:", e));
 
     // Notify admin panel (useful if another admin created it)
@@ -152,7 +191,7 @@ export async function POST(req: NextRequest) {
       specialRequests:  body.specialRequests,
     }).catch(() => {});
 
-    return NextResponse.json(booking, { status: 201 });
+    return NextResponse.json({ ...booking, payUrl }, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: err.errors[0].message }, { status: 422 });
     return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });

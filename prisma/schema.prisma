@@ -12,6 +12,8 @@ enum Role {
   CUSTOMER
   DRIVER
   ADMIN
+  /// A fleet partner company: owns drivers, dispatches the jobs the office sends it.
+  PARTNER
 }
 
 enum BookingStatus {
@@ -22,6 +24,15 @@ enum BookingStatus {
   COMPLETED
   CANCELLED
   REFUNDED
+}
+
+/// How a booking is (to be) paid. Website checkouts are CARD_LINK; the others
+/// exist for bookings the office creates by hand and marks paid itself.
+enum BookingPaymentMethod {
+  CARD_LINK
+  WHATSAPP
+  CASH
+  BANK_TRANSFER
 }
 
 enum PaymentStatus {
@@ -83,6 +94,7 @@ model User {
   bookings        Booking[]
   driver          Driver?
   customerProfile CustomerProfile?
+  fleetPartner    FleetPartner?
 
   @@map("users")
 }
@@ -142,7 +154,12 @@ model Driver {
   vehiclePhotoBack  String?
   insuranceUrl      String?
 
+  // Set when the driver belongs to a fleet partner company rather than to the
+  // office. Such a driver uses the same portal; the company dispatches to them.
+  partnerId         String?
+
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  partner     FleetPartner? @relation(fields: [partnerId], references: [id])
   vehicles    Vehicle[]
   bookings    Booking[]
   withdrawals Withdrawal[]
@@ -261,6 +278,19 @@ model Booking {
   //
   // Both sides nullable: a one-way booking, which is nearly all of them, has
   // neither and behaves exactly as it did.
+  // How the customer pays. Null on bookings made before the field existed,
+  // which were all website card payments. paidAt/paidMarkedBy record an
+  // office member marking a cash, WhatsApp or transfer payment as received.
+  paymentMethod     BookingPaymentMethod?
+  paidAt            DateTime?
+  paidMarkedBy      String?
+  // A job sent to a fleet partner company. partnerPayout is what the office
+  // pays the company; driverAmount above is what the company shows its
+  // driver. Both nullable: office-driven jobs have neither.
+  partnerId           String?
+  partnerPayout       Float?
+  partnerAssignedAt   DateTime?
+  partnerDispatchedAt DateTime?
   returnOfId        String?    @unique
   returnOf          Booking?   @relation("RoundTrip", fields: [returnOfId], references: [id])
   returnLeg         Booking?   @relation("RoundTrip")
@@ -269,6 +299,7 @@ model Booking {
 
   user     User?      @relation(fields: [userId], references: [id])
   driver   Driver?    @relation(fields: [driverId], references: [id])
+  partner  FleetPartner? @relation(fields: [partnerId], references: [id])
   vehicle  Vehicle?   @relation(fields: [vehicleId], references: [id])
   tracking RideTracking[]
   rideEvents RideEvent[]
@@ -355,6 +386,59 @@ model Withdrawal {
   driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
 
   @@map("withdrawals")
+}
+
+// ─── Fleet partner companies ─────────────────────────────────
+//
+// A fleet partner is an outside company with its own drivers. The office sends
+// it a job with a payout; the company dispatches one of its drivers, choosing
+// what that driver is shown; the customer sees only the driver, branded Elite
+// BCN. Distinct from Company, which is a corporate *customer* account.
+
+model FleetPartner {
+  id          String   @id @default(cuid())
+  /// The login for the company. One per company.
+  userId      String   @unique
+  name        String
+  contactName String
+  email       String
+  phone       String
+  taxId       String?
+  address     String?
+  bankHolder  String?
+  bankIban    String?
+  bizumPhone  String?
+  active      Boolean  @default(true)
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  drivers     Driver[]
+  bookings    Booking[]
+  withdrawals PartnerWithdrawal[]
+
+  @@index([active])
+  @@map("fleet_partners")
+}
+
+model PartnerWithdrawal {
+  id         String           @id @default(cuid())
+  partnerId  String
+  amount     Float
+  method     WithdrawalMethod
+  bankIban   String?
+  bankHolder String?
+  bizumPhone String?
+  status     WithdrawalStatus @default(PENDING)
+  notes      String?          @db.Text
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  partner FleetPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId, status])
+  @@map("partner_withdrawals")
 }
 
 // ─── CRM & Operations Models ─────────────────────────────────

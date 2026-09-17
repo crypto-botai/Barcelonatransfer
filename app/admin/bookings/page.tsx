@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, CheckCircle2, XCircle, User, Loader2, X, Car, MapPin, Calendar, Phone, Mail, Plane, FileText, Save, UserCheck, Receipt, Trash2, RotateCcw, Clock, CheckCheck, Archive } from "lucide-react";
+import Link from "next/link";
+import { Search, CheckCircle2, XCircle, User, Loader2, X, Car, MapPin, Calendar, Phone, Mail, Plane, FileText, Save, UserCheck, Receipt, Trash2, RotateCcw, Clock, CheckCheck, Archive, Plus, Wallet } from "lucide-react";
+import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS, PAYMENT_METHOD_SHORT, type BookingPaymentMethod } from "@/lib/payment-method";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus, vehicleClassLabel } from "@/types";
 import { parseBookingMeta, formatExtraLine } from "@/lib/booking-meta";
@@ -21,6 +23,9 @@ type Booking = {
   flightNumber: string | null; specialRequests: string | null;
   totalAmount: number; driverAmount: number | null;
   status: BookingStatus; paymentStatus: string;
+  paymentMethod: BookingPaymentMethod | null; paidAt: string | null; paidMarkedBy: string | null;
+  partnerId: string | null; partnerPayout: number | null; partnerDispatchedAt: string | null;
+  partner?: { name: string } | null;
   driverId: string | null; adminNotes: string | null;
   isDeleted: boolean; deletedAt: string | null;
   createdAt: string;
@@ -29,6 +34,152 @@ type Booking = {
 type MainTab = "ALL" | "PENDING" | "COMPLETED" | "DELETED";
 
 const ALL_STATUSES: BookingStatus[] = ["PENDING","CONFIRMED","DRIVER_ASSIGNED","IN_PROGRESS","COMPLETED","CANCELLED"];
+
+/**
+ * Cash, WhatsApp and transfer payments never touch the checkout, so the office
+ * says when the money arrived. Card-link bookings are marked by the checkout;
+ * the button is still here for the day the webhook misses one.
+ */
+function PaymentSection({ booking, onChanged }: { booking: Booking; onChanged: () => void }) {
+  const [method, setMethod] = useState<BookingPaymentMethod>(booking.paymentMethod ?? "CARD_LINK");
+  const [busy, setBusy]     = useState(false);
+  const paid = booking.paymentStatus === "PAID";
+
+  async function mark(status: "PAID" | "PENDING") {
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/admin/bookings/${booking.id}/payment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentStatus: status, paymentMethod: method }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error ?? "Failed");
+      toast.success(status === "PAID" ? "Marked paid — receipt sent" : "Marked unpaid");
+      onChanged();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="glass-card rounded-xl p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-dark-500 uppercase tracking-wider inline-flex items-center gap-1.5"><Wallet size={12} /> Payment</p>
+        <span className={`text-[11px] px-2 py-0.5 rounded-full border ${paid ? "border-green-500/30 text-green-400 bg-green-500/10" : "border-amber-500/30 text-amber-400 bg-amber-500/10"}`}>
+          {paid ? "Paid" : "Pending"}
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        {PAYMENT_METHODS.map((m) => (
+          <button key={m} type="button" onClick={() => setMethod(m)} disabled={paid}
+            className={`rounded-lg border px-3 py-1.5 text-left text-xs transition-colors disabled:opacity-60 ${method === m ? "border-gold-500 bg-gold-500/10 text-white" : "border-white/[0.08] text-dark-300 hover:border-white/20"}`}>
+            {PAYMENT_METHOD_LABELS[m]}
+          </button>
+        ))}
+      </div>
+      {paid ? (
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[11px] text-dark-500">
+            {booking.paidAt ? `Received ${new Date(booking.paidAt).toLocaleString("en-GB", { timeZone: "Europe/Madrid" })}` : "Paid"}
+            {booking.paidMarkedBy ? ` · marked by ${booking.paidMarkedBy}` : ""}
+          </p>
+          <button type="button" onClick={() => mark("PENDING")} disabled={busy} className="text-[11px] text-dark-400 hover:text-white underline-offset-2 hover:underline">Undo</button>
+        </div>
+      ) : (
+        <button type="button" onClick={() => mark("PAID")} disabled={busy}
+          className="w-full py-2 rounded-lg bg-green-500/15 border border-green-500/30 text-green-400 text-sm font-medium hover:bg-green-500/25 transition-colors inline-flex items-center justify-center gap-2">
+          {busy ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+          Mark {formatCurrency(booking.totalAmount)} received
+        </button>
+      )}
+    </section>
+  );
+}
+
+/**
+ * Sending the job to a fleet partner company. The company picks its own
+ * driver and sets what that driver is shown; the office sets the payout.
+ */
+function PartnerSection({ booking, onChanged }: { booking: Booking; onChanged: () => void }) {
+  const [partners, setPartners] = useState<{ id: string; name: string; active: boolean }[]>([]);
+  const [partnerId, setPartnerId] = useState(booking.partnerId ?? "");
+  const [payout, setPayout] = useState(booking.partnerPayout != null ? String(booking.partnerPayout) : "");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/partners").then((r) => r.ok ? r.json() : []).then((list) => setPartners(list.filter((p: { active: boolean }) => p.active))).catch(() => {});
+  }, []);
+
+  const closed = ["COMPLETED", "CANCELLED", "REFUNDED"].includes(booking.status);
+  if (closed && !booking.partnerId) return null;
+
+  async function send() {
+    if (!partnerId || !payout) return;
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/admin/bookings/${booking.id}/partner`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ partnerId, payout: parseFloat(payout) }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error ?? "Failed");
+      toast.success("Sent to the company — they have been emailed");
+      onChanged();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); } finally { setBusy(false); }
+  }
+  async function takeBack() {
+    if (!confirm("Take this job back from the company?")) return;
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/admin/bookings/${booking.id}/partner`, { method: "DELETE" });
+      if (!res.ok) throw new Error((await res.json()).error ?? "Failed");
+      toast.success("Job taken back");
+      onChanged();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); } finally { setBusy(false); }
+  }
+
+  return (
+    <section className="glass-card rounded-xl p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-dark-500 uppercase tracking-wider">Fleet company</p>
+        {booking.partnerId && (
+          <span className={`text-[11px] px-2 py-0.5 rounded-full border ${booking.partnerDispatchedAt ? "border-green-500/30 text-green-400 bg-green-500/10" : "border-sky-500/30 text-sky-300 bg-sky-500/10"}`}>
+            {booking.partnerDispatchedAt ? "Driver dispatched" : "Awaiting their driver"}
+          </span>
+        )}
+      </div>
+      {booking.partnerId ? (
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-white text-sm">{booking.partner?.name ?? partners.find((p) => p.id === booking.partnerId)?.name ?? "Company"}</p>
+            <p className="text-dark-400 text-xs">Payout {formatCurrency(booking.partnerPayout ?? 0)}{booking.driverAmount != null ? ` · driver sees ${formatCurrency(booking.driverAmount)}` : ""}</p>
+          </div>
+          {!closed && <button type="button" onClick={takeBack} disabled={busy} className="text-xs text-red-400 hover:text-red-300">Take back</button>}
+        </div>
+      ) : partners.length === 0 ? (
+        <p className="text-dark-500 text-xs">No active fleet company yet. <Link href="/admin/partners" className="text-gold-400 hover:underline">Add one</Link>.</p>
+      ) : (
+        <div className="grid grid-cols-[minmax(0,1fr)_100px_auto] gap-2 items-end">
+          <div>
+            <label className="text-xs text-dark-400 block mb-1">Company</label>
+            <select value={partnerId} onChange={(e) => setPartnerId(e.target.value)} className="input-luxury w-full px-3 py-2 rounded-lg text-sm">
+              <option value="" className="bg-[#111]">Choose…</option>
+              {partners.map((p) => <option key={p.id} value={p.id} className="bg-[#111]">{p.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-dark-400 block mb-1">Payout (€)</label>
+            <input type="number" min={0} step="0.5" value={payout} onChange={(e) => setPayout(e.target.value)} className="input-luxury w-full px-3 py-2 rounded-lg text-sm" />
+          </div>
+          <button type="button" onClick={send} disabled={!partnerId || !payout || busy} className="btn-gold px-3 py-2 rounded-lg text-sm font-medium disabled:opacity-40">
+            {busy ? <Loader2 size={14} className="animate-spin" /> : "Send"}
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
 
 function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
   booking: Booking;
@@ -259,6 +410,10 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
             )}
           </section>
 
+          <PaymentSection booking={booking} onChanged={onSaved} />
+
+          <PartnerSection booking={booking} onChanged={onSaved} />
+
           {/* Admin Notes */}
           <section className="glass-card rounded-xl p-4">
             <label className="text-xs text-dark-500 uppercase tracking-wider block mb-2">Internal Notes</label>
@@ -449,6 +604,9 @@ export default function AdminBookingsPage() {
           <h1 className="font-display text-3xl text-white">Bookings</h1>
           <p className="text-dark-400 mt-1">{bookings.length} total · {pendingCount} pending action</p>
         </div>
+        <Link href="/admin/bookings/new" className="btn-gold px-4 py-2.5 rounded-xl text-sm font-semibold inline-flex items-center gap-2">
+          <Plus size={15} /> New booking
+        </Link>
       </div>
 
       {/* Main Tabs */}
@@ -584,7 +742,12 @@ export default function AdminBookingsPage() {
                           <span className="text-dark-500">{new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { timeZone: "Europe/Madrid", hour:"2-digit", minute:"2-digit" })}</span>
                         </td>
                         <td className="hidden lg:table-cell py-3 px-3 text-xs text-dark-400 whitespace-nowrap">{b.vehicleClass.replace(/_/g, " ")}</td>
-                        <td className="py-3 px-3 text-sm text-gold-400 font-semibold whitespace-nowrap">{formatCurrency(b.totalAmount)}</td>
+                        <td className="py-3 px-3 text-sm text-gold-400 font-semibold whitespace-nowrap">
+                          {formatCurrency(b.totalAmount)}
+                          <span className={`block text-[10px] font-normal ${b.paymentStatus === "PAID" ? "text-green-400" : "text-amber-400"}`}>
+                            {b.paymentStatus === "PAID" ? "Paid" : "Unpaid"}{b.paymentMethod ? ` · ${PAYMENT_METHOD_SHORT[b.paymentMethod]}` : ""}
+                          </span>
+                        </td>
                         <td className="hidden lg:table-cell py-3 px-3 text-sm whitespace-nowrap">
                           {b.driverAmount != null
                             ? <span className="text-green-400">{formatCurrency(b.driverAmount)}</span>

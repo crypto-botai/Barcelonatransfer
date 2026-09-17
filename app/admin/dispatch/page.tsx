@@ -23,7 +23,7 @@ export default async function DispatchPage() {
   const from = new Date(now.getTime() - 4 * 3600_000);    // include ones just started
   const to   = new Date(now.getTime() + 36 * 3600_000);
 
-  const [bookings, drivers] = await Promise.all([
+  const [bookings, partners, drivers] = await Promise.all([
     prisma.booking.findMany({
       where: {
         isDeleted: false,
@@ -37,10 +37,13 @@ export default async function DispatchPage() {
         passengers: true, luggage: true, vehicleClass: true, flightNumber: true,
         totalAmount: true, guestName: true, guestPhone: true, driverId: true,
         driver: { select: { user: { select: { name: true } } } },
+        partnerId: true, partnerPayout: true, partnerDispatchedAt: true,
+        partner: { select: { name: true } },
       },
     }),
+    prisma.fleetPartner.findMany({ where: { active: true }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.driver.findMany({
-      where:  { status: { in: ["APPROVED", "ONLINE", "OFFLINE", "ON_RIDE"] } },
+      where:  { partnerId: null, status: { in: ["APPROVED", "ONLINE", "OFFLINE", "ON_RIDE"] } },
       select: {
         id: true, status: true, rating: true,
         currentLat: true, currentLng: true, lastLocationAt: true,
@@ -79,6 +82,10 @@ export default async function DispatchPage() {
     guestPhone:     b.guestPhone,
     driverId:       b.driverId,
     driverName:     b.driver?.user.name ?? null,
+    partnerId:      b.partnerId,
+    partnerName:    b.partner?.name ?? null,
+    partnerPayout:  b.partnerPayout,
+    partnerDispatched: Boolean(b.partnerDispatchedAt),
   }));
 
   const fleet: DispatchDriver[] = drivers.map((d) => ({
@@ -94,5 +101,5 @@ export default async function DispatchPage() {
     hasLocation: d.currentLat != null && d.currentLng != null,
   }));
 
-  return <DispatchBoard jobs={jobs} drivers={fleet} />;
+  return <DispatchBoard jobs={jobs} drivers={fleet} partners={partners} />;
 }

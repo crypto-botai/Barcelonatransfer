@@ -34,12 +34,13 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/auth") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/driver") ||
+    pathname.startsWith("/partner") ||
     pathname.startsWith("/dashboard")
   ) {
     const res = NextResponse.next();
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
     // Still enforce auth below — don't return here
-    if (pathname.startsWith("/admin") || pathname.startsWith("/driver") || pathname.startsWith("/dashboard")) {
+    if (pathname.startsWith("/admin") || pathname.startsWith("/driver") || pathname.startsWith("/partner") || pathname.startsWith("/dashboard")) {
       if (!token) {
         const loginUrl = req.nextUrl.clone();
         loginUrl.pathname = "/auth/login";
@@ -61,13 +62,27 @@ export async function middleware(req: NextRequest) {
   if (pathname.startsWith("/auth/login") || pathname.startsWith("/auth/register")) {
     if (role === "ADMIN") return NextResponse.redirect(new URL("/admin", req.url));
     if (role === "DRIVER") return NextResponse.redirect(new URL("/driver", req.url));
+    if (role === "PARTNER") return NextResponse.redirect(new URL("/partner", req.url));
     return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
+  // ── PARTNER routes ───────────────────────────────────────────
+  // A fleet company's own panel. Nothing here routes into /admin, and an
+  // admin does not land here either: the two are different jobs.
+  if (pathname.startsWith("/partner")) {
+    if (role !== "PARTNER") {
+      if (role === "ADMIN")  return NextResponse.redirect(new URL("/admin", req.url));
+      if (role === "DRIVER") return NextResponse.redirect(new URL("/driver", req.url));
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+    return NextResponse.next();
   }
 
   // ── ADMIN routes ─────────────────────────────────────────────
   if (pathname.startsWith("/admin")) {
     if (role !== "ADMIN") {
-      if (role === "DRIVER") return NextResponse.redirect(new URL("/driver", req.url));
+      if (role === "DRIVER")  return NextResponse.redirect(new URL("/driver", req.url));
+      if (role === "PARTNER") return NextResponse.redirect(new URL("/partner", req.url));
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
     return NextResponse.next();
@@ -76,7 +91,8 @@ export async function middleware(req: NextRequest) {
   // ── DRIVER routes ────────────────────────────────────────────
   if (pathname.startsWith("/driver")) {
     if (role !== "DRIVER") {
-      if (role === "ADMIN") return NextResponse.redirect(new URL("/admin", req.url));
+      if (role === "ADMIN")   return NextResponse.redirect(new URL("/admin", req.url));
+      if (role === "PARTNER") return NextResponse.redirect(new URL("/partner", req.url));
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
     return NextResponse.next();
@@ -84,8 +100,9 @@ export async function middleware(req: NextRequest) {
 
   // ── USER dashboard ───────────────────────────────────────────
   if (pathname.startsWith("/dashboard")) {
-    if (role === "ADMIN") return NextResponse.redirect(new URL("/admin", req.url));
-    if (role === "DRIVER") return NextResponse.redirect(new URL("/driver", req.url));
+    if (role === "ADMIN")   return NextResponse.redirect(new URL("/admin", req.url));
+    if (role === "DRIVER")  return NextResponse.redirect(new URL("/driver", req.url));
+    if (role === "PARTNER") return NextResponse.redirect(new URL("/partner", req.url));
     return NextResponse.next();
   }
 

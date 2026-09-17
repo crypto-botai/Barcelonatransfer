@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { MessageCircle, X, Phone } from "lucide-react";
 
 const WA_NUMBER = "34635383712";
@@ -20,6 +21,10 @@ const WA_TEXT = "Hello, I would like to book a private transfer.";
 export default function WhatsAppButton() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  // A customer control. Staff panels have their own bottom bars and the
+  // people using them are the ones who answer this WhatsApp.
+  const staff = /^\/(admin|driver|partner)(\/|$)/.test(pathname ?? "");
 
   useEffect(() => {
     if (!open) return;
@@ -34,6 +39,8 @@ export default function WhatsAppButton() {
       document.removeEventListener("keydown", onEsc);
     };
   }, [open]);
+
+  if (staff) return null;
 
   return (
     // Sits clear of the mobile price bar on the booking form, and drops to the
