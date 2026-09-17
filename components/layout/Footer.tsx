@@ -271,7 +271,11 @@ export default function Footer() {
             <Link href="/privacy"      className="text-xs text-dark-400 hover:text-dark-300 transition-colors">{t("legal.privacy")}</Link>
             <Link href="/terms"        className="text-xs text-dark-400 hover:text-dark-300 transition-colors">{t("legal.terms")}</Link>
             <Link href="/cookies"      className="text-xs text-dark-400 hover:text-dark-300 transition-colors">{t("legal.cookies")}</Link>
-            <Link href="/auth/login"   className="text-xs text-dark-400 hover:text-dark-300 transition-colors">Driver & Partner Login</Link>
+            {/* Each goes through the login page and lands in its own panel:
+                the middleware routes a signed-in driver to /driver and a
+                fleet company to /partner. */}
+            <Link href="/driver"       className="text-xs text-dark-400 hover:text-dark-300 transition-colors">Driver Login</Link>
+            <Link href="/partner"      className="text-xs text-dark-400 hover:text-dark-300 transition-colors">Fleet Company Login</Link>
           </div>
         </div>
       </div>
