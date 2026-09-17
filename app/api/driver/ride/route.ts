@@ -48,6 +48,7 @@ export async function PATCH(req: NextRequest) {
     select: {
       id: true, status: true, rideStage: true, userId: true, guestPhone: true,
       pickupAddress: true, dropoffAddress: true, confirmationCode: true,
+      paymentMethod: true, paymentStatus: true,
     },
   });
   if (!booking) {
@@ -75,7 +76,15 @@ export async function PATCH(req: NextRequest) {
   // between describe where the driver is, not what the booking is.
   const statusPatch =
     stage === "ON_THE_WAY"  ? { status: BookingStatus.IN_PROGRESS, rideStartedAt: now }
-  : stage === "COMPLETED"   ? { status: BookingStatus.COMPLETED, rideEndedAt: now, paymentStatus: "PAID" as const }
+  : stage === "COMPLETED"   ? {
+      status: BookingStatus.COMPLETED, rideEndedAt: now,
+      // Finishing the ride settles a cash fare (the driver has the money) and
+      // a website booking (paid at checkout). A WhatsApp or bank-transfer
+      // fare the office has not yet marked received stays pending.
+      ...(booking.paymentStatus === "PAID" || booking.paymentMethod === "CASH" || booking.paymentMethod == null
+        ? { paymentStatus: "PAID" as const, ...(booking.paymentStatus !== "PAID" ? { paidAt: now, paidMarkedBy: "driver" } : {}) }
+        : {}),
+    }
   : {};
 
   await prisma.$transaction([

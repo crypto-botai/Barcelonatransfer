@@ -27,10 +27,12 @@ export async function GET(req: NextRequest) {
       id: true, confirmationCode: true, status: true,
       guestName: true, guestPhone: true,
       pickupAddress: true, dropoffAddress: true, pickupDatetime: true,
+      pickupLat: true, pickupLng: true, dropoffLat: true, dropoffLng: true,
       passengers: true, luggage: true, vehicleClass: true, flightNumber: true, specialRequests: true,
       partnerPayout: true, driverAmount: true, partnerAssignedAt: true, partnerDispatchedAt: true,
       rideStage: true, rideEndedAt: true,
       driverId: true,
+      noShow: { select: { images: true, note: true, waitedMin: true, createdAt: true, lat: true, lng: true } },
       driver: { select: { id: true, user: { select: { name: true, phone: true } }, vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } } } },
     },
   });

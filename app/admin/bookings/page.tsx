@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import IssueInvoiceButton from "@/components/admin/IssueInvoiceButton";
 import RideTimeline from "@/components/admin/RideTimeline";
 import ArrivalPanel from "@/components/arrival/ArrivalPanel";
+import TripChat from "@/components/chat/TripChat";
 
 type Driver = { id: string; status: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] };
 
@@ -413,6 +414,18 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
           <PaymentSection booking={booking} onChanged={onSaved} />
 
           <PartnerSection booking={booking} onChanged={onSaved} />
+
+          {["DRIVER_ASSIGNED", "IN_PROGRESS", "COMPLETED"].includes(booking.status) && (
+            <section className="glass-card rounded-xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-dark-500 uppercase tracking-wider">Messages</p>
+                {booking.status !== "COMPLETED" && (
+                  <a href={`/dashboard/tracking/${booking.id}`} target="_blank" rel="noreferrer" className="text-[11px] text-gold-400 hover:underline">Live location</a>
+                )}
+              </div>
+              <TripChat bookingId={booking.id} compact placeholder="Message the customer and driver…" />
+            </section>
+          )}
 
           {/* Admin Notes */}
           <section className="glass-card rounded-xl p-4">

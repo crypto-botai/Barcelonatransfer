@@ -80,18 +80,27 @@ export async function GET(req: NextRequest) {
 
   const booking = await prisma.booking.findUnique({
     where:  { id: bookingId },
-    select: { id: true, userId: true, driverId: true, confirmationCode: true, status: true },
+    select: { id: true, userId: true, driverId: true, confirmationCode: true, status: true, partnerId: true },
   });
   if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const session = await getServerSession(authOptions);
   const user    = session?.user as { id?: string; role?: string } | undefined;
 
+  // The company that dispatched the driver may watch the ride it is
+  // responsible for, and no other.
+  let partnerOk = false;
+  if (user?.role === "PARTNER" && user.id && booking.partnerId) {
+    const p = await prisma.fleetPartner.findUnique({ where: { userId: user.id }, select: { id: true } });
+    partnerOk = Boolean(p && p.id === booking.partnerId);
+  }
+
   const authorised =
     (code && code === booking.confirmationCode) ||
     (user?.id && user.id === booking.userId) ||
     user?.role === "ADMIN" ||
-    user?.role === "DRIVER";
+    user?.role === "DRIVER" ||
+    partnerOk;
 
   if (!authorised) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -108,5 +117,13 @@ export async function GET(req: NextRequest) {
     select:  { lat: true, lng: true, speed: true, heading: true, createdAt: true },
   });
 
-  return NextResponse.json({ live: Boolean(latest), status: booking.status, point: latest ?? null });
+  // The recent trail, for a map that draws the route so far.
+  const trail = searchParams.get("trail")
+    ? await prisma.rideTracking.findMany({
+        where: { bookingId }, orderBy: { createdAt: "desc" }, take: 60,
+        select: { lat: true, lng: true, speed: true, heading: true, createdAt: true },
+      })
+    : undefined;
+
+  return NextResponse.json({ live: Boolean(latest), status: booking.status, point: latest ?? null, trail: trail?.reverse() });
 }

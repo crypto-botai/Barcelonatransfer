@@ -100,7 +100,9 @@ export async function middleware(req: NextRequest) {
 
   // ── USER dashboard ───────────────────────────────────────────
   if (pathname.startsWith("/dashboard")) {
-    if (role === "ADMIN")   return NextResponse.redirect(new URL("/admin", req.url));
+    // The live tracking page is the one customer page the office opens too:
+    // the dispatch board and the booking drawer both link to it.
+    if (role === "ADMIN" && !pathname.startsWith("/dashboard/tracking/")) return NextResponse.redirect(new URL("/admin", req.url));
     if (role === "DRIVER")  return NextResponse.redirect(new URL("/driver", req.url));
     if (role === "PARTNER") return NextResponse.redirect(new URL("/partner", req.url));
     return NextResponse.next();

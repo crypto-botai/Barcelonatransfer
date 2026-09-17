@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { Loader2, MapPin, Phone, MessageCircle, CheckCircle2, Car } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
 
+import TripChat from "@/components/chat/TripChat";
 const LiveMap = dynamic(() => import("@/components/dashboard/LiveMap"), {
   ssr: false,
   loading: () => (
@@ -181,6 +182,13 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {booking.driverName && (status === "DRIVER_ASSIGNED" || status === "IN_PROGRESS") && (
+        <div>
+          <p className="text-dark-400 text-[10px] uppercase tracking-widest mb-2">Message your chauffeur</p>
+          <TripChat bookingId={booking.id} code={booking.code} compact placeholder="Write to your chauffeur…" />
         </div>
       )}
 

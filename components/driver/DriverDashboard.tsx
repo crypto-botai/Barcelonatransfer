@@ -13,7 +13,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
 import LocationSharing from "@/components/driver/LocationSharing";
 import FlightStatusBadge from "@/components/driver/FlightStatusBadge";
-import RideStageControl from "@/components/driver/RideStageControl";
+import ActiveRidePanel from "@/components/driver/ActiveRidePanel";
 import NoShowPanel from "@/components/driver/NoShowPanel";
 import ArrivalPanel from "@/components/arrival/ArrivalPanel";
 import type { RideStage } from "@prisma/client";
@@ -27,6 +27,8 @@ type Booking = {
   dropoffAddress: string;
   pickupLat?: number | null;
   pickupLng?: number | null;
+  dropoffLat?: number | null;
+  dropoffLng?: number | null;
   pickupDatetime: Date | string;
   passengers: number;
   luggage?: number;
@@ -384,10 +386,9 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                           {b.rideStage && b.rideStage !== "COMPLETED" && (
                             <LocationSharing bookingId={b.id} active />
                           )}
-                          <RideStageControl
-                            bookingId={b.id}
-                            currentStage={b.rideStage ?? null}
-                            onAdvance={() => window.location.reload()}
+                          <ActiveRidePanel
+                            booking={b}
+                            onStageChange={() => setTimeout(() => window.location.reload(), 1200)}
                           />
 
                           {/* Once the driver has arrived the clock is running.
@@ -425,18 +426,14 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                               </a>
                             </>
                           )}
-                          <a
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(b.pickupAddress)}`}
-                            target="_blank" rel="noreferrer"
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gold-500/10 border border-gold-500/20 text-gold-400 text-xs hover:bg-gold-500/15 transition-colors">
-                            <Navigation size={10} /> Navigate
-                          </a>
-                          <a
-                            href={`https://waze.com/ul?q=${encodeURIComponent(b.pickupAddress)}&navigate=yes`}
-                            target="_blank" rel="noreferrer"
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs hover:bg-cyan-500/15 transition-colors">
-                            <Navigation size={10} /> Waze
-                          </a>
+                          {!["DRIVER_ASSIGNED","IN_PROGRESS"].includes(b.status) && (
+                            <a
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(b.pickupAddress)}`}
+                              target="_blank" rel="noreferrer"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gold-500/10 border border-gold-500/20 text-gold-400 text-xs hover:bg-gold-500/15 transition-colors">
+                              <Navigation size={10} /> Navigate
+                            </a>
+                          )}
                         </div>
                       )}
                     </div>

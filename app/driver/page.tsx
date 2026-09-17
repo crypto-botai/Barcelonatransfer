@@ -21,7 +21,7 @@ export default async function DriverPage() {
         take:    50,
         select: {
           id: true, confirmationCode: true, status: true,
-          pickupAddress: true, dropoffAddress: true, pickupLat: true, pickupLng: true,
+          pickupAddress: true, dropoffAddress: true, pickupLat: true, pickupLng: true, dropoffLat: true, dropoffLng: true,
           pickupDatetime: true, passengers: true, luggage: true,
           vehicleClass: true, totalAmount: true, driverAmount: true,
           rideStage: true, rideStageAt: true,

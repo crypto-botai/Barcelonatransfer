@@ -23,6 +23,7 @@ export const NOTIFICATION_EVENTS = [
   "RIDE_COMPLETED",
   "REVIEW_REQUEST",
   "BOOKING_CANCELLED",
+  "TRIP_MESSAGE",
 ] as const;
 
 export type NotificationEvent = (typeof NOTIFICATION_EVENTS)[number];
@@ -189,6 +190,16 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
       es: { title: "¿Qué tal tu viaje?",         body: "Nos encantaría una breve reseña de tu traslado {{route}}." },
       fr: { title: "Comment s'est passé votre trajet ?", body: "Un court avis sur votre transfert {{route}} nous aiderait beaucoup." },
       de: { title: "Wie war Ihre Fahrt?",        body: "Über eine kurze Bewertung Ihres Transfers {{route}} würden wir uns freuen." },
+    },
+  },
+
+  TRIP_MESSAGE: {
+    channels: ["inapp", "push"],
+    copy: {
+      en: { title: "Message from {{from}}",       body: "{{text}}" },
+      es: { title: "Mensaje de {{from}}",         body: "{{text}}" },
+      fr: { title: "Message de {{from}}",         body: "{{text}}" },
+      de: { title: "Nachricht von {{from}}",      body: "{{text}}" },
     },
   },
 

@@ -305,6 +305,7 @@ model Booking {
   rideEvents RideEvent[]
   noShow   NoShowReport?
   payment  Payment?
+  messages TripMessage[]
 
   @@map("bookings")
 }
@@ -1098,4 +1099,31 @@ model NoShowReport {
 
   @@index([driverId])
   @@map("no_show_reports")
+}
+
+// ─── Trip chat ───────────────────────────────────────────────
+//
+// Messages between the people on one journey: the customer, the chauffeur,
+// the company that dispatched the chauffeur, and the office. Plain text, one
+// row each, read by polling. No attachments, no threads.
+
+enum TripSender {
+  CUSTOMER
+  DRIVER
+  PARTNER
+  ADMIN
+}
+
+model TripMessage {
+  id         String     @id @default(cuid())
+  bookingId  String
+  sender     TripSender
+  senderName String
+  body       String     @db.Text
+  createdAt  DateTime   @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId, createdAt])
+  @@map("trip_messages")
 }

@@ -33,7 +33,7 @@ export interface StageMeta {
 
 export const STAGE_META: Record<RideStage, StageMeta> = {
   ON_THE_WAY: {
-    action: "On the way",
+    action: "Start trip",
     label: "Driver set off",
     event: "DRIVER_EN_ROUTE",
     tone: "blue",

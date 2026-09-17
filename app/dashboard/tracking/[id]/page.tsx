@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import TripChat from "@/components/chat/TripChat";
 import {
   ArrowLeft, MapPin, Clock, Phone, MessageCircle,
   Car, Star, CheckCircle2, Loader2, AlertCircle, Navigation
@@ -243,6 +244,14 @@ export default function TrackingPage({ params }: { params: Promise<{ id: string 
                   <MessageCircle size={13} /> WhatsApp
                 </a>
               </div>
+              {/* A line to the chauffeur that works without a phone number
+                  and is read by the office too. */}
+              {["DRIVER_ASSIGNED", "IN_PROGRESS"].includes(booking.status) && (
+                <div className="mt-4">
+                  <p className="text-dark-400 text-[10px] uppercase tracking-widest mb-2">Message your chauffeur</p>
+                  <TripChat bookingId={booking.id} compact placeholder="Write to your chauffeur…" />
+                </div>
+              )}
             </div>
           ) : (
             <div className="glass-card rounded-2xl p-5 border border-white/[0.08] flex items-center gap-3">

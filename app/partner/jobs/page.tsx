@@ -3,7 +3,8 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Check, Loader2, Phone, Plane, Users } from "lucide-react";
+import { Camera, Check, Loader2, MapPin, MessageSquare, Phone, Plane, Users } from "lucide-react";
+import { ChatSheet, LiveLocationSheet, NoShowSheet } from "@/components/partner/JobTools";
 import toast from "react-hot-toast";
 import { Empty, PageTitle, Sheet, Skeleton, Status, euro, field, ghost, label, primary, vehicleLabel, whenParts } from "@/components/partner/ui";
 
@@ -11,7 +12,9 @@ type Job = {
   id: string; confirmationCode: string; status: string;
   guestName: string | null; guestPhone: string | null;
   pickupAddress: string; dropoffAddress: string; pickupDatetime: string;
+  pickupLat?: number | null; pickupLng?: number | null; dropoffLat?: number | null; dropoffLng?: number | null;
   passengers: number; luggage: number; vehicleClass: string; flightNumber: string | null; specialRequests: string | null;
+  noShow?: { images: string[]; note: string | null; waitedMin: number | null; createdAt: string; lat: number | null; lng: number | null } | null;
   partnerPayout: number | null; driverAmount: number | null; partnerDispatchedAt: string | null;
   driver: { id: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] } | null;
 };
@@ -42,6 +45,9 @@ function Jobs() {
   const [jobs, setJobs] = useState<Job[] | null>(null);
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [dispatching, setDispatching] = useState<Job | null>(null);
+  const [locating, setLocating] = useState<Job | null>(null);
+  const [proof, setProof] = useState<Job | null>(null);
+  const [chatting, setChatting] = useState<Job | null>(null);
   const [completing, setCompleting] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -137,6 +143,25 @@ function Jobs() {
                         {j.driverAmount != null && <span className="text-dark-500"> · sees {euro(j.driverAmount)}</span>}
                       </p>
                     )}
+                    {(canComplete || j.noShow) && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {canComplete && (
+                          <button type="button" onClick={() => setLocating(j)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/[0.1] px-3 text-xs text-dark-200 hover:border-white/20 hover:text-white">
+                            <MapPin size={13} /> Live location
+                          </button>
+                        )}
+                        {canComplete && (
+                          <button type="button" onClick={() => setChatting(j)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/[0.1] px-3 text-xs text-dark-200 hover:border-white/20 hover:text-white">
+                            <MessageSquare size={13} /> Chat
+                          </button>
+                        )}
+                        {j.noShow && (
+                          <button type="button" onClick={() => setProof(j)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 text-xs text-amber-200 hover:bg-amber-500/20">
+                            <Camera size={13} /> No-show proof
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Money and the one action */}
@@ -161,6 +186,9 @@ function Jobs() {
       )}
 
       <DispatchSheet job={dispatching} drivers={activeDrivers} onClose={() => setDispatching(null)} onDone={() => { setDispatching(null); load(); }} />
+      <LiveLocationSheet job={locating} onClose={() => setLocating(null)} />
+      <NoShowSheet job={proof} onClose={() => setProof(null)} />
+      <ChatSheet job={chatting} onClose={() => setChatting(null)} />
     </div>
   );
 }

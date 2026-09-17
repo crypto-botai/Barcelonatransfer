@@ -36,15 +36,22 @@ export default function RideStageControl({
   bookingId,
   currentStage,
   onAdvance,
+  navFor,
 }: {
   bookingId: string;
   currentStage: RideStage | null;
   onAdvance?: (stage: RideStage) => void;
+  /** A maps link to open the moment a stage is tapped, e.g. the pick-up on "Start trip". */
+  navFor?: (stage: RideStage) => string | null;
 }) {
   const [stage, setStage] = useState<RideStage | null>(currentStage);
   const [busy, setBusy] = useState<RideStage | null>(null);
 
   async function advance(to: RideStage) {
+    // Opened synchronously, inside the tap, so the browser treats it as the
+    // driver asking for it rather than a popup after a network round trip.
+    const nav = navFor?.(to);
+    if (nav) window.open(nav, "_blank", "noopener");
     setBusy(to);
     try {
       // Attach the driver's position where the browser will give it up quickly.
