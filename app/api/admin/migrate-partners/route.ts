@@ -59,7 +59,10 @@ const STEPS: { name: string; sql: string }[] = [
         ADD COLUMN IF NOT EXISTS "partnerDispatchedAt" TIMESTAMP(3),
         ADD COLUMN IF NOT EXISTS "partnerId" TEXT,
         ADD COLUMN IF NOT EXISTS "partnerPayout" DOUBLE PRECISION,
-        ADD COLUMN IF NOT EXISTS "paymentMethod" "BookingPaymentMethod";
+        ADD COLUMN IF NOT EXISTS "paymentMethod" "BookingPaymentMethod",
+        ADD COLUMN IF NOT EXISTS "customerLat" DOUBLE PRECISION,
+        ADD COLUMN IF NOT EXISTS "customerLng" DOUBLE PRECISION,
+        ADD COLUMN IF NOT EXISTS "customerLocatedAt" TIMESTAMP(3);
     `,
   },
   {
@@ -170,6 +173,7 @@ const EXPECTED: { table: string; column: string }[] = [
   { table: "bookings", column: "partnerId" },
   { table: "bookings", column: "partnerPayout" },
   { table: "bookings", column: "partnerDispatchedAt" },
+  { table: "bookings", column: "customerLocatedAt" },
   { table: "drivers", column: "partnerId" },
   { table: "fleet_partners", column: "bankIban" },
   { table: "partner_withdrawals", column: "status" },
