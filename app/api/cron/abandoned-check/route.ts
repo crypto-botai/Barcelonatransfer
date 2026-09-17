@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { createAbandonedCoupon, logEmail } from "@/lib/marketing";
 import { sendAbandonedBookingEmail } from "@/lib/resend";
+import { sweepAbandoned } from "@/lib/abandoned";
 
 const CRON_SECRET             = process.env.CRON_SECRET ?? "elite-cron-secret";
 const ABANDON_AFTER_MINUTES   = 60;   // wait 1 hour before first email

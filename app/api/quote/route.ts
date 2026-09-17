@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
+import { sweepAbandonedIfDue } from "@/lib/abandoned";
 import { z } from "zod";
 import { HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, calculateLastMinuteSurcharge, LAST_MINUTE_HOURS } from "@/lib/pricing";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
@@ -32,6 +33,9 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  // Every quote is a visitor on the form: the moment to check, in the
+  // background, whether anyone else has gone quiet for a quarter of an hour.
+  after(() => sweepAbandonedIfDue().catch(() => {}));
   try {
     // A non-JSON body throws here, before zod runs, so it would otherwise
     // escape the ZodError branch below and be reported as a server error.

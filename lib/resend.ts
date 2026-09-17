@@ -14,6 +14,7 @@ import {
   driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard,
   pickupChangedCard, adminPickupChangedCard,
   partnerJobCard, adminPartnerDispatchCard, credentialsCard, partnerConvertedCard,
+  abandonedRecoveryCard, personalNoteCard,
 } from "@/lib/email/premium";
 
 let _resend: Resend | undefined;
@@ -383,102 +384,6 @@ function welcomeHtml({
 }
 
 // ─── Abandoned Booking Email Template ────────────────────────
-function abandonedBookingHtml({
-  firstName, pickupShort, dropoffShort, date, time, quoteAmount, resumeUrl, unsubUrl,
-}: {
-  firstName: string; pickupShort: string; dropoffShort: string;
-  date: string; time: string; quoteAmount: number; resumeUrl: string; unsubUrl?: string;
-}): string {
-  const waLink = "https://wa.me/34635383712?text=I%20need%20help%20with%20my%20Barcelona%20transfer";
-  const priceStr = quoteAmount > 0 ? `€${quoteAmount.toFixed(2)}` : "Quote saved";
-  const fromTo = dropoffShort
-    ? `${esc(pickupShort)} → ${esc(dropoffShort)}`
-    : esc(pickupShort);
-  const dateTime = time ? `${esc(date)} &nbsp;&middot;&nbsp; ${esc(time)}` : esc(date);
-
-  return `<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light">
-<meta name="supported-color-schemes" content="light">
-<title>Your booking is waiting — Elite BCN</title>
-</head>
-<body style="margin:0; padding:0; background-color:#efece5; -webkit-text-size-adjust:100%;">
-<div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">Your luxury transfer is saved — complete your booking in one click.</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#efece5;">
-<tr><td align="center" style="padding:32px 12px;">
-  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:100%;">
-    <tr><td style="background-color:#141414; padding:36px 40px 32px 40px; text-align:center;">
-      <div style="font-family:Georgia,'Times New Roman',serif; font-size:26px; letter-spacing:8px; color:#ffffff;">ELITE<span style="color:#c9a96e;">BCN</span></div>
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#8a8a8a; padding-top:10px;">LUXURY TRANSFERS &nbsp;·&nbsp; BARCELONA</div>
-    </td></tr>
-    <tr><td style="height:3px; background-color:#c9a96e; font-size:0; line-height:0;">&nbsp;</td></tr>
-    <tr><td style="background-color:#faf8f4; padding:48px 48px 16px 48px;">
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:4px; color:#b39159; text-transform:uppercase;">Saved Transfer</div>
-      <div style="font-family:Georgia,'Times New Roman',serif; font-size:28px; line-height:36px; color:#1a1a1a; padding-top:14px;">Your chauffeur is still<br>holding the door, ${esc(firstName)}.</div>
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:23px; color:#5c5c5c; padding-top:16px;">You were one step away from your luxury transfer. We've saved your quote — complete your booking before it expires.</div>
-    </td></tr>
-    <tr><td style="background-color:#faf8f4; padding:20px 48px 8px 48px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#141414; border-radius:2px;">
-        <tr><td colspan="2" style="padding:18px 24px 6px 24px;">
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#8a8a8a; text-transform:uppercase;">Your Saved Quote</div>
-        </td></tr>
-        <tr><td colspan="2" style="padding:4px 24px 4px 24px;">
-          <div style="border-top:1px solid #2a2a2a; font-size:0; line-height:0;">&nbsp;</div>
-        </td></tr>
-        <tr>
-          <td style="padding:8px 12px 4px 24px; vertical-align:top; width:55%;">
-            <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#7a7a7a; text-transform:uppercase;">Route</div>
-            <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; line-height:20px; color:#ffffff; padding-top:4px;">${fromTo}</div>
-          </td>
-          <td style="padding:8px 24px 4px 0; vertical-align:top;">
-            <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#7a7a7a; text-transform:uppercase;">Date &amp; Time</div>
-            <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#ffffff; padding-top:4px;">${dateTime}</div>
-          </td>
-        </tr>
-        <tr><td colspan="2" style="padding:16px 24px 0 24px;">
-          <div style="border-top:1px solid #2a2a2a; font-size:0; line-height:0;">&nbsp;</div>
-        </td></tr>
-        <tr><td colspan="2" style="padding:14px 24px 22px 24px;">
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#7a7a7a; text-transform:uppercase;">Fixed Price</div>
-          <div style="font-family:Georgia,'Times New Roman',serif; font-size:28px; color:#c9a96e; padding-top:6px;">${priceStr}</div>
-        </td></tr>
-      </table>
-    </td></tr>
-    <tr><td style="background-color:#faf8f4; padding:24px 48px 16px 48px; text-align:center;">
-      <table role="presentation" cellpadding="0" cellspacing="0" align="center">
-        <tr><td style="background-color:#b39159; border-radius:2px;">
-          <a href="${esc(resumeUrl)}" style="display:inline-block; padding:16px 42px; font-family:Helvetica,Arial,sans-serif; font-size:13px; letter-spacing:2px; color:#ffffff; text-decoration:none; text-transform:uppercase;">Complete My Booking</a>
-        </td></tr>
-      </table>
-    </td></tr>
-    <tr><td style="background-color:#faf8f4; padding:8px 48px 24px 48px; text-align:center;">
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; line-height:20px; color:#8a8a8a;">✦ No charge until confirmed &nbsp;&nbsp; ✦ Free cancellation 24h &nbsp;&nbsp; ✦ 24/7 support</div>
-    </td></tr>
-    <tr><td style="background-color:#faf8f4; padding:0 48px 40px 48px; text-align:center;">
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#5c5c5c; margin-bottom:14px;">Need help? We're available 24/7.</div>
-      <table role="presentation" cellpadding="0" cellspacing="0" align="center">
-        <tr><td style="background-color:#25D366; border-radius:2px;">
-          <a href="${waLink}" style="display:inline-block; padding:12px 28px; font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#ffffff; text-decoration:none;">Chat on WhatsApp</a>
-        </td></tr>
-      </table>
-    </td></tr>
-    <tr><td style="background-color:#141414; padding:32px 48px; text-align:center;">
-      <div style="font-family:Georgia,'Times New Roman',serif; font-size:15px; letter-spacing:5px; color:#ffffff;">ELITE<span style="color:#c9a96e;">BCN</span></div>
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; line-height:19px; color:#8a8a8a; padding-top:14px;">+34 635 383 712 &nbsp;·&nbsp; www.elitebcn.info<br>Licensed VTC Operator — Barcelona, Spain</div>
-      ${unsubUrl ? `<div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#4a4a4a; padding-top:14px;"><a href="${unsubUrl}" style="color:#4a4a4a; text-decoration:underline;">Unsubscribe</a></div>` : ""}
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#5c5c5c; padding-top:8px;">&copy; ${new Date().getFullYear()} Elite BCN Transfers. All rights reserved.</div>
-    </td></tr>
-  </table>
-</td></tr>
-</table>
-</body>
-</html>`;
-}
-
-// ─── Newsletter Issue Template ────────────────────────────────
 export function newsletterIssueHtml({
   issueTeaser, issueMonth, issueYear, issueNumber,
   leadHeadline, leadBody, leadLink,
@@ -746,47 +651,66 @@ export async function sendWelcomeEmail({
 
 // ─── Abandoned Booking Recovery ──────────────────────────────
 export async function sendAbandonedBookingEmail({
-  to, name, couponCode, expiresAt, formData,
+  to, name, couponCode, formData, bookingId, payUrl,
 }: {
   to: string; name: string; couponCode?: string; expiresAt?: Date; formData?: Record<string, unknown>;
+  /** An unpaid booking rather than a form session: the log row carries it. */
+  bookingId?: string;
+  /** For an unpaid booking, the checkout it already has. */
+  payUrl?: string;
 }) {
   const fd = (formData ?? {}) as Record<string, unknown>;
+  const pickup  = String(fd.pickupAddress ?? fd.pickup ?? "").trim() || "your pick-up";
+  const dropoff = String(fd.dropoffAddress ?? fd.dropoff ?? "").trim() || null;
+  const date = String(fd.date ?? "") || null;
+  const time = String(fd.time ?? "") || null;
+  const quoteObj = fd.quote as Record<string, number> | undefined;
+  const amount = Number(quoteObj?.totalAmount ?? fd.totalAmount ?? 0) || null;
+  const vehicle = fd.vehicleLabel ? String(fd.vehicleLabel)
+    : fd.vehicleClass ? vehicleName(String(fd.vehicleClass)) : null;
+  const passengers = Number(fd.passengers ?? 0) || null;
 
-  // Extract route details from formData (try multiple field name conventions)
-  const rawPickup  = String(fd.pickupAddress  ?? fd.pickup  ?? "").trim();
-  const rawDropoff = String(fd.dropoffAddress ?? fd.dropoff ?? "").trim();
-  const pickupShort  = rawPickup.split(",")[0].trim()  || "your pickup";
-  const dropoffShort = rawDropoff.split(",")[0].trim() || "";
-  const date = String(fd.date ?? "");
-  const time = String(fd.time ?? "");
-
-  // Extract price (quote object or flat totalAmount)
-  const quoteObj   = fd.quote as Record<string, number> | undefined;
-  const quoteAmount = Number(quoteObj?.totalAmount ?? fd.totalAmount ?? 0);
-
-  // Build resume URL — embed coupon so it auto-applies
-  const params = new URLSearchParams();
-  const urlFields = ["pickupAddress","dropoffAddress","date","time","passengers","vehicleClass","pickupLat","pickupLng","dropoffLat","dropoffLng"];
-  for (const k of urlFields) {
-    const v = fd[k];
-    if (v != null) params.set(k, String(v));
+  // Where the button goes: the checkout an unpaid booking already has, or
+  // the form pre-filled with what they typed (and the coupon, if any).
+  let resumeUrl: string;
+  if (payUrl) {
+    resumeUrl = `${SITE_URL}${payUrl}`;
+  } else {
+    const params = new URLSearchParams();
+    for (const k of ["pickupAddress", "dropoffAddress", "date", "time", "passengers", "vehicleClass", "pickupLat", "pickupLng", "dropoffLat", "dropoffLng"]) {
+      const v = fd[k];
+      if (v != null && v !== "") params.set(k, String(v));
+    }
+    if (couponCode) params.set("coupon", couponCode);
+    resumeUrl = `${SITE_URL}/book?${params.toString()}`;
   }
-  if (couponCode) params.set("coupon", couponCode);
-  const resumeUrl = `${SITE_URL}/book?${params.toString()}`;
 
-  const html = abandonedBookingHtml({
-    firstName:    name.split(" ")[0] || name,
-    pickupShort,
-    dropoffShort,
-    date,
-    time,
-    quoteAmount,
-    resumeUrl,
-    unsubUrl: `${SITE_URL}/contact`,
-  });
+  const html = emailDocument(
+    abandonedRecoveryCard({
+      firstName: name.split(" ")[0] || name,
+      pickup, dropoff, date, time, vehicle, passengers, amount, resumeUrl, couponCode,
+    }),
+    `Your transfer ${pickup}${dropoff ? ` to ${dropoff}` : ""} is still waiting. One tap finishes it.`,
+  );
 
-  const id = await sendEmail({ from: FROM, to, subject: `Your Elite BCN transfer is still waiting — complete your booking`, html });
-  await logEmail({ to, subject: `Abandoned booking recovery`, type: "ABANDONED", resendId: id });
+  const id = await sendEmail({ from: FROM, to, subject: "Your Elite BCN transfer is still waiting", html });
+  await logEmail({ to, subject: `Recovery: ${pickup}${dropoff ? ` → ${dropoff}` : ""}`, type: "ABANDONED", resendId: id, bookingId });
+}
+
+// ─── A note from the office ──────────────────────────────────
+
+/** The office writing to a customer in its own words. */
+export async function sendPersonalNoteEmail({
+  to, name, subject, message, signedBy, resumeUrl, bookingId,
+}: {
+  to: string; name: string; subject: string; message: string; signedBy?: string | null; resumeUrl?: string | null; bookingId?: string;
+}) {
+  const html = emailDocument(
+    personalNoteCard({ firstName: name.split(" ")[0] || name, message, signedBy, resumeUrl }),
+    message.slice(0, 120),
+  );
+  const id = await sendEmail({ from: FROM, to, subject, html });
+  await logEmail({ to, subject: `Note: ${subject}`, type: "ABANDONED_MANUAL", resendId: id, bookingId });
 }
 
 // ─── Pickup Reminder ─────────────────────────────────────────

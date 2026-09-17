@@ -7,6 +7,7 @@ import { COMPANY } from "@/lib/company-facts";
 import { reconcilePendingPayments } from "@/lib/payments/reconcile";
 import { sweepFlightDelays } from "@/lib/flights/sweep";
 import { formatPickupDateTime } from "@/lib/datetime";
+import { sweepAbandoned } from "@/lib/abandoned";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,68 +19,15 @@ function authorise(req: NextRequest): boolean {
   return auth === `Bearer ${secret}`;
 }
 
+/**
+ * Abandoned bookings. The quarter-hour recovery in lib/abandoned.ts normally
+ * runs on form traffic; here it is the backstop for a night with none. The
+ * body that used to live here filed sessions and wrote "SENT" rows to the
+ * email log without sending anything, which made the report lie.
+ */
 async function runAbandonedCheck(): Promise<number> {
-  // Phase 1: sessions inactive >60 min, not yet converted
-  const cutoff = new Date(Date.now() - 60 * 60 * 1000);
-  const sessions = await prisma.bookingSession.findMany({
-    where: { lastActivity: { lt: cutoff }, converted: false, email: { not: null } },
-    take: 30,
-  });
-
-  let sent = 0;
-  for (const s of sessions) {
-    const alreadyAbandoned = await prisma.abandonedBooking.findUnique({ where: { sessionId: s.sessionId } });
-    if (alreadyAbandoned) continue;
-
-    // Import coupon creation from marketing
-    const { createAbandonedCoupon } = await import("@/lib/marketing");
-    const couponId = await createAbandonedCoupon(s.email!);
-
-    await prisma.abandonedBooking.create({
-      data: {
-        sessionId:    s.sessionId,
-        email:        s.email!,
-        name:         s.name ?? null,
-        phone:        s.phone ?? null,
-        formSnapshot: (s.formData ?? {}) as import("@prisma/client").Prisma.InputJsonValue,
-        couponId,
-      },
-    }).catch(() => {});
-
-    sent++;
-  }
-
-  // Phase 2: send follow-ups for existing abandoned bookings (up to 3 emails total, 24h apart)
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const toFollowUp = await prisma.abandonedBooking.findMany({
-    where: {
-      convertedAt: null,
-      OR: [
-        { emailSentAt: null },
-        { emailSentAt: { lt: oneDayAgo } },
-      ],
-    },
-    take: 30,
-  });
-
-  for (const ab of toFollowUp) {
-    const priorEmails = await prisma.emailLog.count({
-      where: { to: ab.email, type: "ABANDONED" },
-    });
-    if (priorEmails >= 3) continue;
-
-    await prisma.abandonedBooking.update({
-      where: { id: ab.id },
-      data: { emailSentAt: new Date() },
-    }).catch(() => {});
-
-    // Note: actual email sending uses existing resend infrastructure
-    await prisma.emailLog.create({
-      data: { to: ab.email, subject: "Complete your Elite BCN booking", type: "ABANDONED", status: "SENT" },
-    }).catch(() => {});
-  }
-
-  return sent;
+  const r = await sweepAbandoned();
+  return r.sessionsEmailed + r.bookingsEmailed;
 }
 
 async function runPickupReminder(): Promise<number> {

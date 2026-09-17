@@ -1,238 +1,236 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Clock, Mail, Tag, TrendingUp, RefreshCw, MessageCircle, Users, AlertTriangle } from "lucide-react";
-
-type AbandonedBooking = {
-  id:          string;
-  email:       string;
-  name:        string | null;
-  phone:       string | null;
-  emailSentAt: string | null;
-  convertedAt: string | null;
-  createdAt:   string;
-  coupon: {
-    code:        string;
-    discountPct: number;
-    usedAt:      string | null;
-    expiresAt:   string;
-  } | null;
-};
-
-type Funnel = {
-  sessions:        number;
-  withEmail:       number;
-  convertedToBook: number;
-  byStep:          { step: number; count: number }[];
-  pendingRecovery: number;
-  overdueRecovery: number;
-};
+import { useCallback, useEffect, useState } from "react";
+import { Loader2, Mail, MessageCircle, PenLine, RefreshCw, Send, X } from "lucide-react";
+import toast from "react-hot-toast";
+import { formatCurrency } from "@/lib/utils";
 
 /**
- * What the customer is doing at each step of the booking form.
+ * Everyone who nearly booked, and the office's two ways of writing to them.
  *
- * Kept in step with BookFormClient's STEPS. The order changed on 17 Aug 2026,
- * and these labels described the flow that came before it.
+ * Leads are form sessions with a name and an email that never became a
+ * booking; unpaid are website bookings whose checkout was never completed.
+ * Each shows whether the automatic recovery email went and when, offers the
+ * card again, or a note in the office's own words. The report underneath is
+ * every recovery email sent, automatic or by hand.
  */
-const STEP_LABELS: Record<number, string> = {
-  1: "Route, date & passengers",
-  2: "Contact details",
-  3: "Vehicle & price",
-  4: "Review & pay",
+type Lead = {
+  sessionId: string; email: string | null; name: string | null; phone: string | null; step: number;
+  formData: Record<string, unknown>; lastActivity: string; createdAt: string;
+  abandonedBooking: { id: string; emailSentAt: string | null; convertedAt: string | null; coupon: { code: string } | null } | null;
 };
+type Unpaid = {
+  id: string; confirmationCode: string; guestName: string | null; guestEmail: string | null; guestPhone: string | null;
+  pickupAddress: string; dropoffAddress: string; pickupDatetime: string; passengers: number; vehicleClass: string;
+  totalAmount: number; createdAt: string; recoveryEmailedAt: string | null; emailed: boolean;
+};
+type Report = { id: string; to: string; subject: string; type: string; status: string; createdAt: string; bookingId: string | null };
 
-export default function AbandonedBookingsPage() {
-  const [items,     setItems]     = useState<AbandonedBooking[]>([]);
-  const [stats,     setStats]     = useState({ total: 0, converted: 0 });
-  const [funnel,    setFunnel]    = useState<Funnel | null>(null);
-  const [loading,   setLoading]   = useState(true);
+type Target = { to: string; name: string; bookingId?: string; sessionId?: string; label: string };
 
-  const load = async () => {
-    setLoading(true);
+const when = (iso: string) => new Date(iso).toLocaleString("en-GB", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+
+export default function AbandonedPage() {
+  const [data, setData] = useState<{ leads: Lead[]; unpaid: Unpaid[]; report: Report[] } | null>(null);
+  const [tab, setTab] = useState<"unpaid" | "leads" | "report">("unpaid");
+  const [sweeping, setSweeping] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [note, setNote] = useState<Target | null>(null);
+
+  const load = useCallback(async () => {
+    const r = await fetch("/api/admin/abandoned");
+    if (r.ok) setData(await r.json());
+  }, []);
+  useEffect(() => { load(); }, [load]);
+
+  async function sweep() {
+    setSweeping(true);
     try {
-      const res  = await fetch("/api/admin/abandoned-bookings");
-      const data = await res.json();
-      setItems(data.items ?? []);
-      setStats({ total: data.total ?? 0, converted: data.converted ?? 0 });
-      setFunnel(data.funnel ?? null);
-    } finally {
-      setLoading(false);
-    }
-  };
+      const r = await fetch("/api/admin/abandoned", { method: "PUT" });
+      const d = await r.json();
+      toast.success(`Checked. ${d.sessionsEmailed + d.bookingsEmailed} recovery email${d.sessionsEmailed + d.bookingsEmailed === 1 ? "" : "s"} sent.`);
+      load();
+    } catch { toast.error("Failed"); } finally { setSweeping(false); }
+  }
 
-  useEffect(() => { load(); }, []);
+  async function resend(t: Target) {
+    setBusy(t.to + (t.bookingId ?? t.sessionId ?? ""));
+    try {
+      const r = await fetch("/api/admin/abandoned", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "recovery", ...t }) });
+      if (!r.ok) throw new Error((await r.json()).error ?? "Failed");
+      toast.success(`Recovery email sent to ${t.to}`);
+      load();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); } finally { setBusy(null); }
+  }
 
-  const convRate = stats.total > 0 ? ((stats.converted / stats.total) * 100).toFixed(1) : "0";
+  const leads = data?.leads.filter((l) => !l.abandonedBooking?.convertedAt) ?? [];
+  const unpaid = data?.unpaid ?? [];
+  const report = data?.report ?? [];
 
   return (
-    <div className="p-4 pt-16 lg:pt-6 lg:p-8 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 pt-16 lg:pt-6 lg:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
-          <h1 className="font-display text-3xl text-white">Abandoned Bookings</h1>
-          <p className="text-dark-400 text-sm mt-1">
-            Where visitors stop, and the ones we can still email back
-          </p>
+          <h1 className="font-display text-3xl text-white">Abandoned</h1>
+          <p className="text-dark-400 mt-1">People who nearly booked. Each gets one recovery email within a quarter of an hour; write again here whenever you like.</p>
         </div>
-        <button onClick={load} className="btn-outline-gold px-4 py-2 rounded-lg text-sm flex items-center gap-2">
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
+        <button onClick={sweep} disabled={sweeping} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/[0.1] text-sm text-dark-200 hover:text-white">
+          {sweeping ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />} Check now
         </button>
       </div>
 
-      {/* Funnel — the whole picture. The recovery table below covers only the
-          slice where an email was captured, which is a small fraction of it. */}
-      {funnel && funnel.sessions > 0 && (
-        <div className="glass-card rounded-xl p-5 mb-6">
-          <div className="flex items-start justify-between mb-5 gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Users size={16} className="text-gold-400" />
-                <p className="text-white font-medium">Booking form funnel</p>
-              </div>
-              <p className="text-dark-400 text-xs">
-                {funnel.sessions} people started the booking form ·{" "}
-                {funnel.convertedToBook} completed a booking ·{" "}
-                {funnel.withEmail} left an email
-              </p>
-            </div>
-            {/* Only alarming once a session has waited longer than the daily
-                cron interval. Before that it is simply queued for the next
-                run, which is not a fault. */}
-            {funnel.overdueRecovery > 0 ? (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-amber-500/30 bg-amber-500/5 flex-shrink-0">
-                <AlertTriangle size={13} className="text-amber-400" />
-                <span className="text-amber-300 text-xs">
-                  {funnel.overdueRecovery} overdue by more than a day — check the cron
-                </span>
-              </div>
-            ) : funnel.pendingRecovery > 0 ? (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 bg-white/[0.03] flex-shrink-0">
-                <Clock size={13} className="text-dark-400" />
-                <span className="text-dark-400 text-xs">
-                  {funnel.pendingRecovery} queued for the next daily run
-                </span>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="space-y-2">
-            {funnel.byStep.map(({ step, count }) => {
-              const pct = Math.round((count / funnel.sessions) * 100);
-              return (
-                <div key={step} className="flex items-center gap-3">
-                  <span className="text-dark-400 text-xs w-40 flex-shrink-0">
-                    {step}. {STEP_LABELS[step] ?? `Step ${step}`}
-                  </span>
-                  <div className="flex-1 h-5 rounded bg-white/[0.04] overflow-hidden">
-                    <div
-                      className="h-full bg-gold-500/40 border-r border-gold-500"
-                      style={{ width: `${Math.max(pct, 1)}%` }}
-                    />
-                  </div>
-                  <span className="text-dark-300 text-xs w-20 text-right flex-shrink-0 tabular-nums">
-                    {count} · {pct}%
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          <p className="text-dark-500 text-xs mt-4 pt-3 border-t border-white/[0.06]">
-            Only visitors who reach the contact step can be emailed back, so the
-            recovery list below is always a fraction of the total. A large first-step
-            number means people are getting a price and leaving.
-          </p>
-        </div>
-      )}
-
-      {/* Recovery stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {[
-          { icon: Clock,       label: "Recoverable",      value: stats.total },
-          { icon: TrendingUp,  label: "Converted",        value: stats.converted },
-          { icon: Tag,         label: "Conversion Rate",  value: `${convRate}%` },
-          { icon: Mail,        label: "Emails Sent",      value: items.filter((i) => i.emailSentAt).length },
-        ].map(({ icon: Icon, label, value }) => (
-          <div key={label} className="glass-card rounded-xl p-5">
-            <Icon size={18} className="text-gold-400 mb-3" />
-            <p className="text-dark-400 text-xs uppercase tracking-wider">{label}</p>
-            <p className="font-display text-2xl text-white mt-1">{value}</p>
-          </div>
+      <div className="flex gap-1 mb-6 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1">
+        {([["unpaid", `Unpaid bookings (${unpaid.length})`], ["leads", `Leads (${leads.length})`], ["report", `Emails sent (${report.length})`]] as const).map(([id, label]) => (
+          <button key={id} onClick={() => setTab(id)} className={`flex-1 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${tab === id ? "bg-gold-500 text-black" : "text-dark-400 hover:text-white"}`}>{label}</button>
         ))}
       </div>
 
-      {/* Table */}
-      <div className="glass-card rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/[0.06]">
-                {["Email", "Name", "Phone", "Coupon", "Discount", "Sent At", "Converted", "Expires"].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs text-dark-400 uppercase tracking-wider font-normal">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-dark-400">Loading…</td></tr>
-              ) : items.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-dark-400">No abandoned bookings yet</td></tr>
-              ) : items.map((item) => {
-                const isConverted = !!item.convertedAt;
-                const isUsed      = !!item.coupon?.usedAt;
-                const isExpired   = item.coupon ? new Date(item.coupon.expiresAt) < new Date() : false;
-
-                return (
-                  <tr key={item.id} className="border-b border-white/[0.04] hover:bg-white/[0.02]">
-                    <td className="px-4 py-3 text-white">{item.email}</td>
-                    <td className="px-4 py-3 text-dark-300">{item.name ?? "—"}</td>
-                    <td className="px-4 py-3">
-                      {item.phone ? (
-                        <a
-                          href={`https://wa.me/${item.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                            `Hi${item.name ? ` ${item.name}` : ""}! I noticed you started a booking with Elite BCN Transfers but didn't finish.${item.coupon && !item.coupon.usedAt ? ` Here's your ${item.coupon.discountPct}% discount code to complete it: ${item.coupon.code}` : " Can I help you complete it or answer any questions?"}`
-                          )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 text-[#25D366] hover:text-[#2fe378] text-xs font-medium transition-colors"
-                          title="Start WhatsApp conversation"
-                        >
-                          <MessageCircle size={13} /> {item.phone}
-                        </a>
-                      ) : <span className="text-dark-500 text-xs">—</span>}
-                    </td>
-                    <td className="px-4 py-3">
-                      {item.coupon ? (
-                        <code className="text-gold-400 text-xs font-mono">{item.coupon.code}</code>
-                      ) : <span className="text-dark-500">—</span>}
-                    </td>
-                    <td className="px-4 py-3">
-                      {item.coupon ? (
-                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                          isUsed ? "bg-green-500/20 text-green-400" :
-                          isExpired ? "bg-red-500/20 text-red-400" :
-                          "bg-gold-500/20 text-gold-400"
-                        }`}>
-                          {isUsed ? "Used" : isExpired ? "Expired" : `${item.coupon.discountPct}% OFF`}
-                        </span>
-                      ) : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-dark-400 text-xs">
-                      {item.emailSentAt ? new Date(item.emailSentAt).toLocaleString("en-GB") : <span className="text-red-400">Not sent</span>}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded text-xs ${isConverted ? "bg-green-500/20 text-green-400" : "bg-dark-500/20 text-dark-400"}`}>
-                        {isConverted ? "✓ Converted" : "Pending"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-dark-500 text-xs">
-                      {item.coupon ? new Date(item.coupon.expiresAt).toLocaleDateString("en-GB") : "—"}
-                    </td>
+      {!data ? (
+        <p className="inline-flex items-center gap-2 text-sm text-dark-400"><Loader2 size={14} className="animate-spin" /> Loading</p>
+      ) : tab === "unpaid" ? (
+        unpaid.length === 0 ? <Empty text="No unpaid website booking in the last 30 days." /> : (
+          <div className="space-y-2">
+            {unpaid.map((b) => {
+              const t: Target = { to: b.guestEmail ?? "", name: b.guestName ?? "there", bookingId: b.id, label: b.confirmationCode };
+              return (
+                <Row
+                  key={b.id}
+                  title={`${b.guestName ?? "No name"} · ${b.guestEmail ?? ""}${b.guestPhone ? ` · ${b.guestPhone}` : ""}`}
+                  line={`${b.pickupAddress} → ${b.dropoffAddress} · ${when(b.pickupDatetime)} · ${b.passengers} pax · ${formatCurrency(b.totalAmount)}`}
+                  meta={`Ref ${b.confirmationCode} · created ${when(b.createdAt)}`}
+                  sent={b.recoveryEmailedAt}
+                  phone={b.guestPhone}
+                  busy={busy === t.to + b.id}
+                  onResend={b.guestEmail ? () => resend(t) : undefined}
+                  onNote={b.guestEmail ? () => setNote(t) : undefined}
+                />
+              );
+            })}
+          </div>
+        )
+      ) : tab === "leads" ? (
+        leads.length === 0 ? <Empty text="Nobody has left contact details without booking in the last 30 days." /> : (
+          <div className="space-y-2">
+            {leads.map((l) => {
+              const fd = l.formData ?? {};
+              const t: Target = { to: l.email ?? "", name: l.name ?? "there", sessionId: l.sessionId, label: l.sessionId };
+              const q = (fd.quote as { totalAmount?: number } | undefined)?.totalAmount;
+              return (
+                <Row
+                  key={l.sessionId}
+                  title={`${l.name ?? "No name"} · ${l.email ?? ""}${l.phone ? ` · ${l.phone}` : ""}`}
+                  line={fd.pickupAddress ? `${fd.pickupAddress}${fd.dropoffAddress ? ` → ${fd.dropoffAddress}` : ""}${fd.date ? ` · ${fd.date}${fd.time ? ` ${fd.time}` : ""}` : ""}${q ? ` · ${formatCurrency(Number(q))}` : ""}` : "No route entered yet"}
+                  meta={`Step ${l.step} · last seen ${when(l.lastActivity)}${l.abandonedBooking?.coupon ? ` · coupon ${l.abandonedBooking.coupon.code}` : ""}`}
+                  sent={l.abandonedBooking?.emailSentAt ?? null}
+                  phone={l.phone}
+                  busy={busy === t.to + l.sessionId}
+                  onResend={l.email ? () => resend(t) : undefined}
+                  onNote={l.email ? () => setNote(t) : undefined}
+                />
+              );
+            })}
+          </div>
+        )
+      ) : (
+        report.length === 0 ? <Empty text="No recovery email sent yet." /> : (
+          <div className="glass-card rounded-2xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead><tr className="text-[10px] uppercase tracking-wider text-dark-500 text-left border-b border-white/[0.06]">
+                <th className="py-2.5 px-4">When</th><th className="py-2.5 px-4">To</th><th className="py-2.5 px-4">What</th><th className="py-2.5 px-4">By</th><th className="py-2.5 px-4">Status</th>
+              </tr></thead>
+              <tbody>
+                {report.map((r) => (
+                  <tr key={r.id} className="border-b border-white/[0.04]">
+                    <td className="py-2.5 px-4 text-dark-300 whitespace-nowrap">{when(r.createdAt)}</td>
+                    <td className="py-2.5 px-4 text-white">{r.to}</td>
+                    <td className="py-2.5 px-4 text-dark-300">{r.subject}</td>
+                    <td className="py-2.5 px-4 text-dark-400">{r.type === "ABANDONED_MANUAL" ? "Office" : "Automatic"}</td>
+                    <td className={`py-2.5 px-4 ${r.status === "SENT" ? "text-green-400" : "text-red-400"}`}>{r.status}</td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      )}
+
+      {note && <NoteModal target={note} onClose={() => setNote(null)} onSent={() => { setNote(null); load(); }} />}
+    </div>
+  );
+}
+
+function Empty({ text }: { text: string }) {
+  return <div className="glass-card rounded-2xl p-10 text-center text-dark-400 text-sm">{text}</div>;
+}
+
+function Row({ title, line, meta, sent, phone, busy, onResend, onNote }: {
+  title: string; line: string; meta: string; sent: string | null; phone?: string | null; busy: boolean;
+  onResend?: () => void; onNote?: () => void;
+}) {
+  return (
+    <div className="glass-card rounded-xl p-4 flex flex-wrap items-start justify-between gap-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-white text-sm">{title}</p>
+        <p className="text-dark-300 text-xs mt-1">{line}</p>
+        <p className="text-dark-500 text-[11px] mt-1">{meta}</p>
+        <p className={`text-[11px] mt-1.5 inline-flex items-center gap-1 ${sent ? "text-green-400" : "text-amber-400"}`}>
+          <Mail size={11} /> {sent ? `Recovery email sent ${when(sent)}` : "Recovery email not sent yet (goes 15 min after they go quiet)"}
+        </p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {phone && (
+          <a href={`https://wa.me/${phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-xs hover:bg-green-500/15">
+            <MessageCircle size={12} /> WhatsApp
+          </a>
+        )}
+        {onResend && (
+          <button onClick={onResend} disabled={busy} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/[0.1] text-dark-200 text-xs hover:text-white disabled:opacity-40">
+            {busy ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />} {sent ? "Send card again" : "Send card now"}
+          </button>
+        )}
+        {onNote && (
+          <button onClick={onNote} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gold-500/10 border border-gold-500/30 text-gold-300 text-xs hover:bg-gold-500/20">
+            <PenLine size={12} /> Write to them
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NoteModal({ target, onClose, onSent }: { target: Target; onClose: () => void; onSent: () => void }) {
+  const [subject, setSubject] = useState("About your Elite BCN transfer");
+  const [message, setMessage] = useState(`Hello ${target.name.split(" ")[0]},\n\nI saw you started booking a transfer with us and did not finish. If anything held you back, the price, the vehicle, the timing, tell me and I will find the best option for you.\n\nYou can reply to this email or write to us on WhatsApp at any hour.`);
+  const [busy, setBusy] = useState(false);
+
+  async function send() {
+    setBusy(true);
+    try {
+      const r = await fetch("/api/admin/abandoned", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "note", to: target.to, name: target.name, bookingId: target.bookingId, sessionId: target.sessionId, subject, message }) });
+      if (!r.ok) throw new Error((await r.json()).error ?? "Failed");
+      toast.success(`Sent to ${target.to}`);
+      onSent();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); } finally { setBusy(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-lg bg-[#0a0a0a] border border-white/[0.08] rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="font-display text-xl text-white">Write to {target.name}</h2>
+            <p className="text-dark-400 text-xs">{target.to} · sent on the Elite BCN card, with a button back to their booking</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-dark-400 hover:text-white"><X size={14} /></button>
         </div>
+        <label className="block text-[10px] text-gold-500/80 uppercase tracking-[0.15em] font-semibold mb-1.5">Subject</label>
+        <input value={subject} onChange={(e) => setSubject(e.target.value)} className="input-luxury w-full px-3 py-2.5 rounded-lg text-sm mb-3" />
+        <label className="block text-[10px] text-gold-500/80 uppercase tracking-[0.15em] font-semibold mb-1.5">Your message</label>
+        <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={9} className="input-luxury w-full px-3 py-2.5 rounded-lg text-sm leading-relaxed" />
+        <button onClick={send} disabled={busy || message.trim().length < 2} className="btn-gold w-full mt-4 py-3 rounded-xl font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-40">
+          {busy ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} Send
+        </button>
       </div>
     </div>
   );

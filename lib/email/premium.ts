@@ -942,3 +942,103 @@ export function partnerConvertedCard(o: { contactName: string; companyName: stri
     ${sectionSpacer(42)}
   `);
 }
+
+// ─── 17. You left your booking (customer) ────────────────────
+
+/**
+ * The recovery email. Sent once, automatically, a quarter of an hour after
+ * someone with a name and an email went quiet on the form or left a booking
+ * unpaid. It shows them what they were booking, gives them the price they
+ * saw, and offers two ways back: the button that resumes the booking, and
+ * WhatsApp to a person.
+ */
+export function abandonedRecoveryCard(o: {
+  firstName: string;
+  pickup: string; dropoff?: string | null;
+  date?: string | null; time?: string | null;
+  vehicle?: string | null; passengers?: number | null;
+  amount?: number | null;
+  resumeUrl: string;
+  couponCode?: string | null;
+}): string {
+  const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Hello, I was booking a transfer ${o.pickup}${o.dropoff ? ` to ${o.dropoff}` : ""}${o.date ? ` on ${o.date}` : ""}. Can you help me finish it?`)}`;
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Your Booking")}
+      ${headline(`Your transfer is still waiting, ${esc(o.firstName)}.`)}
+      ${paragraph("You started booking with Elite BCN and did not finish. Nothing has been charged and nothing is lost: everything you entered is below, and one tap picks it up where you left it.")}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;">
+      ${detailTable(
+        row("Pick-up", esc(o.pickup)) +
+        (o.dropoff ? row("Drop-off", esc(o.dropoff)) : "") +
+        (o.date ? row("Date", `${esc(o.date)}${o.time ? ` &nbsp;&middot;&nbsp; ${esc(o.time)}` : ""}`) : "") +
+        (o.vehicle ? row("Vehicle", esc(o.vehicle)) : "") +
+        row("Guests", o.passengers ? String(o.passengers) : "—", true),
+      )}
+    </td></tr>
+
+    ${o.amount && o.amount > 0 ? `
+      ${sectionSpacer(28)}
+      <tr><td style="padding:0 44px;">${amountBar("Your fixed price", o.amount, "all included, no surprises")}</td></tr>
+    ` : ""}
+
+    ${o.couponCode ? `
+      ${sectionSpacer(18)}
+      <tr><td style="padding:0 44px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
+          <tr><td style="padding:20px 24px;text-align:center;">
+            <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">5% off if you book today</div>
+            <div style="font-family:${SERIF};font-size:24px;letter-spacing:5px;color:${GOLD};padding-top:8px;">${esc(o.couponCode)}</div>
+            <div style="font-family:${SANS};font-size:12px;color:${LABEL};padding-top:6px;">Applied for you when you use the button below.</div>
+          </td></tr>
+        </table>
+      </td></tr>
+    ` : ""}
+    ${sectionSpacer(32)}
+
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(o.resumeUrl, "Finish My Booking")}
+      <div style="padding-top:16px;">${secondaryLink(wa, "Talk to us on WhatsApp")}</div>
+      <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${LABEL};padding-top:18px;">
+        Prefer to talk? We are on
+        <a href="tel:${PHONE_DIGITS}" style="color:${GOLD};text-decoration:none;">${PHONE}</a>
+        24 hours a day, in English and Spanish, and we will always find you our best rate.
+      </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+// ─── 18. A note from the office (customer) ───────────────────
+
+/**
+ * The office writing to a customer in its own words, on the same card as
+ * everything else. Line breaks are kept; nothing else is interpreted.
+ */
+export function personalNoteCard(o: {
+  firstName: string; message: string; signedBy?: string | null;
+  resumeUrl?: string | null;
+}): string {
+  const wa = `https://wa.me/${PHONE_DIGITS}`;
+  const body = esc(o.message).replace(/\r?\n/g, "<br>");
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("A note from Elite BCN")}
+      ${headline(`Hello, ${esc(o.firstName)}.`)}
+      <div style="font-family:${SANS};font-size:15px;line-height:25px;color:${TEXT};padding-top:16px;">${body}</div>
+      ${o.signedBy ? `<div style="font-family:${SANS};font-size:14px;color:${TITLE};padding-top:18px;">${esc(o.signedBy)}<br><span style="color:${LABEL};font-size:12px;">Elite BCN Transfers</span></div>` : ""}
+    </td></tr>
+    ${sectionSpacer(32)}
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${o.resumeUrl ? button(o.resumeUrl, "Finish My Booking") : button(wa, "Message Us on WhatsApp")}
+      ${o.resumeUrl ? `<div style="padding-top:16px;">${secondaryLink(wa, "Talk to us on WhatsApp")}</div>` : ""}
+      <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${LABEL};padding-top:18px;">
+        Or call <a href="tel:${PHONE_DIGITS}" style="color:${GOLD};text-decoration:none;">${PHONE}</a>, any hour.
+      </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}

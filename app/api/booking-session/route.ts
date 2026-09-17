@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
+import { sweepAbandonedIfDue } from "@/lib/abandoned";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
@@ -15,6 +16,7 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  after(() => sweepAbandonedIfDue().catch(() => {}));
   try {
     const body = schema.parse(await req.json());
 
