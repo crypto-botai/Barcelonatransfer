@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { formatPickupDateTime } from "@/lib/datetime";
 import {
   sendDriverAssignedEmail, sendDriverBookingDetailsEmail, sendTemporaryPassword,
-  sendPartnerJobEmail, sendAdminPartnerDispatchAlert, sendAdminAlertEmail,
+  sendPartnerJobEmail, sendAdminPartnerDispatchAlert, sendAdminAlertEmail, sendPartnerConvertedEmail,
 } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
 
@@ -44,10 +44,41 @@ export function temporaryPassword(): string {
 export async function createPartner(input: {
   name: string; contactName: string; email: string; phone: string;
   taxId?: string; address?: string; notes?: string;
+  /**
+   * The email already belongs to a customer account, and the office wants
+   * that account to become the company login. Their password is kept; the
+   * role changes and a company record is attached. Drivers and admins are
+   * never converted.
+   */
+  convertExisting?: boolean;
 }) {
   const email = input.email.trim().toLowerCase();
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) throw new Error("That email already has an account");
+  const existing = await prisma.user.findUnique({ where: { email }, include: { driver: { select: { id: true } }, fleetPartner: { select: { id: true } } } });
+
+  if (existing && input.convertExisting) {
+    if (existing.fleetPartner) throw new Error("That account is already a fleet company");
+    if (existing.role !== "CUSTOMER" || existing.driver) throw new Error("Only a customer account can be converted into a company login");
+    const partner = await prisma.$transaction(async (tx) => {
+      await tx.user.update({ where: { id: existing.id }, data: { role: "PARTNER", name: input.contactName.trim(), phone: input.phone.trim() } });
+      return tx.fleetPartner.create({
+        data: {
+          userId: existing.id,
+          name: input.name.trim(),
+          contactName: input.contactName.trim(),
+          email,
+          phone: input.phone.trim(),
+          taxId: input.taxId?.trim() || null,
+          address: input.address?.trim() || null,
+          notes: input.notes?.trim() || null,
+        },
+      });
+    });
+    await sendPartnerConvertedEmail({ to: email, contactName: input.contactName, companyName: partner.name })
+      .catch((e) => console.error("[partner] converted email:", e));
+    return partner;
+  }
+
+  if (existing) throw new Error("EXISTS");
 
   const password = temporaryPassword();
   const passwordHash = await bcrypt.hash(password, 12);

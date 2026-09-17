@@ -49,6 +49,7 @@ const createSchema = z.object({
   taxId:       z.string().optional(),
   address:     z.string().optional(),
   notes:       z.string().optional(),
+  convertExisting: z.boolean().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -63,6 +64,9 @@ export async function POST(req: NextRequest) {
     }).catch(() => {});
     return NextResponse.json(partner, { status: 201 });
   } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : "Could not create partner" }, { status: 400 });
+    const msg = e instanceof Error ? e.message : "Could not create partner";
+    // The email is already an account: the UI offers to convert it.
+    if (msg === "EXISTS") return NextResponse.json({ error: "That email already has an account", exists: true }, { status: 409 });
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 }

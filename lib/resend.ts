@@ -13,7 +13,7 @@ import {
   flightDelayCard,
   driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard,
   pickupChangedCard, adminPickupChangedCard,
-  partnerJobCard, adminPartnerDispatchCard, credentialsCard,
+  partnerJobCard, adminPartnerDispatchCard, credentialsCard, partnerConvertedCard,
 } from "@/lib/email/premium";
 
 let _resend: Resend | undefined;
@@ -1079,6 +1079,16 @@ export async function sendPartnerJobEmail({
   );
   const id = await sendEmail({ from: FROM, to, subject: `New job — ${confirmationCode} · ${pickupDatetime} | Elite BCN`, html });
   await logEmail({ to, subject: `Partner job — ${confirmationCode}`, type: "PARTNER_JOB", resendId: id });
+}
+
+/** A customer account has become a company login; same password, new panel. */
+export async function sendPartnerConvertedEmail({ to, contactName, companyName }: { to: string; contactName: string; companyName: string }) {
+  const html = emailDocument(
+    partnerConvertedCard({ contactName, companyName, panelUrl: `${SITE_URL}/partner` }),
+    `${companyName} now has a fleet partner panel at Elite BCN. Sign in with your usual password.`,
+  );
+  const id = await sendEmail({ from: FROM, to, subject: `Your fleet partner panel is ready | Elite BCN`, html });
+  await logEmail({ to, subject: "Fleet partner panel ready", type: "PARTNER_CONVERTED", resendId: id });
 }
 
 /** The office learns who a partner put on the job. */

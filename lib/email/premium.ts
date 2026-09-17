@@ -921,3 +921,24 @@ export function credentialsCard(o: {
     ${sectionSpacer(42)}
   `);
 }
+
+// ─── 16. Customer account became a company login ─────────────
+
+export function partnerConvertedCard(o: { contactName: string; companyName: string; panelUrl: string }): string {
+  const firstName = o.contactName.split(" ")[0] || o.contactName;
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Fleet Partner")}
+      ${headline(`Your panel is ready, ${esc(firstName)}.`)}
+      ${paragraph(`${esc(o.companyName)} is now a fleet partner of Elite BCN. Your existing sign-in and password now open the company panel, where you add your drivers and dispatch the jobs Elite BCN sends you.`)}
+    </td></tr>
+    ${sectionSpacer(32)}
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(o.panelUrl, "Open Dispatch Panel")}
+      <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${LABEL};padding-top:18px;">
+        Sign in with the same email and password as before.
+      </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}

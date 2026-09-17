@@ -93,17 +93,23 @@ export default function PartnersPage() {
 function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [f, setF] = useState({ name: "", contactName: "", email: "", phone: "", taxId: "", address: "", notes: "" });
   const [busy, setBusy] = useState(false);
+  // The email already belongs to a customer: the office can turn that
+  // account into the company login instead of asking for a new address.
+  const [existing, setExisting] = useState(false);
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setF({ ...f, [k]: e.target.value });
   const field = "input-luxury w-full px-3 py-2.5 rounded-lg text-sm";
   const label = "block text-[10px] text-gold-500/80 uppercase tracking-[0.15em] font-semibold mb-1.5";
 
-  async function submit() {
+  async function submit(convertExisting = false) {
     setBusy(true);
     try {
-      const res = await fetch("/api/admin/partners", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(f) });
+      const res = await fetch("/api/admin/partners", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...f, convertExisting }) });
       const data = await res.json();
+      if (res.status === 409 && data.exists) { setExisting(true); return; }
       if (!res.ok) throw new Error(data.error ?? "Failed");
-      toast.success(`${data.name} created — sign-in details emailed to ${f.email}`);
+      toast.success(convertExisting
+        ? `${data.name} created — ${f.email} now signs in to the company panel with their existing password`
+        : `${data.name} created — sign-in details emailed to ${f.email}`);
       onCreated();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed");
@@ -133,10 +139,25 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
           </div>
           <div><label className={label}>Notes (internal)</label><textarea className={`${field} min-h-[70px]`} value={f.notes} onChange={set("notes")} /></div>
         </div>
-        <p className="text-[11px] text-dark-500 mt-4">A temporary password is emailed to the login address. They choose their own on first sign-in.</p>
-        <button onClick={submit} disabled={busy || !f.name || !f.contactName || !f.email || !f.phone} className="btn-gold w-full mt-4 py-3 rounded-xl font-semibold disabled:opacity-40 inline-flex items-center justify-center gap-2">
-          {busy ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} Create company
-        </button>
+        {existing ? (
+          <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+            <p className="text-sm text-amber-100">{f.email} already has a customer account.</p>
+            <p className="text-xs text-amber-200/80 mt-1">Turn that account into this company's login? They keep their password and sign in at the same place; their dashboard becomes the company panel.</p>
+            <div className="flex gap-2 mt-3">
+              <button onClick={() => submit(true)} disabled={busy} className="btn-gold flex-1 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-40 inline-flex items-center justify-center gap-2">
+                {busy ? <Loader2 size={14} className="animate-spin" /> : null} Convert to company login
+              </button>
+              <button onClick={() => setExisting(false)} className="px-4 py-2.5 rounded-xl border border-white/10 text-sm text-dark-300">Use another email</button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <p className="text-[11px] text-dark-500 mt-4">A temporary password is emailed to the login address. They choose their own on first sign-in.</p>
+            <button onClick={() => submit(false)} disabled={busy || !f.name || !f.contactName || !f.email || !f.phone} className="btn-gold w-full mt-4 py-3 rounded-xl font-semibold disabled:opacity-40 inline-flex items-center justify-center gap-2">
+              {busy ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} Create company
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
