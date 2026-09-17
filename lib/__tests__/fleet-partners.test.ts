@@ -52,6 +52,8 @@ describe("fleet partners", () => {
     expect(mw).toMatch(/role !== "PARTNER"/);
     // A partner hitting /admin is sent to their own panel, never let through.
     expect(mw).toMatch(/if \(role === "PARTNER"\) return NextResponse\.redirect\(new URL\("\/partner"/);
+    // Anyone else hitting /partner is told why, not dropped on another dashboard.
+    expect(mw).toMatch(/if \(role !== "PARTNER"\) return NextResponse\.redirect\(new URL\("\/fleet-login"/);
   });
 
   it("keeps company drivers off the office rosters", () => {

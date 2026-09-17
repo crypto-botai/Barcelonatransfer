@@ -35,6 +35,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/driver") ||
     pathname.startsWith("/partner") ||
+    pathname.startsWith("/fleet-login") ||
     pathname.startsWith("/dashboard")
   ) {
     const res = NextResponse.next();
@@ -70,11 +71,10 @@ export async function middleware(req: NextRequest) {
   // A fleet company's own panel. Nothing here routes into /admin, and an
   // admin does not land here either: the two are different jobs.
   if (pathname.startsWith("/partner")) {
-    if (role !== "PARTNER") {
-      if (role === "ADMIN")  return NextResponse.redirect(new URL("/admin", req.url));
-      if (role === "DRIVER") return NextResponse.redirect(new URL("/driver", req.url));
-      return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
+    // Someone signed in as a customer or a driver who opens the company
+    // panel is told why it will not open, rather than being dropped on a
+    // dashboard that is not the one they wanted.
+    if (role !== "PARTNER") return NextResponse.redirect(new URL("/fleet-login", req.url));
     return NextResponse.next();
   }
 
