@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import DeleteAccountButton from "@/components/account/DeleteAccountButton";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -174,6 +175,8 @@ export default function ProfilePage() {
           <Shield size={14} className="text-dark-500 group-hover:text-gold-500 transition-colors" />
         </button>
       </div>
+
+      <DeleteAccountButton kind="customer" />
     </div>
   );
 }

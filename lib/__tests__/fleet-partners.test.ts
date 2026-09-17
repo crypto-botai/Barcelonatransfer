@@ -131,3 +131,25 @@ describe("fleet partners", () => {
     }
   });
 });
+
+describe("deleting your own account", () => {
+  const api = rd("app/api/account/route.ts");
+  it("is offered on the customer, driver and company portals", () => {
+    expect(rd("app/dashboard/profile/page.tsx")).toContain('<DeleteAccountButton kind="customer" />');
+    expect(rd("components/driver/DriverDashboard.tsx")).toContain('<DeleteAccountButton kind="driver" />');
+    expect(rd("app/partner/account/page.tsx")).toContain('<DeleteAccountButton kind="company" />');
+  });
+  it("refuses admins and keeps bookings as records", () => {
+    expect(api).toMatch(/u\.role === "ADMIN"\) return NextResponse\.json/);
+    expect(api).toContain("data: { userId: null }");
+    expect(api).not.toMatch(/booking\.deleteMany/);
+  });
+  it("takes a company's drivers with it and unassigns their jobs", () => {
+    expect(api).toContain("where: { partnerId: user.fleetPartner.id }, select: { id: true, userId: true }");
+    expect(api).toContain("data: { driverId: null }");
+    expect(api).toContain("id: { in: driverUserIds }");
+  });
+  it("needs the word DELETE typed", () => {
+    expect(rd("components/account/DeleteAccountButton.tsx")).toContain('typed !== "DELETE"');
+  });
+});

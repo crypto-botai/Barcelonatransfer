@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2, Save } from "lucide-react";
 import toast from "react-hot-toast";
 import { PageTitle, Skeleton, field, label, primary } from "@/components/partner/ui";
+import DeleteAccountButton from "@/components/account/DeleteAccountButton";
 
 type Me = {
   name: string; contactName: string; email: string; phone: string;
@@ -68,6 +69,10 @@ export default function PartnerAccountPage() {
         <button type="button" onClick={save} disabled={busy} className={primary}>
           {busy ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} Save
         </button>
+
+        <div className="border-t border-white/[0.06] pt-8">
+          <DeleteAccountButton kind="company" />
+        </div>
       </div>
     </div>
   );

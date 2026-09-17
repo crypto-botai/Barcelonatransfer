@@ -14,6 +14,7 @@ import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
 import LocationSharing from "@/components/driver/LocationSharing";
 import FlightStatusBadge from "@/components/driver/FlightStatusBadge";
 import ActiveRidePanel from "@/components/driver/ActiveRidePanel";
+import DeleteAccountButton from "@/components/account/DeleteAccountButton";
 import NoShowPanel from "@/components/driver/NoShowPanel";
 import ArrivalPanel from "@/components/arrival/ArrivalPanel";
 import type { RideStage } from "@prisma/client";
@@ -611,6 +612,10 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
             </div>
           </div>
         )}
+
+        <div className="mt-10">
+          <DeleteAccountButton kind="driver" />
+        </div>
       </div>
     </main>
   );
