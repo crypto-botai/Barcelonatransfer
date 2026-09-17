@@ -36,10 +36,21 @@ async function sendEmail(payload: Parameters<Resend["emails"]["send"]>[0]): Prom
   if (!payload.replyTo) {
     (payload as unknown as Record<string, unknown>).replyTo = COMPANY.email;
   }
-  const result = await resend.emails.send(payload);
-  if (result?.error) {
-    const errMsg = (result.error as { message?: string }).message ?? JSON.stringify(result.error);
+  let result: Awaited<ReturnType<Resend["emails"]["send"]>> | undefined;
+  let errMsg: string | undefined;
+  try {
+    result = await resend.emails.send(payload);
+    if (result?.error) errMsg = (result.error as { message?: string }).message ?? JSON.stringify(result.error);
+  } catch (e) {
+    errMsg = e instanceof Error ? e.message : String(e);
+  }
+  if (errMsg) {
     console.error(`[resend] FAILED from=${payload.from} to=${payload.to} subject="${payload.subject}": ${errMsg}`);
+    // A refused send used to leave no trace anywhere the office could see.
+    // The reason goes into the email log, prefixed, so Admin -> Email Logs
+    // shows what Resend said rather than an email that silently never went.
+    const to = Array.isArray(payload.to) ? payload.to.join(", ") : String(payload.to);
+    await logEmail({ to, subject: `[FAILED: ${errMsg.slice(0, 160)}] ${payload.subject ?? ""}`, type: "FAILED", status: "FAILED" }).catch(() => {});
     throw new Error(`Resend error: ${errMsg}`);
   }
   return result?.data?.id;
