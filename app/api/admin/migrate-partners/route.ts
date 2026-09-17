@@ -107,8 +107,10 @@ const STEPS: { name: string; sql: string }[] = [
       );
     `,
   },
+  // One statement per step: Prisma sends each as a prepared statement, and
+  // PostgreSQL refuses several commands in one of those. A DO block is one.
   {
-    name: "enum TripSender + table trip_messages",
+    name: "enum TripSender",
     sql: `
       DO $$
       BEGIN
@@ -116,6 +118,11 @@ const STEPS: { name: string; sql: string }[] = [
           CREATE TYPE "TripSender" AS ENUM ('CUSTOMER', 'DRIVER', 'PARTNER', 'ADMIN');
         END IF;
       END $$;
+    `,
+  },
+  {
+    name: "table trip_messages",
+    sql: `
       CREATE TABLE IF NOT EXISTS "trip_messages" (
         "id" TEXT NOT NULL,
         "bookingId" TEXT NOT NULL,
@@ -125,17 +132,12 @@ const STEPS: { name: string; sql: string }[] = [
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT "trip_messages_pkey" PRIMARY KEY ("id")
       );
-      CREATE INDEX IF NOT EXISTS "trip_messages_bookingId_createdAt_idx" ON "trip_messages"("bookingId", "createdAt");
     `,
   },
-  {
-    name: "indexes",
-    sql: `
-      CREATE UNIQUE INDEX IF NOT EXISTS "fleet_partners_userId_key" ON "fleet_partners"("userId");
-      CREATE INDEX IF NOT EXISTS "fleet_partners_active_idx" ON "fleet_partners"("active");
-      CREATE INDEX IF NOT EXISTS "partner_withdrawals_partnerId_status_idx" ON "partner_withdrawals"("partnerId", "status");
-    `,
-  },
+  { name: "index trip_messages", sql: `CREATE INDEX IF NOT EXISTS "trip_messages_bookingId_createdAt_idx" ON "trip_messages"("bookingId", "createdAt");` },
+  { name: "index fleet_partners userId", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "fleet_partners_userId_key" ON "fleet_partners"("userId");` },
+  { name: "index fleet_partners active", sql: `CREATE INDEX IF NOT EXISTS "fleet_partners_active_idx" ON "fleet_partners"("active");` },
+  { name: "index partner_withdrawals", sql: `CREATE INDEX IF NOT EXISTS "partner_withdrawals_partnerId_status_idx" ON "partner_withdrawals"("partnerId", "status");` },
   {
     name: "foreign keys",
     sql: `
@@ -195,8 +197,6 @@ async function run() {
 
   for (const step of STEPS) {
     try {
-      // The index step holds several statements; executeRawUnsafe sends the
-      // string as one simple query, which PostgreSQL accepts.
       await prisma.$executeRawUnsafe(step.sql);
       applied.push(step.name);
     } catch (e) {
