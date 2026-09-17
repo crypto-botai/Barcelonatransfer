@@ -27,7 +27,8 @@ export default async function DriverPage() {
           rideStage: true, rideStageAt: true,
           noShow: { select: { id: true } },
           rideEvents: { where: { stage: "ARRIVED" }, take: 1, select: { createdAt: true } },
-          guestName: true, guestPhone: true, flightNumber: true,
+          guestName: true, guestPhone: true, guestEmail: true, flightNumber: true,
+          customerLat: true, customerLng: true, customerLocatedAt: true,
         },
       },
       withdrawals: {

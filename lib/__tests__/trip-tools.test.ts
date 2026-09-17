@@ -95,3 +95,28 @@ describe("live location", () => {
     expect(rd("middleware.ts")).toMatch(/role === "ADMIN" && !pathname\.startsWith\("\/dashboard\/tracking\/"\)/);
   });
 });
+
+describe("who sees whom", () => {
+  it("the customer sees the chauffeur's name, phone, email and vehicle on both tracking views", () => {
+    expect(rd("app/api/bookings/[id]/route.ts")).toMatch(/user: \{ select: \{ name: true, image: true, phone: true, email: true \} \}/);
+    expect(rd("app/dashboard/tracking/[id]/page.tsx")).toContain("booking.driver.user.email");
+    expect(rd("app/track/[code]/page.tsx")).toContain("driverEmail:");
+    const pub = rd("components/tracking/PublicTrackClient.tsx");
+    expect(pub).toContain("booking.driverEmail");
+    expect(pub).toContain("booking.plate");
+  });
+  it("the driver sees the customer's name, phone and email", () => {
+    expect(rd("app/driver/page.tsx")).toContain("guestEmail: true");
+    expect(rd("components/driver/DriverDashboard.tsx")).toContain("b.guestEmail");
+  });
+  it("only the customer can write their position, and it is dropped when they stop", () => {
+    const api = rd("app/api/bookings/[id]/customer-location/route.ts");
+    expect(api).toMatch(/me\.sender !== "CUSTOMER"\) return NextResponse\.json\(\{ error: "Unauthorized" \}/);
+    expect(api).toContain("customerLat: null, customerLng: null, customerLocatedAt: null");
+    expect(rd("components/tracking/ShareMyLocation.tsx")).toContain('method: "DELETE"');
+  });
+  it("the driver sees where the passenger is and can navigate to them", () => {
+    expect(rd("components/driver/ActiveRidePanel.tsx")).toContain("<PassengerLocation");
+    expect(rd("components/driver/PassengerLocation.tsx")).toContain("Go to them");
+  });
+});

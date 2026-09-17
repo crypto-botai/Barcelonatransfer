@@ -40,7 +40,8 @@ export async function GET(
         createdAt: true,
         driver: {
           select: {
-            user: { select: { name: true, image: true, phone: true } },
+            user: { select: { name: true, image: true, phone: true, email: true } },
+            whatsappNumber: true,
             rating: true,
             vehicles: { take: 1, select: { make: true, model: true, licensePlate: true, color: true } },
           },

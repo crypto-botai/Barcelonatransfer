@@ -6,6 +6,7 @@ import { Loader2, MapPin, Phone, MessageCircle, CheckCircle2, Car } from "lucide
 import { useTranslations } from "@/components/language/I18nProvider";
 
 import TripChat from "@/components/chat/TripChat";
+import ShareMyLocation from "@/components/tracking/ShareMyLocation";
 const LiveMap = dynamic(() => import("@/components/dashboard/LiveMap"), {
   ssr: false,
   loading: () => (
@@ -28,6 +29,7 @@ export interface TrackBooking {
   dropoffLng: number;
   driverName: string | null;
   driverPhone: string | null;
+  driverEmail?: string | null;
   vehicle: string | null;
   plate: string | null;
 }
@@ -155,6 +157,8 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-white text-sm font-medium truncate">{booking.driverName}</p>
+              {booking.driverPhone && <p className="text-dark-300 text-xs">{booking.driverPhone}</p>}
+              {booking.driverEmail && <p className="text-dark-500 text-xs truncate">{booking.driverEmail}</p>}
               {booking.vehicle && (
                 <p className="text-dark-400 text-xs truncate">
                   {booking.vehicle}{booking.plate ? ` · ${booking.plate}` : ""}
@@ -186,7 +190,8 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
       )}
 
       {booking.driverName && (status === "DRIVER_ASSIGNED" || status === "IN_PROGRESS") && (
-        <div>
+        <div className="space-y-3">
+          <ShareMyLocation bookingId={booking.id} code={booking.code} />
           <p className="text-dark-400 text-[10px] uppercase tracking-widest mb-2">Message your chauffeur</p>
           <TripChat bookingId={booking.id} code={booking.code} compact placeholder="Write to your chauffeur…" />
         </div>

@@ -37,7 +37,7 @@ export default async function TrackPage({
       driver: {
         select: {
           whatsappNumber: true,
-          user:     { select: { name: true, phone: true } },
+          user:     { select: { name: true, phone: true, email: true } },
           vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } },
         },
       },
@@ -61,6 +61,7 @@ export default async function TrackPage({
     dropoffLng:     booking.dropoffLng,
     driverName:     booking.driver?.user.name ?? null,
     driverPhone:    booking.driver?.user.phone ?? booking.driver?.whatsappNumber ?? null,
+    driverEmail:    booking.driver?.user.email ?? null,
     vehicle:        v ? `${v.make} ${v.model}`.trim() : null,
     plate:          v?.licensePlate ?? null,
   };

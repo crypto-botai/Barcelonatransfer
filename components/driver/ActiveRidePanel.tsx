@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import type { RideStage } from "@prisma/client";
 import RideStageControl from "@/components/driver/RideStageControl";
 import TripChat from "@/components/chat/TripChat";
+import PassengerLocation from "@/components/driver/PassengerLocation";
 import { navUrl, readNavPref, saveNavPref, freeWaitMinutes, type NavApp } from "@/lib/nav-links";
 import { formatCurrency } from "@/lib/utils";
 
@@ -65,6 +66,8 @@ export default function ActiveRidePanel({
 
       <AddressRow label="Pick-up" address={booking.pickupAddress} nav={pickupNav} onCopy={() => copy(booking.pickupAddress)} active={!stage || stage === "ON_THE_WAY" || stage === "ARRIVED" || stage === "WAITING_PASSENGER"} />
       <AddressRow label="Drop-off" address={booking.dropoffAddress} nav={dropoffNav} onCopy={() => copy(booking.dropoffAddress)} active={stage === "ON_BOARD"} />
+
+      {stage !== "ON_BOARD" && stage !== "COMPLETED" && <PassengerLocation bookingId={booking.id} app={app} />}
 
       {waitingFrom && stage !== "ON_BOARD" && stage !== "COMPLETED" && (
         <WaitTimer since={waitingFrom} freeMin={freeWaitMinutes(Boolean(booking.flightNumber))} />

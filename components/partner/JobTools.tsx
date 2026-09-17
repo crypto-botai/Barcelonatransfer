@@ -29,6 +29,7 @@ export function LiveLocationSheet({ job, onClose }: { job: JobForTools | null; o
   const [trail, setTrail] = useState<Point[]>([]);
   const [live, setLive] = useState<boolean | null>(null);
   const [at, setAt] = useState<string | null>(null);
+  const [pax, setPax] = useState<{ lat: number; lng: number; at: string } | null>(null);
 
   useEffect(() => {
     if (!job) return;
@@ -41,6 +42,8 @@ export function LiveLocationSheet({ job, onClose }: { job: JobForTools | null; o
         setLive(Boolean(d.live));
         if (d.point) { setPoint(d.point); setAt(d.point.createdAt ?? null); }
         if (Array.isArray(d.trail)) setTrail(d.trail);
+        const c = await fetch(`/api/bookings/${job.id}/customer-location`, { cache: "no-store" });
+        if (c.ok && !stop) { const cd = await c.json(); setPax(cd.sharing && cd.lat != null ? { lat: cd.lat, lng: cd.lng, at: cd.at } : null); }
       } catch { /* next tick */ }
     };
     tick();
@@ -66,6 +69,11 @@ export function LiveLocationSheet({ job, onClose }: { job: JobForTools | null; o
               driverStatus={job.status}
             />
           </div>
+          {pax && (
+            <p className="text-xs text-emerald-300">
+              The passenger is sharing their position too: <a href={`https://www.google.com/maps?q=${pax.lat},${pax.lng}`} target="_blank" rel="noreferrer" className="underline">open on a map</a>.
+            </p>
+          )}
           <p className="text-xs text-dark-400">
             {live === null ? <span className="inline-flex items-center gap-1"><Loader2 size={11} className="animate-spin" /> Checking</span>
               : live && at ? `Last position ${new Date(at).toLocaleTimeString("en-GB", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit", second: "2-digit" })}. Updates every few seconds while the driver shares.`

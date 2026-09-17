@@ -291,6 +291,12 @@ model Booking {
   partnerPayout       Float?
   partnerAssignedAt   DateTime?
   partnerDispatchedAt DateTime?
+  // The passenger's own position, when they choose to share it with their
+  // chauffeur from the tracking page. Stale after a couple of minutes; the
+  // driver's panel says how old it is. Cleared when they stop sharing.
+  customerLat         Float?
+  customerLng         Float?
+  customerLocatedAt   DateTime?
   returnOfId        String?    @unique
   returnOf          Booking?   @relation("RoundTrip", fields: [returnOfId], references: [id])
   returnLeg         Booking?   @relation("RoundTrip")

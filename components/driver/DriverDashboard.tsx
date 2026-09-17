@@ -37,6 +37,7 @@ type Booking = {
   driverAmount: number | null;
   guestName?: string | null;
   guestPhone?: string | null;
+  guestEmail?: string | null;
   flightNumber?: string | null;
   rideStage?: RideStage | null;
   rideStageAt?: Date | string | null;
@@ -413,6 +414,9 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                             <span className="text-xs text-dark-400 flex items-center gap-1">
                               <Car size={10} className="text-gold-500" /> {b.guestName}
                             </span>
+                          )}
+                          {b.guestEmail && (
+                            <a href={`mailto:${b.guestEmail}`} className="text-xs text-dark-400 hover:text-white">{b.guestEmail}</a>
                           )}
                           {b.guestPhone && (
                             <>

@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import TripChat from "@/components/chat/TripChat";
+import ShareMyLocation from "@/components/tracking/ShareMyLocation";
 import {
   ArrowLeft, MapPin, Clock, Phone, MessageCircle,
   Car, Star, CheckCircle2, Loader2, AlertCircle, Navigation
@@ -29,7 +30,7 @@ interface BookingDetails {
   totalAmount: number;
   flightNumber?: string | null;
   driver?: {
-    user: { name?: string | null; image?: string | null; phone?: string | null };
+    user: { name?: string | null; image?: string | null; phone?: string | null; email?: string | null };
     rating: number;
     vehicles: { make: string; model: string; licensePlate: string; color?: string }[];
   } | null;
@@ -210,6 +211,8 @@ export default function TrackingPage({ params }: { params: Promise<{ id: string 
                 </div>
                 <div>
                   <p className="text-white font-semibold">{booking.driver.user.name ?? "Your Driver"}</p>
+                  {booking.driver.user.phone && <p className="text-dark-300 text-xs mt-0.5">{booking.driver.user.phone}</p>}
+                  {booking.driver.user.email && <p className="text-dark-500 text-xs truncate">{booking.driver.user.email}</p>}
                   <div className="flex items-center gap-1 mt-0.5">
                     <Star size={11} className="text-gold-500 fill-gold-500" />
                     <span className="text-gold-400 text-xs">{booking.driver.rating?.toFixed(1) ?? "4.9"}</span>
@@ -247,7 +250,8 @@ export default function TrackingPage({ params }: { params: Promise<{ id: string 
               {/* A line to the chauffeur that works without a phone number
                   and is read by the office too. */}
               {["DRIVER_ASSIGNED", "IN_PROGRESS"].includes(booking.status) && (
-                <div className="mt-4">
+                <div className="mt-4 space-y-3">
+                  <ShareMyLocation bookingId={booking.id} />
                   <p className="text-dark-400 text-[10px] uppercase tracking-widest mb-2">Message your chauffeur</p>
                   <TripChat bookingId={booking.id} compact placeholder="Write to your chauffeur…" />
                 </div>
