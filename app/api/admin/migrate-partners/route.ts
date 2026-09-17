@@ -105,6 +105,27 @@ const STEPS: { name: string; sql: string }[] = [
     `,
   },
   {
+    name: "enum TripSender + table trip_messages",
+    sql: `
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'TripSender') THEN
+          CREATE TYPE "TripSender" AS ENUM ('CUSTOMER', 'DRIVER', 'PARTNER', 'ADMIN');
+        END IF;
+      END $$;
+      CREATE TABLE IF NOT EXISTS "trip_messages" (
+        "id" TEXT NOT NULL,
+        "bookingId" TEXT NOT NULL,
+        "sender" "TripSender" NOT NULL,
+        "senderName" TEXT NOT NULL,
+        "body" TEXT NOT NULL,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT "trip_messages_pkey" PRIMARY KEY ("id")
+      );
+      CREATE INDEX IF NOT EXISTS "trip_messages_bookingId_createdAt_idx" ON "trip_messages"("bookingId", "createdAt");
+    `,
+  },
+  {
     name: "indexes",
     sql: `
       CREATE UNIQUE INDEX IF NOT EXISTS "fleet_partners_userId_key" ON "fleet_partners"("userId");
@@ -129,6 +150,10 @@ const STEPS: { name: string; sql: string }[] = [
           ALTER TABLE "fleet_partners" ADD CONSTRAINT "fleet_partners_userId_fkey"
             FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
         END IF;
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'trip_messages_bookingId_fkey') THEN
+          ALTER TABLE "trip_messages" ADD CONSTRAINT "trip_messages_bookingId_fkey"
+            FOREIGN KEY ("bookingId") REFERENCES "bookings"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+        END IF;
         IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'partner_withdrawals_partnerId_fkey') THEN
           ALTER TABLE "partner_withdrawals" ADD CONSTRAINT "partner_withdrawals_partnerId_fkey"
             FOREIGN KEY ("partnerId") REFERENCES "fleet_partners"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -148,6 +173,7 @@ const EXPECTED: { table: string; column: string }[] = [
   { table: "drivers", column: "partnerId" },
   { table: "fleet_partners", column: "bankIban" },
   { table: "partner_withdrawals", column: "status" },
+  { table: "trip_messages", column: "sender" },
 ];
 
 async function run() {
@@ -179,7 +205,7 @@ async function run() {
   try {
     const rows = await prisma.$queryRawUnsafe<{ table_name: string; column_name: string }[]>(
       `SELECT table_name, column_name FROM information_schema.columns
-       WHERE table_name IN ('bookings', 'drivers', 'fleet_partners', 'partner_withdrawals')`,
+       WHERE table_name IN ('bookings', 'drivers', 'fleet_partners', 'partner_withdrawals', 'trip_messages')`,
     );
     const have = new Set(rows.map((r) => `${r.table_name}.${r.column_name}`));
     for (const e of EXPECTED) if (!have.has(`${e.table}.${e.column}`)) missing.push(`${e.table}.${e.column}`);
