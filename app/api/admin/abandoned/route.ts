@@ -89,17 +89,16 @@ export async function POST(req: NextRequest) {
     // What the customer was booking, from the booking or from the session.
     let formData: Record<string, unknown> | undefined;
     let payUrl: string | undefined;
-    let couponCode: string | undefined;
     if (d.bookingId) {
       const b = await prisma.booking.findUnique({ where: { id: d.bookingId } });
       if (b) { formData = bookingAsForm(b); if (b.stripeSessionId) payUrl = `/booking/pay/${b.stripeSessionId}?booking_id=${b.id}`; }
     } else if (d.sessionId) {
-      const s = await prisma.bookingSession.findUnique({ where: { sessionId: d.sessionId }, include: { abandonedBooking: { include: { coupon: true } } } });
-      if (s) { formData = (s.formData ?? {}) as Record<string, unknown>; couponCode = s.abandonedBooking?.coupon?.code; }
+      const s = await prisma.bookingSession.findUnique({ where: { sessionId: d.sessionId } });
+      if (s) formData = (s.formData ?? {}) as Record<string, unknown>;
     }
 
     if (d.kind === "recovery") {
-      await sendAbandonedBookingEmail({ to: d.to, name: d.name, formData, payUrl, couponCode, bookingId: d.bookingId });
+      await sendAbandonedBookingEmail({ to: d.to, name: d.name, formData, payUrl, bookingId: d.bookingId });
       if (d.sessionId) await prisma.abandonedBooking.updateMany({ where: { sessionId: d.sessionId }, data: { emailSentAt: new Date() } });
     } else {
       if (!d.message) return NextResponse.json({ error: "Write the message first" }, { status: 422 });
@@ -108,7 +107,6 @@ export async function POST(req: NextRequest) {
       if (!resumeUrl && formData?.pickupAddress) {
         const p = new URLSearchParams();
         for (const k of ["pickupAddress", "dropoffAddress", "date", "time", "passengers", "vehicleClass"]) { const v = formData[k]; if (v != null && v !== "") p.set(k, String(v)); }
-        if (couponCode) p.set("coupon", couponCode);
         resumeUrl = `${site}/book?${p.toString()}`;
       }
       await sendPersonalNoteEmail({

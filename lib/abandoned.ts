@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { createAbandonedCoupon } from "@/lib/marketing";
 import { sendAbandonedBookingEmail } from "@/lib/resend";
 import { vehicleClassLabel } from "@/types";
 
@@ -61,20 +60,23 @@ export async function sweepAbandoned(): Promise<SweepResult> {
     try {
       // The row is the claim. A unique sessionId means a second sweeper
       // creating it concurrently fails here and sends nothing.
-      const couponId = await createAbandonedCoupon(s.email!).catch(() => null);
+      // No discount code: the owner wants people brought back on service and
+      // the price they already saw, not on a percentage off.
       const ab = await prisma.abandonedBooking.create({
         data: {
           sessionId: s.sessionId, email: s.email!, name: s.name, phone: s.phone,
           formSnapshot: (s.formData ?? {}) as import("@prisma/client").Prisma.InputJsonValue,
-          couponId,
         },
       });
       const fd = (s.formData ?? {}) as Record<string, unknown>;
       if (!fd.pickupAddress) { out.skipped++; continue; } // a name and nothing else is not a booking to recover
-      await sendAbandonedBookingEmail({
-        to: s.email!, name: s.name!, formData: fd,
-        couponCode: couponId ? (await prisma.coupon.findUnique({ where: { id: couponId }, select: { code: true } }))?.code : undefined,
-      });
+      // The details step asks, in so many words, whether Elite BCN may write
+      // once about this journey if they do not finish. That box is the lawful
+      // basis for the email; unticked, the lead is filed but not written to.
+      // (An unpaid booking is different: they booked, so the office may write
+      // about it.)
+      if (fd.contactConsent !== true) { out.skipped++; continue; }
+      await sendAbandonedBookingEmail({ to: s.email!, name: s.name!, formData: fd });
       await prisma.abandonedBooking.update({ where: { id: ab.id }, data: { emailSentAt: new Date() } });
       out.sessionsEmailed++;
     } catch (e) {

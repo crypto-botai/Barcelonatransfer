@@ -651,9 +651,9 @@ export async function sendWelcomeEmail({
 
 // ─── Abandoned Booking Recovery ──────────────────────────────
 export async function sendAbandonedBookingEmail({
-  to, name, couponCode, formData, bookingId, payUrl,
+  to, name, formData, bookingId, payUrl,
 }: {
-  to: string; name: string; couponCode?: string; expiresAt?: Date; formData?: Record<string, unknown>;
+  to: string; name: string; formData?: Record<string, unknown>;
   /** An unpaid booking rather than a form session: the log row carries it. */
   bookingId?: string;
   /** For an unpaid booking, the checkout it already has. */
@@ -681,14 +681,13 @@ export async function sendAbandonedBookingEmail({
       const v = fd[k];
       if (v != null && v !== "") params.set(k, String(v));
     }
-    if (couponCode) params.set("coupon", couponCode);
     resumeUrl = `${SITE_URL}/book?${params.toString()}`;
   }
 
   const html = emailDocument(
     abandonedRecoveryCard({
       firstName: name.split(" ")[0] || name,
-      pickup, dropoff, date, time, vehicle, passengers, amount, resumeUrl, couponCode,
+      pickup, dropoff, date, time, vehicle, passengers, amount, resumeUrl,
     }),
     `Your transfer ${pickup}${dropoff ? ` to ${dropoff}` : ""} is still waiting. One tap finishes it.`,
   );

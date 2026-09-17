@@ -64,3 +64,15 @@ describe("abandoned recovery", () => {
     expect(rd("app/admin/abandoned/page.tsx")).toContain("Emails sent");
   });
 });
+
+describe("no discount, and only with consent", () => {
+  it("the recovery email carries no coupon", () => {
+    expect(rd("lib/email/premium.ts")).not.toMatch(/couponCode/);
+    expect(rd("lib/abandoned.ts")).not.toContain("createAbandonedCoupon");
+    expect(rd("app/api/cron/abandoned-check/route.ts")).not.toContain("createAbandonedCoupon");
+    expect(rd("lib/resend.ts")).not.toMatch(/sendAbandonedBookingEmail\(\{[\s\S]{0,80}couponCode/);
+  });
+  it("a lead who did not tick the contact box is filed but not emailed automatically", () => {
+    expect(rd("lib/abandoned.ts")).toContain("if (fd.contactConsent !== true) { out.skipped++; continue; }");
+  });
+});

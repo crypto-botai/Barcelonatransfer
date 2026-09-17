@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
-import { createAbandonedCoupon, logEmail } from "@/lib/marketing";
+import { logEmail } from "@/lib/marketing";
 import { sendAbandonedBookingEmail } from "@/lib/resend";
 import { sweepAbandoned } from "@/lib/abandoned";
 
@@ -43,10 +43,6 @@ export async function POST(req: NextRequest) {
     const consented = (s.formData as { contactConsent?: boolean } | null)?.contactConsent === true;
     if (!consented) { results.skipped++; continue; }
     try {
-      const couponCode = await createAbandonedCoupon(s.email);
-      const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
-      if (!coupon) continue;
-
       const abandoned = await prisma.abandonedBooking.create({
         data: {
           sessionId:    s.sessionId,
@@ -54,15 +50,12 @@ export async function POST(req: NextRequest) {
           name:         s.name    ?? undefined,
           phone:        s.phone   ?? undefined,
           formSnapshot: s.formData as Prisma.InputJsonValue,
-          couponId:     coupon.id,
         },
       });
 
       await sendAbandonedBookingEmail({
         to:        s.email,
         name:      s.name ?? "there",
-        couponCode,
-        expiresAt: coupon.expiresAt,
         formData:  s.formData as Record<string, unknown>,
       });
 
@@ -125,14 +118,9 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      const couponCode = ab.coupon?.code;
-      const expiresAt  = ab.coupon?.expiresAt ?? new Date(Date.now() + 48 * 3_600_000);
-
       await sendAbandonedBookingEmail({
         to:        ab.email,
         name:      ab.name ?? "there",
-        couponCode,
-        expiresAt,
         formData:  (ab.formSnapshot ?? {}) as Record<string, unknown>,
       });
 

@@ -959,7 +959,6 @@ export function abandonedRecoveryCard(o: {
   vehicle?: string | null; passengers?: number | null;
   amount?: number | null;
   resumeUrl: string;
-  couponCode?: string | null;
 }): string {
   const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Hello, I was booking a transfer ${o.pickup}${o.dropoff ? ` to ${o.dropoff}` : ""}${o.date ? ` on ${o.date}` : ""}. Can you help me finish it?`)}`;
   return card(`
@@ -985,18 +984,6 @@ export function abandonedRecoveryCard(o: {
       <tr><td style="padding:0 44px;">${amountBar("Your fixed price", o.amount, "all included, no surprises")}</td></tr>
     ` : ""}
 
-    ${o.couponCode ? `
-      ${sectionSpacer(18)}
-      <tr><td style="padding:0 44px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
-          <tr><td style="padding:20px 24px;text-align:center;">
-            <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">5% off if you book today</div>
-            <div style="font-family:${SERIF};font-size:24px;letter-spacing:5px;color:${GOLD};padding-top:8px;">${esc(o.couponCode)}</div>
-            <div style="font-family:${SANS};font-size:12px;color:${LABEL};padding-top:6px;">Applied for you when you use the button below.</div>
-          </td></tr>
-        </table>
-      </td></tr>
-    ` : ""}
     ${sectionSpacer(32)}
 
     <tr><td style="padding:0 44px;text-align:center;">

@@ -120,7 +120,7 @@ export default function AbandonedPage() {
                   key={l.sessionId}
                   title={`${l.name ?? "No name"} · ${l.email ?? ""}${l.phone ? ` · ${l.phone}` : ""}`}
                   line={fd.pickupAddress ? `${fd.pickupAddress}${fd.dropoffAddress ? ` → ${fd.dropoffAddress}` : ""}${fd.date ? ` · ${fd.date}${fd.time ? ` ${fd.time}` : ""}` : ""}${q ? ` · ${formatCurrency(Number(q))}` : ""}` : "No route entered yet"}
-                  meta={`Step ${l.step} · last seen ${when(l.lastActivity)}${l.abandonedBooking?.coupon ? ` · coupon ${l.abandonedBooking.coupon.code}` : ""}`}
+                  meta={`Step ${l.step} · last seen ${when(l.lastActivity)} · ${fd.contactConsent === true ? "agreed to be contacted" : "did not tick the contact box: no automatic email"}`}
                   sent={l.abandonedBooking?.emailSentAt ?? null}
                   phone={l.phone}
                   busy={busy === t.to + l.sessionId}
