@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: "desc" },
     take: limit,
     include: {
-      driver:  { include: { user: { select: { name: true, phone: true } } } },
+      driver:  { include: { user: { select: { name: true, phone: true } }, vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } } } },
       user:    { select: { name: true, email: true } },
       partner: { select: { name: true } },
     },

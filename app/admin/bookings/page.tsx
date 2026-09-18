@@ -28,6 +28,7 @@ type Booking = {
   partnerId: string | null; partnerPayout: number | null; partnerDispatchedAt: string | null;
   partner?: { name: string } | null;
   driverId: string | null; adminNotes: string | null;
+  driver?: { user: { name: string | null; phone: string | null }; vehicles?: { make: string; model: string; licensePlate: string }[] } | null;
   isDeleted: boolean; deletedAt: string | null;
   createdAt: string;
 };
@@ -370,6 +371,18 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
           {/* Assign Driver */}
           <section className="glass-card rounded-xl p-4 space-y-3">
             <p className="text-xs text-dark-500 uppercase tracking-wider flex items-center gap-2"><UserCheck size={12} /> Assign Driver</p>
+            {/* A fleet company put its own driver on the job: that driver is
+                not on the office roster, so the picker below would show
+                nothing. Name them here instead; the company changes them. */}
+            {booking.partnerId && booking.partnerDispatchedAt && booking.driver ? (
+              <div className="rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-2.5 text-sm">
+                <p className="text-white">{booking.driver.user.name}{booking.driver.user.phone ? <span className="text-dark-300"> · {booking.driver.user.phone}</span> : null}</p>
+                <p className="text-xs text-dark-400">
+                  {booking.driver.vehicles?.[0] ? `${booking.driver.vehicles[0].make} ${booking.driver.vehicles[0].model} · ${booking.driver.vehicles[0].licensePlate} · ` : ""}
+                  dispatched by {booking.partner?.name ?? "the company"}
+                </p>
+              </div>
+            ) : (
             <select value={driverId} onChange={(e) => setDriverId(e.target.value)}
               className="input-luxury w-full px-3 py-2.5 rounded-xl text-sm">
               <option value="">— Not assigned —</option>
@@ -381,7 +394,8 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
                 </option>
               ))}
             </select>
-            {assignedDriver && (
+            )}
+            {!(booking.partnerId && booking.partnerDispatchedAt) && assignedDriver && (
               <p className="text-xs text-green-400">&#x2713; Assigned: {assignedDriver.user.name}</p>
             )}
           </section>
