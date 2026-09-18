@@ -7,6 +7,10 @@ import { COMPANY } from "@/lib/company-facts";
 import { Star, CheckCircle2, Loader2, MessageSquare } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Link from "next/link";
+import { GOOGLE_PROFILE } from "@/data/reviews";
+
+/** The Google profile the guest book quotes; reviewing is one tap from there. */
+const GOOGLE_REVIEW_URL = `https://www.google.com/maps?cid=${GOOGLE_PROFILE.cid}`;
 
 function ReviewInner() {
   const params    = useSearchParams();
@@ -14,6 +18,8 @@ function ReviewInner() {
   const initRating = parseInt(params.get("rating") ?? "0");
 
   const [rating,    setRating]    = useState(initRating);
+  const [companyRating, setCompanyRating] = useState(0);
+  const [hoverCo, setHoverCo] = useState(0);
   const [hover,     setHover]     = useState(0);
   const [review,    setReview]    = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -28,7 +34,7 @@ function ReviewInner() {
       const res = await fetch("/api/bookings/review", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookingId, rating, review }),
+        body: JSON.stringify({ bookingId, rating, review, companyRating: companyRating || undefined }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to submit");
@@ -71,7 +77,14 @@ function ReviewInner() {
           <p className="text-dark-400 text-sm mb-6">
             Your {rating}-star review has been submitted. We truly appreciate your feedback and look forward to serving you again.
           </p>
-          <Link href="/" className="btn-gold px-8 py-3 rounded-xl text-sm font-semibold inline-block">
+          {rating >= 4 && (
+            <div className="mb-6 rounded-xl border border-gold-500/30 bg-gold-500/[0.06] p-4 text-left">
+              <p className="text-white text-sm font-medium">Would you say it on Google?</p>
+              <p className="text-dark-400 text-xs mt-1">A public review takes a minute and is the single thing that helps a small chauffeur company most.</p>
+              <a href={GOOGLE_REVIEW_URL} target="_blank" rel="noreferrer" className="btn-gold mt-3 inline-block px-5 py-2.5 rounded-xl text-sm font-semibold">Write a Google review</a>
+            </div>
+          )}
+          <Link href="/" className="btn-outline-gold px-8 py-3 rounded-xl text-sm font-semibold inline-block">
             Book Another Transfer
           </Link>
         </motion.div>
@@ -91,7 +104,8 @@ function ReviewInner() {
           <p className="text-dark-400 text-sm">Your feedback helps us maintain our luxury standard of service.</p>
         </div>
 
-        {/* Star rating */}
+        {/* Star rating: the chauffeur */}
+        <p className="text-center text-[11px] uppercase tracking-[0.2em] text-gold-500/80 mb-3">Your chauffeur</p>
         <div className="flex justify-center gap-2 mb-8">
           {Array.from({ length: 5 }).map((_, i) => {
             const val = i + 1;
@@ -125,6 +139,19 @@ function ReviewInner() {
             {["", "Poor", "Fair", "Good", "Very Good", "Excellent!"][rating]}
           </motion.p>
         )}
+
+        {/* Star rating: the company */}
+        <p className="text-center text-[11px] uppercase tracking-[0.2em] text-gold-500/80 mb-3">Elite BCN overall</p>
+        <div className="flex justify-center gap-2 mb-8">
+          {Array.from({ length: 5 }).map((_, i) => {
+            const val = i + 1;
+            return (
+              <button key={val} type="button" onMouseEnter={() => setHoverCo(val)} onMouseLeave={() => setHoverCo(0)} onClick={() => setCompanyRating(val)} aria-label={`Rate Elite BCN ${val} of 5`} className="transition-transform hover:scale-110 active:scale-95">
+                <Star size={30} className={`transition-colors ${val <= (hoverCo || companyRating) ? "text-gold-400 fill-gold-400" : "text-dark-500"}`} />
+              </button>
+            );
+          })}
+        </div>
 
         {/* Review text */}
         <div className="mb-6">

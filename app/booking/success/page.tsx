@@ -13,6 +13,7 @@ import {
 import Navbar from "@/components/layout/Navbar";
 import { useTranslations } from "@/components/language/I18nProvider";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
+import RideAlerts from "@/components/notifications/RideAlerts";
 
 type BookingData = {
   status: "PAID" | "PENDING" | "FAILED";
@@ -190,6 +191,23 @@ function SuccessInner() {
                   <span className="text-dark-400">{t("totalPaid")}</span>
                   <span className="text-gold-400 font-semibold">€{data.totalAmount?.toFixed(2)}</span>
                 </div>
+              </div>
+            )}
+
+            {data?.confirmationCode && bookingId && (
+              <div className="mb-6 text-left"><RideAlerts bookingId={bookingId} code={data.confirmationCode} /></div>
+            )}
+
+            {data?.pickupAddress && data?.dropoffAddress && (
+              <div className="mb-6 rounded-2xl border border-gold-500/30 bg-gold-500/[0.06] p-4 text-left">
+                <p className="text-white text-sm font-medium">Going back too?</p>
+                <p className="text-dark-400 text-xs mt-1">Book the return now at the same fixed price. The route is already filled in the other way round.</p>
+                <Link
+                  href={`/book?${new URLSearchParams({ pickupAddress: data.dropoffAddress, dropoffAddress: data.pickupAddress }).toString()}`}
+                  className="btn-outline-gold mt-3 inline-block px-5 py-2.5 rounded-xl text-sm font-semibold"
+                >
+                  Book my return journey
+                </Link>
               </div>
             )}
 

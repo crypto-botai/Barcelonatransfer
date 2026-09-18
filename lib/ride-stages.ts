@@ -27,7 +27,7 @@ export interface StageMeta {
   /** What the operator reads in the timeline. */
   label: string;
   /** Notification event, or null where telling the customer adds nothing. */
-  event: "DRIVER_EN_ROUTE" | "DRIVER_ARRIVED" | "RIDE_ON_BOARD" | "RIDE_COMPLETED" | null;
+  event: "DRIVER_EN_ROUTE" | "DRIVER_ARRIVED" | "DRIVER_WAITING" | "RIDE_ON_BOARD" | "RIDE_COMPLETED" | null;
   tone: "blue" | "amber" | "emerald" | "gold";
 }
 
@@ -47,9 +47,9 @@ export const STAGE_META: Record<RideStage, StageMeta> = {
   WAITING_PASSENGER: {
     action: "Waiting for passenger",
     label: "Waiting for passenger",
-    // The customer is being waited for; a message saying so would nag rather
-    // than help. This stage exists for the operator, and to time the wait.
-    event: null,
+    // A push, not an email: the one moment a customer most wants their
+    // phone to buzz is when the car is outside and the clock is running.
+    event: "DRIVER_WAITING",
     tone: "amber",
   },
   ON_BOARD: {

@@ -55,10 +55,11 @@ describe("stage metadata", () => {
     }
   });
 
-  it("does not message the customer while waiting for them", () => {
-    // Telling someone "we are waiting for you" nags rather than helps; the
-    // stage exists to time the wait for the operator.
-    expect(STAGE_META.WAITING_PASSENGER.event).toBeNull();
+  it("tells the customer, by push, when the chauffeur is waiting", () => {
+    // Reversed on 18 Sep 2026 at the owner's request: the one moment a
+    // customer most wants their phone to buzz is when the car is outside.
+    // It is a push (and in-app), never an email.
+    expect(STAGE_META.WAITING_PASSENGER.event).toBe("DRIVER_WAITING");
   });
 
   it("messages the customer at the moments that reassure them", () => {

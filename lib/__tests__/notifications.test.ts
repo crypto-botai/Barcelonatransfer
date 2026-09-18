@@ -148,9 +148,10 @@ describe("notify()", () => {
 
   it("uses the event's default channels when none are given", async () => {
     const { notify } = await import("@/lib/notifications/service");
-    const res = await notify({ event: "RIDE_COMPLETED", userId: "u1", vars: { code: "Z9" } });
-    // RIDE_COMPLETED is in-app only.
-    expect(Object.keys(res.results)).toEqual(["inapp"]);
+    const res = await notify({ event: "REVIEW_REQUEST", userId: "u1", vars: { route: "A to B" } });
+    // REVIEW_REQUEST is in-app and email; no email sender was passed, so
+    // email is skipped but still appears in the results.
+    expect(Object.keys(res.results).sort()).toEqual(["email", "inapp"]);
   });
 });
 

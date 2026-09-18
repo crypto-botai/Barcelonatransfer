@@ -109,6 +109,7 @@ export default function AbandonedPage() {
                     ["Reference", b.confirmationCode],
                     ["Created", when(b.createdAt)],
                   ]}
+                  waText={`Hello ${(b.guestName ?? "").split(" ")[0] || "there"}, this is Elite BCN Transfers. I saw you were booking ${b.pickupAddress.split(",")[0]} to ${b.dropoffAddress.split(",")[0]} on ${when(b.pickupDatetime)} for ${formatCurrency(b.totalAmount)} and did not finish. Can I help you complete it? We will give you our best rate.`}
                   sent={b.recoveryEmailedAt}
                   consent
                   busy={busy === t.to + b.id}
@@ -148,6 +149,7 @@ export default function AbandonedPage() {
                     ["Reached", `step ${l.step} of 4`],
                     ["Last seen", when(l.lastActivity)],
                   ]}
+                  waText={`Hello ${(l.name ?? "").split(" ")[0] || "there"}, this is Elite BCN Transfers. I saw you were booking${str("pickupAddress") ? ` ${str("pickupAddress")!.split(",")[0]}` : " a transfer"}${str("dropoffAddress") ? ` to ${str("dropoffAddress")!.split(",")[0]}` : ""}${str("date") ? ` on ${str("date")}` : ""}${q ? ` for ${formatCurrency(Number(q))}` : ""} and did not finish. Can I help you complete it? We will give you our best rate.`}
                   sent={l.abandonedBooking?.emailSentAt ?? null}
                   consent={consent}
                   busy={busy === t.to + l.sessionId}
@@ -190,9 +192,11 @@ function Empty({ text }: { text: string }) {
   return <div className="glass-card rounded-2xl p-10 text-center text-dark-400 text-sm">{text}</div>;
 }
 
-function Row({ name, email, phone, fields, sent, consent, busy, onResend, onNote }: {
+function Row({ name, email, phone, fields, waText, sent, consent, busy, onResend, onNote }: {
   name: string; email: string | null; phone?: string | null;
   fields: [string, string | null | undefined][];
+  /** Prefilled WhatsApp text: the route and the price they saw. */
+  waText?: string;
   sent: string | null; consent: boolean; busy: boolean;
   onResend?: () => void; onNote?: () => void;
 }) {
@@ -222,8 +226,8 @@ function Row({ name, email, phone, fields, sent, consent, busy, onResend, onNote
 
       <div className="mt-4 flex flex-wrap gap-2">
         {phone && (
-          <a href={`https://wa.me/${phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-xs hover:bg-green-500/15">
-            <MessageCircle size={12} /> WhatsApp
+          <a href={`https://wa.me/${phone.replace(/\D/g, "")}${waText ? `?text=${encodeURIComponent(waText)}` : ""}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-xs hover:bg-green-500/15">
+            <MessageCircle size={12} /> WhatsApp them
           </a>
         )}
         {onResend && (

@@ -7,6 +7,7 @@ import { formatPickupDateTime } from "@/lib/datetime";
 import {
   sendDriverAssignedEmail, sendDriverBookingDetailsEmail, sendTemporaryPassword,
   sendPartnerJobEmail, sendAdminPartnerDispatchAlert, sendAdminAlertEmail, sendPartnerConvertedEmail,
+  sendReviewRequestEmail,
 } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
 
@@ -337,7 +338,7 @@ export async function dispatchPartnerJob(partnerId: string, bookingId: string, d
 
   await notify({
     event: "DRIVER_ASSIGNED",
-    channels: ["inapp", "whatsapp"],
+    channels: ["inapp", "whatsapp", "push"],
     userId: booking.userId,
     bookingId: booking.id,
     phone: booking.guestPhone,
@@ -349,6 +350,12 @@ export async function dispatchPartnerJob(partnerId: string, bookingId: string, d
     },
   }).catch(() => {});
 
+  // The driver's phone, too.
+  await notify({
+    event: "DRIVER_NEW_JOB", userId: driver.userId, url: "/driver",
+    vars: { when, pickup: booking.pickupAddress, dropoff: booking.dropoffAddress || "as arranged" },
+  }).catch(() => {});
+
   return updated;
 }
 
@@ -358,10 +365,20 @@ export async function completePartnerJob(partnerId: string, bookingId: string) {
   const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
   if (!booking || booking.partnerId !== partnerId) throw new Error("This job is not assigned to your company");
   if (!["DRIVER_ASSIGNED", "IN_PROGRESS"].includes(booking.status)) throw new Error("Only a dispatched job can be completed");
-  return prisma.booking.update({
+  const updated = await prisma.booking.update({
     where: { id: bookingId },
     data: { status: "COMPLETED", rideEndedAt: booking.rideEndedAt ?? new Date() },
   });
+  // Same rating request the driver's own Completed tap sends.
+  if (booking.guestEmail) {
+    const already = await prisma.emailLog.count({ where: { bookingId, type: "REVIEW" } });
+    if (already === 0) {
+      sendReviewRequestEmail({ to: booking.guestEmail, name: booking.guestName ?? "Guest", confirmationCode: booking.confirmationCode, bookingId })
+        .catch((e) => console.error("[resend] review at partner completion:", e));
+    }
+  }
+  await notify({ event: "RATE_RIDE", userId: booking.userId, bookingId, url: `/review?booking=${bookingId}`, vars: { code: booking.confirmationCode } }).catch(() => {});
+  return updated;
 }
 
 // ─── Earnings ────────────────────────────────────────────────

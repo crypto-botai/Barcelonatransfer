@@ -7,6 +7,7 @@ import { useTranslations } from "@/components/language/I18nProvider";
 
 import TripChat from "@/components/chat/TripChat";
 import ShareMyLocation from "@/components/tracking/ShareMyLocation";
+import RideAlerts from "@/components/notifications/RideAlerts";
 const LiveMap = dynamic(() => import("@/components/dashboard/LiveMap"), {
   ssr: false,
   loading: () => (
@@ -187,6 +188,10 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
             )}
           </div>
         </div>
+      )}
+
+      {status !== "COMPLETED" && status !== "CANCELLED" && (
+        <RideAlerts bookingId={booking.id} code={booking.code} />
       )}
 
       {booking.driverName && (status === "DRIVER_ASSIGNED" || status === "IN_PROGRESS") && (

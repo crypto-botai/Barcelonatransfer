@@ -24,6 +24,10 @@ export const NOTIFICATION_EVENTS = [
   "REVIEW_REQUEST",
   "BOOKING_CANCELLED",
   "TRIP_MESSAGE",
+  "DRIVER_WAITING",
+  "RIDE_TODAY",
+  "RATE_RIDE",
+  "DRIVER_NEW_JOB",
 ] as const;
 
 export type NotificationEvent = (typeof NOTIFICATION_EVENTS)[number];
@@ -174,7 +178,7 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
   },
 
   RIDE_COMPLETED: {
-    channels: ["inapp"],
+    channels: ["inapp", "push"],
     copy: {
       en: { title: "Trip completed",             body: "Thank you for travelling with Elite BCN. Booking {{code}}." },
       es: { title: "Viaje completado",           body: "Gracias por viajar con Elite BCN. Reserva {{code}}." },
@@ -190,6 +194,46 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
       es: { title: "¿Qué tal tu viaje?",         body: "Nos encantaría una breve reseña de tu traslado {{route}}." },
       fr: { title: "Comment s'est passé votre trajet ?", body: "Un court avis sur votre transfert {{route}} nous aiderait beaucoup." },
       de: { title: "Wie war Ihre Fahrt?",        body: "Über eine kurze Bewertung Ihres Transfers {{route}} würden wir uns freuen." },
+    },
+  },
+
+  DRIVER_WAITING: {
+    channels: ["inapp", "push"],
+    copy: {
+      en: { title: "Your chauffeur is waiting",  body: "{{driver}} is at the pick-up point for {{code}}. Open to see where, or message them." },
+      es: { title: "Tu chófer te está esperando", body: "{{driver}} está en el punto de recogida de {{code}}. Abre para ver dónde o escríbele." },
+      fr: { title: "Votre chauffeur vous attend", body: "{{driver}} est au point de prise en charge pour {{code}}." },
+      de: { title: "Ihr Chauffeur wartet",        body: "{{driver}} ist am Abholpunkt für {{code}}." },
+    },
+  },
+
+  RIDE_TODAY: {
+    channels: ["inapp", "push"],
+    copy: {
+      en: { title: "Your transfer is today",     body: "{{when}} from {{pickup}}. Your chauffeur's details will follow here." },
+      es: { title: "Tu traslado es hoy",          body: "{{when}} desde {{pickup}}. Los datos de tu chófer llegarán aquí." },
+      fr: { title: "Votre transfert est aujourd'hui", body: "{{when}} depuis {{pickup}}." },
+      de: { title: "Ihr Transfer ist heute",      body: "{{when}} ab {{pickup}}." },
+    },
+  },
+
+  RATE_RIDE: {
+    channels: ["inapp", "push"],
+    copy: {
+      en: { title: "How was your journey?",       body: "Rate your chauffeur and Elite BCN. It takes ten seconds." },
+      es: { title: "¿Qué tal el viaje?",          body: "Valora a tu chófer y a Elite BCN. Diez segundos." },
+      fr: { title: "Comment s'est passé le trajet ?", body: "Notez votre chauffeur et Elite BCN." },
+      de: { title: "Wie war die Fahrt?",          body: "Bewerten Sie Ihren Chauffeur und Elite BCN." },
+    },
+  },
+
+  DRIVER_NEW_JOB: {
+    channels: ["inapp", "push"],
+    copy: {
+      en: { title: "New job: {{when}}",           body: "{{pickup}} to {{dropoff}}. Open your portal for the details." },
+      es: { title: "Nuevo servicio: {{when}}",    body: "{{pickup}} a {{dropoff}}. Abre tu portal para ver los detalles." },
+      fr: { title: "Nouvelle course : {{when}}",  body: "{{pickup}} vers {{dropoff}}." },
+      de: { title: "Neuer Auftrag: {{when}}",     body: "{{pickup}} nach {{dropoff}}." },
     },
   },
 

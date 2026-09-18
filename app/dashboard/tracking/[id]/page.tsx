@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import TripChat from "@/components/chat/TripChat";
 import ShareMyLocation from "@/components/tracking/ShareMyLocation";
+import RideAlerts from "@/components/notifications/RideAlerts";
 import {
   ArrowLeft, MapPin, Clock, Phone, MessageCircle,
   Car, Star, CheckCircle2, Loader2, AlertCircle, Navigation
@@ -251,6 +252,7 @@ export default function TrackingPage({ params }: { params: Promise<{ id: string 
                   and is read by the office too. */}
               {["DRIVER_ASSIGNED", "IN_PROGRESS"].includes(booking.status) && (
                 <div className="mt-4 space-y-3">
+                  <RideAlerts bookingId={booking.id} />
                   <ShareMyLocation bookingId={booking.id} />
                   <p className="text-dark-400 text-[10px] uppercase tracking-widest mb-2">Message your chauffeur</p>
                   <TripChat bookingId={booking.id} compact placeholder="Write to your chauffeur…" />

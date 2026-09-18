@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BookingStatus, DriverStatus, type RideStage } from "@prisma/client";
 import { notify } from "@/lib/notifications/service";
+import { sendReviewRequestEmail } from "@/lib/resend";
 import { canTransition, STAGE_META, RIDE_STAGES } from "@/lib/ride-stages";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +50,7 @@ export async function PATCH(req: NextRequest) {
       id: true, status: true, rideStage: true, userId: true, guestPhone: true,
       pickupAddress: true, dropoffAddress: true, confirmationCode: true,
       paymentMethod: true, paymentStatus: true,
+      guestEmail: true, guestName: true,
     },
   });
   if (!booking) {
@@ -121,6 +123,26 @@ export async function PATCH(req: NextRequest) {
         code:    booking.confirmationCode,
         link:    `${base}/track/${booking.confirmationCode}`,
       },
+    });
+  }
+
+  // The rating request goes the moment the ride ends, not a day later: the
+  // journey is fresh, the phone is in their hand. The daily cron still
+  // covers anyone whose ride ended without this tap; it checks the log.
+  if (stage === "COMPLETED") {
+    if (booking.guestEmail) {
+      const already = await prisma.emailLog.count({ where: { bookingId: booking.id, type: "REVIEW" } });
+      if (already === 0) {
+        sendReviewRequestEmail({
+          to: booking.guestEmail, name: booking.guestName ?? "Guest",
+          confirmationCode: booking.confirmationCode, bookingId: booking.id,
+        }).catch((e) => console.error("[resend] review at drop-off:", e));
+      }
+    }
+    await notify({
+      event: "RATE_RIDE", userId: booking.userId, bookingId: booking.id,
+      url: `/review?booking=${booking.id}`,
+      vars: { code: booking.confirmationCode },
     });
   }
 

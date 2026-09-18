@@ -9,6 +9,7 @@ import { withUniqueBookingCode } from "@/lib/booking-code";
 import { parsePickupInput, formatPickupDateTime } from "@/lib/datetime";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
 import { PAYMENT_METHODS, paymentLine } from "@/lib/payment-method";
+import { calendarLinks, returnTripUrl } from "@/lib/calendar";
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
 
@@ -179,6 +180,8 @@ export async function POST(req: NextRequest) {
       passengers:       body.passengers,
       bookingId:        booking.id,
       payment,
+      calendar: calendarLinks({ id: booking.id, confirmationCode: booking.confirmationCode, pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupDatetime: pickup }),
+      returnUrl: returnTripUrl({ pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupLat: body.pickupLat, pickupLng: body.pickupLng, dropoffLat: body.dropoffLat, dropoffLng: body.dropoffLng, passengers: body.passengers, vehicleClass: body.vehicleClass }),
     }).catch(e => console.error("[resend] admin create booking confirmation:", e));
 
     // Notify admin panel (useful if another admin created it)

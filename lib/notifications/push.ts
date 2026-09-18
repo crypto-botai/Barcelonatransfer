@@ -101,3 +101,23 @@ export async function sendPushToUser(userId: string, payload: PushPayload): Prom
 
   return { sent, pruned, failed };
 }
+
+/**
+ * Guest bookings have no account, so their devices are stored under a
+ * synthetic key rather than a user id. PushSubscription.userId has no
+ * relation to users, which is what makes this possible without a column.
+ */
+export const guestPushKey = (bookingId: string) => `booking:${bookingId}`;
+
+/**
+ * Everyone who asked to hear about one booking: the account that made it,
+ * if any, and any phone that subscribed from its tracking page.
+ */
+export async function sendPushToBooking(bookingId: string, payload: PushPayload): Promise<PushResult> {
+  const b = await prisma.booking.findUnique({ where: { id: bookingId }, select: { userId: true } }).catch(() => null);
+  const keys = [guestPushKey(bookingId), ...(b?.userId ? [b.userId] : [])];
+  const results = await Promise.all(keys.map((k) => sendPushToUser(k, payload)));
+  const sum = results.reduce((a, r) => ({ sent: a.sent + r.sent, pruned: a.pruned + r.pruned, failed: a.failed + r.failed }), { sent: 0, pruned: 0, failed: 0 });
+  if (sum.sent === 0 && results.every((r) => r.skipped)) return { ...sum, skipped: results[0].skipped };
+  return sum;
+}

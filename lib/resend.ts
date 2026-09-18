@@ -493,13 +493,15 @@ export function newsletterIssueHtml({
 export async function sendBookingConfirmation({
   to, name, confirmationCode, pickupAddress, dropoffAddress,
   pickupDatetime, vehicleClass, totalAmount, passengers,
-  bookingId, returnLeg, payment,
+  bookingId, returnLeg, payment, calendar, returnUrl,
 }: {
   to: string; name: string; confirmationCode: string; pickupAddress: string;
   dropoffAddress: string; pickupDatetime: string; vehicleClass: string;
   totalAmount: number; passengers: number; bookingId?: string;
   /** How the fare is settled, on a booking the office made by hand. */
   payment?: { line: string; payUrl?: string; paid?: boolean };
+  calendar?: { google: string; ics: string };
+  returnUrl?: string | null;
   /** The second booking, when the customer booked a round trip. */
   returnLeg?: {
     confirmationCode: string;
@@ -526,6 +528,8 @@ export async function sendBookingConfirmation({
       totalAmount,
       returnLeg: back,
       payment,
+      calendar,
+      returnUrl,
     }),
     back
       ? `Both journeys are reserved — references ${confirmationCode} and ${back.confirmationCode}`

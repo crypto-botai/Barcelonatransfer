@@ -8,6 +8,7 @@ import { reconcilePendingPayments } from "@/lib/payments/reconcile";
 import { sweepFlightDelays } from "@/lib/flights/sweep";
 import { formatPickupDateTime } from "@/lib/datetime";
 import { sweepAbandoned } from "@/lib/abandoned";
+import { notify } from "@/lib/notifications/service";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,6 +29,26 @@ function authorise(req: NextRequest): boolean {
 async function runAbandonedCheck(): Promise<number> {
   const r = await sweepAbandoned();
   return r.sessionsEmailed + r.bookingsEmailed;
+}
+
+/** A push, on the morning of the ride, to every phone that asked for updates. */
+async function runRideTodayPush(): Promise<number> {
+  const now = new Date();
+  const end = new Date(now.getTime() + 18 * 3600_000);
+  const bookings = await prisma.booking.findMany({
+    where: { isDeleted: false, pickupDatetime: { gte: now, lte: end }, status: { in: ["CONFIRMED", "DRIVER_ASSIGNED"] } },
+    take: 100,
+    select: { id: true, userId: true, pickupAddress: true, pickupDatetime: true },
+  });
+  let sent = 0;
+  for (const b of bookings) {
+    const r = await notify({
+      event: "RIDE_TODAY", userId: b.userId, bookingId: b.id, channels: ["inapp", "push"],
+      vars: { when: new Date(b.pickupDatetime).toLocaleTimeString("en-GB", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit" }), pickup: b.pickupAddress },
+    }).catch(() => null);
+    if (r?.results?.push?.outcome === "sent") sent++;
+  }
+  return sent;
 }
 
 async function runPickupReminder(): Promise<number> {
@@ -257,6 +278,7 @@ async function runAiExecutiveSummary(): Promise<void> {
 export async function GET(req: NextRequest) {
   if (!authorise(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  await runRideTodayPush().catch(() => 0);
   const [abandoned, reminders, reviews] = await Promise.allSettled([
     runAbandonedCheck(),
     runPickupReminder(),

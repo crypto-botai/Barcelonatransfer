@@ -22,7 +22,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { sendWhatsAppText } from "@/lib/whatsapp";
-import { sendPushToUser } from "./push";
+import { sendPushToUser, sendPushToBooking } from "./push";
+import { prisma as db } from "@/lib/prisma";
 import {
   copyFor,
   resolveLocale,
@@ -41,6 +42,8 @@ export interface NotifyInput {
   vars?: Record<string, string | number>;
   /** Overrides the event's default channel set. */
   channels?: Channel[];
+  /** Where a tap on the push lands. Defaults to the booking's tracking page. */
+  url?: string;
   /** The caller's own Resend sender. Without it the email channel is skipped. */
   email?: () => Promise<unknown>;
   /** Customer phone in any format; normalised downstream. */
@@ -129,19 +132,28 @@ export async function notify(input: NotifyInput): Promise<NotifyResult> {
 
   // ---- push ---------------------------------------------------------------
   if (channels.includes("push")) {
-    if (!input.userId) {
-      mark("push", "skipped", "guest booking — no registered devices");
+    if (!input.userId && !input.bookingId) {
+      mark("push", "skipped", "no account and no booking to reach");
     } else {
       try {
-        const r = await sendPushToUser(input.userId, {
+        // A tap lands on the public tracking page, which works with or
+        // without an account and is where the driver, chat and rating live.
+        let url = input.url;
+        if (!url && input.bookingId) {
+          const b = await db.booking.findUnique({ where: { id: input.bookingId }, select: { confirmationCode: true } }).catch(() => null);
+          url = b ? `/track/${b.confirmationCode}` : `/dashboard/bookings?id=${input.bookingId}`;
+        }
+        const payload = {
           title,
           body,
-          // Deep-links straight to the booking when there is one.
-          url: input.bookingId ? `/dashboard/bookings?id=${input.bookingId}` : "/dashboard/notifications",
+          url: url ?? "/dashboard/notifications",
           // Collapses repeat pushes about the same booking into one on the
           // lock screen rather than stacking them.
-          tag: input.bookingId ? `booking-${input.bookingId}` : input.event,
-        });
+          tag: input.bookingId ? `booking-${input.bookingId}-${input.event}` : input.event,
+        };
+        const r = input.bookingId
+          ? await sendPushToBooking(input.bookingId, payload)
+          : await sendPushToUser(input.userId!, payload);
         if (r.skipped) mark("push", "skipped", r.skipped);
         else if (r.sent > 0) mark("push", "sent");
         else mark("push", r.failed > 0 ? "failed" : "skipped", r.failed > 0 ? "all devices failed" : "all endpoints expired");

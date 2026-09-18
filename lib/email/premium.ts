@@ -192,6 +192,10 @@ export function bookingReceivedCard(o: {
    * the customer reads; `payUrl` adds a pay-by-card button under it.
    */
   payment?: { line: string; payUrl?: string; paid?: boolean };
+  /** Add-to-calendar links: Google, and an .ics for Apple and Outlook. */
+  calendar?: { google: string; ics: string };
+  /** The reverse journey, pre-filled, offered when this is a one-way booking. */
+  returnUrl?: string | null;
   /**
    * The leg home, on a round trip.
    *
@@ -259,6 +263,31 @@ export function bookingReceivedCard(o: {
             <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">Payment</div>
             <div style="font-family:${SANS};font-size:14px;line-height:22px;color:${TITLE};padding-top:8px;">${esc(o.payment.line)}</div>
             ${o.payment.payUrl ? `<div style="padding-top:16px;">${button(o.payment.payUrl, "Pay by Card")}</div>` : ""}
+          </td></tr>
+        </table>
+      </td></tr>
+    ` : ""}
+    ${o.calendar ? `
+      ${sectionSpacer(18)}
+      <tr><td style="padding:0 44px;text-align:center;">
+        <div style="font-family:${SANS};font-size:12px;letter-spacing:1px;text-transform:uppercase;color:${LABEL};">Add to your calendar</div>
+        <div style="font-family:${SANS};font-size:14px;padding-top:8px;">
+          <a href="${o.calendar.google}" style="color:${GOLD};text-decoration:none;">Google Calendar</a>
+          <span style="color:${LABEL};">&nbsp;&middot;&nbsp;</span>
+          <a href="${o.calendar.ics}" style="color:${GOLD};text-decoration:none;">Apple / Outlook (.ics)</a>
+        </div>
+      </td></tr>
+    ` : ""}
+
+    ${o.returnUrl && !o.returnLeg ? `
+      ${sectionSpacer(28)}
+      <tr><td style="padding:0 44px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
+          <tr><td style="padding:22px 26px;">
+            <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">Going back too?</div>
+            <div style="font-family:${SERIF};font-size:20px;color:${TITLE};padding-top:8px;">Book the return now, same fixed price.</div>
+            <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${TEXT};padding-top:8px;">The route is already filled in the other way round. Choose the date and time and it is done.</div>
+            <div style="padding-top:16px;">${secondaryLink(o.returnUrl, "Book my return journey")}</div>
           </td></tr>
         </table>
       </td></tr>

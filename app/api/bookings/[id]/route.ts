@@ -157,6 +157,7 @@ export async function PATCH(
         },
       },
     });
+    // (userId is a scalar on Driver and comes with the include.)
 
     // Send notifications when driver is newly assigned
     if (isNewDriverAssignment && booking.driver) {
@@ -200,11 +201,17 @@ export async function PATCH(
         }).catch(e => console.error("[resend] driver booking details:", e));
       }
 
-      // Portal + WhatsApp copy for the customer. Email is omitted because
+      // The driver's phone: a new job, the moment it is theirs.
+      await notify({
+        event: "DRIVER_NEW_JOB", userId: booking.driver.userId, url: "/driver",
+        vars: { when: formatPickupDateTime(booking.pickupDatetime), pickup: booking.pickupAddress, dropoff: booking.dropoffAddress || "as arranged" },
+      }).catch(() => {});
+
+      // Portal + WhatsApp + push for the customer. Email is omitted because
       // sendDriverAssignedEmail above already handles it.
       await notify({
         event:     "DRIVER_ASSIGNED",
-        channels:  ["inapp", "whatsapp"],
+        channels:  ["inapp", "whatsapp", "push"],
         userId:    booking.userId,
         bookingId: booking.id,
         phone:     booking.guestPhone,

@@ -12,6 +12,7 @@ import { isAirportLocation, isNightTime } from "@/lib/utils";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { withUniqueBookingCode } from "@/lib/booking-code";
+import { calendarLinks, returnTripUrl } from "@/lib/calendar";
 import { FLEET_TO_DB_CLASS, type VehicleClass, type FleetVehicle } from "@/types";
 import { roadDistance, resolveEndpoint } from "@/lib/geo";
 import { extrasCostFor, resolveTier, type MemberTier } from "@/lib/loyalty";
@@ -587,6 +588,8 @@ export async function POST(req: NextRequest) {
           totalAmount:      totalWithExtras,
           passengers:       body.passengers,
           bookingId:        booking.id,
+          calendar: calendarLinks({ id: booking.id, confirmationCode: booking.confirmationCode, pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupDatetime, durationMin: body.quote.durationMin }),
+          returnUrl: returnBooking ? null : returnTripUrl({ pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupLat: body.pickupLat, pickupLng: body.pickupLng, dropoffLat: body.dropoffLat, dropoffLng: body.dropoffLng, passengers: body.passengers, vehicleClass: body.vehicleClass }),
           returnLeg: returnBooking && returnDatetime ? {
             confirmationCode: returnBooking.confirmationCode,
             pickupDatetime:   formatPickupDateTime(returnDatetime),

@@ -68,17 +68,15 @@ export async function postMessage(p: Participant, body: string) {
     data: { bookingId: p.bookingId, sender: p.sender, senderName: p.name, body: text },
   });
 
-  // A word from the chauffeur or the company reaches the customer's portal
-  // and phone; the customer's own messages are read by the driver in theirs.
+  // A word from the chauffeur or the company reaches the customer's phone;
+  // a word from the customer or the office reaches the driver's.
+  const booking = await prisma.booking.findUnique({ where: { id: p.bookingId }, select: { userId: true, confirmationCode: true, driver: { select: { userId: true } } } });
+  const vars = { from: p.name, text: text.slice(0, 120), code: booking?.confirmationCode ?? "" };
   if (p.sender !== "CUSTOMER") {
-    const booking = await prisma.booking.findUnique({ where: { id: p.bookingId }, select: { userId: true, confirmationCode: true, guestPhone: true } });
-    await notify({
-      event: "TRIP_MESSAGE",
-      channels: ["inapp", "push"],
-      userId: booking?.userId ?? null,
-      bookingId: p.bookingId,
-      vars: { from: p.name, text: text.slice(0, 120), code: booking?.confirmationCode ?? "" },
-    }).catch(() => {});
+    await notify({ event: "TRIP_MESSAGE", channels: ["inapp", "push"], userId: booking?.userId ?? null, bookingId: p.bookingId, vars }).catch(() => {});
+  }
+  if (p.sender !== "DRIVER" && booking?.driver?.userId) {
+    await notify({ event: "TRIP_MESSAGE", channels: ["inapp", "push"], userId: booking.driver.userId, url: "/driver", vars }).catch(() => {});
   }
   return msg;
 }

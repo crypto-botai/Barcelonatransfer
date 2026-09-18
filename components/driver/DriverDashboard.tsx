@@ -15,6 +15,7 @@ import LocationSharing from "@/components/driver/LocationSharing";
 import FlightStatusBadge from "@/components/driver/FlightStatusBadge";
 import ActiveRidePanel from "@/components/driver/ActiveRidePanel";
 import DeleteAccountButton from "@/components/account/DeleteAccountButton";
+import RideAlerts from "@/components/notifications/RideAlerts";
 import NoShowPanel from "@/components/driver/NoShowPanel";
 import ArrivalPanel from "@/components/arrival/ArrivalPanel";
 import type { RideStage } from "@prisma/client";
@@ -285,6 +286,8 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
             </button>
           </div>
         </motion.div>
+
+        <div className="mb-6"><RideAlerts audience="driver" /></div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
