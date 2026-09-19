@@ -29,7 +29,7 @@ function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
 function isIos() { return /iPhone|iPad|iPod/i.test(navigator.userAgent); }
 function isStandalone() { return window.matchMedia("(display-mode: standalone)").matches || (navigator as { standalone?: boolean }).standalone === true; }
 
-export default function RideAlerts({ bookingId, code, audience = "customer" }: { bookingId?: string; code?: string; audience?: "customer" | "driver" }) {
+export default function RideAlerts({ bookingId, code, audience = "customer", compactIos = false }: { bookingId?: string; code?: string; audience?: "customer" | "driver"; /** The page already shows the Home Screen steps; say only what remains. */ compactIos?: boolean }) {
   const [state, setState] = useState<State>("checking");
   const [key, setKey] = useState<string | null>(null);
 
@@ -87,6 +87,15 @@ export default function RideAlerts({ bookingId, code, audience = "customer" }: {
   const what = audience === "driver"
     ? "New jobs and messages from customers, the moment they happen."
     : "Chauffeur on the way, arrived, waiting, on board, completed. On your lock screen, no app needed.";
+
+  if (state === "ios-browser" && compactIos) {
+    return (
+      <p className="rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3 text-xs text-dark-400">
+        <Bell size={12} className="mr-1.5 inline text-gold-400" />
+        Available once you open Elite BCN from your Home Screen. A <span className="text-white">Turn on</span> button appears here then.
+      </p>
+    );
+  }
 
   if (state === "ios-browser") {
     return (

@@ -26,7 +26,7 @@ describe("push on the phone", () => {
   });
   it("the toggle is on the tracking pages, the success page and the driver portal, and explains iPhone", () => {
     for (const p of ["app/dashboard/tracking/[id]/page.tsx", "components/tracking/PublicTrackClient.tsx", "app/booking/success/page.tsx", "components/driver/DriverDashboard.tsx"]) {
-      expect(rd(p), p).toContain("<RideAlerts");
+      expect(rd(p), p).toMatch(/<RideAlerts|<PhoneSetup/);
     }
     expect(rd("components/notifications/RideAlerts.tsx")).toContain("Add to Home Screen");
   });

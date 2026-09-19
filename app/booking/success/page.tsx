@@ -12,8 +12,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import { useTranslations } from "@/components/language/I18nProvider";
-import InstallPrompt from "@/components/pwa/InstallPrompt";
-import RideAlerts from "@/components/notifications/RideAlerts";
+import PhoneSetup from "@/components/pwa/PhoneSetup";
 
 type BookingData = {
   status: "PAID" | "PENDING" | "FAILED";
@@ -195,7 +194,7 @@ function SuccessInner() {
             )}
 
             {data?.confirmationCode && bookingId && (
-              <div className="mb-6 text-left"><RideAlerts bookingId={bookingId} code={data.confirmationCode} /></div>
+              <div className="mb-6"><PhoneSetup bookingId={bookingId} code={data.confirmationCode} /></div>
             )}
 
             {data?.pickupAddress && data?.dropoffAddress && (
@@ -268,8 +267,6 @@ function SuccessInner() {
                 </div>
               </div>
             )}
-
-            <InstallPrompt />
 
             <div className="flex flex-col gap-3">
               <Link href="/" className="btn-gold w-full py-3.5 rounded-xl font-semibold">
