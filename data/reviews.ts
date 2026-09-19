@@ -45,7 +45,13 @@ export const GOOGLE_PROFILE = {
   cid:    "8610295895899713122",
   rating: 5.0,
   /** Reviews on the profile. Update alongside the list below. */
-  count:  16,
+  count:  22,
+  /**
+   * Google's direct "write a review" link for this profile, from Business
+   * Profile -> Reviews -> Get more reviews (a g.page/r/.../review address).
+   * Empty until the owner pastes it; the profile page is used instead.
+   */
+  reviewUrl: "",
 } as const;
 
 export const REVIEWS: Review[] = [

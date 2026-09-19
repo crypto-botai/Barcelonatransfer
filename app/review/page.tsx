@@ -10,7 +10,7 @@ import Link from "next/link";
 import { GOOGLE_PROFILE } from "@/data/reviews";
 
 /** The Google profile the guest book quotes; reviewing is one tap from there. */
-const GOOGLE_REVIEW_URL = `https://www.google.com/maps?cid=${GOOGLE_PROFILE.cid}`;
+const GOOGLE_REVIEW_URL = GOOGLE_PROFILE.reviewUrl || `https://www.google.com/maps?cid=${GOOGLE_PROFILE.cid}`;
 
 function ReviewInner() {
   const params    = useSearchParams();
