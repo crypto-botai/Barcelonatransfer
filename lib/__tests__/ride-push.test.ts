@@ -92,3 +92,14 @@ describe("Google review link", () => {
     expect(rd("lib/email/premium.ts")).toContain('"Or review us on Google"');
   });
 });
+
+describe("the office sending a notification by hand", () => {
+  it("reaches a booking's phones or a driver's, by push and in-app only", () => {
+    const api = rd("app/api/admin/notify/route.ts");
+    expect(api).toContain('event: "OFFICE_MESSAGE"');
+    expect(api).toContain('channels: ["inapp", "push"]');
+    expect(EVENT_DEFS.OFFICE_MESSAGE.channels).not.toContain("email");
+    expect(rd("app/admin/bookings/page.tsx")).toContain('<SendNotificationButton bookingId={booking.id}');
+    expect(rd("app/admin/drivers/page.tsx")).toContain("<SendNotificationButton driverId={d.id}");
+  });
+});

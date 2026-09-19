@@ -13,6 +13,7 @@ import IssueInvoiceButton from "@/components/admin/IssueInvoiceButton";
 import RideTimeline from "@/components/admin/RideTimeline";
 import ArrivalPanel from "@/components/arrival/ArrivalPanel";
 import TripChat from "@/components/chat/TripChat";
+import SendNotificationButton from "@/components/admin/SendNotificationButton";
 
 type Driver = { id: string; status: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] };
 
@@ -271,6 +272,7 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
                 netAmount={booking.totalAmount}
               />
             )}
+            <SendNotificationButton bookingId={booking.id} label="Notify customer" compact />
             <a
               href={`/booking/${booking.id}/invoice`}
               target="_blank"

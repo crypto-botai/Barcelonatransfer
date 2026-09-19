@@ -28,6 +28,7 @@ export const NOTIFICATION_EVENTS = [
   "RIDE_TODAY",
   "RATE_RIDE",
   "DRIVER_NEW_JOB",
+  "OFFICE_MESSAGE",
 ] as const;
 
 export type NotificationEvent = (typeof NOTIFICATION_EVENTS)[number];
@@ -234,6 +235,16 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
       es: { title: "Nuevo servicio: {{when}}",    body: "{{pickup}} a {{dropoff}}. Abre tu portal para ver los detalles." },
       fr: { title: "Nouvelle course : {{when}}",  body: "{{pickup}} vers {{dropoff}}." },
       de: { title: "Neuer Auftrag: {{when}}",     body: "{{pickup}} nach {{dropoff}}." },
+    },
+  },
+
+  OFFICE_MESSAGE: {
+    channels: ["inapp", "push"],
+    copy: {
+      en: { title: "{{title}}", body: "{{text}}" },
+      es: { title: "{{title}}", body: "{{text}}" },
+      fr: { title: "{{title}}", body: "{{text}}" },
+      de: { title: "{{title}}", body: "{{text}}" },
     },
   },
 
