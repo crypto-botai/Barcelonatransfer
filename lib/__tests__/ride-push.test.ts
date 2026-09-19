@@ -82,3 +82,13 @@ describe("confirmation extras", () => {
     expect(rd("app/admin/abandoned/page.tsx")).toContain("this is Elite BCN Transfers. I saw you were booking");
   });
 });
+
+describe("Google review link", () => {
+  it("is the direct g.page review link, used by the review page and the review email", async () => {
+    const { GOOGLE_PROFILE } = await import("@/data/reviews");
+    expect(GOOGLE_PROFILE.reviewUrl).toMatch(/^https:\/\/g\.page\/r\/[A-Za-z0-9_-]+\/review$/);
+    expect(rd("app/review/page.tsx")).toContain("GOOGLE_PROFILE.reviewUrl ||");
+    expect(rd("lib/resend.ts")).toContain("googleUrl: GOOGLE_PROFILE.reviewUrl");
+    expect(rd("lib/email/premium.ts")).toContain('"Or review us on Google"');
+  });
+});

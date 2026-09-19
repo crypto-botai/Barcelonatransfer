@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { logEmail } from "@/lib/marketing";
 import { COMPANY } from "@/lib/company-facts";
+import { GOOGLE_PROFILE } from "@/data/reviews";
 import { notifyAdmin } from "@/lib/whatsapp";
 import {
   emailDocument,
@@ -781,6 +782,7 @@ export async function sendReviewRequestEmail({
       firstName: name.split(" ")[0],
       confirmationCode,
       reviewUrl,
+      googleUrl: GOOGLE_PROFILE.reviewUrl || null,
     }),
     `How was your journey? — reference ${confirmationCode}`,
   );

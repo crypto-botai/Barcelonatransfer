@@ -51,7 +51,7 @@ export const GOOGLE_PROFILE = {
    * Profile -> Reviews -> Get more reviews (a g.page/r/.../review address).
    * Empty until the owner pastes it; the profile page is used instead.
    */
-  reviewUrl: "",
+  reviewUrl: "https://g.page/r/CWIuG35_6n13EBI/review",
 } as const;
 
 export const REVIEWS: Review[] = [

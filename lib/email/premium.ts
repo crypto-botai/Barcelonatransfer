@@ -579,6 +579,8 @@ export function paymentReceiptCard(o: {
 
 export function rideCompleteCard(o: {
   firstName: string; confirmationCode: string; reviewUrl: string;
+  /** The direct Google review link, for the public word that helps most. */
+  googleUrl?: string | null;
 }): string {
   return card(`
     <tr><td style="padding:38px 44px 0 44px;">
@@ -593,7 +595,10 @@ export function rideCompleteCard(o: {
     </td></tr>
     ${sectionSpacer(26)}
 
-    <tr><td style="padding:0 44px;text-align:center;">${button(o.reviewUrl, "Leave a Review")}</td></tr>
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(o.reviewUrl, "Leave a Review")}
+      ${o.googleUrl ? `<div style="padding-top:16px;">${secondaryLink(o.googleUrl, "Or review us on Google")}</div>` : ""}
+    </td></tr>
 
     ${sectionSpacer(30)}
     <tr><td style="padding:0 44px;">
