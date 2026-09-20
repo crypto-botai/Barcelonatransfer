@@ -30,7 +30,7 @@ export default function CheckoutTrust({ protectionTaken = false }: { protectionT
       t: protectionTaken ? `Cancel free up to ${PROTECTION_CUTOFF_HOURS} hours before pickup` : `Free cancellation up to ${FREE_CANCEL_HOURS} hours before pickup`,
       d: protectionTaken ? "Full refund of the fare; only the protection fee stays." : "Change of plan? Cancel from your confirmation email and the full amount comes back.",
     },
-    { Icon: Plane, t: "Flight tracked — no charge for delays", d: "Your chauffeur follows the flight and adjusts; 60 minutes of waiting after landing is included." },
+    { Icon: Plane, t: "Flight tracked, no charge for delays", d: "Your chauffeur follows the flight and adjusts; 60 minutes of waiting after landing is included." },
     { Icon: UserCheck, t: "Meet & greet with a name board included", d: "Your chauffeur waits in the arrivals hall with your name, at no extra cost." },
   ];
 
@@ -66,7 +66,7 @@ export default function CheckoutTrust({ protectionTaken = false }: { protectionT
             {reviews.map((r) => (
               <li key={r.author} className="text-[12px] leading-relaxed text-dark-300">
                 <p className="line-clamp-4">&ldquo;{r.text}&rdquo;</p>
-                <p className="mt-1.5 text-[11px] text-dark-500">— {r.author}{r.when ? `, ${r.when}` : ""}</p>
+                <p className="mt-1.5 text-[11px] text-dark-500">{r.author}{r.when ? `, ${r.when}` : ""}</p>
               </li>
             ))}
           </ul>

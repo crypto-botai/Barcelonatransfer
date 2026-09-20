@@ -55,8 +55,18 @@ describe("checkout: the browser side", () => {
   });
 
   it("the pay button says what the card is charged today", () => {
-    expect(form).toContain("${formatCurrency(payNow)}");
-    expect(form).not.toContain("${t(\"pay\")} ${formatCurrency(grandTotal)}");
+    // Both pay buttons (inline and the phone's sticky bar) are the premium
+    // button, and both are handed what is due today, never the total.
+    expect(form).toContain("<PremiumPayButton");
+    expect(form).toContain("amount={quote ? formatCurrency(payNow) : \"\"}");
+    expect(form).toContain("amount={formatCurrency(payNow)}");
+    expect(form).not.toContain("amount={formatCurrency(grandTotal)}");
+    // The button itself: no spinner, a loading label, stills under reduced motion.
+    const btn = rd("components/ui/PremiumPayButton.tsx");
+    expect(btn).toContain("useReducedMotion");
+    expect(btn).toContain("useMotionValue");
+    expect(btn).not.toContain("Loader2");
+    expect(btn).toContain("aria-busy");
   });
 
   it("shows the options and the trust block only once there is a price", () => {

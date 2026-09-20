@@ -24,6 +24,7 @@ import { TIP_PRESETS, tipForPercent, clampTip, MAX_TIP_ABSOLUTE } from "@/lib/ti
 import { paymentPlan, protectionFeeFor, returnDiscountFor, RETURN_DISCOUNT_PERCENT, type PayOption } from "@/lib/checkout-money";
 import PaymentOptions from "@/components/booking/PaymentOptions";
 import CheckoutTrust from "@/components/booking/CheckoutTrust";
+import PremiumPayButton from "@/components/ui/PremiumPayButton";
 import toast from "react-hot-toast";
 import { useTranslations } from "@/components/language/I18nProvider";
 import { pickupToUtc } from "@/lib/datetime";
@@ -1366,11 +1367,14 @@ export default function BookFormClient() {
                       <MessageCircle size={16} /> WhatsApp for quote
                     </a>
                   ) : (
-                    <button onClick={handlePay} disabled={!contactValid || submitting}
-                      className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40">
-                      {submitting ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
-                      {submitting ? t("processing") : quote ? `${t("pay")} ${formatCurrency(payNow)}` : t("confirmBooking")}
-                    </button>
+                    <PremiumPayButton
+                      onClick={handlePay}
+                      disabled={!contactValid}
+                      loading={submitting}
+                      label={quote ? t("pay") : t("confirmBooking")}
+                      amount={quote ? formatCurrency(payNow) : ""}
+                      className="flex-1"
+                    />
                   )}
                 </div>
 
@@ -1399,11 +1403,15 @@ export default function BookFormClient() {
             <p className="font-display text-lg text-gold-400 leading-tight">{formatCurrency(payNow)}{plan.balance > 0 && <span className="ml-1.5 text-[11px] text-dark-400">+ {formatCurrency(plan.balance)} on the day</span>}</p>
           </div>
           {step === 3 && (
-            <button onClick={handlePay} disabled={!contactValid || submitting}
-              className="btn-gold px-5 py-3 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-2 disabled:opacity-40">
-              {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
-              {submitting ? "…" : `Pay ${formatCurrency(payNow)}`}
-            </button>
+            <PremiumPayButton
+              onClick={handlePay}
+              disabled={!contactValid}
+              loading={submitting}
+              loadingLabel="Securing"
+              amount={formatCurrency(payNow)}
+              size="md"
+              className="flex-shrink-0"
+            />
           )}
         </div>
       )}
