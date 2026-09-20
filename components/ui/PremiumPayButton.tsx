@@ -109,14 +109,16 @@ export default function PremiumPayButton({
         />
       )}
 
-      <span className="relative flex items-center justify-center gap-2.5 whitespace-nowrap">
+      <span className="relative flex items-center justify-center gap-2.5 whitespace-nowrap leading-none">
         {loading ? (
           <span className="tracking-[0.02em]">{loadingLabel}<span className="inline-block w-4 text-left" aria-hidden>…</span></span>
         ) : (
           <>
             <Lock size={size === "lg" ? 15 : 13} strokeWidth={2.25} className="opacity-80" aria-hidden />
             <span className="tracking-[0.04em]">{label}</span>
-            <span className={cn("font-display tabular-nums", size === "lg" ? "text-[21px]" : "text-lg")}>{amount}</span>
+            {/* Lining figures: Playfair's default old-style numerals hang below
+                the baseline, which read as the price sitting lower than "Pay". */}
+            <span className={cn("font-display leading-none [font-variant-numeric:lining-nums_tabular-nums]", size === "lg" ? "text-[21px]" : "text-lg")}>{amount}</span>
             {children}
           </>
         )}
