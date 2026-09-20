@@ -50,6 +50,7 @@ export async function PATCH(req: NextRequest) {
       id: true, status: true, rideStage: true, userId: true, guestPhone: true,
       pickupAddress: true, dropoffAddress: true, confirmationCode: true,
       paymentMethod: true, paymentStatus: true,
+      balanceAmount: true, balancePaidAt: true,
       guestEmail: true, guestName: true,
     },
   });
@@ -85,6 +86,11 @@ export async function PATCH(req: NextRequest) {
       // fare the office has not yet marked received stays pending.
       ...(booking.paymentStatus === "PAID" || booking.paymentMethod === "CASH" || booking.paymentMethod == null
         ? { paymentStatus: "PAID" as const, ...(booking.paymentStatus !== "PAID" ? { paidAt: now, paidMarkedBy: "driver" } : {}) }
+        : {}),
+      // A deposit booking's balance is handed to the chauffeur at the end of
+      // the ride. Finishing records it as collected, by whom.
+      ...(booking.balanceAmount && booking.balanceAmount > 0 && !booking.balancePaidAt
+        ? { balancePaidAt: now, balancePaidBy: driver.id, balanceMethod: "DRIVER" }
         : {}),
     }
   : {};

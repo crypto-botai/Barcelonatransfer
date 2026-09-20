@@ -117,6 +117,55 @@ function amountBar(label: string, amount: number, note?: string): string {
   </table>`;
 }
 
+/**
+ * How the price is settled, when it is not simply "paid in full".
+ *
+ * A deposit booking says what was paid today and what the chauffeur collects
+ * on the day; a protected booking says so and what that buys. Empty for the
+ * ordinary case, so every card can include it unconditionally.
+ */
+export interface PaymentSplit {
+  /** Charged online today (or due online, when `paid` is false). */
+  payNow: number;
+  /** To the chauffeur on the day. 0 on a full payment. */
+  balance: number;
+  /** Cancellation protection fee, 0 when not taken. */
+  protectionFee: number;
+  /** Whether payNow has actually been received. */
+  paid: boolean;
+}
+
+function splitPanel(o?: PaymentSplit | null): string {
+  if (!o || (o.balance <= 0 && o.protectionFee <= 0)) return "";
+  const lines: string[] = [];
+  if (o.balance > 0) {
+    lines.push(row(o.paid ? "Paid today" : "Due today", `&euro;${o.payNow.toFixed(2)}`));
+    lines.push(row("To your chauffeur", `<strong style="font-weight:bold;">&euro;${o.balance.toFixed(2)}</strong> <span style="color:${LABEL};">on the day, cash or card</span>`, o.protectionFee <= 0));
+  }
+  if (o.protectionFee > 0) {
+    lines.push(row("Protection", `Included (&euro;${o.protectionFee.toFixed(2)}) &mdash; cancel up to 2 hours before pick-up for a full refund of the fare`, true));
+  }
+  return `
+    ${sectionSpacer(12)}
+    <tr><td style="padding:0 44px;">${detailTable(lines.join(""))}</td></tr>`;
+}
+
+/** The line a chauffeur or fleet company reads about money on the day. */
+function collectPanel(amount?: number | null): string {
+  if (!amount || amount <= 0) return "";
+  return `
+    ${sectionSpacer(18)}
+    <tr><td style="padding:0 44px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
+        <tr><td style="padding:20px 24px;">
+          <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">Collect from the client</div>
+          <div style="font-family:${SERIF};font-size:24px;color:${GOLD};padding-top:8px;">&euro;${amount.toFixed(2)}</div>
+          <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${TEXT};padding-top:6px;">Cash or card, at the end of the journey. Mark it received when you finish the ride.</div>
+        </td></tr>
+      </table>
+    </td></tr>`;
+}
+
 function sectionSpacer(height = 32): string {
   return `<tr><td style="height:${height}px;font-size:0;line-height:0;">&nbsp;</td></tr>`;
 }
@@ -192,6 +241,8 @@ export function bookingReceivedCard(o: {
    * the customer reads; `payUrl` adds a pay-by-card button under it.
    */
   payment?: { line: string; payUrl?: string; paid?: boolean };
+  /** Deposit / protection breakdown; omitted on an ordinary full payment. */
+  split?: PaymentSplit | null;
   /** Add-to-calendar links: Google, and an .ics for Apple and Outlook. */
   calendar?: { google: string; ics: string };
   /** The reverse journey, pre-filled, offered when this is a one-way booking. */
@@ -254,6 +305,7 @@ export function bookingReceivedCard(o: {
       o.totalAmount,
       o.payment?.paid ? "paid, thank you" : "excl. VAT &amp; tolls",
     )}</td></tr>
+    ${splitPanel(o.split)}
 
     ${o.payment ? `
       ${sectionSpacer(18)}
@@ -285,8 +337,8 @@ export function bookingReceivedCard(o: {
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
           <tr><td style="padding:22px 26px;">
             <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">Going back too?</div>
-            <div style="font-family:${SERIF};font-size:20px;color:${TITLE};padding-top:8px;">Book the return now, same fixed price.</div>
-            <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${TEXT};padding-top:8px;">The route is already filled in the other way round. Choose the date and time and it is done.</div>
+            <div style="font-family:${SERIF};font-size:20px;color:${TITLE};padding-top:8px;">Book the return now and save 5%.</div>
+            <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${TEXT};padding-top:8px;">The route is already filled in the other way round, and the 5% comes off at the checkout. Choose the date and time and it is done.</div>
             <div style="padding-top:16px;">${secondaryLink(o.returnUrl, "Book my return journey")}</div>
           </td></tr>
         </table>
@@ -542,16 +594,22 @@ export function paymentReceiptCard(o: {
   pickupAddress: string; dropoffAddress: string;
   date: string; time: string; vehicle: string;
   passengers: number; totalAmount: number;
+  /** Deposit / protection breakdown; omitted on an ordinary full payment. */
+  split?: PaymentSplit | null;
 }): string {
+  const deposit = !!o.split && o.split.balance > 0;
   return card(`
     <tr><td style="padding:38px 44px 0 44px;">
       ${eyebrow("Booking Confirmed")}
       ${headline(`Your transfer is confirmed, ${esc(o.firstName)}.`)}
-      ${paragraph("Paid in full, and this email is your receipt. Your chauffeur will be assigned shortly and you will hear from us again the day before you travel.")}
+      ${paragraph(deposit
+        ? "Your deposit is received and this email is your receipt. The rest is paid to your chauffeur on the day, in cash or by card. Your chauffeur will be assigned shortly and you will hear from us again the day before you travel."
+        : "Paid in full, and this email is your receipt. Your chauffeur will be assigned shortly and you will hear from us again the day before you travel.")}
     </td></tr>
 
     ${sectionSpacer(30)}
-    <tr><td style="padding:0 44px;">${amountBar("Amount Paid", o.totalAmount)}</td></tr>
+    <tr><td style="padding:0 44px;">${amountBar(deposit ? "Deposit Paid" : "Amount Paid", deposit ? o.split!.payNow : o.totalAmount, deposit ? `of &euro;${o.totalAmount.toFixed(2)} in total` : undefined)}</td></tr>
+    ${splitPanel(o.split)}
     ${sectionSpacer(12)}
 
     <tr><td style="padding:0 44px;">
@@ -635,6 +693,8 @@ export function driverJobCard(o: {
   flightNumber?: string | null;
   extras?: string | null; tipAmount?: number; notes?: string | null;
   driverAmount?: number | null;
+  /** What the chauffeur collects from the client on the day, if anything. */
+  collectAmount?: number | null;
 }): string {
   const phoneDigits = o.guestPhone.replace(/\D/g, "");
   const waGuest = `https://wa.me/${phoneDigits}?text=${encodeURIComponent(`Hello, I am your Elite BCN chauffeur for booking ${o.confirmationCode}.`)}`;
@@ -645,11 +705,14 @@ export function driverJobCard(o: {
     <tr><td style="padding:38px 44px 0 44px;">
       ${eyebrow("Chauffeur · New Job")}
       ${headline(`A booking is yours, ${esc(firstName)}.`)}
-      ${paragraph("Please read the details below and confirm you can take it. The client has already paid.")}
+      ${paragraph(o.collectAmount && o.collectAmount > 0
+        ? "Please read the details below and confirm you can take it. Part of the fare is collected from the client at the end of the journey."
+        : "Please read the details below and confirm you can take it. The client has already paid.")}
     </td></tr>
 
     ${sectionSpacer(30)}
     <tr><td style="padding:0 44px;">${referencePanel(o.confirmationCode, "Quote this reference with dispatch")}</td></tr>
+    ${collectPanel(o.collectAmount)}
     ${sectionSpacer(12)}
 
     <tr><td style="padding:0 44px;">
@@ -842,6 +905,8 @@ export function partnerJobCard(o: {
   pickupAddress: string; dropoffAddress?: string | null; pickupDatetime: string;
   vehicle: string; passengers: number; luggage: number; flightNumber?: string | null;
   payout: number; panelUrl: string;
+  /** What the driver collects from the client on the day, if anything. */
+  collectAmount?: number | null;
 }): string {
   const firstName = o.contactName.split(" ")[0] || o.contactName;
   return card(`
@@ -868,6 +933,7 @@ export function partnerJobCard(o: {
 
     ${sectionSpacer(28)}
     <tr><td style="padding:0 44px;">${amountBar("Your payout", o.payout, "on completion")}</td></tr>
+    ${collectPanel(o.collectAmount)}
     ${sectionSpacer(32)}
 
     <tr><td style="padding:0 44px;text-align:center;">
@@ -1059,6 +1125,48 @@ export function personalNoteCard(o: {
       <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${LABEL};padding-top:18px;">
         Or call <a href="tel:${PHONE_DIGITS}" style="color:${GOLD};text-decoration:none;">${PHONE}</a>, any hour.
       </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+// ─── 19. The journey home (customer) ─────────────────────────
+
+/**
+ * Three days after a completed one-way journey, for a customer who has not
+ * booked again: the same route the other way round, pre-filled, 5% off. One
+ * button. Sent once per booking, by the daily job.
+ */
+export function returnRebookCard(o: {
+  firstName: string;
+  /** Where they were dropped: the pick-up for the journey home. */
+  from: string;
+  /** Where they were collected: the drop-off for the journey home. */
+  to: string;
+  discountPct: number;
+  rebookUrl: string;
+}): string {
+  const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Hello, I would like to book my return journey from ${o.from} to ${o.to}.`)}`;
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("The Journey Home")}
+      ${headline(`Heading back, ${esc(o.firstName)}?`)}
+      ${paragraph(`Thank you for travelling with Elite BCN. When it is time to go home, the same chauffeur service is ready the other way round &mdash; and as a returning guest you have <strong style="color:${TITLE};">${o.discountPct}% off</strong> the fare. The route is already filled in; choose your date and time and it is done.`)}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;">
+      ${detailTable(
+        row("Pick-up", esc(o.from)) +
+        row("Drop-off", esc(o.to)) +
+        row("Your discount", `<strong style="font-weight:bold;color:${GOLD};">${o.discountPct}% off</strong> <span style="color:${LABEL};">applied at the checkout</span>`, true),
+      )}
+    </td></tr>
+
+    ${sectionSpacer(32)}
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(o.rebookUrl, "Book My Return Journey")}
+      <div style="padding-top:16px;">${secondaryLink(wa, "Or ask us on WhatsApp")}</div>
     </td></tr>
     ${sectionSpacer(42)}
   `);

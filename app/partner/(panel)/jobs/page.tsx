@@ -1,9 +1,11 @@
 "use client";
 
+import { collectDue } from "@/lib/checkout-money";
+
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Camera, Check, Loader2, MapPin, MessageSquare, Phone, Plane, Users } from "lucide-react";
+import { Camera, Check, Loader2, MapPin, MessageSquare, Phone, Plane, Users, Wallet } from "lucide-react";
 import { ChatSheet, LiveLocationSheet, NoShowSheet } from "@/components/partner/JobTools";
 import toast from "react-hot-toast";
 import { Empty, PageTitle, Sheet, Skeleton, Status, euro, field, ghost, label, primary, vehicleLabel, whenParts } from "@/components/partner/ui";
@@ -16,6 +18,7 @@ type Job = {
   passengers: number; luggage: number; vehicleClass: string; flightNumber: string | null; specialRequests: string | null;
   noShow?: { images: string[]; note: string | null; waitedMin: number | null; createdAt: string; lat: number | null; lng: number | null } | null;
   partnerPayout: number | null; driverAmount: number | null; partnerDispatchedAt: string | null;
+  totalAmount: number; paymentStatus: string; paymentMethod?: string | null; balanceAmount?: number | null; balancePaidAt?: string | null;
   driver: { id: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] } | null;
 };
 type Driver = {
@@ -137,6 +140,11 @@ function Jobs() {
                       </p>
                     )}
                     {j.specialRequests && <p className="mt-1 text-xs text-dark-500">{j.specialRequests}</p>}
+                    {collectDue(j) > 0 && (
+                      <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-gold-500/30 bg-gold-500/10 px-2.5 py-1 text-xs text-gold-300">
+                        <Wallet size={12} /> Driver collects {euro(collectDue(j))} from the client, cash or card, at the end of the ride
+                      </p>
+                    )}
                     {j.driver && (
                       <p className="mt-2 text-sm text-sky-200">
                         {j.driver.user.name}{v ? ` · ${v.make} ${v.model} · ${v.licensePlate}` : ""}

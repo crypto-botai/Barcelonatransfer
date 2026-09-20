@@ -21,6 +21,9 @@ import { getFleetFromPrice, getFleetOffer, HOURLY_RATES, MIN_HOURLY_HOURS } from
 import { RETURN_TRIPS_ENABLED } from "@/lib/feature-flags";
 import { VAT_RATE, vatOn, wantsInvoice } from "@/lib/vat";
 import { TIP_PRESETS, tipForPercent, clampTip, MAX_TIP_ABSOLUTE } from "@/lib/tips";
+import { paymentPlan, protectionFeeFor, returnDiscountFor, RETURN_DISCOUNT_PERCENT, type PayOption } from "@/lib/checkout-money";
+import PaymentOptions from "@/components/booking/PaymentOptions";
+import CheckoutTrust from "@/components/booking/CheckoutTrust";
 import toast from "react-hot-toast";
 import { useTranslations } from "@/components/language/I18nProvider";
 import { pickupToUtc } from "@/lib/datetime";
@@ -253,6 +256,15 @@ export default function BookFormClient() {
   const [tipPct,        setTipPct]        = useState<number | null>(0);
   const [tipCustom,     setTipCustom]     = useState("");
 
+  // Cancellation protection and the deposit option. Both off by default: an
+  // opt-out fee is a dark pattern, and a deposit is something to choose.
+  const [protection,    setProtection]    = useState(false);
+  const [payOption,     setPayOption]     = useState<PayOption>("FULL");
+  // The paid booking this is the return of, from its "book your return"
+  // link. The server checks it; the 5% is shown here on trust and simply
+  // does not apply if the check fails.
+  const returnOf = params.get("returnOf") ?? "";
+
   const sessionId    = useRef<string>("");
   const saveDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -372,7 +384,8 @@ export default function BookFormClient() {
   // Fares are quoted excluding VAT. The 10% is only charged to customers who
   // ask for an invoice, and it goes on the discounted figure — VAT is due on
   // what is actually paid, not on the list price before a coupon.
-  const netTotal     = Math.round(Math.max(0, subtotal - couponSaving) * 100) / 100;
+  const returnSaving = returnOf ? returnDiscountFor(subtotal) : 0;
+  const netTotal     = Math.round(Math.max(0, subtotal - couponSaving - returnSaving) * 100) / 100;
   const invoiceAsked = wantsInvoice(data.extras);
   const vatAmount    = invoiceAsked ? vatOn(netTotal) : 0;
 
@@ -382,7 +395,12 @@ export default function BookFormClient() {
     ? tipForPercent(netTotal, tipPct)
     : clampTip(tipCustom.replace(",", "."), netTotal);
 
-  const grandTotal   = Math.round((netTotal + vatAmount + tipAmount) * 100) / 100;
+  // A round trip is always paid in full: its balance would have to be
+  // collected on one of two journeys by possibly two chauffeurs.
+  const depositAllowed = !addReturn;
+  const plan = paymentPlan({ net: netTotal, vat: vatAmount, tip: tipAmount, protection, option: depositAllowed ? payOption : "FULL" });
+  const grandTotal   = plan.total;
+  const payNow       = plan.payNow;
 
   const toggleExtra = (id: string) => {
     const catalog = EXTRAS_CATALOG.find((e) => e.id === id)!;
@@ -484,6 +502,9 @@ export default function BookFormClient() {
           quote: finalQuote,
           couponCode: couponCode || undefined,
           tipAmount,
+          protection,
+          payOption: depositAllowed ? payOption : "FULL",
+          returnOf: returnOf || undefined,
         }),
       });
       const json = await res.json();
@@ -1222,6 +1243,12 @@ export default function BookFormClient() {
                           <span>-{formatCurrency(couponSaving)}</span>
                         </div>
                       )}
+                      {returnSaving > 0 && (
+                        <div className="flex justify-between text-green-400">
+                          <span className="flex items-center gap-1.5"><Tag size={11} /> Return journey ({RETURN_DISCOUNT_PERCENT}% off)</span>
+                          <span>-{formatCurrency(returnSaving)}</span>
+                        </div>
+                      )}
                       {vatAmount > 0 && (
                         <>
                           <div className="flex justify-between text-dark-400 border-t border-white/10 pt-2">
@@ -1240,10 +1267,28 @@ export default function BookFormClient() {
                           <span>{formatCurrency(tipAmount)}</span>
                         </div>
                       )}
+                      {plan.protectionFee > 0 && (
+                        <div className="flex justify-between text-dark-400">
+                          <span className="flex items-center gap-1.5"><Shield size={11} className="text-gold-500" /> Cancellation protection</span>
+                          <span>{formatCurrency(plan.protectionFee)}</span>
+                        </div>
+                      )}
                       <div className="border-t border-white/10 pt-3 flex justify-between items-end">
                         <span className="text-white font-semibold">{t("total")}</span>
                         <span className="font-display text-xl text-gold-400">{formatCurrency(grandTotal)}</span>
                       </div>
+                      {plan.balance > 0 && (
+                        <>
+                          <div className="flex justify-between text-white pt-1">
+                            <span>Due today</span>
+                            <span className="font-semibold">{formatCurrency(payNow)}</span>
+                          </div>
+                          <div className="flex justify-between text-dark-400">
+                            <span>To your chauffeur on the day</span>
+                            <span>{formatCurrency(plan.balance)}</span>
+                          </div>
+                        </>
+                      )}
                       {vatAmount === 0 && (
                         <p className="text-dark-500 text-xs pt-1">
                           Excludes VAT. Tick &ldquo;I need an invoice&rdquo; above to add {VAT_RATE}% VAT and receive a
@@ -1252,13 +1297,26 @@ export default function BookFormClient() {
                       )}
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-xs text-dark-500">
-                      <span className="flex items-center gap-1"><Shield size={11} className="text-gold-500" /> Free cancellation 24h+</span>
+                      <span className="flex items-center gap-1"><Shield size={11} className="text-gold-500" /> {protection ? "Cancel free up to 2h before pickup" : "Free cancellation 24h+"}</span>
                       <span className="flex items-center gap-1"><CreditCard size={11} className="text-gold-500" /> {t("securePayment")}</span>
                       {hoursUntilPickup < 4 && hoursUntilPickup >= 1 && (
                         <span className="flex items-center gap-1 text-amber-400 font-medium"><Zap size={11} /> 15% last-minute fee applied</span>
                       )}
                     </div>
                   </div>
+                )}
+
+                {/* Protection and the deposit option */}
+                {quote && !needsManualQuote && (
+                  <PaymentOptions
+                    plan={plan}
+                    protection={protection}
+                    option={depositAllowed ? payOption : "FULL"}
+                    protectionFeeIfTaken={protectionFeeFor(netTotal)}
+                    depositAllowed={depositAllowed}
+                    onProtection={setProtection}
+                    onOption={setPayOption}
+                  />
                 )}
 
                 {/* Coupon */}
@@ -1311,14 +1369,19 @@ export default function BookFormClient() {
                     <button onClick={handlePay} disabled={!contactValid || submitting}
                       className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-40">
                       {submitting ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
-                      {submitting ? t("processing") : quote ? `${t("pay")} ${formatCurrency(grandTotal)}` : t("confirmBooking")}
+                      {submitting ? t("processing") : quote ? `${t("pay")} ${formatCurrency(payNow)}` : t("confirmBooking")}
                     </button>
                   )}
                 </div>
 
-                <p className="text-center text-xs text-dark-500 pb-4">
+                <p className="text-center text-xs text-dark-500">
                   Secured by SumUp · PCI DSS Level 1 · Apple Pay & Google Pay accepted
                 </p>
+
+                {/* Why it is safe to press the button, from people who did. */}
+                {quote && !needsManualQuote && (
+                  <div className="pb-4"><CheckoutTrust protectionTaken={protection} /></div>
+                )}
               </div>
             </motion.div>
           )}
@@ -1333,13 +1396,13 @@ export default function BookFormClient() {
             <p className="text-xs text-dark-400 truncate">
               {VEHICLE_CATALOG.find((v) => FLEET_TO_DB_CLASS[v.class] === data.vehicleClass)?.label}
             </p>
-            <p className="font-display text-lg text-gold-400 leading-tight">{formatCurrency(grandTotal)}</p>
+            <p className="font-display text-lg text-gold-400 leading-tight">{formatCurrency(payNow)}{plan.balance > 0 && <span className="ml-1.5 text-[11px] text-dark-400">+ {formatCurrency(plan.balance)} on the day</span>}</p>
           </div>
           {step === 3 && (
             <button onClick={handlePay} disabled={!contactValid || submitting}
               className="btn-gold px-5 py-3 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-2 disabled:opacity-40">
               {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
-              {submitting ? "…" : `Pay ${formatCurrency(grandTotal)}`}
+              {submitting ? "…" : `Pay ${formatCurrency(payNow)}`}
             </button>
           )}
         </div>

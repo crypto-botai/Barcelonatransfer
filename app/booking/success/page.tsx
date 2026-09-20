@@ -8,7 +8,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   CheckCircle2, XCircle, Clock, Calendar, MapPin,
-  MessageCircle, Mail, RefreshCw, CreditCard, FileText, Copy, Eye, EyeOff,
+  MessageCircle, Mail, RefreshCw, CreditCard, FileText, Copy, Eye, EyeOff, Shield,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import { useTranslations } from "@/components/language/I18nProvider";
@@ -22,6 +22,11 @@ type BookingData = {
   pickupDatetime?: string;
   vehicleClass?: string;
   totalAmount?: number;
+  depositAmount?: number | null;
+  balanceAmount?: number | null;
+  protectionFee?: number | null;
+  pickupLat?: number; pickupLng?: number; dropoffLat?: number; dropoffLng?: number;
+  passengers?: number;
   guestEmail?: string;
   hasCheckout?: boolean;
 };
@@ -186,10 +191,27 @@ function SuccessInner() {
                     <p className="text-dark-200">{new Date(data.pickupDatetime).toLocaleString("en-GB", { timeZone: "Europe/Madrid", })}</p>
                   </div>
                 )}
-                <div className="border-t border-white/[0.06] pt-3 flex justify-between">
-                  <span className="text-dark-400">{t("totalPaid")}</span>
-                  <span className="text-gold-400 font-semibold">€{data.totalAmount?.toFixed(2)}</span>
-                </div>
+                {data.balanceAmount && data.balanceAmount > 0 ? (
+                  <>
+                    <div className="border-t border-white/[0.06] pt-3 flex justify-between">
+                      <span className="text-dark-400">Paid today</span>
+                      <span className="text-gold-400 font-semibold">€{(data.depositAmount ?? 0).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-dark-400">To your chauffeur on the day</span>
+                      <span className="text-white">€{data.balanceAmount.toFixed(2)}</span>
+                    </div>
+                    <p className="text-dark-500 text-xs">Cash or card, at the end of the journey. Total €{data.totalAmount?.toFixed(2)}.</p>
+                  </>
+                ) : (
+                  <div className="border-t border-white/[0.06] pt-3 flex justify-between">
+                    <span className="text-dark-400">{t("totalPaid")}</span>
+                    <span className="text-gold-400 font-semibold">€{data.totalAmount?.toFixed(2)}</span>
+                  </div>
+                )}
+                {data.protectionFee && data.protectionFee > 0 ? (
+                  <p className="flex items-center gap-2 text-xs text-dark-300"><Shield size={12} className="text-gold-400 flex-shrink-0" /> Cancellation protection included — cancel up to 2 hours before pickup for a full refund of the fare.</p>
+                ) : null}
               </div>
             )}
 
@@ -199,10 +221,17 @@ function SuccessInner() {
 
             {data?.pickupAddress && data?.dropoffAddress && (
               <div className="mb-6 rounded-2xl border border-gold-500/30 bg-gold-500/[0.06] p-4 text-left">
-                <p className="text-white text-sm font-medium">Going back too?</p>
-                <p className="text-dark-400 text-xs mt-1">Book the return now at the same fixed price. The route is already filled in the other way round.</p>
+                <p className="text-white text-sm font-medium">Going back too? Save 5% on the return.</p>
+                <p className="text-dark-400 text-xs mt-1">The route is already filled in the other way round, and the 5% comes off at the checkout. Choose the date and time and it is done.</p>
                 <Link
-                  href={`/book?${new URLSearchParams({ pickupAddress: data.dropoffAddress, dropoffAddress: data.pickupAddress }).toString()}`}
+                  href={`/book?${new URLSearchParams({
+                    pickup: data.dropoffAddress, dropoff: data.pickupAddress,
+                    ...(data.dropoffLat && data.dropoffLng ? { pLat: String(data.dropoffLat), pLng: String(data.dropoffLng) } : {}),
+                    ...(data.pickupLat && data.pickupLng ? { dLat: String(data.pickupLat), dLng: String(data.pickupLng) } : {}),
+                    ...(data.passengers ? { pax: String(data.passengers) } : {}),
+                    ...(data.vehicleClass ? { vehicle: data.vehicleClass } : {}),
+                    ...(bookingId ? { returnOf: bookingId } : {}),
+                  }).toString()}`}
                   className="btn-outline-gold mt-3 inline-block px-5 py-2.5 rounded-xl text-sm font-semibold"
                 >
                   Book my return journey

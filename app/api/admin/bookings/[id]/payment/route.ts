@@ -20,6 +20,12 @@ const schema = z.object({
   paymentMethod: z.enum(PAYMENT_METHODS as [string, ...string[]]).optional(),
   /** Send the customer a receipt when marking paid. Default on. */
   sendReceipt:   z.boolean().default(true),
+  /**
+   * The balance on a deposit booking, received (or not). Independent of
+   * paymentStatus, which describes the deposit. When present, nothing else
+   * in the body is applied.
+   */
+  balancePaid:   z.boolean().optional(),
 });
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -34,6 +40,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const booking = await prisma.booking.findUnique({ where: { id } });
   if (!booking || booking.isDeleted) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+
+  if (body.balancePaid !== undefined) {
+    if (!booking.balanceAmount || booking.balanceAmount <= 0) return NextResponse.json({ error: "This booking has no balance" }, { status: 422 });
+    const updated = await prisma.booking.update({
+      where: { id },
+      data: body.balancePaid
+        ? { balancePaidAt: new Date(), balancePaidBy: admin.name ?? admin.id ?? "admin", balanceMethod: "OFFICE" }
+        : { balancePaidAt: null, balancePaidBy: null, balanceMethod: null },
+    });
+    await prisma.activityLog.create({
+      data: {
+        adminId: admin.id ?? "admin", adminName: admin.name ?? "Admin",
+        action: body.balancePaid ? "MARK_BALANCE_PAID" : "MARK_BALANCE_UNPAID", entity: "BOOKING", entityId: id,
+        details: { confirmationCode: booking.confirmationCode, amount: booking.balanceAmount } as never,
+      },
+    }).catch(() => {});
+    return NextResponse.json({ id: updated.id, balancePaidAt: updated.balancePaidAt, balancePaidBy: updated.balancePaidBy, balanceMethod: updated.balanceMethod });
+  }
 
   const paid = body.paymentStatus === "PAID";
   const updated = await prisma.booking.update({

@@ -20,6 +20,7 @@ import NoShowPanel from "@/components/driver/NoShowPanel";
 import ArrivalPanel from "@/components/arrival/ArrivalPanel";
 import type { RideStage } from "@prisma/client";
 import toast from "react-hot-toast";
+import { collectDue } from "@/lib/checkout-money";
 
 type Booking = {
   id: string;
@@ -37,6 +38,11 @@ type Booking = {
   vehicleClass: string;
   totalAmount: number;
   driverAmount: number | null;
+  /** What the chauffeur collects from the passenger, derived from these. */
+  paymentStatus?: string;
+  paymentMethod?: string | null;
+  balanceAmount?: number | null;
+  balancePaidAt?: Date | string | null;
   guestName?: string | null;
   guestPhone?: string | null;
   guestEmail?: string | null;
@@ -374,6 +380,11 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                             ? <p className="font-display text-xl text-gold-400">{formatCurrency(b.driverAmount)}</p>
                             : <p className="font-display text-xl text-dark-500">TBC</p>
                           }
+                          {collectDue({ totalAmount: b.totalAmount, paymentStatus: b.paymentStatus ?? "PAID", paymentMethod: b.paymentMethod, balanceAmount: b.balanceAmount, balancePaidAt: b.balancePaidAt }) > 0 && b.status !== "COMPLETED" && (
+                            <p className="inline-flex items-center gap-1.5 rounded-lg border border-gold-500/30 bg-gold-500/10 px-2.5 py-1 text-xs text-gold-300">
+                              <Wallet size={12} /> Collect {formatCurrency(collectDue({ totalAmount: b.totalAmount, paymentStatus: b.paymentStatus ?? "PAID", paymentMethod: b.paymentMethod, balanceAmount: b.balanceAmount, balancePaidAt: b.balancePaidAt }))} from passenger
+                            </p>
+                          )}
                         </div>
                       </div>
 

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { refundSumUpTransaction } from "@/lib/sumup";
 import { sendCancellationEmail, sendAdminCancellationAlert } from "@/lib/resend";
 import { formatPickupDateTime } from "@/lib/datetime";
+import { refundPolicy, paidOnline, FREE_CANCEL_HOURS, PROTECTION_CUTOFF_HOURS } from "@/lib/deposits";
 
 export async function POST(
   _req: NextRequest,
@@ -28,23 +29,32 @@ export async function POST(
     return NextResponse.json({ error: "Booking is already cancelled" }, { status: 409 });
   }
 
-  // 24-hour policy check (server-authoritative)
-  const hoursUntilPickup = (booking.pickupDatetime.getTime() - Date.now()) / 3_600_000;
-  if (hoursUntilPickup < 24) {
+  // The policy, server-authoritative. Free up to 24 hours before pickup;
+  // with cancellation protection, up to 2 hours before, the fee itself kept.
+  // See lib/deposits.ts.
+  const paid = paidOnline(booking);
+  const decision = refundPolicy({ pickupDatetime: booking.pickupDatetime, paidAmount: paid, protectionFee: booking.protectionFee });
+  if (!decision.allowed) {
     return NextResponse.json({
-      error: "Free cancellation requires more than 24 hours notice. For assistance, contact us via WhatsApp.",
+      error: decision.rule === "inside-2h"
+        ? `Cancellation protection covers cancellations up to ${PROTECTION_CUTOFF_HOURS} hours before pickup. For assistance, contact us via WhatsApp.`
+        : `Free cancellation requires more than ${FREE_CANCEL_HOURS} hours notice. For assistance, contact us via WhatsApp.`,
       policy: "NO_REFUND",
       whatsappUrl: "https://wa.me/34635383712",
     }, { status: 422 });
   }
 
-  // Process SumUp refund if already paid
+  // Process the SumUp refund if already paid. On a protected booking the
+  // protection fee stays with us and the rest comes back; on a deposit
+  // booking it is the deposit (less the fee) that is refunded, since that is
+  // all that was ever charged.
   let refundProcessed = false;
   let refundError: string | undefined;
+  const refundAmount = decision.refund;
 
-  if (booking.paymentStatus === "PAID" && booking.stripePaymentId) {
+  if (booking.paymentStatus === "PAID" && booking.stripePaymentId && refundAmount > 0) {
     try {
-      await refundSumUpTransaction(booking.stripePaymentId, booking.totalAmount);
+      await refundSumUpTransaction(booking.stripePaymentId, refundAmount);
       refundProcessed = true;
     } catch (err) {
       refundError = err instanceof Error ? err.message : String(err);
@@ -52,13 +62,22 @@ export async function POST(
     }
   }
 
+  const partial = refundProcessed && decision.kept > 0;
   const updated = await prisma.booking.update({
     where: { id: booking.id },
     data: {
       status:        refundProcessed ? "REFUNDED" : "CANCELLED",
-      paymentStatus: refundProcessed ? "REFUNDED" : booking.paymentStatus,
+      paymentStatus: refundProcessed ? (partial ? "PARTIALLY_REFUNDED" : "REFUNDED") : booking.paymentStatus,
     },
   });
+
+  await prisma.activityLog.create({
+    data: {
+      adminId: user.id, adminName: booking.guestName ?? "Customer",
+      action: "CANCEL_BOOKING", entity: "BOOKING", entityId: booking.id,
+      details: { rule: decision.rule, paid, refund: refundAmount, kept: decision.kept, refundProcessed, refundError: refundError ?? null } as never,
+    },
+  }).catch(() => {});
 
   const customerEmail = booking.guestEmail ?? (session.user as { email?: string }).email;
   if (customerEmail) {
@@ -69,13 +88,13 @@ export async function POST(
         name,
         confirmationCode: booking.confirmationCode,
         refundProcessed,
-        totalAmount:      booking.totalAmount,
+        totalAmount:      refundProcessed ? refundAmount : booking.totalAmount,
       }),
       sendAdminCancellationAlert({
         confirmationCode: booking.confirmationCode,
         guestName:        name,
         guestEmail:       customerEmail,
-        totalAmount:      booking.totalAmount,
+        totalAmount:      refundProcessed ? refundAmount : booking.totalAmount,
         refundProcessed,
         pickupDatetime:   formatPickupDateTime(booking.pickupDatetime),
         pickupAddress:    booking.pickupAddress,
@@ -87,9 +106,13 @@ export async function POST(
     success:        true,
     status:         updated.status,
     refundProcessed,
+    refundAmount:   refundProcessed ? refundAmount : 0,
+    keptAmount:     decision.kept,
     refundError,
     message: refundProcessed
-      ? "Booking cancelled and refund initiated. Allow 3–5 business days."
+      ? decision.kept > 0
+        ? `Booking cancelled. €${refundAmount.toFixed(2)} is on its way back to your card; the €${decision.kept.toFixed(2)} protection fee is not refundable. Allow 3–5 business days.`
+        : "Booking cancelled and refund initiated. Allow 3–5 business days."
       : booking.paymentStatus === "PAID"
         ? "Booking cancelled. Please contact us if you need refund assistance."
         : "Booking cancelled successfully.",

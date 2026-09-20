@@ -260,6 +260,14 @@ model Booking {
   balanceAmount     Float?
   balancePaidAt     DateTime?
   balanceCheckoutId String?
+  // Who took the balance and how: a chauffeur at the end of the ride (cash or
+  // their card reader), the office, or an online balance payment.
+  balanceMethod     String?
+  balancePaidBy     String?
+  // Cancellation protection bought at checkout: 20% of the fare, never
+  // refunded, and it lets the customer cancel up to two hours before pickup for
+  // a full refund of everything else. Null on bookings without it.
+  protectionFee     Float?
   // Current position within an in-progress journey. Null until the driver sets
   // off; the full history lives in RideEvent.
   rideStage         RideStage?

@@ -202,6 +202,42 @@ const DESTINATIONS = [
     description: "Five kilometres of wide, flat sand just 20 km from El Prat — the fastest airport-to-beach transfer on this coast.",
     highlights: ["5 km of beach", "22 min from airport", "Medieval castle", "Garraf Natural Park"],
   },
+  {
+    slug: "cambrils",
+    name: "Cambrils",
+    tagline: "Fishing port & family beaches",
+    duration: "1 hr 15 min",
+    distance: "110 km",
+    description: "The quieter neighbour on the Costa Daurada — a working port, seafood along the marina, and PortAventura ten minutes away.",
+    highlights: ["Marina restaurants", "Vilafortuny beach", "PortAventura 10 min", "Reus Airport 15 min"],
+  },
+  {
+    slug: "calella",
+    name: "Calella",
+    tagline: "Maresme coast · Pineda · Santa Susanna",
+    duration: "55 min",
+    distance: "70 km",
+    description: "The holiday hotels north of Barcelona: Calella, Pineda de Mar, Santa Susanna and Malgrat, all served to the door at fixed fares.",
+    highlights: ["Under an hour", "Four towns, one road", "Beachfront hotels", "R1 coast railway"],
+  },
+  {
+    slug: "blanes",
+    name: "Blanes",
+    tagline: "Where the Costa Brava begins",
+    duration: "1 hr",
+    distance: "85 km",
+    description: "The first town of the Costa Brava — fishing port, Marimurtra gardens on the headland, and Lloret ten minutes beyond.",
+    highlights: ["Sa Palomera rock", "Marimurtra gardens", "S’Abanell beach", "Lloret 10 min"],
+  },
+  {
+    slug: "roses",
+    name: "Roses",
+    tagline: "Bay of Roses & Empuriabrava",
+    duration: "1 hr 50 min",
+    distance: "170 km",
+    description: "The wide bay at the top of the Costa Brava, with Empuriabrava’s canals next door and Cadaqués over the headland.",
+    highlights: ["Bay of Roses beaches", "Empuriabrava canals", "Cap de Creus", "Figueres & Dalí 20 min"],
+  },
 ];
 
 /**

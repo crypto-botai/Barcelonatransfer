@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSumUpCheckout } from "@/lib/sumup";
-import { finalizeSumUpPayment, markSumUpPaymentFailed } from "@/lib/payment-completion";
+import { finalizeSumUpPayment, finalizeBalancePayment, markSumUpPaymentFailed } from "@/lib/payment-completion";
 import crypto from "crypto";
 
 export const runtime = "nodejs";
@@ -46,7 +46,18 @@ export async function POST(req: NextRequest) {
   if (!checkoutId) return NextResponse.json({ ok: true });
 
   const booking = await prisma.booking.findFirst({ where: { stripeSessionId: checkoutId } });
-  if (!booking) return NextResponse.json({ ok: true });
+  if (!booking) {
+    // Not a fare checkout; perhaps the balance on a deposit booking, paid
+    // online from the link in the confirmation rather than to the chauffeur.
+    const balanceOf = await prisma.booking.findFirst({ where: { balanceCheckoutId: checkoutId }, select: { id: true } });
+    if (balanceOf) {
+      try {
+        const checkout = await getSumUpCheckout(checkoutId);
+        if (checkout.status === "PAID") await finalizeBalancePayment(balanceOf.id, checkout);
+      } catch (err) { console.error("[payments/webhook] balance:", err); }
+    }
+    return NextResponse.json({ ok: true });
+  }
 
   try {
     // Authoritative status straight from SumUp — never trust the webhook body's own status field.

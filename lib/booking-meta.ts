@@ -38,6 +38,13 @@ export interface BookingMeta {
   vatAmount:     number;
   /** Gratuity for the driver, included in totalAmount but never in the VAT base. */
   tipAmount:     number;
+  /** Cancellation protection fee bought at checkout; 0 when not taken. */
+  protectionFee: number;
+  /** "DEPOSIT" when 30% was paid online and the rest goes to the chauffeur. */
+  payOption:     "FULL" | "DEPOSIT";
+  /** The 5% off a return journey, and the paid booking that earned it. */
+  returnDiscount: number;
+  returnDiscountOfCode: string | null;
   /** The customer's own note, with the metadata block removed. */
   notes:         string | null;
 }
@@ -55,6 +62,10 @@ const EMPTY: BookingMeta = {
   netAmount: null,
   vatAmount: 0,
   tipAmount: 0,
+  protectionFee: 0,
+  payOption: "FULL",
+  returnDiscount: 0,
+  returnDiscountOfCode: null,
   notes: null,
 };
 
@@ -92,6 +103,10 @@ export function parseBookingMeta(specialRequests?: string | null): BookingMeta {
     netAmount:     typeof raw.netAmount === "number" ? raw.netAmount : null,
     vatAmount:     typeof raw.vatAmount === "number" ? raw.vatAmount : 0,
     tipAmount:     typeof raw.tipAmount === "number" && raw.tipAmount > 0 ? raw.tipAmount : 0,
+    protectionFee: typeof raw.protectionFee === "number" && raw.protectionFee > 0 ? raw.protectionFee : 0,
+    payOption:     raw.payOption === "DEPOSIT" ? "DEPOSIT" : "FULL",
+    returnDiscount: typeof raw.returnDiscount === "number" && raw.returnDiscount > 0 ? raw.returnDiscount : 0,
+    returnDiscountOfCode: typeof raw.returnDiscountOfCode === "string" ? raw.returnDiscountOfCode : null,
     notes,
   };
 }

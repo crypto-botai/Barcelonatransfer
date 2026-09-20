@@ -30,6 +30,8 @@ export async function GET(req: NextRequest) {
       pickupLat: true, pickupLng: true, dropoffLat: true, dropoffLng: true,
       passengers: true, luggage: true, vehicleClass: true, flightNumber: true, specialRequests: true,
       partnerPayout: true, driverAmount: true, partnerAssignedAt: true, partnerDispatchedAt: true,
+      // What the driver collects from the client, if anything.
+      totalAmount: true, paymentStatus: true, paymentMethod: true, balanceAmount: true, balancePaidAt: true,
       rideStage: true, rideEndedAt: true,
       driverId: true,
       noShow: { select: { images: true, note: true, waitedMin: true, createdAt: true, lat: true, lng: true } },

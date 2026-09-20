@@ -2,7 +2,9 @@
 // Idempotent: safe to run multiple times per day.
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendPickupReminder, sendReviewRequestEmail, resend } from "@/lib/resend";
+import { sendPickupReminder, sendReviewRequestEmail, sendReturnRebookEmail, resend } from "@/lib/resend";
+import { returnTripUrl } from "@/lib/calendar";
+import { RETURN_DISCOUNT_PERCENT } from "@/lib/checkout-money";
 import { COMPANY } from "@/lib/company-facts";
 import { reconcilePendingPayments } from "@/lib/payments/reconcile";
 import { sweepFlightDelays } from "@/lib/flights/sweep";
@@ -123,6 +125,54 @@ async function runReviewRequest(): Promise<number> {
       data: { to: b.guestEmail!, subject: "How was your transfer?", type: "REVIEW", status: "SENT", bookingId: b.id },
     }).catch(() => {});
 
+    sent++;
+  }
+  return sent;
+}
+
+// ─── The journey home ────────────────────────────────────────────────────────
+// Three days after a completed one-way journey, if the customer has not
+// booked anything since: the same route the other way round, 5% off, one
+// button. Once per booking, and never for a round trip or a return leg.
+async function runReturnRebook(): Promise<number> {
+  const now   = new Date();
+  const ago3d = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
+  const ago4d = new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000);
+
+  const bookings = await prisma.booking.findMany({
+    where: {
+      status:      "COMPLETED",
+      isDeleted:   false,
+      rideEndedAt: { gte: ago4d, lte: ago3d },
+      guestEmail:  { not: null },
+      dropoffAddress: { not: "" },
+      returnOfId:  null,
+      returnLeg:   null,
+    },
+    take: 30,
+  });
+
+  let sent = 0;
+  for (const b of bookings) {
+    const alreadySent = await prisma.emailLog.findFirst({ where: { type: "RETURN_REBOOK", bookingId: b.id } });
+    if (alreadySent) continue;
+    // Booked again since (or the way home already exists): nothing to offer.
+    const later = await prisma.booking.count({
+      where: { guestEmail: b.guestEmail!, isDeleted: false, id: { not: b.id }, pickupDatetime: { gt: b.pickupDatetime }, status: { notIn: ["CANCELLED", "REFUNDED"] } },
+    });
+    if (later > 0) continue;
+    const rebookUrl = returnTripUrl(b);
+    if (!rebookUrl) continue;
+
+    await sendReturnRebookEmail({
+      to:          b.guestEmail!,
+      name:        b.guestName ?? "Guest",
+      from:        b.dropoffAddress,
+      toAddress:   b.pickupAddress,
+      discountPct: RETURN_DISCOUNT_PERCENT,
+      rebookUrl,
+      bookingId:   b.id,
+    }).catch((e) => console.error("[cron/daily] return rebook:", e));
     sent++;
   }
   return sent;
@@ -279,10 +329,11 @@ export async function GET(req: NextRequest) {
   if (!authorise(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   await runRideTodayPush().catch(() => 0);
-  const [abandoned, reminders, reviews] = await Promise.allSettled([
+  const [abandoned, reminders, reviews, rebooks] = await Promise.allSettled([
     runAbandonedCheck(),
     runPickupReminder(),
     runReviewRequest(),
+    runReturnRebook(),
   ]);
 
   // Payment reconciliation piggybacks on this job as well. The Hobby plan
@@ -305,6 +356,7 @@ export async function GET(req: NextRequest) {
     abandoned: abandoned.status === "fulfilled" ? abandoned.value : 0,
     reminders: reminders.status === "fulfilled" ? reminders.value : 0,
     reviews:   reviews.status   === "fulfilled" ? reviews.value   : 0,
+    rebooks:   rebooks.status   === "fulfilled" ? rebooks.value   : 0,
     payments,
   });
 }

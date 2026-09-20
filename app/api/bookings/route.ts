@@ -18,6 +18,7 @@ import { roadDistance, resolveEndpoint } from "@/lib/geo";
 import { extrasCostFor, resolveTier, type MemberTier } from "@/lib/loyalty";
 import { vatOn, wantsInvoice } from "@/lib/vat";
 import { clampTip } from "@/lib/tips";
+import { paymentPlan, returnDiscountFor, RETURN_DISCOUNT_PERCENT, type PayOption } from "@/lib/deposits";
 
 /**
  * Membership tier of whoever is booking.
@@ -53,6 +54,13 @@ const extraSchema = z.object({
 
 const schema = z.object({
   couponCode:      z.string().optional(),
+  // Pay everything now, or 30% now and the rest to the chauffeur.
+  payOption:       z.enum(["FULL", "DEPOSIT"]).default("FULL"),
+  // Cancellation protection: 20% of the fare, cancel free up to 2 h before.
+  protection:      z.boolean().default(false),
+  // The paid booking this is the return journey of, from its "book your
+  // return" link. Earns 5% off when it checks out server-side.
+  returnOf:        z.string().optional(),
   bookingType:     z.enum(["TRANSFER", "HOURLY", "DAY_HIRE", "CORPORATE"]).default("TRANSFER"),
   pickupAddress:   z.string().min(3),
   pickupLat:       z.number(),
@@ -340,11 +348,28 @@ export async function POST(req: NextRequest) {
       ? Math.round(discountable * (couponDiscountPct / 100) * 100) / 100
       : 0;
 
+    // The return-journey discount. Only the link on a paid booking's
+    // confirmation carries the id, so the check is that the booking exists
+    // and was paid, and that nobody has already claimed a return off it. The
+    // customer's email is not compared: a partner booking the way home for
+    // the person who booked the way out is exactly the case this is for.
+    const returnOfBooking = body.returnOf
+      ? await prisma.booking.findUnique({
+          where: { id: body.returnOf },
+          select: { id: true, confirmationCode: true, paymentStatus: true, isDeleted: true },
+        }).catch(() => null)
+      : null;
+    const returnClaimed = returnOfBooking
+      ? await prisma.booking.count({ where: { specialRequests: { contains: `"returnDiscountOf":"${returnOfBooking.id}"` } } }).catch(() => 1)
+      : 1;
+    const returnEligible = !!returnOfBooking && returnOfBooking.paymentStatus === "PAID" && !returnOfBooking.isDeleted && returnClaimed === 0;
+    const returnDiscount = returnEligible ? returnDiscountFor(discountable) : 0;
+
     // Fares are quoted excluding VAT; the 10% is charged only to customers who
     // asked for an invoice, and on the discounted figure, because VAT is due on
     // what is actually paid. Computed here rather than trusted from the client
     // for the same reason the extras are: the request can say anything.
-    const netTotal = Math.round((discountable - couponDiscount) * 100) / 100;
+    const netTotal = Math.round((discountable - couponDiscount - returnDiscount) * 100) / 100;
     const invoiceRequested = wantsInvoice(body.extras);
     const vatAmount = invoiceRequested ? vatOn(netTotal) : 0;
 
@@ -353,7 +378,16 @@ export async function POST(req: NextRequest) {
     // only bounds-checked, which is what clampTip does. It sits outside the
     // taxable base and outside the discount: added last, after the VAT.
     const tipAmount = clampTip(body.tipAmount, netTotal);
-    const totalWithExtras = Math.round((netTotal + vatAmount + tipAmount) * 100) / 100;
+
+    // How the money is taken. Everything now, or 30% now and the rest to the
+    // chauffeur on the day; cancellation protection, when chosen, is 20% of
+    // the fare and is always paid in full up front. A round trip is always
+    // paid in full: its balance would have to be collected on one of two
+    // journeys by possibly two chauffeurs, which is not a thing anyone can
+    // settle cleanly.
+    const payOption: PayOption = returnDatetime ? "FULL" : body.payOption;
+    const plan = paymentPlan({ net: netTotal, vat: vatAmount, tip: tipAmount, protection: body.protection, option: payOption });
+    const totalWithExtras = plan.total;
 
     // Encode booking metadata into specialRequests.
     //
@@ -379,6 +413,11 @@ export async function POST(req: NextRequest) {
       netAmount:    netTotal,
       vatAmount,
       tipAmount,
+      ...(plan.protectionFee > 0 ? { protectionFee: plan.protectionFee } : {}),
+      ...(plan.option === "DEPOSIT" ? { payOption: "DEPOSIT", depositAmount: plan.payNow, balanceAmount: plan.balance } : {}),
+      ...(returnDiscount > 0 && returnOfBooking
+        ? { returnDiscount, returnDiscountPct: RETURN_DISCOUNT_PERCENT, returnDiscountOf: returnOfBooking.id, returnDiscountOfCode: returnOfBooking.confirmationCode }
+        : {}),
     };
     const metaPrefix = `[META]${JSON.stringify(metaObj)}[/META]\n`;
     const specialRequests = body.specialRequests
@@ -423,6 +462,11 @@ export async function POST(req: NextRequest) {
           totalAmount:      Math.round((totalWithExtras - returnFare) * 100) / 100,
           status:           "PENDING",
           paymentStatus:    "PENDING",
+          // The split, stored rather than recomputed: the receipt, the
+          // chauffeur's job sheet and the admin panel all read these.
+          depositAmount:    plan.option === "DEPOSIT" ? plan.payNow : null,
+          balanceAmount:    plan.option === "DEPOSIT" ? plan.balance : null,
+          protectionFee:    plan.protectionFee > 0 ? plan.protectionFee : null,
         },
       }));
     } catch (dbErr) {
@@ -586,10 +630,13 @@ export async function POST(req: NextRequest) {
           // The figure actually charged, which on a round trip covers both
           // legs — the same number the customer agreed to at the checkout.
           totalAmount:      totalWithExtras,
+          payNow:           plan.payNow,
+          balanceAmount:    plan.balance,
+          protectionFee:    plan.protectionFee,
           passengers:       body.passengers,
           bookingId:        booking.id,
           calendar: calendarLinks({ id: booking.id, confirmationCode: booking.confirmationCode, pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupDatetime, durationMin: body.quote.durationMin }),
-          returnUrl: returnBooking ? null : returnTripUrl({ pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupLat: body.pickupLat, pickupLng: body.pickupLng, dropoffLat: body.dropoffLat, dropoffLng: body.dropoffLng, passengers: body.passengers, vehicleClass: body.vehicleClass }),
+          returnUrl: returnBooking ? null : returnTripUrl({ id: booking.id, pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupLat: body.pickupLat, pickupLng: body.pickupLng, dropoffLat: body.dropoffLat, dropoffLng: body.dropoffLng, passengers: body.passengers, vehicleClass: body.vehicleClass }),
           returnLeg: returnBooking && returnDatetime ? {
             confirmationCode: returnBooking.confirmationCode,
             pickupDatetime:   formatPickupDateTime(returnDatetime),
@@ -613,7 +660,8 @@ export async function POST(req: NextRequest) {
       try {
         const checkout = await createSumUpCheckout({
           bookingId:     booking.id,
-          amount:        totalWithExtras,
+          // The deposit on a deposit booking; the chauffeur collects the rest.
+          amount:        plan.payNow,
           description:   `Elite BCN: ${body.pickupAddress} → ${body.dropoffAddress || body.bookingType}`,
           customerEmail: body.guestEmail,
         });

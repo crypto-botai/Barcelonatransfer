@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { collectDue } from "@/lib/deposits";
 import { formatPickupDateTime } from "@/lib/datetime";
 import {
   sendDriverAssignedEmail, sendDriverBookingDetailsEmail, sendTemporaryPassword,
@@ -229,6 +230,7 @@ export async function assignBookingToPartner(bookingId: string, partnerId: strin
     flightNumber: booking.flightNumber,
     payout,
     panelUrl: `${SITE_URL}/partner/jobs`,
+    collectAmount: collectDue(booking),
   }).catch((e) => console.error("[resend] partner job:", e));
 
   return updated;
@@ -316,6 +318,7 @@ export async function dispatchPartnerJob(partnerId: string, bookingId: string, d
       flightNumber: booking.flightNumber,
       specialRequests: booking.specialRequests,
       driverAmount,
+      collectAmount: collectDue(booking),
     }).catch((e) => console.error("[resend] partner dispatch (driver):", e));
   }
 
@@ -367,7 +370,13 @@ export async function completePartnerJob(partnerId: string, bookingId: string) {
   if (!["DRIVER_ASSIGNED", "IN_PROGRESS"].includes(booking.status)) throw new Error("Only a dispatched job can be completed");
   const updated = await prisma.booking.update({
     where: { id: bookingId },
-    data: { status: "COMPLETED", rideEndedAt: booking.rideEndedAt ?? new Date() },
+    data: {
+      status: "COMPLETED", rideEndedAt: booking.rideEndedAt ?? new Date(),
+      // The company's driver collected the balance on a deposit booking.
+      ...(booking.balanceAmount && booking.balanceAmount > 0 && !booking.balancePaidAt
+        ? { balancePaidAt: new Date(), balancePaidBy: booking.driverId ?? partnerId, balanceMethod: "DRIVER" }
+        : {}),
+    },
   });
   // Same rating request the driver's own Completed tap sends.
   if (booking.guestEmail) {

@@ -76,12 +76,14 @@ describe("derived hub links point at the place they name", () => {
 
 describe("routePageHref resolves the destination end only", () => {
   it("returns null when the destination has no page, rather than the origin's", () => {
-    // Calella and Cubelles are priced, have no page, and are reached from both
+    // Cubelles and Malgrat are priced, have no page, and are reached from both
     // generic origins. Either one resolving to a page is the bug returning.
-    expect(routePageHref("airport", "calella")).toBeNull();
-    expect(routePageHref("barcelona_city", "calella")).toBeNull();
+    // (Calella was the example until 20 Sep 2026, when it got a page.)
+    expect(routePageHref("airport", "cubelles")).toBeNull();
     expect(routePageHref("barcelona_city", "cubelles")).toBeNull();
     expect(routePageHref("airport", "malgrat")).toBeNull();
+    expect(routePageHref("barcelona_city", "malgrat")).toBeNull();
+    expect(routePageHref("airport", "calella")).toBe("/transfers/calella");
   });
 
   it("resolves destinations that do have a page", () => {

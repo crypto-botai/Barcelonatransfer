@@ -39,4 +39,10 @@ export const STATIC_TRANSFER_PAGES: StaticTransferPage[] = [
   // prices.sedan is not displayed — the nearby cards resolve the real fare — so the
   // +20 EUR return surcharge is not expressible here and does not need to be.
   { slug: "andorra-to-barcelona", name: "Andorra to Barcelona", type: "route", distance_km: 210, prices: { sedan: 370 } },
+  // Added 20 Sep 2026. prices.sedan is not displayed; the nearby cards resolve
+  // the real fare through SLUG_TO_ZONE.
+  { slug: "cambrils",  name: "Cambrils",  type: "route", distance_km: 110, prices: { sedan: 140 } },
+  { slug: "calella",   name: "Calella",   type: "route", distance_km: 70,  prices: { sedan: 110 } },
+  { slug: "blanes",    name: "Blanes",    type: "route", distance_km: 85,  prices: { sedan: 135 } },
+  { slug: "roses",     name: "Roses",     type: "route", distance_km: 170, prices: { sedan: 205 } },
 ];

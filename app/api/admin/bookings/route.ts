@@ -181,7 +181,7 @@ export async function POST(req: NextRequest) {
       bookingId:        booking.id,
       payment,
       calendar: calendarLinks({ id: booking.id, confirmationCode: booking.confirmationCode, pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupDatetime: pickup }),
-      returnUrl: returnTripUrl({ pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupLat: body.pickupLat, pickupLng: body.pickupLng, dropoffLat: body.dropoffLat, dropoffLng: body.dropoffLng, passengers: body.passengers, vehicleClass: body.vehicleClass }),
+      returnUrl: returnTripUrl({ id: booking.id, pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupLat: body.pickupLat, pickupLng: body.pickupLng, dropoffLat: body.dropoffLat, dropoffLng: body.dropoffLng, passengers: body.passengers, vehicleClass: body.vehicleClass }),
     }).catch(e => console.error("[resend] admin create booking confirmation:", e));
 
     // Notify admin panel (useful if another admin created it)

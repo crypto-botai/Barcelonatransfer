@@ -64,10 +64,20 @@ describe("confirmation extras", () => {
     expect(icsFile(b)).toContain("DTSTART:20260925T080000Z");
   });
   it("the return link reverses the journey", () => {
-    const u = returnTripUrl({ pickupAddress: "A", dropoffAddress: "B", pickupLat: 1, pickupLng: 2, dropoffLat: 3, dropoffLng: 4 });
-    expect(u).toContain("pickupAddress=B");
-    expect(u).toContain("dropoffAddress=A");
-    expect(u).toContain("pickupLat=3");
+    // The names /book reads (pickup, dropoff, pLat…), as the widget sends
+    // them. The first version used pickupAddress= and opened an empty form.
+    const u = returnTripUrl({ id: "bk1", pickupAddress: "A", dropoffAddress: "B", pickupLat: 1, pickupLng: 2, dropoffLat: 3, dropoffLng: 4, passengers: 3, vehicleClass: "BUSINESS" });
+    expect(u).toContain("pickup=B");
+    expect(u).toContain("dropoff=A");
+    expect(u).toContain("pLat=3");
+    expect(u).toContain("dLat=1");
+    expect(u).toContain("pax=3");
+    expect(u).toContain("vehicle=BUSINESS");
+    expect(u).toContain("returnOf=bk1");
+    expect(u).not.toContain("pickupAddress=");
+    // /book must actually read those names.
+    const form = rd("app/book/BookFormClient.tsx");
+    for (const k of ["pickup", "dropoff", "pLat", "dLat", "pax", "vehicle", "returnOf"]) expect(form).toContain(`params.get("${k}")`);
     expect(returnTripUrl({ pickupAddress: "A", dropoffAddress: null })).toBeNull();
   });
   it("the card offers both, and the site's booking flows pass them", () => {

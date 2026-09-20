@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { collectDue } from "@/lib/deposits";
 import { DriverStatus } from "@prisma/client";
 import { resolveBookingStatus } from "@/lib/booking-status";
 import { sendDriverAssignedEmail, sendBookingCancelledEmail, sendDriverBookingDetailsEmail } from "@/lib/resend";
@@ -198,6 +199,7 @@ export async function PATCH(
           flightNumber:     booking.flightNumber,
           specialRequests:  booking.specialRequests,
           driverAmount:     booking.driverAmount,
+          collectAmount:    collectDue(booking),
         }).catch(e => console.error("[resend] driver booking details:", e));
       }
 

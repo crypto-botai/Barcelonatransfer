@@ -64,13 +64,24 @@ export function icsFile(b: CalendarBooking): string {
   ].join("\r\n");
 }
 
-/** The reverse of a journey, pre-filled on the booking form. */
-export function returnTripUrl(b: { pickupAddress: string; dropoffAddress?: string | null; pickupLat?: number | null; pickupLng?: number | null; dropoffLat?: number | null; dropoffLng?: number | null; passengers?: number | null; vehicleClass?: string | null }): string | null {
+/**
+ * The reverse of a journey, pre-filled on the booking form.
+ *
+ * The parameter names are the ones /book actually reads — pickup, dropoff,
+ * pLat, pLng, dLat, dLng, pax, vehicle — the same as the homepage widget
+ * sends. The first version of this used pickupAddress/dropoffAddress and the
+ * form, which had never heard of those, opened empty.
+ *
+ * `id` is the paid booking this is the return of; /book sends it back as
+ * returnOf and the server takes 5% off once it has checked the booking.
+ */
+export function returnTripUrl(b: { id?: string | null; pickupAddress: string; dropoffAddress?: string | null; pickupLat?: number | null; pickupLng?: number | null; dropoffLat?: number | null; dropoffLng?: number | null; passengers?: number | null; vehicleClass?: string | null }): string | null {
   if (!b.dropoffAddress) return null;
-  const p = new URLSearchParams({ pickupAddress: b.dropoffAddress, dropoffAddress: b.pickupAddress });
-  if (b.dropoffLat && b.dropoffLng) { p.set("pickupLat", String(b.dropoffLat)); p.set("pickupLng", String(b.dropoffLng)); }
-  if (b.pickupLat && b.pickupLng) { p.set("dropoffLat", String(b.pickupLat)); p.set("dropoffLng", String(b.pickupLng)); }
-  if (b.passengers) p.set("passengers", String(b.passengers));
-  if (b.vehicleClass) p.set("vehicleClass", b.vehicleClass);
+  const p = new URLSearchParams({ pickup: b.dropoffAddress, dropoff: b.pickupAddress });
+  if (b.dropoffLat && b.dropoffLng) { p.set("pLat", String(b.dropoffLat)); p.set("pLng", String(b.dropoffLng)); }
+  if (b.pickupLat && b.pickupLng) { p.set("dLat", String(b.pickupLat)); p.set("dLng", String(b.pickupLng)); }
+  if (b.passengers) p.set("pax", String(b.passengers));
+  if (b.vehicleClass) p.set("vehicle", b.vehicleClass);
+  if (b.id) p.set("returnOf", b.id);
   return `${SITE_URL}/book?${p.toString()}`;
 }

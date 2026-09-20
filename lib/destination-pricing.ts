@@ -175,6 +175,11 @@ export const SLUG_TO_ZONE: Record<string, string> = {
   "sants-station":   "sants",
   vilanova:          "vilanova",
   begur:             "begur",
+  // Added 20 Sep 2026: four more priced zones with pages of their own.
+  cambrils:          "cambrils",
+  calella:           "calella",
+  blanes:            "blanes",
+  roses:             "roses",
 };
 
 /** The five price columns for one route, in display order. */

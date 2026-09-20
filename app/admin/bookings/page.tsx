@@ -26,6 +26,9 @@ type Booking = {
   totalAmount: number; driverAmount: number | null;
   status: BookingStatus; paymentStatus: string;
   paymentMethod: BookingPaymentMethod | null; paidAt: string | null; paidMarkedBy: string | null;
+  // Deposit bookings and cancellation protection, all null on an ordinary one.
+  depositAmount?: number | null; balanceAmount?: number | null; balancePaidAt?: string | null; balancePaidBy?: string | null; balanceMethod?: string | null;
+  protectionFee?: number | null;
   partnerId: string | null; partnerPayout: number | null; partnerDispatchedAt: string | null;
   partner?: { name: string } | null;
   driverId: string | null; adminNotes: string | null;
@@ -48,6 +51,9 @@ function PaymentSection({ booking, onChanged }: { booking: Booking; onChanged: (
   const [busy, setBusy]     = useState(false);
   const paid = booking.paymentStatus === "PAID";
 
+  const deposit = !!booking.balanceAmount && booking.balanceAmount > 0;
+  const balanceDue = deposit && !booking.balancePaidAt;
+
   async function mark(status: "PAID" | "PENDING") {
     setBusy(true);
     try {
@@ -66,14 +72,54 @@ function PaymentSection({ booking, onChanged }: { booking: Booking; onChanged: (
     }
   }
 
+  async function markBalance(received: boolean) {
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/admin/bookings/${booking.id}/payment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentStatus: booking.paymentStatus === "PAID" ? "PAID" : "PENDING", balancePaid: received }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error ?? "Failed");
+      toast.success(received ? "Balance marked received" : "Balance marked outstanding");
+      onChanged();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <section className="glass-card rounded-xl p-4 space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-xs text-dark-500 uppercase tracking-wider inline-flex items-center gap-1.5"><Wallet size={12} /> Payment</p>
-        <span className={`text-[11px] px-2 py-0.5 rounded-full border ${paid ? "border-green-500/30 text-green-400 bg-green-500/10" : "border-amber-500/30 text-amber-400 bg-amber-500/10"}`}>
-          {paid ? "Paid" : "Pending"}
+        <span className={`text-[11px] px-2 py-0.5 rounded-full border ${paid ? (balanceDue ? "border-gold-500/30 text-gold-400 bg-gold-500/10" : "border-green-500/30 text-green-400 bg-green-500/10") : "border-amber-500/30 text-amber-400 bg-amber-500/10"}`}>
+          {paid ? (balanceDue ? "Deposit paid" : "Paid") : "Pending"}
         </span>
       </div>
+      {(deposit || (booking.protectionFee ?? 0) > 0) && (
+        <div className="rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2 text-[12px] space-y-1">
+          {deposit && (
+            <>
+              <div className="flex justify-between text-dark-300"><span>Deposit (online)</span><span className="text-white">{formatCurrency(booking.depositAmount ?? 0)}</span></div>
+              <div className="flex justify-between text-dark-300">
+                <span>Balance to chauffeur</span>
+                <span className={balanceDue ? "text-amber-400" : "text-green-400"}>{formatCurrency(booking.balanceAmount ?? 0)} · {balanceDue ? "outstanding" : `received${booking.balanceMethod === "ONLINE" ? " online" : booking.balanceMethod === "OFFICE" ? " (office)" : " by chauffeur"}`}</span>
+              </div>
+            </>
+          )}
+          {(booking.protectionFee ?? 0) > 0 && (
+            <div className="flex justify-between text-dark-300"><span>Cancellation protection</span><span className="text-white">{formatCurrency(booking.protectionFee ?? 0)} · cancel free to 2h before</span></div>
+          )}
+          {deposit && (
+            <button type="button" onClick={() => markBalance(balanceDue)} disabled={busy}
+              className={`mt-1 w-full py-1.5 rounded-lg border text-xs font-medium transition-colors ${balanceDue ? "bg-green-500/15 border-green-500/30 text-green-400 hover:bg-green-500/25" : "border-white/[0.08] text-dark-400 hover:text-white"}`}>
+              {balanceDue ? `Mark ${formatCurrency(booking.balanceAmount ?? 0)} balance received` : "Undo balance received"}
+            </button>
+          )}
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-2">
         {PAYMENT_METHODS.map((m) => (
           <button key={m} type="button" onClick={() => setMethod(m)} disabled={paid}
@@ -94,7 +140,7 @@ function PaymentSection({ booking, onChanged }: { booking: Booking; onChanged: (
         <button type="button" onClick={() => mark("PAID")} disabled={busy}
           className="w-full py-2 rounded-lg bg-green-500/15 border border-green-500/30 text-green-400 text-sm font-medium hover:bg-green-500/25 transition-colors inline-flex items-center justify-center gap-2">
           {busy ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
-          Mark {formatCurrency(booking.totalAmount)} received
+          Mark {formatCurrency(deposit ? (booking.depositAmount ?? booking.totalAmount) : booking.totalAmount)} received
         </button>
       )}
     </section>

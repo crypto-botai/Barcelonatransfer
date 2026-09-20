@@ -1121,8 +1121,468 @@ const ANDORRA_RETURN: RouteLanding = {
   ),
 };
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cambrils
+//
+// Ten minutes south of Salou on the same coast, and on the same Tarragona
+// price ladder since the 8 Sep 2026 offer. Distance and time follow from the
+// Salou figures (100 km / 1h10) plus the short run down the coast road. No
+// Wikidata identifier: not verified, so none is claimed.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const cambrils = ladder("BCN_AIRPORT", "CAMBRILS");
+const cambrilsCity = ladder("BARCELONA_CITY", "CAMBRILS");
+const cambrilsFrom = cheapestOf(cambrils);
+
+const CAMBRILS: RouteLanding = {
+  slug: "cambrils",
+  name: "Cambrils",
+  h1: "Barcelona Airport to Cambrils Transfer",
+  eyebrow: "Costa Daurada · Fishing port",
+  EyebrowIcon: Umbrella,
+  title: `Barcelona Airport to Cambrils Transfer — from €${cambrilsFrom}`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Cambrils. Fixed €${cambrilsFrom} per vehicle, about 110 km and 1 hour 15 minutes, door to door to your hotel or apartment.`,
+  keywords: [
+    "barcelona airport to cambrils transfer",
+    "barcelona to cambrils",
+    "transfer barcelona cambrils",
+    "taxi barcelona airport cambrils",
+    "cambrils airport transfer",
+  ],
+  heroLead: `A private car from arrivals to your door in Cambrils, in one run with no change at Sants or Tarragona. Fixed at €${cambrilsFrom} per vehicle — the same from the airport or from central Barcelona.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "about 110 km" },
+    { icon: Clock, k: "Journey", v: "about 1h 15" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${cambrilsFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to Cambrils by vehicle", vehicles: cambrils },
+    { heading: "From central Barcelona", caption: "Fixed fares from central Barcelona to Cambrils by vehicle", vehicles: cambrilsCity },
+  ],
+  priceNote: "Cambrils is priced on the same ladder as Salou and PortAventura: the three are within ten minutes of each other, so a stay that touches more than one of them costs the same whichever you name as the destination.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Door-to-door to any Cambrils hotel, apartment or the marina",
+    "Free cancellation up to 24 hours before",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the AP-7",
+    "Meet and greet with your name on a tablet",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "Cambrils has a station, which makes the train look closer than it is. The honest comparison:",
+  options: [
+    { name: "Private transfer", cost: `€${cambrilsFrom} per vehicle`, time: "About 1 hour 15 minutes, door to door", best: "Families, groups, holiday luggage, and anyone staying on the seafront" },
+    { name: "Train via Sants", cost: "Per person, plus getting to Sants first", time: "About 1h 30 on the train, plus the connection at each end", best: "Solo travellers staying near the station" },
+    { name: "Coach", cost: "Per person, timetabled", time: "Two hours or more with the connection", best: "Budget travel, arriving mid-day" },
+    { name: "Taxi", cost: "Metered, plus an airport supplement", time: "Similar to a private transfer", best: "Rarely, on this distance" },
+  ],
+  optionsNote: "The airport is not on the railway. Reaching Cambrils by train means the airport shuttle to Sants, the regional train down the coast, and then a walk or taxi from the station to wherever you are staying — three legs with the luggage. One person with a rucksack will not mind. A family arriving at nine at night generally does.",
+  sections: [
+    {
+      h2: "A fishing town, not",
+      h2Accent: "a resort strip",
+      paras: [
+        "Cambrils is the quieter neighbour on this coast: a working port, a promenade of seafood restaurants along the marina, and a beach that runs for kilometres without the high-rise of Salou next door. Most visitors are here for a week or two in an apartment or a family hotel near the sea, which is exactly the kind of stay that arrives with luggage and does not want three changes to get there.",
+        "We drop at the door — a hotel on the Passeig Marítim, an apartment block in Vilafortuny, or the marina if you are joining a boat. Tell us the address when you book and the chauffeur has it before you land.",
+        "The park is close too. PortAventura is about ten minutes from Cambrils and the [PortAventura page](/transfers/port-aventura) covers the gates and the resort hotels; if your stay in Cambrils includes a park day, a car to the gates and back is a short local run rather than a transfer.",
+      ],
+      cards: [
+        { icon: Luggage, t: "Sized for the fortnight", d: "Two weeks by the sea is more luggage than the seat count suggests. One size up is usually right." },
+        { icon: MapPin, t: "Seafront or Vilafortuny", d: "Same fare anywhere in Cambrils, including the marina." },
+        { icon: Clock, t: "Late flights are fine", d: "We track the flight and wait 60 minutes free from touchdown." },
+      ],
+    },
+    {
+      h2: "The drive down",
+      h2Accent: "the coast",
+      paras: [
+        "About an hour and a quarter for roughly 110 km: the AP-7 southwest past Tarragona, then the last few kilometres along the coast road into town. It is motorway almost the whole way, so outside the summer changeover the time is predictable.",
+        "Summer Saturdays are the exception, as everywhere on the Costa Daurada. The motorway carries the whole coast's arrivals and departures at once and the same run can take half an hour longer. A fixed fare means that costs you time rather than money — the figure agreed at booking is the figure charged.",
+      ],
+    },
+    {
+      h2: "Nearby, and",
+      h2Accent: "priced the same way",
+      paras: [
+        "[Salou](/transfers/salou) is ten minutes north, [Tarragona](/transfers/tarragona) twenty-five minutes back up the coast with its Roman amphitheatre and old town, and [Reus Airport](/transfers/reus-airport) fifteen minutes inland if you are flying out on a Ryanair route rather than from Barcelona. Everything along this stretch is in the same price table, so combining two of them in one stay is a matter of comparing the rows rather than asking for a quote.",
+        "The [Costa Dorada page](/transfers/costa-dorada) covers the whole run from Sitges down to Cambrils.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona Airport to Cambrils?", a: `From €${cambrilsFrom} for the ${cambrils[0].label}, fixed per vehicle rather than per person — a family of four pays once. A minivan for a larger group is €${cambrils.find((v) => v.class === "VITO")?.price ?? cambrils[cambrils.length - 2].price}. Prices exclude VAT and tolls; 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long is the drive from Barcelona to Cambrils?", a: "About 1 hour 15 minutes for roughly 110 km, on the AP-7 past Tarragona and then the coast road into town. Allow longer on summer Saturdays, which are changeover day for the whole coast." },
+    { q: "Is Cambrils the same price as Salou?", a: "Yes. Cambrils, Salou and PortAventura are within ten minutes of each other and are priced together, so whichever you name as the destination the fare is the same." },
+    { q: "Can you pick us up from Reus Airport instead?", a: "Yes — Reus is fifteen minutes from Cambrils and we serve it. It is a short local transfer rather than the Barcelona run, and priced accordingly; ask when you book or use the Reus Airport page." },
+    { q: "What about the train?", a: "It is cheaper per person, and Cambrils does have a station. The airport, however, is not on the line: it means the shuttle to Sants first, the regional train down the coast, then getting from Cambrils station to your accommodation. Fine for one person with one bag; three changes with a family's luggage otherwise." },
+    { q: "Do you carry child seats?", a: "Yes. Child, baby and booster seats are fitted before the car is dispatched, so ask when you book rather than on the day. Pushchairs travel in the boot — mention them so the vehicle is sized for them alongside the cases." },
+  ],
+  bookingLead: "Give us your flight number, the address in Cambrils, and how many passengers. The price is confirmed before you pay and does not move afterwards — not for traffic, not for a delayed flight, not for a summer Saturday.",
+  ctaLead: `Fixed at €${cambrilsFrom} per vehicle from BCN El Prat or central Barcelona.`,
+  cheapest: cambrilsFrom,
+  ...schemaFor(
+    "cambrils",
+    "Cambrils",
+    "Barcelona to Cambrils Private Transfer",
+    `Fixed-price private transfer from Barcelona El Prat Airport or central Barcelona to Cambrils. From €${cambrilsFrom} per vehicle, about 110 km and 1 hour 15 minutes.`,
+    cambrilsFrom,
+    { type: "City", name: "Cambrils" },
+  ),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Calella
+//
+// The package-holiday town of the Maresme coast, an hour up the C-32 from the
+// airport and the closest of the "Costa Brava" resorts to Barcelona — it is
+// strictly the Costa del Maresme, and the page says so. Pineda de Mar, Santa
+// Susanna and Malgrat are the next three towns along and share the same price
+// ladder within a few euros; they are covered here rather than given pages of
+// their own. Distances are from the zone centres in lib/pricing.ts by road.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const calella = ladder("BCN_AIRPORT", "CALELLA");
+const calellaCity = ladder("BARCELONA_CITY", "CALELLA");
+const calellaFrom = cheapestOf(calella);
+
+const CALELLA: RouteLanding = {
+  slug: "calella",
+  name: "Calella",
+  h1: "Barcelona Airport to Calella Transfer",
+  eyebrow: "Costa del Maresme · Pineda · Santa Susanna",
+  EyebrowIcon: Umbrella,
+  title: `Barcelona Airport to Calella Transfer — from €${calellaFrom}`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Calella, Pineda de Mar and Santa Susanna. Fixed €${calellaFrom} per vehicle, about 70 km and 55 minutes, door to door.`,
+  keywords: [
+    "barcelona airport to calella transfer",
+    "barcelona to calella",
+    "transfer barcelona calella",
+    "calella airport transfer",
+    "pineda de mar airport transfer",
+    "santa susanna airport transfer",
+  ],
+  heroLead: `A private car from arrivals to your hotel in Calella — or Pineda de Mar, Santa Susanna and Malgrat along the same road — in under an hour, with no coach queue and no change at Sants. Fixed at €${calellaFrom} per vehicle.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "about 70 km" },
+    { icon: Clock, k: "Journey", v: "about 55 min" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${calellaFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to Calella by vehicle", vehicles: calella },
+    { heading: "From central Barcelona", caption: "Fixed fares from central Barcelona to Calella by vehicle", vehicles: calellaCity },
+  ],
+  priceNote: "Pineda de Mar is the next town along and takes the same fare. Santa Susanna and Malgrat de Mar are a few minutes further and a few euros more — every one of them is in the price table, so you can compare the rows before you book.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Door-to-door to any hotel in Calella or Pineda de Mar",
+    "Free cancellation up to 24 hours before",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the C-32",
+    "Meet and greet with your name on a tablet",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "Calella is on the railway and the coach companies serve it in season, so there are real alternatives. Here they are, honestly:",
+  options: [
+    { name: "Private transfer", cost: `€${calellaFrom} per vehicle`, time: "About 55 minutes, door to door", best: "Families, groups, luggage, and anyone landing outside the coach timetable" },
+    { name: "Train (R1) via Sants", cost: "Per person, plus getting to Sants first", time: "About 1h 15 on the train, plus the connection at each end", best: "Solo travellers staying near the station" },
+    { name: "Tour-operator coach", cost: "Usually bundled with a package", time: "Two hours or more, with several hotel stops before yours", best: "Package holidays where it is already paid for" },
+    { name: "Taxi", cost: "Metered, plus an airport supplement", time: "Similar to a private transfer", best: "Occasionally, for one or two people" },
+  ],
+  optionsNote: "The R1 train along the Maresme coast is genuinely pleasant — it runs beside the sea — but the airport is not on it. It means the shuttle to Sants, the R1 north, and a walk or taxi from Calella station with the cases. The tour-operator coach goes to the door but visits half a dozen hotels on the way and leaves when it leaves, not when you land. A private car does the door-to-door at your flight's time.",
+  sections: [
+    {
+      h2: "Calella, Pineda, Santa Susanna,",
+      h2Accent: "Malgrat",
+      paras: [
+        "Four towns in a row on the same road, sharing a beach and a railway line, and between them most of the holiday hotels north of Barcelona. Calella is the largest and the one with the town centre; Pineda de Mar runs into it without a gap; Santa Susanna is the newer hotel strip beyond, and Malgrat de Mar rounds off the run before the road climbs into Blanes.",
+        "We serve all four at fixed fares. Calella and Pineda are priced together. Santa Susanna and Malgrat are a little further and a little more, which the price table shows rather than surprising you with on the day. Name the hotel when you book and the chauffeur goes to its door.",
+        "Staying in Calella but flying into Girona? Girona Airport is about the same distance from Calella as Barcelona is, on a different road — the [Girona Airport page](/transfers/girona-airport) has that fare.",
+      ],
+      cards: [
+        { icon: MapPin, t: "Any hotel, any of the four", d: "Calella, Pineda, Santa Susanna and Malgrat all at fixed fares, to the door." },
+        { icon: Clock, t: "Your time, not the coach's", d: "The car is timed to your flight, not to a timetable and six other hotels." },
+        { icon: Luggage, t: "Sized for the cases", d: "A Vito or V-Class for a family with a fortnight's luggage. The table shows the price." },
+      ],
+    },
+    {
+      h2: "How the drive",
+      h2Accent: "goes",
+      paras: [
+        "About 55 minutes for roughly 70 km. From the airport the route runs around Barcelona on the ring road and then up the C-32 motorway along the coast, coming off at Calella. From central Barcelona it is closer to 45 minutes.",
+        "The C-32 is a toll road and the toll is not in the fare — it is the one variable, and it is a few euros. Summer weekends add time in both directions as the coast fills and empties; the fare does not change with the clock.",
+      ],
+    },
+    {
+      h2: "Further up",
+      h2Accent: "the coast",
+      paras: [
+        "Beyond Malgrat the road crosses the Tordera river and the Costa Brava proper begins at [Blanes](/transfers/blanes), fifteen minutes on, with [Lloret de Mar](/transfers/lloret-de-mar) and [Tossa de Mar](/transfers/tossa-de-mar) beyond that. Each has its own page and its own row in the price table. The [Costa Brava page](/transfers/costa-brava) covers the coast as a whole.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona Airport to Calella?", a: `From €${calellaFrom} for the ${calella[0].label}, fixed per vehicle — a family of four pays once, not four times. A minivan for a larger group is €${calella.find((v) => v.class === "VITO")?.price ?? calella[calella.length - 2].price}. Prices exclude VAT and the C-32 toll; 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long does it take to get from Barcelona Airport to Calella?", a: "About 55 minutes for roughly 70 km, around the city and up the C-32 along the coast. From central Barcelona it is about 45 minutes. Summer weekends can add fifteen or twenty minutes." },
+    { q: "Do you go to Pineda de Mar and Santa Susanna?", a: "Yes, all four towns on this stretch. Pineda is priced the same as Calella; Santa Susanna and Malgrat de Mar are a few euros more and have their own rows in the price table." },
+    { q: "Is the train from the airport to Calella easy?", a: "It is cheap and the R1 runs along the sea, but the airport is not on the line. You take the shuttle to Sants first, then the R1 north for about an hour and a quarter, then get from Calella station to your hotel. With luggage that is three legs. A private car is one." },
+    { q: "Our package includes a coach transfer. Why book a car?", a: "The coach leaves when it leaves and stops at several hotels before yours; two hours is normal. If you are landing late, travelling with small children, or simply want to be at the hotel within the hour, a car timed to your flight is what you are paying for." },
+    { q: "Do you carry child seats?", a: "Yes. Child, baby and booster seats are fitted before the car is dispatched — ask when you book. Pushchairs travel in the boot; mention them so the vehicle is sized for them alongside the cases." },
+  ],
+  bookingLead: "Give us your flight number, the hotel in Calella, Pineda, Santa Susanna or Malgrat, and how many passengers. The price is confirmed before you pay and does not move afterwards.",
+  ctaLead: `Fixed at €${calellaFrom} per vehicle from BCN El Prat or central Barcelona.`,
+  cheapest: calellaFrom,
+  ...schemaFor(
+    "calella",
+    "Calella",
+    "Barcelona to Calella Private Transfer",
+    `Fixed-price private transfer from Barcelona El Prat Airport or central Barcelona to Calella, Pineda de Mar and Santa Susanna. From €${calellaFrom} per vehicle, about 70 km and 55 minutes.`,
+    calellaFrom,
+    { type: "City", name: "Calella" },
+  ),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Blanes
+//
+// Where the Costa Brava begins: the first town north of the Tordera, with the
+// Marimurtra gardens on the headland and Lloret ten minutes beyond. Priced on
+// its own row, between Malgrat and Lloret. Distances by road from the zone
+// centre in lib/pricing.ts.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const blanes = ladder("BCN_AIRPORT", "BLANES");
+const blanesCity = ladder("BARCELONA_CITY", "BLANES");
+const blanesFrom = cheapestOf(blanes);
+
+const BLANES: RouteLanding = {
+  slug: "blanes",
+  name: "Blanes",
+  h1: "Barcelona Airport to Blanes Transfer",
+  eyebrow: "Costa Brava · Where the coast begins",
+  EyebrowIcon: Waves,
+  title: `Barcelona Airport to Blanes Transfer — from €${blanesFrom}`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Blanes, the first town of the Costa Brava. Fixed €${blanesFrom} per vehicle, about 85 km and 1 hour, door to door.`,
+  keywords: [
+    "barcelona airport to blanes transfer",
+    "barcelona to blanes",
+    "transfer barcelona blanes",
+    "blanes airport transfer",
+    "taxi barcelona airport blanes",
+  ],
+  heroLead: `A private car from arrivals to your hotel or apartment in Blanes in about an hour, with no change at Sants and no coach tour of other people's hotels first. Fixed at €${blanesFrom} per vehicle.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "about 85 km" },
+    { icon: Clock, k: "Journey", v: "about 1 hour" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${blanesFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to Blanes by vehicle", vehicles: blanes },
+    { heading: "From central Barcelona", caption: "Fixed fares from central Barcelona to Blanes by vehicle", vehicles: blanesCity },
+  ],
+  priceNote: "Blanes has its own row in the table, between Malgrat de Mar just before it and Lloret de Mar just after. If you are staying in Lloret, book Lloret — it is ten minutes further and priced separately.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Door-to-door to any Blanes hotel, apartment or campsite",
+    "Free cancellation up to 24 hours before",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the C-32",
+    "Meet and greet with your name on a tablet",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "Blanes is the last stop on the R1 railway, which makes it one of the few Costa Brava towns with a real train option. The comparison:",
+  options: [
+    { name: "Private transfer", cost: `€${blanesFrom} per vehicle`, time: "About 1 hour, door to door", best: "Families, groups, luggage, late arrivals, campsites outside the centre" },
+    { name: "Train (R1) via Sants", cost: "Per person, plus getting to Sants first", time: "About 1h 30 on the train, plus the connection at each end", best: "Solo travellers staying near the station" },
+    { name: "Coach", cost: "Per person, timetabled", time: "Two hours or more", best: "Budget travel, arriving in the middle of the day" },
+    { name: "Taxi", cost: "Metered, plus an airport supplement", time: "Similar to a private transfer", best: "Occasionally, for one or two people" },
+  ],
+  optionsNote: "Blanes station is a couple of kilometres inland from the beach and the hotels, so the train is not quite the door-to-door it looks like on a map: the shuttle to Sants, the R1 to the end of the line, then a bus or taxi down to the sea. It is a fine way to travel light. It is a poor way to arrive with a family's luggage at ten at night.",
+  sections: [
+    {
+      h2: "The first town of",
+      h2Accent: "the Costa Brava",
+      paras: [
+        "The Costa Brava officially starts at Blanes — at the rock of Sa Palomera on the beach, which divides the long sand of the Maresme from the coves to the north. The town is more Catalan than the resorts beyond it: a working fishing port, a Monday market, and the Marimurtra botanical garden on the headland, which is worth the visit on its own.",
+        "Most visitors stay in hotels along the S'Abanell beach, in apartments in the centre, or at the campsites on the road out towards Lloret. We drop at any of them at the same fare — say which when you book. Campsites in particular are worth naming precisely; there are several, and they are not next to each other.",
+      ],
+      cards: [
+        { icon: MapPin, t: "Hotel, apartment or campsite", d: "Same fare anywhere in Blanes. Name the campsite — there are several." },
+        { icon: Clock, t: "Timed to your flight", d: "The car waits 60 minutes free from touchdown, however late the flight." },
+        { icon: Luggage, t: "Sized for the stay", d: "A Vito or V-Class for a family and its cases. The table shows the price." },
+      ],
+    },
+    {
+      h2: "How long the drive",
+      h2Accent: "takes",
+      paras: [
+        "About an hour for roughly 85 km: around Barcelona on the ring road, up the C-32 along the Maresme coast to its end at Palafolls, then the last few kilometres across the Tordera into Blanes. From central Barcelona it is closer to 55 minutes. The C-32 toll is not in the fare.",
+        "Summer weekends add time, as they do on every road out of Barcelona towards the sea. The fare agreed at booking is the fare charged, whatever the traffic does.",
+      ],
+    },
+    {
+      h2: "Lloret, Tossa and",
+      h2Accent: "onwards",
+      paras: [
+        "[Lloret de Mar](/transfers/lloret-de-mar) is ten minutes beyond Blanes and has its own row and its own page; [Tossa de Mar](/transfers/tossa-de-mar) is twenty minutes further along one of the best coast roads in Catalonia. Coming the other way, [Calella](/transfers/calella) and the Maresme towns are fifteen minutes back down the coast. The [Costa Brava page](/transfers/costa-brava) covers the whole run from here to the French border.",
+        "Flying into Girona instead? Girona Airport is about 40 minutes from Blanes — closer than Barcelona — and the [Girona Airport page](/transfers/girona-airport) has that fare.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona Airport to Blanes?", a: `From €${blanesFrom} for the ${blanes[0].label}, fixed per vehicle rather than per person. A minivan for a larger group is €${blanes.find((v) => v.class === "VITO")?.price ?? blanes[blanes.length - 2].price}. Prices exclude VAT and the C-32 toll; 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long does it take from Barcelona Airport to Blanes?", a: "About an hour for roughly 85 km, around the city and up the C-32 to the end of the motorway, then across the Tordera into town. From central Barcelona about 55 minutes." },
+    { q: "Is Lloret de Mar the same price as Blanes?", a: "No — Lloret is ten minutes further and has its own row in the price table. If you are staying in Lloret, book Lloret; the Lloret de Mar page has the fares." },
+    { q: "Can we take the train to Blanes?", a: "Yes, Blanes is the end of the R1 line. The airport is not on it, so it means the shuttle to Sants first and then about an hour and a half on the train, and the station is a couple of kilometres from the beach. Fine with a rucksack; three legs with luggage." },
+    { q: "Do you drop at campsites?", a: "Yes, at the same fare. There are several around Blanes and on the road to Lloret, so give us the name of the campsite rather than just the town when you book." },
+    { q: "Do you carry child seats?", a: "Yes. Child, baby and booster seats are fitted before the car is dispatched — ask when you book. Pushchairs travel in the boot; mention them so the vehicle is sized for them alongside the cases." },
+  ],
+  bookingLead: "Give us your flight number, the address in Blanes — hotel, apartment or campsite by name — and how many passengers. The price is confirmed before you pay and does not move afterwards.",
+  ctaLead: `Fixed at €${blanesFrom} per vehicle from BCN El Prat or central Barcelona.`,
+  cheapest: blanesFrom,
+  ...schemaFor(
+    "blanes",
+    "Blanes",
+    "Barcelona to Blanes Private Transfer",
+    `Fixed-price private transfer from Barcelona El Prat Airport or central Barcelona to Blanes on the Costa Brava. From €${blanesFrom} per vehicle, about 85 km and 1 hour.`,
+    blanesFrom,
+    { type: "City", name: "Blanes" },
+  ),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Roses
+//
+// The Bay of Roses at the top of the Costa Brava: Roses itself, the canals of
+// Empuriabrava next door, and Cadaqués over the headland. A long run — most of
+// the AP-7 to Figueres and then across — which is precisely why a fixed fare
+// matters here more than on a 50 km hop. Distances by road from the zone
+// centre in lib/pricing.ts.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const roses = ladder("BCN_AIRPORT", "ROSES");
+const rosesCity = ladder("BARCELONA_CITY", "ROSES");
+const rosesFrom = cheapestOf(roses);
+
+const ROSES: RouteLanding = {
+  slug: "roses",
+  name: "Roses",
+  h1: "Barcelona Airport to Roses Transfer",
+  eyebrow: "Costa Brava · Bay of Roses · Empuriabrava",
+  EyebrowIcon: Waves,
+  title: `Barcelona Airport to Roses Transfer — from €${rosesFrom}`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Roses and Empuriabrava on the Bay of Roses. Fixed €${rosesFrom} per vehicle, about 170 km and 1 hour 50 minutes, door to door.`,
+  keywords: [
+    "barcelona airport to roses transfer",
+    "barcelona to roses",
+    "transfer barcelona roses costa brava",
+    "roses airport transfer",
+    "empuriabrava airport transfer",
+  ],
+  heroLead: `A private car from arrivals to your door in Roses — or Empuriabrava, ten minutes round the bay — with no change at Sants, Girona or Figueres. Fixed at €${rosesFrom} per vehicle, agreed before you travel, on a run where the meter would otherwise be the only thing you could not predict.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "about 170 km" },
+    { icon: Clock, k: "Journey", v: "about 1h 50" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${rosesFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to Roses by vehicle", vehicles: roses },
+    { heading: "From central Barcelona", caption: "Fixed fares from central Barcelona to Roses by vehicle", vehicles: rosesCity },
+  ],
+  priceNote: "Empuriabrava has its own row a few euros from this one, and Cadaqués — over the headland on a slower road — its own page. On a journey this long the table is the point: the fare is known before the car leaves the airport.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Flight tracking, pickup moved to your landing time",
+    "60 minutes free waiting from touchdown",
+    "Door-to-door to any Roses hotel, apartment or the marina",
+    "Free cancellation up to 24 hours before",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the AP-7",
+    "Meet and greet with your name on a tablet",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "At 170 km the alternatives are real but slow. The honest comparison:",
+  options: [
+    { name: "Private transfer", cost: `€${rosesFrom} per vehicle`, time: "About 1 hour 50 minutes, door to door", best: "Families, groups, luggage, late arrivals, and anyone staying outside the town centre" },
+    { name: "Train to Figueres, then bus", cost: "Per person, plus the airport shuttle and the bus", time: "Three hours or more with the connections", best: "Solo travellers with time and one bag" },
+    { name: "Coach from Barcelona Nord", cost: "Per person, timetabled", time: "Around three hours, with the shuttle to Nord first", best: "Budget travel, arriving mid-day" },
+    { name: "Taxi", cost: "Metered, plus an airport supplement", time: "Similar to a private transfer", best: "Rarely — see below" },
+  ],
+  optionsNote: "Roses has no station. The train gets you to Figueres — the high-speed AVE from Sants does it in under an hour — and from there it is a bus or a taxi across the plain to the coast, with the luggage, after the shuttle from the airport to Sants at the start. Three legs and the best part of three hours. A taxi will do it in one, but a metered fare over 170 km is a number nobody can quote you in advance, and that is the argument for a fixed one.",
+  sections: [
+    {
+      h2: "Roses, Empuriabrava and",
+      h2Accent: "the bay",
+      paras: [
+        "The Bay of Roses is the wide sweep of sand at the top of the Costa Brava, with Roses at its northern end under the Cap de Creus and Empuriabrava — the canal town built for boats — ten minutes round the shore. Between them are most of the holiday apartments and hotels of the Alt Empordà, and the Aiguamolls wetland reserve in the middle.",
+        "We drop at the door anywhere in Roses at this fare: the hotels along the seafront, apartments up towards Canyelles and Almadrava, or the marina. Empuriabrava is priced on its own row a few euros from this one. Say which when you book and the chauffeur has the address before you land.",
+        "[Cadaqués](/transfers/cadaques) is over the headland from Roses on a slower, winding road and has its own page and fare — if that is where you are staying, book Cadaqués rather than Roses and a taxi.",
+      ],
+      cards: [
+        { icon: MapPin, t: "Roses or Empuriabrava", d: "Both at fixed fares, to the door. Cadaqués has its own page." },
+        { icon: Clock, t: "Late flights are fine", d: "We track the flight and wait 60 minutes free from touchdown — worth more on a run with no late bus." },
+        { icon: Luggage, t: "Book for the boot", d: "Two weeks on the bay is more luggage than the seat count suggests." },
+      ],
+    },
+    {
+      h2: "Nearly two hours,",
+      h2Accent: "mostly motorway",
+      paras: [
+        "About an hour and fifty minutes for roughly 170 km: the AP-7 north past Girona to Figueres — an hour and a quarter of steady motorway — then the C-260 across the plain to the coast. From central Barcelona it is about ten minutes less.",
+        "The motorway section is predictable outside the summer changeover weekends; the last stretch into Roses slows on August evenings as the bay fills up. A fixed fare means that costs you time and not money.",
+        "Flying into Girona instead of Barcelona cuts the run to under an hour. If your flight gives you the choice, the [Girona Airport page](/transfers/girona-airport) has that fare.",
+      ],
+    },
+    {
+      h2: "On the way,",
+      h2Accent: "and nearby",
+      paras: [
+        "[Figueres](/transfers/figueres) and the Dalí museum are twenty minutes inland from Roses, on the road you arrive by; [Cadaqués](/transfers/cadaques) and Portlligat are over the headland. Coming from the south, [Begur](/transfers/begur), Palamós and Platja d'Aro are the central Costa Brava, each with its own row in the table. The [Costa Brava page](/transfers/costa-brava) covers the coast from Blanes to the border.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona Airport to Roses?", a: `From €${rosesFrom} for the ${roses[0].label}, fixed per vehicle rather than per person — a family of four pays once. A minivan for a larger group is €${roses.find((v) => v.class === "VITO")?.price ?? roses[roses.length - 2].price}. Prices exclude VAT and tolls; 10% VAT is added only if you ask for an invoice.` },
+    { q: "How long is the drive from Barcelona to Roses?", a: "About 1 hour 50 minutes for roughly 170 km — the AP-7 to Figueres and then the C-260 across to the coast. From central Barcelona about ten minutes less. August evenings add time on the last stretch into the bay." },
+    { q: "Do you go to Empuriabrava?", a: "Yes. Empuriabrava is ten minutes round the bay from Roses and has its own row in the price table, a few euros from the Roses fare. Name it as the destination when you book." },
+    { q: "Would Girona Airport be closer?", a: "Much closer — under an hour to Roses. If your route offers a Girona flight, it is worth considering; the Girona Airport page has that fare. From Barcelona, the fixed fare here is the answer to a run that would otherwise be three legs by public transport or an unknown number on a taxi meter." },
+    { q: "How does the train compare?", a: "The AVE from Sants reaches Figueres in under an hour, which sounds close. But the airport is not at Sants, Figueres is not on the coast, and Roses has no station: it is the shuttle, the train, then a bus or taxi across with the luggage. Three hours is normal. Fine with a rucksack and time; not with a family at nine at night." },
+    { q: "Do you carry child seats?", a: "Yes. Child, baby and booster seats are fitted before the car is dispatched — ask when you book. Pushchairs travel in the boot; mention them so the vehicle is sized for them alongside the cases." },
+  ],
+  bookingLead: "Give us your flight number, the address in Roses or Empuriabrava, and how many passengers. The price is confirmed before you pay and does not move afterwards — not for traffic, not for a delayed flight, not for an August evening on the bay.",
+  ctaLead: `Fixed at €${rosesFrom} per vehicle from BCN El Prat or central Barcelona.`,
+  cheapest: rosesFrom,
+  ...schemaFor(
+    "roses",
+    "Roses",
+    "Barcelona to Roses Private Transfer",
+    `Fixed-price private transfer from Barcelona El Prat Airport or central Barcelona to Roses and Empuriabrava on the Bay of Roses. From €${rosesFrom} per vehicle, about 170 km and 1 hour 50 minutes.`,
+    rosesFrom,
+    { type: "City", name: "Roses" },
+  ),
+};
+
 export const ROUTE_LANDINGS: RouteLanding[] = [
   LA_ROCA, SANTS, VILANOVA, BEGUR, ENCAMP, SITGES, SALOU, ANDORRA_RETURN,
+  CAMBRILS, CALELLA, BLANES, ROSES,
 ];
 
 export function routeLanding(slug: string): RouteLanding | undefined {

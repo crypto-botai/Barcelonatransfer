@@ -27,6 +27,8 @@ export const FAQ_GROUPS = [
       { q: "How far in advance should I book?", a: "Book at least 4 hours before pickup to avoid the last-minute surcharge: bookings made inside 4 hours carry 15%, and we cannot accept a booking with less than 1 hour's notice. For peak periods, weekends or big events in Barcelona, 48–72 hours ahead is wiser — that is about availability rather than price." },
       { q: "Can I book for someone else?", a: "Absolutely. When booking you can enter the passenger's name, phone, and email separately. The driver will be briefed with the passenger's details and will greet them by name." },
       { q: "Is there a cancellation fee?", a: "Cancellations made more than 24 hours before the scheduled pickup are fully refunded. Cancellations within 24 hours may incur a 50% charge. No-shows are charged in full. Please contact us as early as possible if your plans change." },
+      { q: "What is cancellation protection?", a: "An optional add-on at the checkout, priced at 20% of the fare. With it, you can cancel up to 2 hours before pickup and the whole fare is refunded — only the protection fee itself is kept. Without it, the free cancellation window is 24 hours." },
+      { q: "Can I pay a deposit instead of the full fare?", a: "Yes. At the checkout choose \"Pay 30% now\": the deposit holds the car and the remaining 70% is paid to your chauffeur at the end of the journey, in cash or by card. Your confirmation shows both amounts." },
       { q: "Can I modify my booking after confirmation?", a: "Yes — contact us by WhatsApp or email as soon as possible with the changes. We'll do our best to accommodate modifications to date, time, or destination. Changes are subject to availability." },
     ],
   },

@@ -4,6 +4,7 @@ import { sendWhatsAppBookingConfirmation } from "@/lib/whatsapp";
 import { notify } from "@/lib/notifications/service";
 import type { SumUpCheckout } from "@/lib/sumup";
 import { formatPickupDateTime } from "@/lib/datetime";
+import { paidOnline } from "@/lib/deposits";
 
 // Shared by app/api/payments/webhook, app/api/payments/verify, and app/api/cron/payment-reconcile
 // so all three entry points apply the exact same DB + email side-effects for a paid or failed
@@ -33,7 +34,8 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
       bookingId,
       stripeSessionId: checkout.id,
       stripePaymentId: transactionId,
-      amount:          updated.totalAmount,
+      // What the card was actually charged: the deposit on a deposit booking.
+      amount:          paidOnline(updated),
       currency:        updated.currency,
       status:          "PAID",
     },
@@ -72,6 +74,9 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
         pickupDatetime:   formatPickupDateTime(updated.pickupDatetime),
         vehicleClass:     updated.vehicleClass,
         totalAmount:      updated.totalAmount,
+        payNow:           paidOnline(updated),
+        balanceAmount:    updated.balanceAmount ?? 0,
+        protectionFee:    updated.protectionFee ?? 0,
         passengers:       updated.passengers,
         bookingId,
         transactionId,
@@ -124,6 +129,25 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
   }
 
   return "confirmed";
+}
+
+/**
+ * The balance on a deposit booking, paid online instead of to the chauffeur.
+ * Idempotent: a second call for a balance already marked paid does nothing.
+ */
+export async function finalizeBalancePayment(bookingId: string, checkout: SumUpCheckout): Promise<"already-paid" | "paid" | "not-found"> {
+  const booking = await prisma.booking.findUnique({ where: { id: bookingId }, select: { id: true, balanceAmount: true, balancePaidAt: true } });
+  if (!booking) return "not-found";
+  if (booking.balancePaidAt || !booking.balanceAmount) return "already-paid";
+  await prisma.booking.update({
+    where: { id: bookingId },
+    data: { balancePaidAt: new Date(), balancePaidBy: "online", balanceMethod: "ONLINE" },
+  });
+  const transactionId = (checkout.transaction_id ?? checkout.id) as string;
+  await prisma.activityLog.create({
+    data: { adminId: "system", adminName: "SumUp", action: "BALANCE_PAID", entity: "BOOKING", entityId: bookingId, details: { amount: booking.balanceAmount, transactionId } as never },
+  }).catch(() => {});
+  return "paid";
 }
 
 export async function markSumUpPaymentFailed(bookingId: string): Promise<void> {

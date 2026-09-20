@@ -101,6 +101,17 @@ const RELEASES: ReadonlyArray<{ date: string; paths: readonly string[] }> = [
     ],
   },
   {
+    // Four more priced zones given pages of their own: the Costa Daurada and
+    // Maresme/Costa Brava resorts people search for by name.
+    date: "2026-09-20",
+    paths: [
+      "/transfers/cambrils",
+      "/transfers/calella",
+      "/transfers/blanes",
+      "/transfers/roses",
+    ],
+  },
+  {
     // Pages built from the first twelve months of Search Console data, for
     // demand that was already showing impressions with nothing targeting it.
     date: "2026-08-26",
@@ -229,6 +240,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/transfers/figueres`,      lastModified: lastMod("/transfers/figueres"), changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/transfers/tossa-de-mar`,  lastModified: lastMod("/transfers/tossa-de-mar"), changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/transfers/salou`,         lastModified: lastMod("/transfers/salou"), changeFrequency: "monthly", priority: 0.75 },
+    { url: `${BASE}/transfers/cambrils`,      lastModified: lastMod("/transfers/cambrils"), changeFrequency: "monthly", priority: 0.75 },
+    { url: `${BASE}/transfers/calella`,       lastModified: lastMod("/transfers/calella"), changeFrequency: "monthly", priority: 0.75 },
+    { url: `${BASE}/transfers/blanes`,        lastModified: lastMod("/transfers/blanes"), changeFrequency: "monthly", priority: 0.75 },
+    { url: `${BASE}/transfers/roses`,         lastModified: lastMod("/transfers/roses"), changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/transfers/castelldefels`, lastModified: lastMod("/transfers/castelldefels"), changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/transfers/tarragona`,     lastModified: lastMod("/transfers/tarragona"), changeFrequency: "monthly", priority: 0.8  },
     { url: `${BASE}/transfers/andorra`,       lastModified: lastMod("/transfers/andorra"), changeFrequency: "monthly", priority: 0.8  },

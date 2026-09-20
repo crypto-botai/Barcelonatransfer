@@ -24,6 +24,7 @@ export default async function DriverPage() {
           pickupAddress: true, dropoffAddress: true, pickupLat: true, pickupLng: true, dropoffLat: true, dropoffLng: true,
           pickupDatetime: true, passengers: true, luggage: true,
           vehicleClass: true, totalAmount: true, driverAmount: true,
+          paymentStatus: true, paymentMethod: true, balanceAmount: true, balancePaidAt: true,
           rideStage: true, rideStageAt: true,
           noShow: { select: { id: true } },
           rideEvents: { where: { stage: "ARRIVED" }, take: 1, select: { createdAt: true } },

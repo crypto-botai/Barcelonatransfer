@@ -12,7 +12,7 @@ import {
   paymentReceiptCard,
   rideCompleteCard,
   flightDelayCard,
-  driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard,
+  driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard, returnRebookCard,
   pickupChangedCard, adminPickupChangedCard,
   partnerJobCard, adminPartnerDispatchCard, credentialsCard, partnerConvertedCard,
   abandonedRecoveryCard, personalNoteCard,
@@ -108,12 +108,14 @@ function splitDatetime(dt: string): { date: string; time: string } {
 function adminNewBookingAlertHtml({
   confirmationCode, clientName, clientEmail, clientPhone,
   pickupAddress, dropoffAddress, pickupDatetime, vehicleClass,
-  passengers, luggage, flightNumber, totalAmount, specialRequests,
+  passengers, luggage, flightNumber, totalAmount, specialRequests, paymentNote,
 }: {
   confirmationCode: string; clientName: string; clientEmail: string; clientPhone?: string | null;
   pickupAddress: string; dropoffAddress?: string | null; pickupDatetime: string;
   vehicleClass: string; passengers: number; luggage?: number; flightNumber?: string | null;
   totalAmount: number; specialRequests?: string | null;
+  /** How the money is arriving, when it is not simply paid in full. */
+  paymentNote?: string | null;
 }): string {
   const { date, time } = splitDatetime(pickupDatetime);
   const code = esc(confirmationCode);
@@ -172,6 +174,7 @@ function adminNewBookingAlertHtml({
           <td style="padding:18px 24px; text-align:right; vertical-align:middle;">
             <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:3px; color:#9a9a9a; text-transform:uppercase;">Amount</span><br>
             <span style="font-family:Georgia,'Times New Roman',serif; font-size:24px; color:#1a1a1a;">€${totalAmount.toFixed(2)}</span>
+            ${paymentNote ? `<br><span style="font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#b39159;">${esc(paymentNote)}</span>` : ""}
           </td>
         </tr>
       </table>
@@ -495,10 +498,13 @@ export async function sendBookingConfirmation({
   to, name, confirmationCode, pickupAddress, dropoffAddress,
   pickupDatetime, vehicleClass, totalAmount, passengers,
   bookingId, returnLeg, payment, calendar, returnUrl,
+  payNow, balanceAmount, protectionFee,
 }: {
   to: string; name: string; confirmationCode: string; pickupAddress: string;
   dropoffAddress: string; pickupDatetime: string; vehicleClass: string;
   totalAmount: number; passengers: number; bookingId?: string;
+  /** Deposit / protection split. Omitted on an ordinary full payment. */
+  payNow?: number; balanceAmount?: number; protectionFee?: number;
   /** How the fare is settled, on a booking the office made by hand. */
   payment?: { line: string; payUrl?: string; paid?: boolean };
   calendar?: { google: string; ics: string };
@@ -531,6 +537,9 @@ export async function sendBookingConfirmation({
       payment,
       calendar,
       returnUrl,
+      split: (balanceAmount ?? 0) > 0 || (protectionFee ?? 0) > 0
+        ? { payNow: payNow ?? totalAmount, balance: balanceAmount ?? 0, protectionFee: protectionFee ?? 0, paid: payment?.paid ?? false }
+        : null,
     }),
     back
       ? `Both journeys are reserved — references ${confirmationCode} and ${back.confirmationCode}`
@@ -554,6 +563,13 @@ export async function sendAdminNewBookingAlert({
   vehicleClass: string; totalAmount: number; passengers?: number; luggage?: number;
   flightNumber?: string | null; specialRequests?: string | null;
 }) {
+  // A deposit booking is worth its total, but only part of it has arrived.
+  // The office reads that here rather than discovering it when the chauffeur
+  // asks why the customer is handing over cash.
+  const meta = parseBookingMeta(specialRequests);
+  const paymentNote = meta.payOption === "DEPOSIT"
+    ? `Deposit paid online · chauffeur collects the balance on the day${meta.protectionFee > 0 ? " · cancellation protection taken" : ""}`
+    : meta.protectionFee > 0 ? "Paid in full · cancellation protection taken" : null;
   const html = adminNewBookingAlertHtml({
     confirmationCode,
     clientName:      guestName,
@@ -568,6 +584,7 @@ export async function sendAdminNewBookingAlert({
     flightNumber,
     totalAmount,
     specialRequests,
+    paymentNote,
   });
   // Logged like every other email. This was the one send that recorded nothing,
   // so there was no way to tell from the admin whether a new-booking alert had
@@ -771,6 +788,20 @@ export async function sendDriverAssignedEmail({
 }
 
 // ─── Review Request ──────────────────────────────────────────
+/** Three days after the ride: the journey home, pre-filled, 5% off. */
+export async function sendReturnRebookEmail({
+  to, name, from, toAddress, discountPct, rebookUrl, bookingId,
+}: {
+  to: string; name: string; from: string; toAddress: string; discountPct: number; rebookUrl: string; bookingId: string;
+}) {
+  const html = emailDocument(
+    returnRebookCard({ firstName: firstNameOf(name), from, to: toAddress, discountPct, rebookUrl }),
+    `Your journey home, ${discountPct}% off — ${from} to ${toAddress}`,
+  );
+  const id = await sendEmail({ from: FROM, to, subject: `Heading back? ${discountPct}% off your return journey | Elite BCN`, html });
+  await logEmail({ to, subject: "Return journey offer", type: "RETURN_REBOOK", resendId: id, bookingId });
+}
+
 export async function sendReviewRequestEmail({
   to, name, confirmationCode, bookingId,
 }: {
@@ -795,10 +826,13 @@ export async function sendReviewRequestEmail({
 export async function sendPaymentConfirmationEmail({
   to, name, confirmationCode, pickupAddress, dropoffAddress,
   pickupDatetime, vehicleClass, totalAmount, passengers, bookingId,
+  payNow, balanceAmount, protectionFee,
 }: {
   to: string; name: string; confirmationCode: string; pickupAddress: string;
   dropoffAddress: string | null; pickupDatetime: string; vehicleClass: string;
   totalAmount: number; passengers: number; bookingId: string; transactionId?: string;
+  /** Deposit / protection split. Omitted on an ordinary full payment. */
+  payNow?: number; balanceAmount?: number; protectionFee?: number;
 }) {
   const { date, time } = splitDatetime(pickupDatetime);
   const html = emailDocument(
@@ -812,6 +846,9 @@ export async function sendPaymentConfirmationEmail({
       vehicle: vehicleName(vehicleClass),
       passengers,
       totalAmount,
+      split: (balanceAmount ?? 0) > 0 || (protectionFee ?? 0) > 0
+        ? { payNow: payNow ?? totalAmount, balance: balanceAmount ?? 0, protectionFee: protectionFee ?? 0, paid: true }
+        : null,
     }),
     `Payment received — reference ${confirmationCode}`,
   );
@@ -852,12 +889,14 @@ export async function sendBookingCancelledEmail({
 export async function sendDriverBookingDetailsEmail({
   to, driverName, confirmationCode, guestName, guestPhone,
   pickupAddress, dropoffAddress, pickupDatetime, vehicleClass,
-  passengers, luggage, flightNumber, specialRequests, driverAmount,
+  passengers, luggage, flightNumber, specialRequests, driverAmount, collectAmount,
 }: {
   to: string; driverName: string; confirmationCode: string; guestName: string;
   guestPhone: string; pickupAddress: string; dropoffAddress: string | null;
   pickupDatetime: string; vehicleClass: string; passengers: number; luggage: number;
   flightNumber?: string | null; specialRequests?: string | null; driverAmount?: number | null;
+  /** What the chauffeur collects from the client on the day, if anything. */
+  collectAmount?: number | null;
 }) {
   // The driver is the one who has to bring the child seat, so the extras go in
   // a row of their own rather than being stripped out with the metadata block.
@@ -872,6 +911,7 @@ export async function sendDriverBookingDetailsEmail({
       tipAmount: driverMeta.tipAmount,
       notes: driverMeta.notes,
       driverAmount,
+      collectAmount,
     }),
     `${confirmationCode} · ${pickupDatetime} · ${pickupAddress}`,
   );
@@ -1003,17 +1043,19 @@ export async function sendTemporaryPassword({
 /** A job sent to a partner company, with the payout the office set for it. */
 export async function sendPartnerJobEmail({
   to, contactName, companyName, confirmationCode, pickupAddress, dropoffAddress,
-  pickupDatetime, vehicleClass, passengers, luggage, flightNumber, payout, panelUrl,
+  pickupDatetime, vehicleClass, passengers, luggage, flightNumber, payout, panelUrl, collectAmount,
 }: {
   to: string; contactName: string; companyName: string; confirmationCode: string;
   pickupAddress: string; dropoffAddress?: string | null; pickupDatetime: string;
   vehicleClass: string; passengers: number; luggage: number; flightNumber?: string | null;
   payout: number; panelUrl: string;
+  /** What the driver collects from the client on the day, if anything. */
+  collectAmount?: number | null;
 }) {
   const html = emailDocument(
     partnerJobCard({
       contactName, companyName, confirmationCode, pickupAddress, dropoffAddress, pickupDatetime,
-      vehicle: vehicleName(vehicleClass), passengers, luggage, flightNumber, payout, panelUrl,
+      vehicle: vehicleName(vehicleClass), passengers, luggage, flightNumber, payout, panelUrl, collectAmount,
     }),
     `New job ${confirmationCode} · ${pickupDatetime} · payout €${payout.toFixed(2)}`,
   );
