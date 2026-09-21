@@ -349,6 +349,9 @@ describe("wallets are claimed only when they exist", () => {
     const w = rd("lib/wallets.ts");
     expect(w).toContain("NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_ID");
     expect(w).toContain("merchantId ? { merchantId, merchantName } : null");
+    // The id is public by design; Apple is gated separately until verified.
+    expect(w).toContain("NEXT_PUBLIC_APPLE_PAY_READY");
+    expect(w).toContain("Google Pay accepted");
     const pay = rd("app/booking/pay/[checkoutId]/page.tsx");
     expect(pay).toContain("...(GOOGLE_PAY ? { googlePay: GOOGLE_PAY } : {})");
     // Apple Pay has no mount option; it appears once the domain is registered.

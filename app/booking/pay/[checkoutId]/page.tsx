@@ -311,7 +311,7 @@ function PayInner() {
 
                   <p className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[11px] text-dark-400">
                     <span className="inline-flex items-center gap-1.5"><ShieldCheck size={12} className="text-gold-500/80" /> 256-bit SSL, PCI DSS Level 1</span>
-                    {WALLET_LABEL && <span className="sm:hidden">Apple Pay and Google Pay</span>}
+                    {WALLET_LABEL && <span className="sm:hidden">{WALLET_LABEL}</span>}
                     <span>Powered by SumUp</span>
                   </p>
                 </>

@@ -156,7 +156,7 @@ export default function PaymentsPage() {
         <CreditCard size={18} className="text-gold-500 flex-shrink-0 mt-0.5" />
         <div>
           <p className="text-white text-sm font-medium">Secure Payments by SumUp</p>
-          <p className="text-dark-400 text-xs mt-0.5">All payments are processed securely via SumUp. We accept all major credit and debit cards{WALLET_LABEL ? ", Apple Pay and Google Pay" : ""}.</p>
+          <p className="text-dark-400 text-xs mt-0.5">All payments are processed securely via SumUp. We accept all major credit and debit cards{WALLET_LABEL ? `, ${WALLET_LABEL.replace(" accepted", "")}` : ""}.</p>
         </div>
       </div>
     </div>
