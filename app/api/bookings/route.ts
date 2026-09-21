@@ -381,13 +381,24 @@ export async function POST(req: NextRequest) {
 
     // How the money is taken. Everything now, or 30% now and the rest to the
     // chauffeur on the day; cancellation protection, when chosen, is 20% of
-    // the fare and is always paid in full up front. A round trip is always
-    // paid in full: its balance would have to be collected on one of two
-    // journeys by possibly two chauffeurs, which is not a thing anyone can
-    // settle cleanly.
-    const payOption: PayOption = returnDatetime ? "FULL" : body.payOption;
+    // the fare and is always paid in full up front.
+    //
+    // A round trip takes a deposit too. The balance is divided between the
+    // two legs in proportion to their fares and stored on each booking, so
+    // each chauffeur collects for the journey they actually drive and the
+    // two amounts add back to exactly the balance.
+    const payOption: PayOption = body.payOption;
     const plan = paymentPlan({ net: netTotal, vat: vatAmount, tip: tipAmount, protection: body.protection, option: payOption });
     const totalWithExtras = plan.total;
+
+    // The balance, per leg. The outbound keeps its share and the return leg
+    // takes the remainder by subtraction, never by a second percentage, so
+    // rounding cannot lose or invent a cent.
+    const outboundFare = Math.round((totalWithExtras - returnFare) * 100) / 100;
+    const outboundBalance = returnFare > 0 && totalWithExtras > 0
+      ? Math.round(plan.balance * (outboundFare / totalWithExtras) * 100) / 100
+      : plan.balance;
+    const returnBalance = Math.round((plan.balance - outboundBalance) * 100) / 100;
 
     // Encode booking metadata into specialRequests.
     //
@@ -464,8 +475,10 @@ export async function POST(req: NextRequest) {
           paymentStatus:    "PENDING",
           // The split, stored rather than recomputed: the receipt, the
           // chauffeur's job sheet and the admin panel all read these.
+          // The deposit is the one online payment and belongs to the booking
+          // that owns the checkout; the balance here is this leg's share.
           depositAmount:    plan.option === "DEPOSIT" ? plan.payNow : null,
-          balanceAmount:    plan.option === "DEPOSIT" ? plan.balance : null,
+          balanceAmount:    plan.option === "DEPOSIT" ? outboundBalance : null,
           protectionFee:    plan.protectionFee > 0 ? plan.protectionFee : null,
         },
       }));
@@ -520,6 +533,9 @@ export async function POST(req: NextRequest) {
             // The single checkout below covers both legs and is attached to the
             // outbound one; this row is paid when that one is.
             paymentStatus:    "PENDING",
+            // This leg's share of a deposit booking's balance, collected by
+            // whoever drives the journey home.
+            balanceAmount:    plan.option === "DEPOSIT" && returnBalance > 0 ? returnBalance : null,
           },
         }));
       } catch (dbErr) {

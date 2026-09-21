@@ -58,15 +58,17 @@ const cardClass = (on: boolean) => cn(
 );
 
 export default function PaymentOptions({
-  plan, protection, option, protectionFeeIfTaken, depositAllowed, onProtection, onOption,
+  plan, protection, option, protectionFeeIfTaken, depositAllowed, depositNote, onProtection, onOption,
 }: {
   plan: PaymentPlan;
   protection: boolean;
   option: PayOption;
   /** What protection would cost, so the toggle can say so before it is on. */
   protectionFeeIfTaken: number;
-  /** False on a round trip, which is always paid in full. */
+  /** Reserved for journeys a deposit cannot be taken on. Currently always true. */
   depositAllowed: boolean;
+  /** Extra line under the choice, e.g. how a round trip's balance is split. */
+  depositNote?: string;
   onProtection: (on: boolean) => void;
   onOption: (o: PayOption) => void;
 }) {
@@ -139,6 +141,10 @@ export default function PaymentOptions({
             );
           })}
         </div>
+      )}
+
+      {depositNote && (
+        <p className="px-1 text-xs leading-relaxed text-dark-400">{depositNote}</p>
       )}
     </div>
   );

@@ -133,6 +133,8 @@ export interface PaymentSplit {
   protectionFee: number;
   /** Whether payNow has actually been received. */
   paid: boolean;
+  /** A line under the split, e.g. how a round trip divides the balance. */
+  note?: string;
 }
 
 function splitPanel(o?: PaymentSplit | null): string {
@@ -147,7 +149,8 @@ function splitPanel(o?: PaymentSplit | null): string {
   }
   return `
     ${sectionSpacer(12)}
-    <tr><td style="padding:0 44px;">${detailTable(lines.join(""))}</td></tr>`;
+    <tr><td style="padding:0 44px;">${detailTable(lines.join(""))}</td></tr>${o.note ? `
+    <tr><td style="padding:10px 44px 0 44px;"><div style="font-family:${SANS};font-size:12px;line-height:19px;color:${LABEL};">${esc(o.note)}</div></td></tr>` : ""}`;
 }
 
 /**

@@ -539,7 +539,14 @@ export async function sendBookingConfirmation({
       calendar,
       returnUrl,
       split: (balanceAmount ?? 0) > 0 || (protectionFee ?? 0) > 0
-        ? { payNow: payNow ?? totalAmount, balance: balanceAmount ?? 0, protectionFee: protectionFee ?? 0, paid: payment?.paid ?? false }
+        ? {
+            payNow: payNow ?? totalAmount, balance: balanceAmount ?? 0, protectionFee: protectionFee ?? 0, paid: payment?.paid ?? false,
+            // On a round trip the balance is divided between the legs, so the
+            // figure above is not what either chauffeur asks for on its own.
+            note: back && (balanceAmount ?? 0) > 0
+              ? "That amount is split between your two journeys in proportion to each fare, so each chauffeur collects only for the journey they drive."
+              : undefined,
+          }
         : null,
       // The same five lines they read at the checkout, so the email and the
       // page they agreed on cannot say different things.

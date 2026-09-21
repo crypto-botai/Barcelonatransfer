@@ -30,7 +30,7 @@ describe("checkout: what the server stores and charges", () => {
 
   it("stores the split on the booking so nothing downstream recomputes it", () => {
     expect(route).toContain(`depositAmount:    plan.option === "DEPOSIT" ? plan.payNow : null`);
-    expect(route).toContain(`balanceAmount:    plan.option === "DEPOSIT" ? plan.balance : null`);
+    expect(route).toContain(`balanceAmount:    plan.option === "DEPOSIT" ? outboundBalance : null`);
     expect(route).toContain(`protectionFee:    plan.protectionFee > 0 ? plan.protectionFee : null`);
   });
 
@@ -40,8 +40,22 @@ describe("checkout: what the server stores and charges", () => {
     expect(route).toContain("returnClaimed === 0");
   });
 
-  it("keeps a round trip on full payment", () => {
-    expect(route).toContain(`const payOption: PayOption = returnDatetime ? "FULL" : body.payOption;`);
+  it("offers the deposit on a round trip and splits the balance between the legs", () => {
+    // It used to force FULL on any booking with a return leg.
+    expect(route).toContain("const payOption: PayOption = body.payOption;");
+    expect(route).not.toContain(`returnDatetime ? "FULL"`);
+    // Each leg carries its own share, and the return leg takes the remainder
+    // by subtraction so the two add back to exactly the balance.
+    expect(route).toContain("const outboundBalance =");
+    expect(route).toContain("const returnBalance = Math.round((plan.balance - outboundBalance)");
+    expect(route).toContain("balanceAmount:    plan.option === \"DEPOSIT\" ? outboundBalance : null");
+    expect(route).toContain("balanceAmount:    plan.option === \"DEPOSIT\" && returnBalance > 0 ? returnBalance : null");
+  });
+
+  it("tells the customer how a round trip is split, on the page and in the email", () => {
+    expect(rd("app/book/BookFormClient.tsx")).toContain("depositNote={addReturn");
+    expect(rd("components/booking/PaymentOptions.tsx")).toContain("{depositNote}");
+    expect(rd("lib/resend.ts")).toContain("split between your two journeys");
   });
 });
 

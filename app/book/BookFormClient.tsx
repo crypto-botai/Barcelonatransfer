@@ -397,10 +397,10 @@ export default function BookFormClient() {
     ? tipForPercent(netTotal, tipPct)
     : clampTip(tipCustom.replace(",", "."), netTotal);
 
-  // A round trip is always paid in full: its balance would have to be
-  // collected on one of two journeys by possibly two chauffeurs.
-  const depositAllowed = !addReturn;
-  const plan = paymentPlan({ net: netTotal, vat: vatAmount, tip: tipAmount, protection, option: depositAllowed ? payOption : "FULL" });
+  // Offered on a round trip too. The server divides the balance between the
+  // two legs by fare, so each chauffeur collects for the journey they drive.
+  const depositAllowed = true;
+  const plan = paymentPlan({ net: netTotal, vat: vatAmount, tip: tipAmount, protection, option: payOption });
   const grandTotal   = plan.total;
   const payNow       = plan.payNow;
 
@@ -1105,15 +1105,15 @@ export default function BookFormClient() {
                     <PaymentOptions
                       plan={plan}
                       protection={protection}
-                      option={depositAllowed ? payOption : "FULL"}
+                      option={payOption}
                       protectionFeeIfTaken={protectionFeeFor(netTotal)}
                       depositAllowed={depositAllowed}
+                      depositNote={addReturn && payOption === "DEPOSIT"
+                        ? "On a round trip the remaining amount is split between the two journeys by fare, so each chauffeur collects for the one they drive. Both amounts are on your confirmation."
+                        : undefined}
                       onProtection={setProtection}
                       onOption={setPayOption}
                     />
-                    {!depositAllowed && (
-                      <p className="mt-3 text-xs text-dark-400">A round trip is paid in full: the balance would otherwise have to be collected on one of two journeys, possibly by two different chauffeurs.</p>
-                    )}
                   </div>
                 )}
 
