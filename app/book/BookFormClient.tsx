@@ -25,6 +25,7 @@ import { paymentPlan, protectionFeeFor, returnDiscountFor, RETURN_DISCOUNT_PERCE
 import PaymentOptions from "@/components/booking/PaymentOptions";
 import CheckoutTrust from "@/components/booking/CheckoutTrust";
 import PolicySummary from "@/components/booking/PolicySummary";
+import { WALLET_LABEL } from "@/lib/wallets";
 import PremiumPayButton from "@/components/ui/PremiumPayButton";
 import toast from "react-hot-toast";
 import { useTranslations } from "@/components/language/I18nProvider";
@@ -1397,7 +1398,7 @@ export default function BookFormClient() {
                 </div>
 
                 <p className="text-center text-xs text-dark-500">
-                  Secured by SumUp · PCI DSS Level 1 · Apple Pay & Google Pay accepted
+                  Secured by SumUp · PCI DSS Level 1{WALLET_LABEL ? ` · ${WALLET_LABEL}` : ""}
                 </p>
 
                 {/* Why it is safe to press the button, from people who did. */}

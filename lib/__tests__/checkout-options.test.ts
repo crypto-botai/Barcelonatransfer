@@ -343,3 +343,32 @@ describe("one policy, every surface", () => {
     expect(cancel).toContain("proof of a cancelled flight");
   });
 });
+
+describe("wallets are claimed only when they exist", () => {
+  it("hands Google Pay to the widget only when a merchant id is configured", () => {
+    const w = rd("lib/wallets.ts");
+    expect(w).toContain("NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_ID");
+    expect(w).toContain("merchantId ? { merchantId, merchantName } : null");
+    const pay = rd("app/booking/pay/[checkoutId]/page.tsx");
+    expect(pay).toContain("...(GOOGLE_PAY ? { googlePay: GOOGLE_PAY } : {})");
+    // Apple Pay has no mount option; it appears once the domain is registered.
+    expect(pay).not.toContain("applePay:");
+  });
+
+  it("never advertises a wallet the checkout cannot offer", () => {
+    for (const f of [
+      "app/booking/pay/[checkoutId]/page.tsx",
+      "app/book/BookFormClient.tsx",
+      "app/dashboard/payments/page.tsx",
+    ]) {
+      const src = rd(f);
+      // Every remaining mention is behind the flag.
+      const bare = src.split("WALLET_LABEL").length - 1;
+      expect(bare, f).toBeGreaterThan(0);
+    }
+    // The homepage FAQ named Stripe, which this site has never used.
+    const faq = rd("components/sections/FAQSection.tsx");
+    expect(faq).not.toContain("through Stripe");
+    expect(faq).toContain("through SumUp");
+  });
+});

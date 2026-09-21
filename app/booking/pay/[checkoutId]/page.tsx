@@ -12,6 +12,7 @@ import PolicySummary from "@/components/booking/PolicySummary";
 import { VEHICLE_CATALOG, FLEET_TO_DB_CLASS } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { PROTECTION_CUTOFF_HOURS, FREE_CANCEL_HOURS } from "@/lib/checkout-money";
+import { GOOGLE_PAY, WALLET_LABEL } from "@/lib/wallets";
 
 /**
  * The payment page: SumUp's card form, set inside our own page.
@@ -41,6 +42,9 @@ declare global {
         showAmount?: boolean;
         locale?: string;
         currency?: string;
+        /** Renders a Google Pay button. Apple Pay needs no option: it
+         *  appears by itself once the domain is registered with Apple. */
+        googlePay?: { merchantId: string; merchantName: string };
       }) => { unmount: () => void; submit?: () => void };
     };
   }
@@ -139,6 +143,7 @@ function PayInner() {
       widgetRef.current = window.SumUpCard.mount({
         id: "sumup-card", checkoutId, locale: "en-GB", currency: "EUR",
         showSubmitButton: false, showFooter: false, showInstallments: false,
+        ...(GOOGLE_PAY ? { googlePay: GOOGLE_PAY } : {}),
         onLoad: () => {
           setMounted(true);
           setStatus("idle");
@@ -149,6 +154,7 @@ function PayInner() {
             widgetRef.current = window.SumUpCard.mount({
               id: "sumup-card", checkoutId, locale: "en-GB", currency: "EUR",
               showSubmitButton: true, showFooter: false, showInstallments: false, showAmount: true,
+              ...(GOOGLE_PAY ? { googlePay: GOOGLE_PAY } : {}),
               onLoad: () => setMounted(true), onResponse,
             });
           }
@@ -247,7 +253,9 @@ function PayInner() {
             <TiltCard className="p-5 sm:p-7">
               <div className="mb-5 flex items-center justify-between">
                 <p className="flex items-center gap-2 text-sm text-white"><Lock size={14} className="text-gold-400" /> Card payment</p>
-                <p className="hidden items-center gap-1.5 text-[11px] text-dark-400 sm:flex"><Smartphone size={12} className="text-gold-500/70" /> Apple Pay and Google Pay accepted</p>
+                {WALLET_LABEL && (
+                  <p className="hidden items-center gap-1.5 text-[11px] text-dark-400 sm:flex"><Smartphone size={12} className="text-gold-500/70" /> {WALLET_LABEL}</p>
+                )}
               </div>
 
               {error && (
@@ -303,7 +311,7 @@ function PayInner() {
 
                   <p className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[11px] text-dark-400">
                     <span className="inline-flex items-center gap-1.5"><ShieldCheck size={12} className="text-gold-500/80" /> 256-bit SSL, PCI DSS Level 1</span>
-                    <span className="sm:hidden">Apple Pay and Google Pay</span>
+                    {WALLET_LABEL && <span className="sm:hidden">Apple Pay and Google Pay</span>}
                     <span>Powered by SumUp</span>
                   </p>
                 </>

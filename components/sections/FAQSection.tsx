@@ -33,7 +33,7 @@ const FAQS = [
   },
   {
     q: "What payment methods do you accept?",
-    a: "We accept all major credit and debit cards, Apple Pay, Google Pay, and bank transfers for corporate accounts. Payments are processed securely through Stripe. You'll receive an invoice automatically after payment.",
+    a: "We accept all major credit and debit cards, and bank transfers for corporate accounts. Payments are processed securely through SumUp, a regulated European payment provider. An invoice is issued on request.",
   },
   {
     q: "Do you serve destinations outside Barcelona?",
