@@ -353,6 +353,10 @@ describe("wallets are claimed only when they exist", () => {
     expect(w).toContain("NEXT_PUBLIC_APPLE_PAY_READY");
     // ...and Google likewise: configured is not the same as visible.
     expect(w).toContain("NEXT_PUBLIC_GOOGLE_PAY_READY");
+    // ...and withheld from the widget entirely until Google approves the
+    // merchant, so no customer meets OR_BIBED_11 at the pay button.
+    expect(w).toContain("NEXT_PUBLIC_GOOGLE_PAY_APPROVED");
+    expect(w).toContain("merchantId && GOOGLE_PAY_APPROVED ?");
     expect(w).toContain("Google Pay accepted");
     const pay = rd("app/booking/pay/[checkoutId]/page.tsx");
     expect(pay).toContain("...(GOOGLE_PAY ? { googlePay: GOOGLE_PAY } : {})");

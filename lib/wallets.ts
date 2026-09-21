@@ -32,9 +32,21 @@ const DEFAULT_GOOGLE_PAY_MERCHANT_ID = "BCR2DN6D5KZNHQDX";
 const merchantId = process.env.NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_ID ?? DEFAULT_GOOGLE_PAY_MERCHANT_ID;
 const merchantName = process.env.NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_NAME ?? "Elite BCN Transfers";
 
-/** Passed straight to SumUpCard.mount(); null when not configured. */
+/**
+ * Whether Google has approved the merchant for live payments.
+ *
+ * Until it has, the button renders but every tap ends in Google's own
+ * "This merchant is having trouble accepting your payment [OR_BIBED_11]"
+ * screen, which a customer reads as the site being broken. So the merchant
+ * id is withheld from the widget, and the button with it, until the review
+ * submitted on 21 Sep 2026 comes back approved. Flip the default then, or
+ * set NEXT_PUBLIC_GOOGLE_PAY_APPROVED=true.
+ */
+export const GOOGLE_PAY_APPROVED = (process.env.NEXT_PUBLIC_GOOGLE_PAY_APPROVED ?? "false") === "true";
+
+/** Passed straight to SumUpCard.mount(); null until configured and approved. */
 export const GOOGLE_PAY: { merchantId: string; merchantName: string } | null =
-  merchantId ? { merchantId, merchantName } : null;
+  merchantId && GOOGLE_PAY_APPROVED ? { merchantId, merchantName } : null;
 
 /**
  * Apple has verified the domain and SumUp has the wallet enabled.
