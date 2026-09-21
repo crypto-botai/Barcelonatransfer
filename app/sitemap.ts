@@ -258,6 +258,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // ── Legal (low priority) ───────────────────────────────────────
     { url: `${BASE}/privacy`, lastModified: lastMod("/privacy"), changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/terms`,   lastModified: lastMod("/terms"), changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE}/refund-policy`, lastModified: lastMod("/refund-policy"), changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/cookies`, lastModified: lastMod("/cookies"), changeFrequency: "yearly", priority: 0.3 },
   ];
 }

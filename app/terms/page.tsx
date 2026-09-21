@@ -41,7 +41,7 @@ export default function TermsPage() {
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-4">
               Terms & <span className="text-gold-gradient">Conditions</span>
             </h1>
-            <p className="text-dark-400 max-w-xl mx-auto">Last updated: May 2025</p>
+            <p className="text-dark-400 max-w-xl mx-auto">Last updated: 20 September 2026</p>
           </div>
         </section>
 
@@ -71,6 +71,8 @@ export default function TermsPage() {
                     <li>All prices are fixed per vehicle and <strong>exclude VAT and motorway tolls</strong>. Quoted fares include the chauffeur, vehicle, fuel and parking. Spanish VAT at 10% is added to the fare only where the client requests an invoice; motorway tolls are charged separately on routes that use them.</li>
                     <li>A 20% night surcharge applies to journeys commencing between 22:00 and 06:00.</li>
                     <li>Payment is accepted by credit/debit card via SumUp, bank transfer, or cash by prior arrangement.</li>
+                    <li>At the checkout you may pay the full fare, or a 30% deposit with the remaining 70% paid to your chauffeur at the end of the journey in cash or by card. Both amounts are shown before you pay and on your confirmation.</li>
+                    <li>Cancellation protection is an optional add-on priced at 20% of the fare. It extends free cancellation to 2 hours before pickup; the fee itself is not refundable. See the <a href="/refund-policy" className="text-gold-400 hover:underline">Refund &amp; Cancellation Policy</a>.</li>
                     <li>Payment must be completed before or at the time of travel unless a corporate account has been established.</li>
                   </ul>
                 </div>
@@ -82,7 +84,10 @@ export default function TermsPage() {
                     <li><strong className="text-white">Between 2 and 24 hours before pickup:</strong> 50% cancellation charge.</li>
                     <li><strong className="text-white">Less than 2 hours before pickup / no-show:</strong> 100% charge.</li>
                     <li>Flight delays are NOT considered cancellations — we track all flights in real time and adjust accordingly at no extra charge.</li>
+                    <li>With cancellation protection, a cancellation up to 2 hours before pickup is refunded in full except for the protection fee.</li>
+                    <li>On a deposit booking these rules apply to the amount actually paid; a no-show forfeits the deposit.</li>
                     <li>Refunds will be processed within 5–10 business days to the original payment method.</li>
+                    <li>The full policy, including changes and refunds by bank transfer, is at <a href="/refund-policy" className="text-gold-400 hover:underline">elitebcn.info/refund-policy</a>.</li>
                   </ul>
                 </div>
 

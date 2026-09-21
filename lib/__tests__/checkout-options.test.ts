@@ -203,3 +203,66 @@ describe("the four new route pages", () => {
     }
   });
 });
+
+describe("the payment page", () => {
+  const pay = rd("app/booking/pay/[checkoutId]/page.tsx");
+
+  it("shows what is being paid for, and what is due today", () => {
+    expect(pay).toContain("/api/payments/verify?booking_id=");
+    expect(pay).toContain("Your journey");
+    expect(pay).toContain("Due today");
+    expect(pay).toContain("to your chauffeur on the day");
+  });
+
+  it("uses our own button and suppresses SumUp's, with a fallback when it cannot", () => {
+    expect(pay).toContain("<PremiumPayButton");
+    expect(pay).toContain("showSubmitButton: false");
+    // If this SDK build offers no submit(), SumUp's own button comes back.
+    expect(pay).toContain("typeof widgetRef.current?.submit !== \"function\"");
+    expect(pay).toContain("showSubmitButton: true");
+  });
+
+  it("puts the policies where the card number is typed", () => {
+    expect(pay).toContain("href=\"/refund-policy\"");
+    expect(pay).toContain("href=\"/terms\"");
+  });
+
+  it("stills its motion under reduced motion and never polls scroll", () => {
+    expect(pay).toContain("useReducedMotion");
+    expect(pay).toContain("initial={reduce ? false : \"hidden\"}");
+    expect(pay).not.toContain("addEventListener(\"scroll\"");
+    const tilt = rd("components/booking/TiltCard.tsx");
+    expect(tilt).toContain("useMotionValue");
+    expect(tilt).toContain("useReducedMotion");
+    expect(tilt).toContain("e.pointerType === \"touch\"");
+    expect(tilt).not.toContain("useState");
+  });
+});
+
+describe("the refund policy page", () => {
+  const page = rd("app/refund-policy/page.tsx");
+
+  it("states the policy from the same constants the code refunds by", () => {
+    expect(page).toContain("from \"@/lib/checkout-money\"");
+    expect(page).toContain("{FREE_CANCEL_HOURS}");
+    expect(page).toContain("{PROTECTION_CUTOFF_HOURS}");
+    expect(page).toContain("{PROTECTION_PERCENT}");
+    expect(page).toContain("{DEPOSIT_PERCENT}");
+  });
+
+  it("is reachable and indexed", () => {
+    expect(rd("components/layout/Footer.tsx")).toContain("href=\"/refund-policy\"");
+    expect(rd("app/sitemap.ts")).toContain("/refund-policy`");
+    for (const l of ["en", "es", "fr", "de", "it", "pt", "ru", "zh", "ar"]) {
+      const m = JSON.parse(rd(`messages/${l}.json`)) as { footer: { legal: Record<string, string> } };
+      expect(m.footer.legal.refunds, l).toBeTruthy();
+    }
+  });
+
+  it("the terms point at it rather than restating it alone", () => {
+    const terms = rd("app/terms/page.tsx");
+    expect(terms).toContain("/refund-policy");
+    expect(terms).toContain("30% deposit");
+    expect(terms).toContain("Cancellation protection");
+  });
+});
