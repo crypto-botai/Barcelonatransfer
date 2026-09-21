@@ -8,6 +8,7 @@ import { ShieldCheck, AlertCircle, MapPin, Calendar, Users, Car, Smartphone, Loc
 import Navbar from "@/components/layout/Navbar";
 import TiltCard from "@/components/booking/TiltCard";
 import PremiumPayButton from "@/components/ui/PremiumPayButton";
+import PolicySummary from "@/components/booking/PolicySummary";
 import { VEHICLE_CATALOG, FLEET_TO_DB_CLASS } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { PROTECTION_CUTOFF_HOURS, FREE_CANCEL_HOURS } from "@/lib/checkout-money";
@@ -308,6 +309,10 @@ function PayInner() {
                 </>
               )}
             </TiltCard>
+
+            {status !== "success" && (
+              <motion.div variants={rise} className="mt-4"><PolicySummary /></motion.div>
+            )}
 
             {/* The two things people look for before typing a card number. */}
             <motion.div variants={rise} className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-dark-400">

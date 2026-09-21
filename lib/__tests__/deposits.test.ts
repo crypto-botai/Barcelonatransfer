@@ -3,6 +3,7 @@ import {
   splitDeposit, isDepositEligible, DEPOSIT_PERCENT, DEPOSIT_MIN_FARE,
   paymentPlan, protectionFeeFor, returnDiscountFor, refundPolicy, collectDue, paidOnline,
   PROTECTION_PERCENT, PROTECTION_CUTOFF_HOURS, RETURN_DISCOUNT_PERCENT,
+  CANCEL_WINDOW_HOURS, CITY_RADIUS_KM, tripKind, freeCancelHours,
 } from "@/lib/deposits";
 
 describe("deposit split", () => {
@@ -96,31 +97,62 @@ describe("payment plan", () => {
   });
 });
 
+describe("the cancellation window depends on the journey", () => {
+  it("is 24 h in the city, 48 h beyond it, 72 h for a minibus", () => {
+    expect(CANCEL_WINDOW_HOURS).toMatchObject({ CITY: 24, INTERCITY: 48, MINIBUS: 72 });
+    // Airport to city is ~15 km, the cruise port ~10, Sants ~14.
+    expect(tripKind({ distanceKm: 15 })).toBe("CITY");
+    expect(freeCancelHours({ distanceKm: 15 })).toBe(24);
+    // Sitges at 35 km is the first journey on the far side of the line.
+    expect(CITY_RADIUS_KM).toBe(30);
+    expect(tripKind({ distanceKm: 35 })).toBe("INTERCITY");
+    expect(freeCancelHours({ distanceKm: 210 })).toBe(48);
+    // A minibus is a minibus wherever it goes.
+    expect(tripKind({ distanceKm: 12, vehicleClass: "MINIBUS" })).toBe("MINIBUS");
+    expect(freeCancelHours({ distanceKm: 12, vehicleClass: "MINIBUS" })).toBe(72);
+  });
+});
+
 describe("refund policy", () => {
   const at = (hours: number) => new Date(Date.now() + hours * 3_600_000);
 
-  it("refunds everything more than 24 hours out without protection", () => {
-    expect(refundPolicy({ pickupDatetime: at(30), paidAmount: 50, protectionFee: null }))
-      .toMatchObject({ allowed: true, refund: 50, kept: 0, rule: "free-24h" });
+  it("refunds everything before the window closes", () => {
+    expect(refundPolicy({ pickupDatetime: at(30), paidAmount: 50, protectionFee: null, freeHours: 24 }))
+      .toMatchObject({ allowed: true, refund: 50, kept: 0, rule: "free-window" });
+    // The same journey as an intercity run is still inside its 48 h window.
+    expect(refundPolicy({ pickupDatetime: at(30), paidAmount: 50, protectionFee: null, freeHours: 48 }))
+      .toMatchObject({ allowed: false, rule: "inside-window", freeHours: 48 });
   });
 
-  it("refuses inside 24 hours without protection", () => {
-    expect(refundPolicy({ pickupDatetime: at(20), paidAmount: 50, protectionFee: 0 }))
-      .toMatchObject({ allowed: false, rule: "inside-24h" });
+  it("refunds nothing inside the window, and never part of it", () => {
+    const d = refundPolicy({ pickupDatetime: at(20), paidAmount: 50, protectionFee: 0, freeHours: 24 });
+    expect(d).toMatchObject({ allowed: false, rule: "inside-window", freeHours: 24 });
+    // There is no 50% tier any more: inside the window it is a WhatsApp
+    // conversation with proof, not an automatic part-refund.
+    expect(d.allowed).toBe(false);
+  });
+
+  it("defaults to the strictest window when the caller knows nothing", () => {
+    expect(refundPolicy({ pickupDatetime: at(30), paidAmount: 50, protectionFee: null }))
+      .toMatchObject({ allowed: true, rule: "free-window" });
+    expect(refundPolicy({ pickupDatetime: at(20), paidAmount: 50, protectionFee: null }))
+      .toMatchObject({ allowed: false, freeHours: 24 });
   });
 
   it("with protection, refunds the fare but keeps the fee up to two hours before", () => {
     expect(PROTECTION_CUTOFF_HOURS).toBe(2);
-    expect(refundPolicy({ pickupDatetime: at(3), paidAmount: 60, protectionFee: 10 }))
-      .toMatchObject({ allowed: true, refund: 50, kept: 10, rule: "protected-2h" });
+    // Protection beats the journey's own window: a 72 h minibus booking
+    // cancelled 3 h out is still refunded when it was taken.
+    expect(refundPolicy({ pickupDatetime: at(3), paidAmount: 60, protectionFee: 10, freeHours: 72 }))
+      .toMatchObject({ allowed: true, refund: 50, kept: 10, rule: "protected" });
     // On a deposit booking only the deposit was paid; the fee still comes off it.
     expect(refundPolicy({ pickupDatetime: at(3), paidAmount: 25, protectionFee: 10 }))
       .toMatchObject({ allowed: true, refund: 15, kept: 10 });
   });
 
   it("refuses inside two hours even with protection", () => {
-    expect(refundPolicy({ pickupDatetime: at(1), paidAmount: 60, protectionFee: 10 }))
-      .toMatchObject({ allowed: false, rule: "inside-2h" });
+    expect(refundPolicy({ pickupDatetime: at(1), paidAmount: 60, protectionFee: 10, freeHours: 24 }))
+      .toMatchObject({ allowed: false, rule: "inside-protection-cutoff" });
   });
 });
 

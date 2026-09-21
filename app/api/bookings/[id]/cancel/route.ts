@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { refundSumUpTransaction } from "@/lib/sumup";
 import { sendCancellationEmail, sendAdminCancellationAlert } from "@/lib/resend";
 import { formatPickupDateTime } from "@/lib/datetime";
-import { refundPolicy, paidOnline, FREE_CANCEL_HOURS, PROTECTION_CUTOFF_HOURS } from "@/lib/deposits";
+import { refundPolicy, paidOnline, freeCancelHours, PROTECTION_CUTOFF_HOURS } from "@/lib/deposits";
 
 export async function POST(
   _req: NextRequest,
@@ -29,17 +29,26 @@ export async function POST(
     return NextResponse.json({ error: "Booking is already cancelled" }, { status: 409 });
   }
 
-  // The policy, server-authoritative. Free up to 24 hours before pickup;
-  // with cancellation protection, up to 2 hours before, the fee itself kept.
-  // See lib/deposits.ts.
+  // The policy, server-authoritative. Free up to this journey's own window,
+  // 24 hours in the city, 48 beyond it, 72 for a minibus; with cancellation
+  // protection, up to 2 hours before, the fee itself kept. Inside either
+  // window nothing is refunded here: the customer is sent to WhatsApp with
+  // their proof and the office decides. See lib/deposits.ts.
   const paid = paidOnline(booking);
-  const decision = refundPolicy({ pickupDatetime: booking.pickupDatetime, paidAmount: paid, protectionFee: booking.protectionFee });
+  const decision = refundPolicy({
+    pickupDatetime: booking.pickupDatetime,
+    paidAmount: paid,
+    protectionFee: booking.protectionFee,
+    // 24 h in the city, 48 h beyond it, 72 h for a minibus.
+    freeHours: freeCancelHours(booking),
+  });
   if (!decision.allowed) {
     return NextResponse.json({
-      error: decision.rule === "inside-2h"
-        ? `Cancellation protection covers cancellations up to ${PROTECTION_CUTOFF_HOURS} hours before pickup. For assistance, contact us via WhatsApp.`
-        : `Free cancellation requires more than ${FREE_CANCEL_HOURS} hours notice. For assistance, contact us via WhatsApp.`,
+      error: decision.rule === "inside-protection-cutoff"
+        ? `Cancellation protection covers cancellations up to ${PROTECTION_CUTOFF_HOURS} hours before pickup. Inside that the fare is not refunded automatically. Message us on WhatsApp with proof of a cancelled flight or another serious reason and we will look at it.`
+        : `This journey can be cancelled free of charge up to ${decision.freeHours} hours before pickup. Inside that the fare is not refunded automatically. Message us on WhatsApp with proof of a cancelled flight or another serious reason and we will look at it.`,
       policy: "NO_REFUND",
+      freeHours: decision.freeHours,
       whatsappUrl: "https://wa.me/34635383712",
     }, { status: 422 });
   }

@@ -5,7 +5,8 @@ import Footer from "@/components/layout/Footer";
 import { COMPANY } from "@/lib/company-facts";
 import { SHARED_OG } from "@/lib/seo";
 import { simpleBreadcrumb } from "@/lib/hub-schema";
-import { DEPOSIT_PERCENT, PROTECTION_PERCENT, PROTECTION_CUTOFF_HOURS, FREE_CANCEL_HOURS } from "@/lib/checkout-money";
+import { PROTECTION_CUTOFF_HOURS } from "@/lib/checkout-money";
+import { policySection, CANCELLATION_WINDOWS } from "@/lib/policies";
 
 /**
  * The refund and cancellation policy, as a page of its own.
@@ -14,24 +15,26 @@ import { DEPOSIT_PERCENT, PROTECTION_PERCENT, PROTECTION_CUTOFF_HOURS, FREE_CANC
  * the pay button, so it has to be readable in a minute on a phone: what comes
  * back, when, and how the deposit and the protection option change that. The
  * figures are the constants the checkout and the cancellation route run on,
- * so the page cannot drift from what the code actually refunds.
+ * so the page cannot drift from what the code actually refunds. The prose
+ * itself lives in lib/policies.ts, shared with the Terms, the FAQ, the
+ * checkout and the confirmation email.
  */
 
 export const metadata: Metadata = {
   title: { absolute: "Refund & Cancellation Policy | Elite BCN Transfers" },
-  description: "What is refunded when you cancel an Elite BCN transfer: free cancellation up to 24 hours before pickup, cancellation protection to 2 hours before, deposits, no-shows and processing times.",
+  description: "What is refunded when you cancel an Elite BCN transfer: free cancellation 24 hours before a city pickup, 48 hours outside the city, 72 hours for a minibus. Cancellation protection to 2 hours before, deposits, no-shows and how refunds are paid.",
   alternates: { canonical: "https://www.elitebcn.info/refund-policy" },
   openGraph: {
     ...SHARED_OG,
     title: "Refund & Cancellation Policy — Elite BCN Transfers",
-    description: "Free cancellation up to 24 hours before pickup. Cancellation protection to 2 hours before. Deposits, no-shows and refund times explained.",
+    description: "Free cancellation 24 h in the city, 48 h beyond it, 72 h for a minibus. Cancellation protection holds your booking to 2 hours before pickup.",
     url: "https://www.elitebcn.info/refund-policy",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN Transfers — Refund Policy" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Refund & Cancellation Policy — Elite BCN Transfers",
-    description: "Free cancellation up to 24 hours before pickup. Cancellation protection to 2 hours before.",
+    description: "Free cancellation 24 h city, 48 h intercity, 72 h minibus. Protection holds it to 2 hours before.",
     images: ["/opengraph-image"],
   },
 };
@@ -51,7 +54,7 @@ export default function RefundPolicyPage() {
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-4">
               Refund &amp; <span className="text-gold-gradient">Cancellation</span>
             </h1>
-            <p className="text-dark-400 max-w-xl mx-auto">Last updated: 20 September 2026</p>
+            <p className="text-dark-400 max-w-xl mx-auto">Last updated: 21 September 2026</p>
           </div>
         </section>
 
@@ -64,45 +67,28 @@ export default function RefundPolicyPage() {
                 <div className="rounded-xl border border-gold-500/25 bg-gold-500/[0.05] p-5">
                   <h2 className="text-white font-display text-xl mb-3">In short</h2>
                   <ul className="space-y-2">
-                    <li><strong className="text-white">More than {FREE_CANCEL_HOURS} hours before pickup:</strong> cancel from your confirmation email or your account and everything you paid comes back, automatically.</li>
-                    <li><strong className="text-white">With cancellation protection:</strong> the same, up to {PROTECTION_CUTOFF_HOURS} hours before pickup. Only the protection fee is kept.</li>
-                    <li><strong className="text-white">Flight delays are never a cancellation.</strong> We track the flight and wait; there is nothing to cancel and nothing to pay.</li>
+                    {CANCELLATION_WINDOWS.map((w) => <li key={w}>{w}</li>)}
+                    <li><strong className="text-white">Inside that window the fare is not refunded.</strong> Message us on WhatsApp with proof of a cancelled flight or another serious reason and we will look at it case by case.</li>
+                    <li><strong className="text-white">With cancellation protection</strong> your booking is held until {PROTECTION_CUTOFF_HOURS} hours before pickup and the fare is refunded in full. The protection fee itself is never refunded.</li>
+                    <li><strong className="text-white">A delayed flight is never a cancellation.</strong> We track it and move your pickup at no charge.</li>
                   </ul>
                 </div>
 
-                <div>
-                  <h2 className="text-white font-display text-xl mb-3">1. Cancelling without protection</h2>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li><strong className="text-white">More than {FREE_CANCEL_HOURS} hours before pickup:</strong> full refund of everything paid online.</li>
-                    <li><strong className="text-white">Between {PROTECTION_CUTOFF_HOURS} and {FREE_CANCEL_HOURS} hours before pickup:</strong> a 50% cancellation charge applies. Inside this window the cancellation is handled by our team: contact us on WhatsApp or by email and we arrange the refund of the remaining 50%.</li>
-                    <li><strong className="text-white">Less than {PROTECTION_CUTOFF_HOURS} hours before pickup, or no-show:</strong> the full fare is charged. A chauffeur has already been dispatched.</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h2 className="text-white font-display text-xl mb-3">2. Cancellation protection</h2>
-                  <p className="mb-2">Cancellation protection is an optional add-on offered at the checkout, priced at {PROTECTION_PERCENT}% of the fare. It is shown as a separate line before you pay.</p>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>With protection you may cancel up to <strong className="text-white">{PROTECTION_CUTOFF_HOURS} hours before pickup</strong> for a full refund of the fare, from your confirmation email or your account, with no need to contact us.</li>
-                    <li>The protection fee itself is <strong className="text-white">not refundable</strong> in any circumstance. It is the price of the flexibility.</li>
-                    <li>Inside the final {PROTECTION_CUTOFF_HOURS} hours, or on a no-show, the full fare is charged as in section 1.</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h2 className="text-white font-display text-xl mb-3">3. Deposits</h2>
-                  <p className="mb-2">At the checkout you may pay {DEPOSIT_PERCENT}% of the fare as a deposit and the remainder to your chauffeur at the end of the journey, in cash or by card.</p>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>The rules above apply to what has actually been paid. A cancellation more than {FREE_CANCEL_HOURS} hours before pickup refunds the deposit in full; with protection, the deposit less the protection fee, up to {PROTECTION_CUTOFF_HOURS} hours before.</li>
-                    <li>A no-show or a cancellation inside the charged window forfeits the deposit. Where the fare exceeds the deposit, the balance may be invoiced.</li>
-                    <li>Cancellation protection on a deposit booking is always paid in full with the deposit.</li>
-                  </ul>
-                </div>
+                {[policySection("cancellation"), policySection("protection"), policySection("deposit")].map((sec, i) => sec ? (
+                  <div key={sec.id}>
+                    <h2 className="text-white font-display text-xl mb-3">{i + 1}. {sec.heading}</h2>
+                    {sec.lead && <p className="mb-2">{sec.lead}</p>}
+                    <ul className="list-disc pl-5 space-y-1">
+                      {sec.points.map((p) => <li key={p}>{p}</li>)}
+                    </ul>
+                    {sec.note && <p className="mt-2 text-dark-400">{sec.note}</p>}
+                  </div>
+                ) : null)}
 
                 <div>
                   <h2 className="text-white font-display text-xl mb-3">4. Changes rather than cancellations</h2>
                   <ul className="list-disc pl-5 space-y-1">
-                    <li>Changing the date, time, pickup or drop-off of a booking is free of charge when requested more than {FREE_CANCEL_HOURS} hours before pickup, subject to availability. Reply to your confirmation email or contact us on WhatsApp.</li>
+                    <li>Changing the date, time, pickup or drop-off is free of charge when requested before your cancellation window closes, subject to availability. Reply to your confirmation email or message us on WhatsApp.</li>
                     <li>A change of destination is re-priced from the same fixed-price table; any difference is charged or refunded.</li>
                     <li>Flight delays are tracked automatically. A pickup moves with the flight at no charge, and airport pickups include 60 minutes of waiting from the actual landing time.</li>
                   </ul>

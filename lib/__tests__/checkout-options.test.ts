@@ -242,12 +242,13 @@ describe("the payment page", () => {
 describe("the refund policy page", () => {
   const page = rd("app/refund-policy/page.tsx");
 
-  it("states the policy from the same constants the code refunds by", () => {
-    expect(page).toContain("from \"@/lib/checkout-money\"");
-    expect(page).toContain("{FREE_CANCEL_HOURS}");
+  it("renders the shared policy module rather than its own prose", () => {
+    expect(page).toContain("from \"@/lib/policies\"");
+    expect(page).toContain("CANCELLATION_WINDOWS.map");
+    expect(page).toContain("policySection(\"cancellation\")");
+    expect(page).toContain("policySection(\"protection\")");
+    expect(page).toContain("policySection(\"deposit\")");
     expect(page).toContain("{PROTECTION_CUTOFF_HOURS}");
-    expect(page).toContain("{PROTECTION_PERCENT}");
-    expect(page).toContain("{DEPOSIT_PERCENT}");
   });
 
   it("is reachable and indexed", () => {
@@ -264,5 +265,67 @@ describe("the refund policy page", () => {
     expect(terms).toContain("/refund-policy");
     expect(terms).toContain("30% deposit");
     expect(terms).toContain("Cancellation protection");
+  });
+});
+
+describe("one policy, every surface", () => {
+  it("the windows and the prose come from the same module the refund route runs on", () => {
+    const pol = rd("lib/policies.ts");
+    expect(pol).toContain(`from "@/lib/checkout-money"`);
+    // No hand-typed hour counts in the prose.
+    expect(pol).toContain("${CANCEL_WINDOW_HOURS.CITY}");
+    expect(pol).toContain("${CANCEL_WINDOW_HOURS.INTERCITY}");
+    expect(pol).toContain("${CANCEL_WINDOW_HOURS.MINIBUS}");
+    expect(pol).toContain("${PROTECTION_CUTOFF_HOURS}");
+  });
+
+  it("covers every rule the owner set", () => {
+    const pol = rd("lib/policies.ts");
+    for (const claim of [
+      "135 cm",                       // child seats, by Spanish law
+      "does not extend to licensed VTC",
+      "Como restaurant",              // T1 / T2B meeting point
+      "Terminal 2A",
+      "ten minutes",                  // the window the chauffeur needs
+      "express car park",             // the shorter walk at T2
+      "meet-and-greet fee back",      // refunded if the chauffeur is late
+      "not in the passenger compartment",
+      "not covered by our insurance",
+      "never refunded",               // the protection fee
+      "goodwill decision",            // discretionary refund with proof
+      "no-show is charged in full",
+    ]) expect(pol, claim).toContain(claim);
+  });
+
+  it("reaches the checkout, the payment page and the confirmation email", () => {
+    expect(rd("app/book/BookFormClient.tsx")).toContain("<PolicySummary />");
+    expect(rd("app/booking/pay/[checkoutId]/page.tsx")).toContain("<PolicySummary />");
+    expect(rd("components/booking/PolicySummary.tsx")).toContain("CHECKOUT_POLICY_POINTS");
+    const resend = rd("lib/resend.ts");
+    expect(resend).toContain("CHECKOUT_POLICY_POINTS");
+    // Both the "booking received" email and the paid receipt carry it.
+    expect((resend.match(/policy: \{ points: CHECKOUT_POLICY_POINTS/g) ?? []).length).toBeGreaterThanOrEqual(2);
+    expect(rd("lib/email/premium.ts")).toContain("function policyPanel(");
+  });
+
+  it("the Terms and the FAQ say the same thing", () => {
+    const terms = rd("app/terms/page.tsx");
+    for (const id of ["cancellation", "protection", "meet-greet", "luggage", "children"]) {
+      expect(terms, id).toContain(`<Section id="${id}"`);
+    }
+    // The old flat 24 h / 50% clause is gone from both.
+    expect(terms).not.toContain("Between 2 and 24 hours before pickup");
+    const faq = rd("lib/faq-data.ts");
+    expect(faq).not.toContain("may incur a 50% charge");
+    expect(faq).toContain("What is your cancellation policy?");
+    expect(faq).toContain("How does Meet & Greet actually work when I land?");
+    expect(faq).toContain("Do I need a child seat in Spain?");
+  });
+
+  it("the cancel route honours this booking's own window", () => {
+    const cancel = rd("app/api/bookings/[id]/cancel/route.ts");
+    expect(cancel).toContain("freeHours: freeCancelHours(booking)");
+    expect(cancel).toContain("inside-protection-cutoff");
+    expect(cancel).toContain("proof of a cancelled flight");
   });
 });

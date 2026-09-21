@@ -4,6 +4,23 @@ import Footer from "@/components/layout/Footer";
 import { COMPANY } from "@/lib/company-facts";
 import { SHARED_OG } from "@/lib/seo";
 import { simpleBreadcrumb } from "@/lib/hub-schema";
+import { policySection } from "@/lib/policies";
+
+/** One policy section from lib/policies.ts, numbered for the Terms. */
+function Section({ id, n }: { id: string; n: number }) {
+  const sec = policySection(id);
+  if (!sec) return null;
+  return (
+    <div>
+      <h2 className="text-white font-display text-xl mb-3">{n}. {sec.heading}</h2>
+      {sec.lead && <p className="mb-2">{sec.lead}</p>}
+      <ul className="list-disc pl-5 space-y-1">
+        {sec.points.map((p) => <li key={p}>{p}</li>)}
+      </ul>
+      {sec.note && <p className="mt-2 text-dark-400">{sec.note}</p>}
+    </div>
+  );
+}
 
 export const metadata: Metadata = {
   title: { absolute: "Terms & Conditions | Elite BCN Transfers" },
@@ -59,8 +76,9 @@ export default function TermsPage() {
                   <h2 className="text-white font-display text-xl mb-3">2. Bookings & Confirmation</h2>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>A booking is confirmed only upon receipt of a written confirmation email from us.</li>
-                    <li>We recommend booking at least 24 hours in advance. Last-minute bookings are subject to availability.</li>
-                    <li>You are responsible for providing accurate pick-up address, destination, date, time, and passenger details.</li>
+                    <li>We recommend booking at least 24 hours in advance. Bookings made less than 4 hours before pickup carry a 15% last-minute surcharge, and we cannot accept a booking with less than 1 hour&apos;s notice.</li>
+                    <li>You are responsible for providing accurate pick-up address, destination, date, time, flight number and passenger details. A journey that cannot be made because the details given were wrong is treated as a no-show.</li>
+                    <li>Tell us when you book if you are travelling with a child of 135 cm or under, with a pet, or with more luggage than the vehicle is listed to carry. See sections 8 and 9.</li>
                     <li>Any changes to a confirmed booking must be requested as early as possible and are subject to availability.</li>
                   </ul>
                 </div>
@@ -77,22 +95,21 @@ export default function TermsPage() {
                   </ul>
                 </div>
 
+                <Section id="cancellation" n={4} />
+
+                <Section id="protection" n={5} />
+
                 <div>
-                  <h2 className="text-white font-display text-xl mb-3">4. Cancellation Policy</h2>
+                  <h2 className="text-white font-display text-xl mb-3">6. Refunds</h2>
                   <ul className="list-disc pl-5 space-y-1">
-                    <li><strong className="text-white">More than 24 hours before pickup:</strong> Full refund.</li>
-                    <li><strong className="text-white">Between 2 and 24 hours before pickup:</strong> 50% cancellation charge.</li>
-                    <li><strong className="text-white">Less than 2 hours before pickup / no-show:</strong> 100% charge.</li>
-                    <li>Flight delays are NOT considered cancellations — we track all flights in real time and adjust accordingly at no extra charge.</li>
-                    <li>With cancellation protection, a cancellation up to 2 hours before pickup is refunded in full except for the protection fee.</li>
-                    <li>On a deposit booking these rules apply to the amount actually paid; a no-show forfeits the deposit.</li>
-                    <li>Refunds will be processed within 5–10 business days to the original payment method.</li>
+                    <li>Refunds are returned to the card used to pay and normally appear within 5 to 10 business days, depending on your bank.</li>
+                    <li>On a deposit booking these rules apply to the amount actually paid; a cancellation inside the window, or a no-show, forfeits the deposit.</li>
                     <li>The full policy, including changes and refunds by bank transfer, is at <a href="/refund-policy" className="text-gold-400 hover:underline">elitebcn.info/refund-policy</a>.</li>
                   </ul>
                 </div>
 
                 <div>
-                  <h2 className="text-white font-display text-xl mb-3">5. Waiting Time</h2>
+                  <h2 className="text-white font-display text-xl mb-3">7. Waiting Time</h2>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>Airport pick-ups include 60 minutes of free waiting time from the actual flight landing time.</li>
                     <li>Non-airport pick-ups include 15 minutes of free waiting time from the scheduled pickup time.</li>
@@ -100,8 +117,10 @@ export default function TermsPage() {
                   </ul>
                 </div>
 
+                <Section id="meet-greet" n={8} />
+
                 <div>
-                  <h2 className="text-white font-display text-xl mb-3">6. Passenger Conduct</h2>
+                  <h2 className="text-white font-display text-xl mb-3">9. Passenger Conduct</h2>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>All passengers must wear seatbelts at all times.</li>
                     <li>Smoking, including e-cigarettes, is strictly prohibited in all vehicles.</li>
@@ -111,33 +130,34 @@ export default function TermsPage() {
                   </ul>
                 </div>
 
-                <div>
-                  <h2 className="text-white font-display text-xl mb-3">7. Luggage</h2>
-                  <p>Standard luggage allowances apply per vehicle class. The Company accepts no liability for loss of or damage to luggage unless caused by proven negligence of the driver.</p>
-                </div>
+                <Section id="luggage" n={10} />
+
+                <Section id="children" n={11} />
 
                 <div>
-                  <h2 className="text-white font-display text-xl mb-3">8. Liability</h2>
+                  <h2 className="text-white font-display text-xl mb-3">12. Liability</h2>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>The Company holds full professional passenger liability insurance.</li>
                     <li>The Company is not liable for delays caused by traffic, road closures, adverse weather, or other circumstances beyond our control.</li>
                     <li>The Company is not liable for missed flights, trains, or events due to such delays.</li>
                     <li>Our maximum liability is limited to the amount paid for the affected journey.</li>
+                    <li>Luggage is loaded and unloaded by the chauffeur. Where the Client insists on handling luggage themselves, the Company&apos;s insurance does not cover damage, loss, or injury arising from it.</li>
+                    <li>The Company accepts no liability for loss of or damage to luggage unless caused by proven negligence of the chauffeur.</li>
                   </ul>
                 </div>
 
                 <div>
-                  <h2 className="text-white font-display text-xl mb-3">9. Complaints</h2>
+                  <h2 className="text-white font-display text-xl mb-3">13. Complaints</h2>
                   <p>Any complaints must be submitted in writing within 7 days of the journey to {COMPANY.email}. We aim to respond within 48 hours.</p>
                 </div>
 
                 <div>
-                  <h2 className="text-white font-display text-xl mb-3">10. Governing Law</h2>
+                  <h2 className="text-white font-display text-xl mb-3">14. Governing Law</h2>
                   <p>These Terms are governed by the laws of Spain. Any disputes shall be subject to the jurisdiction of the courts of Barcelona.</p>
                 </div>
 
                 <div>
-                  <h2 className="text-white font-display text-xl mb-3">11. Contact</h2>
+                  <h2 className="text-white font-display text-xl mb-3">15. Contact</h2>
                   <p>Elite BCN Transfers · Barcelona, Spain · <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40">{COMPANY.email}</a> · +34 635 383 712</p>
                 </div>
 

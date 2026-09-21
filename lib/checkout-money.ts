@@ -34,8 +34,36 @@ export const PROTECTION_PERCENT = 20;
 /** With protection, a cancellation this close to pickup is still refunded. */
 export const PROTECTION_CUTOFF_HOURS = 2;
 
-/** Without protection, this is the free-cancellation window. */
-export const FREE_CANCEL_HOURS = 24;
+/**
+ * The free-cancellation window, by journey.
+ *
+ * It is not one number. The further the car travels the earlier a chauffeur
+ * is committed to it and the harder the slot is to resell, so an Andorra run
+ * closes two days out and a minibus three.
+ */
+export const CANCEL_WINDOW_HOURS = { CITY: 24, INTERCITY: 48, MINIBUS: 72 } as const;
+export type TripKind = keyof typeof CANCEL_WINDOW_HOURS;
+
+/**
+ * Journeys within this distance count as city work: the airport, the cruise
+ * port, Sants, Castelldefels and anything inside Barcelona. Sitges at 35 km
+ * is the first journey on the far side of it, which is right: it is a coast
+ * run, not a city hop.
+ */
+export const CITY_RADIUS_KM = 30;
+
+/** The city window, for copy that has no particular booking in hand. */
+export const FREE_CANCEL_HOURS = CANCEL_WINDOW_HOURS.CITY;
+
+export function tripKind(b: { vehicleClass?: string | null; distanceKm?: number | null }): TripKind {
+  if (b.vehicleClass === "MINIBUS" || b.vehicleClass === "SPRINTER") return "MINIBUS";
+  return (b.distanceKm ?? 0) > CITY_RADIUS_KM ? "INTERCITY" : "CITY";
+}
+
+/** Hours before pickup that this booking may be cancelled free of charge. */
+export function freeCancelHours(b: { vehicleClass?: string | null; distanceKm?: number | null }): number {
+  return CANCEL_WINDOW_HOURS[tripKind(b)];
+}
 
 /** Off the fare of a return journey booked from a paid booking's link. */
 export const RETURN_DISCOUNT_PERCENT = 5;
@@ -130,32 +158,40 @@ export interface RefundPolicyInput {
   /** What the customer has actually paid online so far. */
   paidAmount: number;
   protectionFee: number | null | undefined;
+  /**
+   * This booking's own free-cancellation window. Defaults to the city one
+   * so a caller with nothing but a date still gets the strictest sensible
+   * answer rather than an accidental 72 hours.
+   */
+  freeHours?: number;
   now?: Date;
 }
 
 export type RefundDecision =
-  | { allowed: true; refund: number; kept: number; rule: "free-24h" | "protected-2h" }
-  | { allowed: false; rule: "inside-24h" | "inside-2h"; hoursLeft: number };
+  | { allowed: true; refund: number; kept: number; rule: "free-window" | "protected" }
+  | { allowed: false; rule: "inside-window" | "inside-protection-cutoff"; hoursLeft: number; freeHours: number };
 
 /**
- * Whether a cancellation is accepted, and what comes back.
+ * Whether a cancellation is refunded, and by how much.
  *
- * Protected: allowed up to two hours before pickup; the fee stays, the rest
- * is refunded. Unprotected: allowed up to 24 hours before; everything is
- * refunded. Inside those windows the office handles it by hand, which is
- * what the caller's error message says.
+ * Protected: refunded up to two hours before pickup, the fee kept, whatever
+ * the journey. Unprotected: refunded up to this booking's own window, 24,
+ * 48 or 72 hours out. Inside either window nothing is refunded automatically;
+ * the customer is sent to WhatsApp with their proof and the office decides,
+ * which is what the caller's message says.
  */
 export function refundPolicy(i: RefundPolicyInput): RefundDecision {
   const now = i.now ?? new Date();
   const hoursLeft = (i.pickupDatetime.getTime() - now.getTime()) / 3_600_000;
+  const freeHours = i.freeHours ?? FREE_CANCEL_HOURS;
   const fee = i.protectionFee ?? 0;
   if (fee > 0) {
-    if (hoursLeft < PROTECTION_CUTOFF_HOURS) return { allowed: false, rule: "inside-2h", hoursLeft };
+    if (hoursLeft < PROTECTION_CUTOFF_HOURS) return { allowed: false, rule: "inside-protection-cutoff", hoursLeft, freeHours };
     const refund = r2(Math.max(0, i.paidAmount - fee));
-    return { allowed: true, refund, kept: r2(i.paidAmount - refund), rule: "protected-2h" };
+    return { allowed: true, refund, kept: r2(i.paidAmount - refund), rule: "protected" };
   }
-  if (hoursLeft < FREE_CANCEL_HOURS) return { allowed: false, rule: "inside-24h", hoursLeft };
-  return { allowed: true, refund: r2(i.paidAmount), kept: 0, rule: "free-24h" };
+  if (hoursLeft < freeHours) return { allowed: false, rule: "inside-window", hoursLeft, freeHours };
+  return { allowed: true, refund: r2(i.paidAmount), kept: 0, rule: "free-window" };
 }
 
 /**

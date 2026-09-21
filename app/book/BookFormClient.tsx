@@ -24,6 +24,7 @@ import { TIP_PRESETS, tipForPercent, clampTip, MAX_TIP_ABSOLUTE } from "@/lib/ti
 import { paymentPlan, protectionFeeFor, returnDiscountFor, RETURN_DISCOUNT_PERCENT, type PayOption } from "@/lib/checkout-money";
 import PaymentOptions from "@/components/booking/PaymentOptions";
 import CheckoutTrust from "@/components/booking/CheckoutTrust";
+import PolicySummary from "@/components/booking/PolicySummary";
 import PremiumPayButton from "@/components/ui/PremiumPayButton";
 import toast from "react-hot-toast";
 import { useTranslations } from "@/components/language/I18nProvider";
@@ -1352,6 +1353,9 @@ export default function BookFormClient() {
                     </button>
                   </div>
                 )}
+
+                {/* What they are agreeing to, before they agree to it. */}
+                {quote && !needsManualQuote && <PolicySummary />}
 
                 <div className="flex gap-3">
                   <button onClick={() => goToStep(2)} className="btn-outline-gold flex items-center gap-2 px-5 py-4 rounded-xl text-sm">

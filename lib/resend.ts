@@ -3,6 +3,7 @@ import { logEmail } from "@/lib/marketing";
 import { COMPANY } from "@/lib/company-facts";
 import { GOOGLE_PROFILE } from "@/data/reviews";
 import { notifyAdmin } from "@/lib/whatsapp";
+import { CHECKOUT_POLICY_POINTS } from "@/lib/policies";
 import {
   emailDocument,
   bookingReceivedCard,
@@ -540,6 +541,9 @@ export async function sendBookingConfirmation({
       split: (balanceAmount ?? 0) > 0 || (protectionFee ?? 0) > 0
         ? { payNow: payNow ?? totalAmount, balance: balanceAmount ?? 0, protectionFee: protectionFee ?? 0, paid: payment?.paid ?? false }
         : null,
+      // The same five lines they read at the checkout, so the email and the
+      // page they agreed on cannot say different things.
+      policy: { points: CHECKOUT_POLICY_POINTS, url: `${SITE_URL}/refund-policy` },
     }),
     back
       ? `Both journeys are reserved — references ${confirmationCode} and ${back.confirmationCode}`
@@ -849,6 +853,7 @@ export async function sendPaymentConfirmationEmail({
       split: (balanceAmount ?? 0) > 0 || (protectionFee ?? 0) > 0
         ? { payNow: payNow ?? totalAmount, balance: balanceAmount ?? 0, protectionFee: protectionFee ?? 0, paid: true }
         : null,
+      policy: { points: CHECKOUT_POLICY_POINTS, url: `${SITE_URL}/refund-policy` },
     }),
     `Payment received — reference ${confirmationCode}`,
   );
