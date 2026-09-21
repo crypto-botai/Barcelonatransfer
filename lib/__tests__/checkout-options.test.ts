@@ -250,6 +250,12 @@ describe("the payment page", () => {
     expect(tilt).toContain("useReducedMotion");
     expect(tilt).toContain("e.pointerType === \"touch\"");
     expect(tilt).not.toContain("useState");
+    // No 3D transform around SumUp's iframes: Chrome's compositor dropped
+    // clicks into the card fields on desktop while the panel tilted.
+    expect(tilt).not.toContain("rotateX");
+    expect(tilt).not.toContain("rotateY");
+    expect(tilt).not.toContain("perspective");
+    expect(tilt).not.toContain("preserve-3d");
   });
 });
 
