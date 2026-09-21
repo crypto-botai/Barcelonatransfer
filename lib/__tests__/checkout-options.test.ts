@@ -348,7 +348,7 @@ describe("wallets are claimed only when they exist", () => {
   it("hands Google Pay to the widget only when a merchant id is configured", () => {
     const w = rd("lib/wallets.ts");
     expect(w).toContain("NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_ID");
-    expect(w).toContain("merchantId ? { merchantId, merchantName } : null");
+    expect(w).toContain("merchantId && GOOGLE_PAY_APPROVED ? { merchantId, merchantName } : null");
     // The id is public by design; Apple is gated separately until verified.
     expect(w).toContain("NEXT_PUBLIC_APPLE_PAY_READY");
     // ...and Google likewise: configured is not the same as visible.
