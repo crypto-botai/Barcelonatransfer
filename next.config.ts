@@ -80,6 +80,14 @@ const nextConfig: NextConfig = {
       });
     }
 
+    // Apple fetches this to prove we control the domain before it will
+    // enable Apple Pay here. Served as text so nothing downstream decides to
+    // offer it as a download.
+    result.push({
+      source: "/.well-known/apple-developer-merchantid-domain-association",
+      headers: [{ key: "Content-Type", value: "text/plain; charset=utf-8" }],
+    });
+
     // Always noindex admin/auth/api on production
     result.push(
       { source: "/admin/:path*",     headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },

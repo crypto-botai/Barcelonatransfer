@@ -372,3 +372,28 @@ describe("wallets are claimed only when they exist", () => {
     expect(faq).toContain("through SumUp");
   });
 });
+
+describe("Apple Pay domain verification", () => {
+  it("the file SumUp issued is present, intact and extensionless", () => {
+    // Apple fetches exactly this path. A rename, an added .txt, or an editor
+    // appending a newline all fail the check and silently disable Apple Pay.
+    const p = join(ROOT, "public", ".well-known", "apple-developer-merchantid-domain-association");
+    expect(existsSync(p), "verification file missing").toBe(true);
+    const raw = readFileSync(p);
+    expect(raw.length).toBe(9118);
+    expect(raw[raw.length - 1]).not.toBe(10);
+    expect(raw[raw.length - 1]).not.toBe(13);
+    // Hex-encoded JSON from the PSP: starts with { and ends with }.
+    const text = raw.toString("utf8");
+    expect(/^[0-9A-F]+$/.test(text), "not plain uppercase hex").toBe(true);
+    const decoded = Buffer.from(text, "hex").toString("utf8");
+    expect(decoded.startsWith("{")).toBe(true);
+    expect(decoded).toContain("pspId");
+    expect(decoded).toContain("signature");
+  });
+
+  it("is served as text rather than a download", () => {
+    expect(readFileSync(join(ROOT, "next.config.ts"), "utf-8"))
+      .toContain("/.well-known/apple-developer-merchantid-domain-association");
+  });
+});
