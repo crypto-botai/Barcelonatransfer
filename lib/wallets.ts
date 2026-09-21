@@ -51,11 +51,12 @@ export const APPLE_PAY_READY = process.env.NEXT_PUBLIC_APPLE_PAY_READY === "true
  * Handing the widget a merchant id is not the same as the button appearing:
  * SumUp also has to enable the wallet on the merchant account, and until it
  * has, the form shows card fields only. A test booking on 21 Sep 2026 with a
- * live checkout and the id configured rendered no button. So the sentence
- * waits for NEXT_PUBLIC_GOOGLE_PAY_READY=true, set once someone has watched
- * the button appear, while the id is still passed so that it can.
+ * live checkout and the id configured rendered no button; once the domain
+ * was enabled in SumUp's Electronic wallets, the same checkout rendered it
+ * (seen, screenshotted, 21 Sep 2026). Defaults on from then; the env var
+ * can switch the sentence off again if SumUp ever disables it.
  */
-export const GOOGLE_PAY_READY = GOOGLE_PAY !== null && process.env.NEXT_PUBLIC_GOOGLE_PAY_READY === "true";
+export const GOOGLE_PAY_READY = GOOGLE_PAY !== null && (process.env.NEXT_PUBLIC_GOOGLE_PAY_READY ?? "true") === "true";
 
 /** The sentence to show, or null when there is nothing true to say. */
 export const WALLET_LABEL: string | null =
