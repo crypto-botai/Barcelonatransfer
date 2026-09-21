@@ -1090,6 +1090,33 @@ export default function BookFormClient() {
           {step === 3 && (
             <motion.div key="s3b" custom={stepDir} variants={stepVariants} initial="enter" animate="center" exit="exit" transition={STEP_TRANSITION}>
               <div className="space-y-4">
+
+                {/* How you would like to pay.
+
+                    Directly under the car and its price, because that is where
+                    the money decision is made. It used to sit below the extras,
+                    the tip and the summary, four screens down a phone, while a
+                    sticky "Pay" bar stayed on screen the whole way: a customer
+                    could pay in full having never seen that a deposit existed. */}
+                {quote && !needsManualQuote && (
+                  <div className="glass-card rounded-2xl p-5 sm:p-6">
+                    <h2 className="font-display text-xl text-white mb-1">How would you like to pay?</h2>
+                    <p className="text-dark-400 text-sm mb-4">Everything now, or hold the car with a deposit and settle the rest with your chauffeur.</p>
+                    <PaymentOptions
+                      plan={plan}
+                      protection={protection}
+                      option={depositAllowed ? payOption : "FULL"}
+                      protectionFeeIfTaken={protectionFeeFor(netTotal)}
+                      depositAllowed={depositAllowed}
+                      onProtection={setProtection}
+                      onOption={setPayOption}
+                    />
+                    {!depositAllowed && (
+                      <p className="mt-3 text-xs text-dark-400">A round trip is paid in full: the balance would otherwise have to be collected on one of two journeys, possibly by two different chauffeurs.</p>
+                    )}
+                  </div>
+                )}
+
                 <div className="glass-card rounded-2xl p-6 sm:p-8">
                   <h2 className="font-display text-xl text-white mb-2">{t("addExtras")}</h2>
                   <p className="text-dark-400 text-sm mb-5">Enhance your journey with optional add-ons</p>
@@ -1306,19 +1333,6 @@ export default function BookFormClient() {
                       )}
                     </div>
                   </div>
-                )}
-
-                {/* Protection and the deposit option */}
-                {quote && !needsManualQuote && (
-                  <PaymentOptions
-                    plan={plan}
-                    protection={protection}
-                    option={depositAllowed ? payOption : "FULL"}
-                    protectionFeeIfTaken={protectionFeeFor(netTotal)}
-                    depositAllowed={depositAllowed}
-                    onProtection={setProtection}
-                    onOption={setPayOption}
-                  />
                 )}
 
                 {/* Coupon */}
