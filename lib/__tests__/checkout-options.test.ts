@@ -351,6 +351,8 @@ describe("wallets are claimed only when they exist", () => {
     expect(w).toContain("merchantId ? { merchantId, merchantName } : null");
     // The id is public by design; Apple is gated separately until verified.
     expect(w).toContain("NEXT_PUBLIC_APPLE_PAY_READY");
+    // ...and Google likewise: configured is not the same as visible.
+    expect(w).toContain("NEXT_PUBLIC_GOOGLE_PAY_READY");
     expect(w).toContain("Google Pay accepted");
     const pay = rd("app/booking/pay/[checkoutId]/page.tsx");
     expect(pay).toContain("...(GOOGLE_PAY ? { googlePay: GOOGLE_PAY } : {})");
