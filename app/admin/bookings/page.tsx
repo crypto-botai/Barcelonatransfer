@@ -37,7 +37,7 @@ type Booking = {
   createdAt: string;
 };
 
-type MainTab = "ALL" | "PENDING" | "COMPLETED" | "DELETED";
+type MainTab = "ALL" | "PENDING" | "UNPAID" | "COMPLETED" | "DELETED";
 
 const ALL_STATUSES: BookingStatus[] = ["PENDING","CONFIRMED","DRIVER_ASSIGNED","IN_PROGRESS","COMPLETED","CANCELLED"];
 
@@ -605,6 +605,10 @@ function DeletedBookingRow({ b, onRestore }: { b: Booking; onRestore: (id: strin
 const MAIN_TABS: { id: MainTab; label: string; icon: React.ReactNode }[] = [
   { id: "ALL",       label: "All Bookings", icon: <Archive size={14} /> },
   { id: "PENDING",   label: "Pending",      icon: <Clock size={14} /> },
+  // Website bookings whose checkout was never completed. Hidden from every
+  // other tab on purpose, so abandoned card pages do not read as jobs; shown
+  // here so one that is later paid by Bizum or in cash can be marked so.
+  { id: "UNPAID",    label: "Unpaid",       icon: <Wallet size={14} /> },
   { id: "COMPLETED", label: "Completed",    icon: <CheckCheck size={14} /> },
   { id: "DELETED",   label: "Deleted",      icon: <Trash2 size={14} /> },
 ];
@@ -612,6 +616,7 @@ const MAIN_TABS: { id: MainTab; label: string; icon: React.ReactNode }[] = [
 export default function AdminBookingsPage() {
   const [bookings,  setBookings]  = useState<Booking[]>([]);
   const [deleted,   setDeleted]   = useState<Booking[]>([]);
+  const [unpaid,    setUnpaid]    = useState<Booking[]>([]);
   const [drivers,   setDrivers]   = useState<Driver[]>([]);
   const [loading,   setLoading]   = useState(true);
   const [search,    setSearch]    = useState("");
@@ -629,6 +634,16 @@ export default function AdminBookingsPage() {
     if (res.ok) setDeleted(await res.json());
   };
 
+  // The API returns everything with ?unpaid=true; keep only the rows the
+  // default list leaves out, so this tab is exactly the hidden set.
+  const loadUnpaid = async () => {
+    const res = await fetch("/api/admin/bookings?unpaid=true");
+    if (res.ok) {
+      const all: Booking[] = await res.json();
+      setUnpaid(all.filter((b) => b.status === "PENDING" && b.paymentStatus === "PENDING" && !b.paymentMethod));
+    }
+  };
+
   const loadDrivers = async () => {
     const res = await fetch("/api/admin/drivers");
     if (res.ok) {
@@ -642,7 +657,7 @@ export default function AdminBookingsPage() {
 
   const load = async () => {
     setLoading(true);
-    await Promise.all([loadBookings(), loadDeleted(), loadDrivers()]);
+    await Promise.all([loadBookings(), loadDeleted(), loadUnpaid(), loadDrivers()]);
     setLoading(false);
   };
 
@@ -651,6 +666,7 @@ export default function AdminBookingsPage() {
   // When switching to DELETED tab, ensure data is fresh
   useEffect(() => {
     if (mainTab === "DELETED") loadDeleted();
+    if (mainTab === "UNPAID") loadUnpaid();
   }, [mainTab]);
 
   // Determine the status pre-filter from the main tab
@@ -661,7 +677,8 @@ export default function AdminBookingsPage() {
 
   const activeFilter = mainTab === "ALL" ? filter : tabStatusFilter;
 
-  const filtered = bookings.filter((b) => {
+  const source = mainTab === "UNPAID" ? unpaid : bookings;
+  const filtered = source.filter((b) => {
     const matchSearch = !search || [b.confirmationCode, b.guestName, b.guestEmail, b.guestPhone, b.pickupAddress]
       .some((v) => v?.toLowerCase().includes(search.toLowerCase()));
     const matchFilter = activeFilter === "ALL" || b.status === activeFilter;
@@ -671,6 +688,7 @@ export default function AdminBookingsPage() {
   const pendingCount   = bookings.filter((b) => b.status === "PENDING").length;
   const completedCount = bookings.filter((b) => b.status === "COMPLETED").length;
   const deletedCount   = deleted.length;
+  const unpaidCount    = unpaid.length;
 
   return (
     <div className="p-4 pt-16 lg:pt-6 lg:p-8">
@@ -687,7 +705,7 @@ export default function AdminBookingsPage() {
       {/* Main Tabs */}
       <div className="flex gap-1 mb-6 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1">
         {MAIN_TABS.map((tab) => {
-          const count = tab.id === "PENDING" ? pendingCount : tab.id === "COMPLETED" ? completedCount : tab.id === "DELETED" ? deletedCount : null;
+          const count = tab.id === "PENDING" ? pendingCount : tab.id === "UNPAID" ? unpaidCount : tab.id === "COMPLETED" ? completedCount : tab.id === "DELETED" ? deletedCount : null;
           return (
             <button
               key={tab.id}
