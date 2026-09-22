@@ -4,6 +4,9 @@ import { sendReviewRequestEmail } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
 import { sweepFlightDelays } from "@/lib/flights/sweep";
 
+// One email per completed ride in the window.
+export const maxDuration = 120;
+
 const CRON_SECRET = process.env.CRON_SECRET ?? "elite-cron-secret";
 
 export async function POST(req: NextRequest) {
@@ -57,9 +60,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Flight delays are also swept here. Each cron entry may run only once
-  // per day on the Hobby plan, so checking from several existing jobs is
-  // the only way to catch a delay announced after the morning run.
+  // Flight delays are also swept here, as a backstop. The pickup-reminder
+  // entry sweeps them hourly, which is where freshness actually comes from;
+  // this call costs nothing when there is nothing to find.
   await sweepFlightDelays(36).catch(() => null);
 
   return NextResponse.json({ ok: true, sent });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { ROUTE_LANDINGS, routeLanding } from "@/lib/route-landings";
 import { SLUG_TO_ZONE, routePageHref } from "@/lib/destination-pricing";
@@ -472,9 +472,25 @@ describe("cron schedules use the Pro plan rather than working around Hobby", () 
     expect(vercel.crons.length).toBeLessThanOrEqual(100);
   });
 
-  it("no longer explains itself with the Hobby limit", () => {
-    for (const f of ["app/api/cron/daily/route.ts", "app/api/cron/pickup-reminder/route.ts"]) {
-      expect(rd(f), f).not.toContain("Hobby");
+  it("no cron route still justifies itself by the Hobby once-a-day limit", () => {
+    // The word may appear as history ("60 was the Hobby ceiling"). What must
+    // not survive is the reasoning that made jobs piggyback on one another.
+    const stale = "may run only once";
+    for (const f of readdirSync(join(ROOT, "app/api/cron"))) {
+      const p = join("app/api/cron", f, "route.ts");
+      if (!existsSync(join(ROOT, p))) continue;
+      expect(rd(p), p).not.toContain(stale);
+      expect(rd(p), p).not.toContain("Hobby plan allows");
     }
+  });
+
+  it("gives the long-running jobs the time the Pro plan allows", () => {
+    // Eight jobs ran inside daily within a 60s Hobby ceiling; anything past
+    // the cut simply did not happen, silently.
+    expect(rd("app/api/cron/daily/route.ts")).toContain("export const maxDuration = 300;");
+    for (const f of ["abandoned-check", "pickup-reminder", "review-request", "payment-reconcile", "orchestrator"]) {
+      expect(rd(`app/api/cron/${f}/route.ts`), f).toMatch(/export const maxDuration = [0-9]+;/);
+    }
+    expect(rd("app/api/cron/daily/route.ts")).not.toContain("maxDuration = 60");
   });
 });

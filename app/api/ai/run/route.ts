@@ -9,7 +9,8 @@ import { AnalyticsAgent } from "@/lib/ai/agents/analytics";
 import { MarketingAgent } from "@/lib/ai/agents/marketing";
 import { KnowledgeAgent } from "@/lib/ai/agents/knowledge";
 
-export const maxDuration = 55; // Vercel Hobby max 60s
+// A model call and its retries. 55 was chosen to sit under the Hobby cap.
+export const maxDuration = 300;
 
 async function adminOnly() {
   const session = await getServerSession(authOptions);

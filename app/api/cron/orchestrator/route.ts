@@ -5,7 +5,8 @@ import { sweepFlightDelays } from "@/lib/flights/sweep";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+// AI agents, several model calls per run. 60 was the Hobby ceiling.
+export const maxDuration = 300;
 
 function authorise(req: NextRequest): boolean {
   const auth   = req.headers.get("authorization") ?? "";
@@ -18,9 +19,9 @@ export async function GET(req: NextRequest) {
   const result = await runOrchestrator();
   // Run learning reviews after agents complete so insights are based on today's data
   await runAllAgentReviews().catch(() => {});
-  // Flight delays are also swept here. Each cron entry may run only once
-  // per day on the Hobby plan, so checking from several existing jobs is
-  // the only way to catch a delay announced after the morning run.
+  // Flight delays are also swept here, as a backstop. The pickup-reminder
+  // entry sweeps them hourly, which is where freshness actually comes from;
+  // this call costs nothing when there is nothing to find.
   await sweepFlightDelays(36).catch(() => null);
 
   return NextResponse.json({ ok: true, ...result });

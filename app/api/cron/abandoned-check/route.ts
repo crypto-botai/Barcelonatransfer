@@ -5,6 +5,9 @@ import { logEmail } from "@/lib/marketing";
 import { sendAbandonedBookingEmail } from "@/lib/resend";
 import { sweepAbandoned } from "@/lib/abandoned";
 
+// One recovery email per abandoned booking; a busy evening is a long list.
+export const maxDuration = 120;
+
 const CRON_SECRET             = process.env.CRON_SECRET ?? "elite-cron-secret";
 const ABANDON_AFTER_MINUTES   = 60;   // wait 1 hour before first email
 const FOLLOW_UP_HOURS         = 24;   // send follow-ups every 24 hours

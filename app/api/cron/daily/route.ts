@@ -14,7 +14,15 @@ import { notify } from "@/lib/notifications/service";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+/**
+ * Eight jobs run inside this one request: ride-today pushes, the abandoned
+ * sweep, pickup reminders, review requests, return re-books, payment
+ * reconciliation, the AI summary and the flight sweep. The 60 here was the
+ * Hobby ceiling, not a measurement, and a run that hit it was cut off part
+ * way through with no error anywhere: the jobs after the cut simply did not
+ * happen that day. Pro allows 300.
+ */
+export const maxDuration = 300;
 
 function authorise(req: NextRequest): boolean {
   const auth   = req.headers.get("authorization") ?? "";

@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { sendPickupReminder } from "@/lib/resend";
 import { arrivalUrl } from "@/lib/arrival-token";
 
+// Reminders plus the flight-delay sweep, which calls an external API per flight.
+export const maxDuration = 180;
+
 /**
  * The arrival link, or nothing if it cannot be signed.
  *

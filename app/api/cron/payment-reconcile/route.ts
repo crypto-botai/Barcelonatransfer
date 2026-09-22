@@ -3,7 +3,9 @@ import { reconcilePendingPayments } from "@/lib/payments/reconcile";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+// Runs every 15 minutes now, so each pass has little to do; the headroom is
+// for the occasional backlog after SumUp has been unreachable for a while.
+export const maxDuration = 120;
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "elite-cron-secret";
 
