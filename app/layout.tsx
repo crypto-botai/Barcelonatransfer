@@ -14,6 +14,7 @@ import MotionProvider from "@/components/layout/MotionProvider";
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import MobileBookBar from "@/components/layout/MobileBookBar";
 import DeferredAnalytics from "@/components/layout/DeferredAnalytics";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { buildOfferCatalog } from "@/lib/offer-catalog";
 import { CHEAPEST_FARE } from "@/lib/destination-pricing";
 import { SUPPORTED_LOCALES } from "@/lib/i18n";
@@ -390,6 +391,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <WhatsAppButton />
           <MobileBookBar />
           <DeferredAnalytics gaId="G-E9QZFG5WZY" adsId="AW-18391666445" />
+          {/* Core Web Vitals from real visitors, on real phones and real
+              networks. Lighthouse runs here have only ever measured this
+              machine; this measures the customer standing in an airport on
+              4G, which is the number Google actually ranks on.
+
+              Not deferred like the Google tags above, and it does not need to
+              be: about 1.6 KB, loaded async, and it has to be present early
+              enough to observe the paint it is reporting on. Deferring it to
+              first interaction would mean never recording LCP.
+
+              Vercel Analytics is deliberately not installed alongside it. GA4
+              already counts page views; a second tag doing the same job would
+              be weight for nothing. */}
+          <SpeedInsights />
           </MotionProvider>
           </I18nProvider>
         </AuthProvider>
