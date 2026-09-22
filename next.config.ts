@@ -32,6 +32,32 @@ const nextConfig: NextConfig = {
   },
   serverExternalPackages: ["@prisma/client", "prisma"],
 
+  /**
+   * Keep other platforms' native binaries out of the deployed functions.
+   *
+   * Every route that touches the database traces the Prisma query engine into
+   * its own bundle, and the same goes for sharp. On a Linux build only the
+   * Linux binaries can ever run, but the tracer copies whatever it finds, and
+   * there are 237 functions here: one stray 18 MB engine is 18 MB times 237,
+   * in every deployment, and Vercel bills function storage across all of the
+   * deployments it keeps.
+   *
+   * Listed per foreign platform rather than as one wildcard, so that a Linux
+   * binary can never be excluded by accident. That would not fail the build;
+   * it would fail every database query at runtime.
+   */
+  outputFileTracingExcludes: {
+    "**": [
+      "node_modules/.prisma/client/*windows*",
+      "node_modules/.prisma/client/*darwin*",
+      "node_modules/.prisma/client/*.tmp*",
+      "node_modules/@img/sharp-win32-**",
+      "node_modules/@img/sharp-darwin-**",
+      "node_modules/@img/sharp-libvips-win32-**",
+      "node_modules/@img/sharp-libvips-darwin-**",
+    ],
+  },
+
   // Permanent redirect: non-www → www (belt-and-suspenders on top of Vercel CDN redirect)
   // Ensures Google always sees a single canonical domain regardless of request origin
   async redirects() {
