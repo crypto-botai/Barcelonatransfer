@@ -66,7 +66,7 @@ export const POLICY_SECTIONS: PolicySection[] = [
   {
     id: "meet-greet",
     heading: "Meet and greet with a name board",
-    lead: "An international arrival takes as long as it takes. Passport control and baggage reclaim can run to an hour, sometimes two, and no chauffeur can stand inside for all of it. This is how we handle it, and it works when you follow the steps.",
+    lead: "An optional extra, added at the checkout, for an airport arrival. An international arrival takes as long as it takes. Passport control and baggage reclaim can run to an hour, sometimes two, and no chauffeur can stand inside for all of it. This is how we handle it, and it works when you follow the steps.",
     points: [
       "Your chauffeur waits outside and follows your flight. Nothing is charged for the wait.",
       "When you reach baggage reclaim, message your chauffeur: \"please come to the meeting point\". That message is what starts them moving.",
@@ -114,6 +114,6 @@ export const CHECKOUT_POLICY_POINTS: string[] = [
   `Free cancellation up to ${CANCEL_WINDOW_HOURS.CITY} hours before a city pickup, ${CANCEL_WINDOW_HOURS.INTERCITY} hours outside the city, ${CANCEL_WINDOW_HOURS.MINIBUS} hours for a minibus. Inside that window the fare is not refunded.`,
   `Cancellation protection holds your booking until ${PROTECTION_CUTOFF_HOURS} hours before pickup and refunds the fare in full. The protection fee itself is never refunded.`,
   "A delayed flight is never a cancellation. We track it and move your pickup at no charge.",
-  "Meet and greet: message your chauffeur from baggage reclaim and allow ten minutes for them to reach the meeting point.",
+  "Meet and greet is an optional extra. With it, message your chauffeur from baggage reclaim and allow ten minutes for them to reach the meeting point; without it, they wait at the meeting point outside the terminal.",
   "Travelling with a child of 135 cm or under, or with a pet? Tell us when you book. Spanish law requires an approved child seat and we fit it before the car leaves.",
 ];

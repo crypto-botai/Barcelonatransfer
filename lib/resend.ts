@@ -14,6 +14,7 @@ import {
   rideCompleteCard,
   flightDelayCard,
   driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard, returnRebookCard,
+  driverEmailChangedCard,
   pickupChangedCard, adminPickupChangedCard,
   partnerJobCard, adminPartnerDispatchCard, credentialsCard, partnerConvertedCard,
   abandonedRecoveryCard, personalNoteCard,
@@ -799,6 +800,18 @@ export async function sendDriverAssignedEmail({
 }
 
 // ─── Review Request ──────────────────────────────────────────
+/** A fleet company changed a driver's sign-in address. */
+export async function sendDriverEmailChanged({
+  to, name, newEmail, company,
+}: { to: string; name: string; newEmail: string; company: string }) {
+  const html = emailDocument(
+    driverEmailChangedCard({ firstName: firstNameOf(name), newEmail, company }),
+    `Your Elite BCN sign-in address is now ${newEmail}`,
+  );
+  const id = await sendEmail({ from: FROM, to, subject: "Your sign-in address has changed | Elite BCN", html });
+  await logEmail({ to, subject: "Driver sign-in address changed", type: "DRIVER_EMAIL_CHANGED", resendId: id });
+}
+
 /** Three days after the ride: the journey home, pre-filled, 5% off. */
 export async function sendReturnRebookEmail({
   to, name, from, toAddress, discountPct, rebookUrl, bookingId,

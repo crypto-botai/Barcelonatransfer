@@ -62,6 +62,8 @@ type Summary = {
   depositAmount?: number | null;
   balanceAmount?: number | null;
   protectionFee?: number | null;
+  /** The paid extras on this booking, so the page promises only those. */
+  extras?: { id: string; label: string; quantity: number }[];
 };
 
 const stage: Variants = {
@@ -240,7 +242,11 @@ function PayInner() {
                 {[
                   (summary?.protectionFee ?? 0) > 0 ? `Free cancellation up to ${PROTECTION_CUTOFF_HOURS} hours before pickup` : `Free cancellation up to ${FREE_CANCEL_HOURS} hours before pickup`,
                   "Flight tracked, 60 minutes of waiting included",
-                  "Meet and greet with your name board",
+                  // Only what this booking actually bought. Meet and greet is a
+                  // paid extra; listing it unconditionally promised a chauffeur
+                  // inside arrivals to everyone who never asked for one.
+                  ...(summary?.extras ?? []).map((e) => e.quantity > 1 ? `${e.label} ×${e.quantity}` : e.label),
+                  ...((summary?.extras ?? []).length === 0 ? ["Fixed price per vehicle, no meter"] : []),
                 ].map((t) => (
                   <li key={t} className="flex items-start gap-2"><Check size={13} className="mt-0.5 flex-shrink-0 text-gold-400" /> {t}</li>
                 ))}

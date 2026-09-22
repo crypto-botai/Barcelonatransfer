@@ -2,9 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requirePartner } from "@/lib/partner";
+import { sendDriverEmailChanged } from "@/lib/resend";
 
 const schema = z.object({
   name:          z.string().min(2).optional(),
+  /**
+   * The driver signs in with this, so changing it changes their login. The
+   * handler refuses an address already in use and writes to the driver at
+   * the new one, because a company that mistypes it would otherwise lock
+   * their driver out with nothing on screen to say so.
+   */
+  email:         z.string().email().optional(),
   phone:         z.string().min(6).optional(),
   licenseNumber: z.string().nullable().optional(),
   /** APPROVED puts them back on the roster; SUSPENDED takes them off. */
@@ -24,8 +32,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!parsed.success) return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 422 });
   const d = parsed.data;
 
-  const driver = await prisma.driver.findFirst({ where: { id, partnerId: p.id }, include: { vehicles: { take: 1 } } });
+  const driver = await prisma.driver.findFirst({
+    where: { id, partnerId: p.id },
+    include: { vehicles: { take: 1 }, user: { select: { email: true, name: true } } },
+  });
   if (!driver) return NextResponse.json({ error: "Not one of your drivers" }, { status: 404 });
+
+  // A new sign-in address has to be free, and the driver has to be told.
+  const email = d.email?.trim().toLowerCase();
+  const emailChanged = !!email && email !== driver.user.email.toLowerCase();
+  if (emailChanged) {
+    const taken = await prisma.user.findUnique({ where: { email }, select: { id: true } });
+    if (taken) return NextResponse.json({ error: "That email already has an account" }, { status: 409 });
+  }
 
   await prisma.$transaction([
     prisma.driver.update({
@@ -38,7 +57,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }),
     prisma.user.update({
       where: { id: driver.userId },
-      data: { ...(d.name ? { name: d.name } : {}), ...(d.phone ? { phone: d.phone } : {}) },
+      data: {
+        ...(d.name ? { name: d.name } : {}),
+        ...(d.phone ? { phone: d.phone } : {}),
+        ...(emailChanged ? { email } : {}),
+      },
     }),
     ...(driver.vehicles[0] && (d.vehicleMake || d.vehicleModel || d.vehiclePlate || d.vehicleClass || d.vehicleColor)
       ? [prisma.vehicle.update({
@@ -53,5 +76,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         })]
       : []),
   ]);
-  return NextResponse.json({ ok: true });
+
+  if (emailChanged) {
+    // Sent to both: the new address is where they sign in from now on, and
+    // the old one is the only place a driver who did not ask for this will
+    // notice that it happened.
+    await Promise.allSettled([
+      sendDriverEmailChanged({ to: email!, name: d.name ?? driver.user.name ?? "there", newEmail: email!, company: p.name }),
+      sendDriverEmailChanged({ to: driver.user.email, name: d.name ?? driver.user.name ?? "there", newEmail: email!, company: p.name }),
+    ]);
+  }
+
+  return NextResponse.json({ ok: true, emailChanged });
 }

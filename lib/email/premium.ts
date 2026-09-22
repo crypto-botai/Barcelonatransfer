@@ -1160,6 +1160,38 @@ export function personalNoteCard(o: {
   `);
 }
 
+// ─── 18b. Sign-in address changed (driver) ───────────────────
+
+/**
+ * A fleet company changed one of its drivers' email addresses.
+ *
+ * Sent to both the old and the new address: the new one because that is the
+ * login from now on, the old one because a driver who did not ask for this
+ * needs somewhere to find out that it happened.
+ */
+export function driverEmailChangedCard(o: { firstName: string; newEmail: string; company: string }): string {
+  const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent("Hello, my Elite BCN sign-in address has changed and I did not expect it.")}`;
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Chauffeur · Sign-in")}
+      ${headline(`Your sign-in address has changed, ${esc(o.firstName)}.`)}
+      ${paragraph(`${esc(o.company)} has updated the email on your chauffeur account. From now on you sign in with the address below. Your password has not changed.`)}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;">${detailTable(row("Sign in with", `<strong style="font-weight:bold;color:${GOLD};">${esc(o.newEmail)}</strong>`, true))}</td></tr>
+    ${sectionSpacer(28)}
+
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(`${SITE_URL}/driver`, "Open Your Panel")}
+      <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${LABEL};padding-top:18px;">
+        If you did not expect this, ${"" }<a href="${wa}" style="color:${GOLD};text-decoration:none;">tell us on WhatsApp</a> straight away.
+      </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
 // ─── 19. The journey home (customer) ─────────────────────────
 
 /**

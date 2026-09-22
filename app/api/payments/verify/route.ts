@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSumUpCheckout } from "@/lib/sumup";
 import { finalizeSumUpPayment, markSumUpPaymentFailed } from "@/lib/payment-completion";
+import { parseBookingMeta } from "@/lib/booking-meta";
+
+/** The paid extras on a booking, for the page that shows what was bought. */
+const extrasOf = (specialRequests: string | null) =>
+  parseBookingMeta(specialRequests).extras.map((e) => ({ id: e.id, label: e.label, quantity: e.quantity }));
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -34,6 +39,7 @@ export async function GET(req: NextRequest) {
         dropoffLng:       booking.dropoffLng,
         passengers:       booking.passengers,
         bookingId:        booking.id,
+        extras:           extrasOf(booking.specialRequests),
         guestEmail:       booking.guestEmail,
       });
     }
@@ -63,6 +69,7 @@ export async function GET(req: NextRequest) {
           dropoffLng:       updated.dropoffLng,
           passengers:       updated.passengers,
           bookingId:        updated.id,
+          extras:           extrasOf(updated.specialRequests),
           guestEmail:       updated.guestEmail,
         });
       }
@@ -91,6 +98,7 @@ export async function GET(req: NextRequest) {
       dropoffLng:       booking.dropoffLng,
       passengers:       booking.passengers,
       bookingId:        booking.id,
+      extras:           extrasOf(booking.specialRequests),
       guestEmail:       booking.guestEmail,
       hasCheckout:      !!booking.stripeSessionId,
     });

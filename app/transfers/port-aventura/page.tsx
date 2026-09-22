@@ -113,7 +113,7 @@ export default function PortAventuraTransferPage() {
                 { icon: Shield, title: `Fixed price from €${PA.economy}`, body: "Single fixed price per vehicle, excluding VAT and tolls. No meter running, no extra charge for luggage." },
                 { icon: CheckCircle2, title: "Child seats available", body: "Baby and booster seats on request, €5 per seat — essential for families flying in with young children." },
                 { icon: Star, title: "Direct to theme park gate", body: "Drop-off at PortAventura main entrance, Ferrari Land entrance, or your on-site hotel lobby." },
-                { icon: Clock, title: "Meet & greet in arrivals", body: "Driver waits with your name board in the arrivals hall. 60 minutes free waiting from your flight landing." },
+                { icon: Clock, title: "Meet & greet in arrivals", body: "60 minutes of free waiting from your flight landing on every airport pickup. A name board inside the arrivals hall is a €5 extra, added when you book." },
                 { icon: MapPin, title: "All Costa Daurada hotels", body: "We drop at any resort hotel in Salou, Cambrils, La Pineda, or Vila-seca on the same journey." },
                 { icon: Shield, title: "7-seat MPV for families", body: "The Mercedes V-Class comfortably fits 2 adults + children with prams, luggage, and child seats." },
               ].map(({ icon: Icon, title, body }) => (

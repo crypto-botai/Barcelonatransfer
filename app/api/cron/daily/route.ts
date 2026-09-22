@@ -336,19 +336,17 @@ export async function GET(req: NextRequest) {
     runReturnRebook(),
   ]);
 
-  // Payment reconciliation piggybacks on this job as well. The Hobby plan
-  // allows one run per cron entry per day, so a payment that failed at 17:00
-  // used to sit labelled PENDING in the admin panel until 05:00 the next
-  // morning. Running it from several existing jobs spreads the checks across
-  // the day without adding a cron entry the plan would reject.
+  // Payment reconciliation has its own entry now, every 15 minutes, which is
+  // what the Pro plan allows. This call stays as a backstop: it is idempotent,
+  // and a payment that failed at 17:00 should never again sit labelled PENDING
+  // in the admin panel until the following morning.
   const payments = await reconcilePendingPayments().catch(() => null);
 
   // AI executive summary — runs after agent cron (06:00) so data is fresh
   await runAiExecutiveSummary().catch(() => {});
 
-  // Flight delays are also swept here. Each cron entry may run only once
-  // per day on the Hobby plan, so checking from several existing jobs is
-  // the only way to catch a delay announced after the morning run.
+  // Flight delays are swept hourly by the pickup-reminder entry. This call is
+  // the same sweep, kept as a backstop for the same reason as the line above.
   await sweepFlightDelays(36).catch(() => null);
 
   return NextResponse.json({

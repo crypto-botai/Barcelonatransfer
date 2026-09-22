@@ -1,6 +1,7 @@
 "use client";
 
-import { Shield, Plane, UserCheck, Star, ExternalLink } from "lucide-react";
+import { Shield, Plane, UserCheck, Baby, Coins, Star, ExternalLink } from "lucide-react";
+import { EXTRAS_CATALOG } from "@/types";
 import { REVIEWS, GOOGLE_PROFILE } from "@/data/reviews";
 import { PROTECTION_CUTOFF_HOURS, FREE_CANCEL_HOURS } from "@/lib/checkout-money";
 
@@ -20,9 +21,30 @@ function pickReviews(n: number) {
     .slice(0, n);
 }
 
-export default function CheckoutTrust({ protectionTaken = false }: { protectionTaken?: boolean }) {
+const SEAT_IDS = ["baby_seat", "child_seat", "booster_seat"];
+const priceOf = (id: string) => EXTRAS_CATALOG.find((e) => e.id === id)?.price ?? 0;
+
+/**
+ * The third promise depends on what the customer has actually chosen.
+ *
+ * This block used to state flatly that meet and greet was "included ... at no
+ * extra cost" on every booking. It is a paid extra a few rows further up the
+ * same page, so the checkout contradicted its own order form, and a customer
+ * who did not tick it would have waited in arrivals for a chauffeur standing
+ * outside. Now it says what is true of this booking: added, or available and
+ * what it costs.
+ */
+export default function CheckoutTrust({ protectionTaken = false, extras = [] }: { protectionTaken?: boolean; extras?: string[] }) {
   const reviews = pickReviews(3);
   const profileUrl = `https://www.google.com/maps?cid=${GOOGLE_PROFILE.cid}`;
+  const hasMeetGreet = extras.includes("meet_greet");
+  const seats = extras.filter((id) => SEAT_IDS.includes(id));
+
+  const third = hasMeetGreet
+    ? { Icon: UserCheck, t: "Meet & greet with a name board", d: "Added to your booking. Your chauffeur meets you in the arrivals hall and helps with your bags." }
+    : seats.length > 0
+      ? { Icon: Baby, t: "Child seat fitted before dispatch", d: "Added to your booking, and fitted before the car leaves, as Spanish law requires." }
+      : { Icon: Coins, t: "Fixed price, per vehicle", d: `No meter and no surge: the fare you see is the fare you pay. Meet & greet at arrivals is available for €${priceOf("meet_greet")} if you want it.` };
 
   const points = [
     {
@@ -31,7 +53,7 @@ export default function CheckoutTrust({ protectionTaken = false }: { protectionT
       d: protectionTaken ? "Full refund of the fare; only the protection fee stays." : "Change of plan? Cancel from your confirmation email and the full amount comes back.",
     },
     { Icon: Plane, t: "Flight tracked, no charge for delays", d: "Your chauffeur follows the flight and adjusts; 60 minutes of waiting after landing is included." },
-    { Icon: UserCheck, t: "Meet & greet with a name board included", d: "Your chauffeur waits in the arrivals hall with your name, at no extra cost." },
+    third,
   ];
 
   return (

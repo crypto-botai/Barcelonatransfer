@@ -1403,7 +1403,7 @@ export default function BookFormClient() {
 
                 {/* Why it is safe to press the button, from people who did. */}
                 {quote && !needsManualQuote && (
-                  <div className="pb-4"><CheckoutTrust protectionTaken={protection} /></div>
+                  <div className="pb-4"><CheckoutTrust protectionTaken={protection} extras={(data.extras ?? []).map((e) => e.id)} /></div>
                 )}
               </div>
             </motion.div>

@@ -29,10 +29,11 @@ export async function POST(req: NextRequest) {
   if (auth !== `Bearer ${CRON_SECRET}`)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // This cron now runs once daily (Vercel Hobby plan caps crons at once/day), so the window
-  // must be at least as wide as the 24h gap between runs, or bookings whose pickup time falls
-  // outside a narrow band would never be checked on any run and would silently get no reminder.
-  // 6h-36h gives every booking two overlapping chances to be caught, with margin for cron jitter.
+  // A wide window on purpose. It was written for a daily cron, where anything
+  // narrower would have let a booking fall between two runs and get no reminder
+  // at all. The cron is hourly now, so every booking is seen many times over,
+  // and the EmailLog check below is what stops a customer being reminded twice.
+  // The width costs a little query work and removes a whole class of silence.
   const from = new Date(Date.now() + 6  * 60 * 60 * 1000);
   const to   = new Date(Date.now() + 36 * 60 * 60 * 1000);
 
@@ -89,18 +90,19 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Same daily pass, same 36h horizon: check whether any of tomorrow's flights
-  // have slipped and tell the affected customers. Kept inside this cron because
-  // the Hobby plan allows one run per day per entry, so a separate cron would
-  // add deployment risk without adding freshness.
+  // Same pass, same 36h horizon: check whether any of tomorrow's flights have
+  // slipped and tell the affected customers. This cron runs hourly, so a delay
+  // announced in the evening reaches the customer that evening rather than the
+  // next morning. It stays here rather than in a cron of its own because the
+  // two jobs look at the same set of upcoming pickups.
   const flights = await sweepFlightDelays(36).catch((err) => {
     console.error("[cron/pickup-reminder] flight sweep:", err);
     return null;
   });
 
-  // Payment reconciliation piggybacks here: the Hobby plan allows one run
-  // per cron entry per day, so spreading it across the existing jobs is the
-  // only way to catch a failed payment before the next morning.
+  // Payment reconciliation also runs on its own schedule, every 15 minutes.
+  // This call is the belt to that braces: harmless when there is nothing to
+  // reconcile, and it keeps working if the dedicated entry is ever removed.
   const payments = await reconcilePendingPayments().catch(() => null);
 
   return NextResponse.json({ ok: true, sent, flights, payments });

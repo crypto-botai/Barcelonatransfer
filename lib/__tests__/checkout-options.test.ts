@@ -85,7 +85,7 @@ describe("checkout: the browser side", () => {
 
   it("shows the options and the trust block only once there is a price", () => {
     expect(form).toContain("<PaymentOptions");
-    expect(form).toContain("<CheckoutTrust protectionTaken={protection} />");
+    expect(form).toContain("<CheckoutTrust protectionTaken={protection} extras={");
   });
 
   it("never pulls the server into the client bundle", () => {
@@ -410,5 +410,71 @@ describe("Apple Pay domain verification", () => {
   it("is served as text rather than a download", () => {
     expect(readFileSync(join(ROOT, "next.config.ts"), "utf-8"))
       .toContain("/.well-known/apple-developer-merchantid-domain-association");
+  });
+});
+
+describe("the checkout promises only what the booking bought", () => {
+  it("does not claim meet and greet is included when it is a paid extra", () => {
+    const trust = rd("components/booking/CheckoutTrust.tsx");
+    // The old copy said it flatly, on every booking, next to an order form
+    // that charged EUR 5 for it a few rows above.
+    expect(trust).not.toContain("Meet & greet with a name board included");
+    expect(trust).not.toContain("at no extra cost");
+    // It is now conditional on the customer having chosen it.
+    expect(trust).toContain(`extras.includes("meet_greet")`);
+    expect(trust).toContain("Added to your booking");
+    // And the price it quotes comes from the catalogue, never typed by hand.
+    expect(trust).toContain("EXTRAS_CATALOG");
+  });
+
+  it("the payment page lists the real extras, not a fixed sentence", () => {
+    const pay = rd("app/booking/pay/[checkoutId]/page.tsx");
+    expect(pay).not.toContain(`"Meet and greet with your name board"`);
+    expect(pay).toContain("(summary?.extras ?? []).map");
+    // ...which means the API has to send them.
+    const verify = rd("app/api/payments/verify/route.ts");
+    expect(verify).toContain("parseBookingMeta");
+    expect(verify.split("extras:           extrasOf(").length - 1).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe("a fleet company can correct its own drivers", () => {
+  it("accepts an email change, refuses a taken address, and tells the driver", () => {
+    const api = rd("app/api/partner/drivers/[id]/route.ts");
+    expect(api).toContain("email:         z.string().email().optional()");
+    expect(api).toContain("That email already has an account");
+    expect(api).toContain("...(emailChanged ? { email } : {})");
+    // Written to both addresses: the new one is the login, the old one is
+    // where a driver who did not ask for this finds out.
+    expect(api.split("sendDriverEmailChanged(").length - 1).toBe(2);
+    expect(rd("lib/email/premium.ts")).toContain("export function driverEmailChangedCard(");
+  });
+
+  it("the form lets it be edited and says what it does", () => {
+    const page = rd("app/partner/(panel)/drivers/page.tsx");
+    expect(page).not.toContain("cannot change");
+    expect(page).not.toContain("disabled={edit}");
+    expect(page).toContain("Changing this changes how they sign in");
+    expect(page).toContain("email: f.email");
+  });
+});
+
+describe("cron schedules use the Pro plan rather than working around Hobby", () => {
+  const vercel = JSON.parse(rd("vercel.json")) as { crons: { path: string; schedule: string }[] };
+  it("runs the time-critical jobs often, not once a day", () => {
+    const by = Object.fromEntries(vercel.crons.map((c) => [c.path, c.schedule]));
+    // The recovery email promises to arrive within 15 minutes of someone
+    // leaving the form; a daily sweep could never keep that promise.
+    expect(by["/api/cron/abandoned-check"]).toBe("*/10 * * * *");
+    expect(by["/api/cron/payment-reconcile"]).toBe("*/15 * * * *");
+    // Hourly: carries the flight-delay sweep with it.
+    expect(by["/api/cron/pickup-reminder"]).toBe("0 * * * *");
+    expect(vercel.crons.length).toBeLessThanOrEqual(100);
+  });
+
+  it("no longer explains itself with the Hobby limit", () => {
+    for (const f of ["app/api/cron/daily/route.ts", "app/api/cron/pickup-reminder/route.ts"]) {
+      expect(rd(f), f).not.toContain("Hobby");
+    }
   });
 });

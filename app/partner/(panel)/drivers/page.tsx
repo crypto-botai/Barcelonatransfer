@@ -101,10 +101,15 @@ function DriverSheet({ open, driver, onClose, onDone }: { open: boolean; driver:
     setBusy(true);
     try {
       const r = edit
-        ? await fetch(`/api/partner/drivers/${driver!.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: f.name, phone: f.phone, licenseNumber: f.licenseNumber || null, vehicleMake: f.vehicleMake, vehicleModel: f.vehicleModel, vehiclePlate: f.vehiclePlate, vehicleClass: f.vehicleClass, vehicleColor: f.vehicleColor }) })
+        ? await fetch(`/api/partner/drivers/${driver!.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: f.name, email: f.email, phone: f.phone, licenseNumber: f.licenseNumber || null, vehicleMake: f.vehicleMake, vehicleModel: f.vehicleModel, vehiclePlate: f.vehiclePlate, vehicleClass: f.vehicleClass, vehicleColor: f.vehicleColor }) })
         : await fetch("/api/partner/drivers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(f) });
-      if (!r.ok) throw new Error((await r.json()).error ?? "Failed");
-      toast.success(edit ? "Driver updated" : `Driver added. Sign-in details sent to ${f.email}.`);
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(body.error ?? "Failed");
+      toast.success(
+        edit
+          ? body.emailChanged ? `Driver updated. They now sign in as ${f.email} and both addresses have been told.` : "Driver updated"
+          : `Driver added. Sign-in details sent to ${f.email}.`,
+      );
       onDone();
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); } finally { setBusy(false); }
   }
@@ -115,7 +120,13 @@ function DriverSheet({ open, driver, onClose, onDone }: { open: boolean; driver:
         <div className="space-y-3">
           <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-gold-400"><UserRound size={13} /> Driver</p>
           <div><label className={label} htmlFor="d-name">Full name</label><input id="d-name" className={field} value={f.name} onChange={set("name")} /></div>
-          <div><label className={label} htmlFor="d-email">Email {edit && <span className="normal-case tracking-normal text-dark-500">(login, cannot change)</span>}</label><input id="d-email" type="email" className={field} value={f.email} onChange={set("email")} disabled={edit} /></div>
+          <div>
+            <label className={label} htmlFor="d-email">Email {edit && <span className="normal-case tracking-normal text-dark-500">(this is their login)</span>}</label>
+            <input id="d-email" type="email" className={field} value={f.email} onChange={set("email")} />
+            {edit && f.email.trim().toLowerCase() !== (driver?.user.email ?? "").toLowerCase() && (
+              <p className="mt-1.5 text-[11px] leading-relaxed text-gold-400">Changing this changes how they sign in. Their password stays the same, and we write to both the old and the new address.</p>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div><label className={label} htmlFor="d-phone">Phone</label><input id="d-phone" className={field} value={f.phone} onChange={set("phone")} placeholder="+34 6…" /></div>
             <div><label className={label} htmlFor="d-lic">Licence no.</label><input id="d-lic" className={field} value={f.licenseNumber} onChange={set("licenseNumber")} /></div>
