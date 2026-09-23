@@ -56,6 +56,34 @@ describe("the address picker can be used without a mouse", () => {
   });
 });
 
+describe("the list scrolls", () => {
+  /**
+   * It did not. The panel is overflow-hidden so its corners stay rounded, and
+   * the lists inside carried no scroll of their own, so a full set of results
+   * and the fixed-price zones were both cut off at the fold with no way to
+   * reach the rest.
+   */
+  it("caps each list's height and lets it scroll", () => {
+    expect(picker).toContain("const LIST_CLS =");
+    expect(picker).toContain("overflow-y-auto");
+    // Not taller than the phone it is on.
+    expect(picker).toContain("max-h-[min(60vh,18rem)]");
+    // And the page behind it does not take over at the end of the list.
+    expect(picker).toContain("overscroll-contain");
+  });
+
+  it("applies it to all three lists, not just one", () => {
+    const lists = picker.match(/role="listbox"[^>]*/g) ?? [];
+    expect(lists.length).toBe(3);
+    for (const l of lists) expect(l).toContain("className={LIST_CLS}");
+  });
+
+  /** Grabbing the scrollbar blurs the input, and losing focus closes the panel. */
+  it("does not close itself when the scrollbar is grabbed", () => {
+    expect(picker).toContain("onMouseDown={(e) => e.preventDefault()}");
+  });
+});
+
 describe("what a row shows", () => {
   /**
    * The old row printed Nominatim's display_name whole. For the airport that

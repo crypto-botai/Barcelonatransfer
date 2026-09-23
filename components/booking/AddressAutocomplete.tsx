@@ -72,6 +72,20 @@ function pushRecent(r: Recent) {
   } catch { /* never block a booking on storage */ }
 }
 
+/**
+ * Every list in the dropdown scrolls.
+ *
+ * The panel around them is overflow-hidden, to keep its rounded corners, so a
+ * list without this is simply cut off at the bottom with no way to reach the
+ * rest: the fixed-price zones and a full set of results both run past the
+ * fold. overscroll-contain stops the page behind it scrolling once the list
+ * hits its end, which on a phone reads as the whole form jumping.
+ *
+ * The cap is in view units as well as rem so the list cannot grow taller than
+ * the phone it is on.
+ */
+const LIST_CLS = "max-h-[min(60vh,18rem)] overflow-y-auto overscroll-contain";
+
 const KIND_ICON = {
   airport:  Plane,
   train:    Train,
@@ -274,13 +288,19 @@ export default function AddressAutocomplete({
             animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.99 }}
             transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+            // Pressing anywhere in the panel must not take focus off the
+            // input, because losing focus closes the panel. Without this,
+            // grabbing the scrollbar to scroll the list shuts the list.
+            // The rows use onMouseDown and still fire: this only stops the
+            // browser's default focus shift.
+            onMouseDown={(e) => e.preventDefault()}
             className="absolute z-50 w-full mt-1.5 bg-[#0e0e0e] border border-white/[0.09] rounded-xl shadow-2xl overflow-hidden"
           >
             {/* Fixed-price zones, while the field is still near-empty */}
             {showZones && quickZones && (
               <>
                 <Header icon={<Navigation size={10} className="text-[#c9a84c]/60" />} text="Fixed-price zones" />
-                <ul ref={listRef} id={listId} role="listbox">
+                <ul ref={listRef} id={listId} role="listbox" className={LIST_CLS}>
                   {quickZones.map((z, i) => (
                     <li
                       key={z.address + i}
@@ -308,7 +328,7 @@ export default function AddressAutocomplete({
             {showRecents && (
               <>
                 <Header icon={<Clock3 size={10} className="text-[#c9a84c]/60" />} text="Recent" />
-                <ul ref={listRef} id={listId} role="listbox">
+                <ul ref={listRef} id={listId} role="listbox" className={LIST_CLS}>
                   {recents.map((r, i) => (
                     <li
                       key={r.label}
@@ -333,7 +353,7 @@ export default function AddressAutocomplete({
 
             {/* Results */}
             {!showZones && !showRecents && suggestions.length > 0 && (
-              <ul ref={listRef} id={listId} role="listbox">
+              <ul ref={listRef} id={listId} role="listbox" className={LIST_CLS}>
                 {suggestions.map((s, i) => (
                   <li
                     key={s.id ?? `${s.lat},${s.lng},${i}`}
