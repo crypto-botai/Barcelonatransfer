@@ -118,23 +118,108 @@ describe("searchPlaces", () => {
   beforeEach(() => { vi.stubGlobal("fetch", fetchMock); fetchMock.mockReset(); vi.resetModules(); });
   afterEach(() => vi.unstubAllGlobals());
 
-  it("ignores queries below the minimum length without calling out", async () => {
+  /** A Photon answer, which is GeoJSON rather than Nominatim's bare array. */
+  const photon = (...features: object[]) => ({ ok: true, json: async () => ({ features }) });
+  const feature = (lng: number, lat: number, properties: object) => ({ geometry: { coordinates: [lng, lat] }, properties });
+
+  it("ignores a single character without calling out", async () => {
     const { searchPlaces } = await import("@/lib/geo");
-    expect(await searchPlaces("ab")).toEqual([]);
+    expect(await searchPlaces("a")).toEqual([]);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("identifies the application and biases to Spain and Andorra", async () => {
-    fetchMock.mockResolvedValue({ ok: true, json: async () => [] });
+  /** "T1" and "BCN" are both things customers type, and both used to be ignored. */
+  it("searches on two characters", async () => {
+    fetchMock.mockResolvedValue(photon(feature(2.07, 41.29, { name: "Terminal 1", city: "el Prat de Llobregat", osm_key: "aeroway" })));
     const { searchPlaces } = await import("@/lib/geo");
-    await searchPlaces("sagrada familia");
+    expect(await searchPlaces("T1")).toHaveLength(1);
+  });
 
-    const [url, init] = fetchMock.mock.calls[0];
+  /**
+   * Nominatim matched literally and knew nothing of where the customer is, so
+   * "zaragosa" returned nothing at all and "terminal 1" returned Madrid.
+   * Photon is asked first: fuzzy, and ranked from Barcelona outwards.
+   */
+  it("asks the type-ahead index first, from Barcelona and inside the service area", async () => {
+    fetchMock.mockResolvedValue(photon());
+    const { searchPlaces } = await import("@/lib/geo");
+    await searchPlaces("zaragosa");
+
+    const url = String(fetchMock.mock.calls[0][0]);
+    expect(url).toContain("photon");
+    expect(url).toContain("lat=41.3851");
+    expect(url).toContain("lon=2.1734");
+    // Iberia, Andorra and southern France; short of Italy, so "andora" is the
+    // principality rather than the town in Liguria.
+    expect(url).toContain("bbox=-9.8,35.5,4.6,44.5");
+  });
+
+  it("splits a result into the two lines the picker shows", async () => {
+    fetchMock.mockResolvedValue(photon(
+      feature(2.1962, 41.3874, { osm_id: 7, name: "Hotel Arts", street: "Carrer de la Marina", city: "Barcelona", state: "Catalonia", countrycode: "ES", osm_value: "hotel" }),
+    ));
+    const { searchPlaces } = await import("@/lib/geo");
+    const [p] = await searchPlaces("hotel arts");
+
+    expect(p.name).toBe("Hotel Arts");
+    expect(p.context).toBe("Carrer de la Marina, Barcelona, Catalonia");
+    // The one-line form is what gets stored on the booking and priced from.
+    expect(p.label).toBe("Hotel Arts, Carrer de la Marina, Barcelona, Catalonia");
+    expect(p.kind).toBe("hotel");
+    expect(p).toMatchObject({ lat: 41.3874, lng: 2.1962 });
+  });
+
+  it("names the kind of place, so an airport is not drawn as a street corner", async () => {
+    fetchMock.mockResolvedValue(photon(
+      feature(2.07, 41.29, { name: "Terminal 1", osm_key: "aeroway", osm_value: "terminal" }),
+      feature(2.14, 41.38, { name: "Barcelona Sants", osm_key: "railway", osm_value: "station" }),
+      feature(2.18, 41.37, { name: "Port de Barcelona", osm_value: "ferry_terminal" }),
+      feature(-0.88, 41.65, { name: "Zaragoza", osm_key: "place", osm_value: "city" }),
+    ));
+    const { searchPlaces } = await import("@/lib/geo");
+    expect((await searchPlaces("x")).length).toBe(0); // below the minimum
+    expect((await searchPlaces("xx")).map((p) => p.kind)).toEqual(["airport", "train", "port", "city"]);
+  });
+
+  it("does not list the same place twice", async () => {
+    fetchMock.mockResolvedValue(photon(
+      feature(-0.88, 41.65, { name: "Zaragoza", state: "Aragon" }),
+      feature(-0.87, 41.66, { name: "Zaragoza", state: "Aragon" }),
+    ));
+    const { searchPlaces } = await import("@/lib/geo");
+    expect(await searchPlaces("zaragosa")).toHaveLength(1);
+  });
+
+  /**
+   * One free community service being down must not empty the field, because an
+   * empty field is a booking that cannot be priced.
+   */
+  it("falls back to the older search when the first returns nothing", async () => {
+    fetchMock
+      .mockResolvedValueOnce(photon())
+      .mockResolvedValueOnce({ ok: true, json: async () => [{ place_id: 3, lat: "41.65", lon: "-0.88", display_name: "Zaragoza, Aragón, 50001, España" }] });
+    const { searchPlaces } = await import("@/lib/geo");
+    const out = await searchPlaces("zaragoza");
+
+    expect(out).toHaveLength(1);
+    expect(out[0].name).toBe("Zaragoza");
+    // The postcode and the country are dropped: they do not tell two places apart.
+    expect(out[0].context).toBe("Aragón");
+
+    const [url, init] = fetchMock.mock.calls[1];
     expect(String(url)).toContain("countrycodes=es,ad");
     // Nominatim's usage policy requires a User-Agent naming the application.
     expect((init as RequestInit).headers).toMatchObject({
       "User-Agent": expect.stringContaining("EliteBCNTransfers"),
     });
+  });
+
+  it("falls back when the first search errors outright", async () => {
+    fetchMock
+      .mockRejectedValueOnce(new Error("photon down"))
+      .mockResolvedValueOnce({ ok: true, json: async () => [{ lat: "41.65", lon: "-0.88", display_name: "Zaragoza" }] });
+    const { searchPlaces } = await import("@/lib/geo");
+    expect(await searchPlaces("zaragoza")).toHaveLength(1);
   });
 
   it("maps results and drops any with unusable coordinates", async () => {

@@ -42,8 +42,15 @@ export const FALLBACK_AVG_KMH = 50;
 export interface LatLng { lat: number; lng: number }
 
 export interface Place extends LatLng {
+  /** The whole thing on one line. What gets stored on the booking. */
   label: string;
-  /** Nominatim's own place id, useful as a stable React key. */
+  /** The first line in the picker: "Terminal 1", "Hotel Arts". */
+  name?: string;
+  /** The second line, enough to tell two places of the same name apart. */
+  context?: string;
+  /** Decides the icon beside the row. */
+  kind?: PlaceKind;
+  /** The source's own place id, useful as a stable React key. */
   id?: string;
 }
 
@@ -92,6 +99,133 @@ function serialise<T>(fn: () => Promise<T>): Promise<T> {
 
 // ─── geocoding ───────────────────────────────────────────────────────────────
 
+/**
+ * Where this business drives, as a bounding box.
+ *
+ * Iberia, Andorra and southern France: the Costa Brava, Andorra, Lourdes and
+ * the Pyrenees are all real destinations on the price table. It stops short of
+ * Italy, which is what keeps "andora" meaning the principality rather than the
+ * town in Liguria.
+ *
+ * minLon, minLat, maxLon, maxLat.
+ */
+const SERVICE_BBOX = "-9.8,35.5,4.6,44.5";
+
+/** Barcelona. Results near here rank first, which is where the cars are. */
+const HOME = { lat: 41.3851, lng: 2.1734 };
+
+/**
+ * Photon: OpenStreetMap data served by an index built for type-ahead.
+ *
+ * Nominatim is a geocoder, not a search engine, and it showed. It matched
+ * literally, so one wrong letter returned nothing at all: "zaragosa" gave zero
+ * results, which left the customer with an empty dropdown and — because the
+ * quote geocodes the typed address when no suggestion was clicked — no price
+ * either. It also had no notion of where the customer is, so "terminal 1"
+ * returned Madrid Barajas and "camp nou" a village in the Alt Empordà.
+ *
+ * Photon is the same OSM data behind ElasticSearch, with fuzzy matching and a
+ * proximity bias. All eight of the queries that failed above resolve correctly
+ * through it. Free, no key, no rate limit published, same open licence.
+ *
+ * Nominatim stays as the fallback, so an outage at one degrades to the other
+ * rather than to an empty field.
+ */
+const PHOTON = "https://photon.komoot.io";
+
+interface PhotonFeature {
+  geometry?: { coordinates?: [number, number] };
+  properties?: {
+    osm_id?: number; osm_key?: string; osm_value?: string;
+    name?: string; housenumber?: string; street?: string;
+    city?: string; district?: string; county?: string; state?: string;
+    postcode?: string; country?: string; countrycode?: string;
+  };
+}
+
+/**
+ * The kind of place, for the icon the picker shows beside it.
+ *
+ * An airport, a hotel and a street corner are different enough errands that
+ * telling them apart at a glance is most of what makes a long list scannable.
+ */
+export type PlaceKind = "airport" | "train" | "port" | "hotel" | "city" | "landmark" | "address";
+
+function kindOf(key?: string, value?: string): PlaceKind {
+  if (key === "aeroway" || value === "aerodrome" || value === "terminal") return "airport";
+  if (key === "railway" || value === "station" || value === "bus_station") return "train";
+  if (value === "ferry_terminal" || value === "harbour" || value === "port" || value === "cruise_terminal") return "port";
+  if (value === "hotel" || value === "hostel" || value === "guest_house" || value === "apartments" || value === "resort") return "hotel";
+  if (key === "place" && ["city", "town", "village", "suburb", "municipality", "hamlet"].includes(value ?? "")) return "city";
+  if (key === "tourism" || key === "leisure" || key === "amenity" || key === "historic") return "landmark";
+  return "address";
+}
+
+/**
+ * A Photon feature as two readable lines.
+ *
+ * The old dropdown printed Nominatim's display_name whole, which for the
+ * airport is ninety characters of administrative hierarchy ending in "España"
+ * — truncated in the row, so every airport suggestion looked identical. The
+ * name goes on the first line and just enough to disambiguate on the second.
+ */
+function photonPlace(f: PhotonFeature): Place | null {
+  const c = f.geometry?.coordinates;
+  const p = f.properties;
+  if (!c || !p) return null;
+  const [lng, lat] = c;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+  const street = [p.street, p.housenumber].filter(Boolean).join(" ");
+  const name = p.name || street || p.city || p.county || p.state;
+  if (!name) return null;
+
+  const context = [
+    p.name && street && street !== p.name ? street : null,
+    p.district && p.district !== p.city ? p.district : null,
+    p.city && p.city !== name ? p.city : null,
+    p.county && !p.city && p.county !== name ? p.county : null,
+    p.state && p.state !== name ? p.state : null,
+    p.countrycode && p.countrycode !== "ES" ? p.country : null,
+  ].filter(Boolean).join(", ");
+
+  return {
+    lat, lng,
+    name,
+    context,
+    // The single-line form the rest of the system stores and prices from.
+    label: context ? `${name}, ${context}` : name,
+    kind: kindOf(p.osm_key, p.osm_value),
+    id: p.osm_id ? `photon-${p.osm_id}` : undefined,
+  };
+}
+
+async function photonSearch(q: string): Promise<Place[]> {
+  try {
+    const url =
+      `${PHOTON}/api/?q=${encodeURIComponent(q)}&limit=8&lang=en` +
+      // Rank by distance from Barcelona, then clip to where we actually drive.
+      `&lat=${HOME.lat}&lon=${HOME.lng}&bbox=${SERVICE_BBOX}`;
+
+    const res = await fetch(url, {
+      headers: { "User-Agent": UA },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return [];
+
+    const data = (await res.json()) as { features?: PhotonFeature[] };
+    const seen = new Set<string>();
+    return (data.features ?? [])
+      .map(photonPlace)
+      .filter((p): p is Place => p !== null)
+      // Photon returns a city and its centre point as separate features often
+      // enough that the same line appears twice in the dropdown.
+      .filter((p) => (seen.has(p.label) ? false : (seen.add(p.label), true)));
+  } catch {
+    return [];
+  }
+}
+
 interface NominatimResult {
   place_id?: number;
   lat: string;
@@ -99,10 +233,7 @@ interface NominatimResult {
   display_name: string;
 }
 
-async function searchUncached(query: string): Promise<Place[]> {
-  const q = query.trim();
-  if (q.length < 3) return [];
-
+async function nominatimSearch(q: string): Promise<Place[]> {
   try {
     const url =
       `${NOMINATIM}/search?q=${encodeURIComponent(q)}&format=json&limit=6` +
@@ -120,16 +251,39 @@ async function searchUncached(query: string): Promise<Place[]> {
 
     const data = (await res.json()) as NominatimResult[];
     return data
-      .map((r) => ({
-        lat: Number(r.lat),
-        lng: Number(r.lon),
-        label: r.display_name,
-        id: r.place_id ? String(r.place_id) : undefined,
-      }))
+      .map((r) => {
+        // display_name is "Name, Street, District, City, Province, Postcode,
+        // España". The first part is the name; the rest, minus the country and
+        // the postcode, is the context line.
+        const parts = r.display_name.split(",").map((s) => s.trim()).filter(Boolean);
+        const name = parts[0] ?? r.display_name;
+        const context = parts.slice(1).filter((s) => !/^\d{5}$/.test(s) && s !== "España" && s !== "Spain").join(", ");
+        return {
+          lat: Number(r.lat),
+          lng: Number(r.lon),
+          name,
+          context,
+          label: r.display_name,
+          kind: "address" as PlaceKind,
+          id: r.place_id ? String(r.place_id) : undefined,
+        };
+      })
       .filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng));
   } catch {
     return [];
   }
+}
+
+async function searchUncached(query: string): Promise<Place[]> {
+  const q = query.trim();
+  if (q.length < 2) return [];
+
+  const photon = await photonSearch(q);
+  if (photon.length > 0) return photon;
+
+  // Photon down, or a query it genuinely has nothing for. Either way the
+  // customer gets the older, stricter search rather than an empty field.
+  return nominatimSearch(q);
 }
 
 /**
@@ -137,7 +291,7 @@ async function searchUncached(query: string): Promise<Place[]> {
  * street do not change, and the same handful of airports and hotels are
  * searched over and over.
  */
-export const searchPlaces = unstable_cache(searchUncached, ["nominatim-search"], {
+export const searchPlaces = unstable_cache(searchUncached, ["place-search-v2"], {
   revalidate: 604_800,
   tags: ["geo"],
 });

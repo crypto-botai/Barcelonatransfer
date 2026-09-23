@@ -20,8 +20,9 @@ export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
 
   // Matches the client's own minimum, and stops a stray empty request from
-  // becoming a wildcard search.
-  if (q.length < 3) return NextResponse.json({ results: [] });
+  // becoming a wildcard search. Two, not three: "T1" and "BCN" are both things
+  // a customer types, and both used to return nothing.
+  if (q.length < 2) return NextResponse.json({ results: [] });
   if (q.length > 200) return NextResponse.json({ error: "Query too long" }, { status: 400 });
 
   const results = await searchPlaces(q);
