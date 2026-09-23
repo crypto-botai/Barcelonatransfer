@@ -301,7 +301,11 @@ async function searchUncached(query: string): Promise<Place[]> {
  * street do not change, and the same handful of airports and hotels are
  * searched over and over.
  */
-export const searchPlaces = unstable_cache(searchUncached, ["place-search-v2"], {
+// The suffix is part of the cache key, so it has to change whenever the shape
+// or the ranking of a result changes. A week-long cache otherwise keeps
+// serving the previous version of this function's answers to everyone: the
+// limit went from eight to five and the old eight-row answers stayed up.
+export const searchPlaces = unstable_cache(searchUncached, ["place-search-v3-limit5"], {
   revalidate: 604_800,
   tags: ["geo"],
 });

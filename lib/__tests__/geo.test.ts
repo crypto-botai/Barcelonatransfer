@@ -163,7 +163,11 @@ describe("searchPlaces", () => {
    * makes the first one wrong.
    */
   it("asks for five results, because more makes the ranking worse", () => {
-    expect(readFileSync(join(__dirname, "..", "geo", "index.ts"), "utf-8")).toContain("const PHOTON_LIMIT = 5;");
+    const src = readFileSync(join(__dirname, "..", "geo", "index.ts"), "utf-8");
+    expect(src).toContain("const PHOTON_LIMIT = 5;");
+    // The cache runs a week, so the key has to name the limit: changing one
+    // without the other left the old eight-row answers being served live.
+    expect(src).toMatch(/unstable_cache\(searchUncached, \["place-search-[^"]*limit5"\]/);
   });
 
   it("splits a result into the two lines the picker shows", async () => {
