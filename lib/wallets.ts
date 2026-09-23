@@ -51,11 +51,13 @@ export const GOOGLE_PAY: { merchantId: string; merchantName: string } | null =
 /**
  * Apple has verified the domain and SumUp has the wallet enabled.
  *
- * Set NEXT_PUBLIC_APPLE_PAY_READY=true once www.elitebcn.info shows as
- * verified in the SumUp dashboard. Until then the button simply does not
- * appear, and saying otherwise would be a promise the checkout cannot keep.
+ * The domain association file was served, SumUp showed www.elitebcn.info as
+ * verified, and the button rendered on a real iPhone checkout (confirmed by
+ * the owner, 23 Sep 2026). Defaults on from then; set
+ * NEXT_PUBLIC_APPLE_PAY_READY=false to take the sentence back off if Apple
+ * or SumUp ever drops the domain.
  */
-export const APPLE_PAY_READY = process.env.NEXT_PUBLIC_APPLE_PAY_READY === "true";
+export const APPLE_PAY_READY = (process.env.NEXT_PUBLIC_APPLE_PAY_READY ?? "true") === "true";
 
 /**
  * Google Pay has been seen rendering on a real checkout.
