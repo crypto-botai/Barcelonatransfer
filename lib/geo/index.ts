@@ -200,10 +200,20 @@ function photonPlace(f: PhotonFeature): Place | null {
   };
 }
 
+/**
+ * Five, and not more, because Photon re-ranks as this grows.
+ *
+ * Asking for eight moves a parish church in Sabadell above the Sagrada
+ * Família for "sagrada famili" — reproducibly, the flip happening between
+ * five and eight. Whatever it is doing inside, a longer list is a worse one
+ * here, and five rows is as many as anyone reads in a dropdown anyway.
+ */
+const PHOTON_LIMIT = 5;
+
 async function photonSearch(q: string): Promise<Place[]> {
   try {
     const url =
-      `${PHOTON}/api/?q=${encodeURIComponent(q)}&limit=8&lang=en` +
+      `${PHOTON}/api/?q=${encodeURIComponent(q)}&limit=${PHOTON_LIMIT}&lang=en` +
       // Rank by distance from Barcelona, then clip to where we actually drive.
       `&lat=${HOME.lat}&lon=${HOME.lng}&bbox=${SERVICE_BBOX}`;
 

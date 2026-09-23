@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 // unstable_cache needs a Next.js request context that does not exist under
 // vitest. Caching is Next's concern, not this module's -- these tests are about
@@ -152,6 +154,16 @@ describe("searchPlaces", () => {
     // Iberia, Andorra and southern France; short of Italy, so "andora" is the
     // principality rather than the town in Liguria.
     expect(url).toContain("bbox=-9.8,35.5,4.6,44.5");
+  });
+
+  /**
+   * Photon re-ranks as the limit grows: at eight, a parish church in Sabadell
+   * outranks the Sagrada Família for "sagrada famili", reproducibly, with the
+   * flip somewhere between five and eight. Raising this to show more choices
+   * makes the first one wrong.
+   */
+  it("asks for five results, because more makes the ranking worse", () => {
+    expect(readFileSync(join(__dirname, "..", "geo", "index.ts"), "utf-8")).toContain("const PHOTON_LIMIT = 5;");
   });
 
   it("splits a result into the two lines the picker shows", async () => {
