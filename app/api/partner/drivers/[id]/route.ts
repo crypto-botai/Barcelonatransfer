@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requirePartner } from "@/lib/partner";
 import { sendDriverEmailChanged } from "@/lib/resend";
+import { isGeneratedLogin } from "@/lib/driver-email";
 
 const schema = z.object({
   name:          z.string().min(2).optional(),
@@ -22,6 +23,14 @@ const schema = z.object({
   vehiclePlate:  z.string().min(2).optional(),
   vehicleClass:  z.enum(["ECONOMY", "BUSINESS", "LUXURY", "ELECTRIC_VIP", "MINIVAN", "LUXURY_MINIVAN", "MINIBUS"]).optional(),
   vehicleColor:  z.string().optional(),
+  /**
+   * Send this driver's mail to the company instead of to their own address.
+   *
+   * Separate from the login on purpose: any number of drivers may share one
+   * inbox, but each still signs in as themselves, so the company can still
+   * dispatch to one of them and see where that one is.
+   */
+  mailToCompany: z.boolean().optional(),
 });
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -46,6 +55,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (taken) return NextResponse.json({ error: "That email already has an account" }, { status: 409 });
   }
 
+  const mailToCompany = d.mailToCompany;
+
   await prisma.$transaction([
     prisma.driver.update({
       where: { id },
@@ -53,6 +64,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ...(d.status ? { status: d.status } : {}),
         ...(d.licenseNumber !== undefined ? { licenseNumber: d.licenseNumber } : {}),
         ...(d.phone ? { whatsappNumber: d.phone } : {}),
+        ...(mailToCompany === undefined ? {} : { notifyEmail: mailToCompany ? p.email.trim().toLowerCase() : null }),
       },
     }),
     prisma.user.update({
@@ -80,11 +92,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (emailChanged) {
     // Sent to both: the new address is where they sign in from now on, and
     // the old one is the only place a driver who did not ask for this will
-    // notice that it happened.
-    await Promise.allSettled([
-      sendDriverEmailChanged({ to: email!, name: d.name ?? driver.user.name ?? "there", newEmail: email!, company: p.name }),
-      sendDriverEmailChanged({ to: driver.user.email, name: d.name ?? driver.user.name ?? "there", newEmail: email!, company: p.name }),
-    ]);
+    // notice that it happened. A generated sign-in address is skipped, since
+    // it is not a mailbox and nothing sent there is ever read.
+    const who = d.name ?? driver.user.name ?? "there";
+    await Promise.allSettled(
+      [email!, driver.user.email]
+        .filter((to) => !isGeneratedLogin(to))
+        .map((to) => sendDriverEmailChanged({ to, name: who, newEmail: email!, company: p.name })),
+    );
   }
 
   return NextResponse.json({ ok: true, emailChanged });

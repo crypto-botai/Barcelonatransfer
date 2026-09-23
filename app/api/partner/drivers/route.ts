@@ -10,7 +10,7 @@ export async function GET() {
     where: { partnerId: p.id },
     orderBy: { createdAt: "asc" },
     select: {
-      id: true, status: true, licenseNumber: true, rating: true, totalRides: true, createdAt: true,
+      id: true, status: true, licenseNumber: true, rating: true, totalRides: true, createdAt: true, notifyEmail: true,
       user: { select: { name: true, email: true, phone: true } },
       vehicles: { take: 1, select: { id: true, make: true, model: true, licensePlate: true, class: true, color: true } },
       _count: { select: { bookings: { where: { isDeleted: false, status: { in: ["DRIVER_ASSIGNED", "IN_PROGRESS"] } } } } },
@@ -21,7 +21,13 @@ export async function GET() {
 
 const schema = z.object({
   name:          z.string().min(2),
-  email:         z.string().email(),
+  /**
+   * Optional. A company whose driver has no work email leaves it out; a
+   * sign-in address is made for them and their post goes to the company.
+   */
+  email:         z.string().email().or(z.literal("")).optional(),
+  /** Send this driver's mail to the company address rather than to them. */
+  mailToCompany: z.boolean().optional(),
   phone:         z.string().min(6),
   licenseNumber: z.string().optional(),
   vehicleMake:   z.string().min(1),
@@ -31,7 +37,7 @@ const schema = z.object({
   vehicleColor:  z.string().optional(),
 });
 
-/** Adding a driver creates their portal login and emails them the password. */
+/** Adding a driver creates their portal login and emails the password to whoever reads their post. */
 export async function POST(req: NextRequest) {
   const p = await requirePartner();
   if (!p) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

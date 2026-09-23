@@ -8,6 +8,7 @@ import { resolveBookingStatus } from "@/lib/booking-status";
 import { sendDriverAssignedEmail, sendBookingCancelledEmail, sendDriverBookingDetailsEmail } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
 import { formatPickupDateTime } from "@/lib/datetime";
+import { driverMailTo } from "@/lib/driver-email";
 
 export async function GET(
   req: NextRequest,
@@ -151,6 +152,8 @@ export async function PATCH(
       where: { id }, data,
       include: {
         driver: {
+          // An include returns every scalar on Driver, notifyEmail among them,
+          // which is what decides where a fleet driver's post goes.
           include: {
             user: { select: { name: true, email: true, phone: true } },
             vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } },
@@ -164,7 +167,7 @@ export async function PATCH(
     if (isNewDriverAssignment && booking.driver) {
       const driverName  = booking.driver.user.name ?? "Your Driver";
       const driverPhone = booking.driver.user.phone ?? booking.driver.whatsappNumber ?? "";
-      const driverEmail = booking.driver.user.email;
+      const driverEmail = driverMailTo(booking.driver);
       const vehicle     = booking.driver.vehicles[0];
 
       // Customer: driver assigned notification

@@ -7,6 +7,8 @@ import { Empty, PageTitle, Sheet, Skeleton, field, ghost, label, primary, vehicl
 
 type Driver = {
   id: string; status: string; licenseNumber: string | null; totalRides: number; rating: number; createdAt: string;
+  /** Set when this driver's post goes to the company rather than to them. */
+  notifyEmail: string | null;
   user: { name: string | null; email: string; phone: string | null };
   vehicles: { id: string; make: string; model: string; licensePlate: string; class: string; color: string }[];
   _count: { bookings: number };
@@ -14,16 +16,34 @@ type Driver = {
 
 const CLASSES = ["ECONOMY", "BUSINESS", "LUXURY", "ELECTRIC_VIP", "MINIVAN", "LUXURY_MINIVAN", "MINIBUS"];
 
+/**
+ * A sign-in address made for a driver with no inbox of their own.
+ *
+ * Nothing is delivered to it, so the panel never offers it as somewhere to
+ * write and never shows it where a real address belongs.
+ */
+const DRIVER_LOGIN_DOMAIN = "drivers.elitebcn.info";
+const isGeneratedLogin = (e: string) => {
+  // The company is a subdomain of it, so the host is never the bare domain.
+  const host = e.trim().toLowerCase().split("@")[1];
+  return !!host && (host === DRIVER_LOGIN_DOMAIN || host.endsWith(`.${DRIVER_LOGIN_DOMAIN}`));
+};
+
 export default function PartnerDriversPage() {
   const [drivers, setDrivers] = useState<Driver[] | null>(null);
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<Driver | null>(null);
+  /** The company's own address, offered as the one inbox for every driver. */
+  const [companyEmail, setCompanyEmail] = useState("");
 
   const load = useCallback(async () => {
     const r = await fetch("/api/partner/drivers");
     if (r.ok) setDrivers(await r.json());
   }, []);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    fetch("/api/partner/me").then((r) => (r.ok ? r.json() : null)).then((p) => { if (p?.email) setCompanyEmail(p.email); }).catch(() => {});
+  }, []);
 
   async function setStatus(d: Driver, status: "APPROVED" | "SUSPENDED") {
     const r = await fetch(`/api/partner/drivers/${d.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
@@ -54,7 +74,10 @@ export default function PartnerDriversPage() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-white">{d.user.name} {suspended && <span className="ml-2 text-xs text-red-300">Suspended</span>}</p>
-                  <p className="truncate text-xs text-dark-400">{d.user.phone} · {d.user.email}</p>
+                  <p className="truncate text-xs text-dark-400">
+                    {d.user.phone} · {isGeneratedLogin(d.user.email) ? <span className="text-dark-500">signs in as {d.user.email}</span> : d.user.email}
+                  </p>
+                  {d.notifyEmail && <p className="truncate text-xs text-gold-400/80">Mail goes to {d.notifyEmail}</p>}
                   <p className="text-xs text-dark-500">{v ? `${v.make} ${v.model} · ${v.licensePlate} · ${vehicleLabel(v.class)}` : "No vehicle on file"}</p>
                 </div>
                 <div className="text-right text-xs text-dark-400">
@@ -73,42 +96,53 @@ export default function PartnerDriversPage() {
         </ul>
       )}
 
-      <DriverSheet open={adding} driver={null} onClose={() => setAdding(false)} onDone={() => { setAdding(false); load(); }} />
-      <DriverSheet open={Boolean(editing)} driver={editing} onClose={() => setEditing(null)} onDone={() => { setEditing(null); load(); }} />
+      <DriverSheet open={adding} driver={null} companyEmail={companyEmail} onClose={() => setAdding(false)} onDone={() => { setAdding(false); load(); }} />
+      <DriverSheet open={Boolean(editing)} driver={editing} companyEmail={companyEmail} onClose={() => setEditing(null)} onDone={() => { setEditing(null); load(); }} />
     </div>
   );
 }
 
-function DriverSheet({ open, driver, onClose, onDone }: { open: boolean; driver: Driver | null; onClose: () => void; onDone: () => void }) {
+function DriverSheet({ open, driver, companyEmail, onClose, onDone }: { open: boolean; driver: Driver | null; companyEmail: string; onClose: () => void; onDone: () => void }) {
   const blank = { name: "", email: "", phone: "", licenseNumber: "", vehicleMake: "", vehicleModel: "", vehiclePlate: "", vehicleClass: "LUXURY_MINIVAN", vehicleColor: "Black" };
   const [f, setF] = useState(blank);
+  const [mailToCompany, setMailToCompany] = useState(false);
   const [busy, setBusy] = useState(false);
   const edit = Boolean(driver);
+  // A generated address is not a mailbox, so it is never shown in the field a
+  // company would read as "where we write to this driver".
+  const generated = edit && isGeneratedLogin(driver!.user.email);
 
   useEffect(() => {
     if (!open) return;
     if (driver) {
       const v = driver.vehicles[0];
-      setF({ name: driver.user.name ?? "", email: driver.user.email, phone: driver.user.phone ?? "", licenseNumber: driver.licenseNumber ?? "", vehicleMake: v?.make ?? "", vehicleModel: v?.model ?? "", vehiclePlate: v?.licensePlate ?? "", vehicleClass: v?.class ?? "LUXURY_MINIVAN", vehicleColor: v?.color ?? "Black" });
-    } else setF(blank);
+      setF({ name: driver.user.name ?? "", email: isGeneratedLogin(driver.user.email) ? "" : driver.user.email, phone: driver.user.phone ?? "", licenseNumber: driver.licenseNumber ?? "", vehicleMake: v?.make ?? "", vehicleModel: v?.model ?? "", vehiclePlate: v?.licensePlate ?? "", vehicleClass: v?.class ?? "LUXURY_MINIVAN", vehicleColor: v?.color ?? "Black" });
+      setMailToCompany(Boolean(driver.notifyEmail));
+    } else { setF(blank); setMailToCompany(false); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, driver]);
 
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
-  const ready = f.name.trim().length >= 2 && /\S+@\S+\.\S+/.test(f.email) && f.phone.trim().length >= 6 && f.vehicleMake && f.vehicleModel && f.vehiclePlate.trim().length >= 2;
+  const emailOk = /\S+@\S+\.\S+/.test(f.email);
+  // An email is only needed when this driver is to have one of their own: a
+  // company with an office inbox and drivers who never read email should not
+  // have to invent an address to get past this form.
+  const emailReady = mailToCompany || generated ? (!f.email.trim() || emailOk) : emailOk;
+  const ready = f.name.trim().length >= 2 && emailReady && f.phone.trim().length >= 6 && f.vehicleMake && f.vehicleModel && f.vehiclePlate.trim().length >= 2;
 
   async function submit() {
     setBusy(true);
     try {
       const r = edit
-        ? await fetch(`/api/partner/drivers/${driver!.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: f.name, email: f.email, phone: f.phone, licenseNumber: f.licenseNumber || null, vehicleMake: f.vehicleMake, vehicleModel: f.vehicleModel, vehiclePlate: f.vehiclePlate, vehicleClass: f.vehicleClass, vehicleColor: f.vehicleColor }) })
-        : await fetch("/api/partner/drivers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(f) });
+        ? await fetch(`/api/partner/drivers/${driver!.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: f.name, ...(f.email.trim() ? { email: f.email } : {}), phone: f.phone, licenseNumber: f.licenseNumber || null, mailToCompany, vehicleMake: f.vehicleMake, vehicleModel: f.vehicleModel, vehiclePlate: f.vehiclePlate, vehicleClass: f.vehicleClass, vehicleColor: f.vehicleColor }) })
+        : await fetch("/api/partner/drivers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...f, mailToCompany }) });
       const body = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(body.error ?? "Failed");
+      const mailTo = mailToCompany || !f.email.trim() ? companyEmail || "your company address" : f.email;
       toast.success(
         edit
           ? body.emailChanged ? `Driver updated. They now sign in as ${f.email} and both addresses have been told.` : "Driver updated"
-          : `Driver added. Sign-in details sent to ${f.email}.`,
+          : `Driver added. Sign-in details sent to ${mailTo}.`,
       );
       onDone();
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); } finally { setBusy(false); }
@@ -121,12 +155,39 @@ function DriverSheet({ open, driver, onClose, onDone }: { open: boolean; driver:
           <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-gold-400"><UserRound size={13} /> Driver</p>
           <div><label className={label} htmlFor="d-name">Full name</label><input id="d-name" className={field} value={f.name} onChange={set("name")} /></div>
           <div>
-            <label className={label} htmlFor="d-email">Email {edit && <span className="normal-case tracking-normal text-dark-500">(this is their login)</span>}</label>
-            <input id="d-email" type="email" className={field} value={f.email} onChange={set("email")} />
-            {edit && f.email.trim().toLowerCase() !== (driver?.user.email ?? "").toLowerCase() && (
+            <label className={label} htmlFor="d-email">
+              Email {edit && !generated && <span className="normal-case tracking-normal text-dark-500">(this is their login)</span>}
+              {!edit && <span className="normal-case tracking-normal text-dark-500">(optional)</span>}
+            </label>
+            <input id="d-email" type="email" className={field} value={f.email} onChange={set("email")} placeholder={generated ? "No email. Add one to give them their own login." : "driver@example.com"} />
+            {generated && !f.email.trim() && (
+              <p className="mt-1.5 text-[11px] leading-relaxed text-dark-400">
+                This driver has no email. They sign in as <span className="text-dark-200">{driver!.user.email}</span>, which is a name to sign in with, not a mailbox.
+              </p>
+            )}
+            {edit && !generated && f.email.trim().toLowerCase() !== (driver?.user.email ?? "").toLowerCase() && (
               <p className="mt-1.5 text-[11px] leading-relaxed text-gold-400">Changing this changes how they sign in. Their password stays the same, and we write to both the old and the new address.</p>
             )}
           </div>
+
+          {/*
+            One inbox for a whole fleet.
+
+            The sign-in address has to be unique because it is what identifies
+            the driver on the road: who a job went to, whose car is on the map,
+            whose earnings those are. Where the post lands does not, so any
+            number of drivers can share the company's inbox.
+          */}
+          <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-3">
+            <input type="checkbox" checked={mailToCompany} onChange={(e) => setMailToCompany(e.target.checked)} className="mt-0.5 accent-[#c9a84c]" />
+            <span className="min-w-0">
+              <span className="block text-sm text-white">Send this driver&apos;s mail to us</span>
+              <span className="mt-0.5 block text-[11px] leading-relaxed text-dark-400">
+                Sign-in details, job sheets and flight alerts go to {companyEmail ? <span className="text-dark-200">{companyEmail}</span> : "your company address"} instead of to the driver.
+                They still sign in as themselves, so you can dispatch to them and see where they are. Use this for a driver with no work email: leave the box above empty and we will make them a sign-in name.
+              </span>
+            </span>
+          </label>
           <div className="grid grid-cols-2 gap-3">
             <div><label className={label} htmlFor="d-phone">Phone</label><input id="d-phone" className={field} value={f.phone} onChange={set("phone")} placeholder="+34 6…" /></div>
             <div><label className={label} htmlFor="d-lic">Licence no.</label><input id="d-lic" className={field} value={f.licenseNumber} onChange={set("licenseNumber")} /></div>

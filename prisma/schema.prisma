@@ -158,6 +158,15 @@ model Driver {
   // office. Such a driver uses the same portal; the company dispatches to them.
   partnerId         String?
 
+  /// Where this driver's mail goes, when it is not their own login address.
+  ///
+  /// A fleet company often runs drivers who have no work email, or wants every
+  /// job sheet and password in one office inbox it controls. The login has to
+  /// stay unique because it is what they authenticate with, so the two are
+  /// separated: the login identifies the driver, this is where the post lands.
+  /// Null means the login address, which is the case for every office driver.
+  notifyEmail       String?
+
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   partner     FleetPartner? @relation(fields: [partnerId], references: [id])
   vehicles    Vehicle[]

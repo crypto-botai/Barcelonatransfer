@@ -11,6 +11,7 @@ import {
   sendReviewRequestEmail,
 } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
+import { driverMailTo, generateDriverLogin, DRIVER_LOGIN_DOMAIN } from "@/lib/driver-email";
 
 /**
  * Fleet partner companies.
@@ -131,13 +132,46 @@ const CLASS_CAPACITY: Record<string, { max: number; luggage: number }> = {
   MINIBUS:        { max: 16, luggage: 12 },
 };
 
+/**
+ * Adding a driver to a fleet.
+ *
+ * The email is optional. A company whose drivers have no work email, or that
+ * wants every job sheet and password in one inbox it controls, leaves it out:
+ * a sign-in address is generated for the driver, and the post goes to the
+ * company. A driver who does have their own email keeps it, and it is still
+ * their login, exactly as before.
+ */
 export async function createPartnerDriver(partnerId: string, input: {
-  name: string; email: string; phone: string; licenseNumber?: string;
+  name: string; email?: string; phone: string; licenseNumber?: string;
   vehicleMake: string; vehicleModel: string; vehiclePlate: string; vehicleClass: string; vehicleColor?: string;
+  /** Send this driver's mail to the company address rather than to them. */
+  mailToCompany?: boolean;
 }) {
-  const email = input.email.trim().toLowerCase();
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) throw new Error("That email already has an account");
+  const partner = await prisma.fleetPartner.findUnique({ where: { id: partnerId }, select: { name: true, email: true } });
+  if (!partner) throw new Error("Company not found");
+
+  const given = input.email?.trim().toLowerCase() ?? "";
+  let email: string;
+  let notifyEmail: string | null = null;
+
+  if (given) {
+    const existing = await prisma.user.findUnique({ where: { email: given } });
+    if (existing) {
+      throw new Error("That email already signs in as somebody else. Leave the email empty and we will send this driver's mail to your company address instead.");
+    }
+    email = given;
+    if (input.mailToCompany) notifyEmail = partner.email.trim().toLowerCase();
+  } else {
+    // No email of their own: a sign-in address is made for them and every
+    // message about their work goes to the company that dispatches them.
+    const clash = await prisma.user.findMany({
+      where: { email: { endsWith: `.${DRIVER_LOGIN_DOMAIN}` } },
+      select: { email: true },
+    });
+    const takenSet = new Set(clash.map((u) => u.email));
+    email = generateDriverLogin(input.name, partner.name, (e) => takenSet.has(e));
+    notifyEmail = partner.email.trim().toLowerCase();
+  }
 
   const password = temporaryPassword();
   const passwordHash = await bcrypt.hash(password, 12);
@@ -155,6 +189,7 @@ export async function createPartnerDriver(partnerId: string, input: {
         create: {
           status: "APPROVED",
           partnerId,
+          notifyEmail,
           whatsappNumber: input.phone.trim(),
           licenseNumber: input.licenseNumber?.trim() || null,
           vehicles: {
@@ -176,7 +211,9 @@ export async function createPartnerDriver(partnerId: string, input: {
     include: { driver: { include: { vehicles: true } } },
   });
 
-  await sendTemporaryPassword({ to: email, name: input.name, password, portal: "driver" })
+  // To the company when the driver has no inbox of their own: otherwise the
+  // password is sent to an address nobody will ever open.
+  await sendTemporaryPassword({ to: notifyEmail ?? email, name: input.name, password, portal: "driver", signInAs: notifyEmail ? email : undefined })
     .catch((e) => console.error("[partner] driver welcome email:", e));
 
   return user.driver!;
@@ -302,9 +339,10 @@ export async function dispatchPartnerJob(partnerId: string, bookingId: string, d
   }
 
   // Driver: the job sheet, with the price the company chose to show them.
-  if (driver.user.email) {
+  // To the company's inbox when that is where this driver's post goes.
+  if (driverMailTo(driver)) {
     sendDriverBookingDetailsEmail({
-      to: driver.user.email,
+      to: driverMailTo(driver),
       driverName,
       confirmationCode: booking.confirmationCode,
       guestName: booking.guestName ?? "Client",
@@ -330,7 +368,7 @@ export async function dispatchPartnerJob(partnerId: string, bookingId: string, d
     dropoffAddress: booking.dropoffAddress,
     pickupDatetime: when,
     driverName,
-    driverEmail: driver.user.email,
+    driverEmail: driverMailTo(driver),
     driverPhone,
     vehicleMake: vehicle?.make ?? "—",
     vehicleModel: vehicle?.model ?? "",

@@ -17,6 +17,7 @@ import { notify } from "@/lib/notifications/service";
 import { notifyAdmin } from "@/lib/whatsapp";
 import { sendFlightDelayEmail, sendDriverFlightDelayEmail } from "@/lib/resend";
 import { lookupFlight, isMaterialDelay, isFlightTrackingEnabled } from "./index";
+import { driverMailTo } from "@/lib/driver-email";
 
 export interface SweepResult {
   enabled: boolean;
@@ -58,6 +59,8 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
         select: {
           userId: true,
           whatsappNumber: true,
+          // A fleet driver's post may go to their company's inbox instead.
+          notifyEmail: true,
           user: { select: { name: true, phone: true, email: true } },
         },
       },
@@ -147,9 +150,9 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
           passenger: b.guestName ?? "Your passenger",
           pickup:    b.pickupAddress,
         },
-        email: b.driver.user.email
+        email: driverMailTo(b.driver)
           ? () => sendDriverFlightDelayEmail({
-              to:               b.driver!.user.email!,
+              to:               driverMailTo(b.driver!),
               driverName:       b.driver!.user.name ?? "there",
               flight:           status.flightNumber,
               when,

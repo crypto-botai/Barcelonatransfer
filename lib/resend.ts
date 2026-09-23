@@ -1074,20 +1074,30 @@ export async function sendNewsletterCampaign({
  * moment they choose their own.
  */
 export async function sendTemporaryPassword({
-  to, name, password, portal,
+  to, name, password, portal, signInAs,
 }: {
   to: string;
   name: string;
   password: string;
   /** Which portal to point them at — drivers, partners and customers land in different places. */
   portal: "driver" | "customer" | "partner";
+  /**
+   * The address these details sign in with, when it is not the one being
+   * written to.
+   *
+   * A fleet driver with no inbox of their own signs in with an address that
+   * receives nothing, and their company gets this email instead. Printing the
+   * address it was sent to would tell the company to hand the driver a login
+   * that does not work.
+   */
+  signInAs?: string;
 }) {
   const firstName   = name.split(" ")[0] || "there";
   const loginUrl    = `${SITE_URL}/auth/login`;
   const portalLabel = portal === "driver" ? "driver portal" : portal === "partner" ? "fleet partner panel" : "account";
 
   const html = emailDocument(
-    credentialsCard({ firstName, email: to, password, portalLabel, loginUrl }),
+    credentialsCard({ firstName, email: signInAs ?? to, password, portalLabel, loginUrl }),
     "Your Elite BCN sign-in details — choose your own password at first sign-in.",
   );
 

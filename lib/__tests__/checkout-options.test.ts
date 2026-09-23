@@ -445,8 +445,11 @@ describe("a fleet company can correct its own drivers", () => {
     expect(api).toContain("That email already has an account");
     expect(api).toContain("...(emailChanged ? { email } : {})");
     // Written to both addresses: the new one is the login, the old one is
-    // where a driver who did not ask for this finds out.
-    expect(api.split("sendDriverEmailChanged(").length - 1).toBe(2);
+    // where a driver who did not ask for this finds out. A generated sign-in
+    // address is dropped first, since nothing sent there is ever read.
+    expect(api).toContain("[email!, driver.user.email]");
+    expect(api).toContain(".filter((to) => !isGeneratedLogin(to))");
+    expect(api).toContain("sendDriverEmailChanged({ to, name: who");
     expect(rd("lib/email/premium.ts")).toContain("export function driverEmailChangedCard(");
   });
 
