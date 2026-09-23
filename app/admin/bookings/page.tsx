@@ -811,6 +811,11 @@ export default function AdminBookingsPage() {
                       <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Date</th>
                       <th className="hidden lg:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Vehicle</th>
                       <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Amount</th>
+                      {/* Who is driving it. The table showed what the driver is
+                          paid and never which driver, so an office looking at
+                          the list could not tell an assigned job from an
+                          unassigned one without opening each one. */}
+                      <th className="hidden md:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Driver</th>
                       <th className="hidden lg:table-cell text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Driver Pay</th>
                       <th className="text-left py-3 px-3 text-xs text-dark-400 uppercase tracking-wider">Status</th>
                       <th className="py-3 px-3" />
@@ -841,6 +846,24 @@ export default function AdminBookingsPage() {
                             {b.paymentStatus === "PAID" ? "Paid" : "Unpaid"}{b.paymentMethod ? ` · ${PAYMENT_METHOD_SHORT[b.paymentMethod]}` : ""}
                           </span>
                         </td>
+                        <td className="hidden md:table-cell py-3 px-3 text-xs whitespace-nowrap">
+                          {b.driver ? (
+                            <>
+                              <p className="text-white">{b.driver.user.name ?? "Unnamed driver"}</p>
+                              <p className="text-dark-500">
+                                {b.partnerId && b.partner?.name
+                                  ? b.partner.name
+                                  : b.driver.vehicles?.[0]
+                                    ? b.driver.vehicles[0].licensePlate
+                                    : b.driver.user.phone ?? ""}
+                              </p>
+                            </>
+                          ) : b.partnerId ? (
+                            <span className="text-sky-300">{b.partner?.name ?? "With a company"}<span className="block text-dark-500">awaiting their driver</span></span>
+                          ) : (
+                            <span className="text-amber-400/80">Not assigned</span>
+                          )}
+                        </td>
                         <td className="hidden lg:table-cell py-3 px-3 text-sm whitespace-nowrap">
                           {b.driverAmount != null
                             ? <span className="text-green-400">{formatCurrency(b.driverAmount)}</span>
@@ -869,7 +892,7 @@ export default function AdminBookingsPage() {
                       </tr>
                     ))}
                     {filtered.length === 0 && (
-                      <tr><td colSpan={10} className="py-10 text-center text-dark-500">No bookings found.</td></tr>
+                      <tr><td colSpan={11} className="py-10 text-center text-dark-500">No bookings found.</td></tr>
                     )}
                   </tbody>
                 </table>

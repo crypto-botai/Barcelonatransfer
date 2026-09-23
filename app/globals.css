@@ -249,6 +249,38 @@
     box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
   }
 
+  /*
+   * The open list of a dark select.
+   *
+   * A select on this site is dark because the page is: translucent white over
+   * a near-black surface, with color:#fff for the text. The closed control is
+   * ours to style, but the list that drops out of it is drawn by the operating
+   * system on its own opaque background, white on Windows and on most Linux
+   * desktops. The options inherit our white text onto it, so the admin driver
+   * assign box was a white panel of white names: readable only by dragging the
+   * cursor down it and reading the highlight.
+   *
+   * Set here rather than as a class on every <option>, because that has to be
+   * remembered at each of the forty-odd selects in the panel and was already
+   * forgotten at most of them.
+   */
+  .input-luxury option,
+  .input-luxury optgroup,
+  select.text-white option,
+  select.text-white optgroup {
+    background-color: #14130f;
+    color: #f4f2ec;
+  }
+  .input-luxury optgroup,
+  select.text-white optgroup {
+    font-style: normal;
+    color: #c9a84c;
+  }
+  .input-luxury option:disabled,
+  select.text-white option:disabled {
+    color: #7c786d;
+  }
+
   /* Step indicator */
   .step-active {
     background: #c9a84c;
