@@ -89,7 +89,7 @@
     "list": {
       "airport": {
         "title": "Transferts Aéroport",
-        "desc": "Accueil personnalisé avec suivi des vols en temps réel. 60 minutes d'attente offertes."
+        "desc": "Suivi des vols en temps réel. 60 minutes d'attente offertes."
       },
       "cruise": {
         "title": "Transferts Port de Croisière",

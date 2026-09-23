@@ -3,7 +3,36 @@ import { logEmail } from "@/lib/marketing";
 import { COMPANY } from "@/lib/company-facts";
 import { GOOGLE_PROFILE } from "@/data/reviews";
 import { notifyAdmin } from "@/lib/whatsapp";
-import { CHECKOUT_POLICY_POINTS } from "@/lib/policies";
+import { CHECKOUT_POLICY_POINTS, arrivalInstructions } from "@/lib/policies";
+import { isAirportLocation } from "@/lib/utils";
+
+/**
+ * The arrival instructions for one booking.
+ *
+ * Which extras were actually bought decides what the customer is told, so it
+ * is read from the stored metadata rather than passed in by each caller and
+ * eventually forgotten by one of them. No coordinates means we cannot know
+ * whether it is an airport, and the airport-specific instructions would be
+ * worse than none, so it falls back to the plain address arrangement.
+ */
+function arrivalFor(o: {
+  pickupLat?: number | null;
+  pickupLng?: number | null;
+  pickupAddress?: string | null;
+  specialRequests?: string | null;
+}): { heading: string; points: string[] } {
+  const ids = parseBookingMeta(o.specialRequests).extras.map((e) => e.id);
+  const byCoords = o.pickupLat != null && o.pickupLng != null
+    ? isAirportLocation(o.pickupLat, o.pickupLng)
+    : false;
+  // Office-made bookings are typed by hand and often have no coordinates.
+  const byText = /airport|aeropuerto|aeroport|el prat|\bbcn\b|\bt1\b|\bt2\b|terminal/i.test(o.pickupAddress ?? "");
+  return arrivalInstructions({
+    airportPickup: byCoords || byText,
+    meetGreet: ids.includes("meet_greet"),
+    nameBoard: ids.includes("name_board"),
+  });
+}
 import {
   emailDocument,
   bookingReceivedCard,
@@ -850,13 +879,15 @@ export async function sendReviewRequestEmail({
 export async function sendPaymentConfirmationEmail({
   to, name, confirmationCode, pickupAddress, dropoffAddress,
   pickupDatetime, vehicleClass, totalAmount, passengers, bookingId,
-  payNow, balanceAmount, protectionFee,
+  payNow, balanceAmount, protectionFee, pickupLat, pickupLng, specialRequests,
 }: {
   to: string; name: string; confirmationCode: string; pickupAddress: string;
   dropoffAddress: string | null; pickupDatetime: string; vehicleClass: string;
   totalAmount: number; passengers: number; bookingId: string; transactionId?: string;
   /** Deposit / protection split. Omitted on an ordinary full payment. */
   payNow?: number; balanceAmount?: number; protectionFee?: number;
+  /** Used to work out where the customer is met, and with what. */
+  pickupLat?: number | null; pickupLng?: number | null; specialRequests?: string | null;
 }) {
   const { date, time } = splitDatetime(pickupDatetime);
   const html = emailDocument(
@@ -874,6 +905,7 @@ export async function sendPaymentConfirmationEmail({
         ? { payNow: payNow ?? totalAmount, balance: balanceAmount ?? 0, protectionFee: protectionFee ?? 0, paid: true }
         : null,
       policy: { points: CHECKOUT_POLICY_POINTS, url: `${SITE_URL}/refund-policy` },
+      arrival: arrivalFor({ pickupLat, pickupLng, pickupAddress, specialRequests }),
     }),
     `Payment received — reference ${confirmationCode}`,
   );

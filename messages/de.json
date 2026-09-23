@@ -89,7 +89,7 @@
     "list": {
       "airport": {
         "title": "Flughafentransfer",
-        "desc": "Persönliche Begrüßung mit Echtzeit-Flugüberwachung. 60 Minuten kostenlose Wartezeit."
+        "desc": "Echtzeit-Flugüberwachung. 60 Minuten kostenlose Wartezeit."
       },
       "cruise": {
         "title": "Kreuzfahrttransfer",

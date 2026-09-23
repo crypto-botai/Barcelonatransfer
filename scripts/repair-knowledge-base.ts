@@ -60,7 +60,7 @@ const REWRITES: { match: string; answer: string }[] = [
     answer:
       "Yes, this is our most common journey — Barcelona Airport, Terminal 1 or Terminal 2, to any city address. " +
       "The price is fixed per vehicle with no surge pricing, and the current figures are in the live pricing " +
-      "list. Meet & greet in arrivals and 60 minutes of free waiting from landing are included.",
+      "list. 60 minutes of free waiting from landing is included; meet & greet in arrivals with a name board is an optional €5 extra.",
   },
   {
     match: "price to Tarragona",

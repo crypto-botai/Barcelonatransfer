@@ -158,6 +158,27 @@ function splitPanel(o?: PaymentSplit | null): string {
  * repeated in their confirmation so the email and the page cannot differ.
  * Text comes from lib/policies.ts.
  */
+/**
+ * Where to go and what to do on arrival.
+ *
+ * Set apart from the policy panel below it, and above it in the email,
+ * because it is the part a customer opens the email at the airport to find.
+ */
+function arrivalPanel(o?: { heading: string; points: string[] } | null): string {
+  if (!o || !o.points.length) return "";
+  const rows = o.points.map((p) => `<tr><td style="padding:0 0 10px 0;vertical-align:top;"><span style="color:${GOLD};padding-right:8px;">&bull;</span></td><td style="padding:0 0 10px 0;font-family:${SANS};font-size:13px;line-height:20px;color:${TEXT};">${esc(p)}</td></tr>`).join("");
+  return `
+    ${sectionSpacer(18)}
+    <tr><td style="padding:0 44px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
+        <tr><td style="padding:22px 26px;">
+          <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};padding-bottom:12px;">${esc(o.heading)}</div>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${rows}</table>
+        </td></tr>
+      </table>
+    </td></tr>`;
+}
+
 function policyPanel(points: string[], policyUrl: string): string {
   if (!points.length) return "";
   const rows = points.map((p) => `<tr><td style="padding:0 0 10px 0;vertical-align:top;"><span style="color:${GOLD};padding-right:8px;">&bull;</span></td><td style="padding:0 0 10px 0;font-family:${SANS};font-size:13px;line-height:20px;color:${TEXT};">${esc(p)}</td></tr>`).join("");
@@ -269,6 +290,8 @@ export function bookingReceivedCard(o: {
   split?: PaymentSplit | null;
   /** The checkout policy lines, repeated here. */
   policy?: { points: string[]; url: string } | null;
+  /** Where to go on the day. */
+  arrival?: { heading: string; points: string[] } | null;
   /** Add-to-calendar links: Google, and an .ics for Apple and Outlook. */
   calendar?: { google: string; ics: string };
   /** The reverse journey, pre-filled, offered when this is a one-way booking. */
@@ -332,6 +355,7 @@ export function bookingReceivedCard(o: {
       o.payment?.paid ? "paid, thank you" : "excl. VAT &amp; tolls",
     )}</td></tr>
     ${splitPanel(o.split)}
+    ${arrivalPanel(o.arrival)}
     ${o.policy ? policyPanel(o.policy.points, o.policy.url) : ""}
 
     ${o.payment ? `
@@ -625,6 +649,8 @@ export function paymentReceiptCard(o: {
   split?: PaymentSplit | null;
   /** The checkout policy lines, repeated here. */
   policy?: { points: string[]; url: string } | null;
+  /** Where to go on the day; the part they open this email at the airport for. */
+  arrival?: { heading: string; points: string[] } | null;
 }): string {
   const deposit = !!o.split && o.split.balance > 0;
   return card(`
@@ -639,6 +665,7 @@ export function paymentReceiptCard(o: {
     ${sectionSpacer(30)}
     <tr><td style="padding:0 44px;">${amountBar(deposit ? "Deposit Paid" : "Amount Paid", deposit ? o.split!.payNow : o.totalAmount, deposit ? `of &euro;${o.totalAmount.toFixed(2)} in total` : undefined)}</td></tr>
     ${splitPanel(o.split)}
+    ${arrivalPanel(o.arrival)}
     ${o.policy ? policyPanel(o.policy.points, o.policy.url) : ""}
     ${sectionSpacer(12)}
 

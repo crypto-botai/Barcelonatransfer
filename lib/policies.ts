@@ -99,6 +99,66 @@ export const POLICY_SECTIONS: PolicySection[] = [
   },
 ];
 
+/**
+ * What happens when the customer arrives, for their confirmation email.
+ *
+ * This is the one thing they need on the day and the one thing the emails
+ * never said. Someone who did not buy meet and greet was told nothing about
+ * where to go, and would look inside the arrivals hall for a chauffeur who
+ * is standing, correctly, outside it. Someone who did buy it was not told
+ * that the chauffeur waits outside until messaged, and that it takes them
+ * ten minutes to walk in.
+ *
+ * Only an airport pickup gets the terminal detail. Anywhere else the
+ * arrangement is simply that the car comes to the address.
+ */
+export function arrivalInstructions(o: {
+  airportPickup: boolean;
+  meetGreet: boolean;
+  nameBoard: boolean;
+}): { heading: string; points: string[] } {
+  if (!o.airportPickup) {
+    return {
+      heading: "On the day",
+      points: [
+        "Your chauffeur arrives at the pickup address at the booked time and calls you when they are outside.",
+        "Fifteen minutes of waiting is included at any address that is not an airport.",
+        "You get your chauffeur's name, phone number and vehicle as soon as they are assigned, and can follow the car on a live map from the link in this email.",
+      ],
+    };
+  }
+
+  const board = o.nameBoard || o.meetGreet;
+
+  if (o.meetGreet) {
+    return {
+      heading: "Meeting your chauffeur at the airport",
+      points: [
+        "Your chauffeur follows your flight and waits outside the terminal. Nothing is charged for that wait, however late you land.",
+        'When you reach baggage reclaim, message your chauffeur: "please come to the meeting point". That message is what starts them walking in.',
+        "Give them ten minutes from that message. They are coming in on foot from the car park.",
+        "Terminal 1 and Terminal 2B: the meeting point is inside the arrivals hall, by the Como restaurant. Terminal 2A: your chauffeur waits directly in front of the arrivals door.",
+        board
+          ? "They will be holding a board with your name on it, and will help with your bags to the car."
+          : "They will help with your bags to the car.",
+        "If you are in the arrivals hall and they have not appeared within those ten minutes, reply to this email and we refund the meet and greet fee.",
+      ],
+    };
+  }
+
+  return {
+    heading: "Where your chauffeur will be waiting",
+    points: [
+      "Your chauffeur waits at the designated meeting point just outside your terminal, next to the taxi rank where reserved VTC cars are allowed to park. They are not inside the arrivals hall.",
+      "They track your flight and call you shortly after you land. Sixty minutes of waiting from your actual landing time is included.",
+      "Come out through arrivals and follow the signs for taxis. Your chauffeur will be there with the car.",
+      board
+        ? "You have added a name board, so your chauffeur will be holding a board with your name at that meeting point."
+        : "Would you rather be met inside the arrivals hall, with your name on a board and help with your bags from baggage reclaim? Reply to this email and we will add meet and greet for 5 euros.",
+    ],
+  };
+}
+
 export function policySection(id: string): PolicySection | undefined {
   return POLICY_SECTIONS.find((s) => s.id === id);
 }

@@ -91,6 +91,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       pickupDatetime:   formatPickupDateTime(booking.pickupDatetime),
       vehicleClass:     booking.vehicleClass,
       totalAmount:      booking.totalAmount,
+      pickupLat:        booking.pickupLat,
+      pickupLng:        booking.pickupLng,
+      specialRequests:  booking.specialRequests,
       passengers:       booking.passengers,
       bookingId:        booking.id,
     }).catch((e) => console.error("[resend] mark paid receipt:", e));

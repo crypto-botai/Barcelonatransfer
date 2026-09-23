@@ -277,8 +277,8 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
                 },
                 {
                   icon: Clock,
-                  title: "Meet & greet in arrivals",
-                  body: "Your driver waits in the BCN Airport arrivals hall with your name on a board. 60 minutes free waiting from your actual flight landing.",
+                  title: "Where your driver waits",
+                  body: "At the designated meeting point outside the terminal, next to the taxi rank where reserved VTC cars may park. 60 minutes of free waiting from your actual landing time. Meet & greet inside the arrivals hall, with your name on a board, is a €5 extra added when you book.",
                 },
                 {
                   icon: Star,

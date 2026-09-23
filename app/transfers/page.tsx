@@ -145,7 +145,7 @@ const DESTINATIONS = [
     tagline: "World Trade Centre & Moll Adossat terminals",
     duration: "20 min",
     distance: "10 km",
-    description: "Meet-and-greet transfers to all of Barcelona's cruise terminals. We track your vessel arrival and wait for free.",
+    description: "Private transfers to all of Barcelona's cruise terminals. We track your vessel arrival and wait for free.",
     highlights: ["World Trade Centre terminal", "Moll Adossat (T-A to T-D)", "Vessel tracking", "60 min free wait"],
   },
   {

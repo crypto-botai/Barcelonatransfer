@@ -74,6 +74,11 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
         pickupDatetime:   formatPickupDateTime(updated.pickupDatetime),
         vehicleClass:     updated.vehicleClass,
         totalAmount:      updated.totalAmount,
+        // Decides whether they are told about the airport meeting point, and
+        // whether a chauffeur will be holding a board with their name.
+        pickupLat:        updated.pickupLat,
+        pickupLng:        updated.pickupLng,
+        specialRequests:  updated.specialRequests,
         payNow:           paidOnline(updated),
         balanceAmount:    updated.balanceAmount ?? 0,
         protectionFee:    updated.protectionFee ?? 0,

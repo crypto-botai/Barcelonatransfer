@@ -89,7 +89,7 @@
     "list": {
       "airport": {
         "title": "Transfers al Aeropuerto",
-        "desc": "Recepción personalizada con seguimiento de vuelos en tiempo real. 60 minutos de espera incluidos."
+        "desc": "Seguimiento de vuelos en tiempo real. 60 minutos de espera incluidos."
       },
       "cruise": {
         "title": "Transfers al Puerto",

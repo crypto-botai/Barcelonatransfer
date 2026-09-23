@@ -89,7 +89,7 @@
     "list": {
       "airport": {
         "title": "Transfer Aeroporto",
-        "desc": "Accoglienza personalizzata con monitoraggio voli in tempo reale. 60 minuti di attesa gratuita."
+        "desc": "Monitoraggio voli in tempo reale. 60 minuti di attesa gratuita."
       },
       "cruise": {
         "title": "Transfer Porto Crociere",

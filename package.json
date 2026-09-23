@@ -14,7 +14,8 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "npx tsx prisma/seed.ts"
+    "db:seed": "npx tsx prisma/seed.ts",
+    "audit:claims": "node scripts/audit-extra-claims.mjs"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
