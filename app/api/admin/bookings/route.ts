@@ -88,6 +88,23 @@ const createSchema = z.object({
   notes:           z.string().optional(),
   /** Off to record a booking silently, e.g. one already confirmed on WhatsApp. */
   sendEmail:       z.boolean().default(true),
+  /**
+   * An unpaid website booking this one is finishing off.
+   *
+   * The customer already has a row, with a confirmation code they may have
+   * seen on screen and in the recovery email. Creating a second row would
+   * leave two bookings for one journey, the chase list would keep emailing
+   * the dead one, and the code the customer was quoted would belong to
+   * neither. So the existing row is completed in place instead.
+   */
+  fromBookingId:   z.string().optional(),
+  /**
+   * The abandoned-cart session this was typed up from.
+   *
+   * Only used to close the lead once the booking exists, so the office does
+   * not keep chasing someone who has already travelled.
+   */
+  fromSessionId:   z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -103,35 +120,62 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid date or time" }, { status: 422 });
     }
 
-    const booking = await withUniqueBookingCode((confirmationCode) => prisma.booking.create({
-      data: {
-        confirmationCode,
-        guestName:       body.guestName,
-        guestEmail:      body.guestEmail,
-        guestPhone:      body.guestPhone,
-        pickupAddress:   body.pickupAddress,
-        pickupLat:       body.pickupLat,
-        pickupLng:       body.pickupLng,
-        dropoffAddress:  body.dropoffAddress,
-        dropoffLat:      body.dropoffLat,
-        dropoffLng:      body.dropoffLng,
-        pickupDatetime:  pickup,
-        passengers:      body.passengers,
-        luggage:         body.luggage,
-        vehicleClass:    body.vehicleClass as VehicleClass,
-        flightNumber:    body.flightNumber,
-        specialRequests: body.specialRequests,
-        adminNotes:      body.notes,
-        driverAmount:    body.driverAmount,
-        baseFare:        body.totalAmount,
-        totalAmount:     body.totalAmount,
-        status:          "CONFIRMED",
-        paymentStatus:   body.paymentStatus,
-        paymentMethod:   body.paymentMethod as never,
-        paidAt:          body.paymentStatus === "PAID" ? new Date() : null,
-        paidMarkedBy:    body.paymentStatus === "PAID" ? (admin.name ?? admin.id ?? "admin") : null,
-      },
-    }));
+    // Everything below writes the same fields whether the row is new or an
+    // unpaid one being finished off, so the two paths cannot drift apart.
+    const fields = {
+      guestName:       body.guestName,
+      guestEmail:      body.guestEmail,
+      guestPhone:      body.guestPhone,
+      pickupAddress:   body.pickupAddress,
+      pickupLat:       body.pickupLat,
+      pickupLng:       body.pickupLng,
+      dropoffAddress:  body.dropoffAddress,
+      dropoffLat:      body.dropoffLat,
+      dropoffLng:      body.dropoffLng,
+      pickupDatetime:  pickup,
+      passengers:      body.passengers,
+      luggage:         body.luggage,
+      vehicleClass:    body.vehicleClass as VehicleClass,
+      flightNumber:    body.flightNumber,
+      specialRequests: body.specialRequests,
+      adminNotes:      body.notes,
+      driverAmount:    body.driverAmount,
+      baseFare:        body.totalAmount,
+      totalAmount:     body.totalAmount,
+      status:          "CONFIRMED" as const,
+      paymentStatus:   body.paymentStatus,
+      paymentMethod:   body.paymentMethod as never,
+      paidAt:          body.paymentStatus === "PAID" ? new Date() : null,
+      paidMarkedBy:    body.paymentStatus === "PAID" ? (admin.name ?? admin.id ?? "admin") : null,
+    };
+
+    let booking;
+    if (body.fromBookingId) {
+      // Finishing an unpaid website booking. It must still be unpaid: if the
+      // customer paid the original link while the office was typing, or
+      // another admin already converted it, writing over it would wipe the
+      // payment and the confirmation code would go out twice.
+      const existing = await prisma.booking.findUnique({ where: { id: body.fromBookingId } });
+      if (!existing || existing.isDeleted) {
+        return NextResponse.json({ error: "That unpaid booking no longer exists" }, { status: 404 });
+      }
+      if (existing.paymentStatus === "PAID" || existing.paymentMethod || existing.status !== "PENDING") {
+        return NextResponse.json({ error: `${existing.confirmationCode} is no longer unpaid — open it from Bookings instead` }, { status: 409 });
+      }
+      booking = await prisma.booking.update({ where: { id: existing.id }, data: fields });
+    } else {
+      booking = await withUniqueBookingCode((confirmationCode) => prisma.booking.create({
+        data: { confirmationCode, ...fields },
+      }));
+    }
+
+    // A lead that has become a booking is no longer a lead. Without this the
+    // nightly sweep keeps emailing "you left something behind" to a customer
+    // the office has already booked by hand.
+    if (body.fromSessionId) {
+      await prisma.bookingSession.updateMany({ where: { sessionId: body.fromSessionId }, data: { converted: true } }).catch(() => {});
+      await prisma.abandonedBooking.updateMany({ where: { sessionId: body.fromSessionId }, data: { convertedAt: new Date() } }).catch(() => {});
+    }
 
     // A card link needs a checkout to point at. Created here so the
     // confirmation can carry the button; the SumUp webhook and the daily
@@ -160,10 +204,15 @@ export async function POST(req: NextRequest) {
       data: {
         adminId:   admin.id,
         adminName: admin.name ?? "Admin",
-        action:    "CREATE",
+        action:    body.fromBookingId ? "UPDATE" : "CREATE",
         entity:    "BOOKING",
         entityId:  booking.id,
-        details:   { confirmationCode: booking.confirmationCode, amount: body.totalAmount } as never,
+        details:   {
+          confirmationCode: booking.confirmationCode,
+          amount: body.totalAmount,
+          ...(body.fromBookingId ? { convertedFrom: "unpaid booking" } : {}),
+          ...(body.fromSessionId ? { convertedFrom: "abandoned lead", sessionId: body.fromSessionId } : {}),
+        } as never,
       },
     }).catch(() => {});
 

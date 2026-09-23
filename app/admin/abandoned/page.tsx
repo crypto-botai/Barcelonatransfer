@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, Mail, MessageCircle, PenLine, RefreshCw, Send, X } from "lucide-react";
+import Link from "next/link";
+import { ClipboardCheck, Loader2, Mail, MessageCircle, PenLine, RefreshCw, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatCurrency } from "@/lib/utils";
 import { vehicleClassLabel } from "@/types";
@@ -115,6 +116,8 @@ export default function AbandonedPage() {
                   busy={busy === t.to + b.id}
                   onResend={b.guestEmail ? () => resend(t) : undefined}
                   onNote={b.guestEmail ? () => setNote(t) : undefined}
+                  createHref={`/admin/bookings/new?booking=${b.id}`}
+                  createLabel={`Complete ${b.confirmationCode}`}
                 />
               );
             })}
@@ -155,6 +158,7 @@ export default function AbandonedPage() {
                   busy={busy === t.to + l.sessionId}
                   onResend={l.email ? () => resend(t) : undefined}
                   onNote={l.email ? () => setNote(t) : undefined}
+                  createHref={str("pickupAddress") ? `/admin/bookings/new?session=${encodeURIComponent(l.sessionId)}` : undefined}
                 />
               );
             })}
@@ -192,9 +196,11 @@ function Empty({ text }: { text: string }) {
   return <div className="glass-card rounded-2xl p-10 text-center text-dark-400 text-sm">{text}</div>;
 }
 
-function Row({ name, email, phone, fields, waText, sent, consent, busy, onResend, onNote }: {
+function Row({ name, email, phone, fields, waText, sent, consent, busy, onResend, onNote, createHref, createLabel }: {
   name: string; email: string | null; phone?: string | null;
   fields: [string, string | null | undefined][];
+  /** Opens the office booking form with this record already filled in. */
+  createHref?: string; createLabel?: string;
   /** Prefilled WhatsApp text: the route and the price they saw. */
   waText?: string;
   sent: string | null; consent: boolean; busy: boolean;
@@ -225,6 +231,11 @@ function Row({ name, email, phone, fields, waText, sent, consent, busy, onResend
       </dl>
 
       <div className="mt-4 flex flex-wrap gap-2">
+        {createHref && (
+          <Link href={createHref} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gold-500 text-black text-xs font-semibold hover:bg-gold-400">
+            <ClipboardCheck size={12} /> {createLabel ?? "Create the booking"}
+          </Link>
+        )}
         {phone && (
           <a href={`https://wa.me/${phone.replace(/\D/g, "")}${waText ? `?text=${encodeURIComponent(waText)}` : ""}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-xs hover:bg-green-500/15">
             <MessageCircle size={12} /> WhatsApp them

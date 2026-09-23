@@ -45,6 +45,8 @@ export async function GET() {
         pickupAddress: true, dropoffAddress: true, pickupDatetime: true, passengers: true, vehicleClass: true,
         totalAmount: true, stripeSessionId: true, createdAt: true,
         pickupLat: true, pickupLng: true, dropoffLat: true, dropoffLng: true,
+        // So the office can finish the booking without retyping it.
+        luggage: true, flightNumber: true, specialRequests: true,
       },
     }),
     // Every recovery email, automatic or by hand.

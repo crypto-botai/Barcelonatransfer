@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, MapPin, Send, Sparkles, Wallet } from "lucide-react";
+import { ArrowLeft, Inbox, Loader2, MapPin, Send, Sparkles, Wallet, X } from "lucide-react";
 import toast from "react-hot-toast";
 import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
 import { FLEET_TO_DB_CLASS, VEHICLE_CATALOG, type FleetVehicle } from "@/types";
 import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS, type BookingPaymentMethod } from "@/lib/payment-method";
+import ImportPanel, { type ImportSource, type Prefill } from "./ImportPanel";
 
 /**
  * A booking made by the office.
@@ -59,6 +60,35 @@ export default function NewBookingPage() {
   const [paid, setPaid]       = useState(false);
   const [sendEmail, setSendEmail] = useState(true);
   const [saving, setSaving]   = useState(false);
+
+  /** Set when the form was filled from a lead or an unpaid booking. */
+  const [source, setSource] = useState<ImportSource | null>(null);
+  /** A source named in the URL, so Abandoned can link straight into this form. */
+  const [linked, setLinked] = useState<{ bookingId?: string; sessionId?: string }>();
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    const bookingId = p.get("booking") ?? undefined;
+    const sessionId = p.get("session") ?? undefined;
+    if (bookingId || sessionId) setLinked({ bookingId, sessionId });
+  }, []);
+
+  // The imported price is the one the customer was quoted, so it counts as a
+  // deliberate price: the quote must not overwrite it when the route resolves.
+  const applyPrefill = useCallback((p: Prefill) => {
+    setName(p.name); setEmail(p.email); setPhone(p.phone);
+    setPickup(p.pickup); setDropoff(p.dropoff);
+    setDate(p.date); setTime(p.time);
+    setPax(p.pax); setBags(p.bags);
+    setVehicle(p.vehicle); setFlight(p.flight); setNotes(p.notes);
+    if (p.price) { setPrice(p.price); setPriceTouched(true); }
+    setSource(p.source);
+    toast.success(p.source.kind === "unpaid" ? `Loaded ${p.source.label}` : `Loaded ${p.source.label}'s cart`);
+  }, []);
+
+  function clearSource() {
+    setSource(null);
+    setLinked(undefined);
+  }
 
   // The same quote the website gives, so a phone customer is never charged a
   // different fare from one who booked online. The office can still override.
@@ -118,11 +148,15 @@ export default function NewBookingPage() {
           paymentMethod: method,
           paymentStatus: paid ? "PAID" : "PENDING",
           sendEmail,
+          fromBookingId: source?.kind === "unpaid" ? source.bookingId : undefined,
+          fromSessionId: source?.kind === "lead"   ? source.sessionId : undefined,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not create the booking");
-      toast.success(`Booking ${data.confirmationCode} created${sendEmail ? " — confirmation sent" : ""}`);
+      toast.success(
+        `Booking ${data.confirmationCode} ${source?.kind === "unpaid" ? "completed" : "created"}${sendEmail ? " — confirmation sent" : ""}`,
+      );
       router.push("/admin/bookings");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not create the booking");
@@ -141,11 +175,36 @@ export default function NewBookingPage() {
       </Link>
       <div className="mb-6">
         <h1 className="font-display text-3xl text-white">New booking</h1>
-        <p className="text-dark-400 mt-1">For a customer booking by phone or WhatsApp. Priced the same as the website; the customer receives the confirmation email.</p>
+        <p className="text-dark-400 mt-1">For a customer booking by phone or WhatsApp, or finishing one they started online. Priced the same as the website; the customer receives the confirmation email.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start">
         <div className="space-y-6">
+          {/* Start from something the customer already began */}
+          {source ? (
+            <div className={`rounded-2xl border px-4 py-3.5 flex items-start gap-3 ${source.kind === "unpaid" ? "border-gold-500/30 bg-gold-500/[0.06]" : "border-white/[0.1] bg-white/[0.03]"}`}>
+              <Inbox size={15} className="text-gold-400 mt-0.5 shrink-0" />
+              <div className="min-w-0 flex-1">
+                {source.kind === "unpaid" ? (
+                  <>
+                    <p className="text-white text-sm">Completing booking <span className="font-medium text-gold-300">{source.label}</span></p>
+                    <p className="text-dark-400 text-[12px] mt-0.5">Saving updates that booking rather than creating a second one, so the customer keeps the reference they were given.</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-white text-sm">From <span className="font-medium text-gold-300">{source.label}</span>&apos;s abandoned cart</p>
+                    <p className="text-dark-400 text-[12px] mt-0.5">Saving creates a new booking and closes the lead, so the recovery emails stop.</p>
+                  </>
+                )}
+              </div>
+              <button type="button" onClick={clearSource} title="Forget where this came from" className="w-7 h-7 rounded-full border border-white/10 flex items-center justify-center text-dark-400 hover:text-white shrink-0">
+                <X size={13} />
+              </button>
+            </div>
+          ) : (
+            <ImportPanel onPick={applyPrefill} autoOpen={linked} />
+          )}
+
           {/* Customer */}
           <section className="glass-card rounded-2xl p-5">
             <h2 className="text-white font-medium mb-4">Customer</h2>
@@ -258,7 +317,9 @@ export default function NewBookingPage() {
             className="btn-gold w-full py-3 rounded-xl font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-            {saving ? "Creating…" : "Create booking"}
+            {saving
+              ? (source?.kind === "unpaid" ? "Completing…" : "Creating…")
+              : (source?.kind === "unpaid" ? `Complete ${source.label}` : "Create booking")}
           </button>
           {!ready && <p className="text-[11px] text-dark-500 text-center">Name, email, phone, both addresses, date, time and a price are needed.</p>}
         </aside>
