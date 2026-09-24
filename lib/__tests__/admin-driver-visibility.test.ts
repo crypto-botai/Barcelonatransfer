@@ -52,11 +52,16 @@ describe("a dark select's open list", () => {
     const uncovered: string[] = [];
     for (const f of files) {
       const src = readFileSync(f, "utf-8");
-      // A class can come from a const in the same file, e.g. className={`${inputCls} …`}.
+      // A class can come from a const in the same file, whether interpolated
+      // (className={`${inputCls} …`}) or passed whole (className={field}).
       const resolve = (tag: string) => {
         let out = tag;
-        for (const ref of tag.matchAll(/\$\{(\w+)\}/g)) {
-          const decl = src.match(new RegExp(`const ${ref[1]}\\s*=\\s*["'\`]([^"'\`]*)`));
+        const refs = [
+          ...[...tag.matchAll(/\$\{(\w+)\}/g)].map((m) => m[1]),
+          ...[...tag.matchAll(/className=\{(\w+)\}/g)].map((m) => m[1]),
+        ];
+        for (const ref of refs) {
+          const decl = src.match(new RegExp(`const ${ref}\\s*=\\s*["'\`]([^"'\`]*)`));
           if (decl) out += " " + decl[1];
         }
         return out;

@@ -22,9 +22,27 @@ describe("the office can book a return", () => {
   it("takes a moment, not a second pair of addresses", () => {
     expect(api).toContain("returnDatetime:  z.string().optional()");
     expect(api).toContain("returnAmount:    z.number().min(0).optional()");
-    // The route is the outbound one reversed.
-    expect(api).toContain("pickupAddress:   body.dropoffAddress || body.pickupAddress");
-    expect(api).toContain("dropoffAddress:  body.pickupAddress");
+    // The route is the outbound one reversed, unless an end was overridden.
+    expect(api).toContain("body.returnPickupAddress  || body.dropoffAddress || body.pickupAddress");
+    expect(api).toContain("body.returnDropoffAddress || body.pickupAddress");
+  });
+
+  /**
+   * Arriving at one hotel and leaving from another is ordinary: guests move
+   * mid-stay, and plenty fly into El Prat and home out of Girona. Reversing
+   * the outbound then sends a chauffeur to the wrong door.
+   */
+  it("lets either end of the way home be somewhere else", () => {
+    for (const f of ["returnPickupAddress", "returnPickupLat", "returnPickupLng",
+                     "returnDropoffAddress", "returnDropoffLat", "returnDropoffLng"]) {
+      expect(api, f).toContain(f);
+    }
+    // Each falls back to the reversed value rather than to nothing.
+    expect(api).toContain("body.returnPickupLat  ?? (body.dropoffLat || body.pickupLat)");
+    expect(api).toContain("body.returnDropoffLat ?? body.pickupLat");
+    // And the form starts from the reversed route so one end is edited, not both.
+    expect(form).toContain("if (!returnFrom.address) setReturnFrom(dropoff)");
+    expect(form).toContain("if (!returnTo.address) setReturnTo(pickup)");
   });
 
   it("writes it as its own booking, linked back to the outbound", () => {
@@ -68,7 +86,66 @@ describe("what the customer is charged", () => {
 
   it("shows the office the trip total, not one leg", () => {
     expect(form).toContain("const tripTotal = amount +");
-    expect(form).toContain("Trip total");
+    expect(form).toContain("{legCount} bookings");
+  });
+});
+
+describe("several rides for one customer", () => {
+  const rides = rd("app/admin/bookings/new/ExtraRides.tsx");
+
+  /**
+   * A guest on a week's stay is one customer and several jobs. They were
+   * being entered as unrelated bookings with the contact details retyped each
+   * time, which is how a phone number ends up differing between two rides of
+   * the same trip.
+   */
+  it("takes the customer once and the journeys many times", () => {
+    expect(api).toContain("extraRides: z.array(");
+    expect(form).toContain("<ExtraRides rides={rides} onChange={setRides}");
+    expect(rides).toContain("More rides for this customer");
+  });
+
+  it("writes each as its own booking with its own reference", () => {
+    expect(api).toContain("const extraBookings:");
+    expect(api).toContain("extraConfirmationCodes: extraBookings.map((b) => b.confirmationCode)");
+  });
+
+  /** They are separate jobs, not legs of one trip, so they are not linked. */
+  it("does not tie them together the way a return is tied", () => {
+    const block = api.slice(api.indexOf("const extraBookings:"), api.indexOf("A lead that has become a booking"));
+    expect(block).not.toContain("returnOfId");
+  });
+
+  /**
+   * Parsed before anything is written, so a typo in the third ride does not
+   * leave the first two in the database with no way to tell the office.
+   */
+  it("checks every date before creating any booking", () => {
+    expect(api).toContain("const badExtra = extras.findIndex((r) => !r.at)");
+    expect(api).toContain("has an invalid date or time");
+  });
+
+  it("charges the whole lot once, on the first ride", () => {
+    expect(api).toContain("extras.reduce((s, r) => s + r.totalAmount, 0)");
+    // And the others say so rather than leaving the customer wondering.
+    expect(api).toContain("nothing to pay for this ride on its own");
+  });
+
+  /** Where to be, and how the chauffeur finds you, differs for every journey. */
+  it("sends a confirmation for each, not a list on the first", () => {
+    expect(api).toContain("for (const b of extraBookings)");
+    expect(api).toContain("calendar: calendarLinks({ id: b.id");
+  });
+
+  it("will not create a half-filled ride", () => {
+    expect(rides).toContain("export function rideReady(");
+    expect(form).toContain("const ridesReady = rides.every(rideReady)");
+    expect(form).toContain("Every extra ride needs both addresses, a date, a time and a price.");
+  });
+
+  it("quotes each ride at the website price, as the first one is", () => {
+    expect(rides).toContain('fetch("/api/quote"');
+    expect(rides).toContain("Use website price");
   });
 });
 

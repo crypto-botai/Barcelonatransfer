@@ -9,6 +9,7 @@ import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
 import { FLEET_TO_DB_CLASS, VEHICLE_CATALOG, type FleetVehicle } from "@/types";
 import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS, type BookingPaymentMethod } from "@/lib/payment-method";
 import ImportPanel, { type ImportSource, type Prefill } from "./ImportPanel";
+import ExtraRides, { rideReady, rideTotal, type ExtraRide } from "./ExtraRides";
 
 /**
  * A booking made by the office.
@@ -64,6 +65,20 @@ export default function NewBookingPage() {
   const [returnTime, setReturnTime] = useState("");
   const [returnPrice, setReturnPrice] = useState("");
   const [returnPriceTouched, setReturnPriceTouched] = useState(false);
+
+  /**
+   * A return that does not simply retrace the outbound.
+   *
+   * Arriving at one hotel and leaving from another is ordinary: guests move
+   * mid-stay, and plenty fly into El Prat and home out of Girona. Reversing
+   * the outbound in those cases sends a chauffeur to the wrong door.
+   */
+  const [returnCustom, setReturnCustom] = useState(false);
+  const [returnFrom, setReturnFrom] = useState<Place>({ address: "", lat: 0, lng: 0 });
+  const [returnTo, setReturnTo]     = useState<Place>({ address: "", lat: 0, lng: 0 });
+
+  /** Other journeys for this same customer, each its own booking. */
+  const [rides, setRides] = useState<ExtraRide[]>([]);
 
   const [quote, setQuote]         = useState<number | null>(null);
   const [quoting, setQuoting]     = useState(false);
@@ -151,16 +166,21 @@ export default function NewBookingPage() {
   const backAmount = returnOn
     ? (returnPriceTouched && returnPrice !== "" ? parseFloat(returnPrice) : amount)
     : 0;
-  const tripTotal = amount + (Number.isFinite(backAmount) ? backAmount : 0);
+  const extrasTotal = rideTotal(rides);
+  const tripTotal = amount + (Number.isFinite(backAmount) ? backAmount : 0) + extrasTotal;
   // A chauffeur cannot drive them home before they have set off. Checked here
   // as well as at the API so the office sees it before pressing the button.
   const returnAfterOutbound = !returnOn || (!!returnDate && !!returnTime && !!date && !!time
     && `${returnDate}T${returnTime}` > `${date}T${time}`);
   const returnReady = !returnOn || (!!returnDate && !!returnTime && returnAfterOutbound && Number.isFinite(backAmount) && backAmount >= 0);
+  // A half-filled extra ride cannot be created, and silently dropping it would
+  // lose a journey the office believes it has booked.
+  const ridesReady = rides.every(rideReady);
+  const legCount = 1 + (returnOn ? 1 : 0) + rides.length;
 
   const ready = name.trim().length >= 2 && /\S+@\S+\.\S+/.test(email) && phone.trim().length >= 6
     && pickup.address && dropoff.address && date && time && amount >= 0 && !Number.isNaN(amount)
-    && returnReady;
+    && returnReady && ridesReady;
 
   async function submit() {
     if (!ready || saving) return;
@@ -187,13 +207,31 @@ export default function NewBookingPage() {
           fromSessionId: source?.kind === "lead"   ? source.sessionId : undefined,
           returnDatetime: returnOn ? `${returnDate}T${returnTime}` : undefined,
           returnAmount:   returnOn ? backAmount : undefined,
+          // Only sent when the office actually changed them; the API falls
+          // back to the reversed route for anything left out.
+          ...(returnOn && returnCustom && returnFrom.address ? {
+            returnPickupAddress: returnFrom.address, returnPickupLat: returnFrom.lat, returnPickupLng: returnFrom.lng,
+          } : {}),
+          ...(returnOn && returnCustom && returnTo.address ? {
+            returnDropoffAddress: returnTo.address, returnDropoffLat: returnTo.lat, returnDropoffLng: returnTo.lng,
+          } : {}),
+          extraRides: rides.length ? rides.map((r) => ({
+            pickupAddress: r.pickup.address, pickupLat: r.pickup.lat || 41.3851, pickupLng: r.pickup.lng || 2.1734,
+            dropoffAddress: r.dropoff.address, dropoffLat: r.dropoff.lat, dropoffLng: r.dropoff.lng,
+            pickupDatetime: `${r.date}T${r.time}`,
+            vehicleClass: FLEET_TO_DB_CLASS[r.vehicle],
+            totalAmount: parseFloat(r.price),
+            flightNumber: r.flight.trim() || undefined,
+            specialRequests: r.notes.trim() || undefined,
+          })) : undefined,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not create the booking");
+      const codes = [data.confirmationCode, data.returnConfirmationCode, ...(data.extraConfirmationCodes ?? [])].filter(Boolean);
       toast.success(
-        data.returnConfirmationCode
-          ? `Return trip created — ${data.confirmationCode} out, ${data.returnConfirmationCode} back${sendEmail ? ". Confirmation sent." : ""}`
+        codes.length > 1
+          ? `${codes.length} bookings created — ${codes.join(", ")}${sendEmail ? ". Confirmations sent." : ""}`
           : `Booking ${data.confirmationCode} ${source?.kind === "unpaid" ? "completed" : "created"}${sendEmail ? " — confirmation sent" : ""}`,
       );
       router.push("/admin/bookings");
@@ -348,11 +386,60 @@ export default function NewBookingPage() {
                     {returnDate && returnTime && !returnAfterOutbound && (
                       <p className="col-span-full text-[11px] text-red-400">The return has to be after the outbound journey.</p>
                     )}
+
+                    {/* Guests move hotel mid-stay, and plenty fly into El Prat
+                        and home out of Girona. Reversing the outbound then
+                        sends a chauffeur to the wrong door. */}
+                    <div className="col-span-full">
+                      <label className="inline-flex items-center gap-2 cursor-pointer text-[12px] text-dark-300 hover:text-white">
+                        <input
+                          type="checkbox"
+                          checked={returnCustom}
+                          onChange={(e) => {
+                            setReturnCustom(e.target.checked);
+                            // Start from the reversed route, so the office
+                            // edits one end rather than retyping both.
+                            if (e.target.checked) {
+                              if (!returnFrom.address) setReturnFrom(dropoff);
+                              if (!returnTo.address) setReturnTo(pickup);
+                            }
+                          }}
+                          className="accent-[#c9a84c]"
+                        />
+                        Picking up or dropping off somewhere else on the way back
+                      </label>
+
+                      {returnCustom && (
+                        <div className="mt-3 space-y-3">
+                          <div>
+                            <label className={label}>Return pick-up</label>
+                            <AddressAutocomplete
+                              value={returnFrom.address}
+                              onChange={setReturnFrom}
+                              placeholder="Where we collect them on the way back"
+                              icon={<MapPin size={14} className="text-gold-500" />}
+                            />
+                          </div>
+                          <div>
+                            <label className={label}>Return drop-off</label>
+                            <AddressAutocomplete
+                              value={returnTo.address}
+                              onChange={setReturnTo}
+                              placeholder="Where the return journey ends"
+                              icon={<MapPin size={14} className="text-gold-500" />}
+                            />
+                          </div>
+                          <p className="text-[11px] text-dark-500">Leave either empty to use the outbound journey reversed.</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
             </div>
           </section>
+
+          <ExtraRides rides={rides} onChange={setRides} defaultVehicle={vehicle} passengers={pax} />
         </div>
 
         {/* Price & payment */}
@@ -379,18 +466,31 @@ export default function NewBookingPage() {
             {/* What the customer is actually being charged, once there are two
                 legs. The field above is one of them, and a card link for the
                 outbound alone would leave the way home unpaid. */}
-            {returnOn && Number.isFinite(tripTotal) && (
+            {legCount > 1 && Number.isFinite(tripTotal) && (
               <div className="mt-3 rounded-lg border border-gold-500/25 bg-gold-500/[0.06] px-3 py-2.5">
                 <div className="flex items-baseline justify-between gap-2 text-sm">
-                  <span className="text-dark-300">Out</span>
+                  <span className="text-dark-300">{returnOn ? "Out" : "Ride 1"}</span>
                   <span className="text-white">€{(Number.isFinite(amount) ? amount : 0).toFixed(2)}</span>
                 </div>
-                <div className="flex items-baseline justify-between gap-2 text-sm mt-1">
-                  <span className="text-dark-300">Back</span>
-                  <span className="text-white">€{(Number.isFinite(backAmount) ? backAmount : 0).toFixed(2)}</span>
-                </div>
+                {returnOn && (
+                  <div className="flex items-baseline justify-between gap-2 text-sm mt-1">
+                    <span className="text-dark-300">Back</span>
+                    <span className="text-white">€{(Number.isFinite(backAmount) ? backAmount : 0).toFixed(2)}</span>
+                  </div>
+                )}
+                {rides.map((r, i) => {
+                  const n = parseFloat(r.price);
+                  return (
+                    <div key={r.key} className="flex items-baseline justify-between gap-2 text-sm mt-1">
+                      <span className="text-dark-300 truncate">Ride {i + 2}</span>
+                      <span className="text-white">€{(Number.isFinite(n) ? n : 0).toFixed(2)}</span>
+                    </div>
+                  );
+                })}
                 <div className="flex items-baseline justify-between gap-2 mt-2 pt-2 border-t border-gold-500/20">
-                  <span className="text-[10px] uppercase tracking-[0.15em] text-gold-500/80 font-semibold">Trip total</span>
+                  <span className="text-[10px] uppercase tracking-[0.15em] text-gold-500/80 font-semibold">
+                    {legCount} bookings
+                  </span>
                   <span className="font-display text-xl text-gold-300">€{tripTotal.toFixed(2)}</span>
                 </div>
               </div>
@@ -437,17 +537,22 @@ export default function NewBookingPage() {
             {saving
               ? (source?.kind === "unpaid" ? "Completing…" : "Creating…")
               : (source?.kind === "unpaid" ? `Complete ${source.label}`
-                : returnOn ? "Create return trip" : "Create booking")}
+                : legCount > 1 ? `Create ${legCount} bookings`
+                : "Create booking")}
           </button>
           {!ready && (
             <p className="text-[11px] text-dark-500 text-center">
               {returnOn && !returnReady
                 ? "The return needs a date and a time, after the outbound journey."
-                : "Name, email, phone, both addresses, date, time and a price are needed."}
+                : !ridesReady
+                  ? "Every extra ride needs both addresses, a date, a time and a price."
+                  : "Name, email, phone, both addresses, date, time and a price are needed."}
             </p>
           )}
-          {returnOn && ready && (
-            <p className="text-[11px] text-dark-500 text-center">Two bookings are created, each with its own reference. One confirmation email covers both.</p>
+          {legCount > 1 && ready && (
+            <p className="text-[11px] text-dark-500 text-center">
+              {legCount} bookings, each with its own reference and its own confirmation. The fare is charged once, on the first.
+            </p>
           )}
         </aside>
       </div>
