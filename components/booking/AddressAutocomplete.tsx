@@ -81,10 +81,11 @@ function pushRecent(r: Recent) {
  * fold. overscroll-contain stops the page behind it scrolling once the list
  * hits its end, which on a phone reads as the whole form jumping.
  *
- * The cap is in view units as well as rem so the list cannot grow taller than
- * the phone it is on.
+ * The height itself is measured at open time against the room below the field
+ * and passed in, because a fixed cap hangs off the bottom of the window when
+ * the field sits low down a form.
  */
-const LIST_CLS = "max-h-[min(60vh,18rem)] overflow-y-auto overscroll-contain";
+const LIST_CLS = "overflow-y-auto overscroll-contain";
 
 const KIND_ICON = {
   airport:  Plane,
@@ -145,9 +146,39 @@ export default function AddressAutocomplete({
 
   const timer     = useRef<ReturnType<typeof setTimeout> | null>(null);
   const listRef   = useRef<HTMLUListElement>(null);
+  const inputRef  = useRef<HTMLInputElement>(null);
   const requestId = useRef(0);
   const reduce    = useReducedMotion();
   const listId    = useId();
+
+  /**
+   * How much room there is, and which way to open.
+   *
+   * A fixed height is wrong for a field that can sit anywhere down a long
+   * form. The dropoff box on a desktop booking form sits low enough that a
+   * 288px panel hangs 149px below the bottom of the window: the last rows are
+   * cut off by the window edge, and scrolling inside the list does nothing
+   * because its content fits the height it was given. It reads as a stuck
+   * list, which is exactly what it is.
+   *
+   * So the panel is measured against the space actually available and flips
+   * above the field when there is more room up there.
+   */
+  const [place, setPlace] = useState<{ up: boolean; maxH: number }>({ up: false, maxH: 288 });
+
+  const measure = useCallback(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const gap = 14;
+    const below = window.innerHeight - r.bottom - gap;
+    const above = r.top - gap;
+    // Opening upward is the worse option when it is merely tighter, because a
+    // list that covers the field it belongs to is disorienting. Only flip when
+    // downward is genuinely too small to be usable.
+    const up = below < 200 && above > below;
+    setPlace({ up, maxH: Math.max(140, Math.min(288, up ? above : below)) });
+  }, []);
 
   useEffect(() => { setQuery(value); }, [value]);
   useEffect(() => { setRecents(readRecents()); }, []);
@@ -251,6 +282,21 @@ export default function AddressAutocomplete({
     listRef.current?.querySelectorAll("[data-row]")[active]?.scrollIntoView({ block: "nearest" });
   }, [active]);
 
+  // The room below the field changes as the page scrolls or the window resizes,
+  // and on a phone when the on-screen keyboard opens. Remeasured while the
+  // panel is up so it never ends up hanging off the bottom of the screen.
+  useEffect(() => {
+    if (!hasDropdown) return;
+    measure();
+    window.addEventListener("scroll", measure, { passive: true });
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("scroll", measure);
+      window.removeEventListener("resize", measure);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasDropdown, measure]);
+
   const rowCls = (i: number) =>
     cn(
       "flex items-center gap-3 px-4 py-2.5 cursor-pointer border-b border-white/[0.04] last:border-0 transition-colors",
@@ -265,10 +311,11 @@ export default function AddressAutocomplete({
           : icon ?? <MapPin size={14} className="text-[#c9a84c]" />}
       </div>
       <input
+        ref={inputRef}
         type="text"
         value={query}
         onChange={handleInput}
-        onFocus={() => setOpen(true)}
+        onFocus={() => { measure(); setOpen(true); }}
         onKeyDown={onKeyDown}
         onBlur={() => setTimeout(() => setOpen(false), 160)}
         placeholder={placeholder}
@@ -284,9 +331,9 @@ export default function AddressAutocomplete({
       <AnimatePresence>
         {hasDropdown && (
           <motion.div
-            initial={reduce ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.985 }}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: place.up ? 6 : -6, scale: 0.985 }}
             animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.99 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: place.up ? 4 : -4, scale: 0.99 }}
             transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
             // Pressing anywhere in the panel must not take focus off the
             // input, because losing focus closes the panel. Without this,
@@ -294,13 +341,16 @@ export default function AddressAutocomplete({
             // The rows use onMouseDown and still fire: this only stops the
             // browser's default focus shift.
             onMouseDown={(e) => e.preventDefault()}
-            className="absolute z-50 w-full mt-1.5 bg-[#0e0e0e] border border-white/[0.09] rounded-xl shadow-2xl overflow-hidden"
+            className={cn(
+              "absolute z-50 w-full bg-[#0e0e0e] border border-white/[0.09] rounded-xl shadow-2xl overflow-hidden",
+              place.up ? "bottom-full mb-1.5" : "top-full mt-1.5",
+            )}
           >
             {/* Fixed-price zones, while the field is still near-empty */}
             {showZones && quickZones && (
               <>
                 <Header icon={<Navigation size={10} className="text-[#c9a84c]/60" />} text="Fixed-price zones" />
-                <ul ref={listRef} id={listId} role="listbox" className={LIST_CLS}>
+                <ul ref={listRef} id={listId} role="listbox" className={LIST_CLS} style={{ maxHeight: place.maxH }}>
                   {quickZones.map((z, i) => (
                     <li
                       key={z.address + i}
@@ -328,7 +378,7 @@ export default function AddressAutocomplete({
             {showRecents && (
               <>
                 <Header icon={<Clock3 size={10} className="text-[#c9a84c]/60" />} text="Recent" />
-                <ul ref={listRef} id={listId} role="listbox" className={LIST_CLS}>
+                <ul ref={listRef} id={listId} role="listbox" className={LIST_CLS} style={{ maxHeight: place.maxH }}>
                   {recents.map((r, i) => (
                     <li
                       key={r.label}
@@ -353,7 +403,7 @@ export default function AddressAutocomplete({
 
             {/* Results */}
             {!showZones && !showRecents && suggestions.length > 0 && (
-              <ul ref={listRef} id={listId} role="listbox" className={LIST_CLS}>
+              <ul ref={listRef} id={listId} role="listbox" className={LIST_CLS} style={{ maxHeight: place.maxH }}>
                 {suggestions.map((s, i) => (
                   <li
                     key={s.id ?? `${s.lat},${s.lng},${i}`}

@@ -63,11 +63,9 @@ describe("the list scrolls", () => {
    * and the fixed-price zones were both cut off at the fold with no way to
    * reach the rest.
    */
-  it("caps each list's height and lets it scroll", () => {
+  it("lets each list scroll", () => {
     expect(picker).toContain("const LIST_CLS =");
     expect(picker).toContain("overflow-y-auto");
-    // Not taller than the phone it is on.
-    expect(picker).toContain("max-h-[min(60vh,18rem)]");
     // And the page behind it does not take over at the end of the list.
     expect(picker).toContain("overscroll-contain");
   });
@@ -75,7 +73,34 @@ describe("the list scrolls", () => {
   it("applies it to all three lists, not just one", () => {
     const lists = picker.match(/role="listbox"[^>]*/g) ?? [];
     expect(lists.length).toBe(3);
-    for (const l of lists) expect(l).toContain("className={LIST_CLS}");
+    for (const l of lists) {
+      expect(l).toContain("className={LIST_CLS}");
+      expect(l).toContain("style={{ maxHeight: place.maxH }}");
+    }
+  });
+
+  /**
+   * A fixed height hung 149px below the bottom of the window on the dropoff
+   * field of a desktop booking form: the last rows were cut off by the window
+   * edge, and scrolling the list did nothing because its content fitted the
+   * height it had been given. It read as a stuck list.
+   */
+  it("sizes itself to the room actually below the field", () => {
+    expect(picker).toContain("const measure = useCallback(");
+    expect(picker).toContain("window.innerHeight - r.bottom");
+    expect(picker).toContain("Math.max(140, Math.min(288,");
+  });
+
+  it("opens upward when there is not enough room below", () => {
+    expect(picker).toContain("const up = below < 200 && above > below");
+    expect(picker).toContain('place.up ? "bottom-full mb-1.5" : "top-full mt-1.5"');
+  });
+
+  /** The room changes as the page scrolls and when a phone keyboard opens. */
+  it("remeasures while it is open", () => {
+    expect(picker).toContain('window.addEventListener("scroll", measure');
+    expect(picker).toContain('window.addEventListener("resize", measure)');
+    expect(picker).toContain('window.removeEventListener("scroll", measure)');
   });
 
   /** Grabbing the scrollbar blurs the input, and losing focus closes the panel. */
