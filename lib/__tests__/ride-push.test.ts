@@ -85,7 +85,11 @@ describe("confirmation extras", () => {
     expect(prem).toContain("Add to your calendar");
     expect(prem).toContain("Book my return journey");
     expect(rd("app/api/bookings/route.ts")).toContain("calendar: calendarLinks(");
-    expect(rd("app/api/admin/bookings/route.ts")).toContain("returnUrl: returnTripUrl(");
+    // Offered on an office booking too — but not to somebody who has just
+    // booked the return already, which both flows now check.
+    for (const route of ["app/api/admin/bookings/route.ts", "app/api/bookings/route.ts"]) {
+      expect(rd(route), route).toContain("returnBooking ? null : returnTripUrl(");
+    }
     expect(rd("app/booking/success/page.tsx")).toContain("Book my return journey");
   });
   it("the abandoned page's WhatsApp button carries the route and price", () => {

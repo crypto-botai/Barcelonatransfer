@@ -105,6 +105,18 @@ const createSchema = z.object({
    * not keep chasing someone who has already travelled.
    */
   fromSessionId:   z.string().optional(),
+  /**
+   * The journey home, on a round trip.
+   *
+   * A moment, not a second pair of addresses: the return leg is the outbound
+   * one reversed, which is what the website has always meant by a return and
+   * what stops the office entering the same two places twice. It becomes a
+   * Booking of its own, linked back to the outbound, because two journeys on
+   * two dates cannot share one row and still be assigned to two chauffeurs.
+   */
+  returnDatetime:  z.string().optional(),
+  /** What the leg home costs. Defaults to the outbound fare, being the same journey. */
+  returnAmount:    z.number().min(0).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -119,6 +131,17 @@ export async function POST(req: NextRequest) {
     if (!pickup) {
       return NextResponse.json({ error: "Invalid date or time" }, { status: 422 });
     }
+
+    const back = body.returnDatetime ? parsePickupInput(body.returnDatetime) : null;
+    if (body.returnDatetime && !back) {
+      return NextResponse.json({ error: "Invalid return date or time" }, { status: 422 });
+    }
+    // A chauffeur cannot drive them home before they have set off.
+    if (back && back <= pickup) {
+      return NextResponse.json({ error: "The return has to be after the outbound journey" }, { status: 422 });
+    }
+    // The same journey reversed costs the same unless the office says otherwise.
+    const returnFare = back ? (body.returnAmount ?? body.totalAmount) : 0;
 
     // Everything below writes the same fields whether the row is new or an
     // unpaid one being finished off, so the two paths cannot drift apart.
@@ -169,6 +192,43 @@ export async function POST(req: NextRequest) {
       }));
     }
 
+    /**
+     * The journey home, as a booking of its own.
+     *
+     * Its own row because it is its own job: a different day, a different
+     * chauffeur, its own place on the dispatch board. Linked back through
+     * returnOfId so the pair can be read as one trip where that matters.
+     *
+     * The flight number is deliberately dropped. It belongs to the arrival,
+     * and a flight number on the ride home makes the tracker wait for a plane
+     * that landed days ago.
+     */
+    let returnBooking: { id: string; confirmationCode: string } | null = null;
+    if (back) {
+      returnBooking = await withUniqueBookingCode((confirmationCode) => prisma.booking.create({
+        data: {
+          ...fields,
+          confirmationCode,
+          returnOfId:      booking.id,
+          // The reverse journey: what was the drop-off is now the pickup.
+          pickupAddress:   body.dropoffAddress || body.pickupAddress,
+          pickupLat:       body.dropoffLat || body.pickupLat,
+          pickupLng:       body.dropoffLng || body.pickupLng,
+          dropoffAddress:  body.pickupAddress,
+          dropoffLat:      body.pickupLat,
+          dropoffLng:      body.pickupLng,
+          pickupDatetime:  back,
+          flightNumber:    null,
+          specialRequests: `Return leg of booking ${booking.confirmationCode}.`,
+          baseFare:        returnFare,
+          totalAmount:     returnFare,
+          // Whatever the office agreed for the outbound is a figure for that
+          // leg; the way home takes the usual share unless it is set by hand.
+          driverAmount:    null,
+        },
+      }));
+    }
+
     // A lead that has become a booking is no longer a lead. Without this the
     // nightly sweep keeps emailing "you left something behind" to a customer
     // the office has already booked by hand.
@@ -180,13 +240,16 @@ export async function POST(req: NextRequest) {
     // A card link needs a checkout to point at. Created here so the
     // confirmation can carry the button; the SumUp webhook and the daily
     // reconcile mark the booking paid when the customer uses it.
+    // One link for the whole trip, attached to the outbound leg. Charging the
+    // outbound alone would leave the way home unpaid with nothing saying so.
+    const tripTotal = body.totalAmount + returnFare;
     let payUrl: string | undefined;
-    if (body.paymentMethod === "CARD_LINK" && body.paymentStatus !== "PAID" && body.totalAmount > 0) {
+    if (body.paymentMethod === "CARD_LINK" && body.paymentStatus !== "PAID" && tripTotal > 0) {
       try {
         const checkout = await createSumUpCheckout({
           bookingId:     booking.id,
-          amount:        body.totalAmount,
-          description:   `Elite BCN: ${body.pickupAddress} -> ${body.dropoffAddress || "transfer"}`,
+          amount:        tripTotal,
+          description:   `Elite BCN: ${body.pickupAddress} -> ${body.dropoffAddress || "transfer"}${returnBooking ? " and back" : ""}`,
           customerEmail: body.guestEmail,
         });
         await prisma.booking.update({ where: { id: booking.id }, data: { stripeSessionId: checkout.id } });
@@ -196,7 +259,7 @@ export async function POST(req: NextRequest) {
       }
     }
     const payment = body.paymentMethod
-      ? { line: paymentLine(body.paymentMethod as never, body.paymentStatus === "PAID", body.totalAmount), payUrl, paid: body.paymentStatus === "PAID" }
+      ? { line: paymentLine(body.paymentMethod as never, body.paymentStatus === "PAID", tripTotal), payUrl, paid: body.paymentStatus === "PAID" }
       : undefined;
 
     // Log activity
@@ -230,7 +293,16 @@ export async function POST(req: NextRequest) {
       bookingId:        booking.id,
       payment,
       calendar: calendarLinks({ id: booking.id, confirmationCode: booking.confirmationCode, pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupDatetime: pickup }),
-      returnUrl: returnTripUrl({ id: booking.id, pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupLat: body.pickupLat, pickupLng: body.pickupLng, dropoffLat: body.dropoffLat, dropoffLng: body.dropoffLng, passengers: body.passengers, vehicleClass: body.vehicleClass }),
+      // Nothing to sell them a return with when they have already booked one.
+      returnUrl: returnBooking ? null : returnTripUrl({ id: booking.id, pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupLat: body.pickupLat, pickupLng: body.pickupLng, dropoffLat: body.dropoffLat, dropoffLng: body.dropoffLng, passengers: body.passengers, vehicleClass: body.vehicleClass }),
+      returnLeg: returnBooking && back ? {
+        confirmationCode: returnBooking.confirmationCode,
+        pickupDatetime:   formatPickupDateTime(back),
+        // Reversed, which is what the customer is expecting to read.
+        pickupAddress:    body.dropoffAddress || body.pickupAddress,
+        dropoffAddress:   body.pickupAddress,
+        totalAmount:      returnFare,
+      } : undefined,
     }).catch(e => console.error("[resend] admin create booking confirmation:", e));
 
     // Notify admin panel (useful if another admin created it)
@@ -250,7 +322,7 @@ export async function POST(req: NextRequest) {
       specialRequests:  body.specialRequests,
     }).catch(() => {});
 
-    return NextResponse.json({ ...booking, payUrl }, { status: 201 });
+    return NextResponse.json({ ...booking, payUrl, returnConfirmationCode: returnBooking?.confirmationCode ?? null }, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: err.errors[0].message }, { status: 422 });
     return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });

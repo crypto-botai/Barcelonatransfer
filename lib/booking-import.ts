@@ -38,6 +38,15 @@ export interface Prefill {
   flight: string; notes: string;
   /** The price they were quoted, as a string for the form field. */
   price: string;
+  /**
+   * The leg home, when the cart had one.
+   *
+   * The booking widget asks for it, so a lead that wanted a return already
+   * carries the dates. Dropping them here would have the office ring back to
+   * ask for something the customer had already typed in.
+   */
+  returnDate?: string;
+  returnTime?: string;
   source: ImportSource;
 }
 
@@ -104,6 +113,10 @@ export function prefillFromLead(l: Lead): Prefill {
     flight: str("flightNumber"),
     notes: notesWithExtras(str("specialRequests"), extras),
     price: Number.isFinite(Number(quoted)) && Number(quoted) > 0 ? String(quoted) : "",
+    // Both or neither: a date with no time cannot be dispatched, and offering
+    // the office half a return is worse than offering none.
+    returnDate: str("returnDate") && str("returnTime") ? str("returnDate") : undefined,
+    returnTime: str("returnDate") && str("returnTime") ? str("returnTime") : undefined,
     source: { kind: "lead", sessionId: l.sessionId, label: l.name ?? l.email ?? l.sessionId },
   };
 }

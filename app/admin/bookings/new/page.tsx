@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Inbox, Loader2, MapPin, Send, Sparkles, Wallet, X } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, Inbox, Loader2, MapPin, Send, Sparkles, Wallet, X } from "lucide-react";
 import toast from "react-hot-toast";
 import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
 import { FLEET_TO_DB_CLASS, VEHICLE_CATALOG, type FleetVehicle } from "@/types";
@@ -50,6 +50,21 @@ export default function NewBookingPage() {
   const [flight, setFlight]   = useState("");
   const [notes, setNotes]     = useState("");
 
+  /**
+   * The journey home.
+   *
+   * A date and a time, never a second pair of addresses: the return is the
+   * outbound reversed, which is what the website has always meant by one and
+   * what stops the office typing the same two places twice. It is saved as a
+   * booking of its own with its own reference, because it is its own job on
+   * its own day and may well be a different chauffeur.
+   */
+  const [returnOn, setReturnOn]     = useState(false);
+  const [returnDate, setReturnDate] = useState("");
+  const [returnTime, setReturnTime] = useState("");
+  const [returnPrice, setReturnPrice] = useState("");
+  const [returnPriceTouched, setReturnPriceTouched] = useState(false);
+
   const [quote, setQuote]         = useState<number | null>(null);
   const [quoting, setQuoting]     = useState(false);
   const [price, setPrice]         = useState("");
@@ -81,6 +96,13 @@ export default function NewBookingPage() {
     setPax(p.pax); setBags(p.bags);
     setVehicle(p.vehicle); setFlight(p.flight); setNotes(p.notes);
     if (p.price) { setPrice(p.price); setPriceTouched(true); }
+    // A cart that wanted a return arrives with one already ticked.
+    if (p.returnDate && p.returnTime) {
+      setReturnOn(true); setReturnDate(p.returnDate); setReturnTime(p.returnTime);
+      setReturnPrice(""); setReturnPriceTouched(false);
+    } else {
+      setReturnOn(false); setReturnDate(""); setReturnTime("");
+    }
     setSource(p.source);
     toast.success(p.source.kind === "unpaid" ? `Loaded ${p.source.label}` : `Loaded ${p.source.label}'s cart`);
   }, []);
@@ -124,8 +146,21 @@ export default function NewBookingPage() {
   }, [fetchQuote]);
 
   const amount = parseFloat(price);
+
+  // The same journey reversed costs the same, until the office says otherwise.
+  const backAmount = returnOn
+    ? (returnPriceTouched && returnPrice !== "" ? parseFloat(returnPrice) : amount)
+    : 0;
+  const tripTotal = amount + (Number.isFinite(backAmount) ? backAmount : 0);
+  // A chauffeur cannot drive them home before they have set off. Checked here
+  // as well as at the API so the office sees it before pressing the button.
+  const returnAfterOutbound = !returnOn || (!!returnDate && !!returnTime && !!date && !!time
+    && `${returnDate}T${returnTime}` > `${date}T${time}`);
+  const returnReady = !returnOn || (!!returnDate && !!returnTime && returnAfterOutbound && Number.isFinite(backAmount) && backAmount >= 0);
+
   const ready = name.trim().length >= 2 && /\S+@\S+\.\S+/.test(email) && phone.trim().length >= 6
-    && pickup.address && dropoff.address && date && time && amount >= 0 && !Number.isNaN(amount);
+    && pickup.address && dropoff.address && date && time && amount >= 0 && !Number.isNaN(amount)
+    && returnReady;
 
   async function submit() {
     if (!ready || saving) return;
@@ -150,12 +185,16 @@ export default function NewBookingPage() {
           sendEmail,
           fromBookingId: source?.kind === "unpaid" ? source.bookingId : undefined,
           fromSessionId: source?.kind === "lead"   ? source.sessionId : undefined,
+          returnDatetime: returnOn ? `${returnDate}T${returnTime}` : undefined,
+          returnAmount:   returnOn ? backAmount : undefined,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not create the booking");
       toast.success(
-        `Booking ${data.confirmationCode} ${source?.kind === "unpaid" ? "completed" : "created"}${sendEmail ? " — confirmation sent" : ""}`,
+        data.returnConfirmationCode
+          ? `Return trip created — ${data.confirmationCode} out, ${data.returnConfirmationCode} back${sendEmail ? ". Confirmation sent." : ""}`
+          : `Booking ${data.confirmationCode} ${source?.kind === "unpaid" ? "completed" : "created"}${sendEmail ? " — confirmation sent" : ""}`,
       );
       router.push("/admin/bookings");
     } catch (e) {
@@ -253,6 +292,65 @@ export default function NewBookingPage() {
                 <div><label className={label}>Flight number</label><input className={field} value={flight} onChange={(e) => setFlight(e.target.value)} placeholder="VY8301" /></div>
                 <div><label className={label}>Notes for the chauffeur</label><input className={field} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Child seat, name board text, meeting point…" /></div>
               </div>
+
+              {/* The way home. Only a date and a time: the route is the one
+                  above, reversed, so there is nothing else to enter. */}
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={returnOn}
+                    onChange={(e) => {
+                      setReturnOn(e.target.checked);
+                      // Most returns are a few days later; offering the same
+                      // day is a worse guess than offering nothing.
+                      if (e.target.checked && !returnTime && time) setReturnTime(time);
+                    }}
+                    className="mt-0.5 accent-[#c9a84c]"
+                  />
+                  <span className="min-w-0">
+                    <span className="flex items-center gap-1.5 text-sm text-white">
+                      <ArrowLeftRight size={13} className="text-gold-400" /> Return journey
+                    </span>
+                    <span className="mt-0.5 block text-[11px] leading-relaxed text-dark-400">
+                      {dropoff.address && pickup.address
+                        ? <>Back from <span className="text-dark-200">{dropoff.address.split(",")[0]}</span> to <span className="text-dark-200">{pickup.address.split(",")[0]}</span>. Saved as its own booking with its own reference, so it can go to a different chauffeur.</>
+                        : "The journey above, reversed. Saved as its own booking with its own reference, so it can go to a different chauffeur."}
+                    </span>
+                  </span>
+                </label>
+
+                {returnOn && (
+                  <div className="mt-3.5 grid grid-cols-2 sm:grid-cols-[1fr_1fr_minmax(0,1fr)] gap-3 border-t border-white/[0.06] pt-3.5">
+                    <div>
+                      <label className={label}>Return date</label>
+                      <input className={`${field} [color-scheme:dark]`} type="date" min={date || todayStr()} value={returnDate} onChange={(e) => setReturnDate(e.target.value)} />
+                    </div>
+                    <div>
+                      <label className={label}>Return time</label>
+                      <input className={`${field} [color-scheme:dark]`} type="time" value={returnTime} onChange={(e) => setReturnTime(e.target.value)} />
+                    </div>
+                    <div>
+                      <label className={label}>Return price (€)</label>
+                      <input
+                        className={field}
+                        type="number" min={0} step="0.5"
+                        value={returnPriceTouched ? returnPrice : (Number.isFinite(amount) ? String(amount) : "")}
+                        onChange={(e) => { setReturnPrice(e.target.value); setReturnPriceTouched(true); }}
+                        placeholder="Same as outbound"
+                      />
+                      {returnPriceTouched && (
+                        <button type="button" onClick={() => { setReturnPriceTouched(false); setReturnPrice(""); }} className="text-[11px] text-gold-400 mt-1.5 hover:underline">
+                          Same as outbound
+                        </button>
+                      )}
+                    </div>
+                    {returnDate && returnTime && !returnAfterOutbound && (
+                      <p className="col-span-full text-[11px] text-red-400">The return has to be after the outbound journey.</p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </section>
         </div>
@@ -277,6 +375,25 @@ export default function NewBookingPage() {
               <button type="button" onClick={() => { setPrice(String(quote)); setPriceTouched(false); }} className="text-[11px] text-gold-400 mt-1.5 hover:underline">
                 Use website price
               </button>
+            )}
+            {/* What the customer is actually being charged, once there are two
+                legs. The field above is one of them, and a card link for the
+                outbound alone would leave the way home unpaid. */}
+            {returnOn && Number.isFinite(tripTotal) && (
+              <div className="mt-3 rounded-lg border border-gold-500/25 bg-gold-500/[0.06] px-3 py-2.5">
+                <div className="flex items-baseline justify-between gap-2 text-sm">
+                  <span className="text-dark-300">Out</span>
+                  <span className="text-white">€{(Number.isFinite(amount) ? amount : 0).toFixed(2)}</span>
+                </div>
+                <div className="flex items-baseline justify-between gap-2 text-sm mt-1">
+                  <span className="text-dark-300">Back</span>
+                  <span className="text-white">€{(Number.isFinite(backAmount) ? backAmount : 0).toFixed(2)}</span>
+                </div>
+                <div className="flex items-baseline justify-between gap-2 mt-2 pt-2 border-t border-gold-500/20">
+                  <span className="text-[10px] uppercase tracking-[0.15em] text-gold-500/80 font-semibold">Trip total</span>
+                  <span className="font-display text-xl text-gold-300">€{tripTotal.toFixed(2)}</span>
+                </div>
+              </div>
             )}
           </div>
 
@@ -319,9 +436,19 @@ export default function NewBookingPage() {
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
             {saving
               ? (source?.kind === "unpaid" ? "Completing…" : "Creating…")
-              : (source?.kind === "unpaid" ? `Complete ${source.label}` : "Create booking")}
+              : (source?.kind === "unpaid" ? `Complete ${source.label}`
+                : returnOn ? "Create return trip" : "Create booking")}
           </button>
-          {!ready && <p className="text-[11px] text-dark-500 text-center">Name, email, phone, both addresses, date, time and a price are needed.</p>}
+          {!ready && (
+            <p className="text-[11px] text-dark-500 text-center">
+              {returnOn && !returnReady
+                ? "The return needs a date and a time, after the outbound journey."
+                : "Name, email, phone, both addresses, date, time and a price are needed."}
+            </p>
+          )}
+          {returnOn && ready && (
+            <p className="text-[11px] text-dark-500 text-center">Two bookings are created, each with its own reference. One confirmation email covers both.</p>
+          )}
         </aside>
       </div>
     </div>
