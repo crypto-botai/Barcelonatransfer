@@ -14,7 +14,7 @@ export const COMPANY = {
    * Gmail is the working fallback until bookings@elitebcn.info has verified MX records.
    * To switch: set NEXT_PUBLIC_CONTACT_EMAIL in Vercel. Zero code change needed.
    */
-  email:        process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "vtcbcn2025@gmail.com",
+  email:        process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "booking@elitebcn.info",
   city:         "Barcelona",
   region:       "Catalonia",
   country:      "ES",

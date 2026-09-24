@@ -88,7 +88,7 @@ export function getIssuer(): IssuerDetails {
     tradeName: envOrNull("COMPANY_TRADE_NAME"),
     taxId:     envOrNull("COMPANY_TAX_ID"),
     address:   envOrNull("COMPANY_ADDRESS"),
-    email:     envOrNull("NEXT_PUBLIC_CONTACT_EMAIL") ?? "vtcbcn2025@gmail.com",
+    email:     envOrNull("NEXT_PUBLIC_CONTACT_EMAIL") ?? "booking@elitebcn.info",
   };
 }
 

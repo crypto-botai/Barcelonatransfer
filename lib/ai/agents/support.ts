@@ -54,7 +54,7 @@ export async function getSupportReply(
   }
 
   await updateKbUsage(messages[messages.length - 1]?.content ?? "");
-  const escalate = /connect you with|our team|whatsapp|vtcbcn2025/i.test(text);
+  const escalate = /connect you with|our team|whatsapp|vtcbcn2025|booking@elitebcn/i.test(text);
   return { reply: text, escalate };
 }
 
@@ -86,7 +86,7 @@ export async function* streamSupportReply(
         await recordSpend(chunk.costCents, agentRecord.id);
         await log({ agentId: agentRecord.id, action: "chat_stream", message: `Session ${sessionId} via ${chunk.provider}`, tokensUsed: chunk.inputTokens + chunk.outputTokens, costCents: chunk.costCents });
       }
-      yield { type: "done", escalate: /connect you with|our team|whatsapp|vtcbcn2025/i.test(fullText) };
+      yield { type: "done", escalate: /connect you with|our team|whatsapp|vtcbcn2025|booking@elitebcn/i.test(fullText) };
     }
   }
 }

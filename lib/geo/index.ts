@@ -25,7 +25,7 @@ const NOMINATIM = "https://nominatim.openstreetmap.org";
 const OSRM      = "https://router.project-osrm.org";
 
 /** Identifies this application to Nominatim as their policy requires. */
-const UA = "EliteBCNTransfers/1.0 (+https://www.elitebcn.info; vtcbcn2025@gmail.com)";
+const UA = "EliteBCNTransfers/1.0 (+https://www.elitebcn.info; booking@elitebcn.info)";
 
 /**
  * Road-distance estimate used when OSRM is unreachable.

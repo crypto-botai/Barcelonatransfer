@@ -61,5 +61,5 @@ See `.env.example` for a complete list. Key services required:
 ## Contact
 
 - **WhatsApp**: +34 635 383 712
-- **Email**: vtcbcn2025@gmail.com
+- **Email**: booking@elitebcn.info
 - **Location**: Barcelona, Spain
