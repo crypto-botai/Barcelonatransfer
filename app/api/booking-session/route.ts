@@ -18,7 +18,11 @@ const schema = z.object({
 export async function POST(req: NextRequest) {
   after(() => sweepAbandonedIfDue().catch(() => {}));
   try {
-    const body = schema.parse(await req.json());
+    // Written to on every keystroke of the booking form, so a malformed body
+    // is a 500 in the middle of somebody booking.
+    const raw = await req.json().catch(() => null);
+    if (raw === null) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    const body = schema.parse(raw);
 
     const fd = body.formData as Prisma.InputJsonValue;
     const session = await prisma.bookingSession.upsert({

@@ -1142,7 +1142,7 @@ const CAMBRILS: RouteLanding = {
   eyebrow: "Costa Daurada · Fishing port",
   EyebrowIcon: Umbrella,
   title: `Barcelona Airport to Cambrils Transfer — from €${cambrilsFrom}`,
-  description: `Private transfer from BCN El Prat or central Barcelona to Cambrils. Fixed €${cambrilsFrom} per vehicle, about 110 km and 1 hour 15 minutes, door to door to your hotel or apartment.`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Cambrils. Fixed €${cambrilsFrom} per vehicle, about 110 km and 1 hour 15 minutes, door to door.`,
   keywords: [
     "barcelona airport to cambrils transfer",
     "barcelona to cambrils",
@@ -1486,7 +1486,7 @@ const ROSES: RouteLanding = {
   eyebrow: "Costa Brava · Bay of Roses · Empuriabrava",
   EyebrowIcon: Waves,
   title: `Barcelona Airport to Roses Transfer — from €${rosesFrom}`,
-  description: `Private transfer from BCN El Prat or central Barcelona to Roses and Empuriabrava on the Bay of Roses. Fixed €${rosesFrom} per vehicle, about 170 km and 1 hour 50 minutes, door to door.`,
+  description: `Private transfer from BCN El Prat or central Barcelona to Roses and Empuriabrava. Fixed €${rosesFrom} per vehicle, about 170 km and 1 hour 50 minutes.`,
   keywords: [
     "barcelona airport to roses transfer",
     "barcelona to roses",

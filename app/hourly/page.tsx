@@ -13,7 +13,7 @@ const NIGHT_PCT = Math.round(NIGHT_SURCHARGE_RATE * 100);
 
 export const metadata: Metadata = {
   title: { absolute: `Hourly Chauffeur Barcelona — Rates From €${HOURLY_FROM}/hr | Elite BCN` },
-  description: `Hourly chauffeur hire in Barcelona: published per-hour rate for every vehicle, from €${HOURLY_FROM}/hr with ${HOURLY_INCLUDED_KM} km included and a ${HOURLY_MIN_HOURS}-hour minimum. Corolla to V-Class and Sprinter.`,
+  description: `Hourly chauffeur hire in Barcelona from €${HOURLY_FROM}/hr, ${HOURLY_INCLUDED_KM} km included, ${HOURLY_MIN_HOURS}-hour minimum. Published rate for every vehicle.`,
   alternates: { canonical: `${BASE}/hourly` },
   keywords: [
     "hourly chauffeur barcelona",

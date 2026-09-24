@@ -9,10 +9,13 @@ import { roadDistance, resolveEndpoint } from "@/lib/geo";
 
 const schema = z.object({
   bookingType:     z.enum(["TRANSFER", "HOURLY", "DAY_HIRE", "CORPORATE"]).default("TRANSFER"),
-  pickupLat:       z.number(),
-  pickupLng:       z.number(),
-  dropoffLat:      z.number().optional(),
-  dropoffLng:      z.number().optional(),
+  // Bounded, because they were not: lat 999 / lng 999 was accepted and
+  // priced as a 26,599 km journey. Nothing rejected it, nothing flagged it,
+  // and the fare it produced was whatever that distance came to.
+  pickupLat:       z.number().min(-90).max(90),
+  pickupLng:       z.number().min(-180).max(180),
+  dropoffLat:      z.number().min(-90).max(90).optional(),
+  dropoffLng:      z.number().min(-180).max(180).optional(),
   vehicleClass:    z.string(),
   // The exact car chosen. Optional so older clients keep working; without it
   // the price falls back to the vehicle class, which is what it always was.

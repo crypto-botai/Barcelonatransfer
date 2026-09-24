@@ -22,7 +22,7 @@ import { policySection, CANCELLATION_WINDOWS } from "@/lib/policies";
 
 export const metadata: Metadata = {
   title: { absolute: "Refund & Cancellation Policy | Elite BCN Transfers" },
-  description: "What is refunded when you cancel an Elite BCN transfer: free cancellation 24 hours before a city pickup, 48 hours outside the city, 72 hours for a minibus. Cancellation protection to 2 hours before, deposits, no-shows and how refunds are paid.",
+  description: "Free cancellation 24 hours before a city pickup, 48 outside the city, 72 for a minibus. Cancellation protection, deposits, no-shows and how refunds are paid.",
   alternates: { canonical: "https://www.elitebcn.info/refund-policy" },
   openGraph: {
     ...SHARED_OG,
