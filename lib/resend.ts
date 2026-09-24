@@ -44,6 +44,7 @@ import {
   flightDelayCard,
   flightOpsCard,
   adminNoticeCard,
+  adminNewBookingCard,
   driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard, returnRebookCard,
   driverEmailChangedCard,
   pickupChangedCard, adminPickupChangedCard,
@@ -138,287 +139,8 @@ function splitDatetime(dt: string): { date: string; time: string } {
     : { date: dt, time: "" };
 }
 
-function adminNewBookingAlertHtml({
-  confirmationCode, clientName, clientEmail, clientPhone,
-  pickupAddress, dropoffAddress, pickupDatetime, vehicleClass,
-  passengers, luggage, flightNumber, totalAmount, specialRequests, paymentNote,
-}: {
-  confirmationCode: string; clientName: string; clientEmail: string; clientPhone?: string | null;
-  pickupAddress: string; dropoffAddress?: string | null; pickupDatetime: string;
-  vehicleClass: string; passengers: number; luggage?: number; flightNumber?: string | null;
-  totalAmount: number; specialRequests?: string | null;
-  /** How the money is arriving, when it is not simply paid in full. */
-  paymentNote?: string | null;
-}): string {
-  const { date, time } = splitDatetime(pickupDatetime);
-  const code = esc(confirmationCode);
-  // Extras were being thrown away here: the metadata block was stripped and
-  // only the customer's own note survived, so a paid-for child seat reached
-  // nobody who could act on it.
-  const meta = parseBookingMeta(specialRequests);
-  const notes = esc(meta.notes ?? "") || "—";
-  const extrasLine = meta.extras.length ? esc(formatExtras(meta.extras)) : "";
-
-  return `<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light">
-<meta name="supported-color-schemes" content="light">
-<title>New Booking — Elite BCN</title>
-</head>
-<body style="margin:0; padding:0; background-color:#efece5; -webkit-text-size-adjust:100%;">
-
-<div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
-  ${code} &middot; ${esc(date)} ${esc(time)} &middot; ${esc(vehicleName(vehicleClass))} &middot; €${totalAmount.toFixed(2)} — driver assignment required.
-</div>
-
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#efece5;">
-<tr><td align="center" style="padding:32px 12px;">
-  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:100%;">
-
-    <tr><td style="background-color:#141414; padding:28px 40px; text-align:center;">
-      <div style="font-family:Georgia,'Times New Roman',serif; font-size:22px; letter-spacing:7px; color:#ffffff;">
-        ELITE<span style="color:#c9a96e;">BCN</span>
-      </div>
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#8a8a8a; padding-top:8px;">
-        ADMIN &nbsp;&middot;&nbsp; OPERATIONS
-      </div>
-    </td></tr>
-    <tr><td style="height:3px; background-color:#c9a96e; font-size:0; line-height:0;">&nbsp;</td></tr>
-
-    <tr><td style="background-color:#faf8f4; padding:40px 48px 8px 48px;">
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:4px; color:#b39159; text-transform:uppercase;">
-        New Booking &middot; Paid
-      </div>
-      <div style="font-family:Georgia,'Times New Roman',serif; font-size:26px; line-height:34px; color:#1a1a1a; padding-top:12px;">
-        Driver assignment required
-      </div>
-    </td></tr>
-
-    <tr><td style="background-color:#faf8f4; padding:24px 48px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #c9a96e; border-radius:2px;">
-        <tr>
-          <td style="padding:18px 24px;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:3px; color:#9a9a9a; text-transform:uppercase;">Code</span><br>
-            <span style="font-family:Georgia,'Times New Roman',serif; font-size:24px; letter-spacing:6px; color:#b39159;">${code}</span>
-          </td>
-          <td style="padding:18px 24px; text-align:right; vertical-align:middle;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:3px; color:#9a9a9a; text-transform:uppercase;">Amount</span><br>
-            <span style="font-family:Georgia,'Times New Roman',serif; font-size:24px; color:#1a1a1a;">€${totalAmount.toFixed(2)}</span>
-            ${paymentNote ? `<br><span style="font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#b39159;">${esc(paymentNote)}</span>` : ""}
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-
-    <tr><td style="background-color:#faf8f4; padding:8px 48px 16px 48px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-
-        <tr>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top; width:120px;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Client</span>
-          </td>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a;">${esc(clientName)}</span>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Contact</span>
-          </td>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#1a1a1a;">
-              <a href="mailto:${esc(clientEmail)}" style="color:#b39159; text-decoration:none;">${esc(clientEmail)}</a><br>
-              ${clientPhone ? `<a href="tel:${esc(clientPhone)}" style="color:#b39159; text-decoration:none;">${esc(clientPhone)}</a>` : "<span style=\"color:#9a9a9a;\">—</span>"}
-            </span>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Pick-up</span>
-          </td>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#1a1a1a;">${esc(pickupAddress)}</span>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Drop-off</span>
-          </td>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#1a1a1a;">${esc(dropoffAddress)}</span>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Date &amp; Time</span>
-          </td>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a; font-weight:bold;">${esc(date)}${time ? ` &nbsp;&middot;&nbsp; ${esc(time)}` : ""}</span>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Vehicle</span>
-          </td>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a;">${esc(vehicleName(vehicleClass))} &nbsp;&middot;&nbsp; ${passengers} pax${luggage != null ? ` &nbsp;&middot;&nbsp; ${luggage} bags` : ""}</span>
-          </td>
-        </tr>
-${flightNumber ? `
-        <tr>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Flight</span>
-          </td>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a; font-weight:bold;">${esc(flightNumber)}</span>
-          </td>
-        </tr>` : ""}
-${extrasLine ? `
-        <tr>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Extras</span>
-          </td>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a; font-weight:bold;">${extrasLine}</span>
-          </td>
-        </tr>` : ""}
-${meta.tipAmount > 0 ? `
-        <tr>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6; vertical-align:top;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Driver tip</span>
-          </td>
-          <td style="padding:14px 0; border-bottom:1px solid #e9e3d6;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#b39159; font-weight:bold;">&euro;${meta.tipAmount.toFixed(2)}</span>
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#8a8a8a;"> &middot; included in the total</span>
-          </td>
-        </tr>` : ""}
-
-        <tr>
-          <td style="padding:14px 0; vertical-align:top;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#9a9a9a; text-transform:uppercase;">Notes</span>
-          </td>
-          <td style="padding:14px 0;">
-            <span style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:21px; color:#5c5c5c;">${notes}</span>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-
-    <tr><td style="background-color:#faf8f4; padding:16px 48px 44px 48px; text-align:center;">
-      <table role="presentation" cellpadding="0" cellspacing="0" align="center">
-        <tr><td style="background-color:#141414; border-radius:2px;">
-          <a href="${SITE_URL}/admin/bookings" style="display:inline-block; padding:15px 38px; font-family:Helvetica,Arial,sans-serif; font-size:13px; letter-spacing:2px; color:#c9a96e; text-decoration:none; text-transform:uppercase;">
-            Assign Driver
-          </a>
-        </td></tr>
-      </table>
-    </td></tr>
-
-    <tr><td style="background-color:#141414; padding:24px 48px; text-align:center;">
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2px; color:#5c5c5c;">
-        INTERNAL NOTIFICATION &middot; ELITE BCN OPERATIONS &middot; ${esc(date)}
-      </div>
-    </td></tr>
-
-  </table>
-</td></tr>
-</table>
-</body>
-</html>`;
-}
 
 // ─── Welcome Email Template ─────────────────────────────────
-function welcomeHtml({
-  firstName, email, password, unsubUrl,
-}: {
-  firstName: string; email: string; password: string; unsubUrl?: string;
-}): string {
-  return `<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light">
-<meta name="supported-color-schemes" content="light">
-<title>Welcome — Elite BCN</title>
-</head>
-<body style="margin:0; padding:0; background-color:#efece5; -webkit-text-size-adjust:100%;">
-<div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">Welcome to Elite BCN — your luxury chauffeur service in Barcelona.</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#efece5;">
-<tr><td align="center" style="padding:32px 12px;">
-  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:100%;">
-    <tr><td style="background-color:#141414; padding:36px 40px 32px 40px; text-align:center;">
-      <div style="font-family:Georgia,'Times New Roman',serif; font-size:26px; letter-spacing:8px; color:#ffffff;">ELITE<span style="color:#c9a96e;">BCN</span></div>
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:4px; color:#8a8a8a; padding-top:10px;">LUXURY TRANSFERS &nbsp;·&nbsp; BARCELONA</div>
-    </td></tr>
-    <tr><td style="height:3px; background-color:#c9a96e; font-size:0; line-height:0;">&nbsp;</td></tr>
-    <tr><td style="background-color:#faf8f4; padding:48px 48px 24px 48px;">
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:4px; color:#b39159; text-transform:uppercase;">Welcome Aboard</div>
-      <div style="font-family:Georgia,'Times New Roman',serif; font-size:30px; line-height:38px; color:#1a1a1a; padding-top:14px;">The keys are yours,<br>${esc(firstName)}.</div>
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:23px; color:#5c5c5c; padding-top:16px;">Your Elite BCN account is ready. From El Prat Airport to your hotel, from Montserrat to Sitges — a professional chauffeur is one tap away.</div>
-    </td></tr>
-    <tr><td style="background-color:#faf8f4; padding:0 48px 28px 48px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e0d8c8; border-radius:2px;">
-        <tr><td style="padding:20px 24px 12px 24px;">
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1a1a1a;"><span style="color:#b39159; margin-right:8px;">✦</span><strong>Professional licensed chauffeurs</strong></div>
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#8a8a8a; padding-top:3px; padding-left:20px;">VTC-certified, background-checked, always in uniform</div>
-        </td></tr>
-        <tr><td style="padding:0 24px 12px 24px;">
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1a1a1a;"><span style="color:#b39159; margin-right:8px;">✦</span><strong>Fixed prices, no surprises</strong></div>
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#8a8a8a; padding-top:3px; padding-left:20px;">Your price is locked at booking — no meter, no surge pricing</div>
-        </td></tr>
-        <tr><td style="padding:0 24px 12px 24px;">
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1a1a1a;"><span style="color:#b39159; margin-right:8px;">✦</span><strong>Free cancellation 24h before pickup</strong></div>
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#8a8a8a; padding-top:3px; padding-left:20px;">Plans change — cancel anytime up to 24 hours before departure</div>
-        </td></tr>
-        <tr><td style="padding:0 24px 20px 24px;">
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1a1a1a;"><span style="color:#b39159; margin-right:8px;">✦</span><strong>Flight tracking &amp; meet &amp; greet</strong></div>
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#8a8a8a; padding-top:3px; padding-left:20px;">We monitor your flight and wait at arrivals with your name board</div>
-        </td></tr>
-      </table>
-    </td></tr>
-    <tr><td style="background-color:#faf8f4; padding:0 48px 32px 48px;">
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:3px; color:#9a9a9a; text-transform:uppercase; margin-bottom:12px;">Your Login Details</div>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0ede6; border:1px solid #e0d8c8; border-radius:2px;">
-        <tr><td style="padding:14px 20px; border-bottom:1px solid #e0d8c8;">
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#9a9a9a; text-transform:uppercase; letter-spacing:2px;">Email</div>
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:14px; color:#1a1a1a; padding-top:4px;">${esc(email)}</div>
-        </td></tr>
-        <tr><td style="padding:14px 20px;">
-          <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#9a9a9a; text-transform:uppercase; letter-spacing:2px;">Temporary Password</div>
-          <div style="font-family:Georgia,'Times New Roman',serif; font-size:18px; letter-spacing:4px; color:#b39159; padding-top:4px;">${esc(password)}</div>
-        </td></tr>
-      </table>
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#9a9a9a; padding-top:10px;">Change your password after your first login at <a href="${SITE_URL}/auth/login" style="color:#b39159; text-decoration:none;">elitebcn.info</a></div>
-    </td></tr>
-    <tr><td style="background-color:#faf8f4; padding:0 48px 48px 48px; text-align:center;">
-      <table role="presentation" cellpadding="0" cellspacing="0" align="center">
-        <tr><td style="background-color:#b39159; border-radius:2px;">
-          <a href="${SITE_URL}/book" style="display:inline-block; padding:15px 38px; font-family:Helvetica,Arial,sans-serif; font-size:13px; letter-spacing:2px; color:#ffffff; text-decoration:none; text-transform:uppercase;">Book Your First Transfer</a>
-        </td></tr>
-      </table>
-    </td></tr>
-    <tr><td style="background-color:#141414; padding:32px 48px; text-align:center;">
-      <div style="font-family:Georgia,'Times New Roman',serif; font-size:15px; letter-spacing:5px; color:#ffffff;">ELITE<span style="color:#c9a96e;">BCN</span></div>
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:11px; line-height:19px; color:#8a8a8a; padding-top:14px;">+34 635 383 712 &nbsp;·&nbsp; www.elitebcn.info<br>Licensed VTC Operator — Barcelona, Spain</div>
-      ${unsubUrl ? `<div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#4a4a4a; padding-top:14px;"><a href="${unsubUrl}" style="color:#4a4a4a; text-decoration:underline;">Unsubscribe</a></div>` : ""}
-      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; color:#5c5c5c; padding-top:8px;">&copy; ${new Date().getFullYear()} Elite BCN Transfers. All rights reserved.</div>
-    </td></tr>
-  </table>
-</td></tr>
-</table>
-</body>
-</html>`;
-}
 
 // ─── Abandoned Booking Email Template ────────────────────────
 export function newsletterIssueHtml({
@@ -613,22 +335,18 @@ export async function sendAdminNewBookingAlert({
   const paymentNote = meta.payOption === "DEPOSIT"
     ? `Deposit paid online · chauffeur collects the balance on the day${meta.protectionFee > 0 ? " · cancellation protection taken" : ""}`
     : meta.protectionFee > 0 ? "Paid in full · cancellation protection taken" : null;
-  const html = adminNewBookingAlertHtml({
-    confirmationCode,
-    clientName:      guestName,
-    clientEmail:     guestEmail,
-    clientPhone:     guestPhone,
-    pickupAddress,
-    dropoffAddress,
-    pickupDatetime,
-    vehicleClass,
-    passengers:      passengers ?? 1,
-    luggage,
-    flightNumber,
-    totalAmount,
-    specialRequests,
-    paymentNote,
-  });
+  const { date, time } = splitDatetime(pickupDatetime);
+  const html = emailDocument(
+    adminNewBookingCard({
+      confirmationCode,
+      clientName: guestName, clientEmail: guestEmail, clientPhone: guestPhone,
+      pickupAddress, dropoffAddress, date, time,
+      vehicleLabel: vehicleName(vehicleClass),
+      passengers: passengers ?? 1,
+      luggage, flightNumber, totalAmount, specialRequests, paymentNote,
+    }),
+    `${guestName} · ${pickupAddress} · ${date}`,
+  );
   // Logged like every other email. This was the one send that recorded nothing,
   // so there was no way to tell from the admin whether a new-booking alert had
   // gone out — which is exactly the question asked when one appears to be
@@ -704,12 +422,18 @@ export async function sendWelcomeEmail({
 }: {
   to: string; name: string; password: string; confirmationCode: string; totalAmount: number;
 }) {
-  const html = welcomeHtml({
-    firstName: name.split(" ")[0],
-    email:     to,
-    password,
-    unsubUrl:  `${SITE_URL}/contact`,
-  });
+  // credentialsCard says exactly this and is already on the template, so
+  // welcomeHtml was a second copy of it with its own colours.
+  const html = emailDocument(
+    credentialsCard({
+      firstName: name.split(" ")[0],
+      email: to,
+      password,
+      portalLabel: "account",
+      loginUrl: `${SITE_URL}/auth/login`,
+    }),
+    "Your Elite BCN account is ready — choose your own password at first sign-in.",
+  );
   const id = await sendEmail({ from: FROM, to, subject: `Welcome to Elite BCN — Your Account is Ready`, html });
   await logEmail({ to, subject: `Welcome to Elite BCN`, type: "WELCOME", resendId: id });
 }

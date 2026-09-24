@@ -1588,3 +1588,72 @@ export function adminNoticeCard(o: {
 export function wrappedCard(innerHtml: string): string {
   return card(`<tr><td style="padding:36px 32px;">${innerHtml}</td></tr>`);
 }
+
+/**
+ * A booking that has come in and needs a chauffeur put on it.
+ *
+ * This had its own hand-built document — a light cream one, with its own
+ * masthead reading "Admin · Operations" and its own footer reading "Internal
+ * notification". It was the last email not on this template, and it hid from
+ * the audit because it lives in the same file as twenty that are: the check
+ * looked per file rather than per email.
+ *
+ * Two templates is worse than one in a way that is easy to miss. Gmail's dark
+ * mode inverts both, and inverting a light template and a dark one gives two
+ * different-looking results, which is why the office was seeing some alerts
+ * dark-on-light and others light-on-dark.
+ */
+export function adminNewBookingCard(o: {
+  confirmationCode: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone?: string | null;
+  pickupAddress: string;
+  dropoffAddress?: string | null;
+  /** Pre-split by the caller, as every other card here takes them. */
+  date: string;
+  time: string;
+  vehicleLabel: string;
+  passengers: number;
+  luggage?: number | null;
+  flightNumber?: string | null;
+  totalAmount: number;
+  specialRequests?: string | null;
+  /** How the money is arriving, when it is not simply paid in full. */
+  paymentNote?: string | null;
+}): string {
+  return card(`
+    <tr><td style="padding:40px 40px 0 40px;">
+      ${eyebrow("New booking · Paid")}
+      ${headline("A chauffeur is needed")}
+    </td></tr>
+
+    <tr><td style="padding:24px 40px 0 40px;">
+      ${amountBar("Total", o.totalAmount, o.paymentNote ?? undefined)}
+    </td></tr>
+
+    <tr><td style="padding:20px 40px 0 40px;">
+      ${referencePanel(o.confirmationCode, "Quote this reference with dispatch")}
+    </td></tr>
+
+    <tr><td style="padding:24px 40px 0 40px;">
+      ${detailTable(
+        row("Client", esc(o.clientName)) +
+        row("Contact",
+          `<a href="mailto:${encodeURIComponent(o.clientEmail)}" style="color:${GOLD};text-decoration:none;">${esc(o.clientEmail)}</a>` +
+          (o.clientPhone ? `<br><a href="tel:${esc(o.clientPhone).replace(/[^+0-9]/g, "")}" style="color:${GOLD};text-decoration:none;">${esc(o.clientPhone)}</a>` : "")) +
+        row("Pick-up", esc(o.pickupAddress)) +
+        row("Drop-off", esc(o.dropoffAddress || "—")) +
+        row("Date", `${esc(o.date)}${o.time ? ` &nbsp;&middot;&nbsp; ${esc(o.time)}` : ""}`) +
+        row("Vehicle", `${esc(o.vehicleLabel)} &nbsp;&middot;&nbsp; ${o.passengers} pax${o.luggage != null ? ` &nbsp;&middot;&nbsp; ${o.luggage} bags` : ""}`) +
+        (o.flightNumber ? row("Flight", esc(o.flightNumber)) : "") +
+        row("Notes", o.specialRequests ? esc(o.specialRequests) : "—", true),
+      )}
+    </td></tr>
+
+    <tr><td style="padding:26px 40px 0 40px;">
+      ${button(`${SITE_URL}/admin/bookings`, "Assign a driver")}
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}

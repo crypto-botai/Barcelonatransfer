@@ -23,8 +23,52 @@ const ROOT = join(__dirname, "..", "..");
 const rd = (p: string) => readFileSync(join(ROOT, p), "utf-8");
 
 describe("no email is built outside the template", () => {
-  /** The shell is what carries the masthead, the footer and the colour scheme. */
-  it("every sender goes through emailDocument", () => {
+  /**
+   * Only the shell may declare a document.
+   *
+   * The first version of this test asked whether each *file* mentioned
+   * emailDocument, and lib/resend.ts does — twenty times. So a hand-built
+   * cream-coloured admin template sitting in the same file passed, and went
+   * on being the one email that looked like a different company's. Counting
+   * documents rather than files is what actually catches that: a second
+   * <!DOCTYPE outside premium.ts is a second template by definition.
+   */
+  it("no email declares its own document outside the shell", () => {
+    const files: string[] = [];
+    for (const dir of ["app", "lib"]) {
+      (function walk(d: string) {
+        for (const e of readdirSync(d)) {
+          const p = join(d, e);
+          if (/node_modules|\.next|__tests__/.test(p)) continue;
+          if (statSync(p).isDirectory()) walk(p);
+          else if (e.endsWith(".ts") || e.endsWith(".tsx")) files.push(p);
+        }
+      })(join(ROOT, dir));
+    }
+
+    const rogue: string[] = [];
+    for (const f of files) {
+      const rel = relative(ROOT, f).replace(/\\/g, "/");
+      if (rel === "lib/email/premium.ts") continue;
+      const s = readFileSync(f, "utf-8");
+      if (!s.includes("<!DOCTYPE")) continue;
+      // An HTML *page* returned to a browser is not an email.
+      if (/new NextResponse\(|Content-Type": "text\/html/.test(s)) continue;
+      /**
+       * The one deliberate exception: the monthly newsletter is a magazine,
+       * not a receipt. It is a light editorial layout that says so —
+       * color-scheme: light — and putting it in the transactional shell
+       * would be flattening two different jobs into one. It is allowed by
+       * name so that a *new* rogue template still fails this test.
+       */
+      if (s.includes("The Barcelona Travel Insider")) continue;
+      rogue.push(rel);
+    }
+    expect(rogue, `these build an email document by hand:\n${rogue.join("\n")}`).toEqual([]);
+  });
+
+  /** And every sender still has to reach for the shell. */
+  it("every file that sends email uses emailDocument", () => {
     const files: string[] = [];
     (function walk(dir: string) {
       for (const e of readdirSync(dir)) {
