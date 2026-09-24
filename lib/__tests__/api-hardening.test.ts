@@ -102,6 +102,36 @@ describe("coordinates have to be on Earth", () => {
   });
 });
 
+describe("everything is sent from a domain that exists", () => {
+  /**
+   * The contact form and the newsletter sent from
+   * noreply@elitebcntransfers.com, which is NXDOMAIN — no A record, no MX,
+   * no DKIM. Nothing failed loudly, because Resend accepts a send and
+   * delivers afterwards: the form returned {"ok":true} to the customer and
+   * the enquiry went nowhere. elitebcn.info is the domain that actually
+   * carries the DKIM key and the SPF record.
+   */
+  it("never sends from elitebcntransfers.com", () => {
+    for (const f of [
+      "app/api/contact/route.ts",
+      "app/api/newsletter/subscribe/route.ts",
+      "app/admin/settings/page.tsx",
+    ]) {
+      const s = rd(f);
+      // The explanation of the bug may name it; a from: line may not.
+      const sending = s.split("\n").filter((l) => /from:|const FROM|value:/.test(l)).join("\n");
+      expect(sending, f).not.toContain("elitebcntransfers.com");
+    }
+  });
+
+  it("uses the one configured sender everywhere", () => {
+    for (const f of ["app/api/contact/route.ts", "app/api/newsletter/subscribe/route.ts"]) {
+      expect(rd(f), f).toContain('process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>"');
+    }
+    expect(rd("lib/resend.ts")).toContain('process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>"');
+  });
+});
+
 describe("the staff endpoints refuse an anonymous caller", () => {
   it("every admin and partner route checks first", () => {
     for (const route of [

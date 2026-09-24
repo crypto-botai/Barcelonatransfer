@@ -11,7 +11,9 @@ const schema = z.object({
 });
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
-const FROM     = "Elite BCN Transfers <noreply@elitebcntransfers.com>";
+// The domain the rest of the site sends from, and the only one with DKIM
+// and SPF published. See the note in app/api/contact/route.ts.
+const FROM     = process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>";
 
 const rateMap = new Map<string, number[]>();
 
