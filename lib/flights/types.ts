@@ -35,6 +35,21 @@ export interface FlightStatus {
   arrivalAirport: string | null;
   arrivalTerminal: string | null;
   departureAirport: string | null;
+  /**
+   * The other half of the journey.
+   *
+   * The provider has always returned all of this and it was thrown away,
+   * because the only question being asked was "when is it on the ground at
+   * BCN?". That is the right question for dispatch and the wrong one for the
+   * person reading the alert: whether a plane has left yet, and how late it
+   * left, is what says whether the arrival estimate is worth anything.
+   */
+  scheduledDeparture: Date | null;
+  /** Wheels up, when the provider has it. Null before the aircraft leaves. */
+  actualDeparture: Date | null;
+  departureTerminal: string | null;
+  departureAirportName: string | null;
+  arrivalAirportName: string | null;
   airline: string | null;
   /** Which provider answered, for the audit trail. */
   source: string;

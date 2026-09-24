@@ -155,6 +155,13 @@ export class AeroDataBoxProvider implements FlightProvider {
       arrivalAirport:   arrival.airport?.iata   ?? arrival.airport?.icao ?? null,
       arrivalTerminal:  arrival.terminal        ?? null,
       departureAirport: f.departure?.airport?.iata ?? null,
+      // Already in the payload; previously dropped on the floor.
+      scheduledDeparture:   parseTime(f.departure?.scheduledTime) ?? null,
+      actualDeparture:      parseTime(f.departure?.actualTime)
+                         ?? parseTime(f.departure?.runwayTime) ?? null,
+      departureTerminal:    f.departure?.terminal ?? null,
+      departureAirportName: f.departure?.airport?.name ?? null,
+      arrivalAirportName:   arrival.airport?.name ?? null,
       airline:          f.airline?.name         ?? null,
       source:           this.name,
     };

@@ -1260,3 +1260,163 @@ export function returnRebookCard(o: {
     ${sectionSpacer(42)}
   `);
 }
+
+// ─── 9. Flight alert (operations) ────────────────────────────
+
+/**
+ * What operations actually needs to see about a delayed flight.
+ *
+ * The alert this replaces was four lines of plain text in a grey box: the
+ * flight number, the new landing time, the pickup address and whether a
+ * driver was assigned. It answered "how late" and nothing else, so the only
+ * way to judge whether that estimate was worth acting on — has the aircraft
+ * even left yet, and how late did it leave? — was to go and look the flight
+ * up somewhere else.
+ *
+ * Everything below was already in the provider's response and was being
+ * thrown away. It is laid out as the boarding pass the reader already has in
+ * their head: origin on the left, destination on the right, scheduled under
+ * actual, and the terminals a driver has to drive to.
+ *
+ * On depth: an email is not a web page. There is no JavaScript, no transform,
+ * and in Gmail no stylesheet at all — so dimension here is layered panels, a
+ * lit top edge and a gradient across the route rule, which every client
+ * renders, rather than anything that collapses to a flat mess in the one
+ * client this alert is actually read in.
+ */
+export function flightOpsCard(o: {
+  confirmationCode: string;
+  flightNumber: string;
+  airline?: string | null;
+  /** "delayed", "cancelled", "diverted", "en_route", "landed"… */
+  state?: string | null;
+  delayMinutes?: number | null;
+  from?: { code?: string | null; name?: string | null; terminal?: string | null; scheduled?: string | null; actual?: string | null } | null;
+  to?:   { code?: string | null; name?: string | null; terminal?: string | null; scheduled?: string | null; estimated?: string | null } | null;
+  /** "3h 27m", when both ends are known. */
+  duration?: string | null;
+  pickupAddress: string;
+  passenger?: string | null;
+  driver?: string | null;
+  bookingUrl: string;
+}): string {
+  const late = typeof o.delayMinutes === "number" && o.delayMinutes > 0;
+  const grave = o.state === "cancelled" || o.state === "diverted";
+  // Red is kept for the two states where the car may not be wanted at all. A
+  // late flight is routine; colouring it red as well would mean neither
+  // colour said anything.
+  const accent = grave ? "#C2553F" : GOLD;
+  const accentEdge = grave ? "#7A3327" : GOLD_EDGE;
+  const stripBg = grave ? "#2E1E1B" : "#2B2520";
+
+  const stateLabel = grave
+    ? (o.state === "cancelled" ? "Cancelled" : "Diverted")
+    : late ? `${o.delayMinutes} min late`
+    : o.state === "landed" ? "Landed"
+    : o.state === "en_route" ? "In the air"
+    : "Schedule changed";
+
+  // headline() does not escape what it is given. The flight number is
+  // normalised to letters and digits upstream, but that is a guarantee made
+  // somewhere else and cheap to stop depending on here.
+  const fn = esc(o.flightNumber);
+  const headline_ = grave
+    ? `${fn} is ${o.state === "cancelled" ? "cancelled" : "diverted"}`
+    : late
+      ? `${fn} is ${o.delayMinutes} minutes late`
+      : `${fn} has a new schedule`;
+
+  /** One end of the journey: big code, airport beneath, times beneath that. */
+  const endpoint = (
+    align: "left" | "right",
+    code: string, name: string, terminal: string | null,
+    headTime: string | null, headLabel: string,
+    subTime: string | null, subLabel: string,
+  ) => `
+    <td width="37%" align="${align}" style="vertical-align:top;">
+      <div style="font-family:${SERIF};font-size:34px;line-height:36px;letter-spacing:2px;color:${TITLE};">${esc(code)}</div>
+      <div style="font-family:${SANS};font-size:11px;line-height:16px;color:${LABEL};padding-top:6px;">${esc(name)}</div>
+      ${terminal ? `<div style="font-family:${SANS};font-size:11px;line-height:16px;color:${accent};padding-top:3px;">Terminal ${esc(terminal)}</div>` : ""}
+      ${headTime ? `
+      <div style="font-family:${SANS};font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${LABEL};padding-top:14px;">${esc(headLabel)}</div>
+      <div style="font-family:${SERIF};font-size:20px;line-height:24px;color:${TITLE};padding-top:2px;">${esc(headTime)}</div>` : ""}
+      ${subTime ? `
+      <div style="font-family:${SANS};font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${LABEL};padding-top:9px;">${esc(subLabel)}</div>
+      <div style="font-family:${SANS};font-size:13px;line-height:18px;color:${TEXT};padding-top:1px;">${esc(subTime)}</div>` : ""}
+    </td>`;
+
+  const from = o.from ?? {};
+  const to = o.to ?? {};
+
+  const driverKnown = !!o.driver && o.driver !== "NOT YET ASSIGNED";
+
+  const strip = late || grave
+    ? `<tr><td style="padding:14px 22px;border-top:1px solid ${accentEdge};background-color:${stripBg};">
+          <div style="font-family:${SANS};font-size:12px;line-height:19px;color:${accent};">
+            ${grave
+              ? "The car may not be wanted. Confirm with the passenger before dispatching."
+              : `The pick-up moves with the aircraft. ${driverKnown ? `${esc(o.driver)} has been told.` : "No driver is assigned yet."}`}
+          </div>
+        </td></tr>`
+    : "";
+
+  return card(`
+    <tr><td style="padding:40px 40px 0 40px;">
+      ${eyebrow("Operations · Flight watch")}
+      ${headline(headline_)}
+    </td></tr>
+
+    <tr><td style="padding:26px 40px 0 40px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${RULE};">
+
+        <!-- a lit top edge: the cheap trick that reads as raised -->
+        <tr><td style="height:1px;background-color:#3D414A;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+        <tr><td style="padding:16px 22px;border-bottom:1px solid ${RULE};background-color:#22262C;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td align="left" style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">${esc(o.airline || "Flight")}</td>
+            <td align="right" style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${accent};">${esc(stateLabel)}</td>
+          </tr></table>
+        </td></tr>
+
+        <tr><td style="padding:24px 22px 22px 22px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            ${endpoint("left",
+              from.code || "—", from.name || "Departure", from.terminal ?? null,
+              from.actual || from.scheduled || null, from.actual ? "Took off" : "Departs",
+              from.actual && from.scheduled ? from.scheduled : null, "Scheduled")}
+
+            <td width="26%" align="center" style="vertical-align:top;padding-top:10px;">
+              <div style="font-family:${SERIF};font-size:13px;color:${accent};letter-spacing:4px;">${esc(o.flightNumber)}</div>
+              <div style="height:2px;margin:12px 0 10px 0;background-color:${accentEdge};background-image:linear-gradient(to right,${BG},${accent},${BG});font-size:0;line-height:0;">&nbsp;</div>
+              ${o.duration ? `<div style="font-family:${SANS};font-size:11px;color:${LABEL};">${esc(o.duration)}</div>` : ""}
+            </td>
+
+            ${endpoint("right",
+              to.code || "BCN", to.name || "Barcelona", to.terminal ?? null,
+              to.estimated || to.scheduled || null, to.estimated ? "Now lands" : "Lands",
+              to.estimated && to.scheduled ? to.scheduled : null, "Scheduled")}
+          </tr></table>
+        </td></tr>
+
+        ${strip}
+      </table>
+    </td></tr>
+
+    <tr><td style="padding:26px 40px 0 40px;">
+      ${detailTable(
+        row("Booking", esc(o.confirmationCode)) +
+        (o.passenger ? row("Passenger", esc(o.passenger)) : "") +
+        row("Pick-up", esc(o.pickupAddress)) +
+        row("Driver", driverKnown
+          ? esc(o.driver)
+          : `<span style="color:${accent};">Not yet assigned</span>`, true),
+      )}
+    </td></tr>
+
+    <tr><td style="padding:26px 40px 0 40px;">
+      ${button(o.bookingUrl, "Open the booking")}
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}

@@ -15,7 +15,7 @@
 import { prisma } from "@/lib/prisma";
 import { notify } from "@/lib/notifications/service";
 import { notifyAdmin } from "@/lib/whatsapp";
-import { sendFlightDelayEmail, sendDriverFlightDelayEmail } from "@/lib/resend";
+import { sendFlightDelayEmail, sendDriverFlightDelayEmail, sendOpsFlightAlert } from "@/lib/resend";
 import { lookupFlight, isMaterialDelay, isFlightTrackingEnabled } from "./index";
 import { driverMailTo } from "@/lib/driver-email";
 
@@ -25,6 +25,23 @@ export interface SweepResult {
   delayed: number;
   notified: number;
   unresolved: number;
+}
+
+/** Just the time, Barcelona clock — for a table where the date is said once. */
+function clockText(d: Date | null): string | null {
+  return d
+    ? d.toLocaleString("en-GB", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit" })
+    : null;
+}
+
+/** "3h 27m" between two moments, or null when either end is unknown. */
+function durationText(from: Date | null, to: Date | null): string | null {
+  if (!from || !to) return null;
+  const mins = Math.round((to.getTime() - from.getTime()) / 60000);
+  if (!Number.isFinite(mins) || mins <= 0 || mins > 24 * 60) return null;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return h ? `${h}h ${m}m` : `${m}m`;
 }
 
 /** Formats a Date for customer-facing copy in the local Barcelona convention. */
@@ -169,6 +186,8 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
     // A delay can collide with the driver's next job, which only a human can
     // re-plan. Fire-and-forget: an admin alert must never hold up telling the
     // customer and driver.
+    // WhatsApp stays a single line, because that is what a phone alert is
+    // for: enough to know whether to open the email standing next to it.
     void notifyAdmin(
       `Flight delay — booking ${b.confirmationCode.slice(0, 8).toUpperCase()}\n` +
       `${status.flightNumber} now lands ${when}` +
@@ -176,6 +195,39 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
       `Pickup: ${b.pickupAddress}\n` +
       `Driver: ${b.driver?.user.name ?? "NOT YET ASSIGNED"}`,
     ).catch(() => {});
+
+    // The email carries everything the provider told us, which is most of
+    // what decides whether this delay needs a human: whether the aircraft has
+    // even left, how late it left, and which terminal it comes into.
+    void sendOpsFlightAlert({
+      confirmationCode: b.confirmationCode,
+      flightNumber:     status.flightNumber,
+      airline:          status.airline,
+      state:            status.state,
+      delayMinutes:     status.delayMinutes,
+      from: {
+        code:      status.departureAirport,
+        name:      status.departureAirportName,
+        terminal:  status.departureTerminal,
+        scheduled: clockText(status.scheduledDeparture),
+        actual:    clockText(status.actualDeparture),
+      },
+      to: {
+        code:      status.arrivalAirport,
+        name:      status.arrivalAirportName,
+        terminal:  status.arrivalTerminal,
+        scheduled: clockText(status.scheduledArrival),
+        estimated: clockText(status.estimatedArrival),
+      },
+      duration: durationText(
+        status.actualDeparture ?? status.scheduledDeparture,
+        status.estimatedArrival ?? status.scheduledArrival,
+      ),
+      pickupAddress: b.pickupAddress,
+      passenger:     b.guestName,
+      driver:        b.driver?.user.name ?? null,
+      bookingId:     b.id,
+    }).catch((e) => console.error("[flights] ops alert:", e));
     result.notified++;
   }
 

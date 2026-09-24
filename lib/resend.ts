@@ -42,6 +42,7 @@ import {
   paymentReceiptCard,
   rideCompleteCard,
   flightDelayCard,
+  flightOpsCard,
   driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard, returnRebookCard,
   driverEmailChangedCard,
   pickupChangedCard, adminPickupChangedCard,
@@ -1257,4 +1258,52 @@ export async function sendDriverFlightDelayEmail({
     html,
   });
   await logEmail({ to, subject: `Driver flight delay — ${confirmationCode}`, type: "FLIGHT_DELAY_DRIVER", resendId: id });
+}
+
+/**
+ * The flight alert operations reads, as a page rather than a paragraph.
+ *
+ * It used to go through sendAdminAlertEmail, which takes a subject and a
+ * block of text and puts it in a grey box. That is right for "a new lead came
+ * in" and wrong for a flight, where the useful content is a table of times
+ * and terminals and the reader is deciding whether to move a chauffeur.
+ */
+export async function sendOpsFlightAlert(o: {
+  confirmationCode: string;
+  flightNumber: string;
+  airline?: string | null;
+  state?: string | null;
+  delayMinutes?: number | null;
+  from?: { code?: string | null; name?: string | null; terminal?: string | null; scheduled?: string | null; actual?: string | null } | null;
+  to?: { code?: string | null; name?: string | null; terminal?: string | null; scheduled?: string | null; estimated?: string | null } | null;
+  duration?: string | null;
+  pickupAddress: string;
+  passenger?: string | null;
+  driver?: string | null;
+  bookingId: string;
+}): Promise<void> {
+  const grave = o.state === "cancelled" || o.state === "diverted";
+  const late = typeof o.delayMinutes === "number" && o.delayMinutes > 0;
+
+  const subject = grave
+    ? `[Ops] ${o.flightNumber} ${o.state === "cancelled" ? "cancelled" : "diverted"} — ${o.confirmationCode}`
+    : late
+      ? `[Ops] ${o.flightNumber} ${o.delayMinutes} min late — ${o.confirmationCode}`
+      : `[Ops] ${o.flightNumber} schedule change — ${o.confirmationCode}`;
+
+  // The preheader is the line the inbox shows beside the subject, and it is
+  // the whole alert for anyone who never opens it.
+  const preheader = [
+    o.to?.estimated ? `Lands ${o.to.estimated}` : null,
+    o.to?.terminal ? `Terminal ${o.to.terminal}` : null,
+    o.driver && o.driver !== "NOT YET ASSIGNED" ? o.driver : "No driver assigned",
+  ].filter(Boolean).join(" · ");
+
+  const html = emailDocument(
+    flightOpsCard({ ...o, bookingUrl: `${SITE_URL}/admin/bookings?open=${encodeURIComponent(o.bookingId)}` }),
+    preheader,
+  );
+
+  const id = await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject, html });
+  await logEmail({ to: ADMIN_EMAIL, subject, type: "ADMIN_ALERT", resendId: id });
 }

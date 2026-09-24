@@ -25,8 +25,11 @@ describe("isMaterialDelay", () => {
     scheduledArrival: new Date("2026-09-01T10:00:00Z"),
     estimatedArrival: new Date("2026-09-01T10:00:00Z"),
     delayMinutes: 0,
-    arrivalAirport: "BCN", arrivalTerminal: "1",
-    departureAirport: "MAD", airline: "Iberia", source: "test",
+    arrivalAirport: "BCN", arrivalTerminal: "1", arrivalAirportName: "Barcelona El Prat",
+    departureAirport: "MAD", departureTerminal: "4", departureAirportName: "Madrid Barajas",
+    scheduledDeparture: new Date("2026-09-01T08:45:00Z"),
+    actualDeparture: new Date("2026-09-01T08:45:00Z"),
+    airline: "Iberia", source: "test",
   };
 
   it("ignores delays the free waiting time absorbs", () => {
