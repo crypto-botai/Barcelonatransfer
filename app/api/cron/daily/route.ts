@@ -11,6 +11,7 @@ import { sweepFlightDelays } from "@/lib/flights/sweep";
 import { formatPickupDateTime } from "@/lib/datetime";
 import { sweepAbandoned } from "@/lib/abandoned";
 import { notify } from "@/lib/notifications/service";
+import { emailDocument, wrappedCard } from "@/lib/email/premium";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -244,10 +245,10 @@ async function runAiExecutiveSummary(): Promise<void> {
       }).join("")
     : `<tr><td style="padding:8px 12px;color:#666">No active alerts</td></tr>`;
 
-  const html = `
-<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="background:#0a0a0a;color:#e5e5e5;font-family:monospace;margin:0;padding:24px">
-  <div style="max-width:600px;margin:0 auto">
+  // The briefing lays its own data out; what it gets from the shell is the
+  // masthead, the footer and the colour-scheme declaration that stops Gmail
+  // repainting it in dark mode.
+  const html = emailDocument(wrappedCard(`
 
     <div style="border:1px solid #c9a84c44;padding:20px;margin-bottom:20px">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
@@ -322,8 +323,7 @@ async function runAiExecutiveSummary(): Promise<void> {
     </div>
     <div style="color:#444;font-size:10px;margin-top:12px">Elite BCN AI Headquarters • Automated daily briefing</div>
 
-  </div>
-</body></html>`;
+`), `${bookingsToday} bookings · ${completedTasks} tasks · ${errorAgents.length > 0 ? `${errorAgents.length} errors` : "all clear"}`);
 
   await (resend as { emails: { send(o: object): Promise<unknown> } }).emails.send({
     from:    "Elite BCN AI <noreply@elitebcn.info>",

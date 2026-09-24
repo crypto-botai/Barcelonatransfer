@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { logEmail } from "@/lib/marketing";
 import { resend } from "@/lib/resend";
 import { z } from "zod";
+import { emailDocument, newsletterWelcomeCard } from "@/lib/email/premium";
 
 const schema = z.object({
   email:  z.string().email(),
@@ -59,13 +60,13 @@ export async function POST(req: NextRequest) {
     resend.emails.send({
       from: FROM, to: email,
       subject: "Welcome to Elite BCN — You're on the list 🎉",
-      html: `<div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#0a0a0a;color:#d0d0d0;padding:36px;">
-        <h2 style="color:#c9a84c;">Welcome to Elite BCN!</h2>
-        <p>Hi ${name ?? "there"},</p>
-        <p>You're now subscribed to our newsletter. You'll receive exclusive deals, travel tips, and Barcelona insider guides.</p>
-        <p style="margin-top:16px;"><a href="${SITE_URL}/book" style="background:#c9a84c;color:#000;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;">Book a Transfer</a></p>
-        <p style="margin-top:24px;font-size:12px;color:#555;"><a href="${SITE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}" style="color:#777;">Unsubscribe</a></p>
-      </div>`,
+      html: emailDocument(
+        newsletterWelcomeCard({
+          name,
+          unsubscribeUrl: `${SITE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`,
+        }),
+        "You are on the Elite BCN list.",
+      ),
     }).catch(() => {});
 
     await logEmail({ to: email, subject: "Newsletter welcome", type: "NEWSLETTER_WELCOME" });

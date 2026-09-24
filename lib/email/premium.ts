@@ -1420,3 +1420,171 @@ export function flightOpsCard(o: {
     ${sectionSpacer(42)}
   `);
 }
+
+// ─── 10. The emails that were never on this template ─────────
+
+/**
+ * A long string that must not be broken, in a box that can hold it.
+ *
+ * A reset link is the one thing in an email that has to survive being
+ * copied by hand, so it is shown as well as linked.
+ */
+function monoBox(text: string): string {
+  return `<div style="background-color:#1B1E23;border:1px solid ${RULE};padding:12px 14px;font-family:'Courier New',Courier,monospace;font-size:12px;line-height:19px;color:#9A9AA2;word-break:break-all;">${esc(text)}</div>`;
+}
+
+/**
+ * Resetting a password.
+ *
+ * This was the worst of the off-template emails, and the one it mattered
+ * most on. It was styled with a <style> block and CSS classes, and Gmail
+ * strips those: what arrived was unstyled black text on white with a bare
+ * link in the middle of it. An unstyled email asking you to click a link and
+ * type a password is indistinguishable from a phishing attempt, which is
+ * exactly the wrong thing for the one message where a customer is deciding
+ * whether to trust us.
+ */
+export function passwordResetCard(o: {
+  name?: string | null;
+  email: string;
+  resetUrl: string;
+  /** How long the link lives, in words. */
+  expiresIn: string;
+}): string {
+  return card(`
+    <tr><td style="padding:40px 40px 0 40px;">
+      ${eyebrow("Account")}
+      ${headline("Reset your password")}
+      ${paragraph(`Hello${o.name ? ` ${esc(o.name)}` : ""}, we were asked to reset the password for <span style="color:${GOLD};">${esc(o.email)}</span>.`)}
+      ${paragraph(`Choose a new one with the button below. The link works once and expires in ${esc(o.expiresIn)}.`, 12)}
+    </td></tr>
+
+    <tr><td style="padding:28px 40px 0 40px;">
+      ${button(o.resetUrl, "Choose a new password")}
+    </td></tr>
+
+    <tr><td style="padding:26px 40px 0 40px;">
+      <div style="font-family:${SANS};font-size:12px;line-height:20px;color:${LABEL};padding-bottom:10px;">Or paste this into your browser:</div>
+      ${monoBox(o.resetUrl)}
+    </td></tr>
+
+    <tr><td style="padding:26px 40px 0 40px;">
+      <div style="border-top:1px solid ${RULE};padding-top:18px;font-family:${SANS};font-size:12px;line-height:20px;color:${LABEL};">
+        If you did not ask for this, nothing has happened and you can ignore this message. Your password stays as it is.
+      </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+/** Someone has joined the newsletter. */
+export function newsletterWelcomeCard(o: {
+  name?: string | null;
+  unsubscribeUrl: string;
+}): string {
+  return card(`
+    <tr><td style="padding:40px 40px 0 40px;">
+      ${eyebrow("Newsletter")}
+      ${headline("You are on the list")}
+      ${paragraph(`Thank you${o.name ? `, ${esc(o.name)}` : ""}. We will write occasionally with routes worth knowing about, what Barcelona is like at the time of year you are coming, and the odd offer. Not often, and never noise.`)}
+    </td></tr>
+
+    <tr><td style="padding:28px 40px 0 40px;">
+      ${button(`${SITE_URL}/book`, "Book a transfer")}
+    </td></tr>
+
+    <tr><td style="padding:26px 40px 0 40px;">
+      <div style="border-top:1px solid ${RULE};padding-top:18px;">
+        ${secondaryLink(o.unsubscribeUrl, "Unsubscribe")}
+      </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+/**
+ * An enquiry from the contact form, for whoever answers it.
+ *
+ * Reply-to is set to the customer, so the reply goes to them and not to us —
+ * which is why the address is shown as plainly as it is.
+ */
+export function contactEnquiryCard(o: {
+  name: string;
+  email: string;
+  phone?: string | null;
+  message: string;
+}): string {
+  return card(`
+    <tr><td style="padding:40px 40px 0 40px;">
+      ${eyebrow("Enquiry · elitebcn.info")}
+      ${headline(esc(o.name))}
+    </td></tr>
+
+    <tr><td style="padding:24px 40px 0 40px;">
+      ${detailTable(
+        row("Email", `<a href="mailto:${encodeURIComponent(o.email)}" style="color:${GOLD};text-decoration:none;">${esc(o.email)}</a>`) +
+        row("Phone", o.phone ? `<a href="tel:${esc(o.phone).replace(/[^+0-9]/g, "")}" style="color:${GOLD};text-decoration:none;">${esc(o.phone)}</a>` : "Not given", true),
+      )}
+    </td></tr>
+
+    <tr><td style="padding:24px 40px 0 40px;">
+      <div style="background-color:${PANEL};border:1px solid ${RULE};padding:20px 22px;">
+        <div style="font-family:${SANS};font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:${LABEL};padding-bottom:10px;">Message</div>
+        <div style="font-family:${SANS};font-size:14px;line-height:23px;color:${TITLE};white-space:pre-wrap;">${esc(o.message)}</div>
+      </div>
+    </td></tr>
+
+    <tr><td style="padding:22px 40px 0 40px;">
+      <div style="font-family:${SANS};font-size:12px;line-height:20px;color:${LABEL};">Reply to this email and it goes straight to them.</div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
+/**
+ * Anything the office needs told, in the house style.
+ *
+ * Replaces a grey box with the message pasted into it, which is what every
+ * operational alert looked like: a new lead, a cancellation, a failed
+ * payment, the email test, all identical and all unreadable at a glance.
+ */
+export function adminNoticeCard(o: {
+  eyebrow?: string;
+  title: string;
+  /** Free text under the title. Newlines become line breaks. */
+  body?: string | null;
+  /** A table of label/value pairs, shown under the body. */
+  facts?: [string, string][];
+  ctaUrl?: string | null;
+  ctaText?: string | null;
+}): string {
+  const facts = (o.facts ?? []).filter(([, v]) => v != null && v !== "");
+  return card(`
+    <tr><td style="padding:40px 40px 0 40px;">
+      ${eyebrow(o.eyebrow ?? "Operations")}
+      ${headline(esc(o.title))}
+      ${o.body ? `<div style="font-family:${SANS};font-size:14px;line-height:23px;color:${TEXT};padding-top:16px;white-space:pre-wrap;">${esc(o.body)}</div>` : ""}
+    </td></tr>
+
+    ${facts.length ? `<tr><td style="padding:24px 40px 0 40px;">
+      ${detailTable(facts.map(([k, v], i) => row(k, esc(v), i === facts.length - 1)).join(""))}
+    </td></tr>` : ""}
+
+    ${o.ctaUrl ? `<tr><td style="padding:26px 40px 0 40px;">
+      ${button(o.ctaUrl, o.ctaText ?? "Open the admin panel")}
+    </td></tr>` : ""}
+    ${sectionSpacer(42)}
+  `);
+}
+
+/**
+ * An email whose body is built elsewhere, given the house shell.
+ *
+ * For the daily AI briefing, which is a dense table of its own and would be
+ * worse rewritten than wrapped. This gives it the masthead, the footer and
+ * the colour-scheme declaration that stops Gmail repainting it, without
+ * touching how it lays its own data out.
+ */
+export function wrappedCard(innerHtml: string): string {
+  return card(`<tr><td style="padding:36px 32px;">${innerHtml}</td></tr>`);
+}

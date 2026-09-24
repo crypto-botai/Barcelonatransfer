@@ -46,21 +46,29 @@ describe("the contact form's enquiry, inside the owner's inbox", () => {
    * in the owner's inbox, arriving from our own domain, which is the part
    * that makes a fake link in it convincing.
    */
-  it("escapes every field it renders", () => {
-    expect(contact).toContain("const esc = (");
-    expect(contact).toContain("${esc(body.name)}");
-    expect(contact).toContain("${esc(body.email)}");
-    expect(contact).toContain("${esc(body.phone)");
-    expect(contact).toContain("${esc(body.message)}");
+  /**
+   * The escaping moved into contactEnquiryCard when this email was rebuilt on
+   * the house template, so the route hands over the raw values and the card
+   * is what must not render them raw. That behaviour is exercised for real in
+   * lib/__tests__/email-templates.test.ts; this only checks the route is
+   * still going through it rather than assembling its own markup again.
+   */
+  it("builds the email from the card, not by hand", () => {
+    expect(contact).toContain("contactEnquiryCard({");
+    expect(contact).toContain("html: emailDocument(");
+    expect(contact).not.toContain("<div style=");
   });
 
-  it("leaves nothing interpolated raw into the markup", () => {
-    // The html template only. replyTo is a validated address and the subject
-    // is plain text, where escaping would show the entities to the reader.
-    const html = contact.slice(contact.indexOf("html: `"));
-    for (const f of ["body.name", "body.email", "body.phone", "body.message"]) {
-      expect(html, f).not.toContain("${" + f + "}");
-    }
+  it("escapes and encodes inside the card", async () => {
+    const { contactEnquiryCard } = await import("@/lib/email/premium");
+    const html = contactEnquiryCard({
+      name: "<b>x</b>", email: "a+b@example.com", phone: "+34 600", message: "<i>hi</i> & bye",
+    });
+    expect(html).not.toContain("<b>x</b>");
+    expect(html).toContain("&lt;b&gt;");
+    expect(html).toContain("&lt;i&gt;hi&lt;/i&gt; &amp; bye");
+    // A raw "+" in a mailto is a space to some clients.
+    expect(html).toContain("mailto:a%2Bb%40example.com");
   });
 
   /** A line break in a subject line is where header injection starts. */
@@ -70,9 +78,6 @@ describe("the contact form's enquiry, inside the owner's inbox", () => {
   });
 
   /** A mailto with an unencoded address is its own small injection. */
-  it("encodes the address in the mailto link", () => {
-    expect(contact).toContain("mailto:${encodeURIComponent(body.email)}");
-  });
 });
 
 describe("coordinates have to be on Earth", () => {

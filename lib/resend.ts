@@ -43,6 +43,7 @@ import {
   rideCompleteCard,
   flightDelayCard,
   flightOpsCard,
+  adminNoticeCard,
   driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard, returnRebookCard,
   driverEmailChangedCard,
   pickupChangedCard, adminPickupChangedCard,
@@ -1172,25 +1173,10 @@ export async function sendAdminPartnerDispatchAlert(o: {
  * only things that matter are the subject line and the few lines under it.
  */
 export async function sendAdminAlertEmail(subject: string, text: string): Promise<void> {
-  const safe = esc(text).replace(/\n/g, "<br>");
-  const html = `<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background-color:#F0EFEC;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F0EFEC;">
-  <tr><td align="center" style="padding:28px 14px;">
-    <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:560px;max-width:560px;background-color:#FFFFFF;">
-      <tr><td style="background-color:#202329;padding:20px 26px;">
-        <div style="font-family:Georgia,'Times New Roman',serif;font-size:15px;letter-spacing:5px;color:#FFFFFF;">ELITE<span style="color:#B68D4C;">BCN</span></div>
-        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:#8E8E96;padding-top:7px;">Operations alert</div>
-      </td></tr>
-      <tr><td style="padding:26px;">
-        <div style="font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:27px;color:#15151A;">${esc(subject)}</div>
-        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:23px;color:#4A4A52;padding-top:14px;">${safe}</div>
-      </td></tr>
-    </table>
-  </td></tr>
-</table>
-</body></html>`;
+  const html = emailDocument(
+    adminNoticeCard({ title: subject, body: text }),
+    text.split("\n")[0]?.slice(0, 120) ?? subject,
+  );
 
   const id = await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject: `[Ops] ${subject}`, html });
   await logEmail({ to: ADMIN_EMAIL, subject: `[Ops] ${subject}`, type: "ADMIN_ALERT", resendId: id });

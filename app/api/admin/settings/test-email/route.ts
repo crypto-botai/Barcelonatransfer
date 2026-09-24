@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { resend } from "@/lib/resend";
 import { COMPANY } from "@/lib/company-facts";
+import { emailDocument, adminNoticeCard } from "@/lib/email/premium";
 
 export async function POST() {
   const session = await getServerSession(authOptions);
@@ -16,7 +17,16 @@ export async function POST() {
       from: process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>",
       to,
       subject: "✓ Email Test — Elite BCN Admin",
-      html: "<p>Your email system is working correctly.</p><p>This test was triggered from the admin settings page.</p>",
+      html: emailDocument(
+        adminNoticeCard({
+          eyebrow: "Diagnostics",
+          title: "Email is working",
+          body: "This was sent from the admin settings page. If you are reading it, delivery, authentication and templating are all in order.",
+          ctaUrl: "https://www.elitebcn.info/admin/settings",
+          ctaText: "Back to settings",
+        }),
+        "Delivery, authentication and templating are all in order.",
+      ),
     });
 
     if (result?.error) {
