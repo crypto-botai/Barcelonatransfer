@@ -10,6 +10,7 @@ import { parsePickupInput, formatPickupDateTime } from "@/lib/datetime";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
 import { PAYMENT_METHODS, paymentLine } from "@/lib/payment-method";
 import { calendarLinks, returnTripUrl } from "@/lib/calendar";
+import { seatShare, vehicleNote } from "@/lib/vehicle-group";
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
 
@@ -86,6 +87,16 @@ const createSchema = z.object({
   paymentMethod:   z.enum(PAYMENT_METHODS as [string, ...string[]]).optional(),
   driverAmount:    z.number().min(0).optional(),
   notes:           z.string().optional(),
+  /**
+   * How many cars this journey needs.
+   *
+   * A group of twenty-four is one journey and four vans, and four vans is
+   * four chauffeurs, four job sheets and four rows on the dispatch board.
+   * There is no way to express that as one booking that anyone can drive, so
+   * each vehicle becomes a booking of its own. totalAmount stays the price of
+   * one car; the party is split across them.
+   */
+  vehicleCount:    z.number().int().min(1).max(10).default(1),
   /** Off to record a booking silently, e.g. one already confirmed on WhatsApp. */
   sendEmail:       z.boolean().default(true),
   /**
@@ -117,6 +128,8 @@ const createSchema = z.object({
   returnDatetime:  z.string().optional(),
   /** What the leg home costs. Defaults to the outbound fare, being the same journey. */
   returnAmount:    z.number().min(0).optional(),
+  /** Cars on the way back. Defaults to however many went out. */
+  returnVehicleCount: z.number().int().min(1).max(10).optional(),
   /**
    * Where the leg home actually starts and ends, when it is not the reverse.
    *
@@ -155,6 +168,7 @@ const createSchema = z.object({
     luggage:         z.number().int().min(0).optional(),
     flightNumber:    z.string().optional(),
     specialRequests: z.string().optional(),
+    vehicleCount:    z.number().int().min(1).max(10).default(1),
   })).max(10).optional(),
 });
 
@@ -203,8 +217,10 @@ export async function POST(req: NextRequest) {
       dropoffLat:      body.dropoffLat,
       dropoffLng:      body.dropoffLng,
       pickupDatetime:  pickup,
-      passengers:      body.passengers,
-      luggage:         body.luggage,
+      // One car's share of the party. Whoever drives this one needs to know
+      // how many are in it, not how many are on the trip.
+      passengers:      seatShare(body.passengers, body.vehicleCount, 0),
+      luggage:         seatShare(body.luggage, body.vehicleCount, 0),
       vehicleClass:    body.vehicleClass as VehicleClass,
       flightNumber:    body.flightNumber,
       specialRequests: body.specialRequests,
@@ -238,6 +254,46 @@ export async function POST(req: NextRequest) {
         data: { confirmationCode, ...fields },
       }));
     }
+
+    /**
+     * Creates the second and further cars on one journey.
+     *
+     * The first one already exists and is the group's reference, which is why
+     * its own note can only be written once it does. Each car is a full
+     * booking so it can be assigned, driven and tracked on its own; what
+     * differs between them is the share of the party and the note saying
+     * which car of how many this is.
+     */
+    const siblings: { id: string; confirmationCode: string }[] = [];
+    async function addVehicles(
+      base: Record<string, unknown>,
+      anchor: { id: string; confirmationCode: string },
+      count: number,
+      pax: number, bags: number, ownNote: string | undefined,
+    ) {
+      if (count <= 1) return;
+      for (let i = 1; i < count; i++) {
+        const made = await withUniqueBookingCode((confirmationCode) => prisma.booking.create({
+          data: {
+            ...base,
+            confirmationCode,
+            passengers:      seatShare(pax, count, i),
+            luggage:         seatShare(bags, count, i),
+            specialRequests: vehicleNote(ownNote, i, count, anchor.confirmationCode),
+            // The agreed figure belongs to the car it was agreed for.
+            driverAmount:    null,
+          } as never,
+        }));
+        siblings.push(made);
+      }
+      // Now that the group has a reference, the first car can say so too.
+      await prisma.booking.update({
+        where: { id: anchor.id },
+        data: { specialRequests: vehicleNote(ownNote, 0, count, anchor.confirmationCode) },
+      });
+    }
+
+    await addVehicles(fields, booking, body.vehicleCount, body.passengers, body.luggage, body.specialRequests);
 
     /**
      * The journey home, as a booking of its own.
@@ -275,6 +331,27 @@ export async function POST(req: NextRequest) {
           driverAmount:    null,
         },
       }));
+
+      // As many cars home as went out, unless the office said otherwise.
+      const backCount = body.returnVehicleCount ?? body.vehicleCount;
+      await addVehicles(
+        {
+          ...fields,
+          returnOfId:      null,
+          pickupAddress:   body.returnPickupAddress  || body.dropoffAddress || body.pickupAddress,
+          pickupLat:       body.returnPickupLat  ?? (body.dropoffLat || body.pickupLat),
+          pickupLng:       body.returnPickupLng  ?? (body.dropoffLng || body.pickupLng),
+          dropoffAddress:  body.returnDropoffAddress || body.pickupAddress,
+          dropoffLat:      body.returnDropoffLat ?? body.pickupLat,
+          dropoffLng:      body.returnDropoffLng ?? body.pickupLng,
+          pickupDatetime:  back,
+          flightNumber:    null,
+          baseFare:        returnFare,
+          totalAmount:     returnFare,
+        },
+        returnBooking, backCount, body.passengers, body.luggage,
+        `Return leg of booking ${booking.confirmationCode}.`,
+      );
     }
 
     /**
@@ -298,8 +375,8 @@ export async function POST(req: NextRequest) {
           dropoffLat:      ride.dropoffLat,
           dropoffLng:      ride.dropoffLng,
           pickupDatetime:  ride.at!,
-          passengers:      ride.passengers ?? body.passengers,
-          luggage:         ride.luggage ?? body.luggage,
+          passengers:      seatShare(ride.passengers ?? body.passengers, ride.vehicleCount, 0),
+          luggage:         seatShare(ride.luggage ?? body.luggage, ride.vehicleCount, 0),
           vehicleClass:    ride.vehicleClass as VehicleClass,
           flightNumber:    ride.flightNumber,
           specialRequests: ride.specialRequests,
@@ -311,6 +388,22 @@ export async function POST(req: NextRequest) {
         },
       }));
       extraBookings.push({ ...made, at: ride.at!, ride });
+
+      await addVehicles(
+        {
+          ...fields,
+          pickupAddress:  ride.pickupAddress,  pickupLat:  ride.pickupLat,  pickupLng:  ride.pickupLng,
+          dropoffAddress: ride.dropoffAddress, dropoffLat: ride.dropoffLat, dropoffLng: ride.dropoffLng,
+          pickupDatetime: ride.at!,
+          vehicleClass:   ride.vehicleClass as VehicleClass,
+          flightNumber:   ride.flightNumber,
+          baseFare:       ride.totalAmount,
+          totalAmount:    ride.totalAmount,
+        },
+        made, ride.vehicleCount,
+        ride.passengers ?? body.passengers, ride.luggage ?? body.luggage,
+        ride.specialRequests,
+      );
     }
 
     // A lead that has become a booking is no longer a lead. Without this the
@@ -327,7 +420,13 @@ export async function POST(req: NextRequest) {
     // One link for everything booked here, attached to the first ride.
     // Charging the first alone would leave the rest unpaid with nothing
     // anywhere saying so.
-    const tripTotal = body.totalAmount + returnFare + extras.reduce((s, r) => s + r.totalAmount, 0);
+    // Every fare here is the price of one car, so each is multiplied by how
+    // many of them are going. Charging one car for a party of four vans is
+    // the kind of mistake nobody notices until the accounts are short.
+    const tripTotal =
+      body.totalAmount * body.vehicleCount
+      + returnFare * (body.returnVehicleCount ?? body.vehicleCount)
+      + extras.reduce((s, r) => s + r.totalAmount * r.vehicleCount, 0);
     let payUrl: string | undefined;
     if (body.paymentMethod === "CARD_LINK" && body.paymentStatus !== "PAID" && tripTotal > 0) {
       try {
@@ -373,7 +472,10 @@ export async function POST(req: NextRequest) {
       dropoffAddress:   body.dropoffAddress || "",
       pickupDatetime:   formatPickupDateTime(pickup),
       vehicleClass:     body.vehicleClass,
-      totalAmount:      body.totalAmount,
+      // One email for the journey, not one per car: the customer booked a
+      // transfer, not four of them. So it carries what the journey costs and
+      // how many people are travelling, rather than one vehicle's share.
+      totalAmount:      body.totalAmount * body.vehicleCount,
       passengers:       body.passengers,
       bookingId:        booking.id,
       payment,
@@ -409,7 +511,8 @@ export async function POST(req: NextRequest) {
         dropoffAddress:   b.ride.dropoffAddress || "",
         pickupDatetime:   formatPickupDateTime(b.at),
         vehicleClass:     b.ride.vehicleClass,
-        totalAmount:      b.ride.totalAmount,
+        // As above: the journey's cost and party, not one car's share.
+        totalAmount:      b.ride.totalAmount * b.ride.vehicleCount,
         passengers:       b.ride.passengers ?? body.passengers,
         bookingId:        b.id,
         payment: {
@@ -434,11 +537,12 @@ export async function POST(req: NextRequest) {
       dropoffAddress:   body.dropoffAddress || "",
       pickupDatetime:   formatPickupDateTime(pickup),
       vehicleClass:     body.vehicleClass,
-      totalAmount:      body.totalAmount,
+      totalAmount:      body.totalAmount * body.vehicleCount,
       passengers:       body.passengers,
       luggage:          body.luggage,
       flightNumber:     body.flightNumber,
-      specialRequests:  body.specialRequests,
+      // The office needs to see at a glance that this one needs four cars.
+      specialRequests:  vehicleNote(body.specialRequests, 0, body.vehicleCount, booking.confirmationCode),
     }).catch(() => {});
 
     return NextResponse.json({
@@ -446,6 +550,8 @@ export async function POST(req: NextRequest) {
       payUrl,
       returnConfirmationCode: returnBooking?.confirmationCode ?? null,
       extraConfirmationCodes: extraBookings.map((b) => b.confirmationCode),
+      // The further cars on each journey, so the office is told the real count.
+      siblingConfirmationCodes: siblings.map((b) => b.confirmationCode),
     }, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: err.errors[0].message }, { status: 422 });

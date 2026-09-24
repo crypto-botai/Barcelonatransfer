@@ -74,7 +74,7 @@ describe("what the customer is charged", () => {
    * and nothing anywhere saying the way home was unpaid.
    */
   it("bills the whole trip on one link, not just the outbound", () => {
-    expect(api).toContain("const tripTotal = body.totalAmount + returnFare");
+    expect(api).toContain("body.totalAmount * body.vehicleCount");
     expect(api).toContain("amount:        tripTotal");
     expect(api).toContain("paymentLine(body.paymentMethod as never, body.paymentStatus === \"PAID\", tripTotal)");
   });
@@ -85,8 +85,70 @@ describe("what the customer is charged", () => {
   });
 
   it("shows the office the trip total, not one leg", () => {
-    expect(form).toContain("const tripTotal = amount +");
+    expect(form).toContain("const tripTotal = amount * vehicleCount");
     expect(form).toContain("{legCount} bookings");
+  });
+});
+
+describe("several cars on one journey", () => {
+  const rides = rd("app/admin/bookings/new/ExtraRides.tsx");
+
+  /**
+   * A group of twenty-four is one journey and four vans, and four vans is
+   * four chauffeurs with four job sheets. There is no way to express that as
+   * one booking that anybody can be assigned to drive.
+   */
+  it("makes a booking per car, so each can be assigned and driven", () => {
+    expect(api).toContain("vehicleCount:    z.number().int().min(1).max(10).default(1)");
+    expect(api).toContain("async function addVehicles(");
+    expect(api).toContain("siblingConfirmationCodes: siblings.map((b) => b.confirmationCode)");
+  });
+
+  /**
+   * The wording and the arithmetic are tested directly in
+   * lib/__tests__/vehicle-group.test.ts; what matters here is that the route
+   * actually reaches for them.
+   */
+  it("tells each chauffeur which car of how many they are driving", () => {
+    expect(api).toContain('import { seatShare, vehicleNote } from "@/lib/vehicle-group"');
+    expect(api).toContain("specialRequests: vehicleNote(ownNote, i, count, anchor.confirmationCode)");
+    // The group's reference is the first car's, known only once it exists,
+    // so the first car's own note is written afterwards.
+    expect(api).toContain("data: { specialRequests: vehicleNote(ownNote, 0, count, anchor.confirmationCode) }");
+  });
+
+  it("splits the party across the cars rather than repeating it", () => {
+    expect(api).toContain("passengers:      seatShare(body.passengers, body.vehicleCount, 0)");
+    expect(api).toContain("luggage:         seatShare(body.luggage, body.vehicleCount, 0)");
+    expect(api).toContain("passengers:      seatShare(pax, count, i)");
+  });
+
+  /** Charging one car for a party of four vans is short by three cars. */
+  it("multiplies every fare by how many cars are going", () => {
+    expect(api).toContain("returnFare * (body.returnVehicleCount ?? body.vehicleCount)");
+    expect(api).toContain("extras.reduce((s, r) => s + r.totalAmount * r.vehicleCount, 0)");
+    expect(rides).toContain("(Number.isFinite(n) ? n : 0) * r.vehicleCount");
+  });
+
+  /** They booked a transfer, not four of them. */
+  it("sends the customer one confirmation for the journey, priced for all the cars", () => {
+    expect(api).toContain("totalAmount:      body.totalAmount * body.vehicleCount");
+    expect(api).toContain("totalAmount:      b.ride.totalAmount * b.ride.vehicleCount");
+  });
+
+  it("brings as many cars home as went out", () => {
+    expect(api).toContain("const backCount = body.returnVehicleCount ?? body.vehicleCount");
+    expect(form).toContain("returnVehicleCount: returnOn ? vehicleCount : undefined");
+  });
+
+  it("warns the office when the party will not fit in the cars chosen", () => {
+    expect(form).toContain("const overCapacity = perCar > seats");
+    expect(form).toContain("that is more than the ${seats} it seats");
+  });
+
+  it("counts bookings rather than journeys, since that is what gets dispatched", () => {
+    expect(form).toContain("const legCount = vehicleCount + (returnOn ? vehicleCount : 0)");
+    expect(form).toContain("rides.reduce((s, r) => s + r.vehicleCount, 0)");
   });
 });
 
@@ -126,7 +188,7 @@ describe("several rides for one customer", () => {
   });
 
   it("charges the whole lot once, on the first ride", () => {
-    expect(api).toContain("extras.reduce((s, r) => s + r.totalAmount, 0)");
+    expect(api).toContain("extras.reduce((s, r) => s + r.totalAmount * r.vehicleCount, 0)");
     // And the others say so rather than leaving the customer wondering.
     expect(api).toContain("nothing to pay for this ride on its own");
   });

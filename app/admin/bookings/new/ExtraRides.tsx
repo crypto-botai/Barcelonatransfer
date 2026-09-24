@@ -29,6 +29,8 @@ export interface ExtraRide {
   date: string;
   time: string;
   vehicle: FleetVehicle;
+  /** How many cars this ride needs; each becomes a booking of its own. */
+  vehicleCount: number;
   price: string;
   flight: string;
   notes: string;
@@ -38,7 +40,7 @@ export const blankRide = (vehicle: FleetVehicle): ExtraRide => ({
   key: Math.random().toString(36).slice(2),
   pickup:  { address: "", lat: 0, lng: 0 },
   dropoff: { address: "", lat: 0, lng: 0 },
-  date: "", time: "", vehicle, price: "", flight: "", notes: "",
+  date: "", time: "", vehicle, vehicleCount: 1, price: "", flight: "", notes: "",
 });
 
 /** A ride the office has filled in far enough to be worth creating. */
@@ -47,10 +49,11 @@ export function rideReady(r: ExtraRide): boolean {
   return !!r.pickup.address && !!r.dropoff.address && !!r.date && !!r.time && Number.isFinite(n) && n >= 0;
 }
 
+/** Each price is one car's; a ride needing four of them costs four times it. */
 export function rideTotal(rides: ExtraRide[]): number {
   return rides.reduce((s, r) => {
     const n = parseFloat(r.price);
-    return s + (Number.isFinite(n) ? n : 0);
+    return s + (Number.isFinite(n) ? n : 0) * r.vehicleCount;
   }, 0);
 }
 
@@ -188,7 +191,7 @@ function RideCard({ index, ride, passengers, onPatch, onRemove }: {
           />
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           <div>
             <label className={label}>Date</label>
             <input className={`${field} [color-scheme:dark]`} type="date" min={todayStr()} value={ride.date} onChange={(e) => onPatch({ date: e.target.value })} />
@@ -204,7 +207,16 @@ function RideCard({ index, ride, passengers, onPatch, onRemove }: {
             </select>
           </div>
           <div>
-            <label className={label}>Price (€)</label>
+            <label className={label}>Cars</label>
+            <input
+              className={field}
+              type="number" min={1} max={10}
+              value={ride.vehicleCount}
+              onChange={(e) => onPatch({ vehicleCount: Math.min(10, Math.max(1, parseInt(e.target.value) || 1)) })}
+            />
+          </div>
+          <div>
+            <label className={label}>Price (€){ride.vehicleCount > 1 && <span className="normal-case tracking-normal text-dark-500"> each</span>}</label>
             <input
               className={field}
               type="number" min={0} step="0.5"

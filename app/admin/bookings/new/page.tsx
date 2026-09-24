@@ -48,6 +48,15 @@ export default function NewBookingPage() {
   const [pax, setPax]         = useState(2);
   const [bags, setBags]       = useState(2);
   const [vehicle, setVehicle] = useState<FleetVehicle>("EQE_300");
+  /**
+   * How many cars this journey needs.
+   *
+   * A group of twenty-four is one journey and four vans, and four vans is
+   * four chauffeurs with four job sheets. Each becomes a booking of its own,
+   * because there is no way to express four cars as one booking that anybody
+   * can be assigned to drive.
+   */
+  const [vehicleCount, setVehicleCount] = useState(1);
   const [flight, setFlight]   = useState("");
   const [notes, setNotes]     = useState("");
 
@@ -166,8 +175,18 @@ export default function NewBookingPage() {
   const backAmount = returnOn
     ? (returnPriceTouched && returnPrice !== "" ? parseFloat(returnPrice) : amount)
     : 0;
+  // Every price on this form is the price of one car. Charging one car for a
+  // party of four vans is the kind of mistake nobody notices until later.
   const extrasTotal = rideTotal(rides);
-  const tripTotal = amount + (Number.isFinite(backAmount) ? backAmount : 0) + extrasTotal;
+  const tripTotal = amount * vehicleCount
+    + (Number.isFinite(backAmount) ? backAmount : 0) * (returnOn ? vehicleCount : 0)
+    + extrasTotal;
+
+  const seats = VEHICLE_CATALOG.find((v) => v.class === vehicle)?.maxPassengers ?? 4;
+  // Rounded up: an uneven split puts the spare passengers in the first cars,
+  // so the fullest car is what has to fit.
+  const perCar = Math.ceil(pax / vehicleCount);
+  const overCapacity = perCar > seats;
   // A chauffeur cannot drive them home before they have set off. Checked here
   // as well as at the API so the office sees it before pressing the button.
   const returnAfterOutbound = !returnOn || (!!returnDate && !!returnTime && !!date && !!time
@@ -176,7 +195,10 @@ export default function NewBookingPage() {
   // A half-filled extra ride cannot be created, and silently dropping it would
   // lose a journey the office believes it has booked.
   const ridesReady = rides.every(rideReady);
-  const legCount = 1 + (returnOn ? 1 : 0) + rides.length;
+  // Bookings, not journeys: four vans on one journey is four rows on the
+  // dispatch board and four references for the office to read out.
+  const legCount = vehicleCount + (returnOn ? vehicleCount : 0)
+    + rides.reduce((s, r) => s + r.vehicleCount, 0);
 
   const ready = name.trim().length >= 2 && /\S+@\S+\.\S+/.test(email) && phone.trim().length >= 6
     && pickup.address && dropoff.address && date && time && amount >= 0 && !Number.isNaN(amount)
@@ -205,8 +227,10 @@ export default function NewBookingPage() {
           sendEmail,
           fromBookingId: source?.kind === "unpaid" ? source.bookingId : undefined,
           fromSessionId: source?.kind === "lead"   ? source.sessionId : undefined,
+          vehicleCount,
           returnDatetime: returnOn ? `${returnDate}T${returnTime}` : undefined,
           returnAmount:   returnOn ? backAmount : undefined,
+          returnVehicleCount: returnOn ? vehicleCount : undefined,
           // Only sent when the office actually changed them; the API falls
           // back to the reversed route for anything left out.
           ...(returnOn && returnCustom && returnFrom.address ? {
@@ -221,6 +245,7 @@ export default function NewBookingPage() {
             pickupDatetime: `${r.date}T${r.time}`,
             vehicleClass: FLEET_TO_DB_CLASS[r.vehicle],
             totalAmount: parseFloat(r.price),
+            vehicleCount: r.vehicleCount,
             flightNumber: r.flight.trim() || undefined,
             specialRequests: r.notes.trim() || undefined,
           })) : undefined,
@@ -324,6 +349,39 @@ export default function NewBookingPage() {
                       <div className="text-dark-400 text-[11px]">{v.badge} · up to {v.maxPassengers}</div>
                     </button>
                   ))}
+                </div>
+
+                {/* A group of twenty-four is one journey and four vans. Each
+                    van is a booking of its own, because each needs its own
+                    chauffeur, job sheet and place on the dispatch board. */}
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+                  <span className={`${label} mb-0`}>How many</span>
+                  <div className="flex gap-1.5">
+                    {[1, 2, 3, 4, 5, 6].map((n) => (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => setVehicleCount(n)}
+                        className={`w-9 h-9 rounded-lg border text-sm transition-colors ${vehicleCount === n ? "border-gold-500 bg-gold-500/10 text-white" : "border-white/[0.08] text-dark-300 hover:border-white/20"}`}
+                      >
+                        {n}
+                      </button>
+                    ))}
+                    <input
+                      type="number" min={1} max={10}
+                      value={vehicleCount > 6 ? vehicleCount : ""}
+                      onChange={(e) => setVehicleCount(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
+                      placeholder="7+"
+                      className={`${field} w-16 text-center px-1`}
+                    />
+                  </div>
+                  {vehicleCount > 1 && (
+                    <span className={`text-[11px] ${overCapacity ? "text-red-400" : "text-dark-400"}`}>
+                      {vehicleCount} × {VEHICLE_CATALOG.find((v) => v.class === vehicle)?.label}
+                      {" · "}{pax} {pax === 1 ? "passenger" : "passengers"} split {perCar} per car
+                      {overCapacity && ` — that is more than the ${seats} it seats`}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-[200px_minmax(0,1fr)] gap-3">
@@ -469,21 +527,27 @@ export default function NewBookingPage() {
             {legCount > 1 && Number.isFinite(tripTotal) && (
               <div className="mt-3 rounded-lg border border-gold-500/25 bg-gold-500/[0.06] px-3 py-2.5">
                 <div className="flex items-baseline justify-between gap-2 text-sm">
-                  <span className="text-dark-300">{returnOn ? "Out" : "Ride 1"}</span>
-                  <span className="text-white">€{(Number.isFinite(amount) ? amount : 0).toFixed(2)}</span>
+                  <span className="text-dark-300">
+                    {returnOn ? "Out" : "Ride 1"}{vehicleCount > 1 && <span className="text-dark-500"> × {vehicleCount}</span>}
+                  </span>
+                  <span className="text-white">€{((Number.isFinite(amount) ? amount : 0) * vehicleCount).toFixed(2)}</span>
                 </div>
                 {returnOn && (
                   <div className="flex items-baseline justify-between gap-2 text-sm mt-1">
-                    <span className="text-dark-300">Back</span>
-                    <span className="text-white">€{(Number.isFinite(backAmount) ? backAmount : 0).toFixed(2)}</span>
+                    <span className="text-dark-300">
+                      Back{vehicleCount > 1 && <span className="text-dark-500"> × {vehicleCount}</span>}
+                    </span>
+                    <span className="text-white">€{((Number.isFinite(backAmount) ? backAmount : 0) * vehicleCount).toFixed(2)}</span>
                   </div>
                 )}
                 {rides.map((r, i) => {
                   const n = parseFloat(r.price);
                   return (
                     <div key={r.key} className="flex items-baseline justify-between gap-2 text-sm mt-1">
-                      <span className="text-dark-300 truncate">Ride {i + 2}</span>
-                      <span className="text-white">€{(Number.isFinite(n) ? n : 0).toFixed(2)}</span>
+                      <span className="text-dark-300 truncate">
+                        Ride {i + 2}{r.vehicleCount > 1 && <span className="text-dark-500"> × {r.vehicleCount}</span>}
+                      </span>
+                      <span className="text-white">€{((Number.isFinite(n) ? n : 0) * r.vehicleCount).toFixed(2)}</span>
                     </div>
                   );
                 })}
