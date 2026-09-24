@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowLeftRight, Inbox, Loader2, MapPin, Send, Sparkles, Wallet, X } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, Car, Inbox, Loader2, MapPin, Plus, Send, Sparkles, Wallet, X } from "lucide-react";
 import toast from "react-hot-toast";
 import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
 import { FLEET_TO_DB_CLASS, VEHICLE_CATALOG, type FleetVehicle } from "@/types";
 import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS, type BookingPaymentMethod } from "@/lib/payment-method";
 import ImportPanel, { type ImportSource, type Prefill } from "./ImportPanel";
-import ExtraRides, { rideReady, rideTotal, type ExtraRide } from "./ExtraRides";
+import ExtraRides, { blankRide, rideReady, rideTotal, type ExtraRide } from "./ExtraRides";
 
 /**
  * A booking made by the office.
@@ -33,6 +33,35 @@ const METHOD_HELP: Record<BookingPaymentMethod, string> = {
 function todayStr() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/**
+ * Scrolls to the control the chip is about, and rings it briefly.
+ *
+ * The chips at the top switch the option on; the fields that go with it are
+ * further down a long form. Without this the office presses "Return journey",
+ * nothing visibly happens, and they press it again.
+ */
+function jumpTo(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.add("ring-2", "ring-gold-500/60");
+  window.setTimeout(() => el.classList.remove("ring-2", "ring-gold-500/60"), 1600);
+}
+
+function TripChip({ active, onClick, label, icon }: {
+  active: boolean; onClick: () => void; label: string; icon?: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs transition-colors ${active ? "border-gold-500 bg-gold-500/10 text-white" : "border-white/[0.1] text-dark-300 hover:border-white/25 hover:text-white"}`}
+    >
+      {icon}{label}
+    </button>
+  );
 }
 
 export default function NewBookingPage() {
@@ -275,9 +304,65 @@ export default function NewBookingPage() {
       <Link href="/admin/bookings" className="inline-flex items-center gap-1.5 text-dark-400 hover:text-white text-sm mb-4">
         <ArrowLeft size={14} /> Bookings
       </Link>
-      <div className="mb-6">
+      <div className="mb-5">
         <h1 className="font-display text-3xl text-white">New booking</h1>
         <p className="text-dark-400 mt-1">For a customer booking by phone or WhatsApp, or finishing one they started online. Priced the same as the website; the customer receives the confirmation email.</p>
+      </div>
+
+      {/*
+        What kind of booking this is, said at the top.
+
+        All three of these already existed further down the form — the return
+        inside the journey section, the vehicle count under the car picker,
+        the extra rides in a section below the fold — and the office could not
+        find any of them, which is the same as not having them. The controls
+        stay where the details are entered; this is the part that says they
+        are there, in the place the eye lands first, and matches the One Way /
+        Return tabs the booking widget on the website already uses.
+      */}
+      <div className="mb-6 rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <span className="text-[10px] uppercase tracking-[0.15em] text-gold-500/80 font-semibold mr-1">This booking</span>
+
+          <TripChip
+            active={!returnOn}
+            onClick={() => setReturnOn(false)}
+            label="One way"
+          />
+          <TripChip
+            active={returnOn}
+            onClick={() => { setReturnOn(true); if (!returnTime && time) setReturnTime(time); jumpTo("return-journey"); }}
+            label="Return journey"
+            icon={<ArrowLeftRight size={12} />}
+          />
+
+          <span className="h-5 w-px bg-white/[0.1] mx-1" />
+
+          {/* The count lives with the car picker; this shows and reaches it. */}
+          <button
+            type="button"
+            onClick={() => jumpTo("vehicle-count")}
+            className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs transition-colors ${vehicleCount > 1 ? "border-gold-500 bg-gold-500/10 text-white" : "border-white/[0.1] text-dark-300 hover:border-white/25 hover:text-white"}`}
+          >
+            <Car size={12} />
+            {vehicleCount === 1 ? "1 vehicle" : `${vehicleCount} vehicles`}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setRides((r) => (r.length ? r : [blankRide(vehicle)])); jumpTo("more-rides"); }}
+            className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs transition-colors ${rides.length ? "border-gold-500 bg-gold-500/10 text-white" : "border-white/[0.1] text-dark-300 hover:border-white/25 hover:text-white"}`}
+          >
+            <Plus size={12} />
+            {rides.length === 0 ? "Add another ride" : `${rides.length} extra ${rides.length === 1 ? "ride" : "rides"}`}
+          </button>
+
+          {legCount > 1 && (
+            <span className="ml-auto text-[11px] text-dark-400">
+              {legCount} bookings will be created
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start">
@@ -354,7 +439,7 @@ export default function NewBookingPage() {
                 {/* A group of twenty-four is one journey and four vans. Each
                     van is a booking of its own, because each needs its own
                     chauffeur, job sheet and place on the dispatch board. */}
-                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+                <div id="vehicle-count" className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg transition-shadow">
                   <span className={`${label} mb-0`}>How many</span>
                   <div className="flex gap-1.5">
                     {[1, 2, 3, 4, 5, 6].map((n) => (
@@ -391,7 +476,7 @@ export default function NewBookingPage() {
 
               {/* The way home. Only a date and a time: the route is the one
                   above, reversed, so there is nothing else to enter. */}
-              <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
+              <div id="return-journey" className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 transition-shadow">
                 <label className="flex items-start gap-2.5 cursor-pointer">
                   <input
                     type="checkbox"
@@ -497,7 +582,9 @@ export default function NewBookingPage() {
             </div>
           </section>
 
-          <ExtraRides rides={rides} onChange={setRides} defaultVehicle={vehicle} passengers={pax} />
+          <div id="more-rides" className="rounded-2xl transition-shadow">
+            <ExtraRides rides={rides} onChange={setRides} defaultVehicle={vehicle} passengers={pax} />
+          </div>
         </div>
 
         {/* Price & payment */}

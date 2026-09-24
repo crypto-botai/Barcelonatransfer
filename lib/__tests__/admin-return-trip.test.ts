@@ -90,6 +90,41 @@ describe("what the customer is charged", () => {
   });
 });
 
+describe("the office can find these at all", () => {
+  /**
+   * All three existed and none were found. The return sat inside a journey
+   * section a hundred and seventy lines long, the vehicle count under the car
+   * picker, the extra rides in a section two screens down — and an option
+   * nobody finds is the same as an option that is not there.
+   */
+  it("says at the top what kind of booking this is", () => {
+    expect(form).toContain("This booking");
+    expect(form).toContain("function TripChip(");
+    expect(form).toContain('label="One way"');
+    expect(form).toContain('label="Return journey"');
+    expect(form).toContain("Add another ride");
+    expect(form).toMatch(/\{vehicleCount === 1 \? "1 vehicle" : `\$\{vehicleCount\} vehicles`\}/);
+  });
+
+  /** Pressing a chip and seeing nothing happen reads as a broken button. */
+  it("scrolls to the fields the chip switched on", () => {
+    expect(form).toContain("function jumpTo(");
+    expect(form).toContain('scrollIntoView({ behavior: "smooth", block: "center" })');
+    for (const id of ["vehicle-count", "return-journey", "more-rides"]) {
+      expect(form, id).toContain(`id="${id}"`);
+      expect(form, id).toContain(`jumpTo("${id}")`);
+    }
+  });
+
+  it("adds a first ride when the ride chip is pressed, rather than only scrolling", () => {
+    expect(form).toContain("setRides((r) => (r.length ? r : [blankRide(vehicle)]))");
+  });
+
+  it("says how many bookings are about to be made", () => {
+    expect(form).toContain("{legCount} bookings will be created");
+  });
+});
+
 describe("several cars on one journey", () => {
   const rides = rd("app/admin/bookings/new/ExtraRides.tsx");
 
