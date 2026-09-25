@@ -45,6 +45,7 @@ import {
   flightOpsCard,
   adminNoticeCard,
   adminNewBookingCard,
+  recoveredLeadsCard,
   driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard, returnRebookCard,
   driverEmailChangedCard,
   pickupChangedCard, adminPickupChangedCard,
@@ -1017,6 +1018,34 @@ export async function sendOpsFlightAlert(o: {
   const html = emailDocument(
     flightOpsCard({ ...o, bookingUrl: `${SITE_URL}/admin/bookings?open=${encodeURIComponent(o.bookingId)}` }),
     preheader,
+  );
+
+  const id = await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject, html });
+  await logEmail({ to: ADMIN_EMAIL, subject, type: "ADMIN_ALERT", resendId: id });
+}
+
+/**
+ * One email for every lead whose alert was lost.
+ *
+ * A digest rather than one message each: the office already knows it missed
+ * them, and a hundred identical emails would be a second failure rather than
+ * a recovery. Capped at what is readable; the rest are in the admin panel.
+ */
+export async function sendRecoveredLeadsDigest(
+  leads: {
+    name: string; email: string; phone: string;
+    pickup?: string | null; dropoff?: string | null;
+    when?: string | null; passengers?: string | null;
+    quoted?: number | null; step: number; lastActivity: Date | string;
+  }[],
+): Promise<void> {
+  if (!leads.length) return;
+  const SHOW = 60;
+
+  const subject = `[Ops] ${leads.length} recovered ${leads.length === 1 ? "lead" : "leads"}`;
+  const html = emailDocument(
+    recoveredLeadsCard({ leads: leads.slice(0, SHOW), shown: leads.length }),
+    `${leads.length} customers who filled the form and were never reported.`,
   );
 
   const id = await sendEmail({ from: FROM, to: ADMIN_EMAIL, subject, html });

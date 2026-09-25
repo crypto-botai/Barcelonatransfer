@@ -1674,3 +1674,74 @@ export function adminNewBookingCard(o: {
     ${sectionSpacer(42)}
   `);
 }
+
+/**
+ * The leads whose alert never arrived, in one list.
+ *
+ * Sending one email per recovered lead would put hundreds of identical
+ * messages in the inbox of somebody who already knows they missed them. This
+ * is one message, newest first, with enough on each line to decide whether it
+ * is still worth a phone call: who, how to reach them, where they were going
+ * and when they last touched the form.
+ */
+export function recoveredLeadsCard(o: {
+  leads: {
+    name: string; email: string; phone: string;
+    pickup?: string | null; dropoff?: string | null;
+    when?: string | null; passengers?: string | null;
+    quoted?: number | null; step: number; lastActivity: Date | string;
+  }[];
+  /** How many are in the email, when the list below has been trimmed. */
+  shown: number;
+}): string {
+  const fmt = (d: Date | string) =>
+    new Date(d).toLocaleString("en-GB", {
+      timeZone: "Europe/Madrid", day: "2-digit", month: "short", year: "numeric",
+      hour: "2-digit", minute: "2-digit",
+    });
+
+  const rows = o.leads.map((l) => `
+    <tr><td style="padding:16px 0;border-bottom:1px solid ${RULE};">
+      <div style="font-family:${SANS};font-size:15px;color:${TITLE};">${esc(l.name)}</div>
+      <div style="font-family:${SANS};font-size:13px;line-height:21px;padding-top:4px;">
+        <a href="tel:${esc(l.phone).replace(/[^+0-9]/g, "")}" style="color:${GOLD};text-decoration:none;">${esc(l.phone)}</a>
+        <span style="color:${LABEL};"> &nbsp;&middot;&nbsp; </span>
+        <a href="mailto:${encodeURIComponent(l.email)}" style="color:${GOLD};text-decoration:none;">${esc(l.email)}</a>
+      </div>
+      ${l.pickup ? `<div style="font-family:${SANS};font-size:13px;line-height:20px;color:${TEXT};padding-top:6px;">${esc(l.pickup)}${l.dropoff ? ` &rarr; ${esc(l.dropoff)}` : ""}</div>` : ""}
+      <div style="font-family:${SANS};font-size:11px;line-height:18px;color:${LABEL};padding-top:5px;">
+        ${[
+          l.when ? `travelling ${esc(l.when)}` : null,
+          l.passengers ? `${esc(l.passengers)} pax` : null,
+          l.quoted ? `quoted &euro;${l.quoted.toFixed(0)}` : null,
+          `reached step ${l.step} of 4`,
+          `last seen ${esc(fmt(l.lastActivity))}`,
+        ].filter(Boolean).join(" &nbsp;&middot;&nbsp; ")}
+      </div>
+    </td></tr>`).join("");
+
+  return card(`
+    <tr><td style="padding:40px 40px 0 40px;">
+      ${eyebrow("Operations · Recovered")}
+      ${headline(`${o.shown} ${o.shown === 1 ? "lead" : "leads"} you were never told about`)}
+      ${paragraph("Each of these filled in their name, phone and email on the booking form and did not finish. The alert that should have reached you at the time was lost; the details were not. Newest first.")}
+    </td></tr>
+
+    <tr><td style="padding:12px 40px 0 40px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        ${rows}
+      </table>
+    </td></tr>
+
+    ${o.shown > o.leads.length ? `<tr><td style="padding:18px 40px 0 40px;">
+      <div style="font-family:${SANS};font-size:12px;line-height:20px;color:${LABEL};">
+        Showing the ${o.leads.length} most recent of ${o.shown}. The rest are in the admin panel under Abandoned.
+      </div>
+    </td></tr>` : ""}
+
+    <tr><td style="padding:26px 40px 0 40px;">
+      ${button(`${SITE_URL}/admin/abandoned`, "Open the abandoned list")}
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
