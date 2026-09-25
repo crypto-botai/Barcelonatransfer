@@ -210,6 +210,94 @@ function photonPlace(f: PhotonFeature): Place | null {
  */
 const PHOTON_LIMIT = 5;
 
+/**
+ * The handful of places this business cannot afford to get wrong.
+ *
+ * A general geocoder ranks by what the words look like, not by what an
+ * airport transfer company means. "Terminal 1 Barcelona airport" came back as
+ * Terminal F1 Balearia — a ferry berth in Sants-Montjuïc, eleven kilometres
+ * from the runway — because "Terminal F1" is a close string match and
+ * "Barcelona" pulls toward the city. Plain "terminal 1" resolved correctly,
+ * so the more precise the customer was, the worse the answer got.
+ *
+ * On a fixed-table route the fare survives that, because the table is matched
+ * on zones rather than on distance. Everything else does not: the distance is
+ * wrong, an off-table fare computed from it is wrong, and the coordinates the
+ * chauffeur is sent to are a different part of the city.
+ *
+ * So the transport hubs are answered from here rather than asked about. Order
+ * matters: the more specific patterns are tested first, which is what keeps
+ * "Girona airport" out of the El Prat entries.
+ */
+interface KnownPlace {
+  test: RegExp;
+  place: Omit<Place, "id">;
+}
+
+const KNOWN_PLACES: KnownPlace[] = [
+  // Other airports first, so they are not swallowed by the El Prat patterns.
+  {
+    test: /\b(girona|gro)\b.*\b(airport|aeroport|aeropuerto)\b|\b(airport|aeroport|aeropuerto)\b.*\bgirona\b/i,
+    place: { lat: 41.9011, lng: 2.7604, name: "Girona-Costa Brava Airport", context: "Vilobí d'Onyar, Catalonia", label: "Girona-Costa Brava Airport (GRO), Vilobí d'Onyar", kind: "airport" },
+  },
+  {
+    test: /\b(reus)\b.*\b(airport|aeroport|aeropuerto)\b|\b(airport|aeroport|aeropuerto)\b.*\breus\b/i,
+    place: { lat: 41.1474, lng: 1.1672, name: "Reus Airport", context: "Reus, Catalonia", label: "Reus Airport (REU), Reus", kind: "airport" },
+  },
+
+  // El Prat, by terminal.
+  {
+    test: /\b(t\s?1|terminal\s*1)\b/i,
+    place: { lat: 41.2971, lng: 2.0785, name: "Terminal 1", context: "Barcelona El Prat Airport (BCN)", label: "Terminal 1, Barcelona El Prat Airport BCN", kind: "airport" },
+  },
+  {
+    test: /\b(t\s?2|terminal\s*2)\b/i,
+    place: { lat: 41.2894, lng: 2.0718, name: "Terminal 2", context: "Barcelona El Prat Airport (BCN)", label: "Terminal 2, Barcelona El Prat Airport BCN", kind: "airport" },
+  },
+  // El Prat generally.
+  {
+    test: /\b(bcn|el\s*prat|barcelona)\b.*\b(airport|aeroport|aeropuerto)\b|\b(airport|aeroport|aeropuerto)\b.*\b(bcn|el\s*prat|barcelona)\b/i,
+    place: { lat: 41.2971, lng: 2.0785, name: "Barcelona El Prat Airport", context: "BCN · el Prat de Llobregat", label: "Barcelona El Prat Airport (BCN), el Prat de Llobregat", kind: "airport" },
+  },
+
+  // The cruise terminals, which are a long way from the ferry berths that
+  // share their vocabulary.
+  {
+    test: /\b(cruise|crucero|creuer)\b|\bmoll\s*adossat\b/i,
+    place: { lat: 41.3611, lng: 2.1761, name: "Barcelona Cruise Port", context: "Moll Adossat · World Trade Centre", label: "Moll Adossat, cruise terminal port Barcelona", kind: "port" },
+  },
+
+  // Sants, where the long-distance trains come in.
+  {
+    test: /\b(sants)\b.*\b(station|estaci|estación)\b|\b(station|estaci|estación)\b.*\bsants\b|\bbarcelona\s*sants\b/i,
+    place: { lat: 41.3794, lng: 2.1401, name: "Barcelona Sants Station", context: "AVE · long-distance trains", label: "Estació de Sants, Barcelona sants station", kind: "train" },
+  },
+];
+
+/**
+ * Words that mean the customer is typing a street, not naming a hub.
+ *
+ * Catalan and Spanish addresses carry door notation like "3r 1a" and "T1",
+ * so without this guard a flat number could resolve to an airport terminal.
+ */
+const STREET = /\b(carrer|calle|c\/|avinguda|avenida|avda|passeig|paseo|rambla|ronda|pla[cç]a|plaza|camino|cam[ií]|carretera|ctra)\b/i;
+
+
+/**
+ * A hub answered from the table above, or null.
+ *
+ * Returned as the only result when it matches: offering the correct airport
+ * alongside four near-misses invites the customer to pick a near-miss.
+ */
+export function knownPlace(query: string): Place | null {
+  const q = query.trim().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  if (STREET.test(q)) return null;
+  for (const k of KNOWN_PLACES) {
+    if (k.test.test(q)) return { ...k.place, id: `known-${k.place.name}` };
+  }
+  return null;
+}
+
 async function photonSearch(q: string): Promise<Place[]> {
   try {
     const url =
@@ -287,6 +375,13 @@ async function nominatimSearch(q: string): Promise<Place[]> {
 async function searchUncached(query: string): Promise<Place[]> {
   const q = query.trim();
   if (q.length < 2) return [];
+
+  // The transport hubs are answered rather than searched for. A general
+  // geocoder ranks by how the words look, and "Terminal 1 Barcelona airport"
+  // looks a great deal like Terminal F1 Balearia, a ferry berth eleven
+  // kilometres away that it used to return first.
+  const known = knownPlace(q);
+  if (known) return [known];
 
   const photon = await photonSearch(q);
   if (photon.length > 0) return photon;
