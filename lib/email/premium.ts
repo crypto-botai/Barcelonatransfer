@@ -1618,7 +1618,20 @@ export function adminNewBookingCard(o: {
   luggage?: number | null;
   flightNumber?: string | null;
   totalAmount: number;
-  specialRequests?: string | null;
+  /**
+   * The customer's own words, with the metadata block already taken out.
+   *
+   * Never the raw specialRequests. That field carries a [META]{…}[/META]
+   * prefix, and printing it whole put a line of JSON in front of the thing
+   * the office actually has to read — in the case that found this, a customer
+   * explaining that the real pickup was their hotel and not the bar they had
+   * been forced to type. parseBookingMeta().notes is the stripped version.
+   */
+  notes?: string | null;
+  /** What was bought on top, already formatted. The driver brings these. */
+  extras?: string | null;
+  /** Included in the total, but the chauffeur's, so it is shown apart. */
+  tipAmount?: number | null;
   /** How the money is arriving, when it is not simply paid in full. */
   paymentNote?: string | null;
 }): string {
@@ -1647,7 +1660,11 @@ export function adminNewBookingCard(o: {
         row("Date", `${esc(o.date)}${o.time ? ` &nbsp;&middot;&nbsp; ${esc(o.time)}` : ""}`) +
         row("Vehicle", `${esc(o.vehicleLabel)} &nbsp;&middot;&nbsp; ${o.passengers} pax${o.luggage != null ? ` &nbsp;&middot;&nbsp; ${o.luggage} bags` : ""}`) +
         (o.flightNumber ? row("Flight", esc(o.flightNumber)) : "") +
-        row("Notes", o.specialRequests ? esc(o.specialRequests) : "—", true),
+        // Somebody has to put the child seat in the car. Dropping this row
+        // was how a paid-for extra reached nobody.
+        (o.extras ? row("Extras", `<span style="color:${GOLD};">${esc(o.extras)}</span>`) : "") +
+        (o.tipAmount ? row("Driver tip", `<span style="color:${GOLD};">&euro;${o.tipAmount.toFixed(2)}</span> <span style="color:${LABEL};">&middot; included in the total</span>`) : "") +
+        row("Notes", o.notes ? esc(o.notes) : "—", true),
       )}
     </td></tr>
 

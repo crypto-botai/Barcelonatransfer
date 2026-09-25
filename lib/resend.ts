@@ -343,7 +343,12 @@ export async function sendAdminNewBookingAlert({
       pickupAddress, dropoffAddress, date, time,
       vehicleLabel: vehicleName(vehicleClass),
       passengers: passengers ?? 1,
-      luggage, flightNumber, totalAmount, specialRequests, paymentNote,
+      luggage, flightNumber, totalAmount, paymentNote,
+      // The stripped note, the extras and the tip, each in their own row —
+      // rather than the raw field with its metadata block on the front.
+      notes: meta.notes,
+      extras: meta.extras.length ? formatExtras(meta.extras) : null,
+      tipAmount: meta.tipAmount,
     }),
     `${guestName} · ${pickupAddress} · ${date}`,
   );
