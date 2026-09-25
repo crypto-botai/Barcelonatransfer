@@ -58,6 +58,16 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
   if (!isFlightTrackingEnabled()) return result;
   result.enabled = true;
 
+  /**
+   * The alerts, held until the sweep is finished.
+   *
+   * Started and forgotten, they raced the cron's own response: this function
+   * returns the moment the loop ends, the route returns straight after, and
+   * the instance can be frozen with the sends still in flight. Collected here
+   * and awaited at the bottom instead.
+   */
+  const pending: Promise<unknown>[] = [];
+
   const bookings = await prisma.booking.findMany({
     where: {
       pickupDatetime: { gte: new Date(), lte: new Date(Date.now() + hoursAhead * 3600_000) },
@@ -188,18 +198,18 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
     // customer and driver.
     // WhatsApp stays a single line, because that is what a phone alert is
     // for: enough to know whether to open the email standing next to it.
-    void notifyAdmin(
+    pending.push(notifyAdmin(
       `Flight delay — booking ${b.confirmationCode.slice(0, 8).toUpperCase()}\n` +
       `${status.flightNumber} now lands ${when}` +
       (status.delayMinutes ? ` (${status.delayMinutes} min late)` : "") + `\n` +
       `Pickup: ${b.pickupAddress}\n` +
       `Driver: ${b.driver?.user.name ?? "NOT YET ASSIGNED"}`,
-    ).catch(() => {});
+    ).catch(() => {}));
 
     // The email carries everything the provider told us, which is most of
     // what decides whether this delay needs a human: whether the aircraft has
     // even left, how late it left, and which terminal it comes into.
-    void sendOpsFlightAlert({
+    pending.push(sendOpsFlightAlert({
       confirmationCode: b.confirmationCode,
       flightNumber:     status.flightNumber,
       airline:          status.airline,
@@ -227,9 +237,12 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
       passenger:     b.guestName,
       driver:        b.driver?.user.name ?? null,
       bookingId:     b.id,
-    }).catch((e) => console.error("[flights] ops alert:", e));
+    }).catch((e) => console.error("[flights] ops alert:", e)));
     result.notified++;
   }
+
+  // Nothing started above may outlive the response.
+  await Promise.allSettled(pending);
 
   return result;
 }

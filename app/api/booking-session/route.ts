@@ -48,7 +48,13 @@ export async function POST(req: NextRequest) {
     // Tell the office straight away, the first time a session has a full set of
     // contact details. The daily recovery job is for the discount offer; this
     // is so somebody can ring while the customer is still on the page.
-    void alertOnFirstContact(body, session.converted);
+    // after(), not a bare void. This handler returns as soon as the session
+    // is saved, and on serverless the instance can be frozen the moment it
+    // does, taking an unawaited promise with it. The alert needs three
+    // database round trips and an HTTP call to Resend before it has sent
+    // anything, so it rarely survived that race — which is why leads stopped
+    // arriving. after() is already used a few lines above for the sweep.
+    after(() => alertOnFirstContact(body, session.converted));
 
     return NextResponse.json({ ok: true, id: session.id });
   } catch (err) {

@@ -152,8 +152,11 @@ describe("the data behind it", () => {
     expect(sweep).toContain("scheduled: clockText(status.scheduledDeparture)");
     expect(sweep).toContain("actual:    clockText(status.actualDeparture)");
     expect(sweep).toContain("terminal:  status.arrivalTerminal");
-    // The phone alert is deliberately still one line.
-    expect(sweep).toContain("void notifyAdmin(");
+    // The phone alert is deliberately still one line, and is now collected
+    // rather than fired and forgotten: an unawaited send does not survive the
+    // cron returning.
+    expect(sweep).toContain("pending.push(notifyAdmin(");
+    expect(sweep).toContain("await Promise.allSettled(pending)");
   });
 
   it("the subject line says which flight and how late, not just 'Flight delay'", () => {

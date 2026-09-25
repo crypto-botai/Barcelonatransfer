@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyArrivalToken } from "@/lib/arrival-token";
@@ -98,11 +98,15 @@ export async function POST(
   // does: the passenger is walking to the car and the vehicle should move.
   // Alerting on every step would train everyone to ignore the alerts.
   if (recorded && stage === "WALKING_TO_MEETING_POINT") {
-    void notifyAdminWhatsApp(
+    // after(), not a bare void. This handler returns as soon as its work is
+    // saved, and on serverless the instance can be frozen the moment it does,
+    // taking an unawaited promise with it. after() keeps the function alive
+    // until the message has actually gone.
+    after(() => notifyAdminWhatsApp(
       `\u{1F6B6} ${booking.confirmationCode} — passenger walking to the meeting point.\n` +
       `${booking.guestName ?? "Passenger"}${booking.flightNumber ? ` · ${booking.flightNumber}` : ""}\n` +
       `${booking.pickupAddress}`,
-    );
+    ).catch(() => {}));
   }
 
   return NextResponse.json({

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
@@ -88,14 +88,18 @@ export async function POST(req: NextRequest) {
 
   // The operator decides what happens next — refund, charge, reschedule — so
   // they hear about it immediately rather than at the end of the day.
-  void notifyAdminWhatsApp(
+  // after(), not a bare void. This handler returns as soon as its work is
+  // saved, and on serverless the instance can be frozen the moment it does,
+  // taking an unawaited promise with it. after() keeps the function alive
+  // until the message has actually gone.
+  after(() => notifyAdminWhatsApp(
     `No-show reported — ${booking.confirmationCode.slice(0, 8).toUpperCase()}\n` +
     `Driver: ${driver.user.name ?? "—"}\n` +
     `Passenger: ${booking.guestName ?? "—"}\n` +
     `Pickup: ${booking.pickupAddress}\n` +
     (waited !== null ? `Waited: ${waited} min\n` : "") +
     `${images.length} photo${images.length === 1 ? "" : "s"} attached`,
-  ).catch(() => {});
+  ).catch(() => {}));
 
   return NextResponse.json({ ok: true, waitedMin: waited, photos: report.images.length });
 }
