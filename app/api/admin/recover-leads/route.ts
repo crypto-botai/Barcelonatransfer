@@ -56,7 +56,12 @@ export async function GET(req: NextRequest) {
   // One query for the log rather than one per session.
   const alerted = new Set(
     (await prisma.emailLog.findMany({
-      where: { type: "ADMIN_LEAD" },
+      // Only a SENT row means the office was actually told. Counting every
+      // row regardless of status was wrong, and it hid the worst cases: a
+      // FAILED send and a claim left PENDING both looked like a delivered
+      // alert, so the leads that most needed recovering were the ones
+      // excluded from it.
+      where: { type: "ADMIN_LEAD", status: "SENT" },
       select: { subject: true },
     })).map((r) => r.subject),
   );

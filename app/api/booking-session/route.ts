@@ -121,8 +121,30 @@ async function alertOnFirstContact(
     const adminEmail = process.env.ADMIN_EMAIL ?? COMPANY.email;
 
     // Cheap path: an earlier request already claimed or sent this one.
-    const already = await prisma.emailLog.count({ where: { type: "ADMIN_LEAD", subject } });
-    if (already > 0) return;
+    // Only a SENT row means this lead has been reported. A FAILED one
+    // should be tried again, and a PENDING one is either a request that is
+    // still in flight or a claim whose send died — the first must block, the
+    // second must not, and the only thing telling them apart is age.
+    const priors = await prisma.emailLog.findMany({
+      where: { type: "ADMIN_LEAD", subject },
+      select: { id: true, status: true, createdAt: true },
+    });
+    if (priors.some((r) => r.status === "SENT")) return;
+
+    const CLAIM_TTL_MS = 5 * 60_000;
+    const live = priors.filter(
+      (r) => r.status === "PENDING" && Date.now() - r.createdAt.getTime() < CLAIM_TTL_MS,
+    );
+    if (live.length > 0) return;
+
+    // Anything older than that is a claim whose send never finished. Left
+    // alone it blocked this session's alert permanently, and silently: the
+    // count above saw a row and returned, so the lead was never reported and
+    // never would be. One was still sitting there from two days earlier.
+    const stale = priors.filter((r) => r.status !== "SENT");
+    if (stale.length > 0) {
+      await prisma.emailLog.deleteMany({ where: { id: { in: stale.map((r) => r.id) } } }).catch(() => {});
+    }
 
     // Stake the claim before sending, so an overlapping request can see it.
     const claim = await prisma.emailLog.create({
