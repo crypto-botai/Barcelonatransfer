@@ -1,4 +1,5 @@
 import { COMPANY } from "@/lib/company-facts";
+import { telHref, waHref, displayPhone, isDialable } from "@/lib/phone";
 
 /**
  * Transactional email templates.
@@ -415,7 +416,13 @@ export function newLeadCard(o: {
   pickup?: string | null; dropoff?: string | null;
   when?: string | null; passengers?: number | null;
 }): string {
-  const wa = `https://wa.me/${o.phone.replace(/\D/g, "")}`;
+  // A number with no dialling code cannot be rung from Barcelona, and the
+  // WhatsApp link built from one points at nothing and fails silently. Both
+  // are offered only when the number is genuinely international; when it is
+  // not, the office is told why rather than handed a link that does nothing.
+  const dial = telHref(o.phone);
+  const wa = waHref(o.phone);
+  const shown = displayPhone(o.phone);
   const optional =
     (o.pickup ? row("Pick-up", esc(o.pickup)) : "") +
     (o.dropoff ? row("Drop-off", esc(o.dropoff)) : "") +
@@ -433,7 +440,9 @@ export function newLeadCard(o: {
     <tr><td style="padding:0 44px;">
       ${detailTable(
         row("Name", `<strong style="font-weight:bold;">${esc(o.name)}</strong>`) +
-        row("Phone", `<a href="tel:${esc(o.phone)}" style="color:${GOLD};text-decoration:none;">${esc(o.phone)}</a>`) +
+        row("Phone", dial
+          ? `<a href="${esc(dial)}" style="color:${GOLD};text-decoration:none;">${esc(shown.text)}</a>${shown.dialable ? "" : ` <span style="color:${LABEL};font-size:12px;">&middot; no country code</span>`}`
+          : `${esc(shown.text)} <span style="color:${LABEL};font-size:12px;">&middot; not a dialable number</span>`) +
         row("Email", `<a href="mailto:${esc(o.email)}" style="color:${GOLD};text-decoration:none;">${esc(o.email)}</a>`) +
         optional +
         row("Status", `<span style="color:${LABEL};">Not paid yet</span>`, true),
@@ -442,8 +451,8 @@ export function newLeadCard(o: {
 
     ${sectionSpacer(32)}
     <tr><td style="padding:0 44px;text-align:center;">
-      ${button(`tel:${esc(o.phone)}`, "Call The Guest")}
-      <div style="padding-top:16px;">${secondaryLink(wa, "Message on WhatsApp")}</div>
+      ${dial ? button(dial, "Call The Guest") : ""}
+      ${wa ? `<div style="padding-top:16px;">${secondaryLink(wa, "Message on WhatsApp")}</div>` : ""}
     </td></tr>
     ${sectionSpacer(42)}
   `);
@@ -1704,7 +1713,9 @@ export function recoveredLeadsCard(o: {
     <tr><td style="padding:16px 0;border-bottom:1px solid ${RULE};">
       <div style="font-family:${SANS};font-size:15px;color:${TITLE};">${esc(l.name)}</div>
       <div style="font-family:${SANS};font-size:13px;line-height:21px;padding-top:4px;">
-        <a href="tel:${esc(l.phone).replace(/[^+0-9]/g, "")}" style="color:${GOLD};text-decoration:none;">${esc(l.phone)}</a>
+        ${telHref(l.phone)
+          ? `<a href="${esc(telHref(l.phone))}" style="color:${GOLD};text-decoration:none;">${esc(displayPhone(l.phone).text)}</a>${isDialable(l.phone) ? "" : ` <span style="color:${LABEL};">(no country code)</span>`}`
+          : esc(l.phone)}
         <span style="color:${LABEL};"> &nbsp;&middot;&nbsp; </span>
         <a href="mailto:${encodeURIComponent(l.email)}" style="color:${GOLD};text-decoration:none;">${esc(l.email)}</a>
       </div>
