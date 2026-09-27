@@ -3,9 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { emailDocument, passwordResetCard } from "@/lib/email/premium";
 import { resend } from "@/lib/resend";
 import crypto from "crypto";
+import { senderAddress } from "@/lib/sender";
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
-const FROM = process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>";
+const FROM = senderAddress();
 
 export async function POST(req: Request) {
   try {

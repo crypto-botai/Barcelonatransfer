@@ -63,7 +63,7 @@ export const resend = new Proxy({} as Resend, { get: (_, p) => (getResend() as a
 // FROM must match a verified domain in Resend dashboard (resend.com/domains)
 // Set RESEND_FROM in Vercel env once your domain is verified.
 // Until verified, only onboarding@resend.dev works (but only to your Resend account email).
-const FROM = process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>";
+const FROM = senderAddress();
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? COMPANY.email;
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
 
@@ -94,6 +94,7 @@ async function sendEmail(payload: Parameters<Resend["emails"]["send"]>[0]): Prom
 }
 
 import { parseBookingMeta, formatExtras } from "@/lib/booking-meta";
+import { senderAddress } from "@/lib/sender";
 
 // ─── Vehicle class → display name ────────────────────────────
 const VEHICLE_NAMES: Record<string, string> = {

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { resend } from "@/lib/resend";
 import { COMPANY } from "@/lib/company-facts";
 import { emailDocument, contactEnquiryCard } from "@/lib/email/premium";
+import { senderAddress } from "@/lib/sender";
 
 const schema = z.object({
   name:    z.string().min(2),
@@ -23,7 +24,7 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? COMPANY.email;
  * nowhere. elitebcn.info is the domain that actually has the DKIM key and
  * the SPF record, and is what every other email on the site is sent from.
  */
-const FROM = process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>";
+const FROM = senderAddress();
 
 /**
  * A name on its way into the subject line.

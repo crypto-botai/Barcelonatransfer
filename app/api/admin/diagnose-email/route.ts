@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { COMPANY } from "@/lib/company-facts";
 import { sendNewLeadAlert } from "@/lib/resend";
+import { senderAddress, senderIsMisconfigured } from "@/lib/sender";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,8 @@ export async function GET(req: NextRequest) {
   }
 
   const effectiveAdminEmail = process.env.ADMIN_EMAIL ?? COMPANY.email;
-  const effectiveFrom = process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>";
+  const effectiveFrom = senderAddress();
+  const fromMisconfigured = senderIsMisconfigured();
 
   // The last few of each, so a failure is visible with its reason.
   const recent = await prisma.emailLog.findMany({
@@ -45,6 +47,10 @@ export async function GET(req: NextRequest) {
     adminEmail: effectiveAdminEmail,
     adminEmailFrom: process.env.ADMIN_EMAIL ? "environment variable" : "code default",
     from: effectiveFrom,
+    // Never echo the value. It was a secret the one time this mattered.
+    fromVariable: fromMisconfigured
+      ? "RESEND_FROM is set to something that is not an email address and is being ignored — check it in the hosting dashboard"
+      : process.env.RESEND_FROM ? "environment variable" : "code default",
     resendKeyConfigured: Boolean(process.env.RESEND_API_KEY),
     contactEmail: COMPANY.email,
     siteUrl: process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info",

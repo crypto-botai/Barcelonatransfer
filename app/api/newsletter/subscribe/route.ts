@@ -4,6 +4,7 @@ import { logEmail } from "@/lib/marketing";
 import { resend } from "@/lib/resend";
 import { z } from "zod";
 import { emailDocument, newsletterWelcomeCard } from "@/lib/email/premium";
+import { senderAddress } from "@/lib/sender";
 
 const schema = z.object({
   email:  z.string().email(),
@@ -14,7 +15,7 @@ const schema = z.object({
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
 // The domain the rest of the site sends from, and the only one with DKIM
 // and SPF published. See the note in app/api/contact/route.ts.
-const FROM     = process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>";
+const FROM     = senderAddress();
 
 const rateMap = new Map<string, number[]>();
 

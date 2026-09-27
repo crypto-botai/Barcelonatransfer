@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { resend } from "@/lib/resend";
 import { COMPANY } from "@/lib/company-facts";
 import { emailDocument, adminNoticeCard } from "@/lib/email/premium";
+import { senderAddress } from "@/lib/sender";
 
 export async function POST() {
   const session = await getServerSession(authOptions);
@@ -14,7 +15,7 @@ export async function POST() {
 
   try {
     const result = await resend.emails.send({
-      from: process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>",
+      from: senderAddress(),
       to,
       subject: "✓ Email Test — Elite BCN Admin",
       html: emailDocument(

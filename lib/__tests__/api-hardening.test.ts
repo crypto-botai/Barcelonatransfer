@@ -130,10 +130,12 @@ describe("everything is sent from a domain that exists", () => {
   });
 
   it("uses the one configured sender everywhere", () => {
-    for (const f of ["app/api/contact/route.ts", "app/api/newsletter/subscribe/route.ts"]) {
-      expect(rd(f), f).toContain('process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>"');
+    // The sender now comes from lib/sender.ts, which ignores a value that
+    // is not an address — RESEND_FROM was briefly set to the API key.
+    for (const f of ["app/api/contact/route.ts", "app/api/newsletter/subscribe/route.ts", "lib/resend.ts"]) {
+      expect(rd(f), f).toContain("senderAddress()");
+      expect(rd(f), f).not.toContain("process.env.RESEND_FROM");
     }
-    expect(rd("lib/resend.ts")).toContain('process.env.RESEND_FROM ?? "Elite BCN Transfers <noreply@elitebcn.info>"');
   });
 });
 
