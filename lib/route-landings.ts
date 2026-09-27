@@ -1258,7 +1258,7 @@ const CALELLA: RouteLanding = {
   eyebrow: "Costa del Maresme · Pineda · Santa Susanna",
   EyebrowIcon: Umbrella,
   title: `Barcelona Airport to Calella Transfer — from €${calellaFrom}`,
-  description: `Private transfer from BCN El Prat or central Barcelona to Calella, Pineda de Mar and Santa Susanna. Fixed €${calellaFrom} per vehicle, about 70 km and 55 minutes, door to door.`,
+  description: `Private transfer from BCN El Prat to Calella, Pineda de Mar and Santa Susanna. Fixed €${calellaFrom} per vehicle, about 70 km and 55 minutes, door to door.`,
   keywords: [
     "barcelona airport to calella transfer",
     "barcelona to calella",
@@ -1372,7 +1372,7 @@ const BLANES: RouteLanding = {
   eyebrow: "Costa Brava · Where the coast begins",
   EyebrowIcon: Waves,
   title: `Barcelona Airport to Blanes Transfer — from €${blanesFrom}`,
-  description: `Private transfer from BCN El Prat or central Barcelona to Blanes, the first town of the Costa Brava. Fixed €${blanesFrom} per vehicle, about 85 km and 1 hour, door to door.`,
+  description: `Private transfer from BCN El Prat to Blanes, the first town of the Costa Brava. Fixed €${blanesFrom} per vehicle, about 85 km and 1 hour, door to door.`,
   keywords: [
     "barcelona airport to blanes transfer",
     "barcelona to blanes",

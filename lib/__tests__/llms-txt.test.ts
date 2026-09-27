@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 import { FIXED_ROUTES, type VehicleCode } from "@/lib/fixed-prices";
 import { VEHICLE_CATALOG, EXTRAS_CATALOG } from "@/types";
 import { SUPPORTED_LOCALES } from "@/lib/i18n";
+import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+import { COMPANY } from "@/lib/company-facts";
 
 /**
  * public/llms.txt and llms-full.txt are served to GPTBot, ClaudeBot,
@@ -133,5 +135,49 @@ describe("every published price matches the route table", () => {
       });
     }
     expect(checked, `${name} compared too few cells`).toBeGreaterThan(100);
+  });
+});
+
+/**
+ * The route table was guarded; the hourly table was not, and drifted the same
+ * way. An SEO audit on 27 Sept 2026 found four of seven hourly rates wrong:
+ * the Vito quoted at €60/h against a real €65, the V-Class at €70 against
+ * €75, and the EQE and Tesla quoted €5 and €10 above their real rates. On a
+ * four-hour minimum that is €20 to €40 misquoted per booking — by ChatGPT,
+ * Perplexity and Claude, which read these files and have no other source.
+ */
+describe("every hourly rate matches the pricing table", () => {
+  it.each(FILES)("%s quotes the real rate and minimum for each class", (name, text) => {
+    let checked = 0;
+    for (const [cls, rate] of Object.entries(HOURLY_RATES)) {
+      const label = cls.replace(/_/g, " ");
+      const row = text.split("\n").find((l) => l.startsWith(`| ${label} `));
+      expect(row, `${name}: no hourly row for ${label}`).toBeTruthy();
+
+      expect(row, `${name}: ${label} hourly rate`).toContain(`€${rate}/h`);
+      const min = (MIN_HOURLY_HOURS as Record<string, number>)[cls];
+      expect(row, `${name}: ${label} minimum`).toContain(`| ${min} hours |`);
+      checked++;
+    }
+    expect(checked, `${name} compared too few classes`).toBe(Object.keys(HOURLY_RATES).length);
+  });
+});
+
+/**
+ * These files are where an AI assistant gets the address to send a customer
+ * to. They named vtcbcn2025@gmail.com for nineteen days after the business
+ * moved to booking@elitebcn.info, because the generator is run by hand and
+ * nothing compared its output to the company record.
+ */
+describe("contact details match the company record", () => {
+  it.each(FILES)("%s gives the current email", (_name, text) => {
+    expect(text).toContain(COMPANY.email);
+    // The address the business moved off. It must not come back.
+    expect(text).not.toMatch(/vtcbcn2025@gmail\.com/);
+  });
+
+  it.each(FILES)("%s gives the current phone and WhatsApp", (_name, text) => {
+    expect(text).toContain(COMPANY.phoneDisplay);
+    expect(text).toMatch(/wa\.me\/34635383712/);
   });
 });

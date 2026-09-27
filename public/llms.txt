@@ -1,7 +1,7 @@
 # Elite BCN Transfers — AI & LLM Reference
 
 > Licensed VTC chauffeur service in Barcelona, Spain. Fixed-price private
-> transfers, no surge pricing. Generated from the live pricing data on 2026-09-08.
+> transfers, no surge pricing. Generated from the live pricing data on 2026-09-27.
 > Format: [llms.txt v1](https://llmstxt.org).
 
 ## Service Summary
@@ -18,7 +18,7 @@ individually. Prices are per vehicle and EXCLUDE VAT and tolls.
 - Available: 24/7, 365 days a year
 - Website languages: English, Spanish, French, Arabic, Russian, Chinese, German, Italian, Portuguese
 - Phone: +34 635 383 712
-- Email: vtcbcn2025@gmail.com
+- Email: booking@elitebcn.info
 
 ## Fleet (7 vehicles operated)
 - Toyota Corolla — Economy, up to 3 passengers, 2 large cases (75 × 50 × 30 cm). Air Conditioning, USB Charging, WiFi, Professional Driver.
@@ -133,10 +133,10 @@ Where an individual car is priced below its class column:
 |------------------|-------------|---------|
 | ECONOMY          | €45/h     | 4 hours |
 | BUSINESS         | €50/h     | 4 hours |
-| LUXURY           | €65/h     | 4 hours |
-| ELECTRIC VIP     | €65/h     | 4 hours |
-| MINIVAN          | €60/h     | 4 hours |
-| LUXURY MINIVAN   | €70/h     | 4 hours |
+| ELECTRIC VIP     | €55/h     | 4 hours |
+| LUXURY           | €60/h     | 4 hours |
+| MINIVAN          | €65/h     | 4 hours |
+| LUXURY MINIVAN   | €75/h     | 4 hours |
 | MINIBUS          | €160/h    | 4 hours |
 
 VAT at 10% is added to the fare only if the customer requests an invoice.
@@ -168,7 +168,7 @@ vehicle, fuel and parking are included.
 - WhatsApp: https://wa.me/34635383712 — fastest response, 24/7
 - Full price table: https://www.elitebcn.info/pricing
 - Phone: +34 635 383 712
-- Email: vtcbcn2025@gmail.com
+- Email: booking@elitebcn.info
 
 ## Cancellation
 - More than 24 hours before pickup: refunded in full

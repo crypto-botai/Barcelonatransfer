@@ -92,6 +92,49 @@ describe("trimToWord", () => {
   });
 });
 
+/**
+ * The route landing pages write their own title and description as template
+ * strings, so they never pass through fitTitle or fitDescription and nothing
+ * measured them. A crawl of all 120 live URLs on 27 Sept 2026 found Calella
+ * at 165 characters and Blanes at 162 — both past the point where Google
+ * truncates, on two pages that exist to sell a specific route.
+ *
+ * One page over the limit is a trim. Seventy-odd pages generated from the
+ * same template are a pattern, so the whole set is measured here rather than
+ * the two that happened to be caught.
+ */
+describe("every route landing fits the search result", () => {
+  // Google truncates around 160 characters for descriptions and 60 for
+  // titles. Both are rendering limits, not hard cut-offs, so this measures
+  // the text we control rather than promising a pixel width.
+  const TITLE_MAX = 60;
+  const DESC_MAX = 160;
+
+  it("keeps every description within the limit", async () => {
+    const { ROUTE_LANDINGS } = await import("@/lib/route-landings");
+    const over = ROUTE_LANDINGS
+      .filter((r) => (r.description ?? "").length > DESC_MAX)
+      .map((r) => `${r.slug} (${r.description.length})`);
+    expect(over, `over ${DESC_MAX} chars`).toEqual([]);
+  });
+
+  it("keeps every title within the limit", async () => {
+    const { ROUTE_LANDINGS } = await import("@/lib/route-landings");
+    const over = ROUTE_LANDINGS
+      .filter((r) => (r.title ?? "").length > TITLE_MAX)
+      .map((r) => `${r.slug} (${r.title.length})`);
+    expect(over, `over ${TITLE_MAX} chars`).toEqual([]);
+  });
+
+  it("gives every landing a description long enough to be useful", async () => {
+    const { ROUTE_LANDINGS } = await import("@/lib/route-landings");
+    const thin = ROUTE_LANDINGS
+      .filter((r) => (r.description ?? "").length < 70)
+      .map((r) => `${r.slug} (${(r.description ?? "").length})`);
+    expect(thin, "under 70 chars").toEqual([]);
+  });
+});
+
 describe("no page lets the layout append the brand twice", () => {
   // A plain-string title gets "| Elite BCN Transfers" appended. That is fine
   // for a title that carries no brand of its own, and wrong for one that does.

@@ -298,6 +298,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     "https://www.tiktok.com/@elitebcn.info",
                     "https://www.google.com/maps?cid=8610295895899713122",
                   ],
+                  // The same Maps listing again, as hasMap. sameAs says "this
+                  // URL is also us"; hasMap says "this is the map entry for
+                  // this address", which is the property Google documents as
+                  // recommended for LocalBusiness and reads when matching a
+                  // site to a Business Profile for the local pack.
+                  hasMap: "https://www.google.com/maps?cid=8610295895899713122",
                   areaServed: [
                     // Core cities
                     { "@type": "City", name: "Barcelona",       sameAs: "https://www.wikidata.org/wiki/Q1492"   },

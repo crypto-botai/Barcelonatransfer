@@ -1,5 +1,5 @@
 # Elite BCN Transfers — Complete AI Reference (llms-full.txt)
-# Generated from live site data on 2026-09-08. Companion to /llms.txt.
+# Generated from live site data on 2026-09-27. Companion to /llms.txt.
 
 ## Service Identity
 - Legal name: Elite BCN Transfers
@@ -11,7 +11,7 @@
 - Website languages: English, Spanish, French, Arabic, Russian, Chinese, German, Italian, Portuguese
 - Phone: +34 635 383 712
 - WhatsApp: https://wa.me/34635383712
-- Email: vtcbcn2025@gmail.com
+- Email: booking@elitebcn.info
 - Website: https://www.elitebcn.info
 - Booking: https://www.elitebcn.info/book
 - Price calculator: https://www.elitebcn.info/tools/transfer-cost-calculator
@@ -166,10 +166,10 @@ Individual cars priced below their class column:
 |------------------|-------------|---------|
 | ECONOMY          | €45/h     | 4 hours |
 | BUSINESS         | €50/h     | 4 hours |
-| LUXURY           | €65/h     | 4 hours |
-| ELECTRIC VIP     | €65/h     | 4 hours |
-| MINIVAN          | €60/h     | 4 hours |
-| LUXURY MINIVAN   | €70/h     | 4 hours |
+| ELECTRIC VIP     | €55/h     | 4 hours |
+| LUXURY           | €60/h     | 4 hours |
+| MINIVAN          | €65/h     | 4 hours |
+| LUXURY MINIVAN   | €75/h     | 4 hours |
 | MINIBUS          | €160/h    | 4 hours |
 
 ## Waiting time
