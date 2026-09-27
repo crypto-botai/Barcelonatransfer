@@ -6,6 +6,7 @@ import { isAirportLocation, isNightTime } from "@/lib/utils";
 import { getQuote } from "@/lib/pricing-service";
 import { FLEET_TO_DB_CLASS, type VehicleClass, type FleetVehicle } from "@/types";
 import { roadDistance, resolveEndpoint } from "@/lib/geo";
+import { capacityError } from "@/lib/capacity";
 
 const schema = z.object({
   bookingType:     z.enum(["TRANSFER", "HOURLY", "DAY_HIRE", "CORPORATE"]).default("TRANSFER"),
@@ -48,6 +49,12 @@ export async function POST(req: NextRequest) {
     }
     const body = schema.parse(raw);
     const { pickupLat, pickupLng, vehicleClass, pickupDatetime, bookingType } = body;
+
+    // Sixteen passengers in a Toyota Corolla quoted EUR 80, against EUR 250
+    // for the Sprinter that would actually be needed. The form filters its
+    // vehicle list by party size; nothing behind it checked.
+    const tooMany = capacityError(body.passengers ?? 1, vehicleClass, body.fleetVehicle);
+    if (tooMany) return NextResponse.json({ error: tooMany }, { status: 422 });
     const pickupDate = new Date(pickupDatetime);
     const vc = vehicleClass as VehicleClass;
 

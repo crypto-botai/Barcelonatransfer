@@ -32,6 +32,7 @@ import { useTranslations } from "@/components/language/I18nProvider";
 import { pickupToUtc } from "@/lib/datetime";
 import PhoneField from "@/components/booking/PhoneField";
 import { isUsablePhone, splitE164 } from "@/lib/dial-codes";
+import { seatsFor } from "@/lib/capacity";
 
 // Addresses use short non-ambiguous strings so resolveZone() always identifies
 // the correct zone — no province names that could shadow the city name.
@@ -798,7 +799,21 @@ export default function BookFormClient() {
                       <div className="relative">
                         <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
                         <select id="book-passengers" value={data.passengers}
-                          onChange={(e) => setData((d) => ({ ...d, passengers: Number(e.target.value) }))}
+                          onChange={(e) => {
+                            const n = Number(e.target.value);
+                            setData((d) => {
+                              // A vehicle chosen for a smaller party does not
+                              // survive the party growing. The list below
+                              // re-filters on every render, but the selection
+                              // sat in state and stayed picked — so an EQE
+                              // chosen for two could be carried through to a
+                              // booking for eight.
+                              const fits = !d.fleetVehicle || seatsFor(d.vehicleClass, d.fleetVehicle) >= n;
+                              return fits
+                                ? { ...d, passengers: n }
+                                : { ...d, passengers: n, fleetVehicle: undefined, vehicleClass: undefined };
+                            });
+                          }}
                           className="input-luxury w-full pl-9 pr-3 py-4 rounded-xl text-sm appearance-none">
                           {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (
                             <option key={n} value={n} className="bg-[#111]">{n} passenger{n > 1 ? "s" : ""}</option>

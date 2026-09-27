@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { VEHICLE_CATALOG, FLEET_TO_DB_CLASS, type FleetVehicle, type QuoteResponse } from "@/types";
 import AddressAutocomplete, { type QuickZone } from "./AddressAutocomplete";
 import { useTranslations } from "@/components/language/I18nProvider";
+import { seatsFor, smallestFor } from "@/lib/capacity";
 
 /* ── Quick-select zones (pickup + drop-off) ────────────────────────────────── */
 // Addresses use short non-ambiguous strings so resolveZone() always identifies
@@ -385,7 +386,17 @@ export default function BookingForm({ compact = false }: Props) {
               <select
                 id="hero-booking-pax"
                 value={pax}
-                onChange={(e) => setPax(Number(e.target.value))}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  setPax(n);
+                  // The list below re-filters, but this value does not: a select
+                  // whose value is no longer among its options renders blank
+                  // while still submitting the car that no longer fits.
+                  if (seatsFor(null, vehicle) < n) {
+                    const bigger = smallestFor(n);
+                    if (bigger) setVehicle(bigger.fleetVehicle);
+                  }
+                }}
                 className="input-luxury w-full pl-8 pr-3 py-3 rounded-xl text-sm appearance-none"
               >
                 {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (

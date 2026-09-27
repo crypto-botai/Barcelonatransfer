@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
 import { sendBookingConfirmation, sendWelcomeEmail } from "@/lib/resend";
 import { redeemCoupon, validateCoupon } from "@/lib/marketing";
+import { capacityError } from "@/lib/capacity";
 import { calculateLastMinuteSurcharge, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, MIN_BOOKING_HOURS } from "@/lib/pricing";
 import { getQuote } from "@/lib/pricing-service";
 import { pickupToUtc, formatPickupDateTime } from "@/lib/datetime";
@@ -63,11 +64,14 @@ const schema = z.object({
   returnOf:        z.string().optional(),
   bookingType:     z.enum(["TRANSFER", "HOURLY", "DAY_HIRE", "CORPORATE"]).default("TRANSFER"),
   pickupAddress:   z.string().min(3),
-  pickupLat:       z.number(),
-  pickupLng:       z.number(),
+  // Bounded, as on the quote. 0,0 stays valid: the form clears the
+  // coordinates whenever the address text is edited and the server geocodes
+  // the text instead.
+  pickupLat:       z.number().min(-90).max(90),
+  pickupLng:       z.number().min(-180).max(180),
   dropoffAddress:  z.string().default(""),
-  dropoffLat:      z.number().default(0),
-  dropoffLng:      z.number().default(0),
+  dropoffLat:      z.number().min(-90).max(90).default(0),
+  dropoffLng:      z.number().min(-180).max(180).default(0),
   date:            z.string(),
   time:            z.string(),
   // Round trip. Only the moment is needed: the return leg is the exact reverse
@@ -180,6 +184,13 @@ export async function POST(req: NextRequest) {
         error: `Bookings require at least ${MIN_BOOKING_HOURS} hour notice. For urgent transfers, please call or WhatsApp us at +34 635 383 712.`,
       }, { status: 422 });
     }
+
+    // The party has to fit in the car. The form filters its vehicle list by
+    // passenger count, but the selection survives the count being raised
+    // afterwards, so an EQE chosen for two could be booked for eight — and a
+    // request sent directly was never checked at all.
+    const tooMany = capacityError(body.passengers, body.vehicleClass, body.fleetVehicle);
+    if (tooMany) return NextResponse.json({ error: tooMany }, { status: 422 });
 
     // Server-side price recalculation (authoritative — client amount is advisory only)
     const vc = body.vehicleClass as VehicleClass;
