@@ -4,15 +4,18 @@ import { BaseAgent } from "@/lib/ai/agents/base";
 import { callProvider } from "@/lib/ai/providers";
 import { saveMemory } from "@/lib/ai/memory";
 import { COMPANY } from "@/lib/company-facts";
-import { Resend } from "resend";
 import { formatPickupDateTime } from "@/lib/datetime";
+// The Resend client is built on first use, not on import. A module-scope
+// `new Resend(...)` throws when the key is absent, and `next build` imports
+// every route to collect page data -- so one missing variable in the build
+// environment failed the whole deployment rather than one email.
+// lib/resend.ts holds the single, lazily-built client.
+import { resend } from "@/lib/resend";
 import { senderAddress } from "@/lib/sender";
 
 type BookingWithUser = Prisma.BookingGetPayload<{
   include: { user: { select: { id: true; createdAt: true; bookings: { select: { id: true } } } } };
 }>;
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export class BookingAgent extends BaseAgent {
   readonly name        = "booking";
