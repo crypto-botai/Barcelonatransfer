@@ -49,7 +49,7 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
   // SumUp's own API answered PAID, the booking is CONFIRMED and the payment
   // row is written. Placed before the guestEmail return below so a booking
   // with no guest email still reports its conversion.
-  await reportOrderCreated(updated);
+  await reportOrderCreated(updated, checkout);
 
   if (!updated.guestEmail) return "confirmed";
 
@@ -181,12 +181,22 @@ const CONVERSION_TYPE = "CONVERSION_ORDER_CREATED";
  * event_id is booking.id: generated once at creation, never changes, and the
  * same on every path. OpenAI deduplicates on it as well, so even a send that
  * slips past this guard is the same conversion rather than a second sale.
+ *
+ * The amount and currency come from the confirmed SumUp checkout, not from
+ * the booking row. They are what SumUp actually charged; the booking row
+ * only says what was expected, and the two can part company — the office can
+ * reschedule an hourly booking, which rewrites totalAmount, while a checkout
+ * for the old figure is still outstanding. Reporting a sale for money that
+ * was never taken is the kind of error nobody notices until the numbers are
+ * reconciled months later.
+ *
+ * The Payment row is deliberately left as it was: it has its own meaning and
+ * its own history, and changing it was not part of this.
  */
-async function reportOrderCreated(booking: {
-  id: string; totalAmount: number; currency: string; paymentStatus: string;
-  specialRequests: string | null;
-  depositAmount: number | null;
-}): Promise<void> {
+async function reportOrderCreated(
+  booking: { id: string; specialRequests: string | null },
+  checkout: SumUpCheckout,
+): Promise<void> {
   try {
     const priors = await prisma.emailLog.findMany({
       where: { bookingId: booking.id, type: CONVERSION_TYPE },
@@ -236,10 +246,10 @@ async function reportOrderCreated(booking: {
     const result = await sendOpenAiConversion({
       eventId:   booking.id,
       eventType: "order_created",
-      // What the card was actually charged: the deposit on a deposit booking,
-      // not the whole fare the chauffeur will finish collecting.
-      amount:    paidOnline(booking),
-      currency:  booking.currency,
+      // Straight from the confirmed checkout: what SumUp actually took,
+      // in the currency it took it in. Never recomputed from the booking.
+      amount:    checkout.amount,
+      currency:  checkout.currency,
       // Exactly as it arrived from the ad click, never rewritten.
       oppref:    meta.oppref,
       sourceUrl: `${siteUrl}/booking/success?booking_id=${booking.id}`,

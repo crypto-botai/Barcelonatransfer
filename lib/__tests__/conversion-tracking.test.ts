@@ -180,7 +180,7 @@ describe("order_created", () => {
   const bookings   = rd("app/api/bookings/route.ts");
 
   it("is sent to OpenAI from finalizeSumUpPayment and nowhere else", () => {
-    expect(completion).toContain("await reportOrderCreated(updated)");
+    expect(completion).toContain("await reportOrderCreated(updated, checkout)");
     expect(completion).toContain('eventType: "order_created"');
     // The only other file allowed to mention the OpenAI sender is the sender.
     for (const f of ["app/booking/success/page.tsx", "app/booking/pay/[checkoutId]/page.tsx",
@@ -191,7 +191,7 @@ describe("order_created", () => {
 
   it("runs only after the booking is marked PAID and CONFIRMED", () => {
     const paidWrite = completion.indexOf('paymentStatus:   "PAID"');
-    const report    = completion.indexOf("await reportOrderCreated(updated)");
+    const report    = completion.indexOf("await reportOrderCreated(updated, checkout)");
     expect(paidWrite).toBeGreaterThan(-1);
     expect(paidWrite).toBeLessThan(report);
   });
@@ -322,7 +322,7 @@ describe("scenario E: the payment fails", () => {
     // reportOrderCreated sits after the PAID write inside finalizeSumUpPayment,
     // which is only entered when SumUp answered PAID.
     const fn = fnBody(completion, "export async function finalizeSumUpPayment");
-    expect(fn).toContain("await reportOrderCreated(updated)");
+    expect(fn).toContain("await reportOrderCreated(updated, checkout)");
     expect(fn).toContain('if (booking.paymentStatus === "PAID") return "already-paid"');
   });
 });
@@ -344,7 +344,7 @@ describe("scenario C: confirmation is processed twice", () => {
   it("the second pass returns before any work", () => {
     const fn = fnBody(completion, "export async function finalizeSumUpPayment");
     const guard = fn.indexOf('if (booking.paymentStatus === "PAID") return "already-paid"');
-    const report = fn.indexOf("await reportOrderCreated(updated)");
+    const report = fn.indexOf("await reportOrderCreated(updated, checkout)");
     expect(guard).toBeGreaterThan(-1);
     expect(guard).toBeLessThan(report);
   });
