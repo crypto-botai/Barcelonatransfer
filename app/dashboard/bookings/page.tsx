@@ -350,6 +350,24 @@ function BookingsContent() {
                               <Star size={10} /> Review
                             </Link>
                           )}
+                          {/* The office moves a booking's date and time, not
+                              the customer — a changed flight usually moves the
+                              address and the vehicle too. Without this the page
+                              simply showed a fixed time and no way to question
+                              it, so people assumed it could not be changed at
+                              all. Opens WhatsApp already filled in. */}
+                          {!isPast && !["CANCELLED", "REFUNDED", "COMPLETED"].includes(b.status) && (
+                            <a
+                              href={`https://wa.me/34635383712?text=${encodeURIComponent(
+                                `Hi, I need to change the date or time for booking #${b.confirmationCode} (currently ${formatPickupDate(new Date(b.pickupDatetime))} at ${formatPickupTime(new Date(b.pickupDatetime))}).`,
+                              )}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center gap-1 text-[10px] text-dark-400 hover:text-gold-400 px-2 py-1 rounded-lg border border-white/[0.06] hover:border-gold-500/20 transition-all"
+                            >
+                              <MessageCircle size={10} /> Change time
+                            </a>
+                          )}
 
                           {b.status === "COMPLETED" && (
                             <button
