@@ -5,6 +5,8 @@ import { notify } from "@/lib/notifications/service";
 import type { SumUpCheckout } from "@/lib/sumup";
 import { formatPickupDateTime } from "@/lib/datetime";
 import { paidOnline } from "@/lib/deposits";
+import { sendOpenAiConversion } from "@/lib/tracking/openai-conversions";
+import { parseBookingMeta } from "@/lib/booking-meta";
 
 // Shared by app/api/payments/webhook, app/api/payments/verify, and app/api/cron/payment-reconcile
 // so all three entry points apply the exact same DB + email side-effects for a paid or failed
@@ -40,6 +42,14 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
       status:          "PAID",
     },
   });
+
+  // ── order_created ──────────────────────────────────────────────────────
+  //
+  // The only place this fires. Everything above has already happened:
+  // SumUp's own API answered PAID, the booking is CONFIRMED and the payment
+  // row is written. Placed before the guestEmail return below so a booking
+  // with no guest email still reports its conversion.
+  await reportOrderCreated(updated);
 
   if (!updated.guestEmail) return "confirmed";
 
@@ -153,6 +163,97 @@ export async function finalizeBalancePayment(bookingId: string, checkout: SumUpC
     data: { adminId: "system", adminName: "SumUp", action: "BALANCE_PAID", entity: "BOOKING", entityId: bookingId, details: { amount: booking.balanceAmount, transactionId } as never },
   }).catch(() => {});
   return "paid";
+}
+
+/** The marker row that makes the conversion send exactly once. */
+const CONVERSION_TYPE = "CONVERSION_ORDER_CREATED";
+
+/**
+ * Reports the paid booking to OpenAI Ads, once and only once.
+ *
+ * Three paths reach finalizeSumUpPayment — the SumUp webhook, the success
+ * page's verify poll, and the reconcile cron — and SumUp retries webhooks on
+ * any non-2xx, so this can be called several times for one booking. The
+ * guard is the same shape the confirmation emails already use: a row in
+ * email_logs, claimed before the work and marked afterwards, with the
+ * earliest claim winning a race.
+ *
+ * event_id is booking.id: generated once at creation, never changes, and the
+ * same on every path. OpenAI deduplicates on it as well, so even a send that
+ * slips past this guard is the same conversion rather than a second sale.
+ */
+async function reportOrderCreated(booking: {
+  id: string; totalAmount: number; currency: string; paymentStatus: string;
+  specialRequests: string | null;
+  depositAmount: number | null;
+}): Promise<void> {
+  try {
+    const priors = await prisma.emailLog.findMany({
+      where: { bookingId: booking.id, type: CONVERSION_TYPE },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    });
+    // Already reported. Nothing to do, however many times we are called.
+    if (priors.some((r) => r.status === "SENT")) return;
+
+    // A claim still in flight elsewhere: leave it to finish rather than
+    // sending a second time alongside it.
+    const CLAIM_TTL_MS = 5 * 60_000;
+    if (priors.some((r) => r.status === "PENDING" && Date.now() - r.createdAt.getTime() < CLAIM_TTL_MS)) return;
+
+    // Clear a dead claim so a failed attempt can be retried by a later path
+    // rather than blocking the conversion for good.
+    if (priors.length) {
+      await prisma.emailLog.deleteMany({
+        where: { id: { in: priors.filter((r) => r.status !== "SENT").map((r) => r.id) } },
+      }).catch(() => {});
+    }
+
+    const claim = await prisma.emailLog.create({
+      data: {
+        bookingId: booking.id,
+        type:      CONVERSION_TYPE,
+        to:        "openai-ads",
+        subject:   booking.id, // the event_id, for looking one up later
+        status:    "PENDING",
+      },
+      select: { id: true },
+    });
+
+    // Earliest claim wins, so two callers that got this far together do not
+    // both send.
+    const winner = await prisma.emailLog.findFirst({
+      where: { bookingId: booking.id, type: CONVERSION_TYPE },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      select: { id: true },
+    });
+    if (winner?.id !== claim.id) {
+      await prisma.emailLog.delete({ where: { id: claim.id } }).catch(() => {});
+      return;
+    }
+
+    const meta = parseBookingMeta(booking.specialRequests);
+    const result = await sendOpenAiConversion({
+      eventId:   booking.id,
+      eventName: "order_created",
+      // What the card was actually charged: the deposit on a deposit booking,
+      // not the whole fare the chauffeur will finish collecting.
+      value:     paidOnline(booking),
+      currency:  booking.currency,
+      oppref:    meta.oppref,
+    });
+
+    await prisma.emailLog.update({
+      where: { id: claim.id },
+      data:  { status: result.ok ? "SENT" : "FAILED" },
+    }).catch(() => {});
+
+    if (!result.ok) {
+      console.error("[conversions] order_created failed for", booking.id, result.error);
+    }
+  } catch (err) {
+    // A marketing report must never stop a payment being confirmed.
+    console.error("[conversions] order_created threw for", booking.id, err);
+  }
 }
 
 export async function markSumUpPaymentFailed(bookingId: string): Promise<void> {

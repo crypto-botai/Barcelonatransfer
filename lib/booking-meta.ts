@@ -54,6 +54,12 @@ export interface BookingMeta {
    * to take it to.
    */
   stops:         string[];
+  /**
+   * The OpenAI Ads click reference this booking came from, when it came from
+   * one. Read by the server at payment confirmation so the conversion can be
+   * attributed long after the browser that held it has closed.
+   */
+  oppref:        string | null;
   /** The customer's own note, with the metadata block removed. */
   notes:         string | null;
 }
@@ -76,6 +82,7 @@ const EMPTY: BookingMeta = {
   returnDiscount: 0,
   returnDiscountOfCode: null,
   stops: [],
+  oppref: null,
   notes: null,
 };
 
@@ -118,6 +125,7 @@ export function parseBookingMeta(specialRequests?: string | null): BookingMeta {
     returnDiscount: typeof raw.returnDiscount === "number" && raw.returnDiscount > 0 ? raw.returnDiscount : 0,
     returnDiscountOfCode: typeof raw.returnDiscountOfCode === "string" ? raw.returnDiscountOfCode : null,
     stops:         normaliseStops(raw.stops),
+    oppref:        typeof raw.oppref === "string" && raw.oppref.trim() ? raw.oppref.trim() : null,
     notes,
   };
 }

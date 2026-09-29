@@ -33,6 +33,8 @@ import { pickupToUtc } from "@/lib/datetime";
 import PhoneField from "@/components/booking/PhoneField";
 import { isUsablePhone, splitE164 } from "@/lib/dial-codes";
 import { seatsFor } from "@/lib/capacity";
+import { track } from "@/lib/tracking/events";
+import { readOppref } from "@/lib/tracking/oppref";
 
 // Addresses use short non-ambiguous strings so resolveZone() always identifies
 // the correct zone — no province names that could shadow the city name.
@@ -509,11 +511,25 @@ export default function BookFormClient() {
           protection,
           payOption: depositAllowed ? payOption : "FULL",
           returnOf: returnOf || undefined,
+          // The ad click that started this visit, caught on the landing page
+          // and kept in localStorage. Absent for organic traffic.
+          oppref: readOppref() ?? undefined,
         }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Booking failed");
       setBookingId(json.bookingId);
+
+      // booking_started: the customer has submitted and a booking row now
+      // exists. Fired here rather than on the button so a validation failure
+      // is not counted as a start, and keyed on the booking id so a retry
+      // after a failed first attempt reports once per booking.
+      track("booking_started", {
+        bookingId: json.bookingId,
+        value:     grandTotal,
+        currency:  "EUR",
+        oppref:    readOppref(),
+      });
       // Store temp credentials in sessionStorage — shown once on success page
       if (json.accountCreated && json.tempPassword) {
         try {

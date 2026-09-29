@@ -13,6 +13,8 @@ import {
 import Navbar from "@/components/layout/Navbar";
 import { useTranslations } from "@/components/language/I18nProvider";
 import PhoneSetup from "@/components/pwa/PhoneSetup";
+import { track } from "@/lib/tracking/events";
+import { readOppref } from "@/lib/tracking/oppref";
 
 type BookingData = {
   status: "PAID" | "PENDING" | "FAILED";
@@ -69,6 +71,24 @@ function SuccessInner() {
         const res  = await fetch(`/api/payments/verify?booking_id=${bookingId}`);
         const json = await res.json();
         setData(json);
+
+        // order_created for the Google Ads and GA4 tags, which live in the
+        // browser and cannot be reached from the server.
+        //
+        // Gated on the SERVER having said PAID — /api/payments/verify checks
+        // SumUp's own API — never on arriving at this page or on the widget
+        // callback. An unpaid booking reaching this page reports nothing.
+        // The OpenAI conversion for the same event is sent server-side from
+        // lib/payment-completion; both use booking.id as the event id, and
+        // track() sends each event at most once per booking.
+        if (json.status === "PAID") {
+          track("order_created", {
+            bookingId,
+            value:    typeof json.totalAmount === "number" ? json.totalAmount : undefined,
+            currency: "EUR",
+            oppref:   readOppref(),
+          });
+        }
 
         if (json.status === "PENDING" && attempts < MAX_AUTO_ATTEMPTS) {
           setTimeout(() => setAttempts((a) => a + 1), 3000);

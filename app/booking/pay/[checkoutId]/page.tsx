@@ -13,6 +13,8 @@ import { VEHICLE_CATALOG, FLEET_TO_DB_CLASS } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { PROTECTION_CUTOFF_HOURS, FREE_CANCEL_HOURS } from "@/lib/checkout-money";
 import { GOOGLE_PAY, WALLET_LABEL } from "@/lib/wallets";
+import { track } from "@/lib/tracking/events";
+import { readOppref } from "@/lib/tracking/oppref";
 
 /**
  * The payment page: SumUp's card form, set inside our own page.
@@ -149,6 +151,10 @@ function PayInner() {
         onLoad: () => {
           setMounted(true);
           setStatus("idle");
+          // checkout_started: the card fields are genuinely in front of the
+          // customer. Not on mount — the SDK can fail to load and leave the
+          // page showing an error with no checkout to start.
+          track("checkout_started", { bookingId, oppref: readOppref() });
           if (typeof widgetRef.current?.submit !== "function") {
             // No programmatic submit: fall back to SumUp's button, with the amount on it.
             widgetRef.current?.unmount();

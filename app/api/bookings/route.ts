@@ -20,6 +20,7 @@ import { extrasCostFor, resolveTier, type MemberTier } from "@/lib/loyalty";
 import { vatOn, wantsInvoice } from "@/lib/vat";
 import { clampTip } from "@/lib/tips";
 import { paymentPlan, returnDiscountFor, RETURN_DISCOUNT_PERCENT, type PayOption } from "@/lib/deposits";
+import { sanitiseOppref } from "@/lib/tracking/oppref";
 
 /**
  * Membership tier of whoever is booking.
@@ -86,6 +87,12 @@ const schema = z.object({
   durationHours:   z.number().int().min(1).max(24).optional(),
   flightNumber:    z.string().optional(),
   specialRequests: z.string().optional(),
+  /**
+   * The OpenAI Ads click reference, caught on the landing page and kept in
+   * localStorage by lib/tracking/oppref. Validated again here: it arrives
+   * from the browser and ends up on a booking record.
+   */
+  oppref:          z.string().max(200).optional(),
   extras:          z.array(extraSchema).optional(),
   // Bounds are enforced by clampTip against the fare, not here — a tip that is
   // too large should quietly become no tip rather than 400 away a real booking.
@@ -445,6 +452,11 @@ export async function POST(req: NextRequest) {
       ...(returnDiscount > 0 && returnOfBooking
         ? { returnDiscount, returnDiscountPct: RETURN_DISCOUNT_PERCENT, returnDiscountOf: returnOfBooking.id, returnDiscountOfCode: returnOfBooking.confirmationCode }
         : {}),
+      // The ad click that produced this booking, so the server can attribute
+      // the conversion when the payment is confirmed — by which time the
+      // browser that held it may be closed. Omitted entirely for organic
+      // traffic rather than stored as null.
+      ...(sanitiseOppref(body.oppref) ? { oppref: sanitiseOppref(body.oppref) } : {}),
     };
     const metaPrefix = `[META]${JSON.stringify(metaObj)}[/META]\n`;
     const specialRequests = body.specialRequests

@@ -65,7 +65,16 @@ describe("checkout: the browser side", () => {
   it("runs the same arithmetic as the server and sends the choices", () => {
     expect(form).toContain(`from "@/lib/checkout-money"`);
     expect(form).toContain("const plan = paymentPlan({");
-    expect(form).toContain("protection,\n          payOption: depositAllowed ? payOption : \"FULL\",\n          returnOf: returnOf || undefined,".replace(/\n/g, "\r\n"));
+    // The three choices, sent together and in this order. Matched without
+    // depending on the file's line endings: this assertion pinned CRLF, and
+    // a checkout on a machine configured for LF failed on the bytes rather
+    // than on anything about the payload.
+    const lf = form.replace(/\r\n/g, "\n");
+    expect(lf).toContain([
+      "protection,",
+      '          payOption: depositAllowed ? payOption : "FULL",',
+      "          returnOf: returnOf || undefined,",
+    ].join("\n"));
   });
 
   it("the pay button says what the card is charged today", () => {

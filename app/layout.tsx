@@ -14,6 +14,7 @@ import MotionProvider from "@/components/layout/MotionProvider";
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import MobileBookBar from "@/components/layout/MobileBookBar";
 import DeferredAnalytics from "@/components/layout/DeferredAnalytics";
+import OpprefCapture from "@/components/tracking/OpprefCapture";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { buildOfferCatalog } from "@/lib/offer-catalog";
 import { CHEAPEST_FARE } from "@/lib/destination-pricing";
@@ -397,6 +398,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <WhatsAppButton />
           <MobileBookBar />
           <DeferredAnalytics gaId="G-E9QZFG5WZY" adsId="AW-18391666445" />
+          {/* Catches ?oppref= on the first page of the visit, whichever page
+              that is: an ad lands on a destination page and the visitor
+              reaches /book by navigating, by which time the parameter is
+              gone from the URL. Renders nothing. */}
+          <OpprefCapture />
           {/* Core Web Vitals from real visitors, on real phones and real
               networks. Lighthouse runs here have only ever measured this
               machine; this measures the customer standing in an airport on
