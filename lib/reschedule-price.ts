@@ -4,11 +4,18 @@ import { isNightTime } from "@/lib/utils";
 /**
  * What moving a booking does to its price.
  *
- * Two parts of the fare depend on when the car is wanted rather than where it
- * goes: a night pickup adds 20%, and a pickup inside the last-minute window
- * adds 15%. Moving a booking from noon to 02:00 therefore changes what it
- * should cost, and the office had no way to see that — the date was simply
- * whatever was typed, and the total never moved.
+ * For an hourly or day hire, two parts of the fare depend on when the car is
+ * wanted rather than where it goes: a night pickup adds 20%, and a pickup
+ * inside the last-minute window adds 15%.
+ *
+ * A TRANSFER carries neither, ever. The price table is fixed and the pricing
+ * page says so in as many words — "No surge pricing, ever" — and the quote
+ * API returns nightSurcharge: 0 on every transfer whatever the hour. An
+ * earlier version of this file applied the uplift to all bookings alike,
+ * which meant moving a fixed-price airport run to 23:00 added 20% the
+ * booking engine would never have charged, against a promise on the public
+ * pricing page. Only the types the engine actually surcharges are
+ * surcharged here.
  *
  * Only these two are recomputed. Distance, the route table price and the
  * vehicle are untouched by a change of time, so the base fare carries over
@@ -20,6 +27,20 @@ import { isNightTime } from "@/lib/utils";
  * server's clock rather than Barcelona's, which is worth fixing — but fixing
  * it here alone would make reschedules disagree with new bookings.)
  */
+
+/**
+ * The booking types whose fare moves with the hour.
+ *
+ * Kept as a list rather than "anything that is not a TRANSFER" so a new
+ * booking type has to be added deliberately rather than inheriting a
+ * surcharge nobody decided on.
+ */
+const SURCHARGED_TYPES = new Set(["HOURLY", "DAY_HIRE"]);
+
+/** True when this booking's fare depends on the time of day at all. */
+export function pricesByTimeOfDay(bookingType: string | null | undefined): boolean {
+  return SURCHARGED_TYPES.has((bookingType ?? "").toUpperCase());
+}
 
 export interface TimeSurcharges {
   night: number;
@@ -63,13 +84,24 @@ export interface Repriced {
  * taken back off, so the same journey is never charged two night uplifts.
  */
 export function repriceForNewTime(
-  booking: { baseFare: number; totalAmount: number; pickupDatetime: Date },
+  booking: {
+    baseFare: number; totalAmount: number; pickupDatetime: Date;
+    /** From the booking's metadata. A transfer, or null, never surcharges. */
+    bookingType?: string | null;
+  },
   newPickup: Date,
   now: number = Date.now(),
 ): Repriced {
   const base = booking.baseFare;
-  const oldSurcharges = timeSurcharges(base, booking.pickupDatetime, now);
-  const newSurcharges = timeSurcharges(base, newPickup, now);
+  const nil: TimeSurcharges = { night: 0, lastMinute: 0, total: 0 };
+
+  // A fixed-price transfer costs the same at 02:00 as at noon, so moving it
+  // moves nothing. Both sides are zero rather than the difference being
+  // zero, so the breakdown the office is shown says "no surcharge" instead
+  // of "two surcharges that happen to cancel".
+  const surcharged = pricesByTimeOfDay(booking.bookingType);
+  const oldSurcharges = surcharged ? timeSurcharges(base, booking.pickupDatetime, now) : nil;
+  const newSurcharges = surcharged ? timeSurcharges(base, newPickup, now) : nil;
 
   // The old total is what is actually on the booking, not a recomputation of
   // it: a fare the office adjusted by hand must not be quietly undone by a

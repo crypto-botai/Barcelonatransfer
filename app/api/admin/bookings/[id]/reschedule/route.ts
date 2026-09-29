@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { pickupToUtc, formatPickupDateTime } from "@/lib/datetime";
 import { repriceForNewTime, applyToBalance } from "@/lib/reschedule-price";
 import { sendBookingRescheduledEmail } from "@/lib/resend";
+import { parseBookingMeta } from "@/lib/booking-meta";
 
 /**
  * Moving a booking to a different date or time.
@@ -78,7 +79,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     select: {
       id: true, confirmationCode: true, status: true,
       pickupDatetime: true, pickupAddress: true,
-      baseFare: true, totalAmount: true,
+      baseFare: true, totalAmount: true, specialRequests: true,
       depositAmount: true, balanceAmount: true, balancePaidAt: true,
       guestName: true, guestEmail: true,
       user: { select: { name: true, email: true } },
@@ -102,6 +103,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       baseFare: booking.baseFare ?? booking.totalAmount,
       totalAmount: booking.totalAmount,
       pickupDatetime: booking.pickupDatetime,
+      // A fixed-price transfer never carries a night or last-minute uplift
+      // — "No surge pricing, ever" is on the public pricing page — so only
+      // an hourly or day hire is repriced by the hour.
+      bookingType: parseBookingMeta(booking.specialRequests).bookingType,
     },
     newPickup,
   );

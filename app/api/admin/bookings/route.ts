@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -521,7 +521,7 @@ export async function POST(req: NextRequest) {
     }).catch(() => {});
 
     // Notify customer
-    if (body.sendEmail) sendBookingConfirmation({
+    if (body.sendEmail) after(() => sendBookingConfirmation({
       to:               body.guestEmail,
       name:             body.guestName,
       confirmationCode: booking.confirmationCode,
@@ -547,7 +547,7 @@ export async function POST(req: NextRequest) {
         dropoffAddress:   body.pickupAddress,
         totalAmount:      returnFare,
       } : undefined,
-    }).catch(e => console.error("[resend] admin create booking confirmation:", e));
+    }).catch(e => console.error("[resend] admin create booking confirmation:", e)));
 
     /**
      * A confirmation for each of the other rides.
@@ -560,7 +560,7 @@ export async function POST(req: NextRequest) {
      * the customer to wonder whether another payment is due.
      */
     if (body.sendEmail) for (const b of extraBookings) {
-      sendBookingConfirmation({
+      after(() => sendBookingConfirmation({
         to:               body.guestEmail,
         name:             body.guestName,
         confirmationCode: b.confirmationCode,
@@ -581,11 +581,11 @@ export async function POST(req: NextRequest) {
         calendar: calendarLinks({ id: b.id, confirmationCode: b.confirmationCode, pickupAddress: b.ride.pickupAddress, dropoffAddress: b.ride.dropoffAddress, pickupDatetime: b.at }),
         // They have several rides already; do not sell them another.
         returnUrl: null,
-      }).catch(e => console.error("[resend] admin extra ride confirmation:", e));
+      }).catch(e => console.error("[resend] admin extra ride confirmation:", e)));
     }
 
     // Notify admin panel (useful if another admin created it)
-    sendAdminNewBookingAlert({
+    after(() => sendAdminNewBookingAlert({
       confirmationCode: booking.confirmationCode,
       guestName:        body.guestName,
       guestEmail:       body.guestEmail,
@@ -600,7 +600,7 @@ export async function POST(req: NextRequest) {
       flightNumber:     body.flightNumber,
       // The office needs to see at a glance that this one needs four cars.
       specialRequests:  vehicleNote(body.specialRequests, 0, body.vehicleCount, booking.confirmationCode),
-    }).catch(() => {});
+    }).catch(() => {}));
 
     return NextResponse.json({
       ...booking,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { timeSurcharges, repriceForNewTime, applyToBalance } from "@/lib/reschedule-price";
+import { timeSurcharges, repriceForNewTime, applyToBalance, pricesByTimeOfDay } from "@/lib/reschedule-price";
 import { NIGHT_SURCHARGE_RATE, LAST_MINUTE_SURCHARGE_RATE } from "@/lib/pricing";
 
 /**
@@ -57,8 +57,10 @@ describe("time-dependent surcharges", () => {
 });
 
 describe("repricing a booking for a new time", () => {
+  // Hourly hire is the type whose fare actually moves with the hour. A
+  // transfer is covered in its own block below, because it must not.
   const booking = (total: number, pickup: Date) => ({
-    baseFare: 100, totalAmount: total, pickupDatetime: pickup,
+    baseFare: 100, totalAmount: total, pickupDatetime: pickup, bookingType: "HOURLY",
   });
 
   it("charges more when moving a midday run into the night", () => {
@@ -120,5 +122,59 @@ describe("what the difference does to a part-paid booking", () => {
   it("leaves a fully-paid booking alone", () => {
     expect(applyToBalance({ depositAmount: null, balanceAmount: null }, 20))
       .toEqual({ balanceAmount: null, refundDue: 0 });
+  });
+});
+
+/**
+ * "No surge pricing, ever" is on the public pricing page, and the quote API
+ * returns nightSurcharge: 0 on every transfer whatever the hour. The first
+ * version of this file surcharged every booking alike, so moving a fixed
+ * airport run to 23:00 added 20% the booking engine would never have
+ * charged — against a promise the customer can read.
+ */
+describe("a fixed-price transfer never moves with the clock", () => {
+  const transfer = (type: string | null) => ({
+    baseFare: 100, totalAmount: 100, pickupDatetime: localAt(5, 12), bookingType: type,
+  });
+
+  it("costs the same moved into the middle of the night", () => {
+    const r = repriceForNewTime(transfer("TRANSFER"), localAt(5, 23), NOW);
+    expect(r.difference).toBe(0);
+    expect(r.newTotal).toBe(100);
+  });
+
+  it("reports no surcharge rather than two that cancel", () => {
+    const r = repriceForNewTime(transfer("TRANSFER"), localAt(5, 2), NOW);
+    expect(r.newSurcharges).toEqual({ night: 0, lastMinute: 0, total: 0 });
+    expect(r.oldSurcharges).toEqual({ night: 0, lastMinute: 0, total: 0 });
+  });
+
+  it("costs the same moved inside the last-minute window", () => {
+    const r = repriceForNewTime(transfer("TRANSFER"), localAt(0, 14), NOW);
+    expect(r.difference).toBe(0);
+  });
+
+  it("treats an unknown or missing type as not surcharged", () => {
+    // A booking with no metadata must not acquire a surcharge by default.
+    for (const type of [null, "", "SOMETHING_NEW"]) {
+      expect(repriceForNewTime(transfer(type), localAt(5, 23), NOW).difference).toBe(0);
+    }
+  });
+
+  it("still surcharges the types the booking engine surcharges", () => {
+    for (const type of ["HOURLY", "DAY_HIRE", "hourly"]) {
+      const r = repriceForNewTime({ ...transfer(type) }, localAt(5, 23), NOW);
+      expect(r.difference, type).toBe(20);
+    }
+  });
+});
+
+describe("pricesByTimeOfDay", () => {
+  it("is true only for hourly and day hire", () => {
+    expect(pricesByTimeOfDay("HOURLY")).toBe(true);
+    expect(pricesByTimeOfDay("DAY_HIRE")).toBe(true);
+    expect(pricesByTimeOfDay("TRANSFER")).toBe(false);
+    expect(pricesByTimeOfDay(null)).toBe(false);
+    expect(pricesByTimeOfDay(undefined)).toBe(false);
   });
 });
