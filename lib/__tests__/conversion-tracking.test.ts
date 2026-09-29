@@ -290,19 +290,65 @@ describe("the existing Google installation is left alone", () => {
   const layout = rd("app/layout.tsx");
 
   it("keeps both IDs exactly as they were", () => {
-    expect(layout).toContain('gaId="G-E9QZFG5WZY"');
-    expect(layout).toContain('adsId="AW-18391666445"');
+    expect(layout).toContain("G-E9QZFG5WZY");
+    expect(layout).toContain("AW-18391666445");
   });
 
-  it("still loads them through the deferred component", () => {
+  it("still loads the heavy script through the deferred component", () => {
     expect(layout).toContain("<DeferredAnalytics");
   });
 
-  it("queues events on dataLayer rather than assuming gtag exists", () => {
-    // gtag.js is deferred to idle, so window.gtag may not exist yet.
+  /**
+   * The shim and both config commands are inline in the head, not deferred.
+   *
+   * gtag.js drains dataLayer in order and discards an event it reaches before
+   * that property's `config`. Deferring the config commands alongside the
+   * script put every event ahead of them in the queue.
+   */
+  it("installs the gtag shim and both configs inline in the head", () => {
+    expect(layout).toContain("function gtag(){window.dataLayer.push(arguments);}");
+    expect(layout).toContain("window.gtag=gtag;");
+    expect(layout).toContain("gtag('config','G-E9QZFG5WZY');");
+    expect(layout).toContain("gtag('config','AW-18391666445');");
+  });
+
+  /**
+   * The regression this file previously enshrined as a requirement.
+   *
+   * This site runs gtag.js, not Tag Manager. gtag.js processes only
+   * `arguments` objects on dataLayer; a plain object or a plain array is
+   * ignored silently. Verified against the live site: `push({event:…})` and
+   * `push(["event",…])` produced no network request, while `gtag("event",…)`
+   * and `push(arguments)` both reached /g/collect and /ccm/collect.
+   */
+  it("sends events through gtag, never as a bare object or array push", () => {
     const events = rd("lib/tracking/events.ts");
-    expect(events).toContain("window.dataLayer = window.dataLayer || []");
-    expect(events).not.toMatch(/window\.gtag\(/);
+    const code = events
+      .split(/\r?\n/)
+      .filter((l) => {
+        const t = l.trim();
+        return !t.startsWith("//") && !t.startsWith("*") && !t.startsWith("/*");
+      })
+      .join("\n");
+
+    // Goes through the shim.
+    expect(code).toContain("window.gtag(...args)");
+    expect(code).toContain('gtagCommand("event", event,');
+    expect(code).toContain('gtagCommand("event", "conversion",');
+
+    // The fallback reproduces the shim, pushing `arguments` — not an array.
+    expect(code).toContain("window.dataLayer!.push(arguments)");
+
+    // Tag Manager syntax must not come back.
+    expect(code).not.toMatch(/dataLayer\s*\.\s*push\s*\(\s*\{/);
+    expect(code).not.toMatch(/dataLayer\s*\.\s*push\s*\(\s*\[/);
+  });
+
+  /** The conversion page cannot wait twelve seconds for the tag. */
+  it("loads analytics immediately on the payment success page", () => {
+    const deferred = rd("components/layout/DeferredAnalytics.tsx");
+    expect(deferred).toContain('const IMMEDIATE_PATHS = ["/booking/success"]');
+    expect(deferred).toContain("useState(immediate)");
   });
 });
 

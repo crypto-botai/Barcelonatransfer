@@ -1,18 +1,33 @@
 /**
  * The three business events, sent once each, to whatever tags are loaded.
  *
- * Google's gtag.js is deliberately deferred to browser idle or first
- * interaction (components/layout/DeferredAnalytics), so `window.gtag` may
- * not exist yet when an event fires. Pushing onto `window.dataLayer`
- * directly works either way: gtag.js drains whatever is already in the array
- * when it loads. Nothing here waits for a script or fails if one never
- * arrives.
+ * Everything here goes through `gtag()`. That is not a style preference: this
+ * site runs gtag.js, not Google Tag Manager, and gtag.js processes *only*
+ * `arguments` objects found on `window.dataLayer`. A plain object
+ * (`dataLayer.push({ event: "order_created" })`) or a plain array
+ * (`dataLayer.push(["event", "conversion", {…}])`) is Tag Manager's syntax;
+ * gtag.js ignores both silently — no error, no warning, no request.
  *
- * `order_created` is the money event and is sent from the server, in
+ * An earlier version of this file used exactly those two forms, so every GA4
+ * event and every Ads conversion was a no-op. Measured against the live site
+ * with five probes, watching the network:
+ *
+ *   dataLayer.push({ event: "x", … })        → no request
+ *   dataLayer.push(["event", "x", { … }])    → no request
+ *   gtag("event", "x", { … })                → /g/collect and /ccm/collect
+ *   dataLayer.push(arguments)                → /g/collect and /ccm/collect
+ *
+ * The shim and both `config` commands are emitted inline in the document head
+ * (app/layout.tsx), so `window.gtag` exists before any of this can run and
+ * the config commands are already ahead of our events in the queue. gtag.js
+ * itself is still deferred; commands queue until it arrives and are then
+ * drained in order.
+ *
+ * `order_created` is the money event and is *also* sent from the server, in
  * lib/payment-completion, after SumUp's own API has confirmed the payment.
- * The client copy here exists only to feed the Google Ads and GA4 tags,
- * which live in the browser, and it is gated on the server having already
- * said PAID — never on a widget callback or on arriving at a page.
+ * The client copy here exists only to feed the Google Ads and GA4 tags, which
+ * live in the browser, and it is gated on the server having already said PAID
+ * — never on a widget callback or on arriving at a page.
  */
 
 export type TrackedEvent = "booking_started" | "checkout_started" | "order_created";
@@ -20,6 +35,7 @@ export type TrackedEvent = "booking_started" | "checkout_started" | "order_creat
 declare global {
   interface Window {
     dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
@@ -36,6 +52,23 @@ export interface EventPayload {
   value?: number | null;
   currency?: string | null;
   oppref?: string | null;
+}
+
+/**
+ * Sends one gtag command.
+ *
+ * Prefers the shim installed in the head. The fallback matters only if that
+ * snippet was blocked or stripped: it reproduces the shim exactly, pushing an
+ * `arguments` object rather than an array, because an array would be ignored.
+ */
+function gtagCommand(...args: unknown[]): void {
+  if (typeof window.gtag === "function") {
+    window.gtag(...args);
+    return;
+  }
+  window.dataLayer = window.dataLayer || [];
+  // eslint-disable-next-line prefer-rest-params
+  (function () { window.dataLayer!.push(arguments); }).apply(null, args as []);
 }
 
 /**
@@ -69,8 +102,8 @@ function markSent(key: string): void {
 /**
  * Sends one business event, at most once per booking per session.
  *
- * Pushes a GA4 event and, when a conversion label is configured, a Google
- * Ads conversion. The Ads conversion carries `transaction_id` so Google
+ * Sends a GA4 event and, when a conversion label is configured, a Google Ads
+ * conversion. The Ads conversion carries `transaction_id` so Google
  * deduplicates it on its own side as well.
  */
 export function track(event: TrackedEvent, payload: EventPayload = {}): void {
@@ -84,11 +117,8 @@ export function track(event: TrackedEvent, payload: EventPayload = {}): void {
   const currency = payload.currency ?? "EUR";
 
   try {
-    window.dataLayer = window.dataLayer || [];
-
     // GA4: the event under its own name, for reporting and audiences.
-    window.dataLayer.push({
-      event,
+    gtagCommand("event", event, {
       booking_id: payload.bookingId ?? undefined,
       oppref:     payload.oppref ?? undefined,
       value,
@@ -100,18 +130,14 @@ export function track(event: TrackedEvent, payload: EventPayload = {}): void {
     // sending one anyway would be a silent no-op.
     const label = ADS_LABELS[event];
     if (label) {
-      window.dataLayer.push([
-        "event",
-        "conversion",
-        {
-          send_to:        label,
-          value,
-          currency,
-          // Google's own deduplication key. Same booking, same id, whether
-          // the page is reloaded or the event arrives twice.
-          transaction_id: payload.bookingId ?? undefined,
-        },
-      ]);
+      gtagCommand("event", "conversion", {
+        send_to:        label,
+        value,
+        currency,
+        // Google's own deduplication key. Same booking, same id, whether
+        // the page is reloaded or the event arrives twice.
+        transaction_id: payload.bookingId ?? undefined,
+      });
     }
   } catch {
     // Tracking must never break the booking flow.

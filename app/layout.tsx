@@ -109,6 +109,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             an origin the page does not request early wastes a connection slot.
             dns-prefetch is the cheap equivalent for a later, deferred request. */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        {/* The light half of the Google tag: the gtag() shim and the config
+            commands. No network request — this only creates the queue that
+            gtag.js drains when DeferredAnalytics eventually loads it.
+
+            It has to be here, in the head, rather than deferred alongside the
+            script. gtag.js processes the queue in order and discards an event
+            it reaches before that property's `config`, so an event fired by a
+            visitor who acts faster than the loader would be silently dropped.
+            Inline in the head is also how Google's own snippet does it.
+
+            gtag.js only ever processes `arguments` objects. A plain array or
+            object pushed onto dataLayer is ignored without error — that is
+            Tag Manager's syntax, and this site does not run Tag Manager. See
+            lib/tracking/events.ts, which must go through window.gtag. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "window.dataLayer=window.dataLayer||[];" +
+              "function gtag(){window.dataLayer.push(arguments);}" +
+              "window.gtag=gtag;" +
+              "gtag('js',new Date());" +
+              "gtag('config','G-E9QZFG5WZY');" +
+              "gtag('config','AW-18391666445');",
+          }}
+        />
         {/* Speculation Rules — prefetch on hover, prerender on intent.
             This site is browsed several pages deep: someone lands on a route
             page, opens the fleet, compares a price, then books. Each of those
@@ -397,7 +422,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
           <WhatsAppButton />
           <MobileBookBar />
-          <DeferredAnalytics gaId="G-E9QZFG5WZY" adsId="AW-18391666445" />
+          {/* Only the heavy gtag.js script is deferred; the shim and both
+              config commands are already in the head above. */}
+          <DeferredAnalytics gaId="G-E9QZFG5WZY" />
           {/* Catches ?oppref= on the first page of the visit, whichever page
               that is: an ad lands on a destination page and the visitor
               reaches /book by navigating, by which time the parameter is

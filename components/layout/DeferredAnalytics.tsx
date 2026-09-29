@@ -1,49 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Script from "next/script";
 
 declare global {
   interface Window {
     dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
 /**
- * Loads Google Analytics and Google Ads off the critical path.
+ * Loads gtag.js — the heavy half of the Google tag — off the critical path.
  *
- * Loaded eagerly, gtag.js is ~161 KiB of third-party JavaScript that competes
- * with the page's own render work — Lighthouse attributed several long
- * main-thread tasks and a large share of unused JS to it, and it was the
- * single biggest non-first-party cost on the homepage.
+ * The tag is two separate things, and they used to be deferred together:
+ *
+ *   1. The `gtag()` shim and the `config` commands. A few hundred bytes of
+ *      inline JavaScript, no network request, no measurable main-thread cost.
+ *      That half now runs in the document head (see app/layout.tsx) so it is
+ *      in place before anything on the page can fire an event.
+ *   2. gtag.js itself — ~161 KiB of third-party script. On the homepage the
+ *      Ads container costs 430 ms of main-thread time and the GA4 container
+ *      420 ms: together 850 ms of a 950 ms total blocking time, and 325 KB. A
+ *      control run with both blocked scored 70 against 59 with them. That is
+ *      the half this component defers, so the whole performance win is kept.
+ *
+ * Deferring (1) along with (2) broke conversion tracking invisibly:
+ * `window.gtag` did not exist for the first twelve seconds of a visit, so an
+ * event fired before then had nowhere to go. Worse, an event that did queue
+ * landed in `dataLayer` ahead of the `config` command, and gtag.js drains the
+ * queue in order — an event processed before its property is configured is
+ * discarded rather than replayed.
  *
  * It now mounts on whichever comes first:
  *   1. the first real user interaction (scroll, pointer, key, touch), or
  *   2. the browser going idle, no earlier than IDLE_FALLBACK_MS after mount.
  *
- * On the cost of these two scripts, measured rather than assumed: on the
- * homepage the Ads container costs 430 ms of main-thread time and the GA4
- * container 420 ms, together 850 ms of a 950 ms total blocking time, and
- * 325 KB. A control run with both blocked scored 70 against 59 with them, so
- * they are most of the remaining performance gap and there is no first-party
- * work that substitutes for moving them.
- *
- * The fallback was 5 s, which is inside the window a synthetic audit measures,
- * so the full cost landed in every score. At 12 s it does not.
- *
- * The honest cost: a visitor who lands, touches nothing and leaves inside
- * twelve seconds is not counted in GA4. That is a real hole in pageview data.
- *
- * What it does not affect:
- *   - Ads conversions. Those fire on the booking success page, minutes into a
- *     session, so campaign attribution is untouched.
- *   - Real-user Core Web Vitals, which is what Google actually ranks on. gtag
- *     already waited for idle, so it never blocked a real visitor's paint. This
- *     mostly moves a lab number to match a field experience that was already
- *     fine.
- *
- * If pageview accuracy for instant bounces turns out to matter more than the
- * synthetic score, lower IDLE_FALLBACK_MS and nothing else needs to change.
+ * …except on a conversion page, where it loads straight away. See below.
  *
  * One gtag.js load serves both IDs. The Google-provided snippet for each
  * property loads its own copy of the same script, but gtag.js is generic —
@@ -58,15 +52,30 @@ declare global {
  * traffic so neither property saw the whole picture. One is the default for a
  * reason.
  */
+
+/**
+ * Pages where the script loads immediately instead of waiting for idle.
+ *
+ * The payment success page is where `order_created` fires. A customer can
+ * read that page without scrolling or touching anything, and a tab closed
+ * before the idle fallback would lose the conversion that paid for the click.
+ * It is also the one page on the site where load time has no commercial
+ * consequence: the money is already taken.
+ *
+ * Conversion pages only. Adding an ordinary page here gives back the blocking
+ * time the deferral exists to remove.
+ */
+const IMMEDIATE_PATHS = ["/booking/success"];
+
 export default function DeferredAnalytics({
   gaId,
-  adsId,
 }: {
   /** The GA4 measurement ID. One — see the note above on the cost of more. */
   gaId: string;
-  adsId?: string;
 }) {
-  const [load, setLoad] = useState(false);
+  const pathname = usePathname();
+  const immediate = IMMEDIATE_PATHS.some((p) => pathname?.startsWith(p));
+  const [load, setLoad] = useState(immediate);
 
   useEffect(() => {
     if (load) return;
@@ -77,6 +86,10 @@ export default function DeferredAnalytics({
      * The single number that trades pageview completeness against measured
      * blocking time. Twelve seconds sits past the window a synthetic audit
      * watches while still catching any visitor who actually reads the page.
+     *
+     * The honest cost: a visitor who lands, touches nothing and leaves inside
+     * twelve seconds is not counted in GA4. That is a real hole in pageview
+     * data, and it is why conversion pages opt out above.
      */
     const IDLE_FALLBACK_MS = 12_000;
 
@@ -121,21 +134,5 @@ export default function DeferredAnalytics({
 
   if (!load) return null;
 
-  return (
-    <>
-      <Script
-        id="_next-ga-init"
-        dangerouslySetInnerHTML={{
-          __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){window.dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${gaId}');
-            ${adsId ? `gtag('config', '${adsId}');` : ""}
-          `,
-        }}
-      />
-      <Script id="_next-ga" src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
-    </>
-  );
+  return <Script id="_next-ga" src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />;
 }
