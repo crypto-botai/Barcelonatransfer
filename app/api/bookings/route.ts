@@ -118,6 +118,11 @@ export async function GET() {
       pickupAddress: true, dropoffAddress: true, pickupDatetime: true,
       vehicleClass: true, passengers: true, luggage: true, totalAmount: true,
       flightNumber: true, createdAt: true,
+      // A deposit booking pays part online and the rest to the chauffeur.
+      // The customer could see only the total, so they had no way to tell
+      // what they had already paid or what to have ready on the day.
+      depositAmount: true, balanceAmount: true, balancePaidAt: true,
+      balanceMethod: true,
       driver: {
         select: {
           user: { select: { name: true, image: true } },

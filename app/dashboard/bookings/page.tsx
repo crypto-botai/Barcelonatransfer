@@ -14,6 +14,8 @@ import { formatCurrency } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus , vehicleClassLabel } from "@/types";
 import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
 import toast from "react-hot-toast";
+import { sortBookingsForList } from "@/lib/booking-order";
+import { formatPickupDate, formatPickupTime } from "@/lib/datetime";
 
 type Tab = "all" | "upcoming" | "completed" | "cancelled" | "pending";
 
@@ -28,6 +30,10 @@ interface Booking {
   vehicleClass: string;
   passengers: number;
   totalAmount: number;
+  depositAmount?: number | null;
+  balanceAmount?: number | null;
+  balancePaidAt?: string | null;
+  balanceMethod?: string | null;
   pickupLat: number;
   pickupLng: number;
   createdAt: string;
@@ -57,7 +63,7 @@ function BookingsContent() {
   const [filtered,       setFiltered]       = useState<Booking[]>([]);
   const [loading,        setLoading]        = useState(true);
   const [search,         setSearch]         = useState("");
-  const [sortDir,        setSortDir]        = useState<"asc" | "desc">("desc");
+  const [sortDir,        setSortDir]        = useState<"upcoming" | "recent">("upcoming");
   const [page,           setPage]           = useState(1);
   const PER_PAGE = 10;
 
@@ -160,10 +166,12 @@ function BookingsContent() {
         (b.dropoffAddress ?? "").toLowerCase().includes(q)
       );
     }
-    result.sort((a, b) => {
-      const diff = new Date(a.pickupDatetime).getTime() - new Date(b.pickupDatetime).getTime();
-      return sortDir === "asc" ? diff : -diff;
-    });
+    // Default is the next trip first. It used to be the furthest-away
+    // pickup first, so a transfer next week sat above one tomorrow.
+    result = sortDir === "upcoming"
+      ? sortBookingsForList(result)
+      : result.sort((a, b) =>
+          new Date(b.pickupDatetime).getTime() - new Date(a.pickupDatetime).getTime());
     setFiltered(result);
     setPage(1);
   }, [bookings, activeTab, search, sortDir]);
@@ -189,11 +197,11 @@ function BookingsContent() {
           />
         </div>
         <button
-          onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")}
+          onClick={() => setSortDir(d => d === "upcoming" ? "recent" : "upcoming")}
           className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-white/[0.08] text-dark-400 hover:text-white hover:border-white/[0.15] transition-all text-sm"
         >
           <ArrowUpDown size={14} />
-          <span className="hidden sm:inline">{sortDir === "desc" ? "Newest" : "Oldest"}</span>
+          <span className="hidden sm:inline">{sortDir === "upcoming" ? "Next trip" : "Most recent"}</span>
         </button>
       </div>
 
@@ -289,8 +297,12 @@ function BookingsContent() {
                           </p>
                         )}
                         <div className="flex flex-wrap gap-3 mt-2 text-[11px] text-dark-500">
-                          <span className="flex items-center gap-1"><Calendar size={10} /> {pickup.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
-                          <span className="flex items-center gap-1"><Clock size={10} /> {pickup.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
+                          {/* Barcelona time, always. These two read the
+                              browser's own zone, so a customer in London saw
+                              08:00 for a 09:00 pickup and a date that could
+                              be the day before. */}
+                          <span className="flex items-center gap-1"><Calendar size={10} /> {formatPickupDate(pickup)}</span>
+                          <span className="flex items-center gap-1"><Clock size={10} /> {formatPickupTime(pickup)}</span>
                           <span className="flex items-center gap-1"><Users size={10} /> {b.passengers} pax</span>
                           <span className="flex items-center gap-1"><Car size={10} /> {vehicleClassLabel(b.vehicleClass)}</span>
                         </div>
@@ -299,6 +311,22 @@ function BookingsContent() {
                       {/* Price + actions */}
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
                         <p className="font-display text-lg text-gold-400">{formatCurrency(b.totalAmount)}</p>
+                        {/* A deposit booking pays part online and the rest to
+                            the chauffeur. Showing only the total left the
+                            customer guessing what to have ready on the day. */}
+                        {!!b.balanceAmount && b.balanceAmount > 0 && (
+                          <div className="text-right leading-tight -mt-1">
+                            <p className="text-[10px] text-dark-500">
+                              Paid online <span className="text-green-400">{formatCurrency(b.depositAmount ?? 0)}</span>
+                            </p>
+                            <p className="text-[10px] text-dark-500">
+                              {b.balancePaidAt ? "Balance paid" : "Due to chauffeur"}{" "}
+                              <span className={b.balancePaidAt ? "text-green-400" : "text-amber-400"}>
+                                {formatCurrency(b.balanceAmount)}
+                              </span>
+                            </p>
+                          </div>
+                        )}
                         <div className="flex items-center gap-1">
                           <Link
                             href={`/booking/${b.id}/invoice`}

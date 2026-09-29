@@ -51,7 +51,10 @@ export async function GET(req: NextRequest) {
         ],
       } : {}),
     },
-    orderBy: { createdAt: "desc" },
+    // Soonest pickup first. The list is re-ordered in the browser too
+    // (lib/booking-order), but a caller that does not sort should still get
+    // something useful rather than the order the office typed them in.
+    orderBy: { pickupDatetime: "asc" },
     take: limit,
     include: {
       driver:  { include: { user: { select: { name: true, phone: true } }, vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } } } },
@@ -80,6 +83,13 @@ const createSchema = z.object({
   flightNumber:    z.string().optional(),
   specialRequests: z.string().optional(),
   totalAmount:     z.number().min(0),
+  /**
+   * What the customer has already paid online, when the office is recording
+   * a booking that was part-paid. The rest is collected by the chauffeur on
+   * the day. Left out entirely for a booking paid in full or not at all,
+   * which keeps those behaving exactly as before.
+   */
+  depositAmount:   z.number().min(0).optional(),
   paymentStatus:   z.enum(["PENDING", "PAID", "FAILED"]).default("PENDING"),
   // How the customer pays. Cash, WhatsApp and transfer are marked received by
   // hand; a card link gets a checkout created here and a pay button in the
@@ -204,9 +214,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `Ride ${badExtra + 2} has an invalid date or time` }, { status: 422 });
     }
 
+    /**
+     * A part-paid booking: some taken online, the rest from the chauffeur.
+     *
+     * Only a deposit strictly between zero and the total splits the booking.
+     * A deposit of zero is no deposit, and one at or above the total is a
+     * booking paid in full — both leave these columns null and behave as
+     * they always did. The balance is derived rather than accepted from the
+     * client so the two figures cannot disagree.
+     */
+    const deposit = body.depositAmount ?? 0;
+    const isSplit = deposit > 0 && deposit < body.totalAmount;
+    const depositFields = isSplit
+      ? {
+          depositAmount: Math.round(deposit * 100) / 100,
+          balanceAmount: Math.round((body.totalAmount - deposit) * 100) / 100,
+          // Nobody has collected it yet; the chauffeur marks it on the day.
+          balancePaidAt: null,
+          balanceMethod: null,
+          balancePaidBy: null,
+        }
+      : {};
+
     // Everything below writes the same fields whether the row is new or an
     // unpaid one being finished off, so the two paths cannot drift apart.
     const fields = {
+      ...depositFields,
       guestName:       body.guestName,
       guestEmail:      body.guestEmail,
       guestPhone:      body.guestPhone,

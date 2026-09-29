@@ -10,6 +10,7 @@ import { FLEET_TO_DB_CLASS, VEHICLE_CATALOG, type FleetVehicle } from "@/types";
 import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS, type BookingPaymentMethod } from "@/lib/payment-method";
 import ImportPanel, { type ImportSource, type Prefill } from "./ImportPanel";
 import ExtraRides, { blankRide, rideReady, rideTotal, type ExtraRide } from "./ExtraRides";
+import TimeSelect from "@/components/admin/TimeSelect";
 
 /**
  * A booking made by the office.
@@ -125,6 +126,9 @@ export default function NewBookingPage() {
   const [driverAmount, setDriverAmount] = useState("");
 
   const [method, setMethod]   = useState<BookingPaymentMethod>("CARD_LINK");
+  // A part-paid booking: some taken online now, the rest collected by the
+  // chauffeur on the day. Empty means the whole fare is handled one way.
+  const [deposit, setDeposit] = useState("");
   const [paid, setPaid]       = useState(false);
   const [sendEmail, setSendEmail] = useState(true);
   const [saving, setSaving]   = useState(false);
@@ -199,6 +203,9 @@ export default function NewBookingPage() {
   }, [fetchQuote]);
 
   const amount = parseFloat(price);
+  const depositNum = deposit.trim() === "" ? 0 : parseFloat(deposit);
+  const depositValid = Number.isFinite(depositNum) && depositNum > 0 && depositNum < amount;
+  const balanceDue = depositValid ? Math.round((amount - depositNum) * 100) / 100 : 0;
 
   // The same journey reversed costs the same, until the office says otherwise.
   const backAmount = returnOn
@@ -253,6 +260,7 @@ export default function NewBookingPage() {
           driverAmount: driverAmount ? parseFloat(driverAmount) : undefined,
           paymentMethod: method,
           paymentStatus: paid ? "PAID" : "PENDING",
+          ...(depositNum > 0 && depositNum < amount ? { depositAmount: depositNum } : {}),
           sendEmail,
           fromBookingId: source?.kind === "unpaid" ? source.bookingId : undefined,
           fromSessionId: source?.kind === "lead"   ? source.sessionId : undefined,
@@ -416,7 +424,7 @@ export default function NewBookingPage() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div><label className={label}>Date</label><input className={`${field} [color-scheme:dark]`} type="date" min={todayStr()} value={date} onChange={(e) => setDate(e.target.value)} /></div>
-                <div><label className={label}>Time</label><input className={`${field} [color-scheme:dark]`} type="time" value={time} onChange={(e) => setTime(e.target.value)} /></div>
+                <div><label className={label}>Time</label><TimeSelect className={`${field} [color-scheme:dark]`} value={time} onChange={setTime} /></div>
                 <div><label className={label}>Passengers</label><input className={field} type="number" min={1} max={16} value={pax} onChange={(e) => setPax(Math.max(1, parseInt(e.target.value) || 1))} /></div>
                 <div><label className={label}>Bags</label><input className={field} type="number" min={0} max={30} value={bags} onChange={(e) => setBags(Math.max(0, parseInt(e.target.value) || 0))} /></div>
               </div>
@@ -509,7 +517,7 @@ export default function NewBookingPage() {
                     </div>
                     <div>
                       <label className={label}>Return time</label>
-                      <input className={`${field} [color-scheme:dark]`} type="time" value={returnTime} onChange={(e) => setReturnTime(e.target.value)} />
+                      <TimeSelect className={`${field} [color-scheme:dark]`} value={returnTime} onChange={setReturnTime} />
                     </div>
                     <div>
                       <label className={label}>Return price (€)</label>
@@ -676,6 +684,32 @@ export default function NewBookingPage() {
               <input type="checkbox" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} className="accent-[#c9a84c]" />
               Email the confirmation to the customer
             </label>
+
+            {/* Deposit paid online, balance to the chauffeur. Left blank for
+                the ordinary case where the whole fare is handled one way. */}
+            <div className="mt-4 pt-3 border-t border-white/[0.06]">
+              <label className={label}>Deposit paid online (optional)</label>
+              <input
+                className={`${field} [color-scheme:dark]`}
+                type="number" min="0" step="0.01" inputMode="decimal"
+                placeholder="Leave empty if not part-paid"
+                value={deposit}
+                onChange={(e) => setDeposit(e.target.value)}
+              />
+              {deposit.trim() !== "" && (
+                depositValid ? (
+                  <p className="text-[11px] mt-2 leading-relaxed text-dark-300">
+                    <span className="text-green-400">€{depositNum.toFixed(2)} paid online</span>
+                    {" · "}
+                    <span className="text-amber-400">€{balanceDue.toFixed(2)} for the chauffeur to collect</span>
+                  </p>
+                ) : (
+                  <p className="text-[11px] mt-2 leading-relaxed text-amber-400">
+                    A deposit must be more than €0 and less than the €{Number.isFinite(amount) ? amount.toFixed(2) : "0.00"} fare. Ignored otherwise.
+                  </p>
+                )
+              )}
+            </div>
           </div>
 
           <button

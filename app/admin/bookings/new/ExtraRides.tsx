@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Loader2, MapPin, Plus, Sparkles, Trash2 } from "lucide-react";
 import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
 import { FLEET_TO_DB_CLASS, VEHICLE_CATALOG, type FleetVehicle } from "@/types";
+import TimeSelect from "@/components/admin/TimeSelect";
 
 /**
  * The rest of one customer's journeys.
@@ -198,7 +199,7 @@ function RideCard({ index, ride, passengers, onPatch, onRemove }: {
           </div>
           <div>
             <label className={label}>Time</label>
-            <input className={`${field} [color-scheme:dark]`} type="time" value={ride.time} onChange={(e) => onPatch({ time: e.target.value })} />
+            <TimeSelect className={`${field} [color-scheme:dark]`} value={ride.time} onChange={(t) => onPatch({ time: t })} />
           </div>
           <div>
             <label className={label}>Vehicle</label>

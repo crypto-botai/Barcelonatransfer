@@ -48,7 +48,7 @@ import {
   recoveredLeadsCard,
   driverJobCard, paymentFailedCard, bookingCancelledCard, adminCancellationCard, returnRebookCard,
   driverEmailChangedCard,
-  pickupChangedCard, adminPickupChangedCard,
+  pickupChangedCard, adminPickupChangedCard, bookingRescheduledCard,
   partnerJobCard, adminPartnerDispatchCard, credentialsCard, partnerConvertedCard,
   abandonedRecoveryCard, personalNoteCard,
 } from "@/lib/email/premium";
@@ -768,6 +768,37 @@ export async function sendPickupChangedEmail({
   );
   const id = await sendEmail({ from: FROM, to, subject: `Pick-up updated — ${confirmationCode} | Elite BCN`, html });
   await logEmail({ to, subject: `Pickup changed — ${confirmationCode}`, type: "PICKUP_CHANGED", resendId: id });
+}
+
+
+/**
+ * The office moved a booking. The customer is told what changed.
+ *
+ * Sent by the admin reschedule route, which is the only thing that can move
+ * a booking — customers cannot reschedule themselves.
+ */
+export async function sendBookingRescheduledEmail({
+  to, name, confirmationCode, oldPickupDatetime, newPickupDatetime,
+  pickupAddress, oldTotal, newTotal, balanceDue,
+}: {
+  to: string; name: string; confirmationCode: string;
+  oldPickupDatetime: string; newPickupDatetime: string; pickupAddress: string;
+  oldTotal?: number | null; newTotal?: number | null; balanceDue?: number | null;
+}) {
+  const html = emailDocument(
+    bookingRescheduledCard({
+      firstName: firstNameOf(name), confirmationCode,
+      oldPickupDatetime, newPickupDatetime, pickupAddress,
+      oldTotal, newTotal, balanceDue,
+    }),
+    `${confirmationCode} has moved to ${newPickupDatetime}.`,
+  );
+  const id = await sendEmail({
+    from: FROM, to,
+    subject: `Booking moved to ${newPickupDatetime} — ${confirmationCode} | Elite BCN`,
+    html,
+  });
+  return id;
 }
 
 export async function sendAdminPickupChangedAlert({

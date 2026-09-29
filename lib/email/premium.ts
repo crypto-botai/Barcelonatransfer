@@ -964,6 +964,63 @@ export function adminPickupChangedCard(o: {
   `);
 }
 
+// ─── 12b. Booking rescheduled by the office ──────────────────
+
+/**
+ * The office moved a booking to a different date or time.
+ *
+ * The old slot is shown struck through beside the new one: a customer
+ * skim-reading needs to see what changed, not just what it now says. The
+ * price only appears when it actually moved — a reschedule that costs the
+ * same should not raise the question.
+ */
+export function bookingRescheduledCard(o: {
+  firstName: string; confirmationCode: string;
+  oldPickupDatetime: string; newPickupDatetime: string;
+  pickupAddress: string;
+  /** Only when the move changed the fare. */
+  oldTotal?: number | null; newTotal?: number | null;
+  /** What is still to pay on the day, for a part-paid booking. */
+  balanceDue?: number | null;
+}): string {
+  const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Booking ${o.confirmationCode} — new time`)}`;
+  const priceMoved = o.oldTotal != null && o.newTotal != null && o.oldTotal !== o.newTotal;
+
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow("Booking Updated")}
+      ${headline(`Your transfer has been moved, ${esc(o.firstName)}.`)}
+      ${paragraph(
+        priceMoved
+          ? "The new time changes the fare, as shown below. Everything else about your booking is unchanged."
+          : "Everything else about your booking is unchanged. Your chauffeur will be there at the new time.",
+      )}
+    </td></tr>
+
+    ${sectionSpacer(30)}
+    <tr><td style="padding:0 44px;">
+      ${detailTable(
+        row("Reference", `<span style="letter-spacing:2px;color:${GOLD};">${esc(o.confirmationCode)}</span>`) +
+        row("Was", `<span style="color:${LABEL};text-decoration:line-through;">${esc(o.oldPickupDatetime)}</span>`) +
+        row("Now", `<strong style="font-weight:bold;">${esc(o.newPickupDatetime)}</strong>`) +
+        row("Pick-up", esc(o.pickupAddress)) +
+        (priceMoved
+          ? row("Fare", `<span style="color:${LABEL};text-decoration:line-through;">€${o.oldTotal!.toFixed(2)}</span> &nbsp;<strong style="font-weight:bold;">€${o.newTotal!.toFixed(2)}</strong>`)
+          : "") +
+        (o.balanceDue != null && o.balanceDue > 0
+          ? row("Due to your chauffeur", `<strong style="font-weight:bold;">€${o.balanceDue.toFixed(2)}</strong>`, true)
+          : row("", "", true)),
+      )}
+    </td></tr>
+    ${sectionSpacer(32)}
+
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(wa, "Message Our Team")}
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
 // ─── 13. Job for a fleet partner company ─────────────────────
 
 export function partnerJobCard(o: {

@@ -14,6 +14,8 @@ import RideTimeline from "@/components/admin/RideTimeline";
 import ArrivalPanel from "@/components/arrival/ArrivalPanel";
 import TripChat from "@/components/chat/TripChat";
 import SendNotificationButton from "@/components/admin/SendNotificationButton";
+import { sortBookingsForList } from "@/lib/booking-order";
+import TimeSelect from "@/components/admin/TimeSelect";
 
 type Driver = { id: string; status: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] };
 
@@ -40,6 +42,126 @@ type Booking = {
 type MainTab = "ALL" | "PENDING" | "UNPAID" | "COMPLETED" | "DELETED";
 
 const ALL_STATUSES: BookingStatus[] = ["PENDING","CONFIRMED","DRIVER_ASSIGNED","IN_PROGRESS","COMPLETED","CANCELLED"];
+
+/**
+ * Moving a booking to another date or time.
+ *
+ * The fare depends on when the car is wanted — 20% at night, 15% at the last
+ * minute — so the move is priced before it is made. The office sees the
+ * difference, decides whether to charge it, and only then confirms. A
+ * waived difference is a normal thing to want: a delayed flight is not the
+ * customer's doing.
+ */
+function RescheduleSection({ booking, onChanged }: { booking: Booking; onChanged: () => void }) {
+  const current = new Date(booking.pickupDatetime);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  // The booking's own date and time as Barcelona reads them, so the form
+  // opens on what the customer was told rather than on the browser's zone.
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false,
+  }).formatToParts(current);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+
+  const [date, setDate] = useState(`${get("year")}-${get("month")}-${get("day")}`);
+  const [time, setTime] = useState(`${get("hour")}:${get("minute")}`);
+  const [applyPrice, setApplyPrice] = useState(true);
+  const [notify, setNotify] = useState(true);
+  const [quote, setQuote] = useState<null | { from: string; to: string; oldTotal: number; newTotal: number; difference: number; balanceAmount: number | null; refundDue: number }>(null);
+  const [busy, setBusy] = useState(false);
+
+  const closed = ["CANCELLED", "REFUNDED", "COMPLETED"].includes(booking.status);
+  const changed = `${date}T${time}` !== `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
+
+  async function call(confirm: boolean) {
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/admin/bookings/${booking.id}/reschedule`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, time, confirm, applyPriceChange: applyPrice, notifyCustomer: notify }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Could not reschedule");
+      if (confirm) {
+        toast.success(`Moved to ${json.to}${json.notified ? " · customer emailed" : ""}`);
+        setQuote(null);
+        onChanged();
+      } else {
+        setQuote(json);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not reschedule");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (closed) return null;
+
+  return (
+    <section className="glass-card rounded-xl p-4 space-y-3">
+      <p className="text-xs text-dark-500 uppercase tracking-wider inline-flex items-center gap-1.5">
+        <Calendar size={12} /> Date &amp; time
+      </p>
+
+      <div className="grid grid-cols-2 gap-2">
+        <input
+          type="date" value={date}
+          onChange={(e) => { setDate(e.target.value); setQuote(null); }}
+          className="input-luxury w-full px-3 py-2 rounded-lg text-sm [color-scheme:dark]"
+        />
+        <TimeSelect
+          value={time}
+          onChange={(t) => { setTime(t); setQuote(null); }}
+          className="input-luxury w-full px-3 py-2 rounded-lg text-sm [color-scheme:dark]"
+        />
+      </div>
+
+      <label className="flex items-center gap-2 text-xs text-dark-200 cursor-pointer">
+        <input type="checkbox" checked={applyPrice} onChange={(e) => { setApplyPrice(e.target.checked); setQuote(null); }} className="accent-[#c9a84c]" />
+        Apply any price change
+      </label>
+      <label className="flex items-center gap-2 text-xs text-dark-200 cursor-pointer">
+        <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} className="accent-[#c9a84c]" />
+        Email the customer
+      </label>
+
+      {quote && (
+        <div className="rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2 text-[12px] space-y-1">
+          <div className="flex justify-between text-dark-300"><span>From</span><span className="text-dark-400 line-through">{quote.from}</span></div>
+          <div className="flex justify-between text-dark-300"><span>To</span><span className="text-white">{quote.to}</span></div>
+          {quote.difference !== 0 ? (
+            <div className="flex justify-between text-dark-300">
+              <span>Fare</span>
+              <span className={quote.difference > 0 ? "text-amber-400" : "text-green-400"}>
+                {formatCurrency(quote.oldTotal)} &rarr; {formatCurrency(quote.newTotal)} ({quote.difference > 0 ? "+" : ""}{formatCurrency(quote.difference)})
+              </span>
+            </div>
+          ) : (
+            <div className="flex justify-between text-dark-300"><span>Fare</span><span className="text-dark-400">unchanged</span></div>
+          )}
+          {quote.balanceAmount != null && (
+            <div className="flex justify-between text-dark-300"><span>Balance to chauffeur</span><span className="text-amber-400">{formatCurrency(quote.balanceAmount)}</span></div>
+          )}
+          {quote.refundDue > 0 && (
+            <p className="text-amber-400">{formatCurrency(quote.refundDue)} was overpaid and is yours to refund.</p>
+          )}
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => call(quote !== null)}
+        disabled={busy || !changed || !time}
+        className="w-full py-2 rounded-lg bg-gold-500/15 border border-gold-500/30 text-gold-400 text-sm font-medium hover:bg-gold-500/25 transition-colors inline-flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {busy ? <Loader2 size={14} className="animate-spin" /> : <Calendar size={14} />}
+        {quote ? "Confirm move" : changed ? "Check new price" : "Pick a new date or time"}
+      </button>
+    </section>
+  );
+}
 
 /**
  * Cash, WhatsApp and transfer payments never touch the checkout, so the office
@@ -474,6 +596,7 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
           </section>
 
           <PaymentSection booking={booking} onChanged={onSaved} />
+          <RescheduleSection booking={booking} onChanged={onSaved} />
 
           <PartnerSection booking={booking} onChanged={onSaved} />
 
@@ -678,12 +801,17 @@ export default function AdminBookingsPage() {
   const activeFilter = mainTab === "ALL" ? filter : tabStatusFilter;
 
   const source = mainTab === "UNPAID" ? unpaid : bookings;
-  const filtered = source.filter((b) => {
-    const matchSearch = !search || [b.confirmationCode, b.guestName, b.guestEmail, b.guestPhone, b.pickupAddress]
-      .some((v) => v?.toLowerCase().includes(search.toLowerCase()));
-    const matchFilter = activeFilter === "ALL" || b.status === activeFilter;
-    return matchSearch && matchFilter;
-  });
+  // Soonest job at the top, then the rest of what is coming, then history
+  // most-recent-first. The list used to arrive in the order the office
+  // entered the bookings, which never matched the order they happen in.
+  const filtered = sortBookingsForList(
+    source.filter((b) => {
+      const matchSearch = !search || [b.confirmationCode, b.guestName, b.guestEmail, b.guestPhone, b.pickupAddress]
+        .some((v) => v?.toLowerCase().includes(search.toLowerCase()));
+      const matchFilter = activeFilter === "ALL" || b.status === activeFilter;
+      return matchSearch && matchFilter;
+    }),
+  );
 
   const pendingCount   = bookings.filter((b) => b.status === "PENDING").length;
   const completedCount = bookings.filter((b) => b.status === "COMPLETED").length;
