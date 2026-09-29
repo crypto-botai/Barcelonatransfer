@@ -617,6 +617,35 @@ model EmailLog {
   @@map("email_logs")
 }
 
+/// A message somebody typed into the contact form.
+///
+/// The form used to do nothing but send an email. When Resend was
+/// misconfigured on 27 Sept the send threw, the route returned 500, and the
+/// message was gone — the customer saw a dead button and the office never
+/// learned anyone had written. That is the same way the booking leads were
+/// lost, one form along.
+///
+/// The enquiry is now written down before the email is attempted, so a
+/// delivery problem costs the notification and not the enquiry. `status` says
+/// whether the email actually went; a FAILED row still holds everything
+/// needed to answer the customer.
+model ContactEnquiry {
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  message    String
+  /// EMAILED when the alert was delivered, FAILED when it was not.
+  status     String   @default("PENDING")
+  /// Why the send failed, when it did. Never holds the message itself.
+  emailError String?
+  createdAt  DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("contact_enquiries")
+}
+
 // ─── AI Platform Models ───────────────────────────────────────
 
 enum AgentStatus {

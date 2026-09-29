@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { resend } from "@/lib/resend";
+import { prisma } from "@/lib/prisma";
 import { COMPANY } from "@/lib/company-facts";
 import { emailDocument, contactEnquiryCard } from "@/lib/email/premium";
 import { senderAddress } from "@/lib/sender";
@@ -35,6 +36,34 @@ const FROM = senderAddress();
  */
 const subjectSafe = (s: string) => s.replace(/[\r\n]+/g, " ").trim().slice(0, 120);
 
+/**
+ * Write the enquiry down before trying to send anything.
+ *
+ * Best effort on purpose. The table is created by `prisma db push`, and a
+ * deployment that runs ahead of that push must not take the contact form
+ * down with it — the email is still the main path. Returns the row id when
+ * the enquiry is safely stored, and null when it is not, which is what
+ * decides whether a failed send is recoverable or genuinely lost.
+ */
+async function record(body: z.infer<typeof schema>): Promise<string | null> {
+  try {
+    const row = await prisma.contactEnquiry.create({
+      data: {
+        name: body.name,
+        email: body.email,
+        phone: body.phone,
+        message: body.message,
+        status: "PENDING",
+      },
+      select: { id: true },
+    });
+    return row.id;
+  } catch (err) {
+    console.error("[contact] could not store the enquiry", err);
+    return null;
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     // A body that is not JSON threw here, and an unhandled throw on a public
@@ -43,24 +72,55 @@ export async function POST(req: NextRequest) {
     if (raw === null) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     const body = schema.parse(raw);
 
-    await resend.emails.send({
-      from: FROM,
-      to:   ADMIN_EMAIL,
-      replyTo: body.email,
-      // A subject is plain text, so it is not escaped — but a newline in
-      // it is how header injection starts, and a name box is a strange place
-      // to have one.
-      subject: `📩 Contact Enquiry from ${subjectSafe(body.name)}`,
-      html: emailDocument(
-        contactEnquiryCard({
-          name: body.name,
-          email: body.email,
-          phone: body.phone,
-          message: body.message,
-        }),
-        `${subjectSafe(body.name)} — ${body.email}`,
-      ),
-    });
+    // First, so that whatever happens to the email, the message survives.
+    const storedId = await record(body);
+
+    try {
+      await resend.emails.send({
+        from: FROM,
+        to:   ADMIN_EMAIL,
+        replyTo: body.email,
+        // A subject is plain text, so it is not escaped — but a newline in
+        // it is how header injection starts, and a name box is a strange place
+        // to have one.
+        subject: `📩 Contact Enquiry from ${subjectSafe(body.name)}`,
+        html: emailDocument(
+          contactEnquiryCard({
+            name: body.name,
+            email: body.email,
+            phone: body.phone,
+            message: body.message,
+          }),
+          `${subjectSafe(body.name)} — ${body.email}`,
+        ),
+      });
+    } catch (sendErr) {
+      console.error("[contact] send failed", sendErr);
+      if (storedId) {
+        await prisma.contactEnquiry
+          .update({
+            where: { id: storedId },
+            data: {
+              status: "FAILED",
+              emailError: sendErr instanceof Error ? sendErr.message : String(sendErr),
+            },
+          })
+          .catch(() => {});
+        // The enquiry is on disk and can be answered, so the customer has
+        // not wasted their time and must not be told to try again. The
+        // failure is the office's to chase, not theirs.
+        return NextResponse.json({ ok: true });
+      }
+      // Nothing was stored and nothing was sent. This one really is lost,
+      // and saying so is better than a false success.
+      throw sendErr;
+    }
+
+    if (storedId) {
+      await prisma.contactEnquiry
+        .update({ where: { id: storedId }, data: { status: "EMAILED" } })
+        .catch(() => {});
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
