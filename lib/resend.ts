@@ -782,25 +782,43 @@ export async function sendPickupChangedEmail({
  */
 export async function sendBookingRescheduledEmail({
   to, name, confirmationCode, oldPickupDatetime, newPickupDatetime,
-  pickupAddress, oldTotal, newTotal, balanceDue,
+  pickupAddress, oldPickupAddress, oldDropoffAddress, newDropoffAddress,
+  timeChanged, oldTotal, newTotal, balanceDue,
 }: {
   to: string; name: string; confirmationCode: string;
   oldPickupDatetime: string; newPickupDatetime: string; pickupAddress: string;
+  /** Supplied only when that end of the journey actually moved. */
+  oldPickupAddress?: string | null;
+  oldDropoffAddress?: string | null;
+  newDropoffAddress?: string | null;
+  /** False when only the route moved. Defaults to true. */
+  timeChanged?: boolean;
   oldTotal?: number | null; newTotal?: number | null; balanceDue?: number | null;
 }) {
+  const timeMoved  = timeChanged !== false;
+  const routeMoved = Boolean(oldPickupAddress || oldDropoffAddress);
+
   const html = emailDocument(
     bookingRescheduledCard({
       firstName: firstNameOf(name), confirmationCode,
       oldPickupDatetime, newPickupDatetime, pickupAddress,
+      oldPickupAddress, oldDropoffAddress, newDropoffAddress, timeChanged,
       oldTotal, newTotal, balanceDue,
     }),
-    `${confirmationCode} has moved to ${newPickupDatetime}.`,
+    // The preview line has to match what the email says, or an inbox that
+    // shows only the preview reports a change that did not happen.
+    timeMoved
+      ? `${confirmationCode} has moved to ${newPickupDatetime}.`
+      : `${confirmationCode}: your pick-up details have changed.`,
   );
-  const id = await sendEmail({
-    from: FROM, to,
-    subject: `Booking moved to ${newPickupDatetime} — ${confirmationCode} | Elite BCN`,
-    html,
-  });
+
+  const subject = timeMoved && routeMoved
+    ? `Booking updated — ${newPickupDatetime} — ${confirmationCode} | Elite BCN`
+    : routeMoved
+      ? `Pick-up details updated — ${confirmationCode} | Elite BCN`
+      : `Booking moved to ${newPickupDatetime} — ${confirmationCode} | Elite BCN`;
+
+  const id = await sendEmail({ from: FROM, to, subject, html });
   return id;
 }
 

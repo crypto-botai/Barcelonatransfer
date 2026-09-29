@@ -985,22 +985,40 @@ export function bookingRescheduledCard(o: {
   firstName: string; confirmationCode: string;
   oldPickupDatetime: string; newPickupDatetime: string;
   pickupAddress: string;
+  /**
+   * The previous addresses, each supplied only when that end actually moved.
+   * A booking whose time changed and whose route did not leaves both null and
+   * the email reads exactly as it always did.
+   */
+  oldPickupAddress?: string | null;
+  oldDropoffAddress?: string | null;
+  newDropoffAddress?: string | null;
+  /** False when only the route moved, so the email does not claim a new time. */
+  timeChanged?: boolean;
   /** Only when the move changed the fare. */
   oldTotal?: number | null; newTotal?: number | null;
   /** What is still to pay on the day, for a part-paid booking. */
   balanceDue?: number | null;
 }): string {
-  const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Booking ${o.confirmationCode} — new time`)}`;
+  const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Booking ${o.confirmationCode} — change`)}`;
   const priceMoved = o.oldTotal != null && o.newTotal != null && o.oldTotal !== o.newTotal;
+  const timeMoved  = o.timeChanged !== false;
+  const routeMoved = Boolean(o.oldPickupAddress || o.oldDropoffAddress);
+
+  // What actually changed, so the opening line is never a claim the rest of
+  // the email contradicts.
+  const what = timeMoved && routeMoved ? "time and route"
+             : routeMoved             ? "route"
+             :                          "time";
 
   return card(`
     <tr><td style="padding:38px 44px 0 44px;">
       ${eyebrow("Booking Updated")}
-      ${headline(`Your transfer has been moved, ${esc(o.firstName)}.`)}
+      ${headline(`Your transfer has been updated, ${esc(o.firstName)}.`)}
       ${paragraph(
         priceMoved
-          ? "The new time changes the fare, as shown below. Everything else about your booking is unchanged."
-          : "Everything else about your booking is unchanged. Your chauffeur will be there at the new time.",
+          ? `The new ${what} changes the fare, as shown below. Everything else about your booking is unchanged.`
+          : `We have changed the ${what} below. Everything else about your booking is unchanged.`,
       )}
     </td></tr>
 
@@ -1008,9 +1026,20 @@ export function bookingRescheduledCard(o: {
     <tr><td style="padding:0 44px;">
       ${detailTable(
         row("Reference", `<span style="letter-spacing:2px;color:${GOLD};">${esc(o.confirmationCode)}</span>`) +
-        row("Was", `<span style="color:${LABEL};text-decoration:line-through;">${esc(o.oldPickupDatetime)}</span>`) +
-        row("Now", `<strong style="font-weight:bold;">${esc(o.newPickupDatetime)}</strong>`) +
-        row("Pick-up", esc(o.pickupAddress)) +
+        (timeMoved
+          ? row("Was", `<span style="color:${LABEL};text-decoration:line-through;">${esc(o.oldPickupDatetime)}</span>`) +
+            row("Now", `<strong style="font-weight:bold;">${esc(o.newPickupDatetime)}</strong>`)
+          : row("Pick-up time", `<strong style="font-weight:bold;">${esc(o.newPickupDatetime)}</strong>`)) +
+        (o.oldPickupAddress
+          ? row("Pick-up was", `<span style="color:${LABEL};text-decoration:line-through;">${esc(o.oldPickupAddress)}</span>`)
+          : "") +
+        row(o.oldPickupAddress ? "Pick-up now" : "Pick-up", esc(o.pickupAddress)) +
+        (o.oldDropoffAddress
+          ? row("Drop-off was", `<span style="color:${LABEL};text-decoration:line-through;">${esc(o.oldDropoffAddress)}</span>`)
+          : "") +
+        (o.newDropoffAddress
+          ? row(o.oldDropoffAddress ? "Drop-off now" : "Drop-off", esc(o.newDropoffAddress))
+          : "") +
         (priceMoved
           ? row("Fare", `<span style="color:${LABEL};text-decoration:line-through;">€${o.oldTotal!.toFixed(2)}</span> &nbsp;<strong style="font-weight:bold;">€${o.newTotal!.toFixed(2)}</strong>`)
           : "") +

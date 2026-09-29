@@ -16,6 +16,7 @@ import TripChat from "@/components/chat/TripChat";
 import SendNotificationButton from "@/components/admin/SendNotificationButton";
 import { sortBookingsForList } from "@/lib/booking-order";
 import TimeSelect from "@/components/admin/TimeSelect";
+import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
 
 type Driver = { id: string; status: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] };
 
@@ -44,17 +45,23 @@ type MainTab = "ALL" | "PENDING" | "UNPAID" | "COMPLETED" | "DELETED";
 const ALL_STATUSES: BookingStatus[] = ["PENDING","CONFIRMED","DRIVER_ASSIGNED","IN_PROGRESS","COMPLETED","CANCELLED"];
 
 /**
- * Moving a booking to another date or time.
+ * Changing when a booking runs, or where it starts and ends.
  *
- * The fare depends on when the car is wanted — 20% at night, 15% at the last
- * minute — so the move is priced before it is made. The office sees the
- * difference, decides whether to charge it, and only then confirms. A
- * waived difference is a normal thing to want: a delayed flight is not the
- * customer's doing.
+ * One panel rather than two, because the fare depends on the whole journey.
+ * Pricing a time change and an address change separately would charge for
+ * the same phone call twice and send the customer two emails for it.
+ *
+ * The change is priced before it is made. The office sees the difference,
+ * decides whether to charge it, and only then confirms. A waived difference
+ * is a normal thing to want: a delayed flight, or a hotel that moved the
+ * guest, is not the customer's doing.
+ *
+ * An address is only sent when the office picks a suggestion from the
+ * dropdown, so the server always receives coordinates it can price from
+ * rather than free text it has to guess at.
  */
-function RescheduleSection({ booking, onChanged }: { booking: Booking; onChanged: () => void }) {
+function JourneySection({ booking, onChanged }: { booking: Booking; onChanged: () => void }) {
   const current = new Date(booking.pickupDatetime);
-  const pad = (n: number) => String(n).padStart(2, "0");
   // The booking's own date and time as Barcelona reads them, so the form
   // opens on what the customer was told rather than on the browser's zone.
   const parts = new Intl.DateTimeFormat("en-GB", {
@@ -62,36 +69,77 @@ function RescheduleSection({ booking, onChanged }: { booking: Booking; onChanged
     hour: "2-digit", minute: "2-digit", hour12: false,
   }).formatToParts(current);
   const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  const originalDate = `${get("year")}-${get("month")}-${get("day")}`;
+  const originalTime = `${get("hour")}:${get("minute")}`;
 
-  const [date, setDate] = useState(`${get("year")}-${get("month")}-${get("day")}`);
-  const [time, setTime] = useState(`${get("hour")}:${get("minute")}`);
+  type Picked = { address: string; lat: number; lng: number };
+
+  const [date, setDate] = useState(originalDate);
+  const [time, setTime] = useState(originalTime);
+  // The text in each box, owned here: AddressAutocomplete syncs its input
+  // from `value`, so letting it fall back to the stored address would reset
+  // the box under the office's cursor mid-word.
+  const [pickupText,  setPickupText]  = useState(booking.pickupAddress);
+  const [dropoffText, setDropoffText] = useState(booking.dropoffAddress);
+  // A pick, only once it carries real coordinates. The box reports 0,0 for
+  // text that has been typed but not chosen from the list, and a fare must
+  // never be computed from that.
+  const [pickup,  setPickup]  = useState<Picked | null>(null);
+  const [dropoff, setDropoff] = useState<Picked | null>(null);
   const [applyPrice, setApplyPrice] = useState(true);
   const [notify, setNotify] = useState(true);
-  const [quote, setQuote] = useState<null | { from: string; to: string; oldTotal: number; newTotal: number; difference: number; balanceAmount: number | null; refundDue: number }>(null);
+  const [quote, setQuote] = useState<null | {
+    basis: "time-only" | "requoted";
+    timeChanged: boolean; pickupChanged: boolean; dropoffChanged: boolean;
+    from: string; to: string;
+    oldPickupAddress: string; newPickupAddress: string;
+    oldDropoffAddress: string; newDropoffAddress: string;
+    oldDistanceKm: number; newDistanceKm: number;
+    oldTotal: number; newTotal: number; difference: number;
+    balanceAmount: number | null; refundDue: number;
+  }>(null);
   const [busy, setBusy] = useState(false);
 
   const closed = ["CANCELLED", "REFUNDED", "COMPLETED"].includes(booking.status);
-  const changed = `${date}T${time}` !== `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
+  const timeMoved  = `${date}T${time}` !== `${originalDate}T${originalTime}`;
+  const changed = timeMoved || pickup !== null || dropoff !== null;
+  // Typed something, but never picked a suggestion — so there are no
+  // coordinates to price from.
+  const unpicked =
+    (pickupText.trim()  !== booking.pickupAddress.trim()  && pickup  === null) ||
+    (dropoffText.trim() !== booking.dropoffAddress.trim() && dropoff === null);
+
+  /** Any edit invalidates the quote on screen — it priced something else. */
+  const invalidate = () => setQuote(null);
 
   async function call(confirm: boolean) {
     setBusy(true);
     try {
-      const res = await fetch(`/api/admin/bookings/${booking.id}/reschedule`, {
+      const res = await fetch(`/api/admin/bookings/${booking.id}/journey`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, time, confirm, applyPriceChange: applyPrice, notifyCustomer: notify }),
+        body: JSON.stringify({
+          date, time,
+          ...(pickup  ? { pickup }  : {}),
+          ...(dropoff ? { dropoff } : {}),
+          confirm, applyPriceChange: applyPrice, notifyCustomer: notify,
+        }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Could not reschedule");
+      if (!res.ok) throw new Error(json.error ?? "Could not update the journey");
       if (confirm) {
-        toast.success(`Moved to ${json.to}${json.notified ? " · customer emailed" : ""}`);
+        toast.success(`Booking updated${json.notified ? " · customer emailed" : ""}`);
         setQuote(null);
+        setPickup(null);
+        setDropoff(null);
+        setPickupText(json.newPickupAddress ?? booking.pickupAddress);
+        setDropoffText(json.newDropoffAddress ?? booking.dropoffAddress);
         onChanged();
       } else {
         setQuote(json);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not reschedule");
+      toast.error(err instanceof Error ? err.message : "Could not update the journey");
     } finally {
       setBusy(false);
     }
@@ -102,24 +150,56 @@ function RescheduleSection({ booking, onChanged }: { booking: Booking; onChanged
   return (
     <section className="glass-card rounded-xl p-4 space-y-3">
       <p className="text-xs text-dark-500 uppercase tracking-wider inline-flex items-center gap-1.5">
-        <Calendar size={12} /> Date &amp; time
+        <Calendar size={12} /> Journey
       </p>
 
       <div className="grid grid-cols-2 gap-2">
         <input
           type="date" value={date}
-          onChange={(e) => { setDate(e.target.value); setQuote(null); }}
+          onChange={(e) => { setDate(e.target.value); invalidate(); }}
           className="input-luxury w-full px-3 py-2 rounded-lg text-sm [color-scheme:dark]"
         />
         <TimeSelect
           value={time}
-          onChange={(t) => { setTime(t); setQuote(null); }}
+          onChange={(t) => { setTime(t); invalidate(); }}
           className="input-luxury w-full px-3 py-2 rounded-lg text-sm [color-scheme:dark]"
         />
       </div>
 
+      <div className="space-y-2">
+        <div>
+          <label className="block text-[11px] text-dark-500 mb-1">Pick-up</label>
+          <AddressAutocomplete
+            value={pickupText}
+            onChange={(v) => { setPickupText(v.address); setPickup(v.lat && v.lng ? v : null); invalidate(); }}
+            placeholder="Search a new pick-up address"
+            icon={<MapPin size={14} className="text-gold-400" />}
+            className="input-luxury w-full px-3 py-2 rounded-lg text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-[11px] text-dark-500 mb-1">Drop-off</label>
+          <AddressAutocomplete
+            value={dropoffText}
+            onChange={(v) => { setDropoffText(v.address); setDropoff(v.lat && v.lng ? v : null); invalidate(); }}
+            placeholder="Search a new drop-off address"
+            icon={<MapPin size={14} className="text-gold-400" />}
+            className="input-luxury w-full px-3 py-2 rounded-lg text-sm"
+          />
+        </div>
+        {unpicked ? (
+          <p className="text-[11px] text-amber-400">
+            Choose an address from the list — typing alone gives no location to price from.
+          </p>
+        ) : (pickup || dropoff) && (
+          <p className="text-[11px] text-dark-400">
+            A new address requotes the journey at today&apos;s published prices.
+          </p>
+        )}
+      </div>
+
       <label className="flex items-center gap-2 text-xs text-dark-200 cursor-pointer">
-        <input type="checkbox" checked={applyPrice} onChange={(e) => { setApplyPrice(e.target.checked); setQuote(null); }} className="accent-[#c9a84c]" />
+        <input type="checkbox" checked={applyPrice} onChange={(e) => { setApplyPrice(e.target.checked); invalidate(); }} className="accent-[#c9a84c]" />
         Apply any price change
       </label>
       <label className="flex items-center gap-2 text-xs text-dark-200 cursor-pointer">
@@ -129,8 +209,35 @@ function RescheduleSection({ booking, onChanged }: { booking: Booking; onChanged
 
       {quote && (
         <div className="rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2 text-[12px] space-y-1">
-          <div className="flex justify-between text-dark-300"><span>From</span><span className="text-dark-400 line-through">{quote.from}</span></div>
-          <div className="flex justify-between text-dark-300"><span>To</span><span className="text-white">{quote.to}</span></div>
+          {quote.timeChanged ? (
+            <>
+              <div className="flex justify-between text-dark-300"><span>From</span><span className="text-dark-400 line-through">{quote.from}</span></div>
+              <div className="flex justify-between text-dark-300"><span>To</span><span className="text-white">{quote.to}</span></div>
+            </>
+          ) : (
+            <div className="flex justify-between text-dark-300"><span>Time</span><span className="text-dark-400">unchanged</span></div>
+          )}
+
+          {quote.pickupChanged && (
+            <div className="space-y-0.5 pt-1">
+              <div className="text-dark-400 line-through break-words">{quote.oldPickupAddress}</div>
+              <div className="text-white break-words">&rarr; {quote.newPickupAddress}</div>
+            </div>
+          )}
+          {quote.dropoffChanged && (
+            <div className="space-y-0.5 pt-1">
+              <div className="text-dark-400 line-through break-words">{quote.oldDropoffAddress}</div>
+              <div className="text-white break-words">&rarr; {quote.newDropoffAddress}</div>
+            </div>
+          )}
+
+          {quote.basis === "requoted" && quote.oldDistanceKm !== quote.newDistanceKm && (
+            <div className="flex justify-between text-dark-300">
+              <span>Distance</span>
+              <span className="text-dark-200">{quote.oldDistanceKm.toFixed(1)} &rarr; {quote.newDistanceKm.toFixed(1)} km</span>
+            </div>
+          )}
+
           {quote.difference !== 0 ? (
             <div className="flex justify-between text-dark-300">
               <span>Fare</span>
@@ -153,11 +260,11 @@ function RescheduleSection({ booking, onChanged }: { booking: Booking; onChanged
       <button
         type="button"
         onClick={() => call(quote !== null)}
-        disabled={busy || !changed || !time}
+        disabled={busy || !changed || unpicked || !time}
         className="w-full py-2 rounded-lg bg-gold-500/15 border border-gold-500/30 text-gold-400 text-sm font-medium hover:bg-gold-500/25 transition-colors inline-flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {busy ? <Loader2 size={14} className="animate-spin" /> : <Calendar size={14} />}
-        {quote ? "Confirm move" : changed ? "Check new price" : "Pick a new date or time"}
+        {quote ? "Confirm change" : changed ? "Check new price" : "Change the date, time or addresses"}
       </button>
     </section>
   );
@@ -605,7 +712,7 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
           </section>
 
           <PaymentSection booking={booking} onChanged={onSaved} />
-          <RescheduleSection booking={booking} onChanged={onSaved} />
+          <JourneySection booking={booking} onChanged={onSaved} />
 
           <PartnerSection booking={booking} onChanged={onSaved} />
 
