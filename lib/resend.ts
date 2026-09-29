@@ -695,6 +695,9 @@ export async function sendDriverBookingDetailsEmail({
     driverJobCard({
       driverName, confirmationCode, guestName, guestPhone,
       pickupAddress, dropoffAddress, pickupDatetime,
+      // Read off the same metadata block the extras come from, so a stop the
+      // office wrote down reaches the chauffeur who has to drive to it.
+      stops: driverMeta.stops,
       vehicle: vehicleName(vehicleClass),
       passengers, luggage, flightNumber,
       extras: driverMeta.extras.length ? formatExtras(driverMeta.extras) : null,

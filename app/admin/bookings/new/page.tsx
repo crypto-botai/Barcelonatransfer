@@ -6,11 +6,16 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowLeftRight, Car, Inbox, Loader2, MapPin, Plus, Send, Sparkles, Wallet, X } from "lucide-react";
 import toast from "react-hot-toast";
 import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
-import { FLEET_TO_DB_CLASS, VEHICLE_CATALOG, type FleetVehicle } from "@/types";
+import { FLEET_TO_DB_CLASS, VEHICLE_CATALOG, EXTRAS_CATALOG, type FleetVehicle } from "@/types";
+import { formatCurrency } from "@/lib/utils";
 import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS, type BookingPaymentMethod } from "@/lib/payment-method";
 import ImportPanel, { type ImportSource, type Prefill } from "./ImportPanel";
 import ExtraRides, { blankRide, rideReady, rideTotal, type ExtraRide } from "./ExtraRides";
 import TimeSelect from "@/components/admin/TimeSelect";
+import { MAX_STOPS } from "@/lib/booking-meta";
+
+/** What the catalogue charges for a stop en route, rather than a second copy of it. */
+const STOP_PRICE = EXTRAS_CATALOG.find((e) => e.id === "multi_stop")?.price ?? 25;
 
 /**
  * A booking made by the office.
@@ -73,6 +78,10 @@ export default function NewBookingPage() {
   const [phone, setPhone]     = useState("");
   const [pickup, setPickup]   = useState<Place>({ address: "", lat: 0, lng: 0 });
   const [dropoff, setDropoff] = useState<Place>({ address: "", lat: 0, lng: 0 });
+  // Places the car calls at on the way. The catalogue sells a "Multiple
+  // Stops" extra at €25 each, up to three; this is where the addresses for
+  // them are written down, which nothing did before.
+  const [stops, setStops] = useState<string[]>([]);
   const [date, setDate]       = useState("");
   const [time, setTime]       = useState("");
   const [pax, setPax]         = useState(2);
@@ -202,6 +211,7 @@ export default function NewBookingPage() {
     return () => clearTimeout(t);
   }, [fetchQuote]);
 
+  const cleanStops = stops.map((v) => v.trim()).filter(Boolean);
   const amount = parseFloat(price);
   const depositNum = deposit.trim() === "" ? 0 : parseFloat(deposit);
   const depositValid = Number.isFinite(depositNum) && depositNum > 0 && depositNum < amount;
@@ -213,8 +223,12 @@ export default function NewBookingPage() {
     : 0;
   // Every price on this form is the price of one car. Charging one car for a
   // party of four vans is the kind of mistake nobody notices until later.
+  // Stops are part of this car's journey, so they price like the fare does:
+  // per car, the same way every other figure on this form is per car.
+  const stopsCost = cleanStops.length * STOP_PRICE;
+  const fareWithStops = (Number.isFinite(amount) ? amount : 0) + stopsCost;
   const extrasTotal = rideTotal(rides);
-  const tripTotal = amount * vehicleCount
+  const tripTotal = fareWithStops * vehicleCount
     + (Number.isFinite(backAmount) ? backAmount : 0) * (returnOn ? vehicleCount : 0)
     + extrasTotal;
 
@@ -251,12 +265,13 @@ export default function NewBookingPage() {
           guestName: name.trim(), guestEmail: email.trim(), guestPhone: phone.trim(),
           pickupAddress: pickup.address, pickupLat: pickup.lat || 41.3851, pickupLng: pickup.lng || 2.1734,
           dropoffAddress: dropoff.address, dropoffLat: dropoff.lat, dropoffLng: dropoff.lng,
+          ...(cleanStops.length ? { stops: cleanStops } : {}),
           pickupDatetime: `${date}T${time}`,
           passengers: pax, luggage: bags,
           vehicleClass: FLEET_TO_DB_CLASS[vehicle],
           flightNumber: flight.trim() || undefined,
           specialRequests: notes.trim() || undefined,
-          totalAmount: amount,
+          totalAmount: fareWithStops,
           driverAmount: driverAmount ? parseFloat(driverAmount) : undefined,
           paymentMethod: method,
           paymentStatus: paid ? "PAID" : "PENDING",
@@ -418,6 +433,39 @@ export default function NewBookingPage() {
                 <label className={label}>Pick-up</label>
                 <AddressAutocomplete value={pickup.address} onChange={setPickup} placeholder="Airport terminal, hotel, address…" icon={<MapPin size={14} className="text-gold-500" />} />
               </div>
+              {/* Stops sit between pick-up and drop-off because that is where
+                  they happen — the order on screen is the order the car
+                  drives. */}
+              {stops.map((stop, i) => (
+                <div key={i}>
+                  <label className={`${label} flex items-center justify-between`}>
+                    <span>Stop {i + 1} &middot; +{formatCurrency(STOP_PRICE)}</span>
+                    <button
+                      type="button"
+                      onClick={() => setStops((prev) => prev.filter((_, j) => j !== i))}
+                      className="text-[11px] text-dark-400 hover:text-red-400 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </label>
+                  <AddressAutocomplete
+                    value={stop}
+                    onChange={(p) => setStops((prev) => prev.map((v, j) => (j === i ? p.address : v)))}
+                    placeholder="Where does the car stop?"
+                    icon={<MapPin size={14} className="text-gold-500/70" />}
+                  />
+                </div>
+              ))}
+              {stops.length < MAX_STOPS && (
+                <button
+                  type="button"
+                  onClick={() => setStops((prev) => [...prev, ""])}
+                  className="w-full py-2 rounded-lg border border-dashed border-white/[0.12] text-dark-400 hover:text-gold-400 hover:border-gold-500/30 text-xs transition-colors"
+                >
+                  + Add a stop on the way ({formatCurrency(STOP_PRICE)} each)
+                </button>
+              )}
+
               <div>
                 <label className={label}>Drop-off</label>
                 <AddressAutocomplete value={dropoff.address} onChange={setDropoff} placeholder="Destination" icon={<MapPin size={14} className="text-gold-500" />} />
@@ -627,6 +675,15 @@ export default function NewBookingPage() {
                   </span>
                   <span className="text-white">€{((Number.isFinite(amount) ? amount : 0) * vehicleCount).toFixed(2)}</span>
                 </div>
+                {stopsCost > 0 && (
+                  <div className="flex items-baseline justify-between gap-2 text-sm mt-1">
+                    <span className="text-dark-300">
+                      {cleanStops.length} stop{cleanStops.length > 1 ? "s" : ""} en route
+                      {vehicleCount > 1 && <span className="text-dark-500"> × {vehicleCount}</span>}
+                    </span>
+                    <span className="text-white">€{(stopsCost * vehicleCount).toFixed(2)}</span>
+                  </div>
+                )}
                 {returnOn && (
                   <div className="flex items-baseline justify-between gap-2 text-sm mt-1">
                     <span className="text-dark-300">

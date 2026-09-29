@@ -476,6 +476,15 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
             <p className="text-xs text-dark-500 uppercase tracking-wider mb-3">Journey</p>
             <div className="space-y-2 text-sm">
               <div className="flex gap-2"><MapPin size={13} className="text-green-400 flex-shrink-0 mt-0.5" /><span className="text-white">{booking.pickupAddress}</span></div>
+              {/* Stops sit between pick-up and drop-off, in driving order. */}
+              {meta.stops.map((stop, i) => (
+                <div key={i} className="flex gap-2">
+                  <MapPin size={13} className="text-amber-400 flex-shrink-0 mt-0.5" />
+                  <span className="text-dark-300">
+                    <span className="text-dark-500">Stop {i + 1}:</span> {stop}
+                  </span>
+                </div>
+              ))}
               <div className="flex gap-2"><MapPin size={13} className="text-red-400 flex-shrink-0 mt-0.5" /><span className="text-dark-300">{booking.dropoffAddress}</span></div>
               <div className="flex gap-2"><Calendar size={13} className="text-gold-500 flex-shrink-0 mt-0.5" /><span className="text-dark-300">{new Date(booking.pickupDatetime).toLocaleString("en-GB", { timeZone: "Europe/Madrid", })}</span></div>
               <div className="flex gap-2"><Car size={13} className="text-gold-500 flex-shrink-0 mt-0.5" /><span className="text-dark-300">{vehicleClassLabel(booking.vehicleClass)} · {booking.passengers} pax · {booking.luggage} bags</span></div>

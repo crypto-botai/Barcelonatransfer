@@ -45,6 +45,15 @@ export interface BookingMeta {
   /** The 5% off a return journey, and the paid booking that earned it. */
   returnDiscount: number;
   returnDiscountOfCode: string | null;
+  /**
+   * Addresses the car calls at between pick-up and drop-off, in order.
+   *
+   * The catalogue has always sold a "Multiple Stops" extra, but it only ever
+   * charged for them — nowhere recorded WHERE the car was supposed to stop,
+   * so the chauffeur was sent a job with a fee for a detour and no address
+   * to take it to.
+   */
+  stops:         string[];
   /** The customer's own note, with the metadata block removed. */
   notes:         string | null;
 }
@@ -66,6 +75,7 @@ const EMPTY: BookingMeta = {
   payOption: "FULL",
   returnDiscount: 0,
   returnDiscountOfCode: null,
+  stops: [],
   notes: null,
 };
 
@@ -107,9 +117,28 @@ export function parseBookingMeta(specialRequests?: string | null): BookingMeta {
     payOption:     raw.payOption === "DEPOSIT" ? "DEPOSIT" : "FULL",
     returnDiscount: typeof raw.returnDiscount === "number" && raw.returnDiscount > 0 ? raw.returnDiscount : 0,
     returnDiscountOfCode: typeof raw.returnDiscountOfCode === "string" ? raw.returnDiscountOfCode : null,
+    stops:         normaliseStops(raw.stops),
     notes,
   };
 }
+
+/**
+ * Stop addresses as written down, blanks dropped.
+ *
+ * An empty or whitespace-only entry is a half-filled form field, not a place
+ * the car should call at, and sending the chauffeur to "" helps nobody.
+ */
+function normaliseStops(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((v): v is string => typeof v === "string")
+    .map((v) => v.trim())
+    .filter((v) => v.length > 0)
+    .slice(0, MAX_STOPS);
+}
+
+/** What the catalogue sells: "Multiple Stops", max 3. */
+export const MAX_STOPS = 3;
 
 /**
  * Turns whatever was stored into clean extra lines.

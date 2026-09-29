@@ -85,7 +85,12 @@ describe("what the customer is charged", () => {
   });
 
   it("shows the office the trip total, not one leg", () => {
-    expect(form).toContain("const tripTotal = amount * vehicleCount");
+    // The per-car fare now carries any stops en route with it, so the total
+    // multiplies fareWithStops rather than the bare typed amount. What this
+    // guards is unchanged: every car and every leg is counted, not one.
+    expect(form).toContain("const tripTotal = fareWithStops * vehicleCount");
+    expect(form).toContain("const fareWithStops = (Number.isFinite(amount) ? amount : 0) + stopsCost");
+    expect(form).toContain("(returnOn ? vehicleCount : 0)");
     expect(form).toContain("{legCount} bookings");
   });
 });

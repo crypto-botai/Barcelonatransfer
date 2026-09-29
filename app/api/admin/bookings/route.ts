@@ -11,6 +11,7 @@ import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
 import { PAYMENT_METHODS, paymentLine } from "@/lib/payment-method";
 import { calendarLinks, returnTripUrl } from "@/lib/calendar";
 import { seatShare, vehicleNote } from "@/lib/vehicle-group";
+import { MAX_STOPS } from "@/lib/booking-meta";
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
 
@@ -66,6 +67,23 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(bookings);
 }
 
+/**
+ * Writes the stop addresses into the booking's metadata block.
+ *
+ * Stops live in the same [META] prefix on specialRequests that the customer
+ * checkout already uses, so parseBookingMeta reads them on an office booking
+ * exactly as it does on a customer one and nothing needed a new column.
+ * Returns the note untouched when there are no stops, so an ordinary booking
+ * is stored exactly as it was before.
+ */
+function withStops(specialRequests: string | undefined, stops: string[] | undefined): string | undefined {
+  const clean = (stops ?? []).map((v) => v.trim()).filter(Boolean).slice(0, MAX_STOPS);
+  if (clean.length === 0) return specialRequests;
+  const prefix = `[META]${JSON.stringify({ stops: clean })}[/META]
+`;
+  return specialRequests ? `${prefix}${specialRequests}` : prefix;
+}
+
 const createSchema = z.object({
   guestName:       z.string().min(2),
   guestEmail:      z.string().email(),
@@ -82,6 +100,12 @@ const createSchema = z.object({
   vehicleClass:    z.string().default("BUSINESS"),
   flightNumber:    z.string().optional(),
   specialRequests: z.string().optional(),
+  /**
+   * Addresses the car calls at on the way, in order. The catalogue sells at
+   * most three, and an empty string is a half-filled form field rather than
+   * a place, so both are trimmed away before anything is stored.
+   */
+  stops:           z.array(z.string().trim().min(3)).max(MAX_STOPS).optional(),
   totalAmount:     z.number().min(0),
   /**
    * What the customer has already paid online, when the office is recording
@@ -256,7 +280,7 @@ export async function POST(req: NextRequest) {
       luggage:         seatShare(body.luggage, body.vehicleCount, 0),
       vehicleClass:    body.vehicleClass as VehicleClass,
       flightNumber:    body.flightNumber,
-      specialRequests: body.specialRequests,
+      specialRequests: withStops(body.specialRequests, body.stops),
       adminNotes:      body.notes,
       driverAmount:    body.driverAmount,
       baseFare:        body.totalAmount,

@@ -754,6 +754,8 @@ export function driverJobCard(o: {
   driverName: string; confirmationCode: string;
   guestName: string; guestPhone: string;
   pickupAddress: string; dropoffAddress?: string | null;
+  /** Places to call at between pick-up and drop-off, in driving order. */
+  stops?: string[] | null;
   pickupDatetime: string; vehicle: string;
   passengers: number; luggage: number;
   flightNumber?: string | null;
@@ -786,6 +788,11 @@ export function driverJobCard(o: {
         row("Client", `<strong style="font-weight:bold;">${esc(o.guestName)}</strong>`) +
         row("Phone", `<a href="tel:${esc(o.guestPhone)}" style="color:${GOLD};text-decoration:none;">${esc(o.guestPhone)}</a>`) +
         row("Pick-up", esc(o.pickupAddress)) +
+        // Between pick-up and drop-off, because that is the order they are
+        // driven. A stop the chauffeur only learns about on the day is a
+        // detour they have not planned for.
+        (o.stops ?? []).map((stop, i) =>
+          row(`Stop ${i + 1}`, `<strong style="font-weight:bold;">${esc(stop)}</strong>`)).join("") +
         row("Drop-off", esc(o.dropoffAddress || "—")) +
         row("When", `<strong style="font-weight:bold;">${esc(o.pickupDatetime)}</strong>`) +
         row("Vehicle", esc(o.vehicle)) +
