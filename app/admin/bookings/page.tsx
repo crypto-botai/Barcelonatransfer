@@ -128,7 +128,10 @@ function JourneySection({ booking, onChanged }: { booking: Booking; onChanged: (
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Could not update the journey");
       if (confirm) {
-        toast.success(`Booking updated${json.notified ? " · customer emailed" : ""}`);
+        toast.success(
+          `Saved${json.pickupChanged || json.dropoffChanged ? " · new address" : ""}` +
+          `${json.notified ? " · customer emailed" : ""}`,
+        );
         setQuote(null);
         setPickup(null);
         setDropoff(null);
@@ -208,7 +211,10 @@ function JourneySection({ booking, onChanged }: { booking: Booking; onChanged: (
       </label>
 
       {quote && (
-        <div className="rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2 text-[12px] space-y-1">
+        <div className="rounded-lg border border-amber-400/30 bg-amber-400/[0.07] px-3 py-2 text-[12px] space-y-1">
+          <p className="text-amber-400 font-medium -mx-1 -mt-0.5 mb-1.5">
+            Not saved yet — check this, then press Confirm below.
+          </p>
           {quote.timeChanged ? (
             <>
               <div className="flex justify-between text-dark-300"><span>From</span><span className="text-dark-400 line-through">{quote.from}</span></div>
@@ -263,8 +269,8 @@ function JourneySection({ booking, onChanged }: { booking: Booking; onChanged: (
         disabled={busy || !changed || unpicked || !time}
         className="w-full py-2 rounded-lg bg-gold-500/15 border border-gold-500/30 text-gold-400 text-sm font-medium hover:bg-gold-500/25 transition-colors inline-flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        {busy ? <Loader2 size={14} className="animate-spin" /> : <Calendar size={14} />}
-        {quote ? "Confirm change" : changed ? "Check new price" : "Change the date, time or addresses"}
+        {busy ? <Loader2 size={14} className="animate-spin" /> : quote ? <Save size={14} /> : <Calendar size={14} />}
+        {quote ? "Confirm & save change" : changed ? "Check new price" : "Change the date, time or addresses"}
       </button>
     </section>
   );
@@ -459,12 +465,14 @@ function PartnerSection({ booking, onChanged }: { booking: Booking; onChanged: (
   );
 }
 
-function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
+function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted, onRefresh }: {
   booking: Booking;
   drivers: Driver[];
   onClose: () => void;
   onSaved: () => void;
   onDeleted: () => void;
+  /** Reload without closing, so a change can be seen where it was made. */
+  onRefresh: () => void;
 }) {
   const [status, setStatus]             = useState<BookingStatus>(booking.status);
   const [driverId, setDriverId]         = useState(booking.driverId ?? "");
@@ -712,7 +720,7 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted }: {
           </section>
 
           <PaymentSection booking={booking} onChanged={onSaved} />
-          <JourneySection booking={booking} onChanged={onSaved} />
+          <JourneySection booking={booking} onChanged={onRefresh} />
 
           <PartnerSection booking={booking} onChanged={onSaved} />
 
@@ -866,6 +874,24 @@ export default function AdminBookingsPage() {
   const loadBookings = async () => {
     const res = await fetch("/api/admin/bookings");
     if (res.ok) setBookings(await res.json());
+  };
+
+  /**
+   * Reloads and leaves the drawer open on the same booking.
+   *
+   * A change of journey used to close the drawer, so the office never saw the
+   * new address land and had no way to tell a saved change from an abandoned
+   * one. This re-seats the open drawer on the freshly loaded row instead.
+   */
+  const refreshSelected = async () => {
+    const res = await fetch("/api/admin/bookings");
+    if (!res.ok) {
+      toast.error("Saved, but the list could not be reloaded. Refresh the page to see it.");
+      return;
+    }
+    const rows: Booking[] = await res.json();
+    setBookings(rows);
+    setSelected((cur) => (cur ? rows.find((b) => b.id === cur.id) ?? cur : cur));
   };
 
   const loadDeleted = async () => {
@@ -1152,6 +1178,7 @@ export default function AdminBookingsPage() {
           drivers={drivers}
           onClose={() => setSelected(null)}
           onSaved={() => { setSelected(null); loadBookings(); }}
+          onRefresh={refreshSelected}
           onDeleted={() => { setSelected(null); loadBookings(); loadDeleted(); }}
         />
       )}
