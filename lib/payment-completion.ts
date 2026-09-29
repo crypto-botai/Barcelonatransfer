@@ -232,23 +232,34 @@ async function reportOrderCreated(booking: {
     }
 
     const meta = parseBookingMeta(booking.specialRequests);
+    const siteUrl = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
     const result = await sendOpenAiConversion({
       eventId:   booking.id,
-      eventName: "order_created",
+      eventType: "order_created",
       // What the card was actually charged: the deposit on a deposit booking,
       // not the whole fare the chauffeur will finish collecting.
-      value:     paidOnline(booking),
+      amount:    paidOnline(booking),
       currency:  booking.currency,
+      // Exactly as it arrived from the ad click, never rewritten.
       oppref:    meta.oppref,
+      sourceUrl: `${siteUrl}/booking/success?booking_id=${booking.id}`,
+      // Set OPENAI_CONVERSIONS_VALIDATE_ONLY=true to exercise the whole path
+      // against the real API without recording a sale.
+      validateOnly: process.env.OPENAI_CONVERSIONS_VALIDATE_ONLY === "true",
     });
 
     await prisma.emailLog.update({
       where: { id: claim.id },
-      data:  { status: result.ok ? "SENT" : "FAILED" },
+      // A validate-only run deliberately records nothing at OpenAI, so the
+      // claim is released rather than marked sent — otherwise a test would
+      // permanently suppress the real conversion for that booking.
+      data:  { status: result.outcome === "sent" ? "SENT" : "FAILED" },
     }).catch(() => {});
 
+    // The sender has already logged the specific outcome (sent, validated,
+    // authentication error, validation error, rejected, not configured).
     if (!result.ok) {
-      console.error("[conversions] order_created failed for", booking.id, result.error);
+      console.error("[conversions] order_created not recorded for", booking.id, "-", result.outcome);
     }
   } catch (err) {
     // A marketing report must never stop a payment being confirmed.

@@ -28,17 +28,28 @@ interface Stored {
 }
 
 /**
- * Anything longer or stranger than this is not a click reference, and an
- * unbounded string from a URL should not be written to storage or later
- * into a booking record.
+ * Validates a click reference without changing it.
+ *
+ * The value is sent to OpenAI exactly as it arrived, so this only decides
+ * whether to keep it — it never rewrites it. An earlier version allowed
+ * only `[\w.:~-]`, which would have silently rejected a base64, base64url or
+ * JWT-shaped token (`+`, `/`, `=`, `.`) and lost the attribution on every
+ * such click.
+ *
+ * What is refused is what could not be an opaque token and could cause harm
+ * downstream: anything with whitespace or control characters, the handful of
+ * characters that matter if a value ever reaches an HTML context, and
+ * anything absurdly long. Surrounding whitespace is stripped because that is
+ * an artefact of URL parsing rather than part of the token.
  */
 function clean(raw: string | null): string | null {
   if (!raw) return null;
   const v = raw.trim();
-  if (!v || v.length > 200) return null;
-  // Click references are opaque tokens. Anything with markup or whitespace
-  // in it did not come from an ad platform.
-  if (!/^[\w.:~-]+$/.test(v)) return null;
+  if (!v || v.length > 512) return null;
+  // Printable ASCII, no spaces, minus the characters that are dangerous if
+  // this ever lands in markup. Everything a real token uses is allowed.
+  if (!/^[\x21-\x7E]+$/.test(v)) return null;
+  if (/[<>"'`\\]/.test(v)) return null;
   return v;
 }
 

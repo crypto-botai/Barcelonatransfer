@@ -92,7 +92,7 @@ describe("the oppref click reference", () => {
   });
 
   it("refuses anything that is not a plain token", () => {
-    for (const bad of ["<script>x</script>", "a b", "a\nb", "x".repeat(300)]) {
+    for (const bad of ["<script>x</script>", "a b", "a\nb", "x".repeat(600)]) {
       expect(captureOppref(`?oppref=${encodeURIComponent(bad)}`), bad).toBeNull();
     }
   });
@@ -181,7 +181,7 @@ describe("order_created", () => {
 
   it("is sent to OpenAI from finalizeSumUpPayment and nowhere else", () => {
     expect(completion).toContain("await reportOrderCreated(updated)");
-    expect(completion).toContain('eventName: "order_created"');
+    expect(completion).toContain('eventType: "order_created"');
     // The only other file allowed to mention the OpenAI sender is the sender.
     for (const f of ["app/booking/success/page.tsx", "app/booking/pay/[checkoutId]/page.tsx",
                      "app/api/bookings/route.ts", "app/book/BookFormClient.tsx"]) {
@@ -250,7 +250,7 @@ describe("the same booking cannot convert twice", () => {
   });
 
   it("marks the outcome so a retry knows", () => {
-    expect(completion).toContain('data:  { status: result.ok ? "SENT" : "FAILED" }');
+    expect(completion).toContain('data:  { status: result.outcome === "sent" ? "SENT" : "FAILED" }');
   });
 
   it("never lets a tracking failure break the payment", () => {
@@ -269,7 +269,7 @@ describe("OpenAI credentials never reach the browser", () => {
     // The prose above the code explains the rule and names the prefix, so
     // only the code itself is checked.
     expect(codeOnly(sender)).not.toContain("NEXT_PUBLIC_");
-    expect(codeOnly(sender)).toContain("process.env.OPENAI_ADS_API_KEY");
+    expect(codeOnly(sender)).toContain("process.env.OPENAI_CONVERSIONS_API_KEY");
   });
 
   it("is imported only by server code", () => {
@@ -375,6 +375,6 @@ describe("scenario D: no oppref", () => {
 describe("an unconfigured ads account is not an error", () => {
   it("skips cleanly when no API key is set", () => {
     const sender = rd("lib/tracking/openai-conversions.ts");
-    expect(sender).toContain('return { ok: true, skipped: "not-configured" }');
+    expect(sender).toContain('return { ok: true, outcome: "not-configured" }');
   });
 });

@@ -1,52 +1,71 @@
 /**
- * The OpenAI Ads conversion, sent from the server.
+ * The OpenAI Ads Conversions API.
+ *
+ * Endpoint, authentication and payload follow the documented specification;
+ * nothing here is inferred. Only the fields the specification defines are
+ * sent, and no field is invented to fill a gap.
+ *
+ *   POST https://bzr.openai.com/v1/events?pid=<PIXEL_ID>
+ *   Authorization: Bearer <OPENAI_CONVERSIONS_API_KEY>
+ *
+ *   { "events": [ { id, type, timestamp_ms, oppref, action_source,
+ *                   source_url, data: { type, amount, currency } } ] }
  *
  * Only `order_created` goes through here, and only from
- * lib/payment-completion after SumUp's own API has answered PAID. Nothing in
- * the browser can reach this: the credentials are server-only environment
- * variables with no NEXT_PUBLIC_ prefix, so they are never bundled into
- * client JavaScript.
- *
- * The endpoint is configurable because OpenAI's conversions API is new and
- * its host may move; `OPENAI_CONVERSIONS_ENDPOINT` overrides the default
- * without a deploy of this file.
+ * lib/payment-completion once SumUp's own API has answered PAID. The
+ * browser cannot reach any of it: the key is a server-only environment
+ * variable with no NEXT_PUBLIC_ prefix, so it is never bundled into client
+ * JavaScript.
  *
  * Failure is never fatal. A conversion that does not send is a reporting
- * problem; a booking that does not confirm because a marketing pixel threw
- * is a business problem. Everything here is caught and logged.
+ * problem; a booking that fails to confirm because a marketing call threw
+ * would be a business one.
  */
 
-const DEFAULT_ENDPOINT = "https://api.openai.com/v1/ads/conversions";
+const ENDPOINT = "https://bzr.openai.com/v1/events";
 
 export interface ConversionInput {
-  /** booking.id — the idempotency key on both sides. */
+  /** booking.id — the event id, shared with the browser pixel. */
   eventId: string;
-  /** Always "order_created" today; typed loosely for future events. */
-  eventName: string;
-  /** What was actually charged online, in major units. */
-  value: number;
+  /** "order_created". */
+  eventType: string;
+  /** What the card was actually charged, in major units. */
+  amount: number;
   currency: string;
-  /** The ad click this booking came from, when there was one. */
+  /** The click reference exactly as it arrived. Never rewritten. */
   oppref?: string | null;
-  /** Seconds since epoch. Defaults to now. */
-  occurredAt?: number;
+  /** The page the conversion belongs to. */
+  sourceUrl: string;
+  /** Milliseconds since epoch. Defaults to now. */
+  timestampMs?: number;
+  /** Validate the request without recording a conversion. */
+  validateOnly?: boolean;
 }
 
-export type ConversionResult =
-  | { ok: true; skipped?: "not-configured" }
-  | { ok: false; error: string };
+export type ConversionOutcome =
+  | "sent"
+  | "validated"
+  | "not-configured"
+  | "authentication-error"
+  | "validation-error"
+  | "rejected"
+  | "transport-error";
 
-function credentials(): { key: string; endpoint: string; advertiserId?: string } | null {
-  const key = process.env.OPENAI_ADS_API_KEY?.trim();
-  if (!key) return null;
-  return {
-    key,
-    endpoint: process.env.OPENAI_CONVERSIONS_ENDPOINT?.trim() || DEFAULT_ENDPOINT,
-    advertiserId: process.env.OPENAI_ADS_ADVERTISER_ID?.trim() || undefined,
-  };
+export interface ConversionResult {
+  ok: boolean;
+  outcome: ConversionOutcome;
+  /** Safe to log: never contains the key or any personal data. */
+  detail?: string;
 }
 
-/** True when the conversion API has been configured at all. */
+function credentials(): { key: string; pixelId: string } | null {
+  const key     = process.env.OPENAI_CONVERSIONS_API_KEY?.trim();
+  const pixelId = process.env.OPENAI_PIXEL_ID?.trim();
+  if (!key || !pixelId) return null;
+  return { key, pixelId };
+}
+
+/** True when both the key and the pixel id are present. */
 export function openAiConversionsConfigured(): boolean {
   return credentials() !== null;
 }
@@ -54,37 +73,55 @@ export function openAiConversionsConfigured(): boolean {
 /**
  * Reports one conversion.
  *
- * `event_id` is sent so OpenAI deduplicates on its own side too: if this is
- * ever called twice for the same booking — a retried webhook, a cron sweep
- * racing the success-page poll — the second report is the same conversion,
- * not a second sale.
+ * `id` is sent so OpenAI deduplicates on its own side: if this runs twice
+ * for one booking — a retried webhook, the reconcile cron racing the
+ * success-page poll — the second report is the same conversion rather than
+ * a second sale. It is the same id the browser pixel uses for the same
+ * event, which is what lets the two be matched up.
+ *
+ * With `validateOnly` the request is checked and nothing is recorded, so a
+ * live configuration can be tested against production without inventing a
+ * sale.
  */
 export async function sendOpenAiConversion(input: ConversionInput): Promise<ConversionResult> {
   const creds = credentials();
   if (!creds) {
-    // Not configured is not an error: the site runs perfectly well without
-    // an ads account attached, and every preview deployment does.
-    return { ok: true, skipped: "not-configured" };
+    // Not an error. The site runs without an ads account attached, and every
+    // preview deployment does.
+    console.info("[conversions] not configured — no event sent for", input.eventId);
+    return { ok: true, outcome: "not-configured" };
   }
 
-  const body: Record<string, unknown> = {
-    event_name: input.eventName,
-    event_id:   input.eventId,
-    event_time: input.occurredAt ?? Math.floor(Date.now() / 1000),
-    value:      input.value,
-    currency:   input.currency,
-    ...(input.oppref ? { oppref: input.oppref } : {}),
-    ...(creds.advertiserId ? { advertiser_id: creds.advertiserId } : {}),
+  const url = new URL(ENDPOINT);
+  url.searchParams.set("pid", creds.pixelId);
+  if (input.validateOnly) url.searchParams.set("validate_only", "true");
+
+  const body = {
+    events: [
+      {
+        id:            input.eventId,
+        type:          input.eventType,
+        timestamp_ms:  input.timestampMs ?? Date.now(),
+        // Exactly as it arrived from the ad click. Omitted, not nulled, when
+        // the booking came from organic traffic.
+        ...(input.oppref ? { oppref: input.oppref } : {}),
+        action_source: "web",
+        source_url:    input.sourceUrl,
+        data: {
+          type:     "contents",
+          amount:   input.amount,
+          currency: input.currency,
+        },
+      },
+    ],
   };
 
   try {
-    // A marketing call must not hold a payment confirmation open. Ten
-    // seconds is generous for one POST; past that the conversion is lost
-    // and the booking carries on.
+    // A marketing call must not hold a payment confirmation open.
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 10_000);
 
-    const res = await fetch(creds.endpoint, {
+    const res = await fetch(url.toString(), {
       method: "POST",
       headers: {
         Authorization:  `Bearer ${creds.key}`,
@@ -94,15 +131,44 @@ export async function sendOpenAiConversion(input: ConversionInput): Promise<Conv
       signal: controller.signal,
     }).finally(() => clearTimeout(timer));
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      // Never log the key, and keep the body short: it is a third party's
-      // error message, not something to dump into the function log whole.
-      return { ok: false, error: `HTTP ${res.status} ${text.slice(0, 200)}` };
+    const text = await res.text().catch(() => "");
+    // The response is OpenAI's own error text. Truncated, and it never
+    // contains our key or anything about the customer.
+    const detail = text.slice(0, 300);
+
+    if (res.status === 401 || res.status === 403) {
+      console.error("[conversions] authentication error", res.status, "for", input.eventId, detail);
+      return { ok: false, outcome: "authentication-error", detail };
     }
 
-    return { ok: true };
+    if (res.status === 400 || res.status === 422) {
+      console.error("[conversions] validation error", res.status, "for", input.eventId, detail);
+      return { ok: false, outcome: "validation-error", detail };
+    }
+
+    if (!res.ok) {
+      console.error("[conversions] rejected", res.status, "for", input.eventId, detail);
+      return { ok: false, outcome: "rejected", detail };
+    }
+
+    // A 2xx can still report per-event failures in its body. Treat any
+    // mention of a failed or rejected event as a rejection rather than
+    // recording a success that did not happen.
+    if (/"(errors|failed|rejected)"\s*:/.test(text) && !/"(errors|failed|rejected)"\s*:\s*(\[\s*\]|0|null|false)/.test(text)) {
+      console.error("[conversions] event rejected by the API for", input.eventId, detail);
+      return { ok: false, outcome: "rejected", detail };
+    }
+
+    if (input.validateOnly) {
+      console.info("[conversions] validated (nothing recorded) for", input.eventId);
+      return { ok: true, outcome: "validated", detail };
+    }
+
+    console.info("[conversions] sent", input.eventType, "for", input.eventId);
+    return { ok: true, outcome: "sent" };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("[conversions] transport error for", input.eventId, detail);
+    return { ok: false, outcome: "transport-error", detail };
   }
 }
