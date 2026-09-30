@@ -29,7 +29,7 @@ import { WALLET_LABEL } from "@/lib/wallets";
 import PremiumPayButton from "@/components/ui/PremiumPayButton";
 import toast from "react-hot-toast";
 import { useTranslations } from "@/components/language/I18nProvider";
-import { pickupToUtc } from "@/lib/datetime";
+import { pickupToUtc, pickupToParts } from "@/lib/datetime";
 import PhoneField from "@/components/booking/PhoneField";
 import { isUsablePhone, splitE164 } from "@/lib/dial-codes";
 import { seatsFor } from "@/lib/capacity";
@@ -155,8 +155,24 @@ const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
 
 const HOURS_OPTIONS = [4, 5, 6, 8, 10, 12];
 
-function todayStr()    { return new Date().toISOString().split("T")[0]; }
-function tomorrowStr() { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split("T")[0]; }
+/**
+ * Today and tomorrow in Barcelona, not wherever the customer is sitting.
+ *
+ * Whatever this form holds is handed to pickupToUtc(), which reads it as
+ * Barcelona wall-clock — so these have to be Barcelona dates or the two ends
+ * disagree. `toISOString()` gives the UTC date, which is the previous day
+ * from 22:00 Barcelona onward in winter and 23:00 in summer: a customer
+ * booking late in the evening was offered, and limited to, a date that had
+ * already passed in the city they were flying into.
+ */
+function todayStr()    { return pickupToParts(new Date()).date; }
+function tomorrowStr() {
+  // Stepped from the Barcelona date at noon UTC, which no DST shift can move
+  // across a midnight, rather than by adding 24h to the current instant.
+  const d = new Date(`${todayStr()}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
 
 // Converts any vehicle identifier (FleetVehicle or VehicleClass) from URL params
 // to the DB-compatible VehicleClass used in data.vehicleClass.
@@ -178,12 +194,30 @@ function normalizeFleetVehicle(v: string | null): FleetVehicle | undefined {
   return v && v in FLEET_TO_DB_CLASS ? (v as FleetVehicle) : undefined;
 }
 
-function roundUpToNext30(): string {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() + 90);
-  const m = now.getMinutes() < 30 ? "30" : "00";
-  if (now.getMinutes() >= 30) now.setHours(now.getHours() + 1);
-  return `${now.getHours().toString().padStart(2, "0")}:${m}`;
+/**
+ * The "in about an hour" slot, as a Barcelona date and time.
+ *
+ * Both halves are read off one instant in Barcelona, so they cannot disagree
+ * and neither depends on where the customer is. Taken from the local clock
+ * instead, someone booking from London was offered a slot an hour behind the
+ * city they were flying into, and from further west a time already past.
+ *
+ * It returns the date as well as the time because rounding up can cross
+ * midnight — at 23:50 the next half hour is 00:00 *tomorrow*, and pairing
+ * that with today's date asked for a slot that had already gone.
+ */
+function soonSlot(): { date: string; time: string } {
+  const target = new Date(Date.now() + 90 * 60 * 1000);
+  const { date, time } = pickupToParts(target);
+  const minute = Number(time.slice(3, 5));
+
+  if (minute === 0 || minute === 30) return { date, time };
+  if (minute < 30) return { date, time: `${time.slice(0, 2)}:30` };
+
+  // Past the half hour: step to the next exact hour and re-read the date with
+  // it, so a roll past midnight moves both.
+  const rolled = pickupToParts(new Date(target.getTime() + (60 - minute) * 60 * 1000));
+  return { date: rolled.date, time: `${rolled.time.slice(0, 2)}:00` };
 }
 
 export default function BookFormClient() {
@@ -434,7 +468,7 @@ export default function BookFormClient() {
   };
 
   const quickSelect = (opt: "now1h" | "tomorrowAM" | "tomorrowPM") => {
-    if (opt === "now1h")       setData((d) => ({ ...d, date: todayStr(), time: roundUpToNext30() }));
+    if (opt === "now1h")       setData((d) => ({ ...d, ...soonSlot() }));
     else if (opt === "tomorrowAM") setData((d) => ({ ...d, date: tomorrowStr(), time: "09:00" }));
     else                       setData((d) => ({ ...d, date: tomorrowStr(), time: "14:00" }));
   };

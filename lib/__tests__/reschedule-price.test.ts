@@ -1,23 +1,32 @@
 import { describe, it, expect } from "vitest";
 import { timeSurcharges, repriceForNewTime, applyToBalance, pricesByTimeOfDay } from "@/lib/reschedule-price";
 import { NIGHT_SURCHARGE_RATE, LAST_MINUTE_SURCHARGE_RATE } from "@/lib/pricing";
+import { pickupToUtc } from "@/lib/datetime";
 
 /**
  * Moving a booking can change what it should cost, because two parts of the
  * fare depend on when the car is wanted: 20% for a night pickup and 15%
  * inside the last-minute window.
  *
- * These use the same clock the booking engine does (isNightTime reads the
- * running process's zone), so the tests build their instants with local hours
- * rather than a fixed UTC string. That keeps them honest about what the code
- * actually does instead of passing only in one timezone.
+ * The hours below are Barcelona wall-clock, because that is the clock the
+ * customer and the driver are both reading and the one `isNightTime` now
+ * prices from. These instants used to be built with local hours instead, back
+ * when the night window was read off the running process's zone — which meant
+ * the suite passed on a laptop in Madrid and mispriced on a UTC server. They
+ * are built through `pickupToUtc`, the same conversion the booking form uses,
+ * so they mean the same thing wherever the tests run.
  */
 
-/** A local instant, N days from a fixed base, at a given local hour. */
+/** The instant of a Barcelona wall-clock hour, N days from a fixed base. */
 const localAt = (dayOffset: number, hour: number): Date => {
-  const d = new Date(2026, 9, 15, hour, 0, 0, 0); // 15 Oct 2026, local
-  d.setDate(d.getDate() + dayOffset);
-  return d;
+  const day = new Date(Date.UTC(2026, 9, 15)); // 15 Oct 2026
+  day.setUTCDate(day.getUTCDate() + dayOffset);
+  const instant = pickupToUtc(
+    day.toISOString().slice(0, 10),
+    `${String(hour).padStart(2, "0")}:00`,
+  );
+  if (!instant) throw new Error(`could not build an instant for hour ${hour}`);
+  return instant;
 };
 
 // Far enough out that the last-minute window never fires unless asked for.

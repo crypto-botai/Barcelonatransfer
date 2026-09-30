@@ -469,6 +469,27 @@ const KNOWN_LOCATIONS: Record<string, GeoPoint> = {
   la_roca:        { lat: 41.6080, lng: 2.3395,  radiusKm: 3   },
   montserrat:     { lat: 41.5932, lng: 1.8360,  radiusKm: 4   },
   girona_airport: { lat: 41.9010, lng: 2.7607,  radiusKm: 3   },
+  /**
+   * Girona city, by coordinates, because the address text cannot be trusted
+   * to identify it.
+   *
+   * The text rule in resolveZoneStrict() only fires when the address *starts*
+   * with "Girona" or spells out "Girona city". A real drop-off does neither:
+   * Places returns "Hotel AC Palau de Bellavista, Pujada dels Polvorins 1,
+   * Girona, Catalonia", with the city in the middle. That missed the
+   * bcn-airport-girona-city route entirely and fell through to per-km — €327
+   * against the €165 the route is priced at, on every Girona hotel booked.
+   *
+   * Matching bare "girona" in the text would fix this one address and break
+   * others: Girona is also the province, so "Olot, Girona" or "Banyoles,
+   * Girona" would take the city fare for a town 30-55 km further on. That is
+   * why the text rule was written tight, and it should stay tight.
+   *
+   * Coordinates have no such ambiguity. 5 km covers the city and its outskirts
+   * while staying clear of everything around it — Girona Airport is 10.5 km
+   * south (and listed above, with its own fare), Lloret 31 km, Tossa 29 km.
+   */
+  girona_city:    { lat: 41.9794, lng: 2.8214,  radiusKm: 5   },
   andorra:        { lat: 42.5063, lng: 1.5218,  radiusKm: 12  },
   lourdes:        { lat: 43.0951, lng: -0.0459, radiusKm: 15  },
   castelldefels:  { lat: 41.2800, lng: 1.9780,  radiusKm: 3   },

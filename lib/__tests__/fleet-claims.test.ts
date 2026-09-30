@@ -30,7 +30,7 @@ const SOURCES = [
   ...fg.sync("lib/**/*.ts", { ignore: ["lib/__tests__/**", "lib/fleet-facts.ts"] }),
   // The locale files, which is where this hid longest. fleet.subtitle read
   // "Every vehicle under 3 years old" in all eight languages and renders
-  // through FleetSection on /fleet and on all seven locale homepages — nine
+  // through FleetStage on /fleet and on all seven locale homepages — nine
   // live pages a sweep of .tsx and .ts could never see. It survived the first
   // pass of this very test for exactly that reason.
   ...fg.sync("messages/*.json"),

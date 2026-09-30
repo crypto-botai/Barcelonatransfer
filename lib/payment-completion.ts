@@ -20,14 +20,42 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
 
   const transactionId = (checkout.transaction_id ?? checkout.id) as string;
 
-  const updated = await prisma.booking.update({
-    where: { id: bookingId },
+  /**
+   * Claim the transition to PAID, atomically.
+   *
+   * Three paths call this — the SumUp webhook, the verify route the browser
+   * hits on return from the card form, and the reconcile cron — and nothing
+   * stops two of them arriving for the same booking at the same moment. The
+   * `paymentStatus === "PAID"` check above is a cheap early exit, not a lock:
+   * both callers can read PENDING before either writes.
+   *
+   * That mattered because everything below this line runs exactly once per
+   * caller that gets past it, including `order_created`. A lost race meant
+   * one payment reported as two conversions to Google Ads and OpenAI, which
+   * is the one number the bidding is now optimising against.
+   *
+   * `updateMany` with the status in the WHERE clause pushes the decision into
+   * a single statement the database serialises: only one caller can match a
+   * row that is not yet PAID, so only one gets count 1 and proceeds.
+   */
+  const claimed = await prisma.booking.updateMany({
+    where: { id: bookingId, paymentStatus: { not: "PAID" } },
     data: {
       paymentStatus:   "PAID",
       status:          "CONFIRMED",
       stripePaymentId: transactionId,
     },
   });
+  if (claimed.count === 0) return "already-paid";
+
+  // What the row now holds. Built from what was just written rather than read
+  // back, because the three fields above are the only ones that changed.
+  const updated = {
+    ...booking,
+    paymentStatus:   "PAID" as const,
+    status:          "CONFIRMED" as const,
+    stripePaymentId: transactionId,
+  };
 
   await prisma.payment.upsert({
     where:  { bookingId },
@@ -154,10 +182,19 @@ export async function finalizeBalancePayment(bookingId: string, checkout: SumUpC
   const booking = await prisma.booking.findUnique({ where: { id: bookingId }, select: { id: true, balanceAmount: true, balancePaidAt: true } });
   if (!booking) return "not-found";
   if (booking.balancePaidAt || !booking.balanceAmount) return "already-paid";
-  await prisma.booking.update({
-    where: { id: bookingId },
+
+  /**
+   * Same atomic claim as finalizeSumUpPayment above, for the same reason:
+   * SumUp retries a webhook on any non-2xx, so two deliveries for one balance
+   * can be in flight together and both read balancePaidAt as null before
+   * either writes. The loser would stamp the payment a second time and file a
+   * second BALANCE_PAID entry against one payment.
+   */
+  const claimed = await prisma.booking.updateMany({
+    where: { id: bookingId, balancePaidAt: null },
     data: { balancePaidAt: new Date(), balancePaidBy: "online", balanceMethod: "ONLINE" },
   });
+  if (claimed.count === 0) return "already-paid";
   const transactionId = (checkout.transaction_id ?? checkout.id) as string;
   await prisma.activityLog.create({
     data: { adminId: "system", adminName: "SumUp", action: "BALANCE_PAID", entity: "BOOKING", entityId: bookingId, details: { amount: booking.balanceAmount, transactionId } as never },
@@ -281,12 +318,27 @@ export async function markSumUpPaymentFailed(bookingId: string): Promise<void> {
   const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
   if (!booking || booking.paymentStatus === "PAID" || booking.paymentStatus === "FAILED") return;
 
-  const failedBooking = await prisma.booking.update({
-    where: { id: bookingId },
+  /**
+   * Mark it failed only while it is still neither paid nor already failed.
+   *
+   * The read above cannot hold that open. This runs from the same webhook
+   * SumUp retries and from the reconcile cron, alongside finalizeSumUpPayment
+   * — so a success and a failure for one booking can be in flight together.
+   * With an unconditional write the failure could land last and stamp FAILED
+   * over a booking whose money had just been taken, hiding a paid job from
+   * the office and mailing the customer that their payment did not go
+   * through. Putting the status in the WHERE clause makes that unwritable.
+   */
+  const claimed = await prisma.booking.updateMany({
+    where: { id: bookingId, paymentStatus: { notIn: ["PAID", "FAILED"] } },
     data:  { paymentStatus: "FAILED" },
-  }).catch(() => null);
+  }).catch(() => ({ count: 0 }));
+  if (claimed.count === 0) return;
 
-  if (!failedBooking?.guestEmail) return;
+  // Read from the row fetched above: only paymentStatus changed.
+  const failedBooking = booking;
+
+  if (!failedBooking.guestEmail) return;
 
   const alreadySent = await prisma.emailLog.findFirst({
     where: { bookingId, type: "PAYMENT_FAILED" },

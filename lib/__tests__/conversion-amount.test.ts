@@ -34,7 +34,12 @@ const sendOpenAiConversion = vi.fn(
 );
 
 const db = {
-  booking:         { findUnique: vi.fn(), update: vi.fn() },
+  // updateMany is the atomic claim on PAID; count 1 means this caller won it.
+  booking:         {
+    findUnique: vi.fn(),
+    update:     vi.fn(),
+    updateMany: vi.fn(async (_args?: { where?: Record<string, unknown> }) => ({ count: 1 })),
+  },
   payment:         { upsert: vi.fn(async (_args: { create: { amount: number } }) => ({})) },
   emailLog:        {
     findMany:   vi.fn(async () => []),
@@ -185,6 +190,37 @@ describe("the PAID gates are untouched", () => {
     const out = await finalizeSumUpPayment("bk_1", paidCheckout() as never);
     expect(out).toBe("not-found");
     expect(sendOpenAiConversion).not.toHaveBeenCalled();
+  });
+
+  /**
+   * Two callers racing for one payment.
+   *
+   * The webhook, the verify route and the reconcile cron can all reach this
+   * for the same booking at the same moment, and all three can read PENDING
+   * before any of them writes. The early `paymentStatus === "PAID"` check
+   * cannot catch that; only the conditional update can, because the database
+   * lets exactly one statement match a row that is not yet PAID.
+   *
+   * count 0 is what losing that race looks like. The loser must stop here:
+   * one payment reported twice would be one booking counted as two
+   * conversions in Google Ads, against the goal the bidding now optimises on.
+   */
+  it("reports nothing when another caller won the race to PAID", async () => {
+    db.booking.findUnique.mockResolvedValue(bookingRow() as never);
+    db.booking.updateMany.mockResolvedValueOnce({ count: 0 } as never);
+
+    const out = await finalizeSumUpPayment("bk_1", paidCheckout() as never);
+
+    expect(out).toBe("already-paid");
+    expect(sendOpenAiConversion).not.toHaveBeenCalled();
+  });
+
+  it("claims the row on the status, not just the id", async () => {
+    db.booking.findUnique.mockResolvedValue(bookingRow() as never);
+    await finalizeSumUpPayment("bk_1", paidCheckout() as never);
+
+    const where = db.booking.updateMany.mock.calls.at(-1)?.[0]?.where;
+    expect(where).toMatchObject({ id: "bk_1", paymentStatus: { not: "PAID" } });
   });
 
   it("reports nothing when a conversion was already sent", async () => {

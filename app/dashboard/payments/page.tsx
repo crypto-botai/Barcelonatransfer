@@ -113,7 +113,14 @@ export default function PaymentsPage() {
               {/* Date */}
               <div className="text-center flex-shrink-0 w-10">
                 <p className="text-white text-sm font-semibold leading-none">
-                  {new Date(b.pickupDatetime).getDate()}
+                  {/*
+                    Barcelona, like the month below it. getDate() reads the
+                    viewer's clock, and this page is read from abroad: a
+                    00:30 pickup in Barcelona is still the previous evening
+                    in London, so the day showed one number and the month
+                    beside it another.
+                  */}
+                  {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", day: "numeric" })}
                 </p>
                 <p className="text-dark-500 text-[10px] uppercase">
                   {new Date(b.pickupDatetime).toLocaleDateString("en-GB", { timeZone: "Europe/Madrid", month: "short" })}
