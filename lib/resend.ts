@@ -510,12 +510,21 @@ export async function sendPersonalNoteEmail({
 
 // ─── Pickup Reminder ─────────────────────────────────────────
 export async function sendPickupReminder({
-  to, name, confirmationCode, pickupAddress, pickupDatetime, vehicleClass, arrivalUrl,
+  to, name, confirmationCode, pickupAddress, pickupDatetime, vehicleClass, arrivalUrl, bookingId,
 }: {
   to: string; name: string; confirmationCode: string; pickupAddress: string;
   pickupDatetime: string; vehicleClass: string;
   /** Passenger arrival link. Passed for airport pick-ups only. */
   arrivalUrl?: string | null;
+  /**
+   * The booking this reminds about.
+   *
+   * Required, not optional, because the hourly cron decides whether to send by
+   * looking for an EmailLog row with this id on it. Logged without one, the
+   * row exists but the lookup never finds it, and the customer is reminded
+   * again on the next run, and the next.
+   */
+  bookingId: string;
 }) {
   const { date, time } = splitDatetime(pickupDatetime);
   const html = emailDocument(
@@ -532,7 +541,7 @@ export async function sendPickupReminder({
   );
 
   const id = await sendEmail({ from: FROM, to, subject: `Your transfer is tomorrow — ${confirmationCode} | Elite BCN`, html });
-  await logEmail({ to, subject: `Pickup reminder`, type: "REMINDER", resendId: id });
+  await logEmail({ to, subject: `Pickup reminder`, type: "REMINDER", resendId: id, bookingId });
 }
 
 // ─── Driver Assigned ─────────────────────────────────────────
@@ -605,7 +614,7 @@ export async function sendReviewRequestEmail({
   );
 
   const id = await sendEmail({ from: FROM, to, subject: `How was your Elite BCN experience? — ${confirmationCode}`, html });
-  await logEmail({ to, subject: `Review request`, type: "REVIEW", resendId: id });
+  await logEmail({ to, subject: `Review request`, type: "REVIEW", resendId: id, bookingId });
 }
 
 // ─── Payment Confirmation (Receipt) ──────────────────────────

@@ -62,44 +62,12 @@ async function runRideTodayPush(): Promise<number> {
   return sent;
 }
 
-async function runPickupReminder(): Promise<number> {
-  const now        = new Date();
-  const in20h      = new Date(now.getTime() + 20 * 60 * 60 * 1000);
-  const in28h      = new Date(now.getTime() + 28 * 60 * 60 * 1000);
-
-  const bookings = await prisma.booking.findMany({
-    where: {
-      pickupDatetime:  { gte: in20h, lte: in28h },
-      status:          { in: ["CONFIRMED", "DRIVER_ASSIGNED"] },
-      guestEmail:      { not: null },
-    },
-    take: 50,
-  });
-
-  let sent = 0;
-  for (const b of bookings) {
-    const alreadySent = await prisma.emailLog.findFirst({
-      where: { to: b.guestEmail!, type: "REMINDER", bookingId: b.id },
-    });
-    if (alreadySent) continue;
-
-    await sendPickupReminder({
-      to:               b.guestEmail!,
-      name:             b.guestName ?? "Guest",
-      confirmationCode: b.confirmationCode,
-      pickupAddress:    b.pickupAddress,
-      pickupDatetime:   formatPickupDateTime(b.pickupDatetime),
-      vehicleClass:     b.vehicleClass ?? "BUSINESS",
-    }).catch(() => {});
-
-    await prisma.emailLog.create({
-      data: { to: b.guestEmail!, subject: "Your transfer is tomorrow", type: "REMINDER", status: "SENT", bookingId: b.id },
-    }).catch(() => {});
-
-    sent++;
-  }
-  return sent;
-}
+/**
+ * The pickup reminder used to live here, on a 20-28 hour window, while
+ * /api/cron/pickup-reminder ran the same job hourly on a 6-36 hour one.
+ * Whichever saw a booking first won, so the reminder went out about a day
+ * ahead and the hourly window never applied. One job owns it now.
+ */
 
 async function runReviewRequest(): Promise<number> {
   const now    = new Date();
@@ -337,12 +305,21 @@ export async function GET(req: NextRequest) {
   if (!authorise(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   await runRideTodayPush().catch(() => 0);
-  const [abandoned, reminders, reviews, rebooks] = await Promise.allSettled([
+  /**
+   * The pickup reminder is not in this list.
+   *
+   * It used to run here too, on a 20-28 hour window, alongside the hourly
+   * /api/cron/pickup-reminder. Two senders meant the reminder went out
+   * whenever this daily job happened to see the booking first, roughly a day
+   * ahead, and the hourly job's own window never got the chance. One job owns
+   * it now, and sends between 6 and 12 hours before the pickup.
+   */
+  const [abandoned, reviews, rebooks] = await Promise.allSettled([
     runAbandonedCheck(),
-    runPickupReminder(),
     runReviewRequest(),
     runReturnRebook(),
   ]);
+  const reminders = { status: "fulfilled", value: 0 } as const;
 
   // Payment reconciliation has its own entry now, every 15 minutes, which is
   // what the Pro plan allows. This call stays as a backstop: it is idempotent,

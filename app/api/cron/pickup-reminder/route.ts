@@ -32,13 +32,23 @@ export async function POST(req: NextRequest) {
   if (auth !== `Bearer ${CRON_SECRET}`)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // A wide window on purpose. It was written for a daily cron, where anything
-  // narrower would have let a booking fall between two runs and get no reminder
-  // at all. The cron is hourly now, so every booking is seen many times over,
-  // and the EmailLog check below is what stops a customer being reminded twice.
-  // The width costs a little query work and removes a whole class of silence.
+  /**
+   * One reminder, between 6 and 12 hours before the car is wanted.
+   *
+   * The window used to run to 36 hours, which was right when this was a daily
+   * job and wrong once it went hourly: a booking sat inside it for thirty
+   * hours and was seen on all thirty runs. The EmailLog check below was meant
+   * to make that harmless, and did not, because the row it looks for was
+   * written without a bookingId. Customers were reminded on the hour, every
+   * hour, through the night. See lib/resend.ts sendPickupReminder.
+   *
+   * Six hours is the floor because a reminder that lands after someone has
+   * left for the airport is no use. Twelve is the ceiling because the evening
+   * before is when it is read. An hourly cron sees each booking about six
+   * times inside that, and sends on the first.
+   */
   const from = new Date(Date.now() + 6  * 60 * 60 * 1000);
-  const to   = new Date(Date.now() + 36 * 60 * 60 * 1000);
+  const to   = new Date(Date.now() + 12 * 60 * 60 * 1000);
 
   const bookings = await prisma.booking.findMany({
     where: {
@@ -70,6 +80,9 @@ export async function POST(req: NextRequest) {
         // walk from the aircraft to the car, and on a hotel pickup there is no
         // such walk to report.
         arrivalUrl:      b.flightNumber ? safeArrivalUrl(b.id) : null,
+        // What the dedup above reads. Without it the log row is written with a
+        // null bookingId, the lookup never matches, and this sends again.
+        bookingId:       b.id,
       });
       sent++;
 
