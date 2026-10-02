@@ -157,10 +157,44 @@ export async function createPartnerDriver(partnerId: string, input: {
   if (given) {
     const existing = await prisma.user.findUnique({ where: { email: given } });
     if (existing) {
-      throw new Error("That email already signs in as somebody else. Leave the email empty and we will send this driver's mail to your company address instead.");
+      /**
+       * The address is already a login. Whose decides what happens next.
+       *
+       * A company that runs one inbox for its whole fleet types the same
+       * address for every driver, and used to be stopped on the second one.
+       * That is a reasonable thing to want: the sign-in address has to be
+       * unique because it identifies who a job went to, but where the post
+       * lands does not.
+       *
+       * So the address is accepted as a destination, and a sign-in identity
+       * is generated alongside it - but only when the address already belongs
+       * to this company or to one of its own drivers. Any other address is
+       * somebody else's, and quietly forwarding a stranger's job details to
+       * it would be worse than the error.
+       */
+      const ownedByThisCompany =
+        given === partner.email.trim().toLowerCase() ||
+        (await prisma.driver.findFirst({
+          where: { userId: existing.id, partnerId },
+          select: { id: true },
+        })) !== null;
+
+      if (!ownedByThisCompany) {
+        throw new Error("That email already signs in as somebody else. Leave the email empty and we will send this driver's mail to your company address instead.");
+      }
+
+      const taken = new Set(
+        (await prisma.user.findMany({
+          where: { email: { endsWith: `.${DRIVER_LOGIN_DOMAIN}` } },
+          select: { email: true },
+        })).map((u) => u.email),
+      );
+      email = generateDriverLogin(input.name, partner.name, (e) => taken.has(e));
+      notifyEmail = given;
+    } else {
+      email = given;
+      if (input.mailToCompany) notifyEmail = partner.email.trim().toLowerCase();
     }
-    email = given;
-    if (input.mailToCompany) notifyEmail = partner.email.trim().toLowerCase();
   } else {
     // No email of their own: a sign-in address is made for them and every
     // message about their work goes to the company that dispatches them.

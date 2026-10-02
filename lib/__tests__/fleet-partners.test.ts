@@ -51,9 +51,58 @@ describe("fleet partners", () => {
     expect(mw).toContain('pathname.startsWith("/partner")');
     expect(mw).toMatch(/role !== "PARTNER"/);
     // A partner hitting /admin is sent to their own panel, never let through.
-    expect(mw).toMatch(/if \(role === "PARTNER"\) return NextResponse\.redirect\(new URL\("\/partner"/);
+    expect(mw).toMatch(/if \(role === "PARTNER"\) return noindex\(NextResponse\.redirect\(new URL\("\/partner"/);
     // Anyone else hitting /partner is told why, not dropped on another dashboard.
-    expect(mw).toMatch(/if \(role !== "PARTNER"\) return NextResponse\.redirect\(new URL\("\/fleet-login"/);
+    expect(mw).toMatch(/if \(role !== "PARTNER"\) return noindex\(NextResponse\.redirect\(new URL\("\/fleet-login"/);
+  });
+
+  /**
+   * The rules above have to be reachable.
+   *
+   * They were not. A block that set the noindex header returned straight
+   * after it, for /auth, /admin, /driver, /partner and /dashboard - which is
+   * every path these rules are about. The one that matters most is the
+   * signed-in user on /auth/login: the rule to send them to their own panel
+   * never ran, so anything that bounced them to the login form left them
+   * there. They signed in, the form accepted it, and nothing moved.
+   */
+  it("does not return before the role rules can run", () => {
+    const mw = rd("middleware.ts");
+    const roleRules = mw.indexOf("const role = token.role");
+    expect(roleRules).toBeGreaterThan(-1);
+
+    // Nothing between the noindex helper and the role rules may return
+    // unconditionally for a staff path.
+    const before = mw.slice(mw.indexOf("const isStaffRoute"), roleRules);
+    expect(before).not.toMatch(/\n\s*return noindex\(NextResponse\.next\(\)\);\s*\n\s*\}\s*\n\s*\n?\s*\/\/ ──/);
+    // The signed-in-on-the-login-page rule exists and is after the helper.
+    expect(mw.indexOf('pathname.startsWith("/auth/login")')).toBeGreaterThan(roleRules);
+  });
+
+  /** A signed-in company on the login form is moved on, not left sitting there. */
+  it("sends a signed-in company away from the login form", () => {
+    const mw = rd("middleware.ts");
+    const block = mw.slice(mw.indexOf('pathname.startsWith("/auth/login")'));
+    expect(block.slice(0, 400)).toMatch(/role === "PARTNER"[\s\S]{0,80}\/partner/);
+  });
+
+  /**
+   * The loop itself: a PARTNER login whose company record is missing.
+   *
+   * The panel bounced it to /auth/login, which is a page, not an explanation.
+   * It now goes to /fleet-login, and /fleet-login checks for the same record
+   * before sending a PARTNER back, so neither can bounce the other.
+   */
+  it("does not bounce a company with no company record back to the login form", () => {
+    const layout = rd("app/partner/(panel)/layout.tsx");
+    expect(layout).toContain('if (!partner) redirect("/fleet-login")');
+    expect(layout).not.toContain('if (!partner) redirect("/auth/login")');
+
+    const fleetLogin = rd("app/fleet-login/page.tsx");
+    // It must look the record up rather than trusting the role alone.
+    expect(fleetLogin).toContain("fleetPartner.findUnique");
+    expect(fleetLogin).toContain('if (company) redirect("/partner")');
+    expect(fleetLogin).not.toMatch(/if \(u\?\.role === "PARTNER"\) redirect\("\/partner"\)/);
   });
 
   it("keeps company drivers off the office rosters", () => {
@@ -187,6 +236,8 @@ describe("sign-up pages are public", () => {
   it("driver and company registration are not sent to the login page", () => {
     const mw = rd("middleware.ts");
     expect(mw).toContain('pathname === "/driver/register" || pathname === "/partner/register"');
-    expect(mw).toMatch(/if \(!publicSignUp && \(pathname\.startsWith\("\/admin"\)/);
+    // The login gate skips them, and only applies to the routes that need one.
+    expect(mw).toMatch(/if \(needsLogin && !publicSignUp && !token\)/);
+    expect(mw).toMatch(/const needsLogin = \[[^\]]*"\/admin"/);
   });
 });

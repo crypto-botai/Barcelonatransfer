@@ -25,7 +25,19 @@ export default async function PartnerLayout({ children }: { children: React.Reac
     where: { userId: user.id },
     select: { name: true, contactName: true, active: true },
   });
-  if (!partner) redirect("/auth/login");
+  /**
+   * Signed in as a company, but no company record is attached to the login.
+   *
+   * This used to send them to /auth/login, which is where the loop came from:
+   * they signed in, were pushed to /partner, landed back on the login form,
+   * signed in again. The form worked every time, which is what made it so
+   * confusing to report.
+   *
+   * /fleet-login says what is wrong and offers a way out. It checks for this
+   * same record before sending a PARTNER back here, so the two cannot bounce
+   * each other.
+   */
+  if (!partner) redirect("/fleet-login");
 
   // Not yet activated by the office, or suspended: the panel is shown with a
   // banner and nothing can be dispatched; the APIs refuse writes meanwhile.
