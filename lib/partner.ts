@@ -503,6 +503,25 @@ export async function completePartnerJob(partnerId: string, bookingId: string) {
   const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
   if (!booking || booking.partnerId !== partnerId) throw new Error("This job is not assigned to your company");
   if (!["DRIVER_ASSIGNED", "IN_PROGRESS"].includes(booking.status)) throw new Error("Only a dispatched job can be completed");
+
+  /**
+   * A ride cannot end before it starts.
+   *
+   * Completing is not a tidy-up: it stamps rideEndedAt, records the balance
+   * as collected by the driver on a deposit booking, emails the customer to
+   * rate a journey, and moves the payout into the company's withdrawable
+   * balance. Done the day before the pickup, every one of those is a false
+   * statement, and the rating request is the one that reaches the customer.
+   *
+   * An hour of slack, because a flight lands early and the car leaves before
+   * the time on the booking. Anything further out is a mistake, usually a tap
+   * on the wrong row.
+   */
+  const EARLY_GRACE_MS = 60 * 60 * 1000;
+  if (booking.pickupDatetime.getTime() - Date.now() > EARLY_GRACE_MS) {
+    throw new Error("This ride has not happened yet. You can mark it completed once the pickup time is near.");
+  }
+
   const updated = await prisma.booking.update({
     where: { id: bookingId },
     data: {

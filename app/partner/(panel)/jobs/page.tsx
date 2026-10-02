@@ -165,7 +165,14 @@ function Jobs() {
               // put somebody back on it.
               const needsDriver = !j.driver;
               const canDispatch = j.status === "CONFIRMED" || (j.status === "DRIVER_ASSIGNED" && needsDriver);
-              const canComplete = j.status === "DRIVER_ASSIGNED" || j.status === "IN_PROGRESS";
+              // Not before the ride. completePartnerJob refuses a pickup
+              // more than an hour out, so offering the button earlier is
+              // offering one that fails - and the failure it prevents is a
+              // customer asked to rate a journey they have not taken.
+              const rideIsDue = new Date(j.pickupDatetime).getTime() - Date.now() <= 60 * 60 * 1000;
+              const canComplete = (j.status === "DRIVER_ASSIGNED" || j.status === "IN_PROGRESS") && rideIsDue;
+              // The tools stay available for the whole dispatched job.
+              const isLive = j.status === "DRIVER_ASSIGNED" || j.status === "IN_PROGRESS";
               const v = j.driver?.vehicles[0];
               return (
                 <motion.li
@@ -248,14 +255,14 @@ function Jobs() {
                         {j.driverAmount != null && <span className="text-dark-500"> · sees {euro(j.driverAmount)}</span>}
                       </p>
                     )}
-                    {(canComplete || j.noShow) && (
+                    {(isLive || j.noShow) && (
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {canComplete && (
+                        {isLive && (
                           <button type="button" onClick={() => setLocating(j)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/[0.1] px-3 text-xs text-dark-200 hover:border-white/20 hover:text-white">
                             <MapPin size={13} /> Live location
                           </button>
                         )}
-                        {canComplete && (
+                        {isLive && (
                           <button type="button" onClick={() => setChatting(j)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/[0.1] px-3 text-xs text-dark-200 hover:border-white/20 hover:text-white">
                             <MessageSquare size={13} /> Chat
                           </button>

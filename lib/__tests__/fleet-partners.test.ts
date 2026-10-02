@@ -229,6 +229,60 @@ describe("fleet partners", () => {
     expect(resets.length).toBe(2);
   });
 
+  /**
+   * A ride cannot end before it starts.
+   *
+   * Completing is not a tidy-up. It stamps rideEndedAt, records the balance
+   * as collected by the driver on a deposit booking, emails the customer to
+   * rate the journey, and moves the payout into the withdrawable balance. On
+   * a pickup that is still a day away every one of those is false, and the
+   * rating request is the one that reaches the customer.
+   */
+  it("refuses to complete a ride that has not happened yet", () => {
+    expect(partner).toContain("const EARLY_GRACE_MS = 60 * 60 * 1000");
+    expect(partner).toMatch(/booking\.pickupDatetime\.getTime\(\) - Date\.now\(\) > EARLY_GRACE_MS/);
+    expect(partner).toMatch(/This ride has not happened yet/);
+  });
+
+  it("does not offer the completed button before the ride is due", () => {
+    const page = rd("app/partner/(panel)/jobs/page.tsx");
+    expect(page).toMatch(/const rideIsDue = new Date\(j\.pickupDatetime\)\.getTime\(\) - Date\.now\(\) <= 60 \* 60 \* 1000/);
+    expect(page).toMatch(/const canComplete = \(j\.status === "DRIVER_ASSIGNED" \|\| j\.status === "IN_PROGRESS"\) && rideIsDue/);
+    // Tracking and chat follow the job, not the completion window.
+    expect(page).toContain("const isLive = ");
+    expect(page).toMatch(/\{\(isLive \|\| j\.noShow\) && \(/);
+  });
+
+  /**
+   * One inbox for a fleet has to work the same on the way in and the way
+   * back. Adding a driver with the company's own address routes their post
+   * there; editing one to the same address used to answer "that email
+   * already has an account".
+   */
+  it("treats the company's own address as a forwarding instruction when editing a driver", () => {
+    const route = rd("app/api/partner/drivers/[id]/route.ts");
+    expect(route).toContain("redirectMailTo");
+    expect(route).toMatch(/email === p\.email\.trim\(\)\.toLowerCase\(\)/);
+    expect(route).toMatch(/partnerId: p\.id/);
+    // Somebody else's address is still refused.
+    expect(route).toMatch(/That email already has an account/);
+  });
+
+  /** Read if suspended, act only while active. */
+  it("lets a suspended company look without letting it dispatch", () => {
+    const writes = [
+      "app/api/partner/jobs/[id]/dispatch/route.ts",
+      "app/api/partner/jobs/[id]/undispatch/route.ts",
+      "app/api/partner/jobs/[id]/complete/route.ts",
+      "app/api/partner/drivers/[id]/route.ts",
+    ];
+    for (const f of writes) {
+      expect(rd(f), `${f} must not allow an inactive company to write`).not.toContain("allowInactive: true");
+    }
+    expect(rd("app/api/partner/jobs/route.ts")).toContain("allowInactive: true");
+    expect(rd("app/api/partner/summary/route.ts")).toContain("allowInactive: true");
+  });
+
   /** A signed-in company on the login form is moved on, not left sitting there. */
   it("sends a signed-in company away from the login form", () => {
     const mw = rd("middleware.ts");

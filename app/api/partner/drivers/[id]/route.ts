@@ -48,11 +48,37 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!driver) return NextResponse.json({ error: "Not one of your drivers" }, { status: 404 });
 
   // A new sign-in address has to be free, and the driver has to be told.
-  const email = d.email?.trim().toLowerCase();
-  const emailChanged = !!email && email !== driver.user.email.toLowerCase();
+  const given = d.email?.trim().toLowerCase();
+  let email = given;
+  let emailChanged = !!email && email !== driver.user.email.toLowerCase();
+
+  /**
+   * Typing the company's own inbox here means "send their post to us".
+   *
+   * Adding a driver already reads it that way - a fleet that runs one inbox
+   * types the same address for every driver, and createPartnerDriver accepts
+   * it as a destination with a generated sign-in identity beside it. Editing
+   * one answered the same gesture with "that email already has an account",
+   * so the same intention worked on the way in and failed on the way back.
+   *
+   * The sign-in address is left alone and the post is redirected instead,
+   * which is what was meant. Any address that is not this company's is still
+   * refused: it belongs to somebody else.
+   */
+  let redirectMailTo: string | null = null;
   if (emailChanged) {
     const taken = await prisma.user.findUnique({ where: { email }, select: { id: true } });
-    if (taken) return NextResponse.json({ error: "That email already has an account" }, { status: 409 });
+    if (taken) {
+      const ownedByThisCompany =
+        email === p.email.trim().toLowerCase() ||
+        (await prisma.driver.findFirst({ where: { userId: taken.id, partnerId: p.id }, select: { id: true } })) !== null;
+      if (!ownedByThisCompany) {
+        return NextResponse.json({ error: "That email already has an account" }, { status: 409 });
+      }
+      redirectMailTo = email!;
+      email = undefined;
+      emailChanged = false;
+    }
   }
 
   const mailToCompany = d.mailToCompany;
@@ -64,7 +90,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ...(d.status ? { status: d.status } : {}),
         ...(d.licenseNumber !== undefined ? { licenseNumber: d.licenseNumber } : {}),
         ...(d.phone ? { whatsappNumber: d.phone } : {}),
-        ...(mailToCompany === undefined ? {} : { notifyEmail: mailToCompany ? p.email.trim().toLowerCase() : null }),
+        // An address this company owns, typed into the email box, is a
+        // forwarding instruction and takes precedence over the checkbox.
+        ...(redirectMailTo
+          ? { notifyEmail: redirectMailTo }
+          : mailToCompany === undefined ? {} : { notifyEmail: mailToCompany ? p.email.trim().toLowerCase() : null }),
       },
     }),
     prisma.user.update({
