@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, CheckCircle2, XCircle, User, Loader2, X, Car, MapPin, Calendar, Phone, Mail, Plane, FileText, Save, UserCheck, Receipt, Trash2, RotateCcw, Clock, CheckCheck, Archive, Plus, Wallet } from "lucide-react";
 import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS, PAYMENT_METHOD_SHORT, type BookingPaymentMethod } from "@/lib/payment-method";
@@ -286,6 +286,10 @@ type MessagingStatus = {
   whatsapp: { configured: boolean; templates: { event: string; template: string | null }[] };
 };
 type SendOutcome = { outcome: "sent" | "skipped" | "failed"; reason?: string };
+type TextHistory = {
+  texts: { status: string; at: string; problem: string | null }[];
+  replies: { at: string; body: string }[];
+};
 
 /**
  * Send this booking to the customer's phone.
@@ -299,6 +303,16 @@ function PhoneSection({ booking }: { booking: Booking }) {
   const [status, setStatus] = useState<MessagingStatus | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [last, setLast] = useState<Record<string, SendOutcome> | null>(null);
+  const [history, setHistory] = useState<TextHistory | null>(null);
+
+  const loadHistory = useCallback(() => {
+    fetch(`/api/admin/bookings/${booking.id}/message`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d) setHistory(d); })
+      .catch(() => {});
+  }, [booking.id]);
+
+  useEffect(() => { loadHistory(); }, [loadHistory]);
 
   useEffect(() => {
     let live = true;
@@ -322,6 +336,8 @@ function PhoneSection({ booking }: { booking: Booking }) {
       if (!res.ok) throw new Error(body.error ?? "Failed");
       const results = body.results as Record<string, SendOutcome>;
       setLast(results);
+      // The receipt arrives a few seconds after the send; look again then.
+      window.setTimeout(loadHistory, 6000);
       const sent = Object.values(results).filter((r) => r.outcome === "sent").length;
       if (sent === channels.length) toast.success("Sent to the customer's phone");
       else if (sent > 0) toast("Sent on some channels, not all. See below.");
@@ -372,6 +388,27 @@ function PhoneSection({ booking }: { booking: Booking }) {
         </p>
       )}
       {dead && <p className="text-xs text-amber-300/80">This booking is cancelled, so it cannot be sent as confirmed.</p>}
+
+      {history && (history.texts.length > 0 || history.replies.length > 0) && (
+        <div className="space-y-2 border-t border-white/[0.06] pt-3 text-xs">
+          {history.texts.map((t, i) => (
+            <p key={i} className="flex flex-wrap gap-x-2">
+              <span className="w-16 flex-shrink-0 text-dark-400">Text</span>
+              <span className={t.status === "delivered" ? "text-emerald-300" : t.status === "undelivered" || t.status === "failed" ? "text-red-300" : "text-amber-300/90"}>
+                {t.status === "delivered" ? "Delivered" : t.status === "undelivered" || t.status === "failed" ? "Not delivered" : "On its way"}
+              </span>
+              <span className="text-dark-500">{new Date(t.at).toLocaleString("en-GB", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+              {t.problem && <span className="w-full pl-[4.5rem] text-red-300/80">{t.problem}</span>}
+            </p>
+          ))}
+          {history.replies.map((r, i) => (
+            <p key={`r${i}`} className="flex gap-2">
+              <span className="w-16 flex-shrink-0 text-gold-400">Replied</span>
+              <span className="text-white">&ldquo;{r.body}&rdquo;</span>
+            </p>
+          ))}
+        </div>
+      )}
 
       {last && (
         <ul className="space-y-1 border-t border-white/[0.06] pt-3 text-xs">

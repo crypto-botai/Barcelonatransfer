@@ -18,6 +18,8 @@ import { BASE_URL } from "@/lib/seo";
  * automatic messages use, so the wording is the same and so is the audit entry.
  */
 
+import { deliveryErrorText } from "@/lib/twilio-webhook";
+
 const schema = z.object({
   channels: z.array(z.enum(["sms", "whatsapp"])).min(1).max(2),
 });
@@ -29,6 +31,47 @@ async function requireAdmin() {
   const u = s.user as { role?: string; id?: string; name?: string };
   if (u.role !== "ADMIN") return null;
   return u;
+}
+
+/**
+ * What has become of the texts to this customer.
+ *
+ * The latest delivery receipt Twilio has reported for a text sent about this
+ * booking, and any replies the customer has sent back, newest first.
+ */
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const admin = await requireAdmin();
+  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+  const rows = await prisma.activityLog.findMany({
+    where: { entity: "Booking", entityId: id, action: { in: ["SMS_DELIVERY", "SMS_REPLY"] } },
+    orderBy: { createdAt: "desc" },
+    take: 40,
+    select: { action: true, details: true, createdAt: true },
+  });
+
+  // One line per text, at the furthest point it reached. Receipts arrive as a
+  // text moves queued, sent, delivered, so the last one per message is the state.
+  const bySid = new Map<string, { status: string; errorCode: string | null; at: Date }>();
+  for (const r of rows) {
+    if (r.action !== "SMS_DELIVERY") continue;
+    const d = r.details as { sid?: string; status?: string; errorCode?: string | null } | null;
+    if (!d?.sid || !d.status || bySid.has(d.sid)) continue;
+    bySid.set(d.sid, { status: d.status, errorCode: d.errorCode ?? null, at: r.createdAt });
+  }
+
+  return NextResponse.json({
+    texts: [...bySid.values()].slice(0, 5).map((t) => ({
+      status: t.status,
+      at: t.at.toISOString(),
+      problem: deliveryErrorText(t.errorCode),
+    })),
+    replies: rows
+      .filter((r) => r.action === "SMS_REPLY")
+      .slice(0, 5)
+      .map((r) => ({ at: r.createdAt.toISOString(), body: (r.details as { body?: string } | null)?.body ?? "" })),
+  });
 }
 
 /** A second send of the same thing inside this window is a double click. */

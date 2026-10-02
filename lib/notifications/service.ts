@@ -161,7 +161,7 @@ ${body}`);
       mark("sms", "skipped", "no phone on booking");
     } else {
       // sendSms never throws; it reports configured / invalid / failed itself.
-      const r = await sendSms(input.phone, text);
+      const r = await sendSms(input.phone, text, { bookingId: input.bookingId });
       mark("sms", r.outcome, r.reason);
     }
   }

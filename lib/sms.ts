@@ -18,6 +18,7 @@
  */
 
 import { toE164 } from "@/lib/phone";
+import { BASE_URL } from "@/lib/seo";
 
 export type SmsOutcome = "sent" | "skipped" | "failed";
 
@@ -108,7 +109,18 @@ const NOT_DELIVERABLE: Record<number, string> = {
 /** Longest text sent in one go: a handful of segments, never an essay. */
 const MAX_CHARS = 480;
 
-export async function sendSms(phone: string | null | undefined, text: string): Promise<SmsResult> {
+export async function sendSms(
+  phone: string | null | undefined,
+  text: string,
+  opts: {
+    /**
+     * The booking this text is about. When given, Twilio is asked to report
+     * back whether the text arrived, to /api/twilio/status, and the report is
+     * filed against this booking so the office can see it.
+     */
+    bookingId?: string | null;
+  } = {},
+): Promise<SmsResult> {
   const sid = process.env.TWILIO_ACCOUNT_SID;
   const token = process.env.TWILIO_AUTH_TOKEN;
   const from = process.env.TWILIO_FROM;
@@ -131,6 +143,11 @@ export async function sendSms(phone: string | null | undefined, text: string): P
   // are set.
   if (service) form.set("MessagingServiceSid", service);
   else form.set("From", from as string);
+  // The delivery receipt. Without it "sent" only means Twilio accepted the
+  // text, which is true of a message to a switched-off phone as well.
+  if (opts.bookingId) {
+    form.set("StatusCallback", `${BASE_URL}/api/twilio/status?booking=${encodeURIComponent(opts.bookingId)}`);
+  }
 
   try {
     const res = await fetch(
