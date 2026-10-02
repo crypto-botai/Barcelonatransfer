@@ -151,6 +151,41 @@ describe("fleet partners", () => {
     expect(partner).toMatch(/\["COMPLETED", "CANCELLED", "REFUNDED", "IN_PROGRESS"\]\.includes\(booking\.status\)/);
   });
 
+  /**
+   * A job with no driver on it needs a driver, whatever the status says.
+   *
+   * Deleting a driver cleared the booking's driverId and left the status at
+   * DRIVER_ASSIGNED. The company's panel renders that as "Dispatched", files
+   * it under Active, and the Dispatch button exists only on Incoming - so a
+   * job whose driver had gone could never be handed to anybody again. The
+   * company could see the ride and had no way to act on it.
+   */
+  it("puts a driverless job back where it can be dispatched", () => {
+    const api = rd("app/api/partner/jobs/route.ts");
+    expect(api).toMatch(/const NEEDS_DRIVER = \{ OR: \[\{ status: "CONFIRMED" as const \}, \{ status: "DRIVER_ASSIGNED" as const, driverId: null \}\] \}/);
+    expect(api).toMatch(/const HAS_DRIVER\s+= \{ status: \{ in: \["DRIVER_ASSIGNED" as const, "IN_PROGRESS" as const\] \}, driverId: \{ not: null \} \}/);
+    // The counts have to agree with the lists, or the tabs lie again.
+    expect(api).toMatch(/where: \{ \.\.\.base, \.\.\.NEEDS_DRIVER \}/);
+    expect(api).toMatch(/where: \{ \.\.\.base, \.\.\.HAS_DRIVER \}/);
+  });
+
+  it("offers the dispatch button on a job whose driver has gone", () => {
+    const page = rd("app/partner/(panel)/jobs/page.tsx");
+    expect(page).toContain("const needsDriver = !j.driver;");
+    expect(page).toMatch(/canDispatch = j\.status === "CONFIRMED" \|\| \(j\.status === "DRIVER_ASSIGNED" && needsDriver\)/);
+    // And the badge stops claiming it is dispatched.
+    expect(page).toMatch(/needsDriver && j\.status === "DRIVER_ASSIGNED" \? "CONFIRMED" : j\.status/);
+  });
+
+  /** Deleting a driver must hand their jobs back, not strand them. */
+  it("returns a deleted driver's jobs to needing a driver", () => {
+    const account = rd("app/api/account/route.ts");
+    const resets = account.match(/status: "DRIVER_ASSIGNED" \},\s*\n\s*data: \{ driverId: null, driverAssignedAt: null, status: "CONFIRMED" \}/g) ?? [];
+    // Once for a company deleting itself with its drivers, once for a driver
+    // deleting their own account.
+    expect(resets.length).toBe(2);
+  });
+
   /** A signed-in company on the login form is moved on, not left sitting there. */
   it("sends a signed-in company away from the login form", () => {
     const mw = rd("middleware.ts");

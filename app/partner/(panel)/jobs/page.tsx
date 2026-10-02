@@ -142,7 +142,12 @@ function Jobs() {
           <AnimatePresence initial={false}>
             {jobs.map((j) => {
               const w = whenParts(j.pickupDatetime);
-              const canDispatch = j.status === "CONFIRMED";
+              // A job with no driver needs one, whatever the status says. A
+              // deleted driver used to leave the status at DRIVER_ASSIGNED,
+              // which read as "Dispatched" and hid the only button that could
+              // put somebody back on it.
+              const needsDriver = !j.driver;
+              const canDispatch = j.status === "CONFIRMED" || (j.status === "DRIVER_ASSIGNED" && needsDriver);
               const canComplete = j.status === "DRIVER_ASSIGNED" || j.status === "IN_PROGRESS";
               const v = j.driver?.vehicles[0];
               return (
@@ -231,7 +236,7 @@ function Jobs() {
                         </p>
                       )}
                     </div>
-                    <Status status={j.status} />
+                    <Status status={needsDriver && j.status === "DRIVER_ASSIGNED" ? "CONFIRMED" : j.status} />
                     {canDispatch && <button type="button" onClick={() => setDispatching(j)} className={primary}>Dispatch</button>}
                     {/*
                       A job already with a driver can still change hands. A car

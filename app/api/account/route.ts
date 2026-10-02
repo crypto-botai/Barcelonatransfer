@@ -37,6 +37,20 @@ export async function DELETE() {
       const drivers = await tx.driver.findMany({ where: { partnerId: user.fleetPartner.id }, select: { id: true, userId: true } });
       const driverIds = drivers.map((d) => d.id);
       const driverUserIds = drivers.map((d) => d.userId);
+      /**
+       * A job whose driver has just gone needs a driver again.
+       *
+       * Clearing driverId without moving the status left the booking saying
+       * DRIVER_ASSIGNED with nobody on it. The company's panel renders that
+       * as "Dispatched", keeps it out of the Incoming tab, and the Dispatch
+       * button only exists on Incoming - so the job could never be given to
+       * anyone again from the panel. unassignPartner a few lines away in
+       * lib/partner.ts already does this correctly.
+       */
+      await tx.booking.updateMany({
+        where: { driverId: { in: driverIds }, status: "DRIVER_ASSIGNED" },
+        data: { driverId: null, driverAssignedAt: null, status: "CONFIRMED" },
+      });
       await tx.booking.updateMany({ where: { driverId: { in: driverIds } }, data: { driverId: null } });
       await tx.booking.updateMany({ where: { partnerId: user.fleetPartner.id }, data: { partnerId: null } });
       await tx.notification.deleteMany({ where: { userId: { in: driverUserIds } } });
@@ -44,6 +58,11 @@ export async function DELETE() {
       await tx.user.deleteMany({ where: { id: { in: driverUserIds } } });
     }
     if (user.driver) {
+      // Same as above: the job goes back to needing a driver, not to limbo.
+      await tx.booking.updateMany({
+        where: { driverId: user.driver.id, status: "DRIVER_ASSIGNED" },
+        data: { driverId: null, driverAssignedAt: null, status: "CONFIRMED" },
+      });
       await tx.booking.updateMany({ where: { driverId: user.driver.id }, data: { driverId: null } });
     }
     // Rows that point at the user without a database relation.

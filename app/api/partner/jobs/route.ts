@@ -12,15 +12,29 @@ export async function GET(req: NextRequest) {
   if (!p) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const scope = req.nextUrl.searchParams.get("scope") ?? "all";
-  const status =
-    scope === "incoming"  ? { in: ["CONFIRMED" as const] } :
-    scope === "active"    ? { in: ["DRIVER_ASSIGNED" as const, "IN_PROGRESS" as const] } :
-    scope === "completed" ? { in: ["COMPLETED" as const] } :
-    scope === "cancelled" ? { in: ["CANCELLED" as const, "REFUNDED" as const] } :
-    undefined;
+
+  /**
+   * "Needs a driver" is about the driver, not only about the status.
+   *
+   * A job can read DRIVER_ASSIGNED with nobody on it, because deleting a
+   * driver used to clear the booking's driverId and leave the status alone.
+   * Such a job showed as "Dispatched", sat under Active, and the Dispatch
+   * button exists only on Incoming - so it could never be handed to anyone.
+   * Asking for a missing driver instead of a particular status puts it back
+   * where it can be dealt with, and repairs the ones already in that state.
+   */
+  const NEEDS_DRIVER = { OR: [{ status: "CONFIRMED" as const }, { status: "DRIVER_ASSIGNED" as const, driverId: null }] };
+  const HAS_DRIVER   = { status: { in: ["DRIVER_ASSIGNED" as const, "IN_PROGRESS" as const] }, driverId: { not: null } };
+
+  const scoped =
+    scope === "incoming"  ? NEEDS_DRIVER :
+    scope === "active"    ? HAS_DRIVER :
+    scope === "completed" ? { status: "COMPLETED" as const } :
+    scope === "cancelled" ? { status: { in: ["CANCELLED" as const, "REFUNDED" as const] } } :
+    {};
 
   const jobs = await prisma.booking.findMany({
-    where: { partnerId: p.id, isDeleted: false, ...(status ? { status } : {}) },
+    where: { partnerId: p.id, isDeleted: false, ...scoped },
     orderBy: { pickupDatetime: scope === "completed" || scope === "cancelled" ? "desc" : "asc" },
     take: 300,
     select: {
@@ -51,8 +65,8 @@ export async function GET(req: NextRequest) {
    */
   const base = { partnerId: p.id, isDeleted: false };
   const [incoming, active, completed, cancelled] = await Promise.all([
-    prisma.booking.count({ where: { ...base, status: "CONFIRMED" } }),
-    prisma.booking.count({ where: { ...base, status: { in: ["DRIVER_ASSIGNED", "IN_PROGRESS"] } } }),
+    prisma.booking.count({ where: { ...base, ...NEEDS_DRIVER } }),
+    prisma.booking.count({ where: { ...base, ...HAS_DRIVER } }),
     prisma.booking.count({ where: { ...base, status: "COMPLETED" } }),
     prisma.booking.count({ where: { ...base, status: { in: ["CANCELLED", "REFUNDED"] } } }),
   ]);
