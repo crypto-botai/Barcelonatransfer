@@ -24,6 +24,7 @@ import { notify } from "@/lib/notifications/service";
 import { sweepFlightDelays } from "@/lib/flights/sweep";
 import { reconcilePendingPayments } from "@/lib/payments/reconcile";
 import { formatPickupDateTime } from "@/lib/datetime";
+import { BASE_URL } from "@/lib/seo";
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "elite-cron-secret";
 
@@ -91,7 +92,10 @@ export async function POST(req: NextRequest) {
       // it is what writes the EmailLog row this loop dedups on.
       await notify({
         event:     "PICKUP_REMINDER",
-        channels:  ["inapp", "whatsapp"],
+        // The text goes with the email and under the same once-only guard: this
+        // block only runs after sendPickupReminder has written its EmailLog row,
+        // so a customer is texted once per booking, not once per hourly run.
+        channels:  ["inapp", "whatsapp", "sms"],
         userId:    b.userId,
         bookingId: b.id,
         phone:     b.guestPhone,
@@ -99,6 +103,7 @@ export async function POST(req: NextRequest) {
           code:  b.confirmationCode,
           when:  formatPickupDateTime(b.pickupDatetime),
           route: b.dropoffAddress ? `${b.pickupAddress} → ${b.dropoffAddress}` : b.pickupAddress,
+          link:  `${BASE_URL}/track/${b.confirmationCode}`,
         },
       });
     } catch (err) {

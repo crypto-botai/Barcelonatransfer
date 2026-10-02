@@ -216,7 +216,7 @@ export async function PATCH(
       // sendDriverAssignedEmail above already handles it.
       await notify({
         event:     "DRIVER_ASSIGNED",
-        channels:  ["inapp", "whatsapp", "push"],
+        channels:  ["inapp", "whatsapp", "push", "sms"],
         userId:    booking.userId,
         bookingId: booking.id,
         phone:     booking.guestPhone,

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { sendPaymentConfirmationEmail, sendAdminNewBookingAlert, sendFailedPaymentEmail } from "@/lib/resend";
-import { sendWhatsAppBookingConfirmation } from "@/lib/whatsapp";
+import { BASE_URL } from "@/lib/seo";
 import { notify } from "@/lib/notifications/service";
 import type { SumUpCheckout } from "@/lib/sumup";
 import { formatPickupDateTime } from "@/lib/datetime";
@@ -144,17 +144,34 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
     if (adminResult.status === "rejected")
       console.error("[payment-completion] admin alert:", adminResult.reason);
 
+    /**
+     * The booking, on the customer's phone: WhatsApp and a text.
+     *
+     * Through notify() rather than a call of its own, so the two share one
+     * audit entry and one rule for what "sent", "skipped" and "failed" mean.
+     * It sits inside the dedup guard above, which is what makes it once per
+     * booking however many of the webhook, the verify poll and the reconcile
+     * cron arrive together. notify() never throws, so a phone that cannot be
+     * reached cannot take the confirmation down with it.
+     *
+     * WhatsApp goes as the approved booking_confirmation template, which works
+     * for a customer who has never messaged us. The text is not sent to a
+     * number with no country code; the audit entry says that is why.
+     */
     if (updated.guestPhone) {
-      try {
-        await sendWhatsAppBookingConfirmation({
-          phone:          updated.guestPhone,
-          bookingRef:     updated.confirmationCode,
-          pickupDatetime: formatPickupDateTime(updated.pickupDatetime),
+      await notify({
+        event:     "BOOKING_CONFIRMED",
+        channels:  ["whatsapp", "sms"],
+        userId:    updated.userId,
+        bookingId: updated.id,
+        phone:     updated.guestPhone,
+        vars: {
+          code:  updated.confirmationCode,
+          when:  formatPickupDateTime(updated.pickupDatetime),
           route,
-        });
-      } catch (waErr) {
-        console.error("[payment-completion] whatsapp:", waErr);
-      }
+          link:  `${BASE_URL}/track/${updated.confirmationCode}`,
+        },
+      });
     }
 
     // In-app copy for the customer portal, plus the audit entry. Email and

@@ -281,6 +281,114 @@ function JourneySection({ booking, onChanged }: { booking: Booking; onChanged: (
  * says when the money arrived. Card-link bookings are marked by the checkout;
  * the button is still here for the day the webhook misses one.
  */
+type MessagingStatus = {
+  sms: { configured: boolean };
+  whatsapp: { configured: boolean; templates: { event: string; template: string | null }[] };
+};
+type SendOutcome = { outcome: "sent" | "skipped" | "failed"; reason?: string };
+
+/**
+ * Send this booking to the customer's phone.
+ *
+ * For the customers the automatic messages do not reach: booked by phone or
+ * WhatsApp and entered by hand, a payment arranged rather than taken online,
+ * or anyone who says it never arrived. Says plainly what is and is not switched
+ * on, because a button that does nothing is worse than no button.
+ */
+function PhoneSection({ booking }: { booking: Booking }) {
+  const [status, setStatus] = useState<MessagingStatus | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [last, setLast] = useState<Record<string, SendOutcome> | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    fetch("/api/admin/messaging").then((r) => (r.ok ? r.json() : null)).then((d) => { if (live) setStatus(d); }).catch(() => {});
+    return () => { live = false; };
+  }, []);
+
+  const dead = booking.status === "CANCELLED" || booking.status === "REFUNDED";
+
+  async function send(channels: ("sms" | "whatsapp")[], label: string) {
+    if (!confirm(`Send this booking to ${booking.guestPhone} by ${label}?`)) return;
+    setBusy(label);
+    setLast(null);
+    try {
+      const res = await fetch(`/api/admin/bookings/${booking.id}/message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channels }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error ?? "Failed");
+      const results = body.results as Record<string, SendOutcome>;
+      setLast(results);
+      const sent = Object.values(results).filter((r) => r.outcome === "sent").length;
+      if (sent === channels.length) toast.success("Sent to the customer's phone");
+      else if (sent > 0) toast("Sent on some channels, not all. See below.");
+      else toast.error("Nothing was sent. See below.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  if (!booking.guestPhone) {
+    return (
+      <section className="glass-card rounded-xl p-4">
+        <h3 className="text-xs uppercase tracking-wider text-dark-400">Send to phone</h3>
+        <p className="mt-2 text-sm text-dark-400">This booking has no phone number.</p>
+      </section>
+    );
+  }
+
+  const smsOn = !!status?.sms.configured;
+  const waOn = !!status?.whatsapp.configured;
+  const btn = "inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/[0.12] px-3 text-xs text-dark-100 transition-colors hover:border-gold-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-40";
+
+  return (
+    <section className="glass-card rounded-xl p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs uppercase tracking-wider text-dark-400">Send to phone</h3>
+        <span className="text-xs text-dark-500">{booking.guestPhone}</span>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <button type="button" disabled={!smsOn || dead || busy !== null} onClick={() => send(["sms"], "text message")} className={btn}>
+          {busy === "text message" ? <Loader2 size={13} className="animate-spin" /> : <Phone size={13} />} Text message
+        </button>
+        <button type="button" disabled={!waOn || dead || busy !== null} onClick={() => send(["whatsapp"], "WhatsApp")} className={btn}>
+          {busy === "WhatsApp" ? <Loader2 size={13} className="animate-spin" /> : <Phone size={13} />} WhatsApp
+        </button>
+        <button type="button" disabled={!(smsOn && waOn) || dead || busy !== null} onClick={() => send(["sms", "whatsapp"], "both")} className={btn}>
+          {busy === "both" ? <Loader2 size={13} className="animate-spin" /> : <Phone size={13} />} Both
+        </button>
+      </div>
+
+      {status && (!smsOn || !waOn) && (
+        <p className="text-xs leading-relaxed text-dark-500">
+          {!smsOn && "Text messages are not switched on yet (Twilio details are missing). "}
+          {!waOn && "WhatsApp is not switched on yet (Meta details are missing)."}
+        </p>
+      )}
+      {dead && <p className="text-xs text-amber-300/80">This booking is cancelled, so it cannot be sent as confirmed.</p>}
+
+      {last && (
+        <ul className="space-y-1 border-t border-white/[0.06] pt-3 text-xs">
+          {Object.entries(last).map(([channel, r]) => (
+            <li key={channel} className="flex gap-2">
+              <span className="w-16 flex-shrink-0 capitalize text-dark-400">{channel === "sms" ? "Text" : "WhatsApp"}</span>
+              <span className={r.outcome === "sent" ? "text-emerald-300" : r.outcome === "skipped" ? "text-amber-300/90" : "text-red-300"}>
+                {r.outcome === "sent" ? "Sent" : r.outcome === "skipped" ? `Not sent: ${r.reason}` : `Failed: ${r.reason}`}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 function PaymentSection({ booking, onChanged }: { booking: Booking; onChanged: () => void }) {
   const [method, setMethod] = useState<BookingPaymentMethod>(booking.paymentMethod ?? "CARD_LINK");
   const [busy, setBusy]     = useState(false);
@@ -721,6 +829,7 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted, onRefres
 
           <PaymentSection booking={booking} onChanged={onSaved} />
           <JourneySection booking={booking} onChanged={onRefresh} />
+          <PhoneSection booking={booking} />
 
           <PartnerSection booking={booking} onChanged={onSaved} />
 

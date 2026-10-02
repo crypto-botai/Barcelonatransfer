@@ -1,5 +1,6 @@
 "use client";
 
+import PhoneField from "@/components/booking/PhoneField";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -140,6 +141,15 @@ export default function NewBookingPage() {
   const [deposit, setDeposit] = useState("");
   const [paid, setPaid]       = useState(false);
   const [sendEmail, setSendEmail] = useState(true);
+  const [sendSms, setSendSms] = useState(true);
+  const [sendWhatsApp, setSendWhatsApp] = useState(true);
+  const [phoneKey, setPhoneKey] = useState(0);
+  const [messaging, setMessaging] = useState<{ sms: { configured: boolean }; whatsapp: { configured: boolean } } | null>(null);
+  useEffect(() => {
+    let live = true;
+    fetch("/api/admin/messaging").then((r) => (r.ok ? r.json() : null)).then((d) => { if (live) setMessaging(d); }).catch(() => {});
+    return () => { live = false; };
+  }, []);
   const [saving, setSaving]   = useState(false);
 
   /** Set when the form was filled from a lead or an unpaid booking. */
@@ -157,6 +167,7 @@ export default function NewBookingPage() {
   // deliberate price: the quote must not overwrite it when the route resolves.
   const applyPrefill = useCallback((p: Prefill) => {
     setName(p.name); setEmail(p.email); setPhone(p.phone);
+    setPhoneKey((k) => k + 1);
     setPickup(p.pickup); setDropoff(p.dropoff);
     setDate(p.date); setTime(p.time);
     setPax(p.pax); setBags(p.bags);
@@ -277,6 +288,8 @@ export default function NewBookingPage() {
           paymentStatus: paid ? "PAID" : "PENDING",
           ...(depositNum > 0 && depositNum < amount ? { depositAmount: depositNum } : {}),
           sendEmail,
+          sendSms: sendSms && !!messaging?.sms.configured,
+          sendWhatsApp: sendWhatsApp && !!messaging?.whatsapp.configured,
           fromBookingId: source?.kind === "unpaid" ? source.bookingId : undefined,
           fromSessionId: source?.kind === "lead"   ? source.sessionId : undefined,
           vehicleCount,
@@ -421,7 +434,14 @@ export default function NewBookingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div><label className={label}>Full name</label><input className={field} value={name} onChange={(e) => setName(e.target.value)} placeholder="Aaron Donovan" /></div>
               <div><label className={label}>Email</label><input className={field} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" /></div>
-              <div><label className={label}>Phone</label><input className={field} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+34 6…" /></div>
+              {/*
+                A country-code picker, not a free text box. Anything typed by hand
+                without one ("07911 123456") cannot be texted or messaged on
+                WhatsApp, and the first sign of that was a confirmation that
+                never arrived. The key remounts it when a prefill supplies a
+                number, because it only reads its initial value once.
+              */}
+              <div><PhoneField key={phoneKey} value={phone} onChange={setPhone} label="Phone" /></div>
             </div>
           </section>
 
@@ -740,6 +760,16 @@ export default function NewBookingPage() {
             <label className="flex items-center gap-2 mt-2 text-sm text-dark-200 cursor-pointer">
               <input type="checkbox" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} className="accent-[#c9a84c]" />
               Email the confirmation to the customer
+            </label>
+            <label className={`flex items-center gap-2 mt-2 text-sm cursor-pointer ${messaging?.sms.configured ? "text-dark-200" : "text-dark-500"}`}>
+              <input type="checkbox" checked={sendSms && !!messaging?.sms.configured} disabled={!messaging?.sms.configured} onChange={(e) => setSendSms(e.target.checked)} className="accent-[#c9a84c]" />
+              Text the confirmation to their phone
+              {messaging && !messaging.sms.configured && <span className="text-xs text-dark-500">(not switched on yet)</span>}
+            </label>
+            <label className={`flex items-center gap-2 mt-2 text-sm cursor-pointer ${messaging?.whatsapp.configured ? "text-dark-200" : "text-dark-500"}`}>
+              <input type="checkbox" checked={sendWhatsApp && !!messaging?.whatsapp.configured} disabled={!messaging?.whatsapp.configured} onChange={(e) => setSendWhatsApp(e.target.checked)} className="accent-[#c9a84c]" />
+              Send the confirmation on WhatsApp
+              {messaging && !messaging.whatsapp.configured && <span className="text-xs text-dark-500">(not switched on yet)</span>}
             </label>
 
             {/* Deposit paid online, balance to the chauffeur. Left blank for

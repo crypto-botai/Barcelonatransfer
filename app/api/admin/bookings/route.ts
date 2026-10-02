@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { type VehicleClass } from "@/types";
 import { sendBookingConfirmation, sendAdminNewBookingAlert } from "@/lib/resend";
+import { notify } from "@/lib/notifications/service";
+import { BASE_URL } from "@/lib/seo";
 import { withUniqueBookingCode } from "@/lib/booking-code";
 import { parsePickupInput, formatPickupDateTime } from "@/lib/datetime";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
@@ -133,6 +135,13 @@ const createSchema = z.object({
   vehicleCount:    z.number().int().min(1).max(10).default(1),
   /** Off to record a booking silently, e.g. one already confirmed on WhatsApp. */
   sendEmail:       z.boolean().default(true),
+  /**
+   * Also put the confirmation on the customer's phone. Off by default so that
+   * nothing that already calls this route starts sending texts it was not
+   * written to send; the admin form turns them on when they are configured.
+   */
+  sendSms:         z.boolean().default(false),
+  sendWhatsApp:    z.boolean().default(false),
   /**
    * An unpaid website booking this one is finishing off.
    *
@@ -582,6 +591,35 @@ export async function POST(req: NextRequest) {
         // They have several rides already; do not sell them another.
         returnUrl: null,
       }).catch(e => console.error("[resend] admin extra ride confirmation:", e)));
+    }
+
+    /**
+     * The confirmation on the customer's phone, for the booking they asked for.
+     *
+     * One message for the journey rather than one per ride, the same as the
+     * money: the extra rides each get their own email, but a text for every leg
+     * of a four-car booking would cost more than it helps. notify() never
+     * throws and records what happened, so a number that cannot be reached
+     * leaves a reason in the audit log and cannot fail the booking.
+     */
+    const phoneChannels = [
+      ...(body.sendSms ? ["sms" as const] : []),
+      ...(body.sendWhatsApp ? ["whatsapp" as const] : []),
+    ];
+    if (phoneChannels.length) {
+      after(() => notify({
+        event:     "BOOKING_CONFIRMED",
+        channels:  phoneChannels,
+        userId:    booking.userId,
+        bookingId: booking.id,
+        phone:     body.guestPhone,
+        vars: {
+          code:  booking.confirmationCode,
+          when:  formatPickupDateTime(pickup),
+          route: body.dropoffAddress ? `${body.pickupAddress} → ${body.dropoffAddress}` : body.pickupAddress,
+          link:  `${BASE_URL}/track/${booking.confirmationCode}`,
+        },
+      }).catch((e) => console.error("[admin create booking] phone confirmation:", e)));
     }
 
     // Notify admin panel (useful if another admin created it)

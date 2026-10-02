@@ -429,7 +429,7 @@ export async function dispatchPartnerJob(partnerId: string, bookingId: string, d
 
   await notify({
     event: "DRIVER_ASSIGNED",
-    channels: ["inapp", "whatsapp", "push"],
+    channels: ["inapp", "whatsapp", "push", "sms"],
     userId: booking.userId,
     bookingId: booking.id,
     phone: booking.guestPhone,

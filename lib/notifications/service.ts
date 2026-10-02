@@ -21,7 +21,11 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { sendWhatsAppText } from "@/lib/whatsapp";
+import { sendWhatsAppText, sendWhatsAppTemplate } from "@/lib/whatsapp";
+import { sendSms } from "@/lib/sms";
+import { toE164 } from "@/lib/phone";
+import { smsTextFor } from "./sms-copy";
+import { whatsappTemplateFor } from "./whatsapp-templates";
 import { sendPushToUser, sendPushToBooking } from "./push";
 import { prisma as db } from "@/lib/prisma";
 import {
@@ -120,13 +124,45 @@ export async function notify(input: NotifyInput): Promise<NotifyResult> {
       mark("whatsapp", "skipped", "no phone on booking");
     } else if (!process.env.WA_PHONE_ID || !process.env.WA_TOKEN) {
       mark("whatsapp", "skipped", "WhatsApp Cloud API not configured");
+    } else if (!toE164(input.phone)) {
+      // Said before sending, so the audit log names the real cause instead of
+      // blaming the 24-hour window for a number that could never be reached.
+      mark("whatsapp", "skipped", "number has no country code");
     } else {
       try {
-        const sent = await sendWhatsAppText(input.phone, `${title}\n\n${body}`);
-        mark("whatsapp", sent ? "sent" : "skipped", sent ? undefined : "outside 24h session window");
+        const template = whatsappTemplateFor(input.event);
+        if (template) {
+          // An approved template reaches a customer at any time. Free text only
+          // reaches one who has written to us in the last day.
+          const r = await sendWhatsAppTemplate(
+            input.phone,
+            template.name,
+            template.fields.map((k) => vars[k]),
+          );
+          mark("whatsapp", r.outcome, r.reason);
+        } else {
+          const sent = await sendWhatsAppText(input.phone, `${title}
+
+${body}`);
+          mark("whatsapp", sent ? "sent" : "skipped", sent ? undefined : "outside 24h session window");
+        }
       } catch (e) {
         mark("whatsapp", "failed", errText(e));
       }
+    }
+  }
+
+  // ---- sms ----------------------------------------------------------------
+  if (channels.includes("sms")) {
+    const text = smsTextFor(input.event, locale, vars);
+    if (!text) {
+      mark("sms", "skipped", "no SMS wording for this event");
+    } else if (!input.phone) {
+      mark("sms", "skipped", "no phone on booking");
+    } else {
+      // sendSms never throws; it reports configured / invalid / failed itself.
+      const r = await sendSms(input.phone, text);
+      mark("sms", r.outcome, r.reason);
     }
   }
 

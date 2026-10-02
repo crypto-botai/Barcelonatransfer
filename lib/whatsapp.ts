@@ -1,21 +1,159 @@
-// WhatsApp Cloud API — sends template messages after successful payment
+// WhatsApp Cloud API.
+//
 // Required env vars: WA_PHONE_ID, WA_TOKEN
-// Template name: "booking_confirmation" must be approved in Meta Business Manager
+// Optional:          WA_ADMIN_NUMBER, WA_TEMPLATE_LANGUAGE, and one
+//                    WA_TEMPLATE_* per message (see lib/notifications/whatsapp-templates.ts)
+//
+// Two kinds of message, and the difference is the whole difficulty:
+//
+//   TEMPLATE  Pre-approved wording with {{1}} {{2}} slots. May be sent to
+//             anyone, at any time. This is what a booking confirmation, a
+//             reminder or a delay notice has to be, because the customer has
+//             usually not messaged us in the last 24 hours.
+//
+//   TEXT      Free wording. Meta only accepts it inside the 24 hours after the
+//             customer last wrote to us; outside that it is rejected.
+//
+// A reminder sent as TEXT therefore works for a customer who happened to
+// message yesterday and silently does not for everybody else.
+
+import { toE164 } from "@/lib/phone";
 
 const WA_API_VERSION = "v21.0";
 
-function toE164(phone: string): string {
-  // Strip everything except digits, then re-add leading +
-  const digits = phone.replace(/\D/g, "");
-  // If it starts with 00, replace with +
-  if (digits.startsWith("00")) return "+" + digits.slice(2);
-  // If already starts with country code (≥10 digits and no leading 0), keep as-is
-  if (digits.length >= 10 && !digits.startsWith("0")) return "+" + digits;
-  // Spanish number starting with 0 → +34
-  if (digits.startsWith("0") && digits.length === 9) return "+34" + digits.slice(1);
-  return "+" + digits;
+export type WhatsAppOutcome = "sent" | "skipped" | "failed";
+
+export interface WhatsAppResult {
+  outcome: WhatsAppOutcome;
+  /** Meta's message id, when it accepted the message. */
+  id?: string;
+  /** Why it was skipped or failed. Safe to show to the office. */
+  reason?: string;
 }
 
+/** True when there is enough configuration to send. */
+export function whatsappConfigured(): boolean {
+  return Boolean(process.env.WA_PHONE_ID && process.env.WA_TOKEN);
+}
+
+/** Meta's error envelope: { error: { code, message, error_data? } }. */
+function parseError(raw: string): { code: number; message: string } {
+  try {
+    const e = (JSON.parse(raw) as { error?: { code?: number; message?: string; error_data?: { details?: string } } }).error;
+    return {
+      code: Number(e?.code ?? 0),
+      message: e?.error_data?.details ?? e?.message ?? raw.slice(0, 200),
+    };
+  } catch {
+    return { code: Number(raw.match(/"code"\s*:\s*(\d+)/)?.[1] ?? 0), message: raw.slice(0, 200) };
+  }
+}
+
+/**
+ * What a Meta error code means for us.
+ *
+ * Most of these are configuration, and the reason says which one, because
+ * "WhatsApp API 400" tells the office nothing about what to fix.
+ */
+function classify(code: number, message: string): { outcome: WhatsAppOutcome; reason: string } {
+  switch (code) {
+    case 131026:
+      return { outcome: "skipped", reason: "that number is not on WhatsApp" };
+    case 131047:
+      return { outcome: "skipped", reason: "outside the 24-hour window and no template was used" };
+    case 190:
+      return { outcome: "failed", reason: "the WhatsApp access token has expired or is invalid (WA_TOKEN)" };
+    case 132001:
+      return { outcome: "failed", reason: "the template does not exist, or is not approved yet, in the language sent" };
+    case 132000:
+      return { outcome: "failed", reason: "the template was sent with the wrong number of fields" };
+    case 132012:
+      return { outcome: "failed", reason: "a template field has the wrong format" };
+    case 131030:
+      return { outcome: "failed", reason: "WhatsApp is in test mode and this number is not on the allowed list" };
+    case 131042:
+      return { outcome: "failed", reason: "the WhatsApp Business account has a payment problem" };
+    default:
+      return { outcome: "failed", reason: `WhatsApp error ${code || "unknown"}: ${message}` };
+  }
+}
+
+async function post(payload: Record<string, unknown>): Promise<WhatsAppResult> {
+  const phoneId = process.env.WA_PHONE_ID;
+  const token = process.env.WA_TOKEN;
+  if (!phoneId || !token) return { outcome: "skipped", reason: "WhatsApp is not configured" };
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/${WA_API_VERSION}/${phoneId}/messages`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ messaging_product: "whatsapp", ...payload }),
+    });
+
+    if (res.ok) {
+      const data = (await res.json().catch(() => ({}))) as { messages?: { id: string }[] };
+      return { outcome: "sent", id: data.messages?.[0]?.id };
+    }
+
+    const { code, message } = parseError(await res.text().catch(() => ""));
+    return classify(code, message);
+  } catch (e) {
+    return { outcome: "failed", reason: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/**
+ * Meta rejects a template field that is empty, has a newline or tab in it, or
+ * has four spaces in a row, with an error that does not say which field. A
+ * booking route or an address can contain any of those, so each one is made
+ * safe here, and an empty one becomes a dash rather than failing the message.
+ */
+export function templateField(value: unknown): string {
+  const s = String(value ?? "")
+    .replace(/[\r\n\t]+/g, ", ")
+    .replace(/ {2,}/g, " ")
+    .trim()
+    .slice(0, 1000);
+  return s || "-";
+}
+
+/**
+ * A pre-approved template, to anyone, at any time.
+ *
+ * Never throws: it returns what happened, and the caller decides how loudly to
+ * say so.
+ */
+export async function sendWhatsAppTemplate(
+  phone: string | null | undefined,
+  template: string,
+  fields: unknown[],
+  language = process.env.WA_TEMPLATE_LANGUAGE || "en",
+): Promise<WhatsAppResult> {
+  if (!whatsappConfigured()) return { outcome: "skipped", reason: "WhatsApp is not configured" };
+
+  const to = toE164(phone);
+  if (!to) return { outcome: "skipped", reason: phone ? "number has no country code" : "no phone number" };
+
+  return post({
+    to,
+    type: "template",
+    template: {
+      name: template,
+      language: { code: language },
+      components: fields.length
+        ? [{ type: "body", parameters: fields.map((f) => ({ type: "text", text: templateField(f) })) }]
+        : [],
+    },
+  });
+}
+
+/**
+ * The booking confirmation, sent after a payment clears.
+ *
+ * Kept for its existing callers. Template name "booking_confirmation" must be
+ * approved in Meta Business Manager with three fields, in this order:
+ * reference, pickup time, route.
+ */
 export async function sendWhatsAppBookingConfirmation({
   phone,
   bookingRef,
@@ -26,97 +164,50 @@ export async function sendWhatsAppBookingConfirmation({
   bookingRef: string;
   pickupDatetime: string;
   route: string;
-}): Promise<void> {
-  const phoneId = process.env.WA_PHONE_ID;
-  const token   = process.env.WA_TOKEN;
-
-  if (!phoneId || !token) {
-    console.warn("[whatsapp] WA_PHONE_ID or WA_TOKEN not set — skipping");
-    return;
-  }
-
-  const e164 = toE164(phone);
-
-  const body = JSON.stringify({
-    messaging_product: "whatsapp",
-    to: e164,
-    type: "template",
-    template: {
-      name: "booking_confirmation",
-      language: { code: "en" },
-      components: [
-        {
-          type: "body",
-          parameters: [
-            { type: "text", text: bookingRef },
-            { type: "text", text: pickupDatetime },
-            { type: "text", text: route },
-          ],
-        },
-      ],
-    },
-  });
-
-  const res = await fetch(
-    `https://graph.facebook.com/${WA_API_VERSION}/${phoneId}/messages`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body,
-    }
-  );
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`WhatsApp API ${res.status}: ${err}`);
-  }
-
-  const data = await res.json() as { messages?: { id: string }[] };
-  console.log("[whatsapp] sent", data.messages?.[0]?.id, "to", e164);
+}): Promise<WhatsAppResult> {
+  const name = process.env.WA_TEMPLATE_BOOKING_CONFIRMED || "booking_confirmation";
+  const result = await sendWhatsAppTemplate(phone, name, [bookingRef, pickupDatetime, route]);
+  if (result.outcome === "sent") console.log("[whatsapp] sent", result.id, "to", toE164(phone));
+  else if (result.outcome === "failed") throw new Error(`WhatsApp: ${result.reason}`);
+  return result;
 }
 
 /**
- * Freeform text message to a customer, used by the shared notification service.
+ * Free text to a customer, used by the shared notification service.
  *
- * The WhatsApp Cloud API only allows freeform messages inside the 24-hour
- * window after the customer's last inbound message. Outside it, Meta rejects
- * the send with error 131047 / 131026. That is an expected, non-exceptional
- * outcome — it means "this customer has not messaged us recently", not "the
- * integration is broken" — so it returns false instead of throwing. Genuine
- * failures (bad token, malformed request) still throw so they surface.
+ * Only accepted inside the 24-hour window after the customer's last inbound
+ * message. Outside it Meta rejects the send, which is an expected outcome and
+ * not a fault, so it returns false rather than throwing. Genuine failures (a
+ * bad token, a malformed request) still throw so they surface.
  *
  * Returns true when WhatsApp accepted the message.
  */
 export async function sendWhatsAppText(phone: string, text: string): Promise<boolean> {
-  const phoneId = process.env.WA_PHONE_ID;
-  const token   = process.env.WA_TOKEN;
-  if (!phoneId || !token) return false;
+  if (!whatsappConfigured()) return false;
+  const to = toE164(phone);
+  if (!to) return false;
 
-  const res = await fetch(
-    `https://graph.facebook.com/${WA_API_VERSION}/${phoneId}/messages`,
-    {
-      method:  "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messaging_product: "whatsapp",
-        to: toE164(phone),
-        type: "text",
-        text: { body: text.slice(0, 4096) },
-      }),
-    },
-  );
+  const result = await post({ to, type: "text", text: { body: text.slice(0, 4096) } });
+  if (result.outcome === "sent") return true;
+  if (result.outcome === "skipped") return false;
+  throw new Error(`WhatsApp: ${result.reason}`);
+}
 
-  if (res.ok) return true;
-
-  const raw = await res.text().catch(() => "");
-  const code = Number(raw.match(/"code"\s*:\s*(\d+)/)?.[1] ?? 0);
-  // 131047 / 131026: re-engagement required, i.e. session window closed.
-  if (code === 131047 || code === 131026) return false;
-
-  throw new Error(`WhatsApp API ${res.status}: ${raw}`);
+/**
+ * The office's own number, as configured.
+ *
+ * Customer numbers are held to the strict rule that a number without its
+ * country is not a number. This one is different: the owner writes it in the
+ * same form as a wa.me link, "34635383712", which is international by
+ * definition and has no plus. Treating that as ambiguous would have switched
+ * the office's own alerts from WhatsApp back to email the moment WhatsApp was
+ * configured, with nothing to say why.
+ */
+export function ownerNumber(raw: string | null | undefined): string | null {
+  const strict = toE164(raw);
+  if (strict) return strict;
+  const digits = String(raw ?? "").replace(/\D/g, "");
+  return digits.length >= 9 ? toE164(`+${digits}`) : null;
 }
 
 /**
@@ -151,11 +242,12 @@ export async function notifyAdmin(
     emailFallback?: boolean;
   } = {},
 ): Promise<void> {
-  const phoneId = process.env.WA_PHONE_ID;
-  const token   = process.env.WA_TOKEN;
-  const adminWA = process.env.WA_ADMIN_NUMBER ?? process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+  // `||`, not `??`: a variable that exists but is empty is how an unset value
+  // usually shows up in a hosting dashboard, and `??` would have let it hide the
+  // number below it.
+  const to = ownerNumber(process.env.WA_ADMIN_NUMBER || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER);
 
-  if (!phoneId || !token || !adminWA) {
+  if (!whatsappConfigured() || !to) {
     if (opts.emailFallback === false) return;
     try {
       const { sendAdminAlertEmail } = await import("@/lib/resend");
@@ -167,22 +259,8 @@ export async function notifyAdmin(
     return;
   }
 
-  const to = toE164(adminWA);
-  const body = JSON.stringify({
-    messaging_product: "whatsapp",
-    to,
-    type: "text",
-    text: { body: text },
-  });
-
-  await fetch(
-    `https://graph.facebook.com/${WA_API_VERSION}/${phoneId}/messages`,
-    {
-      method:  "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body,
-    }
-  ).catch((e) => console.warn("[whatsapp] admin notify failed:", e?.message));
+  const result = await post({ to, type: "text", text: { body: text } });
+  if (result.outcome !== "sent") console.warn("[whatsapp] admin notify:", result.reason);
 }
 
 /**
