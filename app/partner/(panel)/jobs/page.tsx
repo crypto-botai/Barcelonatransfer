@@ -5,7 +5,8 @@ import { collectDue } from "@/lib/checkout-money";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Camera, Check, Loader2, Mail, MapPin, MessageSquare, Phone, Plane, Users, Wallet } from "lucide-react";
+import { Camera, Check, Loader2, Mail, MapPin, MessageSquare, Phone, Plane, Undo2, Users, Wallet } from "lucide-react";
+import { parseBookingMeta, stripMeta } from "@/lib/booking-meta";
 import { ChatSheet, LiveLocationSheet, NoShowSheet } from "@/components/partner/JobTools";
 import toast from "react-hot-toast";
 import { Empty, PageTitle, Sheet, Skeleton, Status, euro, field, ghost, label, primary, vehicleLabel, whenParts } from "@/components/partner/ui";
@@ -53,6 +54,8 @@ function Jobs() {
   const [proof, setProof] = useState<Job | null>(null);
   const [chatting, setChatting] = useState<Job | null>(null);
   const [completing, setCompleting] = useState<string | null>(null);
+  const [detail, setDetail] = useState<Job | null>(null);
+  const [undispatching, setUndispatching] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const r = await fetch(`/api/partner/jobs?scope=${scope}`);
@@ -77,6 +80,20 @@ function Jobs() {
       toast.success("Completed. Payout added to your balance.");
       load();
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); } finally { setCompleting(null); }
+  }
+
+  /** Take the driver back off a job, leaving it waiting for another. */
+  async function undispatch(job: Job) {
+    const who = job.driver?.user.name ?? "the driver";
+    if (!confirm(`Take ${who} off ${job.confirmationCode}? The job goes back to Incoming and can be given to someone else.`)) return;
+    setUndispatching(job.id);
+    try {
+      const r = await fetch(`/api/partner/jobs/${job.id}/undispatch`, { method: "POST" });
+      if (!r.ok) throw new Error((await r.json()).error ?? "Failed");
+      toast.success("Driver taken off. The job is waiting under Incoming.");
+      setDetail(null);
+      load();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); } finally { setUndispatching(null); }
   }
 
   return (
@@ -166,6 +183,17 @@ function Jobs() {
 
                   {/* What */}
                   <div className="min-w-0">
+                    {/*
+                      The row itself opens the full record. Everything below is
+                      the summary a dispatcher scans; the sheet is where the
+                      rest of it lives.
+                    */}
+                    <button
+                      type="button" onClick={() => setDetail(j)}
+                      className="mb-1 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.18em] text-dark-500 transition-colors hover:text-gold-400"
+                    >
+                      Ride details
+                    </button>
                     <p className="truncate text-white">{j.pickupAddress}</p>
                     <p className="truncate text-sm text-dark-400">to {j.dropoffAddress || "as arranged"}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-dark-400">
@@ -180,7 +208,25 @@ function Jobs() {
                         {j.guestEmail && <a href={`mailto:${j.guestEmail}`} className="inline-flex items-center gap-1 truncate text-gold-400/80 hover:underline"><Mail size={12} /> {j.guestEmail}</a>}
                       </p>
                     )}
-                    {j.specialRequests && <p className="mt-1 text-xs text-dark-500">{j.specialRequests}</p>}
+                    {/*
+                      specialRequests carries a [META]{…}[/META] prefix the
+                      booking form writes for its own use. Rendered raw it put
+                      a wall of JSON in front of a dispatcher. Only the
+                      customer's own words belong here; the extras inside the
+                      block are shown as extras, in the detail sheet.
+                    */}
+                    {stripMeta(j.specialRequests) && (
+                      <p className="mt-1 text-xs text-dark-500">{stripMeta(j.specialRequests)}</p>
+                    )}
+                    {parseBookingMeta(j.specialRequests).extras.length > 0 && (
+                      <p className="mt-1 flex flex-wrap gap-1.5">
+                        {parseBookingMeta(j.specialRequests).extras.map((x) => (
+                          <span key={x.id} className="rounded-md border border-white/[0.1] bg-white/[0.03] px-2 py-0.5 text-[11px] text-dark-300">
+                            {x.label}{x.quantity > 1 ? ` x${x.quantity}` : ""}
+                          </span>
+                        ))}
+                      </p>
+                    )}
                     {/*
                       Paid or to collect, stated either way.
                       Only the "collect" case was shown, so a driver on a
@@ -248,10 +294,23 @@ function Jobs() {
                       refuses a job that is IN_PROGRESS, so offering the button
                       then would be a button that always fails.
                     */}
-                    {j.status === "DRIVER_ASSIGNED" && (
-                      <button type="button" onClick={() => setDispatching(j)} className={ghost}>
-                        <Users size={14} /> Change driver
-                      </button>
+                    {j.status === "DRIVER_ASSIGNED" && !needsDriver && (
+                      <>
+                        <button type="button" onClick={() => setDispatching(j)} className={ghost}>
+                          <Users size={14} /> Change driver
+                        </button>
+                        {/*
+                          Undispatch, for when the answer is not yet "this
+                          other driver". A delayed flight at 01:30 is a job
+                          nobody can take until the new time is known.
+                        */}
+                        <button
+                          type="button" onClick={() => undispatch(j)} disabled={undispatching === j.id}
+                          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/[0.06] px-3 text-xs text-amber-200/90 hover:bg-amber-500/[0.12] disabled:opacity-50"
+                        >
+                          {undispatching === j.id ? <Loader2 size={13} className="animate-spin" /> : <Undo2 size={13} />} Undispatch
+                        </button>
+                      </>
                     )}
                     {canComplete && (
                       <button type="button" onClick={() => complete(j)} disabled={completing === j.id} className={ghost}>
@@ -266,6 +325,13 @@ function Jobs() {
         </motion.ul>
       )}
 
+      <DetailSheet
+        job={detail}
+        onClose={() => setDetail(null)}
+        onDispatch={(j) => { setDetail(null); setDispatching(j); }}
+        onUndispatch={undispatch}
+        busy={undispatching}
+      />
       <DispatchSheet job={dispatching} drivers={activeDrivers} onClose={() => setDispatching(null)} onDone={() => { setDispatching(null); load(); }} />
       <LiveLocationSheet job={locating} onClose={() => setLocating(null)} />
       <NoShowSheet job={proof} onClose={() => setProof(null)} />
@@ -359,6 +425,139 @@ function DispatchSheet({ job, drivers, onClose, onDone }: { job: Job | null; dri
           <p className="text-xs text-dark-500">The client receives the chauffeur's name, phone, vehicle and plate under the Elite BCN name. Your company is not mentioned.</p>
         </div>
       )}
+    </Sheet>
+  );
+}
+
+/** One line of the record. */
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex gap-4 border-b border-white/[0.05] py-2.5 last:border-0">
+      <p className="w-32 flex-shrink-0 text-[11px] uppercase tracking-[0.16em] text-dark-500">{label}</p>
+      <div className="min-w-0 flex-1 text-sm text-dark-100">{children}</div>
+    </div>
+  );
+}
+
+/**
+ * The whole ride, in one place.
+ *
+ * The list row is a summary a dispatcher scans at a glance. This is what they
+ * open when they are deciding something: who the customer is and how to reach
+ * them, what was bought, what the driver is owed and what the company keeps,
+ * and the two actions that change who is driving.
+ */
+function DetailSheet({
+  job, onClose, onDispatch, onUndispatch, busy,
+}: {
+  job: Job | null; onClose: () => void;
+  onDispatch: (j: Job) => void; onUndispatch: (j: Job) => void; busy: string | null;
+}) {
+  if (!job) return <Sheet open={false} onClose={onClose} title="Ride"><span /></Sheet>;
+  const meta = parseBookingMeta(job.specialRequests);
+  const notes = stripMeta(job.specialRequests);
+  const w = whenParts(job.pickupDatetime);
+  const v = job.driver?.vehicles?.[0];
+  const needsDriver = !job.driver;
+  const collect = collectDue(job);
+  const margin = job.partnerPayout != null && job.driverAmount != null ? job.partnerPayout - job.driverAmount : null;
+
+  return (
+    <Sheet open onClose={onClose} title={`Ride ${job.confirmationCode}`}>
+      <div className="space-y-6">
+        <div>
+          <p className="font-mono text-[11px] tracking-wider text-gold-400">{job.confirmationCode}</p>
+          <p className="mt-1 font-display text-2xl text-white">{w.time} · {w.day}</p>
+          <div className="mt-2"><Status status={needsDriver && job.status === "DRIVER_ASSIGNED" ? "CONFIRMED" : job.status} /></div>
+        </div>
+
+        <section>
+          <h3 className="mb-1 text-[11px] uppercase tracking-[0.2em] text-dark-500">Journey</h3>
+          <Row label="Pick-up">{job.pickupAddress}</Row>
+          <Row label="Drop-off">{job.dropoffAddress || "As arranged"}</Row>
+          <Row label="Vehicle">{vehicleLabel(job.vehicleClass)}</Row>
+          <Row label="Party">{job.passengers} passengers, {job.luggage} bags</Row>
+          {job.flightNumber && <Row label="Flight">{job.flightNumber}</Row>}
+          {meta.durationHours != null && <Row label="Hours booked">{meta.durationHours}</Row>}
+        </section>
+
+        <section>
+          <h3 className="mb-1 text-[11px] uppercase tracking-[0.2em] text-dark-500">Customer</h3>
+          <Row label="Name">{job.guestName ?? "Not given"}</Row>
+          {job.guestPhone && (
+            <Row label="Phone"><a href={`tel:${job.guestPhone}`} className="text-gold-400 hover:underline">{job.guestPhone}</a></Row>
+          )}
+          {job.guestEmail && (
+            <Row label="Email"><a href={`mailto:${job.guestEmail}`} className="break-all text-gold-400 hover:underline">{job.guestEmail}</a></Row>
+          )}
+          {meta.memberTier && <Row label="Member">{meta.memberTier}</Row>}
+          {notes && <Row label="Their note">{notes}</Row>}
+        </section>
+
+        {meta.extras.length > 0 && (
+          <section>
+            <h3 className="mb-1 text-[11px] uppercase tracking-[0.2em] text-dark-500">Extras the client bought</h3>
+            {meta.extras.map((x) => (
+              <Row key={x.id} label={x.label}>
+                {x.quantity > 1 ? `${x.quantity} x ` : ""}{euro(x.price)}
+              </Row>
+            ))}
+          </section>
+        )}
+
+        <section>
+          <h3 className="mb-1 text-[11px] uppercase tracking-[0.2em] text-dark-500">Money</h3>
+          <Row label="Your payout">
+            <span className="font-display text-lg text-gold-400">{euro(job.partnerPayout)}</span>
+          </Row>
+          {job.driverAmount != null && <Row label="Driver is told">{euro(job.driverAmount)}</Row>}
+          {margin != null && (
+            <Row label="You keep"><span className="text-gold-500/80">{euro(margin)}</span></Row>
+          )}
+          <Row label="At the ride">
+            {collect > 0
+              ? <span className="text-gold-300">Driver collects {euro(collect)} from the client</span>
+              : <span className="text-emerald-300/90">Paid in full online. Nothing to collect.</span>}
+          </Row>
+          {meta.tipAmount > 0 && <Row label="Tip included">{euro(meta.tipAmount)}</Row>}
+        </section>
+
+        <section>
+          <h3 className="mb-1 text-[11px] uppercase tracking-[0.2em] text-dark-500">Driver</h3>
+          {job.driver ? (
+            <>
+              <Row label="Name">{job.driver.user.name ?? "Unnamed"}</Row>
+              {job.driver.user.phone && (
+                <Row label="Phone"><a href={`tel:${job.driver.user.phone}`} className="text-gold-400 hover:underline">{job.driver.user.phone}</a></Row>
+              )}
+              {v && <Row label="Car">{v.make} {v.model} · {v.licensePlate}</Row>}
+            </>
+          ) : (
+            <p className="py-2 text-sm text-dark-400">Nobody is on this job yet.</p>
+          )}
+        </section>
+
+        <div className="flex flex-wrap gap-2 border-t border-white/[0.08] pt-5">
+          {(job.status === "CONFIRMED" || needsDriver) && job.status !== "COMPLETED" && (
+            <button type="button" onClick={() => onDispatch(job)} className={primary}>
+              <Users size={15} /> {needsDriver ? "Assign a driver" : "Dispatch"}
+            </button>
+          )}
+          {job.status === "DRIVER_ASSIGNED" && !needsDriver && (
+            <>
+              <button type="button" onClick={() => onDispatch(job)} className={ghost}>
+                <Users size={14} /> Change driver
+              </button>
+              <button
+                type="button" onClick={() => onUndispatch(job)} disabled={busy === job.id}
+                className="inline-flex h-11 items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/[0.06] px-4 text-sm text-amber-200/90 hover:bg-amber-500/[0.12] disabled:opacity-50"
+              >
+                {busy === job.id ? <Loader2 size={14} className="animate-spin" /> : <Undo2 size={14} />} Undispatch
+              </button>
+            </>
+          )}
+        </div>
+      </div>
     </Sheet>
   );
 }

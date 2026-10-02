@@ -452,6 +452,53 @@ export async function dispatchPartnerJob(partnerId: string, bookingId: string, d
 
 // ─── Completing a job (partner) ──────────────────────────────
 
+/**
+ * Taking a driver back off a job.
+ *
+ * A flight slips, a car breaks down, a driver calls in sick. Until now the
+ * only way out was to dispatch over the top of it, which silently told the
+ * customer their driver had changed without anyone deciding that. This puts
+ * the job back where it started: no driver, waiting under Incoming, ready to
+ * be given to somebody else.
+ *
+ * Refused once the ride is under way. At that point the driver is with the
+ * customer and this is a phone call, not a button.
+ */
+export async function undispatchPartnerJob(partnerId: string, bookingId: string) {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    select: { id: true, partnerId: true, status: true, confirmationCode: true, driverId: true },
+  });
+  if (!booking || booking.partnerId !== partnerId) throw new Error("This job is not assigned to your company");
+  if (booking.status !== "DRIVER_ASSIGNED") {
+    throw new Error(
+      booking.status === "IN_PROGRESS"
+        ? "This ride has already started. Call the driver rather than moving the job."
+        : "Only a job that is waiting with a driver can be taken back.",
+    );
+  }
+
+  const updated = await prisma.booking.update({
+    where: { id: bookingId },
+    data: {
+      driverId: null,
+      driverAssignedAt: null,
+      partnerDispatchedAt: null,
+      status: "CONFIRMED",
+    },
+  });
+
+  await prisma.activityLog.create({
+    data: {
+      adminId: "partner", adminName: "Fleet company",
+      action: "UNDISPATCH_PARTNER_JOB", entity: "BOOKING", entityId: bookingId,
+      details: { confirmationCode: booking.confirmationCode, previousDriverId: booking.driverId } as never,
+    },
+  }).catch(() => {});
+
+  return updated;
+}
+
 export async function completePartnerJob(partnerId: string, bookingId: string) {
   const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
   if (!booking || booking.partnerId !== partnerId) throw new Error("This job is not assigned to your company");

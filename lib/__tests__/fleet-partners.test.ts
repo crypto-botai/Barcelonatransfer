@@ -146,9 +146,52 @@ describe("fleet partners", () => {
    */
   it("lets a company move a dispatched job to another driver", () => {
     const page = rd("app/partner/(panel)/jobs/page.tsx");
-    expect(page).toMatch(/j\.status === "DRIVER_ASSIGNED" && \([\s\S]{0,200}Change driver/);
+    expect(page).toMatch(/j\.status === "DRIVER_ASSIGNED" && !needsDriver && \([\s\S]{0,300}Change driver/);
     // The server still refuses once the ride has started.
     expect(partner).toMatch(/\["COMPLETED", "CANCELLED", "REFUNDED", "IN_PROGRESS"\]\.includes\(booking\.status\)/);
+  });
+
+  /**
+   * Taking a driver back off, which is a different decision from replacing
+   * them. A flight slips at 01:30 and nobody yet knows who will take it;
+   * dispatching over the top would have told the customer their driver had
+   * changed when nobody had decided that.
+   */
+  it("lets a company take a driver back off a job", () => {
+    expect(partner).toContain("export async function undispatchPartnerJob(");
+    // Back to where it started, not into limbo.
+    expect(partner).toMatch(/driverId: null,\s*\n\s*driverAssignedAt: null,\s*\n\s*partnerDispatchedAt: null,\s*\n\s*status: "CONFIRMED"/);
+    // Refused once the car is with the customer.
+    expect(partner).toMatch(/This ride has already started\. Call the driver/);
+    expect(rd("app/api/partner/jobs/[id]/undispatch/route.ts")).toContain("undispatchPartnerJob(p.id, id)");
+    expect(rd("app/partner/(panel)/jobs/page.tsx")).toMatch(/Undispatch/);
+  });
+
+  /**
+   * specialRequests carries a [META]{…}[/META] prefix the booking form writes
+   * for itself. Rendered raw it put a wall of JSON in front of a dispatcher,
+   * including netAmount and memberTier, which are not theirs to read off a
+   * job card.
+   */
+  it("never renders the raw metadata block to a company", () => {
+    const page = rd("app/partner/(panel)/jobs/page.tsx");
+    expect(page).toContain("stripMeta(j.specialRequests)");
+    expect(page).not.toMatch(/\{j\.specialRequests\}/);
+    // The extras inside it are shown as extras instead.
+    expect(page).toContain("parseBookingMeta(j.specialRequests).extras");
+  });
+
+  /** One place that holds the whole ride, and the actions that change it. */
+  it("opens a full ride record with the actions on it", () => {
+    const page = rd("app/partner/(panel)/jobs/page.tsx");
+    expect(page).toContain("function DetailSheet(");
+    expect(page).toMatch(/Ride details/);
+    for (const field of ["Pick-up", "Drop-off", "Vehicle", "Party", "Your payout", "Driver is told", "You keep"]) {
+      expect(page, `detail sheet is missing ${field}`).toContain(`label="${field}"`);
+    }
+    // Both ways out of a dispatch live in the sheet too.
+    expect(page).toMatch(/onDispatch=\{/);
+    expect(page).toMatch(/onUndispatch=\{undispatch\}/);
   });
 
   /**
