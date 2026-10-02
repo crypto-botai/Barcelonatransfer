@@ -7,7 +7,11 @@ import toast from "react-hot-toast";
 import { Empty, PageTitle, Sheet, Skeleton, euro, field, label, primary, whenParts } from "@/components/partner/ui";
 
 type Data = {
-  balance: { totalEarned: number; totalWithdrawn: number; available: number; completedRides: number };
+  balance: {
+    totalEarned: number; totalWithdrawn: number; available: number; completedRides: number;
+    owedToDrivers: number; commission: number;
+    week: { from: string; earned: number; toDrivers: number; commission: number; rides: number };
+  };
   withdrawals: { id: string; amount: number; method: string; bankIban: string | null; bizumPhone: string | null; status: string; createdAt: string; notes: string | null }[];
   ledger: { id: string; confirmationCode: string; pickupAddress: string; dropoffAddress: string; pickupDatetime: string; rideEndedAt: string | null; partnerPayout: number | null; driverAmount: number | null; driver: { user: { name: string | null } } | null }[];
 };
@@ -54,6 +58,51 @@ export default function PartnerPaymentsPage() {
         </section>
       )}
 
+      {/*
+        The week, and the margin.
+
+        Both numbers were already in the data and neither was on the page: a
+        company could see what Elite BCN paid it, but not what it had promised
+        its own drivers against that, and had to work out its own margin.
+      */}
+      {d && (
+        <section className="mt-5 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.06] sm:grid-cols-3">
+          <div className="bg-[#0f0e0b] px-5 py-6">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-dark-500">This week</p>
+            <p className="mt-2 font-display text-[32px] leading-none text-white tabular-nums">{euro(d.balance.week.earned)}</p>
+            <p className="mt-2 text-[11px] leading-relaxed text-dark-400">
+              {d.balance.week.rides} ride{d.balance.week.rides === 1 ? "" : "s"} completed since Monday
+            </p>
+          </div>
+          <div className="bg-[#0f0e0b] px-5 py-6">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-dark-500">Your drivers earned</p>
+            <p className="mt-2 font-display text-[32px] leading-none text-white tabular-nums">{euro(d.balance.week.toDrivers)}</p>
+            <p className="mt-2 text-[11px] leading-relaxed text-dark-400">
+              this week · {euro(d.balance.owedToDrivers)} across every completed ride
+            </p>
+          </div>
+          <div className="bg-[#0f0e0b] px-5 py-6">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-dark-500">Your margin</p>
+            <p className="mt-2 font-display text-[32px] leading-none text-gold-400 tabular-nums">{euro(d.balance.week.commission)}</p>
+            <p className="mt-2 text-[11px] leading-relaxed text-dark-400">
+              this week · {euro(d.balance.commission)} in total
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/*
+        Said plainly rather than left to be discovered: nothing here records a
+        company paying a driver, so the driver figures are everything they have
+        earned, not what is still outstanding.
+      */}
+      {d && d.balance.owedToDrivers > 0 && (
+        <p className="mt-3 text-[11px] leading-relaxed text-dark-500">
+          Driver figures are what your drivers have earned on completed rides. Elite BCN does not track what you have
+          already paid them, so this is a total earned, not an outstanding balance.
+        </p>
+      )}
+
       <div className="mt-8 mb-4 flex gap-1 border-b border-white/[0.08]" role="tablist">
         {(["ledger", "withdrawals"] as const).map((t) => (
           <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`h-11 px-4 text-sm capitalize ${tab === t ? "border-b-2 border-gold-500 text-white" : "text-dark-400 hover:text-white"}`}>
@@ -72,7 +121,19 @@ export default function PartnerPaymentsPage() {
                   <div className="min-w-0">
                     <p className="font-mono text-[11px] tracking-wider text-gold-400">{r.confirmationCode} <span className="ml-2 font-sans text-dark-500">{w.day}</span></p>
                     <p className="truncate text-sm text-white">{r.pickupAddress} <span className="text-dark-500">to</span> {r.dropoffAddress}</p>
-                    <p className="text-xs text-dark-500">{r.driver?.user.name ?? "Driver"}{r.driverAmount != null ? ` · driver paid ${euro(r.driverAmount)}` : ""}</p>
+                    <p className="text-xs text-dark-500">
+                      {r.driver?.user.name ?? "Driver"}
+                      {r.driverAmount != null && (
+                        <>
+                          {" · driver "}{euro(r.driverAmount)}
+                          {r.partnerPayout != null && (
+                            <span className="text-gold-500/70">
+                              {" · you keep "}{euro(r.partnerPayout - r.driverAmount)}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </p>
                   </div>
                   <p className="font-display text-xl text-gold-400 tabular-nums">{euro(r.partnerPayout)}</p>
                 </li>

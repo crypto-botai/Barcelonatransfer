@@ -4,7 +4,7 @@ import { randomBytes } from "crypto";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { collectDue } from "@/lib/deposits";
-import { formatPickupDateTime } from "@/lib/datetime";
+import { formatPickupDateTime, pickupToUtc, BOOKING_TIMEZONE } from "@/lib/datetime";
 import {
   sendDriverAssignedEmail, sendDriverBookingDetailsEmail, sendTemporaryPassword,
   sendPartnerJobEmail, sendAdminPartnerDispatchAlert, sendAdminAlertEmail, sendPartnerConvertedEmail,
@@ -487,24 +487,85 @@ export async function completePartnerJob(partnerId: string, bookingId: string) {
  * happened earns nothing. Withdrawals that are pending or already paid both
  * reduce what is available; only a completed ride replenishes it.
  */
+/**
+ * Midnight on Monday of the current week, in Barcelona.
+ *
+ * The company's week is the one it works, not the one the server happens to
+ * be in. Taken from UTC, a Sunday-night job would fall into the wrong week
+ * twice a year and every job after 22:00 would land a day early. Same clock
+ * as every other time on the site; see lib/datetime.
+ */
+function weekStartMadrid(now = new Date()): Date {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: BOOKING_TIMEZONE,
+    weekday: "short", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(now);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const back = Math.max(0, DAYS.indexOf(get("weekday")));
+  const monday = pickupToUtc(`${get("year")}-${get("month")}-${get("day")}`, "00:00");
+  if (!monday) return new Date(0);
+  return new Date(monday.getTime() - back * 24 * 60 * 60 * 1000);
+}
+
+/**
+ * What the company has earned, what it owes its drivers, and what is left.
+ *
+ * Three figures the panel could not show before, all of them already in the
+ * data: partnerPayout is what Elite BCN pays the company for a job, and
+ * driverAmount is what the company told its own driver they would get. The
+ * difference is the company's margin on that job.
+ *
+ * `owedToDrivers` is a gross total, not a running balance. Nothing records a
+ * company handing cash to a driver, so this is everything the drivers have
+ * earned on completed jobs rather than what is still outstanding. It is
+ * labelled that way in the panel, and a settlement ledger is the thing that
+ * would make it a true balance.
+ */
 export async function partnerBalance(partnerId: string) {
-  const [earned, withdrawn] = await Promise.all([
+  const weekFrom = weekStartMadrid();
+  const completed = { partnerId, status: "COMPLETED" as const, isDeleted: false };
+
+  const [earned, withdrawn, week] = await Promise.all([
     prisma.booking.aggregate({
-      where: { partnerId, status: "COMPLETED", isDeleted: false },
-      _sum: { partnerPayout: true }, _count: true,
+      where: completed,
+      _sum: { partnerPayout: true, driverAmount: true }, _count: true,
     }),
     prisma.partnerWithdrawal.aggregate({
       where: { partnerId, status: { in: ["PENDING", "COMPLETED", "TRANSFERRED"] } },
       _sum: { amount: true },
     }),
+    prisma.booking.aggregate({
+      where: { ...completed, rideEndedAt: { gte: weekFrom } },
+      _sum: { partnerPayout: true, driverAmount: true }, _count: true,
+    }),
   ]);
-  const totalEarned = earned._sum.partnerPayout ?? 0;
+
+  const totalEarned    = earned._sum.partnerPayout ?? 0;
   const totalWithdrawn = withdrawn._sum.amount ?? 0;
+  const owedToDrivers  = earned._sum.driverAmount ?? 0;
+  const weekEarned     = week._sum.partnerPayout ?? 0;
+  const weekToDrivers  = week._sum.driverAmount ?? 0;
+
   return {
-    totalEarned: round2(totalEarned),
+    totalEarned:    round2(totalEarned),
     totalWithdrawn: round2(totalWithdrawn),
-    available: round2(Math.max(0, totalEarned - totalWithdrawn)),
+    available:      round2(Math.max(0, totalEarned - totalWithdrawn)),
     completedRides: earned._count,
+
+    /** Everything the drivers earned on completed jobs. Gross, see above. */
+    owedToDrivers:  round2(owedToDrivers),
+    /** What the company kept: its payout less what it promised its drivers. */
+    commission:     round2(totalEarned - owedToDrivers),
+
+    week: {
+      /** Monday 00:00 Barcelona, as an ISO instant. */
+      from:       weekStartMadrid().toISOString(),
+      earned:     round2(weekEarned),
+      toDrivers:  round2(weekToDrivers),
+      commission: round2(weekEarned - weekToDrivers),
+      rides:      week._count,
+    },
   };
 }
 

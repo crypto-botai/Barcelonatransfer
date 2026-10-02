@@ -151,8 +151,43 @@ describe("fleet partners", () => {
 
   it("a payout counts only once the ride is completed", () => {
     const fn = partner.slice(partner.indexOf("export async function partnerBalance("), partner.indexOf("export async function requestPartnerWithdrawal("));
-    expect(fn).toContain('status: "COMPLETED"');
-    expect(fn).toContain("_sum: { partnerPayout: true }");
+    expect(fn).toContain('status: "COMPLETED" as const');
+    expect(fn).toMatch(/_sum: \{ partnerPayout: true/);
+  });
+
+  /**
+   * What the company keeps, and what its drivers earned.
+   *
+   * partnerPayout is what Elite BCN pays the company for a job; driverAmount
+   * is what the company told its own driver they would get for it. Both were
+   * already stored per booking and neither was ever added up, so a company
+   * could see its payout but not its own margin against it.
+   */
+  it("reports the company's margin and what its drivers earned", () => {
+    const fn = partner.slice(partner.indexOf("export async function partnerBalance("), partner.indexOf("export async function requestPartnerWithdrawal("));
+    expect(fn).toMatch(/_sum: \{ partnerPayout: true, driverAmount: true \}/);
+    expect(fn).toContain("owedToDrivers:");
+    expect(fn).toContain("commission:");
+    // The margin is the difference, never a rate pulled from somewhere else.
+    expect(fn).toMatch(/commission:\s*round2\(totalEarned - owedToDrivers\)/);
+  });
+
+  /** The company's week is the one it works, so Monday is Barcelona's Monday. */
+  it("counts the week from Monday in Barcelona, not from the server's clock", () => {
+    expect(partner).toContain("function weekStartMadrid(");
+    expect(partner).toContain("timeZone: BOOKING_TIMEZONE");
+    expect(partner).toMatch(/week: \{[\s\S]{0,260}commission: round2\(weekEarned - weekToDrivers\)/);
+    // The window is anchored on when the ride actually ended.
+    expect(partner).toMatch(/rideEndedAt: \{ gte: weekFrom \}/);
+  });
+
+  /**
+   * Nothing records a company paying its driver, so the figure is a total
+   * earned rather than an outstanding balance, and the panel has to say so.
+   */
+  it("does not present the driver total as an outstanding balance", () => {
+    const page = rd("app/partner/(panel)/payments/page.tsx");
+    expect(page).toMatch(/total earned, not an outstanding balance/i);
   });
 
   it("a withdrawal cannot exceed the available balance", () => {
