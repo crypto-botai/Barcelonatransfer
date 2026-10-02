@@ -4,7 +4,8 @@ import PhoneField from "@/components/booking/PhoneField";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowLeftRight, Car, Inbox, Loader2, MapPin, Plus, Send, Sparkles, Wallet, X } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, Bell, Car, ClipboardList, Inbox, Loader2, MapPin, Plus, Route, Send, Sparkles, UserRound, Users, Wallet, X } from "lucide-react";
+import Image from "next/image";
 import toast from "react-hot-toast";
 import AddressAutocomplete from "@/components/booking/AddressAutocomplete";
 import { FLEET_TO_DB_CLASS, VEHICLE_CATALOG, EXTRAS_CATALOG, type FleetVehicle } from "@/types";
@@ -55,6 +56,45 @@ function jumpTo(id: string) {
   el.scrollIntoView({ behavior: "smooth", block: "center" });
   el.classList.add("ring-2", "ring-gold-500/60");
   window.setTimeout(() => el.classList.remove("ring-2", "ring-gold-500/60"), 1600);
+}
+
+/**
+ * One numbered step of the form.
+ *
+ * The page was a stack of identical boxes, so nothing said what came first or
+ * how far along the office was. Numbering them, with a line on what each one
+ * is for, turns the same fields into a sequence a person can follow while on
+ * the phone with a customer.
+ */
+function Step({ n, title, hint, icon, optional, children }: {
+  n: number; title: string; hint?: string; icon: React.ReactNode; optional?: boolean; children: React.ReactNode;
+}) {
+  return (
+    <section className="glass-card rounded-2xl overflow-hidden">
+      <header className="flex items-center gap-3 border-b border-white/[0.06] bg-white/[0.015] px-5 py-3.5 sm:px-6">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-gold-500/40 bg-gold-500/10 text-[13px] font-semibold text-gold-300 tabular-nums">{n}</span>
+        <div className="min-w-0 flex-1">
+          <h2 className="flex items-center gap-2 font-display text-lg leading-tight text-white">
+            {title}
+            {optional && <span className="rounded-full border border-white/[0.1] px-2 py-0.5 font-sans text-[10px] uppercase tracking-wider text-dark-400">Optional</span>}
+          </h2>
+          {hint && <p className="mt-0.5 text-[12px] text-dark-400">{hint}</p>}
+        </div>
+        <span className="hidden text-gold-500/60 sm:block">{icon}</span>
+      </header>
+      <div className="px-5 py-5 sm:px-6">{children}</div>
+    </section>
+  );
+}
+
+/** A small titled group inside the price and payment panel. */
+function Group({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="border-t border-white/[0.06] pt-4 first:border-0 first:pt-0">
+      <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-gold-500/80">{icon}{title}</p>
+      {children}
+    </div>
+  );
 }
 
 function TripChip({ active, onClick, label, icon }: {
@@ -336,13 +376,14 @@ export default function NewBookingPage() {
   const label = "block text-[10px] text-gold-500/80 uppercase tracking-[0.15em] font-semibold mb-1.5";
 
   return (
-    <div className="p-4 pt-16 lg:pt-6 lg:p-8 max-w-5xl">
+    <div className="p-4 pt-16 lg:pt-6 lg:p-8 max-w-6xl">
       <Link href="/admin/bookings" className="inline-flex items-center gap-1.5 text-dark-400 hover:text-white text-sm mb-4">
         <ArrowLeft size={14} /> Bookings
       </Link>
-      <div className="mb-5">
-        <h1 className="font-display text-3xl text-white">New booking</h1>
-        <p className="text-dark-400 mt-1">For a customer booking by phone or WhatsApp, or finishing one they started online. Priced the same as the website; the customer receives the confirmation email.</p>
+      <div className="mb-6">
+        <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-500/80">Admin &middot; Bookings</p>
+        <h1 className="font-display text-3xl text-white sm:text-4xl">New booking</h1>
+        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-dark-400">For a customer booking by phone or WhatsApp, or finishing one they started online. Priced the same as the website; the customer receives the confirmation email.</p>
       </div>
 
       {/*
@@ -401,7 +442,7 @@ export default function NewBookingPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_370px] gap-6 items-start">
         <div className="space-y-6">
           {/* Start from something the customer already began */}
           {source ? (
@@ -429,26 +470,37 @@ export default function NewBookingPage() {
           )}
 
           {/* Customer */}
-          <section className="glass-card rounded-2xl p-5">
-            <h2 className="text-white font-medium mb-4">Customer</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div><label className={label}>Full name</label><input className={field} value={name} onChange={(e) => setName(e.target.value)} placeholder="Aaron Donovan" /></div>
-              <div><label className={label}>Email</label><input className={field} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" /></div>
+          <Step n={1} title="Customer" hint="Who is travelling, and how we reach them on the day." icon={<UserRound size={18} />}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><label className={label}>Full name</label><input className={field} value={name} onChange={(e) => setName(e.target.value)} placeholder="Aaron Donovan" autoComplete="off" /></div>
+              <div><label className={label}>Email</label><input className={field} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" autoComplete="off" /></div>
               {/*
                 A country-code picker, not a free text box. Anything typed by hand
                 without one ("07911 123456") cannot be texted or messaged on
                 WhatsApp, and the first sign of that was a confirmation that
                 never arrived. The key remounts it when a prefill supplies a
                 number, because it only reads its initial value once.
+
+                On a row of its own. Squeezed into a third of the row beside the
+                name and the email it had room for the flag and half a digit.
               */}
-              <div><PhoneField key={phoneKey} value={phone} onChange={setPhone} label="Phone" /></div>
+              <div className="sm:col-span-2 sm:max-w-md">
+                <PhoneField
+                  key={phoneKey}
+                  value={phone}
+                  onChange={setPhone}
+                  label="Phone"
+                  compact
+                  labelClassName={label}
+                  hint="Their chauffeur calls this on the day. Enter it without the leading zero."
+                />
+              </div>
             </div>
-          </section>
+          </Step>
 
           {/* Journey */}
-          <section className="glass-card rounded-2xl p-5">
-            <h2 className="text-white font-medium mb-4">Journey</h2>
-            <div className="space-y-3">
+          <Step n={2} title="Route" hint="Pick-up, any stops on the way, drop-off, and when." icon={<Route size={18} />}>
+            <div className="space-y-4">
               <div>
                 <label className={label}>Pick-up</label>
                 <AddressAutocomplete value={pickup.address} onChange={setPickup} placeholder="Airport terminal, hotel, address…" icon={<MapPin size={14} className="text-gold-500" />} />
@@ -496,20 +548,37 @@ export default function NewBookingPage() {
                 <div><label className={label}>Passengers</label><input className={field} type="number" min={1} max={16} value={pax} onChange={(e) => setPax(Math.max(1, parseInt(e.target.value) || 1))} /></div>
                 <div><label className={label}>Bags</label><input className={field} type="number" min={0} max={30} value={bags} onChange={(e) => setBags(Math.max(0, parseInt(e.target.value) || 0))} /></div>
               </div>
+            </div>
+          </Step>
+
+          <Step n={3} title="Vehicle" hint="Choose the car, and how many." icon={<Car size={18} />}>
+            <div className="space-y-4">
               <div>
-                <label className={label}>Vehicle</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {VEHICLE_CATALOG.map((v) => (
-                    <button
-                      key={v.class}
-                      type="button"
-                      onClick={() => setVehicle(v.class)}
-                      className={`text-left rounded-lg border px-3 py-2 transition-colors ${vehicle === v.class ? "border-gold-500 bg-gold-500/10" : "border-white/[0.08] hover:border-white/20"}`}
-                    >
-                      <div className="text-white text-sm">{v.label}</div>
-                      <div className="text-dark-400 text-[11px]">{v.badge} · up to {v.maxPassengers}</div>
-                    </button>
-                  ))}
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
+                  {VEHICLE_CATALOG.map((v) => {
+                    const on = vehicle === v.class;
+                    return (
+                      <button
+                        key={v.class}
+                        type="button"
+                        onClick={() => setVehicle(v.class)}
+                        aria-pressed={on}
+                        className={`group relative overflow-hidden rounded-xl border text-left transition-all duration-200 active:scale-[0.98] ${on ? "border-gold-500 bg-gold-500/[0.08] shadow-[0_0_0_1px_rgba(201,168,76,0.35)]" : "border-white/[0.08] bg-white/[0.02] hover:border-gold-500/30"}`}
+                      >
+                        <div className="relative m-2 aspect-[16/9] overflow-hidden rounded-lg bg-neutral-100">
+                          <Image src={v.image} alt="" fill sizes="(min-width:1280px) 160px, 40vw" className="object-contain transition-transform duration-300 group-hover:scale-105" />
+                        </div>
+                        <div className="px-3 pb-3 pt-1">
+                          <div className="text-sm text-white leading-tight">{v.label}</div>
+                          <div className="mt-1 flex items-center gap-2 text-[11px] text-dark-400">
+                            <span className="text-gold-500/90">{v.badge}</span>
+                            <span className="inline-flex items-center gap-1"><Users size={10} />{v.maxPassengers}</span>
+                          </div>
+                        </div>
+                        {on && <span className="absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full bg-gold-500 text-[11px] font-bold text-black">&#10003;</span>}
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* A group of twenty-four is one journey and four vans. Each
@@ -545,14 +614,23 @@ export default function NewBookingPage() {
                   )}
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-[200px_minmax(0,1fr)] gap-3">
+            </div>
+          </Step>
+
+          <Step n={4} title="Trip details" hint="What the chauffeur needs to know before the day." icon={<ClipboardList size={18} />} optional>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-[200px_minmax(0,1fr)] gap-4">
                 <div><label className={label}>Flight number</label><input className={field} value={flight} onChange={(e) => setFlight(e.target.value)} placeholder="VY8301" /></div>
                 <div><label className={label}>Notes for the chauffeur</label><input className={field} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Child seat, name board text, meeting point…" /></div>
               </div>
 
               {/* The way home. Only a date and a time: the route is the one
                   above, reversed, so there is nothing else to enter. */}
-              <div id="return-journey" className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 transition-shadow">
+            </div>
+          </Step>
+
+          <div id="return-journey" className="glass-card rounded-2xl p-5 sm:p-6 transition-shadow">
+            <div>
                 <label className="flex items-start gap-2.5 cursor-pointer">
                   <input
                     type="checkbox"
@@ -655,16 +733,16 @@ export default function NewBookingPage() {
                   </div>
                 )}
               </div>
-            </div>
-          </section>
+          </div>
 
           <div id="more-rides" className="rounded-2xl transition-shadow">
             <ExtraRides rides={rides} onChange={setRides} defaultVehicle={vehicle} passengers={pax} />
           </div>
         </div>
 
-        {/* Price & payment */}
-        <aside className="glass-card rounded-2xl p-5 space-y-5 lg:sticky lg:top-6">
+        {/* Price & payment: sticky, so the total and the button stay in view. */}
+        <aside className="glass-card rounded-2xl p-5 sm:p-6 space-y-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
+          <Group title="Price" icon={<Sparkles size={11} />}>
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className={`${label} mb-0`}>Price (€)</label>
@@ -733,13 +811,14 @@ export default function NewBookingPage() {
             )}
           </div>
 
-          <div>
+          </Group>
+
+          <Group title="Chauffeur pay" icon={<Car size={11} />}>
             <label className={label}>Driver sees (€, optional)</label>
             <input className={field} type="number" min={0} step="0.5" value={driverAmount} onChange={(e) => setDriverAmount(e.target.value)} placeholder="Leave empty for the usual share" />
-          </div>
+          </Group>
 
-          <div>
-            <label className={label}><Wallet size={11} className="inline mr-1 -mt-0.5" />Payment</label>
+          <Group title="Payment" icon={<Wallet size={11} />}>
             <div className="grid grid-cols-2 gap-2">
               {PAYMENT_METHODS.map((m) => (
                 <button
@@ -757,6 +836,9 @@ export default function NewBookingPage() {
               <input type="checkbox" checked={paid} onChange={(e) => setPaid(e.target.checked)} className="accent-[#c9a84c]" />
               Already paid
             </label>
+          </Group>
+
+          <Group title="Send the confirmation" icon={<Bell size={11} />}>
             <label className="flex items-center gap-2 mt-2 text-sm text-dark-200 cursor-pointer">
               <input type="checkbox" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} className="accent-[#c9a84c]" />
               Email the confirmation to the customer
@@ -774,7 +856,10 @@ export default function NewBookingPage() {
 
             {/* Deposit paid online, balance to the chauffeur. Left blank for
                 the ordinary case where the whole fare is handled one way. */}
-            <div className="mt-4 pt-3 border-t border-white/[0.06]">
+          </Group>
+
+          <Group title="Part payment" icon={<Wallet size={11} />}>
+            <div>
               <label className={label}>Deposit paid online (optional)</label>
               <input
                 className={`${field} [color-scheme:dark]`}
@@ -797,13 +882,13 @@ export default function NewBookingPage() {
                 )
               )}
             </div>
-          </div>
+          </Group>
 
           <button
             type="button"
             onClick={submit}
             disabled={!ready || saving}
-            className="btn-gold w-full py-3 rounded-xl font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="btn-gold w-full py-3.5 rounded-xl font-semibold inline-flex items-center justify-center gap-2 transition-transform active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
             {saving

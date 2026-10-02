@@ -36,6 +36,9 @@ export default function PhoneField({
   placeholder,
   label = "Phone",
   required = true,
+  compact = false,
+  labelClassName,
+  hint,
 }: {
   /** E.164, e.g. "+34612345678". Empty string when unset. */
   value: string;
@@ -43,6 +46,20 @@ export default function PhoneField({
   placeholder?: string;
   label?: string;
   required?: boolean;
+  /**
+   * Same height and corner radius as the plain fields around it.
+   *
+   * The booking form's fields are taller and rounder than the admin's, and the
+   * admin put this one in a third of a row beside two ordinary inputs: the
+   * country button took its natural width and the number was left a sliver,
+   * showing half a digit. Compact is for a form of ordinary inputs; give it a
+   * row of its own as well.
+   */
+  compact?: boolean;
+  /** Replaces the label's style, so it matches the form it sits in. */
+  labelClassName?: string;
+  /** Replaces the line under the field. */
+  hint?: string;
 }) {
   const initial = useMemo(() => splitE164(value || ""), [/* first render only */]); // eslint-disable-line react-hooks/exhaustive-deps
   const [iso, setIso] = useState<string>(initial.iso ?? "ES");
@@ -93,7 +110,7 @@ export default function PhoneField({
 
   return (
     <div ref={wrapRef} className="relative">
-      <label className="text-xs text-dark-400 uppercase tracking-wider block mb-1.5">
+      <label className={labelClassName ?? "text-xs text-dark-400 uppercase tracking-wider block mb-1.5"}>
         {label} {required && "*"}
       </label>
 
@@ -105,7 +122,7 @@ export default function PhoneField({
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-label={`Country code: ${current ? `${current.name} +${current.dial}` : "select"}`}
-          className="input-luxury flex items-center gap-1.5 px-3 py-4 rounded-xl text-sm flex-shrink-0 hover:border-gold-500/40 transition-colors"
+          className={`input-luxury flex items-center gap-1.5 px-3 text-sm flex-shrink-0 hover:border-gold-500/40 transition-colors ${compact ? "py-2.5 rounded-lg" : "py-4 rounded-xl"}`}
         >
           <span className="text-base leading-none">{flagFor(iso)}</span>
           <span className="text-white tabular-nums">+{current?.dial ?? "—"}</span>
@@ -113,7 +130,7 @@ export default function PhoneField({
         </button>
 
         {/* National number */}
-        <div className="relative flex-1">
+        <div className="relative flex-1 min-w-0">
           <Phone size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gold-500/60 pointer-events-none" />
           <input
             required={required}
@@ -125,7 +142,7 @@ export default function PhoneField({
             onBlur={() => setTouched(true)}
             placeholder={placeholder ?? "612 345 678"}
             aria-invalid={showError || undefined}
-            className="input-luxury w-full pl-10 pr-4 py-4 rounded-xl text-sm"
+            className={`input-luxury w-full min-w-0 text-sm ${compact ? "pl-10 pr-3 py-2.5 rounded-lg" : "pl-10 pr-4 py-4 rounded-xl"}`}
           />
         </div>
       </div>
@@ -137,7 +154,7 @@ export default function PhoneField({
       )}
       {!showError && (
         <p className="text-[11px] text-dark-500 mt-1.5">
-          Your driver calls this number on the day. Include it without the leading zero.
+          {hint ?? "Your driver calls this number on the day. Include it without the leading zero."}
         </p>
       )}
 
