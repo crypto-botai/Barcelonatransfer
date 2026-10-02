@@ -5,14 +5,14 @@ import { collectDue } from "@/lib/checkout-money";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Camera, Check, Loader2, MapPin, MessageSquare, Phone, Plane, Users, Wallet } from "lucide-react";
+import { Camera, Check, Loader2, Mail, MapPin, MessageSquare, Phone, Plane, Users, Wallet } from "lucide-react";
 import { ChatSheet, LiveLocationSheet, NoShowSheet } from "@/components/partner/JobTools";
 import toast from "react-hot-toast";
 import { Empty, PageTitle, Sheet, Skeleton, Status, euro, field, ghost, label, primary, vehicleLabel, whenParts } from "@/components/partner/ui";
 
 type Job = {
   id: string; confirmationCode: string; status: string;
-  guestName: string | null; guestPhone: string | null;
+  guestName: string | null; guestPhone: string | null; guestEmail: string | null;
   pickupAddress: string; dropoffAddress: string; pickupDatetime: string;
   pickupLat?: number | null; pickupLng?: number | null; dropoffLat?: number | null; dropoffLng?: number | null;
   passengers: number; luggage: number; vehicleClass: string; flightNumber: string | null; specialRequests: string | null;
@@ -46,6 +46,7 @@ function Jobs() {
   const scope = (SCOPES.some((s) => s.id === params.get("scope")) ? params.get("scope") : "incoming") as Scope;
 
   const [jobs, setJobs] = useState<Job[] | null>(null);
+  const [counts, setCounts] = useState<Record<Scope, number> | null>(null);
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [dispatching, setDispatching] = useState<Job | null>(null);
   const [locating, setLocating] = useState<Job | null>(null);
@@ -55,7 +56,11 @@ function Jobs() {
 
   const load = useCallback(async () => {
     const r = await fetch(`/api/partner/jobs?scope=${scope}`);
-    if (r.ok) setJobs(await r.json());
+    if (r.ok) {
+      const body = await r.json();
+      setJobs(body.jobs);
+      setCounts(body.counts);
+    }
   }, [scope]);
 
   useEffect(() => { setJobs(null); load(); }, [load]);
@@ -88,7 +93,28 @@ function Jobs() {
               onClick={() => router.replace(`/partner/jobs?scope=${s.id}`)}
               className={`relative h-11 whitespace-nowrap px-4 text-sm transition-colors ${active ? "text-white" : "text-dark-400 hover:text-white"}`}
             >
-              {s.label}
+              {/*
+                The count is the point. An empty Incoming tab with no number
+                beside the others reads as an empty portal, and the job, its
+                driver and the dispatch button are one tab away.
+                aria-label carries the meaning so a screen reader does not
+                hear a bare digit.
+              */}
+              <span className="inline-flex items-center gap-2">
+                {s.label}
+                {counts && counts[s.id] > 0 && (
+                  <span
+                    aria-label={`${counts[s.id]} ${s.label.toLowerCase()}`}
+                    className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums ${
+                      s.id === "incoming"
+                        ? "bg-gold-500/20 text-gold-300"
+                        : active ? "bg-white/[0.12] text-white" : "bg-white/[0.06] text-dark-400"
+                    }`}
+                  >
+                    {counts[s.id]}
+                  </span>
+                )}
+              </span>
               {active && <motion.span layoutId="jobs-scope" className="absolute inset-x-2 -bottom-px h-[2px] bg-gold-500" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }} />}
             </button>
           );
@@ -100,7 +126,16 @@ function Jobs() {
       ) : jobs.length === 0 ? (
         <Empty
           title={scope === "incoming" ? "No job is waiting" : `Nothing ${scope}`}
-          body={scope === "incoming" ? "When Elite BCN sends your company a job it appears here, and the contact on your account receives an email." : "Jobs move here as their status changes."}
+          body={
+            // Say where the jobs went. An empty Incoming does not mean an
+            // empty portal, and reading it that way is how a company concludes
+            // the panel cannot dispatch at all.
+            counts && counts.active > 0 && scope === "incoming"
+              ? `Nothing new to dispatch. You have ${counts.active} job${counts.active === 1 ? "" : "s"} already with a driver under Active.`
+              : scope === "incoming"
+                ? "When Elite BCN sends your company a job it appears here, and the contact on your account receives an email."
+                : "Jobs move here as their status changes."
+          }
         />
       ) : (
         <motion.ul className="space-y-3" initial={reduce ? false : "hidden"} animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}>
@@ -133,16 +168,27 @@ function Jobs() {
                       <span>{vehicleLabel(j.vehicleClass)}</span>
                       {j.flightNumber && <span className="inline-flex items-center gap-1"><Plane size={12} /> {j.flightNumber}</span>}
                     </div>
-                    {(j.guestName || j.guestPhone) && (
-                      <p className="mt-2 text-sm text-dark-200">
+                    {(j.guestName || j.guestPhone || j.guestEmail) && (
+                      <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-dark-200">
                         {j.guestName}
-                        {j.guestPhone && <a href={`tel:${j.guestPhone}`} className="ml-2 inline-flex items-center gap-1 text-gold-400 hover:underline"><Phone size={12} /> {j.guestPhone}</a>}
+                        {j.guestPhone && <a href={`tel:${j.guestPhone}`} className="inline-flex items-center gap-1 text-gold-400 hover:underline"><Phone size={12} /> {j.guestPhone}</a>}
+                        {j.guestEmail && <a href={`mailto:${j.guestEmail}`} className="inline-flex items-center gap-1 truncate text-gold-400/80 hover:underline"><Mail size={12} /> {j.guestEmail}</a>}
                       </p>
                     )}
                     {j.specialRequests && <p className="mt-1 text-xs text-dark-500">{j.specialRequests}</p>}
-                    {collectDue(j) > 0 && (
+                    {/*
+                      Paid or to collect, stated either way.
+                      Only the "collect" case was shown, so a driver on a
+                      prepaid job had to infer from silence that there was
+                      nothing to take. Silence is not an instruction.
+                    */}
+                    {collectDue(j) > 0 ? (
                       <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-gold-500/30 bg-gold-500/10 px-2.5 py-1 text-xs text-gold-300">
                         <Wallet size={12} /> Driver collects {euro(collectDue(j))} from the client, cash or card, at the end of the ride
+                      </p>
+                    ) : (
+                      <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/[0.08] px-2.5 py-1 text-xs text-emerald-300/90">
+                        <Wallet size={12} /> Paid in full online. Nothing to collect from the client.
                       </p>
                     )}
                     {j.driver && (
@@ -177,9 +223,31 @@ function Jobs() {
                     <div className="text-left sm:text-right">
                       <p className="text-[10px] uppercase tracking-[0.2em] text-dark-500">Your payout</p>
                       <p className="font-display text-2xl text-gold-400">{euro(j.partnerPayout)}</p>
+                      {/* The margin, where the decision about it is made. */}
+                      {j.partnerPayout != null && j.driverAmount != null && (
+                        <p className="mt-1 text-[11px] leading-tight text-dark-400">
+                          driver {euro(j.driverAmount)} · you keep{" "}
+                          <span className="text-gold-500/80">{euro(j.partnerPayout - j.driverAmount)}</span>
+                        </p>
+                      )}
                     </div>
                     <Status status={j.status} />
                     {canDispatch && <button type="button" onClick={() => setDispatching(j)} className={primary}>Dispatch</button>}
+                    {/*
+                      A job already with a driver can still change hands. A car
+                      breaks down, a driver calls in sick, and the company had
+                      no way to move the job without ringing the office.
+                    */}
+                    {/*
+                      Only while it is still DRIVER_ASSIGNED. dispatchPartnerJob
+                      refuses a job that is IN_PROGRESS, so offering the button
+                      then would be a button that always fails.
+                    */}
+                    {j.status === "DRIVER_ASSIGNED" && (
+                      <button type="button" onClick={() => setDispatching(j)} className={ghost}>
+                        <Users size={14} /> Change driver
+                      </button>
+                    )}
                     {canComplete && (
                       <button type="button" onClick={() => complete(j)} disabled={completing === j.id} className={ghost}>
                         {completing === j.id ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} Completed
@@ -207,7 +275,17 @@ function DispatchSheet({ job, drivers, onClose, onDone }: { job: Job | null; dri
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (job) { setDriverId(""); setAmount(job.partnerPayout != null ? String(job.partnerPayout) : ""); }
+    if (job) {
+      // Re-opening a job that already has a driver keeps what was decided for
+      // it: the current driver selected, and the figure they were told. A
+      // reassignment is usually one of the two changing, not both.
+      setDriverId(job.driver?.id ?? "");
+      setAmount(
+        job.driverAmount != null ? String(job.driverAmount)
+        : job.partnerPayout != null ? String(job.partnerPayout)
+        : "",
+      );
+    }
   }, [job]);
 
   async function submit() {

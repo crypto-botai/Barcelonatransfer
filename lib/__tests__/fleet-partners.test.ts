@@ -97,6 +97,60 @@ describe("fleet partners", () => {
     expect(partner).toMatch(/\|\| existing\.driver\)/);
   });
 
+  /**
+   * An empty tab is not an empty portal.
+   *
+   * A company opened Jobs, landed on Incoming, read "no job is waiting" and
+   * concluded the panel could not dispatch at all. Its one job was already
+   * with a driver, one tab across, with the driver and the controls on it.
+   * Counts on the tabs are what makes that visible without clicking each one.
+   */
+  it("puts a count on every job tab", () => {
+    const api = rd("app/api/partner/jobs/route.ts");
+    expect(api).toMatch(/counts: \{ incoming, active, completed, cancelled \}/);
+    const page = rd("app/partner/(panel)/jobs/page.tsx");
+    expect(page).toContain("counts[s.id]");
+    // A bare digit is not a label.
+    expect(page).toMatch(/aria-label=\{`\$\{counts\[s\.id\]\} \$\{s\.label\.toLowerCase\(\)\}`\}/);
+  });
+
+  it("says where the jobs went when a tab is empty", () => {
+    const page = rd("app/partner/(panel)/jobs/page.tsx");
+    expect(page).toMatch(/already with a driver under Active/);
+  });
+
+  /** The company drives this person, so it gets the means to reach them. */
+  it("gives the company the customer's phone and email", () => {
+    expect(rd("app/api/partner/jobs/route.ts")).toMatch(/guestName: true, guestPhone: true, guestEmail: true/);
+    const page = rd("app/partner/(panel)/jobs/page.tsx");
+    expect(page).toContain("href={`tel:${j.guestPhone}`}");
+    expect(page).toContain("href={`mailto:${j.guestEmail}`}");
+  });
+
+  /** Silence is not an instruction: a prepaid job says so out loud. */
+  it("states the prepaid case as well as the collect case", () => {
+    const page = rd("app/partner/(panel)/jobs/page.tsx");
+    expect(page).toMatch(/Driver collects \{euro\(collectDue\(j\)\)\}/);
+    expect(page).toMatch(/Paid in full online\. Nothing to collect/);
+  });
+
+  /** The margin, shown where the decision about it is made. */
+  it("shows the margin on the job itself", () => {
+    const page = rd("app/partner/(panel)/jobs/page.tsx");
+    expect(page).toMatch(/euro\(j\.partnerPayout - j\.driverAmount\)/);
+  });
+
+  /**
+   * A dispatched job can change hands. dispatchPartnerJob refuses one that is
+   * IN_PROGRESS, so the button is offered only while it would be accepted.
+   */
+  it("lets a company move a dispatched job to another driver", () => {
+    const page = rd("app/partner/(panel)/jobs/page.tsx");
+    expect(page).toMatch(/j\.status === "DRIVER_ASSIGNED" && \([\s\S]{0,200}Change driver/);
+    // The server still refuses once the ride has started.
+    expect(partner).toMatch(/\["COMPLETED", "CANCELLED", "REFUNDED", "IN_PROGRESS"\]\.includes\(booking\.status\)/);
+  });
+
   /** A signed-in company on the login form is moved on, not left sitting there. */
   it("sends a signed-in company away from the login form", () => {
     const mw = rd("middleware.ts");

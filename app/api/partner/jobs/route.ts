@@ -25,7 +25,10 @@ export async function GET(req: NextRequest) {
     take: 300,
     select: {
       id: true, confirmationCode: true, status: true,
-      guestName: true, guestPhone: true,
+      // The company is driving this person. It needs to be able to reach them
+      // without ringing the office, which means the address as well as the
+      // phone: a flight that lands at 01:30 is not a moment to be calling.
+      guestName: true, guestPhone: true, guestEmail: true,
       pickupAddress: true, dropoffAddress: true, pickupDatetime: true,
       pickupLat: true, pickupLng: true, dropoffLat: true, dropoffLng: true,
       passengers: true, luggage: true, vehicleClass: true, flightNumber: true, specialRequests: true,
@@ -38,5 +41,21 @@ export async function GET(req: NextRequest) {
       driver: { select: { id: true, user: { select: { name: true, phone: true } }, vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } } } },
     },
   });
-  return NextResponse.json(jobs);
+  /**
+   * How many jobs sit behind each tab.
+   *
+   * Without these an empty tab is indistinguishable from an empty portal. A
+   * company whose only job was already dispatched opened Incoming, read "no
+   * job is waiting", and concluded the panel could not do any of this - the
+   * job, the driver on it and the dispatch button were all one tab away.
+   */
+  const base = { partnerId: p.id, isDeleted: false };
+  const [incoming, active, completed, cancelled] = await Promise.all([
+    prisma.booking.count({ where: { ...base, status: "CONFIRMED" } }),
+    prisma.booking.count({ where: { ...base, status: { in: ["DRIVER_ASSIGNED", "IN_PROGRESS"] } } }),
+    prisma.booking.count({ where: { ...base, status: "COMPLETED" } }),
+    prisma.booking.count({ where: { ...base, status: { in: ["CANCELLED", "REFUNDED"] } } }),
+  ]);
+
+  return NextResponse.json({ jobs, counts: { incoming, active, completed, cancelled } });
 }
