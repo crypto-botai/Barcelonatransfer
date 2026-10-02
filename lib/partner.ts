@@ -66,7 +66,23 @@ export async function createPartner(input: {
 
   if (existing && input.convertExisting) {
     if (existing.fleetPartner) throw new Error("That account is already a fleet company");
-    if (existing.role !== "CUSTOMER" || existing.driver) throw new Error("Only a customer account can be converted into a company login");
+
+    /**
+     * A PARTNER login with no company row is the account the panel cannot
+     * open, and until now the office could not mend it either: this threw
+     * "only a customer account can be converted", so the one screen that
+     * could have re-attached a company refused to.
+     *
+     * FleetPartner.userId is required and cascades from the user, so the row
+     * cannot be orphaned the other way round. The only way to reach this
+     * state is for the company row to be deleted while its login survives,
+     * and attaching a new one is exactly the repair. A driver or an admin is
+     * still refused: those are different jobs, not a damaged company.
+     */
+    const lostItsCompany = existing.role === "PARTNER";
+    if ((existing.role !== "CUSTOMER" && !lostItsCompany) || existing.driver) {
+      throw new Error("Only a customer account, or a company login that has lost its company record, can be turned into a company login.");
+    }
     const partner = await prisma.$transaction(async (tx) => {
       await tx.user.update({ where: { id: existing.id }, data: { role: "PARTNER", name: input.contactName.trim(), phone: input.phone.trim() } });
       return tx.fleetPartner.create({

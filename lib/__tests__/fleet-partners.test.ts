@@ -79,6 +79,24 @@ describe("fleet partners", () => {
     expect(mw.indexOf('pathname.startsWith("/auth/login")')).toBeGreaterThan(roleRules);
   });
 
+  /**
+   * The office must be able to mend a company login that lost its company.
+   *
+   * FleetPartner.userId is required and cascades from the user, so the row
+   * cannot be orphaned the other way round: the only way to reach this state
+   * is for the company record to be deleted while its login survives. That
+   * login then opens nothing, and the one screen that could re-attach a
+   * company refused it, because the account was already a PARTNER rather than
+   * a customer. Both halves of the trap are closed here.
+   */
+  it("lets the office re-attach a company to a login that lost one", () => {
+    expect(partner).toContain("const lostItsCompany = existing.role === \"PARTNER\"");
+    expect(partner).toMatch(/if \(\(existing\.role !== "CUSTOMER" && !lostItsCompany\) \|\| existing\.driver\)/);
+    // Still refuses a login that already has a company, and a driver.
+    expect(partner).toContain('if (existing.fleetPartner) throw new Error("That account is already a fleet company")');
+    expect(partner).toMatch(/\|\| existing\.driver\)/);
+  });
+
   /** A signed-in company on the login form is moved on, not left sitting there. */
   it("sends a signed-in company away from the login form", () => {
     const mw = rd("middleware.ts");
