@@ -66,12 +66,12 @@ function jumpTo(id: string) {
  * is for, turns the same fields into a sequence a person can follow while on
  * the phone with a customer.
  */
-function Step({ n, title, hint, icon, optional, children }: {
-  n: number; title: string; hint?: string; icon: React.ReactNode; optional?: boolean; children: React.ReactNode;
+function Step({ n, title, hint, icon, optional, raised, children }: {
+  n: number; title: string; hint?: string; icon: React.ReactNode; optional?: boolean; raised?: boolean; children: React.ReactNode;
 }) {
   return (
-    <section className="glass-card rounded-2xl overflow-hidden">
-      <header className="flex items-center gap-3 border-b border-white/[0.06] bg-white/[0.015] px-5 py-3.5 sm:px-6">
+    <section className={`glass-card rounded-2xl ${raised ? "relative z-30" : ""}`}>
+      <header className="flex items-center gap-3 rounded-t-2xl border-b border-white/[0.06] bg-white/[0.015] px-5 py-3.5 sm:px-6">
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-gold-500/40 bg-gold-500/10 text-[13px] font-semibold text-gold-300 tabular-nums">{n}</span>
         <div className="min-w-0 flex-1">
           <h2 className="flex items-center gap-2 font-display text-lg leading-tight text-white">
@@ -470,7 +470,7 @@ export default function NewBookingPage() {
           )}
 
           {/* Customer */}
-          <Step n={1} title="Customer" hint="Who is travelling, and how we reach them on the day." icon={<UserRound size={18} />}>
+          <Step n={1} title="Customer" hint="Who is travelling, and how we reach them on the day." icon={<UserRound size={18} />} raised>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div><label className={label}>Full name</label><input className={field} value={name} onChange={(e) => setName(e.target.value)} placeholder="Aaron Donovan" autoComplete="off" /></div>
               <div><label className={label}>Email</label><input className={field} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" autoComplete="off" /></div>
