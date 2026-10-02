@@ -92,10 +92,10 @@ export async function POST(req: NextRequest) {
       // it is what writes the EmailLog row this loop dedups on.
       await notify({
         event:     "PICKUP_REMINDER",
-        // The text goes with the email and under the same once-only guard: this
-        // block only runs after sendPickupReminder has written its EmailLog row,
-        // so a customer is texted once per booking, not once per hourly run.
-        channels:  ["inapp", "whatsapp", "sms"],
+        // No text. A customer who paid for text alerts gets the confirmation and
+        // the driver's name by text, and nothing else: the reminder goes by
+        // email and in the account.
+        channels:  ["inapp", "whatsapp"],
         userId:    b.userId,
         bookingId: b.id,
         phone:     b.guestPhone,

@@ -259,6 +259,7 @@ export const EXTRAS_CATALOG: ExtraOption[] = [
   { id: "extra_waiting", label: "Extra Waiting (30 min)", description: "Additional waiting time",      price: 25, icon: "⏱️", maxQty: 4, priceLabel: "€25 / 30 min" },
   { id: "pet_transport", label: "Pet Transport",          description: "Travel with your pet",         price: 20, icon: "🐾", maxQty: 2, priceLabel: "€20 each" },
   { id: "multi_stop",    label: "Multiple Stops",         description: "Additional stops en route",    price: 25, icon: "📍", maxQty: 3, priceLabel: "€25 each" },
+  { id: "sms_alerts",    label: "Text Message Alerts",    description: "Two texts only: your booking confirmation and your driver details. Nothing else", price: 0.5, icon: "📱", maxQty: 1, priceLabel: "€0.50" },
   { id: "wheelchair",    label: "Wheelchair Accessible",  description: "Accessible vehicle requested", price: 0,  icon: "♿", maxQty: 1, priceLabel: "On request" },
 ];
 

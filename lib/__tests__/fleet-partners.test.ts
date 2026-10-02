@@ -182,7 +182,7 @@ describe("fleet partners", () => {
     expect(page).not.toMatch(/tipAmount|memberTier|meta\.extras|x\.price/);
     expect(page).not.toMatch(/Tip included|Extras the client bought/);
     expect(route).toMatch(/specialRequests, totalAmount, paymentStatus, paymentMethod, balanceAmount, balancePaidAt, \.\.\.rest/);
-    expect(route).toContain("extras: meta.extras.map((x) => ({ id: x.id, label: x.label, quantity: x.quantity }))");
+    expect(route).toContain("extras: forChauffeur(meta.extras).map((x) => ({ id: x.id, label: x.label, quantity: x.quantity }))");
   });
 
   /** One place that holds the whole ride, and the actions that change it. */

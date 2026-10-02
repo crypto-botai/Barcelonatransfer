@@ -6,7 +6,7 @@ import type { SumUpCheckout } from "@/lib/sumup";
 import { formatPickupDateTime } from "@/lib/datetime";
 import { paidOnline } from "@/lib/deposits";
 import { sendOpenAiConversion } from "@/lib/tracking/openai-conversions";
-import { parseBookingMeta } from "@/lib/booking-meta";
+import { parseBookingMeta, wantsSmsAlerts } from "@/lib/booking-meta";
 
 // Shared by app/api/payments/webhook, app/api/payments/verify, and app/api/cron/payment-reconcile
 // so all three entry points apply the exact same DB + email side-effects for a paid or failed
@@ -161,7 +161,8 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
     if (updated.guestPhone) {
       await notify({
         event:     "BOOKING_CONFIRMED",
-        channels:  ["whatsapp", "sms"],
+        // The text only for a customer who paid for text alerts at checkout.
+        channels:  wantsSmsAlerts(updated.specialRequests) ? ["whatsapp", "sms"] : ["whatsapp"],
         userId:    updated.userId,
         bookingId: updated.id,
         phone:     updated.guestPhone,

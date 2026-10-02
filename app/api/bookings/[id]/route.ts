@@ -9,6 +9,7 @@ import { sendDriverAssignedEmail, sendBookingCancelledEmail, sendDriverBookingDe
 import { notify } from "@/lib/notifications/service";
 import { formatPickupDateTime } from "@/lib/datetime";
 import { driverMailTo } from "@/lib/driver-email";
+import { wantsSmsAlerts } from "@/lib/booking-meta";
 
 export async function GET(
   req: NextRequest,
@@ -216,7 +217,8 @@ export async function PATCH(
       // sendDriverAssignedEmail above already handles it.
       await notify({
         event:     "DRIVER_ASSIGNED",
-        channels:  ["inapp", "whatsapp", "push", "sms"],
+        // A text only for a customer who paid for text alerts at checkout.
+        channels:  wantsSmsAlerts(booking.specialRequests) ? ["inapp", "whatsapp", "push", "sms"] : ["inapp", "whatsapp", "push"],
         userId:    booking.userId,
         bookingId: booking.id,
         phone:     booking.guestPhone,

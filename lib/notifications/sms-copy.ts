@@ -14,16 +14,18 @@
 
 import { render, type Locale, type NotificationEvent } from "./events";
 import { toGsmSafe } from "@/lib/sms";
+import { COMPANY } from "@/lib/company-facts";
 
-/** The events that are worth a text. Everything else stays in-app, email or push. */
-export type SmsEvent = "BOOKING_CONFIRMED" | "PICKUP_REMINDER" | "DRIVER_ASSIGNED" | "FLIGHT_DELAYED";
+/**
+ * The two messages a customer who paid for text alerts gets, and no others.
+ *
+ * Not the reminder and not the flight notice: those go by email and in the
+ * account, and a text for every status change is what the customer said they
+ * did not want when they chose this.
+ */
+export type SmsEvent = "BOOKING_CONFIRMED" | "DRIVER_ASSIGNED";
 
-export const SMS_EVENTS: readonly SmsEvent[] = [
-  "BOOKING_CONFIRMED",
-  "PICKUP_REMINDER",
-  "DRIVER_ASSIGNED",
-  "FLIGHT_DELAYED",
-];
+export const SMS_EVENTS: readonly SmsEvent[] = ["BOOKING_CONFIRMED", "DRIVER_ASSIGNED"];
 
 export function isSmsEvent(event: NotificationEvent): event is SmsEvent {
   return (SMS_EVENTS as readonly string[]).includes(event);
@@ -36,24 +38,27 @@ const COPY: Record<SmsEvent, Record<Locale, string>> = {
     fr: "Elite BCN : transfert {{code}} confirmé pour le {{when}}. {{route}}",
     de: "Elite BCN: Transfer {{code}} am {{when}} bestätigt. {{route}}",
   },
-  PICKUP_REMINDER: {
-    en: "Elite BCN: reminder, pickup {{when}}. {{route}} Ref {{code}}.",
-    es: "Elite BCN: recordatorio, recogida {{when}}. {{route}} Ref {{code}}.",
-    fr: "Elite BCN : rappel, prise en charge {{when}}. {{route}} Réf {{code}}.",
-    de: "Elite BCN: Erinnerung, Abholung {{when}}. {{route}} Ref {{code}}.",
-  },
   DRIVER_ASSIGNED: {
     en: "Elite BCN: {{driver}} will collect you {{when}}. Ref {{code}}.",
     es: "Elite BCN: {{driver}} te recogerá el {{when}}. Ref {{code}}.",
     fr: "Elite BCN : {{driver}} viendra vous chercher le {{when}}. Réf {{code}}.",
     de: "Elite BCN: {{driver}} holt Sie am {{when}} ab. Ref {{code}}.",
   },
-  FLIGHT_DELAYED: {
-    en: "Elite BCN: flight {{flight}} is delayed, new landing {{when}}. Your driver is updated, nothing to do. Ref {{code}}.",
-    es: "Elite BCN: el vuelo {{flight}} va con retraso, nueva llegada {{when}}. Tu conductor está avisado. Ref {{code}}.",
-    fr: "Elite BCN : le vol {{flight}} est retardé, nouvelle arrivée {{when}}. Votre chauffeur est prévenu. Réf {{code}}.",
-    de: "Elite BCN: Flug {{flight}} ist verspätet, neue Landung {{when}}. Ihr Fahrer ist informiert. Ref {{code}}.",
-  },
+};
+
+/**
+ * Said at the end of every text.
+ *
+ * The text comes from a number nobody reads, so a customer who replies to it
+ * is talking to no one at the moment they most want an answer. This sends them
+ * to the line that is staffed, and the number is written without spaces so a
+ * phone makes it tappable.
+ */
+export const NO_REPLY: Record<Locale, string> = {
+  en: `Do not reply to this message. To talk to us, call, text or WhatsApp ${COMPANY.phone}`,
+  es: `No respondas a este mensaje. Para hablar con nosotros, llama, escribe o usa WhatsApp ${COMPANY.phone}`,
+  fr: `Ne repondez pas a ce message. Pour nous parler, appelez, ecrivez ou utilisez WhatsApp ${COMPANY.phone}`,
+  de: `Bitte nicht auf diese Nachricht antworten. Anruf, SMS oder WhatsApp: ${COMPANY.phone}`,
 };
 
 const TRACK_LABEL: Record<Locale, string> = {
@@ -94,6 +99,8 @@ export function smsTextFor(
 
   const body = render(COPY[event][locale] ?? COPY[event].en, safe);
   const link = vars.link ? String(vars.link) : "";
-  const text = link ? `${body} ${TRACK_LABEL[locale] ?? TRACK_LABEL.en}: ${link}` : body;
-  return toGsmSafe(text).trim();
+  const tracked = link ? `${body} ${TRACK_LABEL[locale] ?? TRACK_LABEL.en}: ${link}` : body;
+  // The notice is always last and never clamped: it is the part that says where
+  // to get an answer, and the address above it is what gives way when space is short.
+  return toGsmSafe(`${tracked} ${NO_REPLY[locale] ?? NO_REPLY.en}`).trim();
 }

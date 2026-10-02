@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requirePartner } from "@/lib/partner";
-import { parseBookingMeta, formatExtraNames } from "@/lib/booking-meta";
+import { parseBookingMeta, formatExtraNames, forChauffeur } from "@/lib/booking-meta";
 import { collectDue } from "@/lib/checkout-money";
 
 /**
@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
       // The customer's own words, the extras by name and the stops: what the
       // chauffeur has to act on, with no money in any of it.
       notes: meta.notes || null,
-      extras: meta.extras.map((x) => ({ id: x.id, label: x.label, quantity: x.quantity })),
+      extras: forChauffeur(meta.extras).map((x) => ({ id: x.id, label: x.label, quantity: x.quantity })),
       extrasText: meta.extras.length ? formatExtraNames(meta.extras) : null,
       stops: meta.stops,
       durationHours: meta.durationHours ?? null,

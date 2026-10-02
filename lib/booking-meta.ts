@@ -207,7 +207,35 @@ export function formatExtras(extras: BookingExtraLine[]): string {
  * child seat and stand in arrivals with the name board.
  */
 export function formatExtraNames(extras: BookingExtraLine[]): string {
-  return extras
+  return forChauffeur(extras)
     .map((e) => (e.quantity > 1 ? `${e.label} ×${e.quantity}` : e.label))
     .join(", ");
+}
+
+/** Catalogue id of the paid "text alerts" add-on. */
+export const SMS_ALERTS_ID = "sms_alerts";
+
+/**
+ * Extras that are about the customer's account with us, not about the car.
+ *
+ * Nobody has to bring a text message or an invoice. Listing them for a
+ * chauffeur or fleet company as something to "bring" is noise at best, and for
+ * the invoice line it says what the customer is paying for the paperwork.
+ */
+const OFFICE_ONLY_EXTRAS: readonly string[] = [SMS_ALERTS_ID, "invoice_vat"];
+
+/** The extras a chauffeur has to act on. */
+export function forChauffeur<T extends { id: string }>(extras: readonly T[]): T[] {
+  return extras.filter((e) => !OFFICE_ONLY_EXTRAS.includes(e.id));
+}
+
+/**
+ * Did the customer pay for texts?
+ *
+ * The only thing that decides whether a booking is ever texted automatically.
+ * A text costs real money per message, so it is sent to the customers who chose
+ * and paid for it and to nobody else.
+ */
+export function wantsSmsAlerts(specialRequests?: string | null): boolean {
+  return parseBookingMeta(specialRequests).extras.some((e) => e.id === SMS_ALERTS_ID);
 }

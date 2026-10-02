@@ -36,10 +36,12 @@ export type NotificationEvent = (typeof NOTIFICATION_EVENTS)[number];
 /**
  * `push` is accepted and recorded now; delivery lands with the PWA work.
  *
- * `sms` is a text to the phone number on the booking. It is limited to the
- * events listed in sms-copy.ts: a text costs money per message and nobody wants
- * one for every status change, so an event with no SMS wording sends none even
- * if "sms" is asked for.
+ * `sms` is a text to the phone number on the booking. It is not in any event's
+ * default channels: a text costs money per message, so it is only ever sent to
+ * a customer who bought the text-alerts add-on, by a caller that asks for it.
+ * It is limited to the events listed in sms-copy.ts (the confirmation and the
+ * driver assignment), so an event with no SMS wording sends none even if "sms"
+ * is asked for.
  */
 export type Channel = "inapp" | "email" | "whatsapp" | "push" | "sms";
 
@@ -64,7 +66,7 @@ interface EventDef {
  */
 export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
   BOOKING_CONFIRMED: {
-    channels: ["inapp", "email", "whatsapp", "sms"],
+    channels: ["inapp", "email", "whatsapp"],
     copy: {
       en: { title: "Booking confirmed",          body: "Your transfer {{code}} on {{when}} is confirmed. {{route}}" },
       es: { title: "Reserva confirmada",         body: "Tu traslado {{code}} del {{when}} está confirmado. {{route}}" },
@@ -94,7 +96,7 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
   },
 
   DRIVER_ASSIGNED: {
-    channels: ["inapp", "email", "whatsapp", "sms"],
+    channels: ["inapp", "email", "whatsapp"],
     copy: {
       en: { title: "Your driver is assigned",    body: "{{driver}} will collect you on {{when}}. Booking {{code}}." },
       es: { title: "Conductor asignado",         body: "{{driver}} te recogerá el {{when}}. Reserva {{code}}." },
@@ -104,7 +106,7 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
   },
 
   PICKUP_REMINDER: {
-    channels: ["inapp", "email", "whatsapp", "push", "sms"],
+    channels: ["inapp", "email", "whatsapp", "push"],
     copy: {
       en: { title: "Your transfer is tomorrow",  body: "Pickup {{when}} — {{route}}. Booking {{code}}." },
       es: { title: "Tu traslado es mañana",      body: "Recogida {{when}} — {{route}}. Reserva {{code}}." },
@@ -114,7 +116,7 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
   },
 
   FLIGHT_DELAYED: {
-    channels: ["inapp", "email", "whatsapp", "push", "sms"],
+    channels: ["inapp", "email", "whatsapp", "push"],
     copy: {
       en: { title: "Flight {{flight}} is delayed", body: "New landing time {{when}}. Your driver has been updated — no extra charge, no action needed." },
       es: { title: "El vuelo {{flight}} va con retraso", body: "Nueva hora de llegada {{when}}. Tu conductor ya está avisado — sin coste adicional." },

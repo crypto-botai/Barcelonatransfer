@@ -81,17 +81,17 @@ describe("what the text says", () => {
   it("cuts a long address at a word instead of mid-street", () => {
     const t = smsTextFor("BOOKING_CONFIRMED", "en", { ...VARS, route: "x ".repeat(100) })!;
     expect(t).toContain("...");
-    // The link is last and survives, which is why it is appended after.
-    expect(t.endsWith(VARS.link)).toBe(true);
+    // The link survives, and so does the line saying where to get an answer.
+    expect(t).toContain(VARS.link);
+    expect(t).toContain("+34635383712");
   });
 
-  it("puts the tracking link last, and only when there is one", () => {
-    const withLink = smsTextFor("PICKUP_REMINDER", "en", VARS)!;
-    expect(withLink).toMatch(/Track: https:\/\/www\.elitebcn\.info\/track\/PRB6PY9KU7$/);
+  it("puts the tracking link before the no-reply line, and only when there is one", () => {
+    const withLink = smsTextFor("DRIVER_ASSIGNED", "en", VARS)!;
+    expect(withLink).toMatch(/Track: https:\/\/www\.elitebcn\.info\/track\/PRB6PY9KU7 Do not reply/);
 
-    const without = smsTextFor("PICKUP_REMINDER", "en", { ...VARS, link: "" })!;
+    const without = smsTextFor("DRIVER_ASSIGNED", "en", { ...VARS, link: "" })!;
     expect(without).not.toMatch(/Track/);
-    expect(without.endsWith(":")).toBe(false);
   });
 
   it("names the code and the time, which is what a customer needs from it", () => {
@@ -106,17 +106,16 @@ describe("what the text says", () => {
     }
   });
 
-  it("sends a text on exactly the four events it is switched on for", () => {
-    expect([...SMS_EVENTS].sort()).toEqual(["BOOKING_CONFIRMED", "DRIVER_ASSIGNED", "FLIGHT_DELAYED", "PICKUP_REMINDER"]);
-    for (const event of SMS_EVENTS) {
-      expect(EVENT_DEFS[event].channels, event).toContain("sms");
-    }
-    // And no other event has quietly picked it up.
+  it("sends a text on exactly two events, and on no event by default", () => {
+    expect([...SMS_EVENTS].sort()).toEqual(["BOOKING_CONFIRMED", "DRIVER_ASSIGNED"]);
+    // A text is sent only when a caller asks for it for a customer who paid, so
+    // no event may carry it in its default channels.
     for (const event of Object.keys(EVENT_DEFS) as NotificationEvent[]) {
-      if (!SMS_EVENTS.includes(event as never)) {
-        expect(EVENT_DEFS[event].channels, event).not.toContain("sms");
-      }
+      expect(EVENT_DEFS[event].channels, event).not.toContain("sms");
     }
+    // And the reminder and the flight notice have no wording to send at all.
+    expect(smsTextFor("PICKUP_REMINDER", "en", VARS)).toBeNull();
+    expect(smsTextFor("FLIGHT_DELAYED", "en", VARS)).toBeNull();
   });
 });
 
@@ -325,7 +324,7 @@ describe("the dispatcher, end to end", () => {
 
   it("names a missing country code as the reason, not the 24-hour window", async () => {
     const { notify } = await import("@/lib/notifications/service");
-    const res = await notify({ event: "PICKUP_REMINDER", channels: ["whatsapp", "sms"], phone: "07911 123456", vars: VARS });
+    const res = await notify({ event: "BOOKING_CONFIRMED", channels: ["whatsapp", "sms"], phone: "07911 123456", vars: VARS });
     expect(res.results.whatsapp.outcome).toBe("skipped");
     expect(res.results.whatsapp.reason).toMatch(/country code/);
     expect(res.results.sms.reason).toMatch(/country code/);
@@ -380,7 +379,9 @@ describe("it is sent once, and only to people who should get it", () => {
     expect(email).toBeGreaterThan(guard);
     // The text sits behind the email, so it inherits the guard and the log row.
     expect(phone).toBeGreaterThan(email);
-    expect(cron).toMatch(/channels:\s*\["inapp", "whatsapp", "sms"\]/);
+    // The reminder is not texted: only the confirmation and the driver are.
+    expect(cron).toMatch(/channels:\s*\["inapp", "whatsapp"\]/);
+    expect(cron).not.toMatch(/channels:\s*\[[^\]]*"sms"/);
   });
 
   /** One booking, one confirmation, however many of the three paths race. */

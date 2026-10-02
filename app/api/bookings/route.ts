@@ -21,6 +21,8 @@ import { vatOn, wantsInvoice } from "@/lib/vat";
 import { clampTip } from "@/lib/tips";
 import { paymentPlan, returnDiscountFor, RETURN_DISCOUNT_PERCENT, type PayOption } from "@/lib/deposits";
 import { sanitiseOppref } from "@/lib/tracking/oppref";
+import { toE164 } from "@/lib/phone";
+import { SMS_ALERTS_ID } from "@/lib/booking-meta";
 
 /**
  * Membership tier of whoever is booking.
@@ -153,6 +155,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
     const body    = schema.parse(raw);
+
+    // Text alerts are paid for, so they must be deliverable. A number with no
+    // country code cannot be texted, and charging for a service that then goes
+    // nowhere is worse than asking for the number again.
+    if ((body.extras ?? []).some((e) => e.id === SMS_ALERTS_ID) && !toE164(body.guestPhone)) {
+      return NextResponse.json(
+        { error: "Text alerts need a mobile number with its country code, for example +34 600 000 000." },
+        { status: 422 },
+      );
+    }
 
     // The one conversion in the pipeline. The picker gives a wall-clock date and
     // time with no zone; on a Barcelona website that means Barcelona. Parsing it

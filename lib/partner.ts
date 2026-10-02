@@ -12,6 +12,7 @@ import {
 } from "@/lib/resend";
 import { notify } from "@/lib/notifications/service";
 import { driverMailTo, generateDriverLogin, DRIVER_LOGIN_DOMAIN } from "@/lib/driver-email";
+import { wantsSmsAlerts } from "@/lib/booking-meta";
 
 /**
  * Fleet partner companies.
@@ -429,7 +430,8 @@ export async function dispatchPartnerJob(partnerId: string, bookingId: string, d
 
   await notify({
     event: "DRIVER_ASSIGNED",
-    channels: ["inapp", "whatsapp", "push", "sms"],
+    // A text only for a customer who paid for text alerts at checkout.
+    channels: wantsSmsAlerts(booking.specialRequests) ? ["inapp", "whatsapp", "push", "sms"] : ["inapp", "whatsapp", "push"],
     userId: booking.userId,
     bookingId: booking.id,
     phone: booking.guestPhone,
