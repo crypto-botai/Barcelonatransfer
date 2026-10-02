@@ -172,8 +172,10 @@ describe("several cars on one journey", () => {
 
   /** They booked a transfer, not four of them. */
   it("sends the customer one confirmation for the journey, priced for all the cars", () => {
+    // The single-journey email, and the lines of the combined one.
     expect(api).toContain("totalAmount:      body.totalAmount * body.vehicleCount");
-    expect(api).toContain("totalAmount:      b.ride.totalAmount * b.ride.vehicleCount");
+    expect(api).toContain("fare: body.totalAmount * outboundCars");
+    expect(api).toContain("fare: b.ride.totalAmount * b.ride.vehicleCount");
   });
 
   it("brings as many cars home as went out", () => {
@@ -229,13 +231,18 @@ describe("several rides for one customer", () => {
 
   it("charges the whole lot once, on the first ride", () => {
     expect(api).toContain("extras.reduce((s, r) => s + r.totalAmount * r.vehicleCount, 0)");
-    // And the others say so rather than leaving the customer wondering.
-    expect(api).toContain("nothing to pay for this ride on its own");
+    // And the one email carries that total and the pay button, rather than
+    // leaving the customer wondering whether each ride is charged on its own.
+    expect(api).toMatch(/sendJourneysConfirmation\(\{[\s\S]*?totalAmount: tripTotal/);
   });
 
-  /** Where to be, and how the chauffeur finds you, differs for every journey. */
-  it("sends a confirmation for each, not a list on the first", () => {
-    expect(api).toContain("for (const b of extraBookings)");
+  /**
+   * One email lists every journey, each with its own reference and its own
+   * calendar link, instead of one email per ride with only the first carrying
+   * the payment.
+   */
+  it("lists every ride in one email, each with its own calendar link", () => {
+    expect(api).toContain("...extraBookings.map((b) => ({");
     expect(api).toContain("calendar: calendarLinks({ id: b.id");
   });
 

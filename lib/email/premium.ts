@@ -1848,3 +1848,208 @@ export function recoveredLeadsCard(o: {
     ${sectionSpacer(42)}
   `);
 }
+
+// ─── Several journeys, one confirmation ──────────────────────
+
+/** One journey in a multi-journey confirmation. */
+export interface JourneyLine {
+  /** "Outbound", "Return", "Journey 3". */
+  label: string;
+  confirmationCode: string;
+  date: string;
+  time: string;
+  pickupAddress: string;
+  dropoffAddress: string;
+  vehicle: string;
+  passengers: number;
+  /** What this journey costs, before extras. */
+  fare: number;
+  /** What the customer added to this journey: a child seat, a meet and greet. */
+  extras?: { label: string; quantity: number; price: number }[];
+  calendar?: { google: string; ics: string };
+}
+
+function extrasTotal(j: JourneyLine): number {
+  return (j.extras ?? []).reduce((sum, e) => sum + e.price * e.quantity, 0);
+}
+
+/**
+ * The route as a vertical line with a dot at each end: where from, where to.
+ * Built from table cells because nothing else is dependable in an inbox.
+ */
+function routeLine(from: string, to: string): string {
+  const dot = (filled: boolean) =>
+    `<div style="width:9px;height:9px;margin:6px auto 0 auto;border:2px solid ${GOLD};${filled ? `background-color:${GOLD};` : ""}border-radius:50%;"></div>`;
+  const label = (t: string) =>
+    `<div style="font-family:${SANS};font-size:10px;letter-spacing:2px;text-transform:uppercase;color:${LABEL};">${t}</div>`;
+  const place = (t: string) =>
+    `<div style="font-family:${SANS};font-size:15px;line-height:22px;color:${TITLE};padding-top:3px;">${esc(t)}</div>`;
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr><td style="width:26px;vertical-align:top;">${dot(true)}</td><td style="padding-bottom:4px;">${label("Pick-up")}${place(from)}</td></tr>
+    <tr><td style="width:26px;vertical-align:top;"><div style="width:1px;height:22px;margin:0 auto;background-color:${GOLD_EDGE};"></div></td><td></td></tr>
+    <tr><td style="width:26px;vertical-align:top;">${dot(false)}</td><td>${label("Drop-off")}${place(to)}</td></tr>
+  </table>`;
+}
+
+function journeyCard(n: number, j: JourneyLine): string {
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
+    <tr><td style="padding:18px 22px;border-bottom:1px solid ${RULE};">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td style="width:46px;vertical-align:middle;">
+          <div style="width:36px;height:36px;line-height:36px;text-align:center;background-color:${GOLD};font-family:${SERIF};font-size:18px;color:#15171B;">${n}</div>
+        </td>
+        <td style="vertical-align:middle;">
+          <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${GOLD};">${esc(j.label)}</div>
+          <div style="font-family:${SERIF};font-size:21px;line-height:27px;color:${TITLE};padding-top:3px;">${esc(j.date)}${j.time ? ` &nbsp;&middot;&nbsp; ${esc(j.time)}` : ""}</div>
+        </td>
+        <td style="vertical-align:middle;text-align:right;">
+          <div style="font-family:${SANS};font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:${LABEL};">Reference</div>
+          <div style="font-family:${SERIF};font-size:16px;letter-spacing:3px;color:${GOLD};padding-top:4px;">${esc(j.confirmationCode)}</div>
+        </td>
+      </tr></table>
+    </td></tr>
+    <tr><td style="padding:20px 22px 18px 22px;">
+      ${routeLine(j.pickupAddress, j.dropoffAddress)}
+      <div style="font-family:${SANS};font-size:13px;line-height:20px;color:${TEXT};padding-top:16px;border-top:1px solid ${RULE};margin-top:16px;">
+        ${esc(j.vehicle)} <span style="color:${LABEL};">&nbsp;&middot;&nbsp;</span> ${j.passengers} ${j.passengers === 1 ? "guest" : "guests"}
+      </div>
+    </td></tr>
+    ${j.extras && j.extras.length ? `<tr><td style="padding:16px 22px;border-top:1px solid ${RULE};">
+      <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};padding-bottom:8px;">Extras</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        ${j.extras.map((e) => `<tr>
+          <td style="padding:4px 0;font-family:${SANS};font-size:14px;line-height:21px;color:${TITLE};"><span style="color:${GOLD};">&bull;</span>&nbsp; ${esc(e.label)}${e.quantity > 1 ? ` <span style="color:${LABEL};">&times; ${e.quantity}</span>` : ""}</td>
+          <td style="padding:4px 0;text-align:right;font-family:${SANS};font-size:14px;color:${TEXT};">${e.price * e.quantity > 0 ? `&euro;${(e.price * e.quantity).toFixed(2)}` : "Included"}</td>
+        </tr>`).join("")}
+      </table>
+    </td></tr>` : ""}
+    ${j.calendar ? `<tr><td style="padding:12px 22px;border-top:1px solid ${RULE};font-family:${SANS};font-size:12px;color:${LABEL};">
+      Add to calendar &nbsp;
+      <a href="${j.calendar.google}" style="color:${GOLD};text-decoration:none;">Google</a>
+      <span>&nbsp;&middot;&nbsp;</span>
+      <a href="${j.calendar.ics}" style="color:${GOLD};text-decoration:none;">Apple / Outlook</a>
+    </td></tr>` : ""}
+  </table>`;
+}
+
+/**
+ * Every journey of one booking in a single email.
+ *
+ * A return, a second car, or an extra ride is a booking of its own, with its
+ * own reference and its own chauffeur, and used to arrive as separate emails
+ * or, after payment, not at all. This lists them together: the first thing a
+ * customer reads is how many journeys are reserved, then each one in order,
+ * then what it comes to.
+ */
+export function journeysConfirmationCard(o: {
+  firstName: string;
+  /** "received" before payment is settled, "confirmed" once it is. */
+  stage: "received" | "confirmed";
+  journeys: JourneyLine[];
+  totalAmount: number;
+  payment?: { line: string; payUrl?: string; paid?: boolean };
+  split?: PaymentSplit | null;
+  policy?: { points: string[]; url: string } | null;
+  arrival?: { heading: string; points: string[] } | null;
+  /**
+   * What the total carries beyond the journeys and their extras: VAT, a tip, a
+   * coupon. Shown as one line so the figures above always add up to the total
+   * below, instead of leaving the customer to wonder where the difference went.
+   */
+  adjustment?: { label: string; amount: number } | null;
+}): string {
+  const n = o.journeys.length;
+  const numeral = String(n).padStart(2, "0");
+  const first = o.journeys[0];
+  const last = o.journeys[n - 1];
+  const wa = `https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent(`Hello, my booking references are ${o.journeys.map((j) => j.confirmationCode).join(", ")}`)}`;
+  const intro = n === 2 ? "Both of your journeys are" : `All ${n} of your journeys are`;
+  const verb = o.stage === "confirmed" ? "confirmed" : "reserved";
+
+  return card(`
+    <tr><td style="padding:38px 44px 0 44px;">
+      ${eyebrow(o.stage === "confirmed" ? "Bookings Confirmed" : "Bookings Received")}
+      ${headline(`Thank you, ${esc(o.firstName)}.`)}
+      ${paragraph(`${intro} ${verb}. Each one has its own reference and its own chauffeur, so keep this email: everything you need is below, in the order you will travel.`)}
+    </td></tr>
+
+    ${sectionSpacer(28)}
+    <tr><td style="padding:0 44px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
+        <tr>
+          <td style="padding:22px 0 22px 28px;width:96px;vertical-align:middle;">
+            <div style="font-family:${SERIF};font-size:58px;line-height:58px;color:${GOLD};">${numeral}</div>
+          </td>
+          <td style="padding:22px 28px 22px 12px;vertical-align:middle;">
+            <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">Journeys ${verb}</div>
+            <div style="font-family:${SERIF};font-size:18px;line-height:26px;color:${TITLE};padding-top:6px;">${esc(first.date)}${n > 1 && last.date !== first.date ? ` &nbsp;&rarr;&nbsp; ${esc(last.date)}` : ""}</div>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+
+    ${o.journeys.map((j, i) => `
+      ${sectionSpacer(i === 0 ? 24 : 16)}
+      <tr><td style="padding:0 44px;">${journeyCard(i + 1, j)}</td></tr>
+    `).join("")}
+
+    ${sectionSpacer(28)}
+    <tr><td style="padding:0 44px;">
+      ${detailTable(o.journeys.map((j, i) => `<tr>
+        <td style="padding:13px 18px 13px 0;border-bottom:1px solid ${RULE};vertical-align:top;">
+          <span style="font-family:${SANS};font-size:13px;color:${TEXT};">${i + 1} &nbsp;&middot;&nbsp; ${esc(j.label)}</span>
+          <span style="font-family:${SANS};font-size:12px;letter-spacing:2px;color:${LABEL};">&nbsp;&nbsp;${esc(j.confirmationCode)}</span>
+        </td>
+        <td style="padding:13px 0;border-bottom:1px solid ${RULE};vertical-align:top;text-align:right;">
+          <span style="font-family:${SANS};font-size:14px;color:${TITLE};">&euro;${j.fare.toFixed(2)}</span>
+        </td>
+      </tr>${extrasTotal(j) > 0 ? `<tr>
+        <td style="padding:0 18px 13px 22px;border-bottom:1px solid ${RULE};vertical-align:top;">
+          <span style="font-family:${SANS};font-size:12px;color:${LABEL};">Extras for journey ${i + 1}</span>
+        </td>
+        <td style="padding:0 0 13px 0;border-bottom:1px solid ${RULE};vertical-align:top;text-align:right;">
+          <span style="font-family:${SANS};font-size:13px;color:${TEXT};">&euro;${extrasTotal(j).toFixed(2)}</span>
+        </td>
+      </tr>` : ""}`).join("") + (o.adjustment && Math.abs(o.adjustment.amount) >= 0.01 ? `<tr>
+        <td style="padding:13px 18px 13px 0;border-bottom:1px solid ${RULE};vertical-align:top;">
+          <span style="font-family:${SANS};font-size:13px;color:${TEXT};">${esc(o.adjustment.label)}</span>
+        </td>
+        <td style="padding:13px 0;border-bottom:1px solid ${RULE};vertical-align:top;text-align:right;">
+          <span style="font-family:${SANS};font-size:14px;color:${TITLE};">${o.adjustment.amount < 0 ? "&minus;" : ""}&euro;${Math.abs(o.adjustment.amount).toFixed(2)}</span>
+        </td>
+      </tr>` : ""))}
+    </td></tr>
+    ${sectionSpacer(14)}
+    <tr><td style="padding:0 44px;">${amountBar(
+      `Total, ${n} journeys`,
+      o.totalAmount,
+      o.payment?.paid || o.stage === "confirmed" ? "paid, thank you" : "excl. VAT &amp; tolls",
+    )}</td></tr>
+    ${splitPanel(o.split)}
+    ${arrivalPanel(o.arrival)}
+    ${o.policy ? policyPanel(o.policy.points, o.policy.url) : ""}
+
+    ${o.payment ? `
+      ${sectionSpacer(18)}
+      <tr><td style="padding:0 44px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
+          <tr><td style="padding:20px 24px;${o.payment.payUrl ? "text-align:center;" : ""}">
+            <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">Payment</div>
+            <div style="font-family:${SANS};font-size:14px;line-height:22px;color:${TITLE};padding-top:8px;">${esc(o.payment.line)}</div>
+            ${o.payment.payUrl ? `<div style="padding-top:16px;">${button(o.payment.payUrl, "Pay by Card")}</div>` : ""}
+          </td></tr>
+        </table>
+      </td></tr>
+    ` : ""}
+    ${sectionSpacer(32)}
+
+    <tr><td style="padding:0 44px;text-align:center;">
+      ${button(wa, "Message Our Team")}
+      <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${LABEL};padding-top:18px;">
+        Need to change something? Reply to this email or call
+        <a href="tel:${PHONE_DIGITS}" style="color:${GOLD};text-decoration:none;">${PHONE}</a>.
+      </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}

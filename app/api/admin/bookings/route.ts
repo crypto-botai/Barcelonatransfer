@@ -4,7 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { type VehicleClass } from "@/types";
-import { sendBookingConfirmation, sendAdminNewBookingAlert } from "@/lib/resend";
+import { sendBookingConfirmation, sendJourneysConfirmation, sendAdminNewBookingAlert } from "@/lib/resend";
+import { togetherNote } from "@/lib/journeys";
 import { notify } from "@/lib/notifications/service";
 import { BASE_URL } from "@/lib/seo";
 import { withUniqueBookingCode } from "@/lib/booking-code";
@@ -445,7 +446,7 @@ export async function POST(req: NextRequest) {
           luggage:         seatShare(ride.luggage ?? body.luggage, ride.vehicleCount, 0),
           vehicleClass:    ride.vehicleClass as VehicleClass,
           flightNumber:    ride.flightNumber,
-          specialRequests: ride.specialRequests,
+          specialRequests: togetherNote(booking.confirmationCode, ride.specialRequests),
           baseFare:        ride.totalAmount,
           totalAmount:     ride.totalAmount,
           // The figure the office agreed belongs to the ride it was agreed
@@ -468,7 +469,7 @@ export async function POST(req: NextRequest) {
         },
         made, ride.vehicleCount,
         ride.passengers ?? body.passengers, ride.luggage ?? body.luggage,
-        ride.specialRequests,
+        togetherNote(booking.confirmationCode, ride.specialRequests),
       );
     }
 
@@ -529,8 +530,57 @@ export async function POST(req: NextRequest) {
       },
     }).catch(() => {});
 
-    // Notify customer
-    if (body.sendEmail) after(() => sendBookingConfirmation({
+    /**
+     * One email for the whole arrangement.
+     *
+     * A return, or any extra ride, used to go out as a separate email each, and
+     * the one carrying the payment link named only the first. With more than
+     * one journey they are now listed together, in the order they are travelled,
+     * with one total and one pay button. A single journey keeps its own email.
+     */
+    const multi = !!returnBooking || extraBookings.length > 0;
+    if (body.sendEmail && multi) {
+      const outboundCars = body.vehicleCount;
+      const backCars = body.returnVehicleCount ?? body.vehicleCount;
+      after(() => sendJourneysConfirmation({
+        to:          body.guestEmail,
+        name:        body.guestName,
+        stage:       body.paymentStatus === "PAID" ? "confirmed" : "received",
+        totalAmount: tripTotal,
+        bookingId:   booking.id,
+        logType:     "CONFIRMATION",
+        payment,
+        arrivalFrom: { pickupAddress: body.pickupAddress },
+        journeys: [
+          {
+            role: "outbound", confirmationCode: booking.confirmationCode,
+            pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress || "",
+            at: pickup, vehicleClass: body.vehicleClass, passengers: body.passengers,
+            fare: body.totalAmount * outboundCars,
+            calendar: calendarLinks({ id: booking.id, confirmationCode: booking.confirmationCode, pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupDatetime: pickup }),
+          },
+          ...(returnBooking && back ? [{
+            role: "return" as const, confirmationCode: returnBooking.confirmationCode,
+            // Reversed, which is what the customer is expecting to read.
+            pickupAddress: body.returnPickupAddress || body.dropoffAddress || body.pickupAddress,
+            dropoffAddress: body.returnDropoffAddress || body.pickupAddress,
+            at: back, vehicleClass: body.vehicleClass, passengers: body.passengers,
+            fare: returnFare * backCars,
+            calendar: calendarLinks({ id: returnBooking.id, confirmationCode: returnBooking.confirmationCode, pickupAddress: body.dropoffAddress || body.pickupAddress, dropoffAddress: body.pickupAddress, pickupDatetime: back }),
+          }] : []),
+          ...extraBookings.map((b) => ({
+            role: "extra" as const, confirmationCode: b.confirmationCode,
+            pickupAddress: b.ride.pickupAddress, dropoffAddress: b.ride.dropoffAddress || "",
+            at: b.at, vehicleClass: b.ride.vehicleClass, passengers: b.ride.passengers ?? body.passengers,
+            fare: b.ride.totalAmount * b.ride.vehicleCount,
+            calendar: calendarLinks({ id: b.id, confirmationCode: b.confirmationCode, pickupAddress: b.ride.pickupAddress, dropoffAddress: b.ride.dropoffAddress, pickupDatetime: b.at }),
+          })),
+        ],
+      }).catch(e => console.error("[resend] admin journeys confirmation:", e)));
+    }
+
+    // Notify customer: the single-journey email, unchanged.
+    if (body.sendEmail && !multi) after(() => sendBookingConfirmation({
       to:               body.guestEmail,
       name:             body.guestName,
       confirmationCode: booking.confirmationCode,
@@ -557,41 +607,6 @@ export async function POST(req: NextRequest) {
         totalAmount:      returnFare,
       } : undefined,
     }).catch(e => console.error("[resend] admin create booking confirmation:", e)));
-
-    /**
-     * A confirmation for each of the other rides.
-     *
-     * One email per ride rather than a list on the first, because the useful
-     * half of a confirmation is where to be and how the chauffeur will find
-     * you, and that is different for every journey. What they do not repeat is
-     * the money: the fare for the whole arrangement is charged once, on the
-     * link in the first email, and each of these says so rather than leaving
-     * the customer to wonder whether another payment is due.
-     */
-    if (body.sendEmail) for (const b of extraBookings) {
-      after(() => sendBookingConfirmation({
-        to:               body.guestEmail,
-        name:             body.guestName,
-        confirmationCode: b.confirmationCode,
-        pickupAddress:    b.ride.pickupAddress,
-        dropoffAddress:   b.ride.dropoffAddress || "",
-        pickupDatetime:   formatPickupDateTime(b.at),
-        vehicleClass:     b.ride.vehicleClass,
-        // As above: the journey's cost and party, not one car's share.
-        totalAmount:      b.ride.totalAmount * b.ride.vehicleCount,
-        passengers:       b.ride.passengers ?? body.passengers,
-        bookingId:        b.id,
-        payment: {
-          line: body.paymentStatus === "PAID"
-            ? `Paid, together with booking ${booking.confirmationCode}.`
-            : `Charged with booking ${booking.confirmationCode} — nothing to pay for this ride on its own.`,
-          paid: body.paymentStatus === "PAID",
-        },
-        calendar: calendarLinks({ id: b.id, confirmationCode: b.confirmationCode, pickupAddress: b.ride.pickupAddress, dropoffAddress: b.ride.dropoffAddress, pickupDatetime: b.at }),
-        // They have several rides already; do not sell them another.
-        returnUrl: null,
-      }).catch(e => console.error("[resend] admin extra ride confirmation:", e)));
-    }
 
     /**
      * The confirmation on the customer's phone, for the booking they asked for.

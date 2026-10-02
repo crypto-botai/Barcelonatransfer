@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { sendPaymentConfirmationEmail, sendAdminNewBookingAlert, sendFailedPaymentEmail } from "@/lib/resend";
+import { sendPaymentConfirmationEmail, sendJourneysConfirmation, sendAdminNewBookingAlert, sendFailedPaymentEmail } from "@/lib/resend";
 import { BASE_URL } from "@/lib/seo";
 import { notify } from "@/lib/notifications/service";
 import type { SumUpCheckout } from "@/lib/sumup";
@@ -7,6 +7,7 @@ import { formatPickupDateTime } from "@/lib/datetime";
 import { paidOnline } from "@/lib/deposits";
 import { sendOpenAiConversion } from "@/lib/tracking/openai-conversions";
 import { parseBookingMeta, wantsSmsAlerts } from "@/lib/booking-meta";
+import { loadJourneyGroup } from "@/lib/journeys";
 
 // Shared by app/api/payments/webhook, app/api/payments/verify, and app/api/cron/payment-reconcile
 // so all three entry points apply the exact same DB + email side-effects for a paid or failed
@@ -102,8 +103,36 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
       ? `${updated.pickupAddress} → ${updated.dropoffAddress}`
       : updated.pickupAddress;
 
+    // A return, or rides booked together with this one, are told about in the
+    // same email. The receipt used to cover this booking alone, so a customer
+    // who had paid for two journeys read about one.
+    const group = await loadJourneyGroup(updated).catch(() => null);
+
     const [custResult, adminResult] = await Promise.allSettled([
-      sendPaymentConfirmationEmail({
+      group
+        ? sendJourneysConfirmation({
+            to:         updated.guestEmail,
+            name:       updated.guestName ?? "Valued Client",
+            stage:      "confirmed",
+            journeys:   group.journeys,
+            totalAmount: group.total,
+            bookingId,
+            logType:    "PAYMENT_CONFIRMATION",
+            split: group.balance > 0 || (updated.protectionFee ?? 0) > 0
+              ? {
+                  payNow: paidOnline(updated),
+                  balance: group.balance,
+                  protectionFee: updated.protectionFee ?? 0,
+                  paid: true,
+                  note: "That balance is split between your journeys in proportion to each fare, so each chauffeur collects only for the journey they drive.",
+                }
+              : null,
+            arrivalFrom: {
+              pickupLat: updated.pickupLat, pickupLng: updated.pickupLng,
+              pickupAddress: updated.pickupAddress, specialRequests: updated.specialRequests,
+            },
+          })
+        : sendPaymentConfirmationEmail({
         to:               updated.guestEmail,
         name:             updated.guestName ?? "Valued Client",
         confirmationCode: updated.confirmationCode,

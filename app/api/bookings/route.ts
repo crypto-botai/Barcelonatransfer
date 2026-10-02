@@ -3,7 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
-import { sendBookingConfirmation, sendWelcomeEmail } from "@/lib/resend";
+import { sendBookingConfirmation, sendJourneysConfirmation, sendWelcomeEmail } from "@/lib/resend";
+import { customerExtras } from "@/lib/journeys";
+import { calendarLinks as journeyCalendar } from "@/lib/calendar";
 import { redeemCoupon, validateCoupon } from "@/lib/marketing";
 import { capacityError } from "@/lib/capacity";
 import { calculateLastMinuteSurcharge, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, MIN_BOOKING_HOURS } from "@/lib/pricing";
@@ -675,6 +677,38 @@ export async function POST(req: NextRequest) {
     // and not as a confirmation.
     const sendPendingBookingEmail = async () => {
       try {
+        // A round trip is one email listing both journeys.
+        if (returnBooking && returnDatetime) {
+          const outboundTotal = Math.round((totalWithExtras - returnFare) * 100) / 100;
+          const extras = customerExtras(specialRequests);
+          const extrasCost = extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
+          await sendJourneysConfirmation({
+            to:          body.guestEmail,
+            name:        body.guestName,
+            stage:       "received",
+            totalAmount: totalWithExtras,
+            bookingId:   booking.id,
+            logType:     "CONFIRMATION",
+            arrivalFrom: { pickupLat: body.pickupLat, pickupLng: body.pickupLng, pickupAddress: body.pickupAddress, specialRequests: specialRequests },
+            journeys: [
+              {
+                role: "outbound", confirmationCode: booking.confirmationCode,
+                pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress || "",
+                at: pickupDatetime, vehicleClass: body.vehicleClass, passengers: body.passengers,
+                fare: Math.max(0, Math.round((outboundTotal - extrasCost) * 100) / 100), extras,
+                calendar: journeyCalendar({ id: booking.id, confirmationCode: booking.confirmationCode, pickupAddress: body.pickupAddress, dropoffAddress: body.dropoffAddress, pickupDatetime, durationMin: body.quote.durationMin }),
+              },
+              {
+                role: "return", confirmationCode: returnBooking.confirmationCode,
+                pickupAddress: body.dropoffAddress, dropoffAddress: body.pickupAddress,
+                at: returnDatetime, vehicleClass: body.vehicleClass, passengers: body.passengers,
+                fare: returnFare,
+                calendar: journeyCalendar({ id: returnBooking.id, confirmationCode: returnBooking.confirmationCode, pickupAddress: body.dropoffAddress, dropoffAddress: body.pickupAddress, pickupDatetime: returnDatetime }),
+              },
+            ],
+          });
+          return;
+        }
         await sendBookingConfirmation({
           to:               body.guestEmail,
           name:             body.guestName,

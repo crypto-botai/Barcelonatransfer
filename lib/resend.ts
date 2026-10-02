@@ -4,6 +4,7 @@ import { COMPANY } from "@/lib/company-facts";
 import { GOOGLE_PROFILE } from "@/data/reviews";
 import { notifyAdmin } from "@/lib/whatsapp";
 import { CHECKOUT_POLICY_POINTS, arrivalInstructions } from "@/lib/policies";
+import { formatPickupDateTime } from "@/lib/datetime";
 import { isAirportLocation } from "@/lib/utils";
 
 /**
@@ -51,6 +52,7 @@ import {
   pickupChangedCard, adminPickupChangedCard, bookingRescheduledCard,
   partnerJobCard, adminPartnerDispatchCard, credentialsCard, partnerConvertedCard,
   abandonedRecoveryCard, personalNoteCard,
+  journeysConfirmationCard, type JourneyLine,
 } from "@/lib/email/premium";
 
 let _resend: Resend | undefined;
@@ -318,6 +320,103 @@ export async function sendBookingConfirmation({
     : `Booking received — ${confirmationCode} | Elite BCN`;
   const id = await sendEmail({ from: FROM, to, subject, html });
   await logEmail({ to, subject: `Booking received — ${confirmationCode}`, type: "CONFIRMATION", resendId: id, bookingId });
+}
+
+
+// ─── Several journeys, one confirmation ──────────────────────
+
+/** One journey of a booking, as the caller knows it. */
+export interface JourneyInput {
+  role: "outbound" | "return" | "extra";
+  confirmationCode: string;
+  pickupAddress: string;
+  dropoffAddress: string;
+  at: Date;
+  vehicleClass: string;
+  passengers: number;
+  /** The fare for this journey, before extras. */
+  fare: number;
+  extras?: { label: string; quantity: number; price: number }[];
+  calendar?: { google: string; ics: string };
+}
+
+/**
+ * Every journey of one booking in a single email.
+ *
+ * A return, an extra ride or a second car is a booking of its own, and used to
+ * arrive as separate emails or, once paid, not at all: the receipt covered the
+ * first booking only, so a customer who had paid for two journeys read about
+ * one. This lists them together, in the order they will travel, with one total.
+ *
+ * Logged once, against the first booking, which is what the dedup checks on a
+ * payment confirmation look for.
+ */
+export async function sendJourneysConfirmation({
+  to, name, stage, journeys, totalAmount, bookingId, logType,
+  payment, split, arrivalFrom,
+}: {
+  to: string; name: string;
+  stage: "received" | "confirmed";
+  journeys: JourneyInput[];
+  /** What the customer is charged for all of it. */
+  totalAmount: number;
+  /** The booking the email is logged against. */
+  bookingId?: string;
+  logType: "CONFIRMATION" | "PAYMENT_CONFIRMATION";
+  payment?: { line: string; payUrl?: string; paid?: boolean };
+  split?: { payNow: number; balance: number; protectionFee: number; paid: boolean; note?: string } | null;
+  /** The outbound booking's pick-up and extras, which decide the arrival advice. */
+  arrivalFrom?: { pickupLat?: number | null; pickupLng?: number | null; pickupAddress?: string | null; specialRequests?: string | null };
+}) {
+  // In the order they will be travelled, whatever order they were created in.
+  const ordered = [...journeys].sort((a, b) => a.at.getTime() - b.at.getTime());
+
+  const lines: JourneyLine[] = ordered.map((j, i) => {
+    const { date, time } = splitDatetime(formatPickupDateTime(j.at));
+    return {
+      label: j.role === "outbound" ? "Outbound" : j.role === "return" ? "Return" : `Journey ${i + 1}`,
+      confirmationCode: j.confirmationCode,
+      date, time,
+      pickupAddress: j.pickupAddress,
+      dropoffAddress: j.dropoffAddress,
+      vehicle: vehicleName(j.vehicleClass),
+      passengers: j.passengers,
+      fare: j.fare,
+      extras: j.extras,
+      calendar: j.calendar,
+    };
+  });
+
+  const shown = lines.reduce((s, l) => s + l.fare + (l.extras ?? []).reduce((a, e) => a + e.price * e.quantity, 0), 0);
+  const difference = Math.round((totalAmount - shown) * 100) / 100;
+  const codes = lines.map((l) => l.confirmationCode);
+
+  const html = emailDocument(
+    journeysConfirmationCard({
+      firstName: name.split(" ")[0],
+      stage,
+      journeys: lines,
+      totalAmount,
+      payment,
+      split,
+      policy: { points: CHECKOUT_POLICY_POINTS, url: `${SITE_URL}/refund-policy` },
+      arrival: arrivalFrom ? arrivalFor(arrivalFrom) : null,
+      adjustment: difference !== 0 ? { label: "VAT, tip and discounts", amount: difference } : null,
+    }),
+    `${lines.length} journeys ${stage === "confirmed" ? "confirmed" : "reserved"} — references ${codes.join(", ")}`,
+  );
+
+  const subject = stage === "confirmed"
+    ? `Your ${lines.length} journeys are confirmed — ${codes[0]} | Elite BCN`
+    : `Your ${lines.length} journeys are reserved — ${codes[0]} | Elite BCN`;
+  const id = await sendEmail({ from: FROM, to, subject, html });
+  await logEmail({
+    to,
+    subject: `${logType === "PAYMENT_CONFIRMATION" ? "Payment Confirmed" : "Booking received"} — ${codes.join(", ")}`,
+    type: logType,
+    resendId: id,
+    bookingId,
+  });
 }
 
 // ─── Admin Alert ─────────────────────────────────────────────

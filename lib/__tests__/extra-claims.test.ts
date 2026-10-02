@@ -87,8 +87,9 @@ describe("the paid-booking email says where to meet the chauffeur", () => {
   it("reaches the emails a customer actually receives", () => {
     const prem = rd("lib/email/premium.ts");
     expect(prem).toContain("function arrivalPanel(");
-    // The paid receipt and the booking-received email both render it.
-    expect(prem.split("${arrivalPanel(o.arrival)}").length - 1).toBe(2);
+    // The paid receipt, the booking-received email and the several-journeys
+    // confirmation all render it.
+    expect(prem.split("${arrivalPanel(o.arrival)}").length - 1).toBe(3);
     const resend = rd("lib/resend.ts");
     expect(resend).toContain("function arrivalFor(");
     expect(resend).toContain("arrival: arrivalFor(");
