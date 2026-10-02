@@ -759,7 +759,7 @@ export function driverJobCard(o: {
   pickupDatetime: string; vehicle: string;
   passengers: number; luggage: number;
   flightNumber?: string | null;
-  extras?: string | null; tipAmount?: number; notes?: string | null;
+  extras?: string | null; notes?: string | null;
   driverAmount?: number | null;
   /** What the chauffeur collects from the client on the day, if anything. */
   collectAmount?: number | null;
@@ -799,7 +799,6 @@ export function driverJobCard(o: {
         row("Guests", `${o.passengers} pax &nbsp;&middot;&nbsp; ${o.luggage} bags`) +
         (o.flightNumber ? row("Flight", `<span style="letter-spacing:1.5px;">${esc(o.flightNumber)}</span>`) : "") +
         (o.extras ? row("Bring", `<strong style="font-weight:bold;color:${GOLD};">${esc(o.extras)}</strong>`) : "") +
-        (o.tipAmount && o.tipAmount > 0 ? row("Tip", `<span style="color:${GOLD};">&euro;${o.tipAmount.toFixed(2)}</span> <span style="color:${LABEL};">already paid by the client</span>`) : "") +
         row("Notes", esc(o.notes || "—"), true),
       )}
     </td></tr>

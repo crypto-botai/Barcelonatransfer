@@ -1,12 +1,10 @@
 "use client";
 
-import { collectDue } from "@/lib/checkout-money";
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Camera, Check, Loader2, Mail, MapPin, MessageSquare, Phone, Plane, Undo2, Users, Wallet } from "lucide-react";
-import { parseBookingMeta, stripMeta } from "@/lib/booking-meta";
 import { ChatSheet, LiveLocationSheet, NoShowSheet } from "@/components/partner/JobTools";
 import toast from "react-hot-toast";
 import { Empty, PageTitle, Sheet, Skeleton, Status, euro, field, ghost, label, primary, vehicleLabel, whenParts } from "@/components/partner/ui";
@@ -16,10 +14,13 @@ type Job = {
   guestName: string | null; guestPhone: string | null; guestEmail: string | null;
   pickupAddress: string; dropoffAddress: string; pickupDatetime: string;
   pickupLat?: number | null; pickupLng?: number | null; dropoffLat?: number | null; dropoffLng?: number | null;
-  passengers: number; luggage: number; vehicleClass: string; flightNumber: string | null; specialRequests: string | null;
+  passengers: number; luggage: number; vehicleClass: string; flightNumber: string | null;
+  /** The customer's own words, extras by name, stops. No prices: see the jobs route. */
+  notes: string | null; extras: { id: string; label: string; quantity: number }[]; stops: string[]; durationHours: number | null;
+  /** What the driver collects from the client on the day. */
+  collect: number;
   noShow?: { images: string[]; note: string | null; waitedMin: number | null; createdAt: string; lat: number | null; lng: number | null } | null;
   partnerPayout: number | null; driverAmount: number | null; partnerDispatchedAt: string | null;
-  totalAmount: number; paymentStatus: string; paymentMethod?: string | null; balanceAmount?: number | null; balancePaidAt?: string | null;
   driver: { id: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] } | null;
 };
 type Driver = {
@@ -215,19 +216,10 @@ function Jobs() {
                         {j.guestEmail && <a href={`mailto:${j.guestEmail}`} className="inline-flex items-center gap-1 truncate text-gold-400/80 hover:underline"><Mail size={12} /> {j.guestEmail}</a>}
                       </p>
                     )}
-                    {/*
-                      specialRequests carries a [META]{…}[/META] prefix the
-                      booking form writes for its own use. Rendered raw it put
-                      a wall of JSON in front of a dispatcher. Only the
-                      customer's own words belong here; the extras inside the
-                      block are shown as extras, in the detail sheet.
-                    */}
-                    {stripMeta(j.specialRequests) && (
-                      <p className="mt-1 text-xs text-dark-500">{stripMeta(j.specialRequests)}</p>
-                    )}
-                    {parseBookingMeta(j.specialRequests).extras.length > 0 && (
+                    {j.notes && <p className="mt-1 text-xs text-dark-500">{j.notes}</p>}
+                    {j.extras.length > 0 && (
                       <p className="mt-1 flex flex-wrap gap-1.5">
-                        {parseBookingMeta(j.specialRequests).extras.map((x) => (
+                        {j.extras.map((x) => (
                           <span key={x.id} className="rounded-md border border-white/[0.1] bg-white/[0.03] px-2 py-0.5 text-[11px] text-dark-300">
                             {x.label}{x.quantity > 1 ? ` x${x.quantity}` : ""}
                           </span>
@@ -240,9 +232,9 @@ function Jobs() {
                       prepaid job had to infer from silence that there was
                       nothing to take. Silence is not an instruction.
                     */}
-                    {collectDue(j) > 0 ? (
+                    {j.collect > 0 ? (
                       <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-gold-500/30 bg-gold-500/10 px-2.5 py-1 text-xs text-gold-300">
-                        <Wallet size={12} /> Driver collects {euro(collectDue(j))} from the client, cash or card, at the end of the ride
+                        <Wallet size={12} /> Driver collects {euro(j.collect)} from the client, cash or card, at the end of the ride
                       </p>
                     ) : (
                       <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/[0.08] px-2.5 py-1 text-xs text-emerald-300/90">
@@ -461,12 +453,10 @@ function DetailSheet({
   onDispatch: (j: Job) => void; onUndispatch: (j: Job) => void; busy: string | null;
 }) {
   if (!job) return <Sheet open={false} onClose={onClose} title="Ride"><span /></Sheet>;
-  const meta = parseBookingMeta(job.specialRequests);
-  const notes = stripMeta(job.specialRequests);
   const w = whenParts(job.pickupDatetime);
   const v = job.driver?.vehicles?.[0];
   const needsDriver = !job.driver;
-  const collect = collectDue(job);
+  const collect = job.collect;
   const margin = job.partnerPayout != null && job.driverAmount != null ? job.partnerPayout - job.driverAmount : null;
 
   return (
@@ -485,7 +475,8 @@ function DetailSheet({
           <Row label="Vehicle">{vehicleLabel(job.vehicleClass)}</Row>
           <Row label="Party">{job.passengers} passengers, {job.luggage} bags</Row>
           {job.flightNumber && <Row label="Flight">{job.flightNumber}</Row>}
-          {meta.durationHours != null && <Row label="Hours booked">{meta.durationHours}</Row>}
+          {job.stops.map((st, i) => <Row key={i} label={`Stop ${i + 1}`}>{st}</Row>)}
+          {job.durationHours != null && <Row label="Hours booked">{job.durationHours}</Row>}
         </section>
 
         <section>
@@ -497,17 +488,14 @@ function DetailSheet({
           {job.guestEmail && (
             <Row label="Email"><a href={`mailto:${job.guestEmail}`} className="break-all text-gold-400 hover:underline">{job.guestEmail}</a></Row>
           )}
-          {meta.memberTier && <Row label="Member">{meta.memberTier}</Row>}
-          {notes && <Row label="Their note">{notes}</Row>}
+          {job.notes && <Row label="Their note">{job.notes}</Row>}
         </section>
 
-        {meta.extras.length > 0 && (
+        {job.extras.length > 0 && (
           <section>
-            <h3 className="mb-1 text-[11px] uppercase tracking-[0.2em] text-dark-500">Extras the client bought</h3>
-            {meta.extras.map((x) => (
-              <Row key={x.id} label={x.label}>
-                {x.quantity > 1 ? `${x.quantity} x ` : ""}{euro(x.price)}
-              </Row>
+            <h3 className="mb-1 text-[11px] uppercase tracking-[0.2em] text-dark-500">The client asked for</h3>
+            {job.extras.map((x) => (
+              <Row key={x.id} label={x.label}>{x.quantity > 1 ? `x${x.quantity}` : "Yes"}</Row>
             ))}
           </section>
         )}
@@ -526,7 +514,6 @@ function DetailSheet({
               ? <span className="text-gold-300">Driver collects {euro(collect)} from the client</span>
               : <span className="text-emerald-300/90">Paid in full online. Nothing to collect.</span>}
           </Row>
-          {meta.tipAmount > 0 && <Row label="Tip included">{euro(meta.tipAmount)}</Row>}
         </section>
 
         <section>

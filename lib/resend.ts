@@ -93,7 +93,7 @@ async function sendEmail(payload: Parameters<Resend["emails"]["send"]>[0]): Prom
   return result?.data?.id;
 }
 
-import { parseBookingMeta, formatExtras } from "@/lib/booking-meta";
+import { parseBookingMeta, formatExtras, formatExtraNames } from "@/lib/booking-meta";
 import { senderAddress } from "@/lib/sender";
 
 // ─── Vehicle class → display name ────────────────────────────
@@ -709,8 +709,9 @@ export async function sendDriverBookingDetailsEmail({
       stops: driverMeta.stops,
       vehicle: vehicleName(vehicleClass),
       passengers, luggage, flightNumber,
-      extras: driverMeta.extras.length ? formatExtras(driverMeta.extras) : null,
-      tipAmount: driverMeta.tipAmount,
+      // Names only. What the customer paid for these, and any tip, belongs to
+      // the office; a chauffeur or fleet company is shown the agreed fare alone.
+      extras: driverMeta.extras.length ? formatExtraNames(driverMeta.extras) : null,
       notes: driverMeta.notes,
       driverAmount,
       collectAmount,

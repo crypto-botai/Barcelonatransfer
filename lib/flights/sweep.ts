@@ -80,6 +80,9 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
       // Both addresses are needed because notify()'s email channel only fires
       // when the caller supplies a sender, and a sender needs somewhere to send.
       guestEmail: true,
+      // The company a job was dispatched to. It has to hear about a delay
+      // before it has named a driver, or nobody on the job does.
+      partner: { select: { userId: true, name: true, contactName: true, email: true, active: true } },
       // Needed to alert the driver, who has to physically be somewhere at a
       // different time than planned.
       driver: {
@@ -123,48 +126,64 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
     // Dedup on the audit trail the notification service already writes, so a
     // delay that holds steady across runs is announced once. A further slip
     // produces a different `when` and does notify again, which is correct.
-    const already = await prisma.activityLog.findFirst({
-      where: {
-        action:   "NOTIFY_FLIGHT_DELAYED",
-        entity:   "Notification",
-        entityId: b.id,
-      },
-      orderBy: { createdAt: "desc" },
-    }).catch(() => null);
+    //
+    // Per recipient, not per booking. One shared check meant that once the
+    // customer had been told, a driver assigned afterwards was never told at
+    // all, which is exactly the driver who most needs to know.
+    // Set when anyone was told something new this run. If nobody was, the office
+    // is not told again either: an hourly sweep that re-announced a steady delay
+    // to operations would be the same bug the customer emails had.
+    let fresh = false;
 
-    const previousWhen = (already?.details as { when?: string } | null)?.when;
-    if (previousWhen === when) continue;
+    const announced = async (action: string, recipient?: string): Promise<boolean> => {
+      const rows = await prisma.activityLog.findMany({
+        where: { action, entity: "Notification", entityId: b.id },
+        orderBy: { createdAt: "desc" },
+        take: 25,
+      }).catch(() => []);
+      const row = rows.find((r) => {
+        const d = r.details as { recipient?: string } | null;
+        return recipient ? d?.recipient === recipient : !d?.recipient;
+      });
+      return (row?.details as { when?: string } | null)?.when === when;
+    };
 
     // ── 1. The customer ──────────────────────────────────────────────────────
     // Reassurance: their driver already knows, nothing for them to do.
-    await notify({
-      event:     "FLIGHT_DELAYED",
-      userId:    b.userId,
-      bookingId: b.id,
-      phone:     b.guestPhone,
-      // `when` lands in the audit details via notify(), which is what the
-      // dedup check above reads on the next run.
-      vars: { flight: status.flightNumber, when, code: b.confirmationCode },
-      // notify() lists "email" among this event's channels but skips it unless
-      // the caller hands it a sender, and none ever did — so the delay email
-      // has been configured and unsent since the sweep was written.
-      email: b.guestEmail && b.guestName
-        ? () => sendFlightDelayEmail({
-            to:               b.guestEmail!,
-            name:             b.guestName!,
-            flight:           status.flightNumber,
-            when,
-            confirmationCode: b.confirmationCode,
-            delayMinutes:     status.delayMinutes,
-          })
-        : undefined,
-    });
+    if (!(await announced("NOTIFY_FLIGHT_DELAYED"))) {
+      fresh = true;
+      await notify({
+        event:     "FLIGHT_DELAYED",
+        userId:    b.userId,
+        bookingId: b.id,
+        phone:     b.guestPhone,
+        // `when` lands in the audit details via notify(), which is what the
+        // dedup check above reads on the next run.
+        vars: { flight: status.flightNumber, when, code: b.confirmationCode },
+        // notify() lists "email" among this event's channels but skips it unless
+        // the caller hands it a sender, and none ever did.
+        email: b.guestEmail && b.guestName
+          ? () => sendFlightDelayEmail({
+              to:               b.guestEmail!,
+              name:             b.guestName!,
+              flight:           status.flightNumber,
+              when,
+              confirmationCode: b.confirmationCode,
+              delayMinutes:     status.delayMinutes,
+            })
+          : undefined,
+      });
+    }
 
     // ── 2. The assigned driver ───────────────────────────────────────────────
     // The customer's message promises "your driver has been updated". This is
     // what makes that true. Without it a driver waits at arrivals for a plane
     // that is ninety minutes away, or leaves before it lands.
-    if (b.driver) {
+    //
+    // A fleet company's driver is a driver like any other: same in-app inbox,
+    // same push, and the company's shared inbox when the company has set one.
+    if (b.driver && !(await announced("NOTIFY_FLIGHT_DELAYED_DRIVER", b.driver.userId))) {
+      fresh = true;
       await notify({
         event:     "FLIGHT_DELAYED_DRIVER",
         userId:    b.driver.userId,
@@ -176,6 +195,7 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
           code:      b.confirmationCode,
           passenger: b.guestName ?? "Your passenger",
           pickup:    b.pickupAddress,
+          recipient: b.driver.userId,
         },
         email: driverMailTo(b.driver)
           ? () => sendDriverFlightDelayEmail({
@@ -191,6 +211,40 @@ export async function sweepFlightDelays(hoursAhead = 36): Promise<SweepResult> {
           : undefined,
       });
     }
+
+    // ── 2b. The fleet company, when it has not named a driver yet ────────────
+    // A job dispatched to a company sits with no driver until the company picks
+    // one. Until then nobody on the job would hear the flight has moved.
+    if (!b.driver && b.partner?.active && !(await announced("NOTIFY_FLIGHT_DELAYED_DRIVER", b.partner.userId))) {
+      fresh = true;
+      await notify({
+        event:     "FLIGHT_DELAYED_DRIVER",
+        userId:    b.partner.userId,
+        bookingId: b.id,
+        vars: {
+          flight:    status.flightNumber,
+          when,
+          code:      b.confirmationCode,
+          passenger: b.guestName ?? "Your passenger",
+          pickup:    b.pickupAddress,
+          recipient: b.partner.userId,
+        },
+        email: b.partner.email
+          ? () => sendDriverFlightDelayEmail({
+              to:               b.partner!.email,
+              driverName:       b.partner!.contactName || b.partner!.name,
+              flight:           status.flightNumber,
+              when,
+              confirmationCode: b.confirmationCode,
+              passenger:        b.guestName ?? "Your passenger",
+              pickupAddress:    b.pickupAddress,
+              delayMinutes:     status.delayMinutes,
+            })
+          : undefined,
+      });
+    }
+
+    if (!fresh) continue;
 
     // ── 3. Operations ────────────────────────────────────────────────────────
     // A delay can collide with the driver's next job, which only a human can

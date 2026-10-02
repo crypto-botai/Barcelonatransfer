@@ -130,7 +130,7 @@ describe("fleet partners", () => {
   /** Silence is not an instruction: a prepaid job says so out loud. */
   it("states the prepaid case as well as the collect case", () => {
     const page = rd("app/partner/(panel)/jobs/page.tsx");
-    expect(page).toMatch(/Driver collects \{euro\(collectDue\(j\)\)\}/);
+    expect(page).toMatch(/Driver collects \{euro\(j\.collect\)\}/);
     expect(page).toMatch(/Paid in full online\. Nothing to collect/);
   });
 
@@ -173,12 +173,16 @@ describe("fleet partners", () => {
    * including netAmount and memberTier, which are not theirs to read off a
    * job card.
    */
-  it("never renders the raw metadata block to a company", () => {
+  it("never sends a company the raw metadata block, the fare or the tip", () => {
     const page = rd("app/partner/(panel)/jobs/page.tsx");
-    expect(page).toContain("stripMeta(j.specialRequests)");
-    expect(page).not.toMatch(/\{j\.specialRequests\}/);
-    // The extras inside it are shown as extras instead.
-    expect(page).toContain("parseBookingMeta(j.specialRequests).extras");
+    const route = rd("app/api/partner/jobs/route.ts");
+    // The page has no way to read what the customer paid for an extra or the
+    // tip: the route removes them, so the browser never receives them.
+    expect(page).not.toMatch(/specialRequests/);
+    expect(page).not.toMatch(/tipAmount|memberTier|meta\.extras|x\.price/);
+    expect(page).not.toMatch(/Tip included|Extras the client bought/);
+    expect(route).toMatch(/specialRequests, totalAmount, paymentStatus, paymentMethod, balanceAmount, balancePaidAt, \.\.\.rest/);
+    expect(route).toContain("extras: meta.extras.map((x) => ({ id: x.id, label: x.label, quantity: x.quantity }))");
   });
 
   /** One place that holds the whole ride, and the actions that change it. */

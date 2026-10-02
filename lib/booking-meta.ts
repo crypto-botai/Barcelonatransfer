@@ -195,3 +195,19 @@ export function formatExtraLine(e: BookingExtraLine): string {
 export function formatExtras(extras: BookingExtraLine[]): string {
   return extras.map(formatExtraLine).join(", ");
 }
+
+/**
+ * What the customer asked for, with no money in it: "Baby Seat ×2, Meet & Greet".
+ *
+ * This is the only form of the extras a chauffeur or a fleet company may see.
+ * The prices, and any tip, are what the customer paid the office. A company is
+ * paid the figure the office agreed with it and nothing else, so showing it a
+ * €5 meet-and-greet or a €6 tip invites a claim on money that was never theirs.
+ * They still need to know the extras exist, because somebody has to bring the
+ * child seat and stand in arrivals with the name board.
+ */
+export function formatExtraNames(extras: BookingExtraLine[]): string {
+  return extras
+    .map((e) => (e.quantity > 1 ? `${e.label} ×${e.quantity}` : e.label))
+    .join(", ");
+}

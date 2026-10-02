@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requirePartner } from "@/lib/partner";
+import { parseBookingMeta, formatExtraNames } from "@/lib/booking-meta";
+import { collectDue } from "@/lib/checkout-money";
 
 /**
  * The company's jobs. Everything the office has sent it, newest pick-up
- * first, with the driver it put on each. The customer's fare is not here —
- * the company sees its payout, and what it chose to show its driver.
+ * first, with the driver it put on each.
+ *
+ * The customer's fare is not in the response. The company sees its payout, what
+ * it chose to show its driver, and what the driver must collect on the day.
+ * Extras are returned by name only: what the customer paid for them, any tip,
+ * and their membership tier are between the customer and the office, and the
+ * browser can read whatever this route sends. So they are removed here, not
+ * merely hidden by the page.
  */
 export async function GET(req: NextRequest) {
   const p = await requirePartner({ allowInactive: true });
@@ -71,5 +79,22 @@ export async function GET(req: NextRequest) {
     prisma.booking.count({ where: { ...base, status: { in: ["CANCELLED", "REFUNDED"] } } }),
   ]);
 
-  return NextResponse.json({ jobs, counts: { incoming, active, completed, cancelled } });
+  const safe = jobs.map(({ specialRequests, totalAmount, paymentStatus, paymentMethod, balanceAmount, balancePaidAt, ...rest }) => {
+    const meta = parseBookingMeta(specialRequests);
+    return {
+      ...rest,
+      // The customer's own words, the extras by name and the stops: what the
+      // chauffeur has to act on, with no money in any of it.
+      notes: meta.notes || null,
+      extras: meta.extras.map((x) => ({ id: x.id, label: x.label, quantity: x.quantity })),
+      extrasText: meta.extras.length ? formatExtraNames(meta.extras) : null,
+      stops: meta.stops,
+      durationHours: meta.durationHours ?? null,
+      // What the driver takes from the client, worked out here from the figures
+      // that stay behind. It is an instruction, not a price list.
+      collect: collectDue({ totalAmount, paymentStatus, paymentMethod, balanceAmount, balancePaidAt }),
+    };
+  });
+
+  return NextResponse.json({ jobs: safe, counts: { incoming, active, completed, cancelled } });
 }

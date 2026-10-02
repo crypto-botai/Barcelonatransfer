@@ -133,7 +133,7 @@ describe("checkout: everyone downstream reads the split", () => {
     expect(rd("app/api/bookings/[id]/route.ts")).toContain("collectAmount:    collectDue(booking)");
     expect(rd("lib/partner.ts")).toContain("collectAmount: collectDue(booking)");
     expect(rd("components/driver/DriverDashboard.tsx")).toContain("Collect {formatCurrency(collectDue(");
-    expect(rd("app/partner/(panel)/jobs/page.tsx")).toContain("Driver collects {euro(collectDue(j))}");
+    expect(rd("app/partner/(panel)/jobs/page.tsx")).toContain("Driver collects {euro(j.collect)}");
   });
 
   it("finishing the ride settles the balance, by driver and by company", () => {
