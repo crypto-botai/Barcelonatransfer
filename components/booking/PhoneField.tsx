@@ -122,7 +122,7 @@ export default function PhoneField({
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-label={`Country code: ${current ? `${current.name} +${current.dial}` : "select"}`}
-          className={`input-luxury flex items-center gap-1.5 px-3 text-sm flex-shrink-0 hover:border-gold-500/40 transition-colors ${compact ? "py-2.5 rounded-lg" : "py-4 rounded-xl"}`}
+          className={`input-luxury flex items-center gap-1.5 px-3 flex-shrink-0 hover:border-gold-500/40 transition-colors ${compact ? "py-3 rounded-lg text-base" : "text-sm py-4 rounded-xl"}`}
         >
           <span className="text-base leading-none">{flagFor(iso)}</span>
           <span className="text-white tabular-nums">+{current?.dial ?? "—"}</span>
@@ -142,7 +142,7 @@ export default function PhoneField({
             onBlur={() => setTouched(true)}
             placeholder={placeholder ?? "612 345 678"}
             aria-invalid={showError || undefined}
-            className={`input-luxury w-full min-w-0 text-sm ${compact ? "pl-10 pr-3 py-2.5 rounded-lg" : "pl-10 pr-4 py-4 rounded-xl"}`}
+            className={`input-luxury w-full min-w-0 ${compact ? "phone-input pl-10 pr-3 py-3 rounded-lg text-base font-medium tracking-wide tabular-nums" : "text-sm pl-10 pr-4 py-4 rounded-xl"}`}
           />
         </div>
       </div>

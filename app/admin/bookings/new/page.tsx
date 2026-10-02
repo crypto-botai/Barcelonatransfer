@@ -484,7 +484,7 @@ export default function NewBookingPage() {
                 On a row of its own. Squeezed into a third of the row beside the
                 name and the email it had room for the flag and half a digit.
               */}
-              <div className="sm:col-span-2 sm:max-w-md">
+              <div className="sm:col-span-2">
                 <PhoneField
                   key={phoneKey}
                   value={phone}

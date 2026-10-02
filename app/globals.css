@@ -512,3 +512,8 @@
 .pac-item-query { color: #c9a84c !important; font-weight: 500 !important; }
 .pac-icon { filter: brightness(0.4) sepia(1) hue-rotate(10deg) !important; }
 .pac-logo::after { display: none !important; }
+
+/* The number being typed should be easy to read: the generic placeholder grey
+   is nearly invisible on the dark panels, which made an empty phone box look
+   broken. Only for the compact phone field. */
+.input-luxury.phone-input::placeholder { color: #9a968a; }
