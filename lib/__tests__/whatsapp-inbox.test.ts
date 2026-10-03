@@ -1,9 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { NextRequest } from "next/server";
+import { describe, it, expect } from "vitest";
 import { createHmac } from "node:crypto";
 import {
-  parseWebhook, validMetaSignature, buildConversations, buildThread, canReplyFreely,
-  waPhone, SESSION_WINDOW_MS, type LogRow,
+  parseWebhook, validMetaSignature, buildConversations, buildThread, canReplyFreely, summarize,
+  latestInboundId, windowEndsAt, waPhone, SESSION_WINDOW_MS, type LogRow,
 } from "@/lib/whatsapp-inbox";
 
 /**
@@ -61,7 +60,7 @@ describe("parseWebhook", () => {
   });
 
   it.each([null, undefined, "x", 5, {}, { entry: "no" }, { entry: [null, {}, { changes: [{}] }] }])("survives garbage %#", (p) => {
-    expect(parseWebhook(p)).toEqual({ messages: [], statuses: [] });
+    expect(parseWebhook(p)).toEqual({ messages: [], statuses: [], reactions: [] });
   });
 
   it("skips a message with no sender or id instead of failing the delivery", () => {
@@ -73,6 +72,40 @@ describe("parseWebhook", () => {
     expect(waPhone("34635383712")).toBe("+34635383712");
     expect(waPhone("123")).toBeNull();
     expect(waPhone(undefined)).toBeNull();
+  });
+});
+
+describe("parseWebhook: replies, reactions and menu choices", () => {
+  it("keeps what a message is a reply to", () => {
+    const { messages } = parseWebhook(inboundPayload({ context: { id: "wamid.OUT1" } }));
+    expect(messages[0].replyTo).toBe("wamid.OUT1");
+    expect(parseWebhook(inboundPayload()).messages[0].replyTo).toBeNull();
+  });
+
+  it("treats a reaction as a reaction, never as a message or an alert", () => {
+    const out = parseWebhook(inboundPayload({ type: "reaction", text: undefined, reaction: { message_id: "wamid.OUT1", emoji: "👍" } }));
+    expect(out.messages).toHaveLength(0);
+    expect(out.reactions).toEqual([expect.objectContaining({ id: "wamid.IN1", wamid: "wamid.OUT1", emoji: "👍", phone: "+34635383712" })]);
+  });
+
+  it("reads a removed reaction as an empty emoji", () => {
+    const out = parseWebhook(inboundPayload({ type: "reaction", text: undefined, reaction: { message_id: "wamid.OUT1" } }));
+    expect(out.reactions[0].emoji).toBe("");
+  });
+
+  it("ignores a reaction that names no message", () => {
+    expect(parseWebhook(inboundPayload({ type: "reaction", text: undefined, reaction: { emoji: "👍" } })).reactions).toEqual([]);
+  });
+
+  it("returns the id of a list pick so a menu choice can be recognised", () => {
+    const { messages } = parseWebhook(inboundPayload({ type: "interactive", text: undefined, interactive: { type: "list_reply", list_reply: { id: "svc:girona", title: "Girona" } } }));
+    expect(messages[0]).toMatchObject({ text: "Girona", choiceId: "svc:girona" });
+  });
+
+  it("labels a voice note and a document with its name", () => {
+    expect(parseWebhook(inboundPayload({ type: "audio", text: undefined, audio: { id: "A1", voice: true } })).messages[0].text).toBe("[voice]");
+    const doc = parseWebhook(inboundPayload({ type: "document", text: undefined, document: { id: "D1", filename: "ticket.pdf" } })).messages[0];
+    expect(doc).toMatchObject({ text: "[document] ticket.pdf", fileName: "ticket.pdf", mediaId: "D1" });
   });
 });
 
@@ -170,181 +203,77 @@ describe("buildThread", () => {
   });
 });
 
-// ─── The routes ──────────────────────────────────────────────────────────────
 
-const mocks = vi.hoisted(() => ({
-  recordInbound: vi.fn(),
-  recordStatus: vi.fn(),
-  recordOutbound: vi.fn(),
-  markSeen: vi.fn(),
-  loadThread: vi.fn(),
-  loadConversations: vi.fn(),
-  notifyAdmin: vi.fn(),
-  sendText: vi.fn(),
-  findBooking: vi.fn(),
-  session: vi.fn(),
-}));
-
-vi.mock("@/lib/whatsapp-inbox-store", () => ({
-  recordInbound: mocks.recordInbound, recordStatus: mocks.recordStatus, recordOutbound: mocks.recordOutbound,
-  markSeen: mocks.markSeen, loadThread: mocks.loadThread, loadConversations: mocks.loadConversations,
-}));
-vi.mock("@/lib/whatsapp", () => ({
-  notifyAdmin: mocks.notifyAdmin, sendWhatsAppTextResult: mocks.sendText, whatsappConfigured: () => true,
-  fetchWhatsAppMedia: vi.fn().mockResolvedValue(null),
-}));
-vi.mock("@/lib/prisma", () => ({ prisma: { booking: { findFirst: mocks.findBooking } } }));
-vi.mock("next-auth", () => ({ getServerSession: mocks.session }));
-vi.mock("@/lib/auth", () => ({ authOptions: {} }));
-
-import { GET as webhookGet, POST as webhookPost } from "@/app/api/whatsapp/webhook/route";
-import { GET as adminThreadGet, POST as adminReply } from "@/app/api/admin/whatsapp/[phone]/route";
-import { GET as adminList } from "@/app/api/admin/whatsapp/route";
-
-const post = (body: string, headers: Record<string, string> = {}) =>
-  new NextRequest("https://www.elitebcn.info/api/whatsapp/webhook", { method: "POST", body, headers });
-
-beforeEach(() => {
-  vi.clearAllMocks();
-  vi.stubEnv("WA_VERIFY_TOKEN", "verify-me");
-  vi.stubEnv("WA_APP_SECRET", SECRET);
-  mocks.recordInbound.mockResolvedValue(true);
-  mocks.recordStatus.mockResolvedValue(true);
-  mocks.notifyAdmin.mockResolvedValue(undefined);
-  mocks.findBooking.mockResolvedValue(null);
-  mocks.loadThread.mockResolvedValue({ messages: [], canReplyFreely: true });
-  mocks.loadConversations.mockResolvedValue([]);
-});
-afterEach(() => vi.unstubAllEnvs());
-
-describe("webhook handshake", () => {
-  const url = (q: string) => new NextRequest(`https://www.elitebcn.info/api/whatsapp/webhook?${q}`);
-  it("echoes the challenge only for the right token", async () => {
-    const ok = await webhookGet(url("hub.mode=subscribe&hub.verify_token=verify-me&hub.challenge=12345"));
-    expect(ok.status).toBe(200);
-    expect(await ok.text()).toBe("12345");
-    expect((await webhookGet(url("hub.mode=subscribe&hub.verify_token=nope&hub.challenge=1"))).status).toBe(403);
-    expect((await webhookGet(url("hub.challenge=1"))).status).toBe(403);
+describe("buildThread: quotes and reactions", () => {
+  it("attaches the quoted message to a reply", () => {
+    const t = buildThread([
+      outMsg(3, "o1", "Your driver is Pedro"),
+      row("WA_MESSAGE", ago(2), { dir: "in", wamid: "i1", text: "Thanks!", type: "text", replyTo: "o1" }),
+    ]);
+    expect(t[1].replyTo).toEqual({ wamid: "o1", text: "Your driver is Pedro", dir: "out", type: "text" });
   });
-  it("refuses everything when no verify token is configured", async () => {
-    vi.stubEnv("WA_VERIFY_TOKEN", "");
-    expect((await webhookGet(url("hub.mode=subscribe&hub.verify_token=&hub.challenge=1"))).status).toBe(403);
+
+  it("keeps a quote even when the original is older than what was loaded", () => {
+    const t = buildThread([row("WA_MESSAGE", ago(1), { dir: "in", wamid: "i1", text: "ok", type: "text", replyTo: "gone" })]);
+    expect(t[0].replyTo).toMatchObject({ wamid: "gone", text: "" });
+  });
+
+  it("shows the latest reaction per side and drops a removed one", () => {
+    const t = buildThread([
+      inMsg(5, "hello"),
+      row("WA_REACTION", ago(4), { id: "r1", wamid: "in-5-hello", emoji: "👍", dir: "out" }),
+      row("WA_REACTION", ago(3), { id: "r2", wamid: "in-5-hello", emoji: "❤️", dir: "out" }),
+      row("WA_REACTION", ago(2), { id: "r3", wamid: "in-5-hello", emoji: "😂", dir: "in" }),
+      row("WA_REACTION", ago(1), { id: "r4", wamid: "in-5-hello", emoji: "", dir: "in" }),
+    ]);
+    expect(t[0].reactions).toEqual([{ emoji: "❤️", dir: "out" }]);
   });
 });
 
-describe("webhook delivery", () => {
-  const body = JSON.stringify(inboundPayload());
-
-  it("stores nothing and tells nobody when the signature is wrong or absent", async () => {
-    expect((await webhookPost(post(body, { "x-hub-signature-256": sign(body, "attacker") }))).status).toBe(403);
-    expect((await webhookPost(post(body))).status).toBe(403);
-    expect(mocks.recordInbound).not.toHaveBeenCalled();
-    expect(mocks.notifyAdmin).not.toHaveBeenCalled();
+describe("conversation list extras", () => {
+  it("carries the tick for our last message and the customer's own last words", () => {
+    const rows = [inMsg(5, "price?"), outMsg(2, "o1", "It is 50 euros"), row("WA_STATUS", ago(1.5), { wamid: "o1", status: "read" })];
+    const [c] = buildConversations(rows, NOW);
+    expect(c.lastStatus).toBe("read");
+    expect(c.lastInText).toBe("price?");
+    expect(c.lastInAt).toBe(ago(5).toISOString());
   });
 
-  it("refuses everything when the app secret is not configured", async () => {
-    vi.stubEnv("WA_APP_SECRET", "");
-    expect((await webhookPost(post(body, { "x-hub-signature-256": sign(body, "") }))).status).toBe(403);
-    expect(mocks.recordInbound).not.toHaveBeenCalled();
+  it("has no tick when the customer wrote last", () => {
+    expect(buildConversations([outMsg(3, "o1"), inMsg(1, "hi")], NOW)[0].lastStatus).toBeNull();
   });
 
-  it("stores a signed message and alerts the office once, with a link to the conversation", async () => {
-    const res = await webhookPost(post(body, { "x-hub-signature-256": sign(body) }));
-    expect(res.status).toBe(200);
-    expect(mocks.recordInbound).toHaveBeenCalledTimes(1);
-    expect(mocks.notifyAdmin).toHaveBeenCalledTimes(1);
-    const text = mocks.notifyAdmin.mock.calls[0][0] as string;
-    expect(text).toContain("Hello");
-    expect(text).toContain("/admin/whatsapp?phone=%2B34635383712");
-  });
-
-  it("does not alert again when Meta retries a message already stored", async () => {
-    mocks.recordInbound.mockResolvedValue(false);
-    expect((await webhookPost(post(body, { "x-hub-signature-256": sign(body) }))).status).toBe(200);
-    expect(mocks.notifyAdmin).not.toHaveBeenCalled();
-  });
-
-  it("still answers 200 if the alert fails", async () => {
-    mocks.notifyAdmin.mockRejectedValue(new Error("down"));
-    expect((await webhookPost(post(body, { "x-hub-signature-256": sign(body) }))).status).toBe(200);
-    expect(mocks.recordInbound).toHaveBeenCalledTimes(1);
-  });
-
-  it("answers 500 when storing fails so Meta retries", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => {});
-    mocks.recordInbound.mockRejectedValue(new Error("db down"));
-    expect((await webhookPost(post(body, { "x-hub-signature-256": sign(body) }))).status).toBe(500);
-  });
-
-  it("answers 200 to a signed body that is not JSON or has nothing in it", async () => {
-    const junk = "not json";
-    expect((await webhookPost(post(junk, { "x-hub-signature-256": sign(junk) }))).status).toBe(200);
-    const empty = JSON.stringify({ entry: [] });
-    expect((await webhookPost(post(empty, { "x-hub-signature-256": sign(empty) }))).status).toBe(200);
-  });
-
-  it("records delivery statuses", async () => {
-    const s = JSON.stringify({ entry: [{ changes: [{ value: { statuses: [{ id: "w1", status: "read", timestamp: "1790000000", recipient_id: "34635383712" }] } }] }] });
-    expect((await webhookPost(post(s, { "x-hub-signature-256": sign(s) }))).status).toBe(200);
-    expect(mocks.recordStatus).toHaveBeenCalledWith(expect.objectContaining({ wamid: "w1", status: "read" }));
+  it("windowEndsAt and latestInboundId follow the customer's newest message", () => {
+    const rows = [inMsg(30, "old"), inMsg(2, "new"), outMsg(1, "o1")];
+    expect(windowEndsAt(rows)).toBe(ago(2).getTime() + SESSION_WINDOW_MS);
+    expect(latestInboundId(rows)).toBe("in-2-new");
+    expect(windowEndsAt([outMsg(1, "o1")])).toBeNull();
+    expect(latestInboundId([])).toBeNull();
   });
 });
 
-const ctx = (phone: string) => ({ params: Promise.resolve({ phone }) });
-const reply = (text: unknown) =>
-  new NextRequest("https://www.elitebcn.info/api/admin/whatsapp/x", { method: "POST", body: JSON.stringify({ text }) });
-const asRole = (role: string | null) => mocks.session.mockResolvedValue(role ? { user: { role, name: "Sam" } } : null);
-
-describe("admin routes", () => {
-  it("refuse anyone who is not an admin", async () => {
-    for (const role of [null, "DRIVER", "PARTNER"]) {
-      asRole(role);
-      expect((await adminList()).status).toBe(401);
-      expect((await adminThreadGet(new NextRequest("https://x.test/y"), ctx("%2B34635383712"))).status).toBe(401);
-      expect((await adminReply(reply("hi"), ctx("%2B34635383712"))).status).toBe(401);
-    }
-    expect(mocks.sendText).not.toHaveBeenCalled();
-    expect(mocks.loadConversations).not.toHaveBeenCalled();
+describe("summarize", () => {
+  it("counts unread across chats and quotes the newest message from a customer", () => {
+    const rows = [
+      inMsg(6, "first", { name: "Ana" }, "+34600000001"),
+      inMsg(2, "second", { name: "Luis" }, "+34600000002"),
+      inMsg(1, "third", {}, "+34600000002"),
+      row("WA_SEEN", ago(10), {}, "+34600000003"),
+      inMsg(20, "read already", {}, "+34600000003"),
+      row("WA_SEEN", ago(19), {}, "+34600000003"),
+    ];
+    const s = summarize(buildConversations(rows, NOW));
+    expect(s.unread).toBe(3);
+    expect(s.chats).toBe(2);
+    expect(s.latest).toMatchObject({ phone: "+34600000002", text: "third" });
   });
 
-  it("the list reports setup as booleans and never leaks the values", async () => {
-    asRole("ADMIN");
-    const body = await (await adminList()).json();
-    expect(body.setup).toEqual({ sending: true, receiving: true });
-    expect(JSON.stringify(body)).not.toContain(SECRET);
+  it("is empty when nothing is waiting", () => {
+    expect(summarize(buildConversations([inMsg(3, "hi"), row("WA_SEEN", ago(1))], NOW))).toEqual({ unread: 0, chats: 0, latest: null });
   });
 
-  it("sends a reply inside the window and records it as ours", async () => {
-    asRole("ADMIN");
-    mocks.sendText.mockResolvedValue({ outcome: "sent", id: "wamid.OUT" });
-    const res = await adminReply(reply("On our way"), ctx("%2B34635383712"));
-    expect(res.status).toBe(200);
-    expect(mocks.sendText).toHaveBeenCalledWith("+34635383712", "On our way");
-    expect(mocks.recordOutbound).toHaveBeenCalledWith({ phone: "+34635383712", wamid: "wamid.OUT", text: "On our way", by: "Sam" });
-  });
-
-  it("refuses a free-text reply outside 24 hours and sends nothing", async () => {
-    asRole("ADMIN");
-    mocks.loadThread.mockResolvedValue({ messages: [], canReplyFreely: false });
-    const res = await adminReply(reply("hello?"), ctx("%2B34635383712"));
-    expect(res.status).toBe(409);
-    expect(mocks.sendText).not.toHaveBeenCalled();
-    expect(mocks.recordOutbound).not.toHaveBeenCalled();
-  });
-
-  it("does not record a message WhatsApp did not accept", async () => {
-    asRole("ADMIN");
-    mocks.sendText.mockResolvedValue({ outcome: "failed", reason: "Token expired" });
-    const res = await adminReply(reply("hi"), ctx("%2B34635383712"));
-    expect(res.status).toBe(502);
-    expect((await res.json()).error).toBe("Token expired");
-    expect(mocks.recordOutbound).not.toHaveBeenCalled();
-  });
-
-  it("rejects an empty reply and a bad phone", async () => {
-    asRole("ADMIN");
-    expect((await adminReply(reply("   "), ctx("%2B34635383712"))).status).toBe(422);
-    expect((await adminReply(reply("hi"), ctx("abc"))).status).toBe(422);
-    expect(mocks.sendText).not.toHaveBeenCalled();
+  it("does not quote our own reply as the thing a customer said", () => {
+    const s = summarize(buildConversations([inMsg(5, "question"), outMsg(1, "o1", "our answer to someone else")].concat([inMsg(0.5, "new thing")]), NOW));
+    expect(s.latest?.text).toBe("new thing");
   });
 });

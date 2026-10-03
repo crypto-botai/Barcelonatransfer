@@ -18,6 +18,9 @@
 // message yesterday and silently does not for everybody else.
 
 import { toE164 } from "@/lib/phone";
+import { MAX_MEDIA_BYTES, SENDABLE_MEDIA } from "@/lib/whatsapp-files";
+
+export { MAX_MEDIA_BYTES, SENDABLE_MEDIA };
 
 const WA_API_VERSION = "v21.0";
 
@@ -199,11 +202,202 @@ export async function sendWhatsAppText(phone: string, text: string): Promise<boo
  * receipts to it) and the reason when it is refused, which sendWhatsAppText
  * folds into a boolean.
  */
-export async function sendWhatsAppTextResult(phone: string | null | undefined, text: string): Promise<WhatsAppResult> {
+export async function sendWhatsAppTextResult(
+  phone: string | null | undefined,
+  text: string,
+  opts: { replyTo?: string | null } = {},
+): Promise<WhatsAppResult> {
+  const to = recipient(phone);
+  if (typeof to !== "string") return to;
+  return post({
+    to,
+    type: "text",
+    text: { body: text.slice(0, 4096), preview_url: true },
+    ...(opts.replyTo ? { context: { message_id: opts.replyTo } } : {}),
+  });
+}
+
+/** The number to send to, or the reason there is none. Shared by every free-form send below. */
+function recipient(phone: string | null | undefined): string | WhatsAppResult {
   if (!whatsappConfigured()) return { outcome: "skipped", reason: "WhatsApp is not configured" };
   const to = toE164(phone);
   if (!to) return { outcome: "skipped", reason: phone ? "number has no country code" : "no phone number" };
-  return post({ to, type: "text", text: { body: text.slice(0, 4096), preview_url: true } });
+  return to;
+}
+
+/**
+ * Tell the customer their messages were read: the blue ticks on their side.
+ *
+ * Naming the newest message marks everything before it too. Best effort — a
+ * failure here must never get in the way of the office reading the chat.
+ */
+export async function markWhatsAppRead(wamid: string): Promise<void> {
+  if (!whatsappConfigured() || !wamid) return;
+  await post({ status: "read", message_id: wamid }).catch(() => {});
+}
+
+/** React to one of the customer's messages. An empty emoji removes the reaction. */
+export async function sendWhatsAppReaction(phone: string, wamid: string, emoji: string): Promise<WhatsAppResult> {
+  const to = recipient(phone);
+  if (typeof to !== "string") return to;
+  return post({ to, type: "reaction", reaction: { message_id: wamid, emoji } });
+}
+
+/** Upload a file to WhatsApp and get the id a message can then refer to. */
+export async function uploadWhatsAppMedia(
+  bytes: ArrayBuffer,
+  mime: string,
+  filename: string,
+): Promise<{ ok: true; id: string } | { ok: false; reason: string }> {
+  const phoneId = process.env.WA_PHONE_ID;
+  const token = process.env.WA_TOKEN;
+  if (!phoneId || !token) return { ok: false, reason: "WhatsApp is not configured" };
+  try {
+    const form = new FormData();
+    form.append("messaging_product", "whatsapp");
+    form.append("type", mime);
+    form.append("file", new Blob([bytes], { type: mime }), filename);
+    const res = await fetch(`https://graph.facebook.com/${WA_API_VERSION}/${phoneId}/media`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+    if (!res.ok) {
+      const e = parseError(await res.text().catch(() => ""));
+      return { ok: false, reason: classify(e.code, e.message).reason };
+    }
+    const { id } = (await res.json()) as { id?: string };
+    return id ? { ok: true, id } : { ok: false, reason: "WhatsApp did not return a file id" };
+  } catch (e) {
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/** A photo or document, from an id returned by uploadWhatsAppMedia. */
+export async function sendWhatsAppMedia(
+  phone: string,
+  m: { kind: "image" | "document"; mediaId: string; caption?: string; filename?: string; replyTo?: string | null },
+): Promise<WhatsAppResult> {
+  const to = recipient(phone);
+  if (typeof to !== "string") return to;
+  const body =
+    m.kind === "image"
+      ? { id: m.mediaId, ...(m.caption ? { caption: m.caption.slice(0, 1024) } : {}) }
+      : { id: m.mediaId, ...(m.filename ? { filename: m.filename.slice(0, 240) } : {}), ...(m.caption ? { caption: m.caption.slice(0, 1024) } : {}) };
+  return post({ to, type: m.kind, [m.kind]: body, ...(m.replyTo ? { context: { message_id: m.replyTo } } : {}) });
+}
+
+/** A list menu or a tap-to-open link button. Free-form, so it needs the 24-hour window like text does. */
+export async function sendWhatsAppInteractive(
+  phone: string,
+  interactive: Record<string, unknown>,
+  opts: { replyTo?: string | null } = {},
+): Promise<WhatsAppResult> {
+  const to = recipient(phone);
+  if (typeof to !== "string") return to;
+  return post({ to, type: "interactive", interactive, ...(opts.replyTo ? { context: { message_id: opts.replyTo } } : {}) });
+}
+
+// ─── The business profile: photo, about, address, hours of the page customers see ──
+
+/** The Meta app that owns the number. Not a secret: it appears in every Meta dashboard URL. */
+const WA_APP_ID = process.env.WA_APP_ID || "2233351653890022";
+
+export interface WhatsAppProfile {
+  about: string;
+  address: string;
+  description: string;
+  email: string;
+  vertical: string;
+  websites: string[];
+  profile_picture_url: string | null;
+}
+
+export async function getWhatsAppProfile(): Promise<{ ok: true; profile: WhatsAppProfile } | { ok: false; reason: string }> {
+  const phoneId = process.env.WA_PHONE_ID;
+  const token = process.env.WA_TOKEN;
+  if (!phoneId || !token) return { ok: false, reason: "WhatsApp is not configured" };
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/${WA_API_VERSION}/${phoneId}/whatsapp_business_profile?fields=about,address,description,email,profile_picture_url,websites,vertical`,
+      { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
+    );
+    if (!res.ok) {
+      const e = parseError(await res.text().catch(() => ""));
+      return { ok: false, reason: classify(e.code, e.message).reason };
+    }
+    const d = ((await res.json()) as { data?: Partial<WhatsAppProfile>[] }).data?.[0] ?? {};
+    return {
+      ok: true,
+      profile: {
+        about: d.about ?? "", address: d.address ?? "", description: d.description ?? "", email: d.email ?? "",
+        vertical: d.vertical ?? "", websites: d.websites ?? [], profile_picture_url: d.profile_picture_url ?? null,
+      },
+    };
+  } catch (e) {
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+export async function updateWhatsAppProfile(
+  fields: Partial<Omit<WhatsAppProfile, "profile_picture_url">> & { profile_picture_handle?: string },
+): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const phoneId = process.env.WA_PHONE_ID;
+  const token = process.env.WA_TOKEN;
+  if (!phoneId || !token) return { ok: false, reason: "WhatsApp is not configured" };
+  try {
+    const res = await fetch(`https://graph.facebook.com/${WA_API_VERSION}/${phoneId}/whatsapp_business_profile`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ messaging_product: "whatsapp", ...fields }),
+    });
+    if (res.ok) return { ok: true };
+    const e = parseError(await res.text().catch(() => ""));
+    return { ok: false, reason: classify(e.code, e.message).reason };
+  } catch (e) {
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/**
+ * Change the profile photo.
+ *
+ * Meta wants it in two steps: the picture is uploaded to the app, which returns
+ * a handle, and the handle is then set on the profile. The picture must be a
+ * JPEG or PNG, square works best, and at most 5 MB.
+ */
+export async function setWhatsAppProfilePhoto(bytes: ArrayBuffer, mime: string): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const token = process.env.WA_TOKEN;
+  if (!token || !process.env.WA_PHONE_ID) return { ok: false, reason: "WhatsApp is not configured" };
+  if (mime !== "image/jpeg" && mime !== "image/png") return { ok: false, reason: "The profile photo must be a JPEG or PNG" };
+  try {
+    const session = await fetch(
+      `https://graph.facebook.com/${WA_API_VERSION}/${WA_APP_ID}/uploads?file_length=${bytes.byteLength}&file_type=${encodeURIComponent(mime)}&file_name=profile`,
+      { method: "POST", headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!session.ok) {
+      const e = parseError(await session.text().catch(() => ""));
+      return { ok: false, reason: `Could not start the upload: ${e.message}` };
+    }
+    const { id } = (await session.json()) as { id?: string };
+    if (!id) return { ok: false, reason: "Meta did not open an upload session" };
+
+    const up = await fetch(`https://graph.facebook.com/${WA_API_VERSION}/${id}`, {
+      method: "POST",
+      headers: { Authorization: `OAuth ${token}`, file_offset: "0", "Content-Type": mime },
+      body: bytes,
+    });
+    if (!up.ok) {
+      const e = parseError(await up.text().catch(() => ""));
+      return { ok: false, reason: `Could not upload the photo: ${e.message}` };
+    }
+    const { h } = (await up.json()) as { h?: string };
+    if (!h) return { ok: false, reason: "Meta did not return a photo handle" };
+
+    return updateWhatsAppProfile({ profile_picture_handle: h });
+  } catch (e) {
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+  }
 }
 
 /**

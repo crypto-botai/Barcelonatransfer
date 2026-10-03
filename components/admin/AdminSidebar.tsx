@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { LayoutDashboard, CalendarCheck, Car, Users, DollarSign, Settings, LogOut, ChevronRight, ChevronDown, Wallet, Clock, Tag, Mail, BarChart2, TrendingUp, UserCheck, PieChart, Menu, X, Building2, Brain, Activity, Bell, BookOpen, Zap, CreditCard, FlaskConical, MessageSquare, Eye, Shield, Key, Radar, Star, Handshake, MessageCircle } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import { UNREAD_EVENT } from "@/components/admin/WhatsAppAlerts";
 
 // ─── Nav structure ─────────────────────────────────────────────────────────────
 interface NavItem {
@@ -79,6 +80,14 @@ export default function AdminSidebar() {
   const pathname = usePathname();
   const [drawerOpen,   setDrawerOpen]   = useState(false);
   const [expandedSubs, setExpandedSubs] = useState<string[]>([]);
+  // Customer messages waiting on WhatsApp, kept current by <WhatsAppAlerts />.
+  const [waUnread, setWaUnread] = useState(0);
+  useEffect(() => {
+    setWaUnread(window.__waUnread ?? 0);
+    const on = (e: Event) => setWaUnread((e as CustomEvent<number>).detail ?? 0);
+    window.addEventListener(UNREAD_EVENT, on);
+    return () => window.removeEventListener(UNREAD_EVENT, on);
+  }, []);
 
   // Auto-expand any group whose child is currently active
   useEffect(() => {
@@ -177,7 +186,10 @@ export default function AdminSidebar() {
           >
             <Icon size={16} className="flex-shrink-0" />
             <span className="truncate">{label}</span>
-            {active && <ChevronRight size={12} className="ml-auto flex-shrink-0" />}
+            {href === "/admin/whatsapp" && waUnread > 0 && (
+              <span className="ml-auto grid h-5 min-w-5 flex-shrink-0 place-items-center rounded-full bg-gold-500 px-1.5 text-[11px] font-bold text-black" aria-label={`${waUnread} unread WhatsApp messages`}>{waUnread}</span>
+            )}
+            {active && !(href === "/admin/whatsapp" && waUnread > 0) && <ChevronRight size={12} className="ml-auto flex-shrink-0" />}
           </Link>
         );
       })}
