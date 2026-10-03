@@ -11,6 +11,8 @@
  * limits are applied here, where they can be shown to the person editing.
  */
 
+import { DEFAULT_AUTO_MESSAGES, type AutoMessageSettings } from "@/lib/whatsapp-policy";
+
 export interface QuickReply {
   id: string;
   /** Typed after a slash in the reply box: "/price". */
@@ -57,6 +59,18 @@ export interface WhatsAppSettings {
   away: AutoReply & { hours: AwayHours };
   /** Also email the owner for every new customer message. */
   emailAlerts: boolean;
+  /** Which messages the site sends to customers and drivers by itself. */
+  autoMessages: AutoMessageSettings;
+  /** What happens when a customer writes and nobody answers. */
+  unanswered: {
+    enabled: boolean;
+    /** How long to wait for a person before answering for them. */
+    minutes: number;
+    /** Said when the question is not one the assistant can answer. */
+    text: string;
+    /** Answer the common questions (price, booking, payment, flights) from the live price table. */
+    assistant: boolean;
+  };
 }
 
 export const LIMITS = {
@@ -66,6 +80,9 @@ export const LIMITS = {
   description: 72,
   replyText: 1000,
   autoText: 1000,
+  /** Shortest and longest wait before answering for the office. */
+  minMinutes: 2,
+  maxMinutes: 720,
 } as const;
 
 export const DEFAULT_SERVICES: ServiceItem[] = [
@@ -81,9 +98,24 @@ export const DEFAULT_SERVICES: ServiceItem[] = [
 export const DEFAULT_QUICK_REPLIES: QuickReply[] = [
   { id: "hello", shortcut: "hello", text: "Hello, thank you for contacting Elite BCN Transfer. How can we help with your transfer?" },
   { id: "details", shortcut: "details", text: "To give you an exact price, could you tell us: pickup place, drop-off place, date and time, and the number of passengers?" },
+  { id: "price", shortcut: "price", text: "Our prices are fixed, with no surge pricing. You can see the exact price for your trip, and book, at https://www.elitebcn.info/book" },
+  { id: "book", shortcut: "book", text: "You can book online in one minute at https://www.elitebcn.info/book. Fixed price, no surge, pay securely by card." },
+  { id: "payment", shortcut: "payment", text: "At checkout you can pay in full, or pay 30% now and the rest to your chauffeur at the end of the journey, in cash or by card." },
+  { id: "cash", shortcut: "cash", text: "Yes, you can pay the balance to your chauffeur at the end of the journey, in cash or by card. Your booking is held once the first payment is made." },
+  { id: "link", shortcut: "link", text: "Here is your secure payment link. Your booking is confirmed as soon as the payment goes through." },
   { id: "flight", shortcut: "flight", text: "Could you send us your flight number? We use it to keep an eye on your arrival time." },
   { id: "pickup", shortcut: "pickup", text: "We will send you your driver's name and number before you land. A name sign in the arrivals hall (meet & greet) can be added as an extra when you book." },
-  { id: "book", shortcut: "book", text: "You can book online in one minute at https://www.elitebcn.info/book. Fixed price, no surge, pay securely by card." },
+  { id: "location", shortcut: "location", text: "At Barcelona Airport your driver will meet you in the arrivals hall. If you cannot find each other, message us here and we will connect you straight away." },
+  { id: "driver", shortcut: "driver", text: "Your driver's name and phone number are in your confirmation. He will contact you shortly before pickup." },
+  { id: "delay", shortcut: "delay", text: "Thank you for letting us know. We have noted the change and your driver has been told, so there is nothing else you need to do." },
+  { id: "wait", shortcut: "wait", text: "Your driver will wait for you. If you are going to be much later than planned, please message us here and we will arrange it." },
+  { id: "child", shortcut: "child", text: "We can provide a child or baby seat for your transfer. Please tell us the age of each child and we will add it to your booking." },
+  { id: "luggage", shortcut: "luggage", text: "How many suitcases and bags will you have? We will make sure the vehicle fits everyone and everything comfortably." },
+  { id: "invoice", shortcut: "invoice", text: "We can issue an invoice for your company. Please send us the company name, address and VAT number." },
+  { id: "change", shortcut: "change", text: "Of course, we can change your booking. Please tell us the new date, time or address and we will confirm it here." },
+  { id: "cancel", shortcut: "cancel", text: "You can read our cancellation and refund terms here: https://www.elitebcn.info/refund-policy. If you need to cancel, tell us your booking reference." },
+  { id: "lost", shortcut: "lost", text: "We are sorry about that. Please tell us your booking reference and what was left behind, and we will contact your driver straight away." },
+  { id: "review", shortcut: "review", text: "We hope you enjoyed your transfer. If you have a minute, a review helps us a great deal. Thank you for travelling with Elite BCN." },
   { id: "thanks", shortcut: "thanks", text: "Thank you for choosing Elite BCN Transfer. Have a lovely stay in Barcelona!" },
 ];
 
@@ -100,6 +132,13 @@ export const DEFAULT_SETTINGS: WhatsAppSettings = {
     hours: { days: [0, 1, 2, 3, 4, 5, 6], from: "08:00", to: "22:00" },
   },
   emailAlerts: true,
+  autoMessages: DEFAULT_AUTO_MESSAGES,
+  unanswered: {
+    enabled: false,
+    minutes: 10,
+    text: "Thank you for your message. We are away from the phone for a moment and will reply as soon as we can. To see prices and book now: https://www.elitebcn.info/book",
+    assistant: true,
+  },
 };
 
 // ─── Cleaning what the browser sends ─────────────────────────────────────────
@@ -115,6 +154,11 @@ export function sitePath(v: unknown, fallback: string): string {
   const s = String(v ?? "").trim();
   return /^\/(?!\/)[A-Za-z0-9\-_/.]*$/.test(s) ? s.slice(0, 200) : fallback;
 }
+
+const clampInt = (v: unknown, min: number, max: number, fallback: number): number => {
+  const n = Math.round(Number(v));
+  return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
+};
 
 const hhmm = (v: unknown, fallback: string) => (/^([01]\d|2[0-3]):[0-5]\d$/.test(String(v)) ? String(v) : fallback);
 
@@ -182,6 +226,18 @@ export function sanitizeSettings(input: unknown): WhatsAppSettings {
       hours: { days, from: hhmm(raw.away?.hours?.from, d.away.hours.from), to: hhmm(raw.away?.hours?.to, d.away.hours.to) },
     },
     emailAlerts: raw.emailAlerts !== false,
+    autoMessages: {
+      cashBookings: raw.autoMessages?.cashBookings === true,
+      headsUp: raw.autoMessages?.headsUp !== false,
+      flightAlerts: raw.autoMessages?.flightAlerts !== false,
+      driverFlightAlerts: raw.autoMessages?.driverFlightAlerts !== false,
+    },
+    unanswered: {
+      enabled: raw.unanswered?.enabled === true,
+      minutes: clampInt(raw.unanswered?.minutes, LIMITS.minMinutes, LIMITS.maxMinutes, d.unanswered.minutes),
+      text: str(raw.unanswered?.text, LIMITS.autoText) || d.unanswered.text,
+      assistant: raw.unanswered?.assistant !== false,
+    },
   };
 }
 

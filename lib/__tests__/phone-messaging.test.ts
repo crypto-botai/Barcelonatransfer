@@ -135,13 +135,22 @@ describe("what goes in a WhatsApp template", () => {
     vi.unstubAllEnvs();
   });
 
-  /** Opt-in: nothing is sent as a template that nobody has created in Meta. */
-  it("uses a template for the other messages only once its name is set", () => {
-    vi.stubEnv("WA_TEMPLATE_PICKUP_REMINDER", "");
-    expect(whatsappTemplateFor("PICKUP_REMINDER")).toBeNull();
-    vi.stubEnv("WA_TEMPLATE_PICKUP_REMINDER", "pickup_reminder");
-    expect(whatsappTemplateFor("PICKUP_REMINDER")).toEqual({ name: "pickup_reminder", fields: ["code", "when", "route"] });
+  /** Every automatic WhatsApp message has its own template, under a fixed name, with an override for the day one is resubmitted. */
+  it("has a template for each automatic message, and lets its name be overridden", () => {
+    vi.stubEnv("WA_TEMPLATE_DRIVER_ASSIGNED", "");
+    expect(whatsappTemplateFor("DRIVER_ASSIGNED")).toEqual({ name: "driver_assigned", fields: ["code", "driver", "when"] });
+    expect(whatsappTemplateFor("FLIGHT_DELAYED")).toEqual({ name: "flight_delayed", fields: ["code", "flight", "when"] });
+    expect(whatsappTemplateFor("PICKUP_SOON")).toEqual({ name: "pickup_soon", fields: ["code", "when", "route"] });
+    expect(whatsappTemplateFor("FLIGHT_DELAYED_DRIVER")).toEqual({ name: "driver_flight_delay", fields: ["code", "passenger", "flight", "when", "pickup"] });
+    vi.stubEnv("WA_TEMPLATE_DRIVER_ASSIGNED", "driver_assigned_v2");
+    expect(whatsappTemplateFor("DRIVER_ASSIGNED")?.name).toBe("driver_assigned_v2");
     vi.unstubAllEnvs();
+  });
+
+  it("has no template for anything that is not an automatic WhatsApp message", () => {
+    for (const e of ["PICKUP_REMINDER", "DRIVER_EN_ROUTE", "DRIVER_ARRIVED", "RIDE_ON_BOARD", "REVIEW_REQUEST", "PAYMENT_RECEIVED"] as const) {
+      expect(whatsappTemplateFor(e), e).toBeNull();
+    }
   });
 
   it("gives the office wording to submit, with one placeholder per field", () => {
@@ -165,7 +174,7 @@ describe("what goes in a WhatsApp template", () => {
     ["BOOKING_CONFIRMED", "lib/payment-completion.ts", 'event:     "BOOKING_CONFIRMED"'],
     ["BOOKING_CONFIRMED", "app/api/admin/bookings/route.ts", 'event:     "BOOKING_CONFIRMED"'],
     ["BOOKING_CONFIRMED", "app/api/admin/bookings/[id]/message/route.ts", 'event: "BOOKING_CONFIRMED"'],
-    ["PICKUP_REMINDER",   "app/api/cron/pickup-reminder/route.ts", 'event:     "PICKUP_REMINDER"'],
+    ["PICKUP_SOON",       "app/api/cron/pickup-reminder/route.ts", 'event:     "PICKUP_SOON"'],
     ["DRIVER_ASSIGNED",   "app/api/bookings/[id]/route.ts", 'event:     "DRIVER_ASSIGNED"'],
     ["DRIVER_ASSIGNED",   "lib/partner.ts", 'event: "DRIVER_ASSIGNED"'],
     ["FLIGHT_DELAYED",    "lib/flights/sweep.ts", 'event:     "FLIGHT_DELAYED"'],
@@ -308,18 +317,21 @@ describe("the dispatcher, end to end", () => {
     expect(new URLSearchParams(sms[1].body).get("Body")).toContain("PRB6PY9KU7");
   });
 
-  /** The reason customers were not being reached. */
-  it("sends a reminder as free text until its template is set, then as the template", async () => {
+  /** A reminder is not one of the WhatsApp messages: it must not be sent, as text or as a template. */
+  it("does not send a pickup reminder by WhatsApp at all", async () => {
     const { notify } = await import("@/lib/notifications/service");
-    await notify({ event: "PICKUP_REMINDER", channels: ["whatsapp"], phone: "+34635383712", vars: VARS });
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body).type).toBe("text");
+    const res = await notify({ event: "PICKUP_REMINDER", channels: ["whatsapp"], phone: "+34635383712", vars: VARS });
+    expect(res.results.whatsapp.outcome).toBe("skipped");
+    expect(res.results.whatsapp.reason).toMatch(/not one of the automatic/);
+    expect(fetchMock.mock.calls.filter((c) => String(c[0]).includes("graph.facebook"))).toHaveLength(0);
+  });
 
-    fetchMock.mockClear();
-    vi.stubEnv("WA_TEMPLATE_PICKUP_REMINDER", "pickup_reminder");
-    await notify({ event: "PICKUP_REMINDER", channels: ["whatsapp"], phone: "+34635383712", vars: VARS });
+  it("sends a flight delay as its approved template, by default", async () => {
+    const { notify } = await import("@/lib/notifications/service");
+    await notify({ event: "FLIGHT_DELAYED", channels: ["whatsapp"], phone: "+34635383712", vars: { ...VARS, flight: "VY1875" } });
     const sent = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(sent.type).toBe("template");
-    expect(sent.template.name).toBe("pickup_reminder");
+    expect(sent.template.name).toBe("flight_delayed");
   });
 
   it("names a missing country code as the reason, not the 24-hour window", async () => {
@@ -379,8 +391,9 @@ describe("it is sent once, and only to people who should get it", () => {
     expect(email).toBeGreaterThan(guard);
     // The text sits behind the email, so it inherits the guard and the log row.
     expect(phone).toBeGreaterThan(email);
-    // The reminder is not texted: only the confirmation and the driver are.
-    expect(cron).toMatch(/channels:\s*\["inapp", "whatsapp"\]/);
+    // The evening reminder is in the account only. WhatsApp's one heads-up is a separate event.
+    expect(cron).toMatch(/channels:\s*\["inapp"\]/);
+    expect(cron).toMatch(/event:\s*"PICKUP_SOON"/);
     expect(cron).not.toMatch(/channels:\s*\[[^\]]*"sms"/);
   });
 

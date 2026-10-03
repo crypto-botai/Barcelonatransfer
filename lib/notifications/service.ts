@@ -26,6 +26,7 @@ import { sendSms } from "@/lib/sms";
 import { toE164 } from "@/lib/phone";
 import { smsTextFor } from "./sms-copy";
 import { whatsappTemplateFor } from "./whatsapp-templates";
+import { whatsappVerdict } from "./whatsapp-guard";
 import { sendPushToUser, sendPushToBooking } from "./push";
 import { prisma as db } from "@/lib/prisma";
 import {
@@ -129,7 +130,14 @@ export async function notify(input: NotifyInput): Promise<NotifyResult> {
       // blaming the 24-hour window for a number that could never be reached.
       mark("whatsapp", "skipped", "number has no country code");
     } else {
-      try {
+      // Only the few messages a customer or driver is meant to get by WhatsApp,
+      // each within its limit, and only for a paid booking. The rules are in
+      // lib/whatsapp-policy.ts; applying them here, where every send passes,
+      // means no caller can add a message that breaks them.
+      const verdict = await whatsappVerdict({ event: input.event, bookingId: input.bookingId, vars });
+      if (!verdict.send) {
+        mark("whatsapp", "skipped", verdict.reason);
+      } else try {
         const template = whatsappTemplateFor(input.event);
         if (template) {
           // An approved template reaches a customer at any time. Free text only

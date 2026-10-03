@@ -565,3 +565,67 @@ export async function subscribeWhatsAppApp(): Promise<{ ok: true } | { ok: false
     return { ok: false, reason: e instanceof Error ? e.message : String(e) };
   }
 }
+
+// ─── Message templates in Meta ────────────────────────────────────────────────
+
+export interface MetaTemplate {
+  name: string;
+  status: string; // APPROVED | PENDING | REJECTED | PAUSED | DISABLED …
+  category: string;
+  language: string;
+  rejectedReason: string | null;
+}
+
+/** Every template on the business account, with where its approval stands. */
+export async function listWhatsAppTemplates(): Promise<{ ok: true; templates: MetaTemplate[] } | { ok: false; reason: string }> {
+  const token = process.env.WA_TOKEN;
+  if (!token) return { ok: false, reason: "WhatsApp is not configured" };
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/${WA_API_VERSION}/${WA_WABA_ID}/message_templates?fields=name,status,category,language,rejected_reason&limit=200`,
+      { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
+    );
+    if (!res.ok) {
+      const e = parseError(await res.text().catch(() => ""));
+      return { ok: false, reason: classify(e.code, e.message).reason };
+    }
+    const data = ((await res.json()) as { data?: { name: string; status: string; category: string; language: string; rejected_reason?: string }[] }).data ?? [];
+    return {
+      ok: true,
+      templates: data.map((t) => ({
+        name: t.name, status: t.status, category: t.category, language: t.language,
+        rejectedReason: t.rejected_reason && t.rejected_reason !== "NONE" ? t.rejected_reason : null,
+      })),
+    };
+  } catch (e) {
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/** Submit one template for Meta's review. It is usually decided within minutes. */
+export async function createWhatsAppTemplate(def: {
+  name: string; language: string; category: string; body: string; examples: readonly string[];
+}): Promise<{ ok: true; status: string } | { ok: false; reason: string }> {
+  const token = process.env.WA_TOKEN;
+  if (!token) return { ok: false, reason: "WhatsApp is not configured" };
+  try {
+    const res = await fetch(`https://graph.facebook.com/${WA_API_VERSION}/${WA_WABA_ID}/message_templates`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: def.name,
+        language: def.language,
+        category: def.category,
+        components: [{ type: "BODY", text: def.body, ...(def.examples.length ? { example: { body_text: [def.examples] } } : {}) }],
+      }),
+    });
+    if (!res.ok) {
+      const e = parseError(await res.text().catch(() => ""));
+      return { ok: false, reason: e.message || classify(e.code, e.message).reason };
+    }
+    const { status } = (await res.json().catch(() => ({}))) as { status?: string };
+    return { ok: true, status: status ?? "PENDING" };
+  } catch (e) {
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+  }
+}

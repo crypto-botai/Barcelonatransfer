@@ -92,10 +92,11 @@ export async function POST(req: NextRequest) {
       // it is what writes the EmailLog row this loop dedups on.
       await notify({
         event:     "PICKUP_REMINDER",
-        // No text. A customer who paid for text alerts gets the confirmation and
-        // the driver's name by text, and nothing else: the reminder goes by
-        // email and in the account.
-        channels:  ["inapp", "whatsapp"],
+        // No text and no WhatsApp. A customer is messaged on WhatsApp only for the
+        // confirmation, the driver's name, a flight delay and one heads-up an hour
+        // before pickup (below). This evening-before reminder goes by email and in
+        // the account.
+        channels:  ["inapp"],
         userId:    b.userId,
         bookingId: b.id,
         phone:     b.guestPhone,
@@ -109,6 +110,41 @@ export async function POST(req: NextRequest) {
     } catch (err) {
       console.error("[cron/pickup-reminder]", err);
     }
+  }
+
+  /**
+   * The one WhatsApp heads-up, about an hour before pickup.
+   *
+   * The window is 30 to 90 minutes out, the same width as the schedule, so each
+   * booking is seen by exactly one run and gets one chance. Whether it is sent
+   * is not decided here: the policy in lib/whatsapp-policy.ts holds it back for
+   * an unpaid or cancelled booking, and when another WhatsApp went to the same
+   * customer in the last two hours, which is what stops a last-minute booking
+   * being told three times in an hour.
+   */
+  const soon = await prisma.booking.findMany({
+    where: {
+      pickupDatetime: { gte: new Date(Date.now() + 30 * 60_000), lte: new Date(Date.now() + 90 * 60_000) },
+      status:         { in: ["CONFIRMED", "DRIVER_ASSIGNED"] },
+      isDeleted:      false,
+      guestPhone:     { not: null },
+    },
+    select: { id: true, userId: true, guestPhone: true, confirmationCode: true, pickupAddress: true, dropoffAddress: true, pickupDatetime: true },
+  }).catch(() => []);
+  for (const b of soon) {
+    await notify({
+      event:     "PICKUP_SOON",
+      channels:  ["whatsapp"],
+      userId:    b.userId,
+      bookingId: b.id,
+      phone:     b.guestPhone,
+      vars: {
+        code:  b.confirmationCode,
+        when:  formatPickupDateTime(b.pickupDatetime),
+        route: b.dropoffAddress ? `${b.pickupAddress} → ${b.dropoffAddress}` : b.pickupAddress,
+        link:  `${BASE_URL}/track/${b.confirmationCode}`,
+      },
+    }).catch((err) => console.error("[cron/pickup-reminder] heads-up:", err));
   }
 
   // Same pass, same 36h horizon: check whether any of tomorrow's flights have

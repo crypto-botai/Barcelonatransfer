@@ -15,6 +15,7 @@ export const NOTIFICATION_EVENTS = [
   "PAYMENT_FAILED",
   "DRIVER_ASSIGNED",
   "PICKUP_REMINDER",
+  "PICKUP_SOON",
   "FLIGHT_DELAYED",
   "FLIGHT_DELAYED_DRIVER",
   "DRIVER_EN_ROUTE",
@@ -112,6 +113,25 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
       es: { title: "Tu traslado es mañana",      body: "Recogida {{when}} — {{route}}. Reserva {{code}}." },
       fr: { title: "Votre transfert est demain", body: "Prise en charge {{when}} — {{route}}. Réservation {{code}}." },
       de: { title: "Ihr Transfer ist morgen",    body: "Abholung {{when}} — {{route}}. Buchung {{code}}." },
+    },
+  },
+
+  /**
+   * One heads-up about an hour before pickup, by WhatsApp only.
+   *
+   * Separate from the evening-before reminder, which goes by email and in the
+   * account. This is the single WhatsApp a customer gets between the driver's
+   * name and the pickup itself, and it is held back when another message has
+   * just been sent (lib/whatsapp-policy.ts), so a last-minute booking is told
+   * once and not three times in an hour.
+   */
+  PICKUP_SOON: {
+    channels: ["whatsapp"],
+    copy: {
+      en: { title: "Your transfer is coming up", body: "Pickup {{when}} — {{route}}. Booking {{code}}." },
+      es: { title: "Tu traslado se acerca",      body: "Recogida {{when}} — {{route}}. Reserva {{code}}." },
+      fr: { title: "Votre transfert approche",   body: "Prise en charge {{when}} — {{route}}. Réservation {{code}}." },
+      de: { title: "Ihr Transfer steht bevor",   body: "Abholung {{when}} — {{route}}. Buchung {{code}}." },
     },
   },
 

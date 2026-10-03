@@ -141,7 +141,7 @@ describe("formatSpans", () => {
 
 describe("matchQuickReplies", () => {
   it("opens on a leading slash and narrows by what follows", () => {
-    expect(matchQuickReplies("/", DEFAULT_QUICK_REPLIES)!.length).toBe(DEFAULT_QUICK_REPLIES.length);
+    expect(matchQuickReplies("/", DEFAULT_QUICK_REPLIES)!.length).toBe(8); // the first eight, so the list stays short
     expect(matchQuickReplies("/fl", DEFAULT_QUICK_REPLIES)!.map((r) => r.shortcut)).toEqual(["flight"]);
   });
   it("also finds a reply by a word in its text", () => {

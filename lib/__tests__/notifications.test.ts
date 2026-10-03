@@ -134,8 +134,7 @@ describe("notify()", () => {
     expect(sendWhatsAppText).not.toHaveBeenCalled();
   });
 
-  it("treats a closed WhatsApp session window as skipped, not failed", async () => {
-    sendWhatsAppText.mockResolvedValueOnce(false);
+  it("does not send a message that is not one of the automatic WhatsApp ones", async () => {
     const { notify } = await import("@/lib/notifications/service");
     const res = await notify({
       event: "PICKUP_REMINDER",
@@ -143,7 +142,8 @@ describe("notify()", () => {
       phone: "+34600000000",
     });
     expect(res.results.whatsapp.outcome).toBe("skipped");
-    expect(res.results.whatsapp.reason).toMatch(/24h/);
+    expect(res.results.whatsapp.reason).toMatch(/not one of the automatic/);
+    expect(sendWhatsAppText).not.toHaveBeenCalled();
   });
 
   it("uses the event's default channels when none are given", async () => {
