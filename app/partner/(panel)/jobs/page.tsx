@@ -4,31 +4,13 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Camera, Check, Loader2, Mail, MapPin, MessageSquare, Phone, Plane, Undo2, Users, Wallet } from "lucide-react";
+import { Camera, Check, Columns3, Loader2, Mail, MapPin, MessageSquare, Phone, Plane, Rows3, Undo2, Users, Wallet } from "lucide-react";
 import { ChatSheet, LiveLocationSheet, NoShowSheet } from "@/components/partner/JobTools";
 import FlightInfoCard from "@/components/flight/FlightInfoCard";
 import toast from "react-hot-toast";
+import PartnerDispatchBoard from "@/components/partner/DispatchBoard";
+import type { Driver, Job } from "@/components/partner/types";
 import { Empty, PageTitle, Sheet, Skeleton, Status, euro, field, ghost, label, primary, vehicleLabel, whenParts } from "@/components/partner/ui";
-
-type Job = {
-  id: string; confirmationCode: string; status: string;
-  guestName: string | null; guestPhone: string | null; guestEmail: string | null;
-  pickupAddress: string; dropoffAddress: string; pickupDatetime: string;
-  pickupLat?: number | null; pickupLng?: number | null; dropoffLat?: number | null; dropoffLng?: number | null;
-  passengers: number; luggage: number; vehicleClass: string; flightNumber: string | null;
-  /** The customer's own words, extras by name, stops. No prices: see the jobs route. */
-  notes: string | null; extras: { id: string; label: string; quantity: number }[]; stops: string[]; durationHours: number | null;
-  /** What the driver collects from the client on the day. */
-  collect: number;
-  noShow?: { images: string[]; note: string | null; waitedMin: number | null; createdAt: string; lat: number | null; lng: number | null } | null;
-  partnerPayout: number | null; driverAmount: number | null; partnerDispatchedAt: string | null;
-  driver: { id: string; user: { name: string | null; phone: string | null }; vehicles: { make: string; model: string; licensePlate: string }[] } | null;
-};
-type Driver = {
-  id: string; status: string; user: { name: string | null; phone: string | null };
-  vehicles: { make: string; model: string; licensePlate: string; class: string }[];
-  _count: { bookings: number };
-};
 
 const SCOPES = [
   { id: "incoming",  label: "Incoming" },
@@ -47,6 +29,8 @@ function Jobs() {
   const router = useRouter();
   const reduce = useReducedMotion();
   const scope = (SCOPES.some((s) => s.id === params.get("scope")) ? params.get("scope") : "incoming") as Scope;
+  // "By driver" is the dispatcher's board; the list is the full record of every job.
+  const view: "list" | "board" = params.get("view") === "board" ? "board" : "list";
 
   const [jobs, setJobs] = useState<Job[] | null>(null);
   const [counts, setCounts] = useState<Record<Scope, number> | null>(null);
@@ -60,13 +44,13 @@ function Jobs() {
   const [undispatching, setUndispatching] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const r = await fetch(`/api/partner/jobs?scope=${scope}`);
+    const r = await fetch(`/api/partner/jobs?scope=${view === "board" ? "open" : scope}`);
     if (r.ok) {
       const body = await r.json();
       setJobs(body.jobs);
       setCounts(body.counts);
     }
-  }, [scope]);
+  }, [scope, view]);
 
   useEffect(() => { setJobs(null); load(); }, [load]);
   useEffect(() => { fetch("/api/partner/drivers").then((r) => r.ok ? r.json() : []).then(setDrivers).catch(() => {}); }, []);
@@ -100,10 +84,27 @@ function Jobs() {
 
   return (
     <div>
-      <PageTitle title="Jobs" sub="Everything Elite BCN has sent your company." />
+      <PageTitle
+        title="Jobs"
+        sub="Everything Elite BCN has sent your company."
+        aside={
+          <div className="relative grid grid-cols-2 rounded-lg border border-white/[0.1] bg-white/[0.03] p-0.5" role="tablist" aria-label="How to show jobs">
+            {([["list", "List", Rows3], ["board", "By driver", Columns3]] as const).map(([id, text, Icon]) => (
+              <button
+                key={id} role="tab" aria-selected={view === id}
+                onClick={() => router.replace(id === "board" ? "/partner/jobs?view=board" : `/partner/jobs?scope=${scope}`)}
+                className={`relative inline-flex h-9 items-center gap-1.5 px-3.5 text-[13px] transition-colors ${view === id ? "text-black" : "text-dark-300 hover:text-white"}`}
+              >
+                {view === id && <motion.span layoutId="jobs-view" className="absolute inset-0 rounded-md bg-gold-500" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }} />}
+                <span className="relative inline-flex items-center gap-1.5 font-medium"><Icon size={14} /> {text}</span>
+              </button>
+            ))}
+          </div>
+        }
+      />
 
       {/* Scope switch: one underline that travels. */}
-      <div className="mb-6 flex gap-1 overflow-x-auto border-b border-white/[0.08]" role="tablist">
+      {view === "list" && <div className="mb-6 flex gap-1 overflow-x-auto border-b border-white/[0.08]" role="tablist">
         {SCOPES.map((s) => {
           const active = s.id === scope;
           return (
@@ -138,10 +139,12 @@ function Jobs() {
             </button>
           );
         })}
-      </div>
+      </div>}
 
       {jobs === null ? (
         <Skeleton rows={4} h={120} />
+      ) : view === "board" ? (
+        <PartnerDispatchBoard jobs={jobs} drivers={activeDrivers} onOpen={setDetail} onDispatch={setDispatching} />
       ) : jobs.length === 0 ? (
         <Empty
           title={scope === "incoming" ? "No job is waiting" : `Nothing ${scope}`}

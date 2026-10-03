@@ -4,18 +4,23 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Sun, ListChecks, Users, Wallet, Building2, LogOut } from "lucide-react";
+import { Sun, ListChecks, Plane, Users, Wallet, Building2, LogOut } from "lucide-react";
 
 /**
  * The frame around every partner page: a rail on desktop, a tab bar on the
- * phone a dispatcher is more likely holding. Five destinations, no more.
+ * phone a dispatcher is more likely holding. Five destinations, no more. The
+ * company's own details sit beside Sign out, because they are visited rarely
+ * and a flight board is not.
+ *
+ * Earnings lives at /partner/payments: the address predates the name, and
+ * emails to companies already link to it.
  */
 const NAV = [
   { href: "/partner",          label: "Today",    icon: Sun },
   { href: "/partner/jobs",     label: "Jobs",     icon: ListChecks },
+  { href: "/partner/flights",  label: "Flights",  icon: Plane },
   { href: "/partner/drivers",  label: "Drivers",  icon: Users },
-  { href: "/partner/payments", label: "Payments", icon: Wallet },
-  { href: "/partner/account",  label: "Account",  icon: Building2 },
+  { href: "/partner/payments", label: "Earnings", icon: Wallet },
 ];
 
 export default function PartnerShell({
@@ -69,10 +74,17 @@ export default function PartnerShell({
             })}
           </nav>
 
+          <Link
+            href="/partner/account"
+            aria-current={isActive("/partner/account") ? "page" : undefined}
+            className={`mt-auto flex h-11 items-center gap-3 rounded-lg px-3 text-sm transition-colors hover:bg-white/[0.03] hover:text-white ${isActive("/partner/account") ? "text-gold-400" : "text-dark-400"}`}
+          >
+            <Building2 size={16} strokeWidth={1.6} /> Company details
+          </Link>
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="mt-auto flex h-11 items-center gap-3 rounded-lg px-3 text-sm text-dark-400 transition-colors hover:bg-white/[0.03] hover:text-white"
+            className="flex h-11 items-center gap-3 rounded-lg px-3 text-sm text-dark-400 transition-colors hover:bg-white/[0.03] hover:text-white"
           >
             <LogOut size={16} strokeWidth={1.6} /> Sign out
           </button>
@@ -82,7 +94,10 @@ export default function PartnerShell({
         <main className="min-w-0 flex-1 px-4 pb-24 pt-5 sm:px-6 lg:px-10 lg:pb-12 lg:pt-8">
           <div className="mb-5 flex items-center justify-between lg:hidden">
             <span className="font-display text-lg tracking-[0.28em]">ELITE<span className="text-gold-500">BCN</span></span>
-            <button type="button" onClick={() => signOut({ callbackUrl: "/" })} className="text-xs text-dark-400">Sign out</button>
+            <span className="flex items-center gap-4 text-xs text-dark-400">
+              <Link href="/partner/account" aria-current={isActive("/partner/account") ? "page" : undefined} className={isActive("/partner/account") ? "text-gold-400" : ""}>Company</Link>
+              <button type="button" onClick={() => signOut({ callbackUrl: "/" })}>Sign out</button>
+            </span>
           </div>
           {suspended && (
             <div className="mb-5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">

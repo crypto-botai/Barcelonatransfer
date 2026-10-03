@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import EarningsPanel from "@/components/partner/EarningsPanel";
 import { Empty, PageTitle, Sheet, Skeleton, euro, field, label, primary, whenParts } from "@/components/partner/ui";
 
 type Data = {
@@ -32,7 +33,7 @@ export default function PartnerPaymentsPage() {
 
   return (
     <div>
-      <PageTitle title="Payments" sub="A ride earns its payout when it is completed. Withdraw whenever you like." />
+      <PageTitle title="Earnings" sub="A ride earns its payout when it is completed. Withdraw whenever you like." />
 
       {!d ? <Skeleton rows={1} h={140} /> : (
         <section className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.06] md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
@@ -57,6 +58,9 @@ export default function PartnerPaymentsPage() {
           </div>
         </section>
       )}
+
+      {/* Daily, weekly and monthly: the same figures at three zoom levels. */}
+      <div className="mt-5"><EarningsPanel /></div>
 
       {/*
         The week, and the margin.

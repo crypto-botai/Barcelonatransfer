@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
   const HAS_DRIVER   = { status: { in: ["DRIVER_ASSIGNED" as const, "IN_PROGRESS" as const] }, driverId: { not: null } };
 
   const scoped =
+    scope === "open"      ? { OR: [NEEDS_DRIVER, HAS_DRIVER] } :
     scope === "incoming"  ? NEEDS_DRIVER :
     scope === "active"    ? HAS_DRIVER :
     scope === "completed" ? { status: "COMPLETED" as const } :
