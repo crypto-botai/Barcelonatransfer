@@ -99,6 +99,22 @@ export function buildServicesMenu(services: ResolvedService[]): Record<string, u
   };
 }
 
+/**
+ * The catalogue itself, opened inside the chat. It works whether or not the
+ * shop icon has shown up on the customer's phone yet, so it is the sure way
+ * to put the products in front of someone. The thumbnail is one product's picture.
+ */
+export function buildCatalogMessage(services: ResolvedService[]): Record<string, unknown> | null {
+  const first = services.find((s) => s.enabled);
+  if (!first) return null;
+  return {
+    type: "catalog_message",
+    body: { text: "Our services with prices. Tap View catalog, pick a service and book in a minute." },
+    footer: { text: "Fixed prices · No surge pricing" },
+    action: { name: "catalog_message", parameters: { thumbnail_product_retailer_id: first.id } },
+  };
+}
+
 /** What a customer gets after choosing a row: the picture, the price and a button to book. */
 export function buildServiceLink(s: ResolvedService): Record<string, unknown> {
   const price = s.fromPrice

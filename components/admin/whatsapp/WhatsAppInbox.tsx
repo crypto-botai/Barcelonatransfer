@@ -577,6 +577,7 @@ export default function WhatsAppInbox() {
                     onSendText={sendText}
                     onSendFile={sendFile}
                     onSendMenu={() => void act({ menu: true }, "Services menu sent")}
+                    onSendCatalog={() => void act({ catalog: true }, "Catalogue sent")}
                     onSendService={(id) => void act({ service: id }, "Service sent")}
                     onCancelReply={() => setReplyingTo(null)}
                     onError={(m) => toast.error(m)}

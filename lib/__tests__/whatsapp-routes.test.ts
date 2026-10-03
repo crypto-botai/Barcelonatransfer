@@ -399,7 +399,7 @@ describe("replying", () => {
 
   it("refuses everything free-form outside 24 hours, and sends nothing", async () => {
     mocks.loadThread.mockResolvedValue({ messages: [], canReplyFreely: false, latestInboundId: null, windowEndsAt: null });
-    for (const body of [{ text: "hello?" }, { reaction: { wamid: "w", emoji: "👍" } }, { menu: true }, { service: "sitges" }]) {
+    for (const body of [{ text: "hello?" }, { reaction: { wamid: "w", emoji: "👍" } }, { menu: true }, { catalog: true }, { service: "sitges" }]) {
       expect((await threadPost(jsonReq(body), ctx())).status).toBe(409);
     }
     expect(mocks.sendText).not.toHaveBeenCalled();
@@ -456,6 +456,21 @@ describe("services from the inbox", () => {
     settings = { ...DEFAULT_SETTINGS, services: DEFAULT_SETTINGS.services.map((s) => ({ ...s, enabled: false })) };
     const res = await threadPost(jsonReq({ menu: true }), ctx());
     expect(res.status).toBe(422);
+    expect(mocks.sendInteractive).not.toHaveBeenCalled();
+  });
+
+  it("sends the catalogue so it opens inside the chat, pictured by a real product id", async () => {
+    expect((await threadPost(jsonReq({ catalog: true }), ctx())).status).toBe(200);
+    const [to, msg] = mocks.sendInteractive.mock.calls[0];
+    expect(to).toBe(E164);
+    expect(msg.type).toBe("catalog_message");
+    expect(msg.action).toEqual({ name: "catalog_message", parameters: { thumbnail_product_retailer_id: "airport-to-city" } });
+    expect(mocks.recordOutbound).toHaveBeenCalledWith(expect.objectContaining({ by: "Sam", wamid: "wamid.OUT", text: expect.stringContaining("Catalogue") }));
+  });
+
+  it("does not send the catalogue when no service is switched on", async () => {
+    settings = { ...DEFAULT_SETTINGS, services: DEFAULT_SETTINGS.services.map((s) => ({ ...s, enabled: false })) };
+    expect((await threadPost(jsonReq({ catalog: true }), ctx())).status).toBe(422);
     expect(mocks.sendInteractive).not.toHaveBeenCalled();
   });
 

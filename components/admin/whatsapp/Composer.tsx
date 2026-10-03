@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { FileText, Image as ImageIcon, LayoutList, Loader2, Paperclip, Send, Smile, X, Zap } from "lucide-react";
+import { FileText, Image as ImageIcon, LayoutList, ShoppingBag, Loader2, Paperclip, Send, Smile, X, Zap } from "lucide-react";
 import type { ChatMessage } from "@/lib/whatsapp-inbox";
 import type { QuickReply } from "@/lib/whatsapp-settings";
 import type { ResolvedService } from "@/lib/whatsapp-services";
@@ -22,6 +22,7 @@ interface Props {
   onSendText: (text: string) => void;
   onSendFile: (file: File, caption: string) => void;
   onSendMenu: () => void;
+  onSendCatalog: () => void;
   onSendService: (id: string) => void;
   onCancelReply: () => void;
   onError: (message: string) => void;
@@ -35,7 +36,7 @@ interface Props {
 type Popup = null | "emoji" | "attach" | "services";
 
 const Composer = forwardRef<ComposerHandle, Props>(function Composer(
-  { value, onChange, onSendText, onSendFile, onSendMenu, onSendService, onCancelReply, onError, replyingTo, customerName, quickReplies, services, busy },
+  { value, onChange, onSendText, onSendFile, onSendMenu, onSendCatalog, onSendService, onCancelReply, onError, replyingTo, customerName, quickReplies, services, busy },
   ref,
 ) {
   const [popup, setPopup] = useState<Popup>(null);
@@ -221,6 +222,13 @@ const Composer = forwardRef<ComposerHandle, Props>(function Composer(
             <span>
               <span className="block text-sm font-medium text-white">Send the services menu</span>
               <span className="block text-[11.5px] text-dark-400">A tap-to-choose list. The customer picks, we send the price and a Book button.</span>
+            </span>
+          </button>
+          <button role="menuitem" type="button" onClick={() => { setPopup(null); onSendCatalog(); }} disabled={enabledServices.length === 0} className="flex w-full items-center gap-3 border-b border-white/[0.06] px-3.5 py-3 text-left hover:bg-white/[0.06] disabled:opacity-40">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold-500/15 text-gold-300"><ShoppingBag size={16} /></span>
+            <span>
+              <span className="block text-sm font-medium text-white">Send the catalogue</span>
+              <span className="block text-[11.5px] text-dark-400">Opens the shop inside the chat, with every service and its price.</span>
             </span>
           </button>
           <p className="px-3.5 pb-1 pt-2.5 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-dark-500">Or send one service</p>

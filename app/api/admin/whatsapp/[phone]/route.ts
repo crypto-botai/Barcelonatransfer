@@ -8,7 +8,7 @@ import {
   markWhatsAppRead, sendWhatsAppInteractive, sendWhatsAppReaction, sendWhatsAppTextResult,
 } from "@/lib/whatsapp";
 import { loadSettings } from "@/lib/whatsapp-settings-store";
-import { buildServiceLink, buildServicesMenu, resolveServices } from "@/lib/whatsapp-services";
+import { buildCatalogMessage, buildServiceLink, buildServicesMenu, resolveServices } from "@/lib/whatsapp-services";
 
 export const dynamic = "force-dynamic";
 
@@ -71,6 +71,7 @@ const body = z.union([
   z.object({ text: z.string().trim().min(1).max(4000), replyTo: z.string().max(200).nullish() }),
   z.object({ reaction: z.object({ wamid: z.string().min(1).max(200), emoji: z.string().max(16) }) }),
   z.object({ menu: z.literal(true) }),
+  z.object({ catalog: z.literal(true) }),
   z.object({ service: z.string().min(1).max(60) }),
 ]);
 
@@ -122,6 +123,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pho
     const result = await sendWhatsAppInteractive(phone, menu);
     if (result.outcome !== "sent" || !result.id) return fail(result.reason);
     await recordOutbound({ phone, wamid: result.id, by: user.name, text: "Services menu: airport and city transfers, Costa Brava, by the hour." });
+    return NextResponse.json({ ok: true, id: result.id });
+  }
+
+  if ("catalog" in b) {
+    const catalog = buildCatalogMessage(services);
+    if (!catalog) return NextResponse.json({ error: "No services are switched on. Turn some on in WhatsApp settings." }, { status: 422 });
+    const result = await sendWhatsAppInteractive(phone, catalog);
+    if (result.outcome !== "sent" || !result.id) return fail(result.reason);
+    await recordOutbound({ phone, wamid: result.id, by: user.name, text: "Catalogue: our services with prices." });
     return NextResponse.json({ ok: true, id: result.id });
   }
 
