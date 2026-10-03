@@ -15,6 +15,24 @@ import type { TripSender } from "@prisma/client";
  * for one of them.
  */
 
+/**
+ * What the customer is told a fleet company's messages come from.
+ *
+ * The customer booked Elite BCN and is looked after by Elite BCN. The company
+ * that supplies the chauffeur is not part of what they were sold, so its name
+ * is never shown to them: not on a message, and not in the alert on their phone.
+ */
+export const PARTNER_PUBLIC_NAME = "Elite BCN";
+
+/**
+ * The name to show beside a message. Messages written before this rule were
+ * stored with the company's name, so it is applied when they are read as well
+ * as when they are written.
+ */
+export function publicSenderName(sender: TripSender, storedName: string): string {
+  return sender === "PARTNER" ? PARTNER_PUBLIC_NAME : storedName;
+}
+
 export interface Participant {
   sender: TripSender;
   name: string;
@@ -40,8 +58,8 @@ export async function identifyParticipant(bookingId: string, code?: string | nul
   }
 
   if (u?.role === "PARTNER" && u.id) {
-    const p = await prisma.fleetPartner.findUnique({ where: { userId: u.id }, select: { id: true, name: true } });
-    if (p && p.id === booking.partnerId) return { sender: "PARTNER", name: p.name, bookingId };
+    const p = await prisma.fleetPartner.findUnique({ where: { userId: u.id }, select: { id: true } });
+    if (p && p.id === booking.partnerId) return { sender: "PARTNER", name: PARTNER_PUBLIC_NAME, bookingId };
     return null;
   }
 
@@ -53,12 +71,13 @@ export async function identifyParticipant(bookingId: string, code?: string | nul
 }
 
 export async function listMessages(bookingId: string, after?: string | null) {
-  return prisma.tripMessage.findMany({
+  const rows = await prisma.tripMessage.findMany({
     where: { bookingId, ...(after ? { createdAt: { gt: new Date(after) } } : {}) },
     orderBy: { createdAt: "asc" },
     take: 200,
     select: { id: true, sender: true, senderName: true, body: true, createdAt: true },
   });
+  return rows.map((r) => ({ ...r, senderName: publicSenderName(r.sender, r.senderName) }));
 }
 
 export async function postMessage(p: Participant, body: string) {
@@ -78,5 +97,5 @@ export async function postMessage(p: Participant, body: string) {
   if (p.sender !== "DRIVER" && booking?.driver?.userId) {
     await notify({ event: "TRIP_MESSAGE", channels: ["inapp", "push"], userId: booking.driver.userId, url: "/driver", vars }).catch(() => {});
   }
-  return msg;
+  return { ...msg, senderName: publicSenderName(msg.sender, msg.senderName) };
 }
