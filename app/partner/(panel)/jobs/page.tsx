@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Camera, Check, Loader2, Mail, MapPin, MessageSquare, Phone, Plane, Undo2, Users, Wallet } from "lucide-react";
 import { ChatSheet, LiveLocationSheet, NoShowSheet } from "@/components/partner/JobTools";
+import FlightInfoCard from "@/components/flight/FlightInfoCard";
 import toast from "react-hot-toast";
 import { Empty, PageTitle, Sheet, Skeleton, Status, euro, field, ghost, label, primary, vehicleLabel, whenParts } from "@/components/partner/ui";
 
@@ -475,6 +476,9 @@ function DetailSheet({
           <Row label="Vehicle">{vehicleLabel(job.vehicleClass)}</Row>
           <Row label="Party">{job.passengers} passengers, {job.luggage} bags</Row>
           {job.flightNumber && <Row label="Flight">{job.flightNumber}</Row>}
+          {job.flightNumber && !["COMPLETED", "CANCELLED", "REFUNDED"].includes(job.status) && (
+            <div className="pt-3"><FlightInfoCard bookingId={job.id} flightNumber={job.flightNumber} /></div>
+          )}
           {job.stops.map((st, i) => <Row key={i} label={`Stop ${i + 1}`}>{st}</Row>)}
           {job.durationHours != null && <Row label="Hours booked">{job.durationHours}</Row>}
         </section>

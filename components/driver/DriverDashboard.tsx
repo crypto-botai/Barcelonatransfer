@@ -13,6 +13,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { STATUS_COLORS, STATUS_LABELS, type BookingStatus } from "@/types";
 import LocationSharing from "@/components/driver/LocationSharing";
 import FlightStatusBadge from "@/components/driver/FlightStatusBadge";
+import FlightInfoCard from "@/components/flight/FlightInfoCard";
 import ActiveRidePanel from "@/components/driver/ActiveRidePanel";
 import DeleteAccountButton from "@/components/account/DeleteAccountButton";
 import RideAlerts from "@/components/notifications/RideAlerts";
@@ -397,6 +398,7 @@ export default function DriverDashboard({ driver, bookings, withdrawals: initial
                               jobs — it is the walk from the aircraft to the car
                               that nobody can see, and a flight number is what
                               tells us this is one of those. */}
+                          {b.flightNumber && <FlightInfoCard bookingId={b.id} flightNumber={b.flightNumber} />}
                           {b.flightNumber && <ArrivalPanel bookingId={b.id} />}
 
                           {b.rideStage && b.rideStage !== "COMPLETED" && (

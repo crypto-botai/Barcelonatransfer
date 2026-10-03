@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   const booking = await prisma.booking.findUnique({
     where:  { id: bookingId },
     select: {
-      id: true, userId: true, driverId: true,
+      id: true, userId: true, driverId: true, partnerId: true,
       flightNumber: true, pickupDatetime: true, confirmationCode: true,
     },
   });
@@ -39,11 +39,20 @@ export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const user    = session?.user as { id?: string; role?: string } | undefined;
 
+  // A fleet company sees the flight of a job the office sent to it, and of no
+  // one else's: the lookup counts against a monthly quota and the flight number
+  // belongs to the customer.
+  const ownsAsPartner =
+    user?.role === "PARTNER" && Boolean(booking.partnerId) && user.id
+      ? (await prisma.fleetPartner.findUnique({ where: { userId: user.id }, select: { id: true } }))?.id === booking.partnerId
+      : false;
+
   const authorised =
     (code && code === booking.confirmationCode) ||
     (user?.id && user.id === booking.userId) ||
     user?.role === "ADMIN" ||
-    (user?.role === "DRIVER" && Boolean(booking.driverId));
+    (user?.role === "DRIVER" && Boolean(booking.driverId)) ||
+    ownsAsPartner;
 
   if (!authorised) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -59,5 +68,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ tracked: false, reason: outcome.reason });
   }
 
-  return NextResponse.json({ tracked: true, status: outcome.status });
+  return NextResponse.json({ tracked: true, status: outcome.status, checkedAt: new Date().toISOString() });
 }

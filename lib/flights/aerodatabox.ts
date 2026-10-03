@@ -50,11 +50,14 @@ interface AdbPoint {
   actualTime?: AdbTime;
   runwayTime?: AdbTime;
   terminal?: string;
+  gate?: string;
+  baggageBelt?: string;
 }
 interface AdbFlight {
   number?: string;
   status?: string;
   airline?: { name?: string };
+  aircraft?: { model?: string };
   departure?: AdbPoint;
   arrival?: AdbPoint;
 }
@@ -163,6 +166,15 @@ export class AeroDataBoxProvider implements FlightProvider {
       departureAirportName: f.departure?.airport?.name ?? null,
       arrivalAirportName:   arrival.airport?.name ?? null,
       airline:          f.airline?.name         ?? null,
+      // Touchdown, not gate arrival: the runway time is when the wheels are on
+      // the ground, and the actual time is when the aircraft reaches the stand.
+      landedAt:         state === "landed"
+        ? (parseTime(arrival.runwayTime) ?? parseTime(arrival.actualTime))
+        : null,
+      arrivalGate:      arrival.gate            ?? null,
+      baggageBelt:      arrival.baggageBelt     ?? null,
+      departureGate:    f.departure?.gate       ?? null,
+      aircraft:         f.aircraft?.model       ?? null,
       source:           this.name,
     };
   }

@@ -51,6 +51,19 @@ export interface FlightStatus {
   departureAirportName: string | null;
   arrivalAirportName: string | null;
   airline: string | null;
+  /**
+   * When the aircraft touched down. Null until it has, and never filled in with
+   * the scheduled time: a driver who reads "landed 14:35" about a plane that has
+   * not left the gate behind them will wait at the wrong door.
+   */
+  landedAt: Date | null;
+  /** Arrival gate. The airport assigns it late, so null is the normal answer early on. */
+  arrivalGate: string | null;
+  /** Baggage belt. Assigned shortly before landing; null before then. */
+  baggageBelt: string | null;
+  departureGate: string | null;
+  /** Aircraft type, e.g. "Airbus A320". */
+  aircraft: string | null;
   /** Which provider answered, for the audit trail. */
   source: string;
 }

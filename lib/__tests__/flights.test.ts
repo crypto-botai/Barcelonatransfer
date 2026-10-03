@@ -29,7 +29,7 @@ describe("isMaterialDelay", () => {
     departureAirport: "MAD", departureTerminal: "4", departureAirportName: "Madrid Barajas",
     scheduledDeparture: new Date("2026-09-01T08:45:00Z"),
     actualDeparture: new Date("2026-09-01T08:45:00Z"),
-    airline: "Iberia", source: "test",
+    airline: "Iberia", landedAt: null, arrivalGate: null, baggageBelt: null, departureGate: null, aircraft: null, source: "test",
   };
 
   it("ignores delays the free waiting time absorbs", () => {
