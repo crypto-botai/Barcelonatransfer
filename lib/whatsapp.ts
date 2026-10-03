@@ -573,6 +573,8 @@ export interface WhatsAppCatalogState {
   visible: boolean;
   /** Customers can add products to a cart. We take bookings on the site, so this stays off. */
   cartEnabled: boolean;
+  /** The catalogues connected to the business account. The number shows the one it is linked to. */
+  catalogs: { id: string; name: string }[];
 }
 
 /**
@@ -593,7 +595,12 @@ export async function getWhatsAppCatalog(): Promise<{ ok: true; state: WhatsAppC
       return { ok: false, reason: classify(e.code, e.message).reason };
     }
     const d = ((await res.json()) as { data?: { is_catalog_visible?: boolean; is_cart_enabled?: boolean }[] }).data?.[0] ?? {};
-    return { ok: true, state: { visible: d.is_catalog_visible === true, cartEnabled: d.is_cart_enabled === true } };
+    // Which catalogues the business account has connected. A failure here is not fatal: the switch state above still stands.
+    const linked = await fetch(`https://graph.facebook.com/${WA_API_VERSION}/${WA_WABA_ID}/product_catalogs?fields=id,name`, {
+      headers: { Authorization: `Bearer ${token}` }, cache: "no-store",
+    }).then(async (r) => (r.ok ? (((await r.json()) as { data?: { id?: string; name?: string }[] }).data ?? []) : [])).catch(() => []);
+    const catalogs = linked.map((c) => ({ id: String(c.id ?? ""), name: String(c.name ?? "") })).filter((c) => c.id);
+    return { ok: true, state: { visible: d.is_catalog_visible === true, cartEnabled: d.is_cart_enabled === true, catalogs } };
   } catch (e) {
     return { ok: false, reason: e instanceof Error ? e.message : String(e) };
   }

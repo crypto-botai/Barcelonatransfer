@@ -34,15 +34,21 @@ afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe("getWhatsAppCatalog", () => {
   it("reads the number's own commerce settings with the token", async () => {
-    fetchMock.mockResolvedValue(settings(true));
-    expect(await getWhatsAppCatalog()).toEqual({ ok: true, state: { visible: true, cartEnabled: false } });
+    fetchMock.mockResolvedValueOnce(settings(true)).mockResolvedValueOnce(ok({ data: [{ id: "1132730822660141", name: "Elite BCN Transfers" }] }));
+    expect(await getWhatsAppCatalog()).toEqual({ ok: true, state: { visible: true, cartEnabled: false, catalogs: [{ id: "1132730822660141", name: "Elite BCN Transfers" }] } });
+    expect(calls()[1].url).toBe("https://graph.facebook.com/v21.0/2114337302504279/product_catalogs?fields=id,name");
     expect(calls()[0].url).toBe("https://graph.facebook.com/v21.0/PHONE1/whatsapp_commerce_settings");
     expect(calls()[0].init.headers.Authorization).toBe("Bearer TOKEN1");
   });
 
   it("is off when Meta says nothing, which is how a number that was never set up looks", async () => {
     fetchMock.mockResolvedValue(ok({ data: [] }));
-    expect(await getWhatsAppCatalog()).toEqual({ ok: true, state: { visible: false, cartEnabled: false } });
+    expect(await getWhatsAppCatalog()).toEqual({ ok: true, state: { visible: false, cartEnabled: false, catalogs: [] } });
+  });
+
+  it("still reports the switch when the list of connected catalogues cannot be read", async () => {
+    fetchMock.mockResolvedValueOnce(settings(true)).mockResolvedValueOnce(fail(10));
+    expect(await getWhatsAppCatalog()).toMatchObject({ ok: true, state: { visible: true, catalogs: [] } });
   });
 
   it("says why it could not check, and never throws", async () => {
@@ -87,17 +93,17 @@ describe("the catalogue route", () => {
   });
 
   it("reports where the switch stands", async () => {
-    fetchMock.mockResolvedValue(settings(false));
+    fetchMock.mockResolvedValueOnce(settings(false)).mockResolvedValueOnce(ok({ data: [] }));
     const res = await GET();
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ visible: false, cartEnabled: false });
+    expect(await res.json()).toEqual({ visible: false, cartEnabled: false, catalogs: [] });
   });
 
   it("switches it on, then reports the new state read back from Meta", async () => {
-    fetchMock.mockResolvedValueOnce(ok({ success: true })).mockResolvedValueOnce(settings(true));
+    fetchMock.mockResolvedValueOnce(ok({ success: true })).mockResolvedValueOnce(settings(true)).mockResolvedValueOnce(ok({ data: [] }));
     const res = await POST(post({ visible: true }));
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ visible: true, cartEnabled: false });
+    expect(await res.json()).toEqual({ visible: true, cartEnabled: false, catalogs: [] });
     expect(calls()[0].init.method).toBe("POST");
   });
 
