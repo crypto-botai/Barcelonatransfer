@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowDown, ArrowLeft, ArrowUp, Bell, BellOff, Camera, Check, CircleAlert, Clock, Copy, ExternalLink, ImageIcon, Loader2, MessageSquareReply, Plus, Save, Trash2, Volume2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, Bell, BellOff, Camera, Check, CircleAlert, RefreshCw, Clock, Copy, ExternalLink, ImageIcon, Loader2, MessageSquareReply, Plus, Save, Trash2, Volume2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { DEFAULT_SETTINGS, LIMITS, isOpenNow, type QuickReply, type ServiceItem, type WhatsAppSettings } from "@/lib/whatsapp-settings";
 import type { ResolvedService } from "@/lib/whatsapp-services";
@@ -114,6 +114,10 @@ export default function WhatsAppSettingsPage() {
 
   const [link, setLink] = useState<{ state: "checking" | "connected" | "disconnected" | "error"; error?: string }>({ state: "checking" });
   const [linking, setLinking] = useState(false);
+  type TemplateRow = { name: string; to: "customer" | "driver"; purpose: string; body: string; status: string; problem: string | null };
+  const [templates, setTemplates] = useState<TemplateRow[] | null>(null);
+  const [templateError, setTemplateError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const alerts = useDesktopAlerts();
   const [sound, setSound] = useState(true);
@@ -132,11 +136,29 @@ export default function WhatsAppSettingsPage() {
       else { toast.error(r.data.error ?? "Could not load the settings."); setSettings(DEFAULT_SETTINGS); setSavedJson(JSON.stringify(DEFAULT_SETTINGS)); }
     });
     void call<Profile>("/api/admin/whatsapp/profile").then((r) => (r.ok ? setProfile(r.data) : setProfileError(r.data.error ?? "Could not load the profile from WhatsApp.")));
+    void call<{ templates: TemplateRow[] }>("/api/admin/whatsapp/templates").then((r) => (r.ok ? setTemplates(r.data.templates) : setTemplateError(r.data.error ?? "Could not read the templates from WhatsApp.")));
     void call<{ subscribed: boolean }>("/api/admin/whatsapp/connection").then((r) =>
       setLink(r.ok ? { state: r.data.subscribed ? "connected" : "disconnected" } : { state: "error", error: r.data.error }),
     );
     try { setSound(localStorage.getItem(SOUND_KEY) !== "0"); } catch { /* default on */ }
   }, [applyView]);
+
+  const refreshTemplates = async () => {
+    const r = await call<{ templates: TemplateRow[] }>("/api/admin/whatsapp/templates").catch(() => null);
+    if (r?.ok) { setTemplates(r.data.templates); setTemplateError(null); } else setTemplateError(r?.data.error ?? "Could not read the templates.");
+  };
+
+  const submitTemplates = async () => {
+    setSubmitting(true);
+    const r = await call<{ submitted: { name: string; ok: boolean; detail: string }[]; templates: TemplateRow[] }>("/api/admin/whatsapp/templates", { method: "POST" }).catch(() => null);
+    setSubmitting(false);
+    if (!r?.ok) { toast.error(r?.data.error ?? "Could not submit the templates."); return; }
+    setTemplates(r.data.templates);
+    const bad = r.data.submitted.filter((x) => !x.ok);
+    if (r.data.submitted.length === 0) toast("Nothing to submit. Every template already exists.");
+    else if (bad.length) toast.error(`${bad.length} could not be submitted: ${bad[0].name}: ${bad[0].detail}`, { duration: 9000 });
+    else toast.success(`Submitted ${r.data.submitted.length} for approval. Meta usually decides within minutes.`);
+  };
 
   const connect = async () => {
     setLinking(true);
@@ -244,6 +266,63 @@ export default function WhatsAppSettingsPage() {
               {linking && <Loader2 size={14} className="animate-spin" />} Connect now
             </button>
           )}
+        </div>
+      </Card>
+
+      {/* ── Automatic messages ─────────────────────────────────────────── */}
+      <Card
+        title="Automatic messages"
+        hint="What the site sends by WhatsApp on its own. A customer gets only these, never more than the limits below, and only for a paid booking. Everything else (driver on the way, reminders, reviews) goes by email or in their account."
+      >
+        <ol className="mb-5 list-decimal space-y-1 pl-5 text-[13px] leading-relaxed text-dark-300">
+          <li><span className="text-white">Booking confirmation</span>, once, as soon as the booking is paid. Email always goes too, and a text only if the customer paid the €0.50 text-alerts option.</li>
+          <li><span className="text-white">Your driver</span>, when a driver is assigned. Once per driver, at most twice.</li>
+          <li><span className="text-white">Flight delay</span>, only when the landing time really moved, at most twice.</li>
+          <li><span className="text-white">One heads-up about an hour before pickup</span>, skipped if another message went to that customer in the previous two hours, so a last-minute booking is told once.</li>
+        </ol>
+        <div className="space-y-4">
+          <Toggle on={settings.autoMessages.headsUp} onChange={(v) => patch((x) => ({ ...x, autoMessages: { ...x.autoMessages, headsUp: v } }))} label="Heads-up an hour before pickup" />
+          <Toggle on={settings.autoMessages.flightAlerts} onChange={(v) => patch((x) => ({ ...x, autoMessages: { ...x.autoMessages, flightAlerts: v } }))} label="Flight delay alerts to customers" />
+          <Toggle on={settings.autoMessages.driverFlightAlerts} onChange={(v) => patch((x) => ({ ...x, autoMessages: { ...x.autoMessages, driverFlightAlerts: v } }))} label="Flight delay alerts to drivers" description="Sent to the driver's WhatsApp number on their profile, so keep it up to date." />
+          <Toggle on={settings.autoMessages.cashBookings} onChange={(v) => patch((x) => ({ ...x, autoMessages: { ...x.autoMessages, cashBookings: v } }))} label="Also message cash-to-chauffeur bookings" description="Off by default: those bookings are not paid yet, so they get email only." />
+        </div>
+
+        <div className="mt-6 border-t border-white/[0.06] pt-5">
+          <div className="mb-3 flex items-start justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-medium text-white">Message templates</h3>
+              <p className="mt-0.5 max-w-xl text-[12.5px] leading-snug text-dark-400">WhatsApp only lets a business start a conversation with wording Meta has approved. These five are what the messages above use.</p>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <button type="button" onClick={() => void refreshTemplates()} aria-label="Refresh template status" title="Refresh" className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-dark-300 hover:bg-white/[0.05]"><RefreshCw size={15} /></button>
+              {templates?.some((t) => t.status === "MISSING") && (
+                <button type="button" onClick={() => void submitTemplates()} disabled={submitting} className="inline-flex items-center gap-2 rounded-lg bg-gold-500 px-3.5 py-2 text-[13px] font-semibold text-black hover:bg-gold-400 disabled:opacity-60">
+                  {submitting && <Loader2 size={14} className="animate-spin" />} Submit missing
+                </button>
+              )}
+            </div>
+          </div>
+          {templateError && <p className="mb-3 rounded-lg border border-amber-500/25 bg-amber-500/[0.07] px-3.5 py-2.5 text-[13px] text-amber-200/90">{templateError}</p>}
+          {templates === null && !templateError && <div className="flex justify-center py-6"><Loader2 className="animate-spin text-dark-500" size={18} /></div>}
+          <ul className="space-y-2">
+            {templates?.map((t) => (
+              <li key={t.name} className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-3.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <code className="text-[13px] text-gold-200">{t.name}</code>
+                  <span className="rounded-full bg-white/[0.06] px-2 py-px text-[10.5px] uppercase tracking-wide text-dark-300">{t.to}</span>
+                  <span className={cn("ml-auto rounded-full border px-2.5 py-0.5 text-[11px] font-medium",
+                    t.status === "APPROVED" ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" :
+                    t.status === "PENDING" ? "border-amber-500/40 bg-amber-500/10 text-amber-300" :
+                    t.status === "MISSING" ? "border-white/15 bg-white/5 text-dark-300" : "border-red-500/40 bg-red-500/10 text-red-300")}>
+                    {t.status === "APPROVED" ? "Approved" : t.status === "PENDING" ? "Waiting for Meta" : t.status === "MISSING" ? "Not submitted" : t.status === "REJECTED" ? "Refused" : t.status.toLowerCase()}
+                  </span>
+                </div>
+                <p className="mt-1.5 text-[12.5px] text-dark-400">{t.purpose}</p>
+                <p className="mt-1.5 text-[12.5px] leading-relaxed text-dark-200">{t.body}</p>
+                {t.problem && <p className="mt-1.5 text-[12px] text-red-300">Meta said: {t.problem}</p>}
+              </li>
+            ))}
+          </ul>
         </div>
       </Card>
 
@@ -436,6 +515,19 @@ export default function WhatsAppSettingsPage() {
             <Field label="Welcome text" count={settings.welcome.text.length} max={LIMITS.autoText}>
               <textarea className={cn(field, "min-h-20 resize-y", !settings.welcome.enabled && "opacity-50")} maxLength={LIMITS.autoText} value={settings.welcome.text} onChange={(e) => patch((s) => ({ ...s, welcome: { ...s.welcome, text: e.target.value } }))} />
             </Field>
+          </div>
+
+          <div className="space-y-3 border-t border-white/[0.06] pt-6">
+            <Toggle on={settings.unanswered.enabled} onChange={(v) => patch((s) => ({ ...s, unanswered: { ...s.unanswered, enabled: v } }))} label="When nobody replies" description="If a customer's message is still unanswered after the wait below, answer for you. Once per customer in twelve hours, then it is a person's turn." />
+            <div className={cn("grid gap-3 sm:grid-cols-[10rem_1fr]", !settings.unanswered.enabled && "opacity-50")}>
+              <Field label="Wait (minutes)">
+                <input className={field} inputMode="numeric" value={settings.unanswered.minutes} onChange={(e) => { const n = Number(e.target.value.replace(/\D/g, "")); patch((s) => ({ ...s, unanswered: { ...s.unanswered, minutes: n } })); }} />
+              </Field>
+              <Field label="Message when the question is not one the assistant knows" count={settings.unanswered.text.length} max={LIMITS.autoText}>
+                <textarea className={cn(field, "min-h-20 resize-y")} maxLength={LIMITS.autoText} value={settings.unanswered.text} onChange={(e) => patch((s) => ({ ...s, unanswered: { ...s.unanswered, text: e.target.value } }))} />
+              </Field>
+            </div>
+            <Toggle on={settings.unanswered.assistant} onChange={(v) => patch((s) => ({ ...s, unanswered: { ...s.unanswered, assistant: v } }))} label="Answer common questions" description="Prices, booking, payment, flights and cancellations are answered from your live price table and terms. It is not an AI model, so it cannot promise anything you have not offered. Meta's own assistant is not available on this kind of number." />
           </div>
 
           <div className="space-y-3 border-t border-white/[0.06] pt-6">

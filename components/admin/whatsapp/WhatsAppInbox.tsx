@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowDown, ArrowLeft, Clock, ExternalLink, Loader2, MessageCircle, Phone, TriangleAlert, X } from "lucide-react";
+import { ArrowDown, ArrowLeft, Clock, ExternalLink, EyeOff, Loader2, MessageCircle, Phone, Star, TriangleAlert, Users, X } from "lucide-react";
 import toast from "react-hot-toast";
 import type { ChatMessage, Conversation } from "@/lib/whatsapp-inbox";
 import type { QuickReply } from "@/lib/whatsapp-settings";
@@ -10,7 +10,8 @@ import type { ResolvedService } from "@/lib/whatsapp-services";
 import { dayLabel, dayOf, windowLeft } from "@/lib/whatsapp-ui";
 import { cn } from "@/lib/utils";
 import { ACTIVE_CHAT_KEY } from "@/components/admin/WhatsAppAlerts";
-import ConversationList, { Avatar } from "./ConversationList";
+import ConversationList, { Avatar, TagPill, type FilterKey } from "./ConversationList";
+import { GroupDetail, GroupsList, useGroups } from "./Groups";
 import Composer, { type ComposerHandle } from "./Composer";
 import { MessageBubble, PendingBubble, type PendingMessage } from "./MessageBubble";
 import { useDesktopAlerts } from "./useDesktopAlerts";
@@ -45,7 +46,8 @@ export default function WhatsAppInbox() {
   const [setup, setSetup] = useState<Setup | null>(null);
   const [active, setActive] = useState<string | null>(null);
   const [thread, setThread] = useState<Thread | null>(null);
-  const [filter, setFilter] = useState<"all" | "unread">("all");
+  const [filter, setFilter] = useState<FilterKey>("all");
+  const [view, setView] = useState<"chats" | "groups">("chats");
   const [query, setQuery] = useState("");
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
@@ -61,6 +63,7 @@ export default function WhatsAppInbox() {
   const [bannerDismissed, setBannerDismissed] = useState(true); // true until storage says otherwise: no flash
 
   const alerts = useDesktopAlerts();
+  const groups = useGroups(view === "groups");
 
   const listRev = useRef<string | null>(null);
   const threadRev = useRef<string | null>(null);
@@ -369,6 +372,30 @@ export default function WhatsAppInbox() {
     return out;
   }, [thread?.messages, now]);
 
+  /** Star or unstar a chat. Shown at once, then confirmed by the server. */
+  const toggleFavorite = useCallback(async (phone: string, value: boolean) => {
+    setList((l) => l && l.map((c) => (c.phone === phone ? { ...c, favorite: value } : c)));
+    const r = await api(`/api/admin/whatsapp/${encodeURIComponent(phone)}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ favorite: value }),
+    }).catch(() => null);
+    if (!r?.ok) toast.error("Could not change the favorite. Try again.");
+    void loadList(true);
+  }, [loadList]);
+
+  /** Keep a chat as unread so it is not forgotten, and go back to the list as WhatsApp does. */
+  const markUnread = useCallback(async (phone: string) => {
+    const r = await api(`/api/admin/whatsapp/${encodeURIComponent(phone)}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ unread: true }),
+    }).catch(() => null);
+    if (!r?.ok) { toast.error("Could not mark it unread. Try again."); return; }
+    lastSeenSent.current = null;
+    setActive(null);
+    await loadList(true);
+    toast.success("Marked as unread");
+  }, [loadList]);
+
+  const startChat = useCallback((phone: string) => { setQuery(""); setFilter("all"); setActive(phone); }, []);
+
   const dismissBanner = () => { setBannerDismissed(true); try { localStorage.setItem(BANNER_KEY, "1"); } catch { /* fine */ } };
 
   return (
@@ -385,7 +412,7 @@ export default function WhatsAppInbox() {
       <div className="flex min-h-0 flex-1 lg:p-4">
         <div className="flex min-h-0 flex-1 overflow-hidden bg-[#0c0c0c] lg:rounded-2xl lg:border lg:border-white/[0.07] lg:shadow-2xl lg:shadow-black/40">
           {/* ── Chats ─────────────────────────────────────────────────── */}
-          <aside className={cn("flex w-full min-w-0 flex-col border-r border-white/[0.06] lg:w-[24rem] lg:shrink-0", active && "hidden lg:flex")}>
+          <aside className={cn("flex w-full min-w-0 flex-col border-r border-white/[0.06] lg:w-[24rem] lg:shrink-0", (view === "groups" ? groups.activeId : active) && "hidden lg:flex")}>
             <ConversationList
               list={list}
               active={active}
@@ -394,22 +421,39 @@ export default function WhatsAppInbox() {
               onFilter={setFilter}
               query={query}
               onQuery={setQuery}
+              onToggleFavorite={toggleFavorite}
+              onStartChat={startChat}
+              view={view}
+              onView={(v) => { setView(v); setActive(null); groups.setActiveId(null); }}
               alerts={alerts}
               showAlertBanner={!bannerDismissed}
               onDismissBanner={dismissBanner}
             />
+            {view === "groups" && <GroupsList g={groups} />}
           </aside>
 
           {/* ── One chat ──────────────────────────────────────────────── */}
           <section
-            className={cn("relative flex min-w-0 flex-1 flex-col bg-[#0a0a0a]", !active && "hidden lg:flex")}
+            className={cn("relative flex min-w-0 flex-1 flex-col bg-[#0a0a0a]", !(view === "groups" ? groups.activeId : active) && "hidden lg:flex")}
             aria-label="Conversation"
             onDragEnter={onDragEnter}
             onDragOver={(e) => { if (canReply) e.preventDefault(); }}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
           >
-            {!active ? (
+            {view === "groups" ? (
+              groups.activeId ? (
+                <GroupDetail g={groups} conversations={list ?? []} onBack={() => groups.setActiveId(null)} onOpenChat={(p) => { setView("chats"); setActive(p); }} />
+              ) : (
+                <div className="grid h-full place-items-center px-8 text-center">
+                  <div>
+                    <span className="mx-auto grid h-20 w-20 place-items-center rounded-full border border-gold-500/25 bg-gold-500/[0.06] text-gold-400"><Users size={32} strokeWidth={1.4} /></span>
+                    <h2 className="mt-5 font-display text-2xl text-white">Groups</h2>
+                    <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-dark-400">Pick a group, or make a new one, to write to a list of customers at once. Each person gets it privately.</p>
+                  </div>
+                </div>
+              )
+            ) : !active ? (
               <div className="grid h-full place-items-center px-8 text-center">
                 <div>
                   <span className="mx-auto grid h-20 w-20 place-items-center rounded-full border border-gold-500/25 bg-gold-500/[0.06] text-gold-400"><MessageCircle size={34} strokeWidth={1.4} /></span>
@@ -431,11 +475,16 @@ export default function WhatsAppInbox() {
                       {thread?.booking && <> · booking {thread.booking.confirmationCode} ({thread.booking.status.toLowerCase().replace(/_/g, " ")})</>}
                     </p>
                   </div>
+                  {conv?.booking && <TagPill tag={conv.booking.tag} label={conv.booking.label} title={conv.booking.detail ?? undefined} className="hidden sm:inline-flex" />}
                   {thread && (
-                    <span className={cn("hidden shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11.5px] md:inline-flex", canReply ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-dark-400")}>
+                    <span className={cn("hidden shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11.5px] lg:inline-flex", canReply ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-dark-400")}>
                       <Clock size={11} /> {canReply ? left ?? "Window open" : "Reply window closed"}
                     </span>
                   )}
+                  <button type="button" onClick={() => void toggleFavorite(active, !conv?.favorite)} aria-label={conv?.favorite ? "Remove from favorites" : "Add to favorites"} aria-pressed={Boolean(conv?.favorite)} title="Favorite" className={cn("grid h-10 w-10 place-items-center rounded-full hover:bg-white/[0.06]", conv?.favorite ? "text-gold-400" : "text-dark-300 hover:text-white")}>
+                    <Star size={18} fill={conv?.favorite ? "currentColor" : "none"} />
+                  </button>
+                  <button type="button" onClick={() => void markUnread(active)} aria-label="Mark as unread" title="Mark as unread" className="grid h-10 w-10 place-items-center rounded-full text-dark-300 hover:bg-white/[0.06] hover:text-white"><EyeOff size={18} /></button>
                   <a href={`tel:${active}`} aria-label={`Call ${customerName}`} title="Call" className="grid h-10 w-10 place-items-center rounded-full text-dark-300 hover:bg-white/[0.06] hover:text-white"><Phone size={18} /></a>
                 </header>
 
@@ -496,7 +545,11 @@ export default function WhatsAppInbox() {
                 {thread && !canReply ? (
                   <div className="border-t border-white/[0.06] bg-[#0f0f0f] px-4 py-3.5">
                     <p className="text-[13px] leading-relaxed text-dark-300">
-                      <span className="font-medium text-white">The 24-hour reply window has closed.</span> WhatsApp only lets you send a pre-approved template now. Ask the customer to write again, or use <span className="text-gold-300">Send to phone</span> on their booking.
+                      {thread.messages.length === 0 ? (
+                        <><span className="font-medium text-white">This number has not written to you yet.</span> WhatsApp only lets a business start a conversation with an approved template. Use <span className="text-gold-300">Send to phone</span> on their booking, or ask them to message you first.</>
+                      ) : (
+                        <><span className="font-medium text-white">The 24-hour reply window has closed.</span> WhatsApp only lets you send a pre-approved template now. Ask the customer to write again, or use <span className="text-gold-300">Send to phone</span> on their booking.</>
+                      )}
                     </p>
                   </div>
                 ) : (

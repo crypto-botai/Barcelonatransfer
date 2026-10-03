@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { paymentTag, phoneVariants, relevantBooking } from "@/lib/whatsapp-tags";
 import {
   WA_ENTITY, buildConversations, buildThread, canReplyFreely, latestInboundId, summarize, windowEndsAt,
   type InboundMessage, type StatusUpdate, type ReactionUpdate, type LogRow,
@@ -122,22 +123,33 @@ export async function recordOutbound(o: {
  * so the caller can send the read receipt for it, and null otherwise.
  */
 export async function markSeen(phone: string): Promise<string | null> {
-  const [lastIn, lastSeen] = await Promise.all([
+  const where = { entity: WA_ENTITY, entityId: phone } as const;
+  const [lastIn, lastSeen, lastFlag] = await Promise.all([
     prisma.activityLog.findFirst({
-      where: { entity: WA_ENTITY, entityId: phone, action: "WA_MESSAGE", details: { path: ["dir"], equals: "in" } },
+      where: { ...where, action: "WA_MESSAGE", details: { path: ["dir"], equals: "in" } },
       orderBy: { createdAt: "desc" },
       select: { createdAt: true, details: true },
     }),
+    prisma.activityLog.findFirst({ where: { ...where, action: "WA_SEEN" }, orderBy: { createdAt: "desc" }, select: { createdAt: true } }),
     prisma.activityLog.findFirst({
-      where: { entity: WA_ENTITY, entityId: phone, action: "WA_SEEN" },
+      where: { ...where, action: "WA_FLAG", AND: [{ details: { path: ["kind"], equals: "unread" } }, { details: { path: ["value"], equals: true } }] },
       orderBy: { createdAt: "desc" },
       select: { createdAt: true },
     }),
   ]);
-  if (!lastIn || (lastSeen && lastSeen.createdAt >= lastIn.createdAt)) return null;
+  const seenAt = lastSeen?.createdAt.getTime() ?? 0;
+  const newMessage = Boolean(lastIn && lastIn.createdAt.getTime() > seenAt);
+  const keptUnread = Boolean(lastFlag && lastFlag.createdAt.getTime() > seenAt);
+  if (!newMessage && !keptUnread) return null;
   await prisma.activityLog.create({ data: { action: "WA_SEEN", entity: WA_ENTITY, entityId: phone, details: {} } });
-  const id = (lastIn.details as { wamid?: string } | null)?.wamid;
+  // A read receipt is only for a real message; clearing a kept-unread mark sends nothing to the customer.
+  const id = newMessage ? (lastIn!.details as { wamid?: string } | null)?.wamid : undefined;
   return id ? String(id) : null;
+}
+
+/** A star, or "keep as unread". Stored as an event so the newest of each kind wins. */
+export async function recordFlag(phone: string, kind: "favorite" | "unread", value: boolean): Promise<void> {
+  await prisma.activityLog.create({ data: { action: "WA_FLAG", entity: WA_ENTITY, entityId: phone, details: { kind, value } } });
 }
 
 async function rowsFor(phone?: string): Promise<LogRow[]> {
@@ -175,12 +187,46 @@ export async function inboxRevision(phone?: string): Promise<string> {
   return count === 0 ? "0" : `${count}-${latest?.createdAt.getTime() ?? 0}`;
 }
 
-export async function loadConversations() {
-  return buildConversations(await rowsFor());
+/**
+ * The inbox, optionally with each customer's booking and its payment tag.
+ *
+ * The bookings are one query for all the numbers at once, matched on the number
+ * written either way (with its plus, or bare digits), because bookings were
+ * saved from several forms over time.
+ */
+export async function loadConversations(opts: { withBookings?: boolean } = {}) {
+  const conversations = buildConversations(await rowsFor());
+  if (opts.withBookings === false || conversations.length === 0) return conversations;
+
+  const bookings = await prisma.booking.findMany({
+    where: { isDeleted: false, guestPhone: { in: conversations.flatMap((c) => phoneVariants(c.phone)) } },
+    orderBy: { pickupDatetime: "desc" },
+    take: 1500,
+    select: {
+      id: true, confirmationCode: true, status: true, paymentStatus: true, paymentMethod: true, depositAmount: true,
+      balanceAmount: true, balancePaidAt: true, totalAmount: true, pickupDatetime: true, guestName: true, guestPhone: true,
+    },
+  }).catch(() => []);
+
+  const byPhone = new Map<string, typeof bookings>();
+  for (const b of bookings) {
+    const digits = (b.guestPhone ?? "").replace(/\D/g, "");
+    if (!digits) continue;
+    byPhone.set(digits, [...(byPhone.get(digits) ?? []), b]);
+  }
+
+  const now = new Date();
+  return conversations.map((c) => {
+    const b = relevantBooking(byPhone.get(c.phone.replace(/\D/g, "")) ?? [], now);
+    if (!b) return c;
+    const t = paymentTag(b);
+    return { ...c, booking: { code: b.confirmationCode, tag: t.tag, label: t.label, detail: t.detail, pickupAt: new Date(b.pickupDatetime).toISOString(), name: b.guestName } };
+  });
 }
 
 export async function loadSummary() {
-  return summarize(await loadConversations());
+  // The badge and the alert need counts and a quote, not bookings.
+  return summarize(await loadConversations({ withBookings: false }));
 }
 
 export async function loadThread(phone: string) {

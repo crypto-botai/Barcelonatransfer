@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/whatsapp-admin";
 import { prisma } from "@/lib/prisma";
 import { toE164 } from "@/lib/phone";
-import { inboxRevision, loadThread, markSeen, recordOutbound, recordOutboundReaction } from "@/lib/whatsapp-inbox-store";
+import { inboxRevision, loadThread, markSeen, recordFlag, recordOutbound, recordOutboundReaction } from "@/lib/whatsapp-inbox-store";
 import {
   markWhatsAppRead, sendWhatsAppInteractive, sendWhatsAppReaction, sendWhatsAppTextResult,
 } from "@/lib/whatsapp";
@@ -45,6 +45,21 @@ export async function PUT(_req: NextRequest, { params }: { params: Promise<{ pho
   if (!phone) return NextResponse.json({ error: "Not a phone number" }, { status: 422 });
   const cleared = await markSeen(phone);
   if (cleared) await markWhatsAppRead(cleared);
+  return NextResponse.json({ ok: true });
+}
+
+const flags = z.object({ favorite: z.boolean().optional(), unread: z.boolean().optional() }).refine((v) => v.favorite !== undefined || v.unread !== undefined);
+
+/** Star a conversation, or keep it as unread so it is not forgotten. */
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ phone: string }> }) {
+  if (!(await requireAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const phone = phoneFrom((await params).phone);
+  if (!phone) return NextResponse.json({ error: "Not a phone number" }, { status: 422 });
+  const parsed = flags.safeParse(await req.json().catch(() => ({})));
+  if (!parsed.success) return NextResponse.json({ error: "Nothing to change." }, { status: 422 });
+  if (parsed.data.favorite !== undefined) await recordFlag(phone, "favorite", parsed.data.favorite);
+  // Only "keep as unread" is stored: opening the chat is what clears it, and that is already recorded.
+  if (parsed.data.unread === true) await recordFlag(phone, "unread", true);
   return NextResponse.json({ ok: true });
 }
 

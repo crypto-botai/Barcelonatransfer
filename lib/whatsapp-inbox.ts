@@ -20,10 +20,13 @@
  *   WA_STATUS    { wamid, status, errorCode?, errorText? }
  *   WA_REACTION  { id, wamid (the message reacted to), emoji ("" = removed), dir }
  *   WA_SEEN      {}                      the office opened the conversation
+ *   WA_FLAG      { kind: "favorite" | "unread", value }
+ *                a star, or "keep this as unread", set by the office
  */
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { toE164 } from "@/lib/phone";
+import type { PaymentTag } from "@/lib/whatsapp-tags";
 
 export const WA_ENTITY = "WhatsApp";
 
@@ -225,6 +228,16 @@ export interface ChatMessage {
   reactions: { emoji: string; dir: "in" | "out" }[];
 }
 
+/** The booking a conversation is about, with where its payment stands. Filled in from the bookings table. */
+export interface ConversationBooking {
+  code: string;
+  tag: PaymentTag;
+  label: string;
+  detail: string | null;
+  pickupAt: string;
+  name: string | null;
+}
+
 export interface Conversation {
   phone: string;
   name: string | null;
@@ -235,6 +248,12 @@ export interface Conversation {
   /** Delivery state of the last message when it is ours, for the tick in the list. */
   lastStatus: ChatMessage["status"];
   unread: number;
+  /** Starred by the office. */
+  favorite: boolean;
+  /** The office chose to keep this unread: it shows as waiting until it is opened again. */
+  markedUnread: boolean;
+  /** The booking this customer is writing about, when their number matches one. */
+  booking: ConversationBooking | null;
   /** The customer's own latest message, which is what a desktop alert quotes. */
   lastInText: string;
   lastInAt: string | null;
@@ -337,7 +356,16 @@ export function buildConversations(rows: LogRow[], now: Date = new Date()): Conv
     const last = messages[messages.length - 1];
     const lastIn = [...messages].reverse().find((r) => det(r).dir === "in");
     const seen = list.filter((r) => r.action === "WA_SEEN").reduce((m, r) => Math.max(m, time(r.createdAt)), 0);
-    const unread = messages.filter((r) => det(r).dir === "in" && time(r.createdAt) > seen).length;
+    const unreadCount = messages.filter((r) => det(r).dir === "in" && time(r.createdAt) > seen).length;
+
+    // Flags are set by the office. The newest of each kind wins, and "keep as
+    // unread" lapses the moment the conversation is opened again.
+    const flags = list.filter((r) => r.action === "WA_FLAG").sort((a, b) => time(a.createdAt) - time(b.createdAt));
+    const latestFlag = (kind: string) => [...flags].reverse().find((r) => det(r).kind === kind);
+    const favorite = latestFlag("favorite") ? det(latestFlag("favorite")!).value === true : false;
+    const unreadFlag = latestFlag("unread");
+    const markedUnread = Boolean(unreadFlag && det(unreadFlag).value === true && time(unreadFlag.createdAt) > seen);
+    const unread = Math.max(unreadCount, markedUnread ? 1 : 0);
 
     const windowEnds = lastIn ? time(lastIn.createdAt) + SESSION_WINDOW_MS : null;
     const name = [...messages].reverse().map((r) => det(r).name).find(Boolean) ?? null;
@@ -352,6 +380,9 @@ export function buildConversations(rows: LogRow[], now: Date = new Date()): Conv
       lastDir: ld.dir === "out" ? "out" : "in",
       lastStatus: ld.dir === "out" ? (status.get(ld.wamid)?.s ?? null) : null,
       unread,
+      favorite,
+      markedUnread,
+      booking: null,
       lastInText: lastIn ? String(det(lastIn).text ?? "") : "",
       lastInAt: lastIn ? new Date(lastIn.createdAt).toISOString() : null,
       windowEndsAt: windowEnds ? new Date(windowEnds).toISOString() : null,
