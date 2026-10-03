@@ -165,6 +165,15 @@ describe("who can see it", () => {
     expect(sheet).toMatch(/\["COMPLETED", "CANCELLED", "REFUNDED"\]\.includes\(job\.status\)/);
   });
 
+  it("is the same card in the admin booking panel, with no second flight display left", () => {
+    const tl = rd("components/admin/RideTimeline.tsx");
+    expect(tl).toContain("<FlightInfoCard bookingId={bookingId} flightNumber={flightNumber} />");
+    // The old hand-rolled flight block and its own lookup are gone.
+    expect(tl).not.toContain("/api/flights/status");
+    expect(tl).not.toContain("flightState");
+    expect(rd("app/admin/bookings/page.tsx")).toContain("<RideTimeline bookingId={booking.id} flightNumber={booking.flightNumber} />");
+  });
+
   it("does not poll hard against a monthly quota", () => {
     const card = rd("components/flight/FlightInfoCard.tsx");
     expect(card).toContain("const REFRESH_MS = 5 * 60 * 1000");

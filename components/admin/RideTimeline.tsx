@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Circle, Loader2, Plane, MapPin } from "lucide-react";
+import { Check, Circle, Loader2, MapPin } from "lucide-react";
+import FlightInfoCard from "@/components/flight/FlightInfoCard";
 import { RIDE_STAGES, STAGE_META, waitMinutes } from "@/lib/ride-stages";
 import type { RideStage } from "@prisma/client";
 
@@ -11,12 +12,6 @@ interface NoShow {
   lat: number | null; lng: number | null;
   waitedMin: number | null; createdAt: string;
 }
-interface Flight {
-  state: string; scheduledArrival: string | null; estimatedArrival: string | null;
-  delayMinutes: number | null; arrivalTerminal: string | null; departureAirport: string | null;
-  flightNumber: string;
-}
-
 const TIME = { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" } as const;
 
 /**
@@ -38,8 +33,6 @@ export default function RideTimeline({
 }) {
   const [events, setEvents] = useState<Event[] | null>(null);
   const [noShow, setNoShow] = useState<NoShow | null>(null);
-  const [flight, setFlight] = useState<Flight | null>(null);
-  const [flightState, setFlightState] = useState<"loading" | "ok" | "none">("loading");
 
   useEffect(() => {
     let alive = true;
@@ -48,18 +41,8 @@ export default function RideTimeline({
       .then((d) => { if (!alive) return; setEvents(d?.events ?? []); setNoShow(d?.noShow ?? null); })
       .catch(() => alive && setEvents([]));
 
-    if (!flightNumber) { setFlightState("none"); return; }
-    fetch(`/api/flights/status?bookingId=${encodeURIComponent(bookingId)}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (!alive) return;
-        if (d?.tracked && d.status) { setFlight(d.status); setFlightState("ok"); }
-        else setFlightState("none");
-      })
-      .catch(() => alive && setFlightState("none"));
-
     return () => { alive = false; };
-  }, [bookingId, flightNumber]);
+  }, [bookingId]);
 
   const at = (s: RideStage) => events?.find((e) => e.stage === s);
   const arrived = at("ARRIVED");
@@ -71,49 +54,9 @@ export default function RideTimeline({
 
   return (
     <div className="space-y-4">
-      {/* Live flight */}
-      {flightNumber && (
-        <div className="glass-card rounded-xl p-4">
-          <p className="text-xs text-dark-500 uppercase tracking-wider mb-2.5">Flight</p>
-          {flightState === "loading" ? (
-            <p className="text-dark-400 text-sm flex items-center gap-2">
-              <Loader2 size={13} className="animate-spin" /> Checking {flightNumber}…
-            </p>
-          ) : flightState === "none" || !flight ? (
-            <p className="text-dark-300 text-sm flex items-center gap-2">
-              <Plane size={13} className="text-blue-400" /> {flightNumber}
-              <span className="text-dark-500 text-xs">— no live data for this flight</span>
-            </p>
-          ) : (
-            <div className="space-y-1.5">
-              <p className="text-white text-sm flex items-center gap-2 flex-wrap">
-                <Plane size={13} className="text-blue-400" />
-                <span className="font-medium">{flight.flightNumber}</span>
-                {flight.departureAirport && <span className="text-dark-400">from {flight.departureAirport}</span>}
-                {flight.arrivalTerminal && <span className="text-dark-400">· T{flight.arrivalTerminal}</span>}
-              </p>
-              <div className="flex items-center gap-4 text-xs">
-                {flight.scheduledArrival && (
-                  <span className="text-dark-400">
-                    scheduled {new Date(flight.scheduledArrival).toLocaleTimeString("en-GB", TIME)}
-                  </span>
-                )}
-                {flight.estimatedArrival && (
-                  <span className="text-white">
-                    expected {new Date(flight.estimatedArrival).toLocaleTimeString("en-GB", TIME)}
-                  </span>
-                )}
-                {flight.delayMinutes !== null && (
-                  <span className={flight.delayMinutes >= 20 ? "text-amber-400 font-medium" : "text-emerald-400"}>
-                    {flight.delayMinutes >= 20 ? `${flight.delayMinutes} min late` : "on time"}
-                  </span>
-                )}
-                {flight.delayMinutes === null && <span className="text-dark-500">no update published yet</span>}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Live flight: the same card the driver and the fleet company read, so
+          the office and the person at the airport are looking at one thing. */}
+      {flightNumber && <FlightInfoCard bookingId={bookingId} flightNumber={flightNumber} />}
 
       {/* No-show evidence — shown first because it is the thing awaiting a
           decision from the operator, not just a record. */}
