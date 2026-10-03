@@ -136,7 +136,7 @@ export function catalogCsv(services: ResolvedService[]): string {
     if (!s.enabled || !s.fromPrice) continue;
     // "Girona" alone is a weak product name; "Airport to City" and "Chauffeur per hour" already read as products.
     const title = /airport|city|chauffeur|hour|transfer/i.test(s.title) ? s.title : `Airport transfer to ${s.title}`;
-    const description = `${s.line}. Private chauffeur transfer at a fixed price, with no surge pricing.`;
+    const description = `${s.line}. Private chauffeur service in Barcelona.`;
     lines.push(
       [s.id, title, description, "in stock", "new", `${s.fromPrice.toFixed(2)} EUR`, s.url, s.imageUrl, "Elite BCN Transfer"].map(csvCell).join(","),
     );
