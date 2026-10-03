@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LayoutGroup, motion, useReducedMotion } from "framer-motion";
 import { Bell, BellRing, Camera, FileText, MessageSquarePlus, Mic, Search, Settings, Star, Users, X } from "lucide-react";
 import type { Conversation } from "@/lib/whatsapp-inbox";
 import { TAG_LABELS, TAG_ORDER, type PaymentTag } from "@/lib/whatsapp-tags";
@@ -78,14 +79,15 @@ export default function ConversationList({
   list, active, onSelect, filter, onFilter, query, onQuery, onToggleFavorite, onStartChat, view, onView, alerts, showAlertBanner, onDismissBanner,
 }: Props) {
   const all = list ?? [];
+  const reduce = useReducedMotion();
   const counts = {
     unread: all.filter((c) => c.unread > 0).length,
     favorites: all.filter((c) => c.favorite).length,
-    ...Object.fromEntries(TAG_ORDER.map((t) => [t, all.filter((c) => c.booking?.tag === t).length])),
+    ...Object.fromEntries(TAG_ORDER.map((t) => [t, all.filter((c) => c.tag?.tag === t).length])),
   } as Record<string, number>;
 
   const matches = (c: Conversation) =>
-    (filter === "all" ? true : filter === "unread" ? c.unread > 0 : filter === "favorites" ? c.favorite : c.booking?.tag === filter) && matchesSearch(c, query);
+    (filter === "all" ? true : filter === "unread" ? c.unread > 0 : filter === "favorites" ? c.favorite : c.tag?.tag === filter) && matchesSearch(c, query);
   // Starred chats first, then the most recent: the order of the list itself is by recency already.
   const shown = [...all.filter(matches)].sort((a, b) => Number(b.favorite) - Number(a.favorite));
 
@@ -123,9 +125,10 @@ export default function ConversationList({
             role="tab"
             aria-selected={view === v}
             onClick={() => onView(v)}
-            className={cn("inline-flex items-center justify-center gap-1.5 rounded-full py-1.5 text-[13px] font-medium capitalize transition-colors", view === v ? "bg-gold-500/20 text-gold-100" : "text-dark-300 hover:text-white")}
+            className={cn("relative inline-flex items-center justify-center gap-1.5 rounded-full py-1.5 text-[13px] font-medium capitalize transition-colors", view === v ? "text-gold-100" : "text-dark-300 hover:text-white")}
           >
-            {v === "groups" && <Users size={13} />} {v}
+            {view === v && <motion.span layoutId="wa-view-pill" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} className="absolute inset-0 rounded-full bg-gold-500/20" />}
+            <span className="relative inline-flex items-center gap-1.5">{v === "groups" && <Users size={13} />} {v}</span>
           </button>
         ))}
       </div>
@@ -215,8 +218,16 @@ export default function ConversationList({
             </p>
           )}
 
+          <LayoutGroup id="wa-chats">
           {shown.map((c) => (
-            <div key={c.phone} className={cn("group relative border-b border-white/[0.04] transition-colors hover:bg-white/[0.04]", active === c.phone && "bg-gold-500/[0.08]")}>
+            <motion.div
+              key={c.phone}
+              layout={reduce ? false : "position"}
+              initial={reduce ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 420, damping: 34 }}
+              className={cn("group relative border-b border-white/[0.04] transition-colors hover:bg-white/[0.04]", active === c.phone && "bg-gold-500/[0.08]")}
+            >
               <button
                 type="button"
                 onClick={() => onSelect(c.phone)}
@@ -237,10 +248,10 @@ export default function ConversationList({
                       </span>
                     )}
                   </span>
-                  {c.booking && (
+                  {(c.tag || c.booking) && (
                     <span className="mt-1 flex items-center gap-1.5">
-                      <TagPill tag={c.booking.tag} label={c.booking.label} title={c.booking.detail ?? undefined} />
-                      <span className="truncate text-[11px] text-dark-500">{c.booking.code}</span>
+                      {c.tag && <TagPill tag={c.tag.tag} label={c.tag.label} title={c.tag.detail ?? undefined} />}
+                      {c.booking && <span className="truncate text-[11px] text-dark-500">{c.booking.code}</span>}
                     </span>
                   )}
                 </span>
@@ -254,8 +265,9 @@ export default function ConversationList({
               >
                 <Star size={15} fill={c.favorite ? "currentColor" : "none"} />
               </button>
-            </div>
+            </motion.div>
           ))}
+          </LayoutGroup>
         </nav>
       )}
     </>

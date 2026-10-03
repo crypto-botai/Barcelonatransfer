@@ -50,7 +50,7 @@ const gctx = (id = "friday") => ({ params: Promise.resolve({ id }) });
 const NOW = new Date("2026-10-14T10:00:00Z");
 const conv = (over: Partial<Conversation> = {}): Conversation => ({
   phone: "+34635383712", name: "Ana", lastText: "how much to sitges", lastType: "text", lastAt: new Date(NOW.getTime() - 20 * 60_000).toISOString(), lastDir: "in",
-  lastStatus: null, unread: 1, favorite: false, markedUnread: false, booking: null, lastInText: "how much to sitges", lastInAt: new Date(NOW.getTime() - 20 * 60_000).toISOString(),
+  lastStatus: null, unread: 1, favorite: false, markedUnread: false, booking: null, manualTag: null, tag: null, lastInText: "how much to sitges", lastInAt: new Date(NOW.getTime() - 20 * 60_000).toISOString(),
   windowEndsAt: new Date(NOW.getTime() + 23 * 3600_000).toISOString(), windowOpen: true, ...over,
 });
 
@@ -97,6 +97,20 @@ describe("PATCH a conversation", () => {
     expect(m.recordFlag).toHaveBeenCalledWith("+34635383712", "unread", true);
     m.recordFlag.mockClear();
     expect((await flagPatch(json({ unread: false }, "PATCH"), ctx())).status).toBe(200);
+    expect(m.recordFlag).not.toHaveBeenCalled();
+  });
+
+  it("tags where the payment stands, and Automatic clears it", async () => {
+    for (const tag of ["pending", "deposit", "cash", "paid", "cancelled"]) {
+      expect((await flagPatch(json({ tag }, "PATCH"), ctx())).status).toBe(200);
+      expect(m.recordFlag).toHaveBeenLastCalledWith("+34635383712", "tag", tag);
+    }
+    expect((await flagPatch(json({ tag: "auto" }, "PATCH"), ctx())).status).toBe(200);
+    expect(m.recordFlag).toHaveBeenLastCalledWith("+34635383712", "tag", null);
+  });
+
+  it("refuses a tag that is not one of ours", async () => {
+    for (const tag of ["vip", "", 3, null]) expect((await flagPatch(json({ tag }, "PATCH"), ctx())).status).toBe(422);
     expect(m.recordFlag).not.toHaveBeenCalled();
   });
 

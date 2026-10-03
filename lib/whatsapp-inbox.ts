@@ -20,13 +20,13 @@
  *   WA_STATUS    { wamid, status, errorCode?, errorText? }
  *   WA_REACTION  { id, wamid (the message reacted to), emoji ("" = removed), dir }
  *   WA_SEEN      {}                      the office opened the conversation
- *   WA_FLAG      { kind: "favorite" | "unread", value }
+ *   WA_FLAG      { kind: "favorite" | "unread", value } or { kind: "tag", value: a payment tag, or null for automatic }
  *                a star, or "keep this as unread", set by the office
  */
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { toE164 } from "@/lib/phone";
-import type { PaymentTag } from "@/lib/whatsapp-tags";
+import { isPaymentTag, manualTagInfo, type ConversationTag, type PaymentTag } from "@/lib/whatsapp-tags";
 
 export const WA_ENTITY = "WhatsApp";
 
@@ -254,6 +254,10 @@ export interface Conversation {
   markedUnread: boolean;
   /** The booking this customer is writing about, when their number matches one. */
   booking: ConversationBooking | null;
+  /** The tag the office put on the chat by hand, if any. It wins over what the booking says. */
+  manualTag: PaymentTag | null;
+  /** The tag to show: the office's own choice, otherwise where the booking's payment stands. */
+  tag: ConversationTag | null;
   /** The customer's own latest message, which is what a desktop alert quotes. */
   lastInText: string;
   lastInAt: string | null;
@@ -366,6 +370,8 @@ export function buildConversations(rows: LogRow[], now: Date = new Date()): Conv
     const unreadFlag = latestFlag("unread");
     const markedUnread = Boolean(unreadFlag && det(unreadFlag).value === true && time(unreadFlag.createdAt) > seen);
     const unread = Math.max(unreadCount, markedUnread ? 1 : 0);
+    const tagValue = latestFlag("tag") ? det(latestFlag("tag")!).value : null;
+    const manualTag = isPaymentTag(tagValue) ? tagValue : null;
 
     const windowEnds = lastIn ? time(lastIn.createdAt) + SESSION_WINDOW_MS : null;
     const name = [...messages].reverse().map((r) => det(r).name).find(Boolean) ?? null;
@@ -383,6 +389,8 @@ export function buildConversations(rows: LogRow[], now: Date = new Date()): Conv
       favorite,
       markedUnread,
       booking: null,
+      manualTag,
+      tag: manualTag ? manualTagInfo(manualTag) : null,
       lastInText: lastIn ? String(det(lastIn).text ?? "") : "",
       lastInAt: lastIn ? new Date(lastIn.createdAt).toISOString() : null,
       windowEndsAt: windowEnds ? new Date(windowEnds).toISOString() : null,

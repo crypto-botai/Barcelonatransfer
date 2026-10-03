@@ -48,9 +48,12 @@ export async function PUT(_req: NextRequest, { params }: { params: Promise<{ pho
   return NextResponse.json({ ok: true });
 }
 
-const flags = z.object({ favorite: z.boolean().optional(), unread: z.boolean().optional() }).refine((v) => v.favorite !== undefined || v.unread !== undefined);
+/** "auto" hands the tag back to the booking. */
+const flags = z
+  .object({ favorite: z.boolean().optional(), unread: z.boolean().optional(), tag: z.enum(["pending", "deposit", "cash", "paid", "cancelled", "auto"]).optional() })
+  .refine((v) => v.favorite !== undefined || v.unread !== undefined || v.tag !== undefined);
 
-/** Star a conversation, or keep it as unread so it is not forgotten. */
+/** Star a conversation, keep it as unread so it is not forgotten, or tag where the payment stands. */
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ phone: string }> }) {
   if (!(await requireAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const phone = phoneFrom((await params).phone);
@@ -60,6 +63,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ph
   if (parsed.data.favorite !== undefined) await recordFlag(phone, "favorite", parsed.data.favorite);
   // Only "keep as unread" is stored: opening the chat is what clears it, and that is already recorded.
   if (parsed.data.unread === true) await recordFlag(phone, "unread", true);
+  if (parsed.data.tag !== undefined) await recordFlag(phone, "tag", parsed.data.tag === "auto" ? null : parsed.data.tag);
   return NextResponse.json({ ok: true });
 }
 

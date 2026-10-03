@@ -566,6 +566,57 @@ export async function subscribeWhatsAppApp(): Promise<{ ok: true } | { ok: false
   }
 }
 
+// ─── Catalogue on the number ──────────────────────────────────────────────────
+
+export interface WhatsAppCatalogState {
+  /** The shop icon shows in the chat header and the business profile. */
+  visible: boolean;
+  /** Customers can add products to a cart. We take bookings on the site, so this stays off. */
+  cartEnabled: boolean;
+}
+
+/**
+ * Whether the catalogue is switched on for the number. Connecting a catalogue
+ * to the business account is not enough: the number has its own switch, and
+ * until it is on, customers see no shop icon.
+ */
+export async function getWhatsAppCatalog(): Promise<{ ok: true; state: WhatsAppCatalogState } | { ok: false; reason: string }> {
+  const phoneId = process.env.WA_PHONE_ID;
+  const token = process.env.WA_TOKEN;
+  if (!phoneId || !token) return { ok: false, reason: "WhatsApp is not configured" };
+  try {
+    const res = await fetch(`https://graph.facebook.com/${WA_API_VERSION}/${phoneId}/whatsapp_commerce_settings`, {
+      headers: { Authorization: `Bearer ${token}` }, cache: "no-store",
+    });
+    if (!res.ok) {
+      const e = parseError(await res.text().catch(() => ""));
+      return { ok: false, reason: classify(e.code, e.message).reason };
+    }
+    const d = ((await res.json()) as { data?: { is_catalog_visible?: boolean; is_cart_enabled?: boolean }[] }).data?.[0] ?? {};
+    return { ok: true, state: { visible: d.is_catalog_visible === true, cartEnabled: d.is_cart_enabled === true } };
+  } catch (e) {
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/** Show or hide the catalogue on the number. The cart is always left off. */
+export async function setWhatsAppCatalog(visible: boolean): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const phoneId = process.env.WA_PHONE_ID;
+  const token = process.env.WA_TOKEN;
+  if (!phoneId || !token) return { ok: false, reason: "WhatsApp is not configured" };
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/${WA_API_VERSION}/${phoneId}/whatsapp_commerce_settings?is_catalog_visible=${visible}&is_cart_enabled=false`,
+      { method: "POST", headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (res.ok) return { ok: true };
+    const e = parseError(await res.text().catch(() => ""));
+    return { ok: false, reason: classify(e.code, e.message).reason };
+  } catch (e) {
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+  }
+}
+
 // ─── Message templates in Meta ────────────────────────────────────────────────
 
 export interface MetaTemplate {

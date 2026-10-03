@@ -10,7 +10,9 @@ import type { ResolvedService } from "@/lib/whatsapp-services";
 import { dayLabel, dayOf, windowLeft } from "@/lib/whatsapp-ui";
 import { cn } from "@/lib/utils";
 import { ACTIVE_CHAT_KEY } from "@/components/admin/WhatsAppAlerts";
-import ConversationList, { Avatar, TagPill, type FilterKey } from "./ConversationList";
+import { manualTagInfo, TAG_LABELS, type PaymentTag } from "@/lib/whatsapp-tags";
+import ConversationList, { Avatar, type FilterKey } from "./ConversationList";
+import TagPicker from "./TagPicker";
 import { GroupDetail, GroupsList, useGroups } from "./Groups";
 import Composer, { type ComposerHandle } from "./Composer";
 import { MessageBubble, PendingBubble, type PendingMessage } from "./MessageBubble";
@@ -382,6 +384,21 @@ export default function WhatsAppInbox() {
     void loadList(true);
   }, [loadList]);
 
+  /** Tag where a customer's payment stands. Shown at once, then confirmed by the server. */
+  const setTag = useCallback(async (phone: string, tag: PaymentTag | "auto") => {
+    setList((l) => l && l.map((c) => {
+      if (c.phone !== phone) return c;
+      if (tag !== "auto") return { ...c, manualTag: tag, tag: manualTagInfo(tag) };
+      return { ...c, manualTag: null, tag: c.booking ? { tag: c.booking.tag, label: c.booking.label, detail: c.booking.detail, source: "booking" as const } : null };
+    }));
+    const r = await api(`/api/admin/whatsapp/${encodeURIComponent(phone)}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tag }),
+    }).catch(() => null);
+    if (!r?.ok) toast.error("Could not save the tag. Try again.");
+    else toast.success(tag === "auto" ? "Tag now follows the booking" : `Tagged: ${TAG_LABELS[tag]}`);
+    void loadList(true);
+  }, [loadList]);
+
   /** Keep a chat as unread so it is not forgotten, and go back to the list as WhatsApp does. */
   const markUnread = useCallback(async (phone: string) => {
     const r = await api(`/api/admin/whatsapp/${encodeURIComponent(phone)}`, {
@@ -475,7 +492,7 @@ export default function WhatsAppInbox() {
                       {thread?.booking && <> · booking {thread.booking.confirmationCode} ({thread.booking.status.toLowerCase().replace(/_/g, " ")})</>}
                     </p>
                   </div>
-                  {conv?.booking && <TagPill tag={conv.booking.tag} label={conv.booking.label} title={conv.booking.detail ?? undefined} className="hidden sm:inline-flex" />}
+                  {conv && <TagPicker conv={conv} onChoose={(t) => void setTag(active, t)} />}
                   {thread && (
                     <span className={cn("hidden shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11.5px] lg:inline-flex", canReply ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-dark-400")}>
                       <Clock size={11} /> {canReply ? left ?? "Window open" : "Reply window closed"}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { paymentTag, phoneVariants, relevantBooking, TAG_LABELS, type BookingForTag } from "@/lib/whatsapp-tags";
+import { isPaymentTag, MANUAL_TAGS, manualTagInfo, paymentTag, phoneVariants, relevantBooking, TAG_LABELS, type BookingForTag } from "@/lib/whatsapp-tags";
 import { assistantReply, detectIntent, mentionedService, unansweredReply } from "@/lib/whatsapp-assistant";
 import { GROUP_LIMITS, planBroadcast, sanitizeGroups } from "@/lib/whatsapp-groups";
 import { followUpCandidates, MAX_PER_RUN } from "@/lib/whatsapp-followup";
@@ -132,6 +132,39 @@ describe("favorites and kept-as-unread", () => {
 
 const PRICES: Record<string, number> = { barcelona_city: 50, tossa: 155, girona_city: 165, lloret: 145, sitges: 80, hourly: 45 };
 const services = () => resolveServices(DEFAULT_SERVICES, async (z) => PRICES[z] ?? null);
+
+describe("tags chosen by the office", () => {
+  const tagFlag = (mins: number, value: unknown) => row("WA_FLAG", ago(mins), { kind: "tag", value });
+
+  it("a chat has no tag of its own until one is chosen, and the newest choice wins", () => {
+    expect(buildConversations([inMsg(5)], NOW)[0]).toMatchObject({ manualTag: null, tag: null });
+    expect(buildConversations([inMsg(5), tagFlag(4, "pending")], NOW)[0]).toMatchObject({ manualTag: "pending", tag: { tag: "pending", label: "Pending payment", source: "manual" } });
+    expect(buildConversations([inMsg(5), tagFlag(4, "pending"), tagFlag(3, "cash")], NOW)[0].manualTag).toBe("cash");
+  });
+
+  it("choosing Automatic (null) hands the tag back", () => {
+    expect(buildConversations([inMsg(5), tagFlag(4, "paid"), tagFlag(3, null)], NOW)[0]).toMatchObject({ manualTag: null, tag: null });
+  });
+
+  it("ignores a stored value that is not a payment tag", () => {
+    expect(buildConversations([inMsg(5), tagFlag(4, "vip")], NOW)[0].manualTag).toBeNull();
+  });
+
+  it("a tag on one customer does not touch another, and does not disturb the star", () => {
+    const rows = [inMsg(5), { ...inMsg(5), entityId: "+34600000009" }, tagFlag(4, "deposit"), row("WA_FLAG", ago(3), { kind: "favorite", value: true })];
+    const [a, b] = buildConversations(rows, NOW).sort((x, y) => x.phone.localeCompare(y.phone));
+    expect([a.phone, a.manualTag === null]).toEqual(["+34600000009", true]);
+    expect(b).toMatchObject({ manualTag: "deposit", favorite: true });
+  });
+
+  it("offers the four the office asked for, and names 30% as 30%", () => {
+    expect(MANUAL_TAGS).toEqual(["pending", "deposit", "cash", "paid"]);
+    expect(MANUAL_TAGS.map((t) => manualTagInfo(t).label)).toEqual(["Pending payment", "30% paid", "Cash to chauffeur", "Paid in full"]);
+    expect(isPaymentTag("cash")).toBe(true);
+    expect(isPaymentTag("auto")).toBe(false);
+    expect(isPaymentTag(null)).toBe(false);
+  });
+});
 
 describe("detectIntent", () => {
   it.each([
@@ -308,7 +341,7 @@ describe("planBroadcast: who a message reaches", () => {
 
 const conv = (over: Partial<Conversation> = {}): Conversation => ({
   phone: P, name: null, lastText: "hello", lastType: "text", lastAt: new Date(NOW.getTime() - 20 * 60_000).toISOString(), lastDir: "in",
-  lastStatus: null, unread: 1, favorite: false, markedUnread: false, booking: null, lastInText: "hello", lastInAt: new Date(NOW.getTime() - 20 * 60_000).toISOString(),
+  lastStatus: null, unread: 1, favorite: false, markedUnread: false, booking: null, manualTag: null, tag: null, lastInText: "hello", lastInAt: new Date(NOW.getTime() - 20 * 60_000).toISOString(),
   windowEndsAt: new Date(NOW.getTime() + 23 * 3600_000).toISOString(), windowOpen: true, ...over,
 });
 

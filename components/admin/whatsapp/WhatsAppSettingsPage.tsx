@@ -114,6 +114,8 @@ export default function WhatsAppSettingsPage() {
 
   const [link, setLink] = useState<{ state: "checking" | "connected" | "disconnected" | "error"; error?: string }>({ state: "checking" });
   const [linking, setLinking] = useState(false);
+  const [shop, setShop] = useState<{ state: "checking" | "on" | "off" | "error"; error?: string }>({ state: "checking" });
+  const [shopBusy, setShopBusy] = useState(false);
   type TemplateRow = { name: string; to: "customer" | "driver"; purpose: string; body: string; status: string; problem: string | null };
   const [templates, setTemplates] = useState<TemplateRow[] | null>(null);
   const [templateError, setTemplateError] = useState<string | null>(null);
@@ -139,6 +141,9 @@ export default function WhatsAppSettingsPage() {
     void call<{ templates: TemplateRow[] }>("/api/admin/whatsapp/templates").then((r) => (r.ok ? setTemplates(r.data.templates) : setTemplateError(r.data.error ?? "Could not read the templates from WhatsApp.")));
     void call<{ subscribed: boolean }>("/api/admin/whatsapp/connection").then((r) =>
       setLink(r.ok ? { state: r.data.subscribed ? "connected" : "disconnected" } : { state: "error", error: r.data.error }),
+    );
+    void call<{ visible: boolean }>("/api/admin/whatsapp/catalog-visibility").then((r) =>
+      setShop(r.ok ? { state: r.data.visible ? "on" : "off" } : { state: "error", error: r.data.error }),
     );
     try { setSound(localStorage.getItem(SOUND_KEY) !== "0"); } catch { /* default on */ }
   }, [applyView]);
@@ -166,6 +171,16 @@ export default function WhatsAppSettingsPage() {
     setLinking(false);
     if (r?.ok && r.data.subscribed) { setLink({ state: "connected" }); toast.success("Connected. Customer messages will now arrive here."); }
     else { setLink({ state: "error", error: r?.data.error ?? "Could not connect." }); toast.error(r?.data.error ?? "Could not connect."); }
+  };
+
+  const showShop = async (visible: boolean) => {
+    setShopBusy(true);
+    const r = await call<{ visible: boolean }>("/api/admin/whatsapp/catalog-visibility", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ visible }),
+    }).catch(() => null);
+    setShopBusy(false);
+    if (r?.ok) { setShop({ state: r.data.visible ? "on" : "off" }); toast.success(r.data.visible ? "The catalogue is now shown on your WhatsApp number." : "The catalogue is hidden."); }
+    else { setShop({ state: "error", error: r?.data.error ?? "Could not change it." }); toast.error(r?.data.error ?? "Could not change it."); }
   };
 
   const dirty = settings !== null && JSON.stringify(settings) !== savedJson;
@@ -463,6 +478,29 @@ export default function WhatsAppSettingsPage() {
 
       {/* ── Catalogue ──────────────────────────────────────────────────── */}
       <Card title="Product catalogue" hint="The same services, as products customers can browse inside WhatsApp (the shop icon in your profile). Meta reads this feed on a schedule, so changing a price here changes it in the catalogue too.">
+        <div className="mb-5 flex items-start justify-between gap-4 rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
+          <div className="flex min-w-0 items-start gap-3">
+            <span className={cn("mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full", shop.state === "on" ? "bg-emerald-500/15 text-emerald-300" : shop.state === "checking" ? "bg-white/10 text-dark-300" : "bg-amber-500/15 text-amber-300")}>
+              {shop.state === "on" ? <Check size={16} /> : shop.state === "checking" ? <Loader2 size={16} className="animate-spin" /> : <CircleAlert size={16} />}
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm text-white">
+                {shop.state === "on" && "The catalogue is switched on for your WhatsApp number."}
+                {shop.state === "checking" && "Checking with Meta…"}
+                {shop.state === "off" && "The catalogue is not shown on your WhatsApp number yet."}
+                {shop.state === "error" && "Could not check the catalogue."}
+              </p>
+              {shop.state === "off" && <p className="mt-0.5 text-[12.5px] leading-snug text-dark-400">Press Show catalogue. Customers then see the shop icon at the top of the chat. It can take a few minutes to appear on their phones.</p>}
+              {shop.state === "on" && <p className="mt-0.5 text-[12.5px] leading-snug text-dark-400">If a customer does not see it yet, they can close and reopen the chat, or update WhatsApp. Products appear once Meta has reviewed them.</p>}
+              {shop.state === "error" && shop.error && <p className="mt-0.5 text-[12.5px] leading-snug text-red-300">{shop.error}</p>}
+            </div>
+          </div>
+          {(shop.state === "off" || shop.state === "error") && (
+            <button type="button" onClick={() => void showShop(true)} disabled={shopBusy} className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-gold-500 px-4 py-2 text-[13px] font-semibold text-black hover:bg-gold-400 disabled:opacity-60">
+              {shopBusy && <Loader2 size={14} className="animate-spin" />} Show catalogue
+            </button>
+          )}
+        </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <code className="min-w-0 flex-1 truncate rounded-lg border border-white/[0.08] bg-black/40 px-3 py-2.5 text-[13px] text-gold-200">{feedUrl}</code>
           <button

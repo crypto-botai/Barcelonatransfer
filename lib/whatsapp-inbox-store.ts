@@ -148,7 +148,7 @@ export async function markSeen(phone: string): Promise<string | null> {
 }
 
 /** A star, or "keep as unread". Stored as an event so the newest of each kind wins. */
-export async function recordFlag(phone: string, kind: "favorite" | "unread", value: boolean): Promise<void> {
+export async function recordFlag(phone: string, kind: "favorite" | "unread" | "tag", value: boolean | string | null): Promise<void> {
   await prisma.activityLog.create({ data: { action: "WA_FLAG", entity: WA_ENTITY, entityId: phone, details: { kind, value } } });
 }
 
@@ -220,7 +220,9 @@ export async function loadConversations(opts: { withBookings?: boolean } = {}) {
     const b = relevantBooking(byPhone.get(c.phone.replace(/\D/g, "")) ?? [], now);
     if (!b) return c;
     const t = paymentTag(b);
-    return { ...c, booking: { code: b.confirmationCode, tag: t.tag, label: t.label, detail: t.detail, pickupAt: new Date(b.pickupDatetime).toISOString(), name: b.guestName } };
+    const booking = { code: b.confirmationCode, tag: t.tag, label: t.label, detail: t.detail, pickupAt: new Date(b.pickupDatetime).toISOString(), name: b.guestName };
+    // A tag the office chose stays; otherwise the chat shows where the booking's payment stands.
+    return { ...c, booking, tag: c.manualTag ? c.tag : { ...t, source: "booking" as const } };
   });
 }
 

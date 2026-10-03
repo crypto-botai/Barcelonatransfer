@@ -35,6 +35,15 @@ describe("recordFlag", () => {
   });
 });
 
+describe("recordFlag for a tag", () => {
+  it("stores the chosen tag, and null when handed back to the booking", async () => {
+    await recordFlag(PHONE, "tag", "cash");
+    expect(db.create.mock.calls[0][0].data).toMatchObject({ action: "WA_FLAG", entity: "WhatsApp", entityId: PHONE, details: { kind: "tag", value: "cash" } });
+    await recordFlag(PHONE, "tag", null);
+    expect(db.create.mock.calls[1][0].data.details).toEqual({ kind: "tag", value: null });
+  });
+});
+
 describe("markSeen with a chat kept as unread", () => {
   it("clears a kept-unread mark even though no new message came, without a read receipt", async () => {
     const lastIn = { createdAt: at("2026-10-03T10:00:00Z"), details: { wamid: "w9" } };
@@ -79,6 +88,18 @@ describe("loadConversations with bookings", () => {
     db.bookings.mockResolvedValue([booking()]);
     const [c] = await loadConversations();
     expect(c.booking).toMatchObject({ code: "EBC-7", tag: "paid", label: "Paid in full", name: "Ana Smith" });
+  });
+
+  it("a tag the office chose beats the booking, and Automatic lets the booking show again", async () => {
+    db.bookings.mockResolvedValue([booking()]);
+    const flag = { action: "WA_FLAG", entityId: PHONE, createdAt: at("2026-10-03T09:00:00Z"), details: { kind: "tag", value: "cash" } };
+    db.findMany.mockResolvedValue([msg(new Date(Date.now() - 3600_000).toISOString()), { ...flag, createdAt: new Date(Date.now() - 1800_000) }]);
+    let [c] = await loadConversations();
+    expect(c.tag).toMatchObject({ tag: "cash", source: "manual" });
+    expect(c.booking?.tag).toBe("paid"); // the booking still says what it says
+    db.findMany.mockResolvedValue([msg(new Date(Date.now() - 3600_000).toISOString())]);
+    [c] = await loadConversations();
+    expect(c.tag).toMatchObject({ tag: "paid", label: "Paid in full", source: "booking" });
   });
 
   it("tags a deposit booking, and a pending one", async () => {

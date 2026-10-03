@@ -47,6 +47,27 @@ export const TAG_LABELS: Record<PaymentTag, string> = {
   cancelled: "Cancelled",
 };
 
+/** The tags the office can put on a chat by hand. A booking cannot always say it: a cash deal, or a bank transfer, is agreed in the chat. */
+export const MANUAL_TAGS: PaymentTag[] = ["pending", "deposit", "cash", "paid"];
+
+/** What a chosen tag is called, and what it means, for the picker. */
+export const MANUAL_TAG_HINTS: Record<PaymentTag, string> = {
+  pending: "Waiting for the customer to pay",
+  deposit: "30% paid, the balance goes to the chauffeur",
+  cash: "The customer pays the chauffeur in cash",
+  paid: "Everything is paid",
+  cancelled: "The booking was cancelled",
+};
+
+export const isPaymentTag = (v: unknown): v is PaymentTag => typeof v === "string" && (TAG_ORDER as string[]).includes(v);
+
+/** The tag a conversation shows, and whether the office chose it or the booking says it. */
+export interface ConversationTag extends TagInfo {
+  source: "manual" | "booking";
+}
+
+export const manualTagInfo = (tag: PaymentTag): ConversationTag => ({ tag, label: TAG_LABELS[tag], detail: MANUAL_TAG_HINTS[tag], source: "manual" });
+
 const euro = (n: number) => `€${Number.isInteger(n) ? n : n.toFixed(2)}`;
 
 export function paymentTag(b: BookingForTag): TagInfo {
