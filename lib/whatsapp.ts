@@ -194,6 +194,43 @@ export async function sendWhatsAppText(phone: string, text: string): Promise<boo
 }
 
 /**
+ * Free text from the office to a customer, reporting what happened instead of
+ * throwing. The inbox needs the message id Meta gives back (to match delivery
+ * receipts to it) and the reason when it is refused, which sendWhatsAppText
+ * folds into a boolean.
+ */
+export async function sendWhatsAppTextResult(phone: string | null | undefined, text: string): Promise<WhatsAppResult> {
+  if (!whatsappConfigured()) return { outcome: "skipped", reason: "WhatsApp is not configured" };
+  const to = toE164(phone);
+  if (!to) return { outcome: "skipped", reason: phone ? "number has no country code" : "no phone number" };
+  return post({ to, type: "text", text: { body: text.slice(0, 4096), preview_url: true } });
+}
+
+/**
+ * A photo, document or voice note a customer sent.
+ *
+ * Meta hands out a media id, not a file. Fetching it is two calls (the id gives
+ * a short-lived address, the address gives the bytes) and both need the access
+ * token, which is why the browser cannot do it and the admin goes through the
+ * server. Returns null when it cannot be had.
+ */
+export async function fetchWhatsAppMedia(mediaId: string): Promise<{ bytes: ArrayBuffer; contentType: string } | null> {
+  const token = process.env.WA_TOKEN;
+  if (!token || !/^\d{5,30}$/.test(mediaId)) return null;
+  try {
+    const meta = await fetch(`https://graph.facebook.com/${WA_API_VERSION}/${mediaId}`, { headers: { Authorization: `Bearer ${token}` } });
+    if (!meta.ok) return null;
+    const { url, mime_type } = (await meta.json()) as { url?: string; mime_type?: string };
+    if (!url) return null;
+    const file = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!file.ok) return null;
+    return { bytes: await file.arrayBuffer(), contentType: mime_type ?? file.headers.get("content-type") ?? "application/octet-stream" };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * The office's own number, as configured.
  *
  * Customer numbers are held to the strict rule that a number without its
@@ -247,7 +284,8 @@ export async function notifyAdmin(
   // number below it.
   const to = ownerNumber(process.env.WA_ADMIN_NUMBER || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER);
 
-  if (!whatsappConfigured() || !to) {
+  /** Email is the way an alert is certain to arrive. */
+  const byEmail = async () => {
     if (opts.emailFallback === false) return;
     try {
       const { sendAdminAlertEmail } = await import("@/lib/resend");
@@ -256,11 +294,20 @@ export async function notifyAdmin(
     } catch (e) {
       console.warn("[alerts] admin email fallback failed:", (e as Error)?.message);
     }
-    return;
-  }
+  };
+
+  if (!whatsappConfigured() || !to) return byEmail();
 
   const result = await post({ to, type: "text", text: { body: text } });
-  if (result.outcome !== "sent") console.warn("[whatsapp] admin notify:", result.reason);
+  if (result.outcome !== "sent") {
+    // WhatsApp refuses free text to anyone who has not written to the business
+    // in the last 24 hours, and the owner usually has not. Before WhatsApp was
+    // switched on this function sent an email; once it is on, that refusal
+    // would have meant a flight delay or a new lead reaching no one. So a
+    // refusal falls back to the email, exactly as "not configured" does.
+    console.warn("[whatsapp] admin notify:", result.reason);
+    return byEmail();
+  }
 }
 
 /**

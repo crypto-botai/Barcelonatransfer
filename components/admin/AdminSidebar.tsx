@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { LayoutDashboard, CalendarCheck, Car, Users, DollarSign, Settings, LogOut, ChevronRight, ChevronDown, Wallet, Clock, Tag, Mail, BarChart2, TrendingUp, UserCheck, PieChart, Menu, X, Building2, Brain, Activity, Bell, BookOpen, Zap, CreditCard, FlaskConical, MessageSquare, Eye, Shield, Key, Radar, Star, Handshake } from "lucide-react";
+import { LayoutDashboard, CalendarCheck, Car, Users, DollarSign, Settings, LogOut, ChevronRight, ChevronDown, Wallet, Clock, Tag, Mail, BarChart2, TrendingUp, UserCheck, PieChart, Menu, X, Building2, Brain, Activity, Bell, BookOpen, Zap, CreditCard, FlaskConical, MessageSquare, Eye, Shield, Key, Radar, Star, Handshake, MessageCircle } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,7 @@ const NAV: NavItem[] = [
   { icon: LayoutDashboard, label: "Overview",    href: "/admin" },
   { icon: Radar,           label: "Dispatch",    href: "/admin/dispatch" },
   { icon: CalendarCheck,   label: "Bookings",    href: "/admin/bookings" },
+  { icon: MessageCircle,   label: "WhatsApp",    href: "/admin/whatsapp" },
   { icon: PieChart,        label: "Analytics",   href: "/admin/analytics" },
   { icon: TrendingUp,      label: "Revenue",     href: "/admin/revenue" },
   { icon: UserCheck,       label: "Customers",   href: "/admin/customers" },
