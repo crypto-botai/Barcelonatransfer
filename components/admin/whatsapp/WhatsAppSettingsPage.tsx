@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowDown, ArrowLeft, ArrowUp, Bell, BellOff, Camera, Check, Clock, Copy, ExternalLink, ImageIcon, Loader2, MessageSquareReply, Plus, Save, Trash2, Volume2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, Bell, BellOff, Camera, Check, CircleAlert, Clock, Copy, ExternalLink, ImageIcon, Loader2, MessageSquareReply, Plus, Save, Trash2, Volume2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { DEFAULT_SETTINGS, LIMITS, isOpenNow, type QuickReply, type ServiceItem, type WhatsAppSettings } from "@/lib/whatsapp-settings";
 import type { ResolvedService } from "@/lib/whatsapp-services";
@@ -112,6 +112,9 @@ export default function WhatsAppSettingsPage() {
   const [photoBusy, setPhotoBusy] = useState(false);
   const photoInput = useRef<HTMLInputElement>(null);
 
+  const [link, setLink] = useState<{ state: "checking" | "connected" | "disconnected" | "error"; error?: string }>({ state: "checking" });
+  const [linking, setLinking] = useState(false);
+
   const alerts = useDesktopAlerts();
   const [sound, setSound] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -129,8 +132,19 @@ export default function WhatsAppSettingsPage() {
       else { toast.error(r.data.error ?? "Could not load the settings."); setSettings(DEFAULT_SETTINGS); setSavedJson(JSON.stringify(DEFAULT_SETTINGS)); }
     });
     void call<Profile>("/api/admin/whatsapp/profile").then((r) => (r.ok ? setProfile(r.data) : setProfileError(r.data.error ?? "Could not load the profile from WhatsApp.")));
+    void call<{ subscribed: boolean }>("/api/admin/whatsapp/connection").then((r) =>
+      setLink(r.ok ? { state: r.data.subscribed ? "connected" : "disconnected" } : { state: "error", error: r.data.error }),
+    );
     try { setSound(localStorage.getItem(SOUND_KEY) !== "0"); } catch { /* default on */ }
   }, [applyView]);
+
+  const connect = async () => {
+    setLinking(true);
+    const r = await call<{ subscribed: boolean }>("/api/admin/whatsapp/connection", { method: "POST" }).catch(() => null);
+    setLinking(false);
+    if (r?.ok && r.data.subscribed) { setLink({ state: "connected" }); toast.success("Connected. Customer messages will now arrive here."); }
+    else { setLink({ state: "error", error: r?.data.error ?? "Could not connect." }); toast.error(r?.data.error ?? "Could not connect."); }
+  };
 
   const dirty = settings !== null && JSON.stringify(settings) !== savedJson;
 
@@ -206,6 +220,32 @@ export default function WhatsAppSettingsPage() {
         <h1 className="font-display text-3xl text-white">WhatsApp settings</h1>
         <p className="mt-1 text-sm text-dark-400">Change the business profile, the services customers can pick, your saved replies and your alerts.</p>
       </div>
+
+      {/* ── Connection ─────────────────────────────────────────────────── */}
+      <Card title="Connection to WhatsApp" hint="Whether Meta passes your customers' messages on to this inbox.">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-start gap-3">
+            <span className={cn("mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full", link.state === "connected" ? "bg-emerald-500/15 text-emerald-300" : link.state === "checking" ? "bg-white/10 text-dark-300" : "bg-amber-500/15 text-amber-300")}>
+              {link.state === "connected" ? <Check size={16} /> : link.state === "checking" ? <Loader2 size={16} className="animate-spin" /> : <CircleAlert size={16} />}
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm text-white">
+                {link.state === "connected" && "Connected. Customer messages arrive in the inbox."}
+                {link.state === "checking" && "Checking with Meta…"}
+                {link.state === "disconnected" && "Not connected. Customer messages are not reaching this inbox."}
+                {link.state === "error" && "Could not check the connection."}
+              </p>
+              {link.state === "disconnected" && <p className="mt-0.5 text-[12.5px] leading-snug text-dark-400">Press Connect now. It takes a second and needs nothing else.</p>}
+              {link.state === "error" && link.error && <p className="mt-0.5 text-[12.5px] leading-snug text-red-300">{link.error}</p>}
+            </div>
+          </div>
+          {(link.state === "disconnected" || link.state === "error") && (
+            <button type="button" onClick={() => void connect()} disabled={linking} className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-gold-500 px-4 py-2 text-[13px] font-semibold text-black hover:bg-gold-400 disabled:opacity-60">
+              {linking && <Loader2 size={14} className="animate-spin" />} Connect now
+            </button>
+          )}
+        </div>
+      </Card>
 
       {/* ── Business profile ───────────────────────────────────────────── */}
       <Card title="Business profile" hint="What customers see when they tap the business name in WhatsApp.">

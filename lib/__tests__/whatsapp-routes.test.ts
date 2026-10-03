@@ -19,7 +19,7 @@ const mocks = vi.hoisted(() => ({
   recordInbound: vi.fn(), recordStatus: vi.fn(), recordReaction: vi.fn(), recordOutbound: vi.fn(), recordOutboundReaction: vi.fn(),
   markSeen: vi.fn(), loadThread: vi.fn(), loadConversations: vi.fn(), loadSummary: vi.fn(), inboxRevision: vi.fn(), lastOutboundTimes: vi.fn(),
   notifyAdmin: vi.fn(), sendText: vi.fn(), sendInteractive: vi.fn(), sendReaction: vi.fn(), sendMedia: vi.fn(), uploadMedia: vi.fn(),
-  markRead: vi.fn(), getProfile: vi.fn(), updateProfile: vi.fn(), setPhoto: vi.fn(), push: vi.fn(),
+  markRead: vi.fn(), getConnection: vi.fn(), subscribe: vi.fn(), getProfile: vi.fn(), updateProfile: vi.fn(), setPhoto: vi.fn(), push: vi.fn(),
   loadSettings: vi.fn(), saveSettings: vi.fn(), findBooking: vi.fn(), session: vi.fn(), prices: vi.fn(),
 }));
 
@@ -36,6 +36,7 @@ vi.mock("@/lib/whatsapp", async () => {
     notifyAdmin: mocks.notifyAdmin, whatsappConfigured: () => true, fetchWhatsAppMedia: vi.fn().mockResolvedValue(null),
     sendWhatsAppTextResult: mocks.sendText, sendWhatsAppInteractive: mocks.sendInteractive, sendWhatsAppReaction: mocks.sendReaction,
     sendWhatsAppMedia: mocks.sendMedia, uploadWhatsAppMedia: mocks.uploadMedia, markWhatsAppRead: mocks.markRead,
+    getWhatsAppConnection: mocks.getConnection, subscribeWhatsAppApp: mocks.subscribe,
     getWhatsAppProfile: mocks.getProfile, updateWhatsAppProfile: mocks.updateProfile, setWhatsAppProfilePhoto: mocks.setPhoto,
   };
 });
@@ -56,6 +57,7 @@ import { GET as settingsGet, PUT as settingsPut } from "@/app/api/admin/whatsapp
 import { GET as profileGet, PUT as profilePut } from "@/app/api/admin/whatsapp/profile/route";
 import { POST as photoPost } from "@/app/api/admin/whatsapp/profile/photo/route";
 import { GET as catalogGet } from "@/app/api/whatsapp/catalog/route";
+import { GET as connectionGet, POST as connectionPost } from "@/app/api/admin/whatsapp/connection/route";
 
 const PHONE = "%2B34635383712";
 const E164 = "+34635383712";
@@ -296,6 +298,8 @@ describe("admin routes refuse everyone who is not an admin", () => {
     ["profile GET", () => profileGet()],
     ["profile PUT", () => profilePut(jsonReq({}, "PUT"))],
     ["photo POST", () => photoPost(jsonReq({ useLogo: true }))],
+    ["connection GET", () => connectionGet()],
+    ["connection POST", () => connectionPost()],
   ];
 
   for (const role of [null, "DRIVER", "PARTNER", "CUSTOMER"]) {
@@ -308,6 +312,7 @@ describe("admin routes refuse everyone who is not an admin", () => {
       expect(mocks.setPhoto).not.toHaveBeenCalled();
       expect(mocks.updateProfile).not.toHaveBeenCalled();
       expect(mocks.saveSettings).not.toHaveBeenCalled();
+      expect(mocks.subscribe).not.toHaveBeenCalled();
       expect(mocks.loadConversations).not.toHaveBeenCalled();
     });
   }
@@ -685,5 +690,45 @@ describe("catalogue feed", () => {
   it("follows the settings: a service switched off is not in the feed", async () => {
     settings = { ...DEFAULT_SETTINGS, services: DEFAULT_SETTINGS.services.map((s) => (s.id === "girona" ? { ...s, enabled: false } : s)) };
     expect(await (await catalogGet()).text()).not.toContain("girona");
+  });
+});
+
+describe("connection to Meta", () => {
+  it("reports whether Meta is delivering customers' messages", async () => {
+    mocks.getConnection.mockResolvedValue({ ok: true, subscribed: false, apps: [] });
+    expect(await (await connectionGet()).json()).toEqual({ subscribed: false, apps: [] });
+    mocks.getConnection.mockResolvedValue({ ok: true, subscribed: true, apps: [{ id: "1", name: "A" }] });
+    expect((await (await connectionGet()).json()).subscribed).toBe(true);
+  });
+
+  it("says why it could not check", async () => {
+    mocks.getConnection.mockResolvedValue({ ok: false, reason: "token expired" });
+    const res = await connectionGet();
+    expect(res.status).toBe(502);
+    expect((await res.json()).error).toBe("token expired");
+  });
+
+  it("connects, then reports the result from Meta rather than assuming it worked", async () => {
+    mocks.subscribe.mockResolvedValue({ ok: true });
+    mocks.getConnection.mockResolvedValue({ ok: true, subscribed: true, apps: [] });
+    const res = await connectionPost();
+    expect(res.status).toBe(200);
+    expect((await res.json()).subscribed).toBe(true);
+    expect(mocks.subscribe).toHaveBeenCalledTimes(1);
+    expect(mocks.getConnection).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports a refusal to connect, and does not claim success", async () => {
+    mocks.subscribe.mockResolvedValue({ ok: false, reason: "no permission" });
+    const res = await connectionPost();
+    expect(res.status).toBe(502);
+    expect((await res.json()).error).toBe("no permission");
+    expect(mocks.getConnection).not.toHaveBeenCalled();
+  });
+
+  it("says not connected when Meta accepted the call but the app still is not listed", async () => {
+    mocks.subscribe.mockResolvedValue({ ok: true });
+    mocks.getConnection.mockResolvedValue({ ok: true, subscribed: false, apps: [] });
+    expect((await (await connectionPost()).json()).subscribed).toBe(false);
   });
 });

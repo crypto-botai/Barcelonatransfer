@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
-  getWhatsAppProfile, markWhatsAppRead, sendWhatsAppInteractive, sendWhatsAppMedia, sendWhatsAppReaction,
+  getWhatsAppConnection, subscribeWhatsAppApp, getWhatsAppProfile, markWhatsAppRead, sendWhatsAppInteractive, sendWhatsAppMedia, sendWhatsAppReaction,
   sendWhatsAppTextResult, setWhatsAppProfilePhoto, updateWhatsAppProfile, uploadWhatsAppMedia,
 } from "@/lib/whatsapp";
 
@@ -217,5 +217,44 @@ describe("business profile", () => {
     fetchMock.mockReset();
     fetchMock.mockResolvedValueOnce(ok({ id: "upload:S" })).mockResolvedValueOnce(ok({}));
     expect(await setWhatsAppProfilePhoto(new ArrayBuffer(10), "image/png")).toMatchObject({ ok: false, reason: expect.stringContaining("handle") });
+  });
+});
+
+describe("connection to Meta", () => {
+  const subscribed = (...ids: string[]) => ({ data: ids.map((id) => ({ whatsapp_business_api_data: { id, name: `App ${id}` } })) });
+
+  it("reports that our app receives the business account's messages", async () => {
+    fetchMock.mockResolvedValue(ok(subscribed("2233351653890022")));
+    expect(await getWhatsAppConnection()).toEqual({ ok: true, subscribed: true, apps: [{ id: "2233351653890022", name: "App 2233351653890022" }] });
+    expect(calls()[0].url).toBe("https://graph.facebook.com/v21.0/2114337302504279/subscribed_apps");
+    expect(calls()[0].init.headers.Authorization).toBe("Bearer TOKEN1");
+  });
+
+  it("reports not connected when only other apps, or none, are subscribed", async () => {
+    fetchMock.mockResolvedValue(ok(subscribed("999")));
+    expect(await getWhatsAppConnection()).toMatchObject({ ok: true, subscribed: false });
+    fetchMock.mockResolvedValue(ok({ data: [] }));
+    expect(await getWhatsAppConnection()).toMatchObject({ ok: true, subscribed: false, apps: [] });
+  });
+
+  it("says why it could not check, and never throws", async () => {
+    fetchMock.mockResolvedValue(fail(190));
+    expect(await getWhatsAppConnection()).toMatchObject({ ok: false, reason: expect.stringContaining("token") });
+    fetchMock.mockRejectedValue(new Error("offline"));
+    expect(await getWhatsAppConnection()).toEqual({ ok: false, reason: "offline" });
+    vi.stubEnv("WA_TOKEN", "");
+    expect(await getWhatsAppConnection()).toMatchObject({ ok: false });
+  });
+
+  it("subscribes the business account with a POST and no body", async () => {
+    fetchMock.mockResolvedValue(ok({ success: true }));
+    expect(await subscribeWhatsAppApp()).toEqual({ ok: true });
+    expect(calls()[0].init.method).toBe("POST");
+    expect(calls()[0].url).toBe("https://graph.facebook.com/v21.0/2114337302504279/subscribed_apps");
+  });
+
+  it("reports Meta's refusal to subscribe", async () => {
+    fetchMock.mockResolvedValue(fail(100, "Unsupported post request"));
+    expect(await subscribeWhatsAppApp()).toMatchObject({ ok: false, reason: expect.stringContaining("Unsupported post request") });
   });
 });

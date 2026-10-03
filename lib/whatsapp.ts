@@ -301,7 +301,10 @@ export async function sendWhatsAppInteractive(
 // ─── The business profile: photo, about, address, hours of the page customers see ──
 
 /** The Meta app that owns the number. Not a secret: it appears in every Meta dashboard URL. */
-const WA_APP_ID = process.env.WA_APP_ID || "2233351653890022";
+export const WA_APP_ID = process.env.WA_APP_ID || "2233351653890022";
+
+/** The WhatsApp Business Account that owns the number. Also an identifier, not a secret. */
+export const WA_WABA_ID = process.env.WA_WABA_ID || "2114337302504279";
 
 export interface WhatsAppProfile {
   about: string;
@@ -512,3 +515,53 @@ export async function notifyAdmin(
  * should call notifyAdmin.
  */
 export const notifyAdminWhatsApp = notifyAdmin;
+
+// ─── Is Meta actually delivering customers' messages to this app? ──────────────
+
+export type WhatsAppConnection =
+  | { ok: true; subscribed: boolean; apps: { id: string; name: string }[] }
+  | { ok: false; reason: string };
+
+/**
+ * Which apps the business account sends its messages to.
+ *
+ * Saving a webhook address in the app is not enough on its own. Meta's sample
+ * message from the dashboard goes to the app directly, so it arrives even when
+ * the business account is not connected, while a customer's real message does
+ * not. Real messages are only passed on to apps the account is subscribed to,
+ * and this is the one place that says whether ours is.
+ */
+export async function getWhatsAppConnection(): Promise<WhatsAppConnection> {
+  const token = process.env.WA_TOKEN;
+  if (!token) return { ok: false, reason: "WhatsApp is not configured" };
+  try {
+    const res = await fetch(`https://graph.facebook.com/${WA_API_VERSION}/${WA_WABA_ID}/subscribed_apps`, {
+      headers: { Authorization: `Bearer ${token}` }, cache: "no-store",
+    });
+    if (!res.ok) {
+      const e = parseError(await res.text().catch(() => ""));
+      return { ok: false, reason: classify(e.code, e.message).reason };
+    }
+    const data = ((await res.json()) as { data?: { whatsapp_business_api_data?: { id?: string; name?: string } }[] }).data ?? [];
+    const apps = data.map((d) => ({ id: String(d.whatsapp_business_api_data?.id ?? ""), name: String(d.whatsapp_business_api_data?.name ?? "") })).filter((a) => a.id);
+    return { ok: true, subscribed: apps.some((a) => a.id === WA_APP_ID), apps };
+  } catch (e) {
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/** Subscribe the business account to our app, so customers' messages are delivered to the webhook. */
+export async function subscribeWhatsAppApp(): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const token = process.env.WA_TOKEN;
+  if (!token) return { ok: false, reason: "WhatsApp is not configured" };
+  try {
+    const res = await fetch(`https://graph.facebook.com/${WA_API_VERSION}/${WA_WABA_ID}/subscribed_apps`, {
+      method: "POST", headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) return { ok: true };
+    const e = parseError(await res.text().catch(() => ""));
+    return { ok: false, reason: classify(e.code, e.message).reason };
+  } catch (e) {
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+  }
+}
