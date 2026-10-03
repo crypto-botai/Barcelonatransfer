@@ -459,12 +459,12 @@ describe("services from the inbox", () => {
     expect(mocks.sendInteractive).not.toHaveBeenCalled();
   });
 
-  it("sends the catalogue so it opens inside the chat, pictured by a real product id", async () => {
+  it("sends the catalogue so it opens inside the chat", async () => {
     expect((await threadPost(jsonReq({ catalog: true }), ctx())).status).toBe(200);
     const [to, msg] = mocks.sendInteractive.mock.calls[0];
     expect(to).toBe(E164);
     expect(msg.type).toBe("catalog_message");
-    expect(msg.action).toEqual({ name: "catalog_message", parameters: { thumbnail_product_retailer_id: "airport-to-city" } });
+    expect(msg.action).toEqual({ name: "catalog_message" });
     expect(mocks.recordOutbound).toHaveBeenCalledWith(expect.objectContaining({ by: "Sam", wamid: "wamid.OUT", text: expect.stringContaining("Catalogue") }));
   });
 

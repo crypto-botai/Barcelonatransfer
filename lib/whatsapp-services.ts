@@ -102,16 +102,16 @@ export function buildServicesMenu(services: ResolvedService[]): Record<string, u
 /**
  * The catalogue itself, opened inside the chat. It works whether or not the
  * shop icon has shown up on the customer's phone yet, so it is the sure way
- * to put the products in front of someone. The thumbnail is one product's picture.
+ * to put the products in front of someone.
  */
 export function buildCatalogMessage(services: ResolvedService[]): Record<string, unknown> | null {
-  const first = services.find((s) => s.enabled);
-  if (!first) return null;
+  if (!services.some((s) => s.enabled)) return null;
   return {
     type: "catalog_message",
     body: { text: "Our services with prices. Tap View catalog, pick a service and book in a minute." },
     footer: { text: "Fixed prices · No surge pricing" },
-    action: { name: "catalog_message", parameters: { thumbnail_product_retailer_id: first.id } },
+    // No thumbnail product is named: Meta uses the first item. Naming one that its copy of the catalogue does not hold yet is refused outright.
+    action: { name: "catalog_message" },
   };
 }
 
