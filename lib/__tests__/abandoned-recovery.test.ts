@@ -61,7 +61,9 @@ describe("abandoned recovery", () => {
 
   it("reports every recovery email, automatic or by hand", () => {
     expect(rd("app/api/admin/abandoned/route.ts")).toContain('type: { in: ["ABANDONED", "ABANDONED_MANUAL"] }');
-    expect(rd("app/admin/abandoned/page.tsx")).toContain("Emails sent");
+    // The tab now lists the texts the office sends from here as well as the emails.
+    expect(rd("app/admin/abandoned/page.tsx")).toContain("Sent (${report.length + smsList.length})");
+    expect(rd("app/api/admin/abandoned/route.ts")).toContain('action: "ABANDONED_SMS"');
   });
 });
 
