@@ -5,14 +5,20 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendAbandonedBookingEmail, sendPersonalNoteEmail } from "@/lib/resend";
 import { bookingAsForm, sweepAbandoned } from "@/lib/abandoned";
+import { sendSms, smsConfigured, smsSegments, toGsmSafe } from "@/lib/sms";
+import { SMS_MAX_CHARS } from "@/lib/abandoned-sms";
+import { toE164 } from "@/lib/phone";
 
 export const dynamic = "force-dynamic";
 
 /**
- * The office's view of everyone who nearly booked, and its two ways of
- * writing to them: the automatic recovery card again, or a note in the
- * office's own words.
+ * The office's view of everyone who nearly booked, and its ways of writing
+ * to them: the automatic recovery card again, a note in the office's own
+ * words, or a text message for the ones who do not use WhatsApp.
  */
+
+/** A number is texted at most once in this long, however many times the button is pressed. */
+const SMS_COOLDOWN_MS = 24 * 3600_000;
 async function admin() {
   const s = await getServerSession(authOptions);
   const u = s?.user as { role?: string; name?: string } | undefined;
@@ -24,7 +30,7 @@ export async function GET() {
   const since30 = new Date(Date.now() - 30 * 86_400_000);
   const since60 = new Date(Date.now() - 60 * 86_400_000);
 
-  const [leads, unpaid, report] = await Promise.all([
+  const [leads, unpaid, report, smsRows] = await Promise.all([
     // Everyone who left a name and an email on the form and did not book.
     prisma.bookingSession.findMany({
       where: { email: { not: null }, converted: false, createdAt: { gt: since30 } },
@@ -56,7 +62,19 @@ export async function GET() {
       take: 300,
       select: { id: true, to: true, subject: true, type: true, status: true, createdAt: true, bookingId: true },
     }),
+    // Every text the office has sent from here.
+    prisma.activityLog.findMany({
+      where: { action: "ABANDONED_SMS", createdAt: { gt: since60 } },
+      orderBy: { createdAt: "desc" },
+      take: 300,
+      select: { id: true, entityId: true, adminName: true, createdAt: true, details: true },
+    }),
   ]);
+
+  const sms = smsRows.map((r) => {
+    const d = (r.details ?? {}) as { to?: string; outcome?: string; text?: string; segments?: number };
+    return { id: r.id, entityId: r.entityId, to: d.to ?? "", outcome: d.outcome ?? "failed", text: d.text ?? "", segments: d.segments ?? 1, by: r.adminName ?? null, createdAt: r.createdAt };
+  });
 
   // Which unpaid bookings have had the automatic email.
   const emailedBookingIds = new Set(report.filter((r) => r.type === "ABANDONED" && r.bookingId).map((r) => r.bookingId));
@@ -66,7 +84,56 @@ export async function GET() {
     emailed: emailedBookingIds.has(b.id),
   }));
 
-  return NextResponse.json({ leads, unpaid: unpaidWithEmail, report });
+  return NextResponse.json({ leads, unpaid: unpaidWithEmail, report, sms });
+}
+
+const smsSchema = z.object({
+  kind: z.literal("sms"),
+  phone: z.string().min(5).max(40),
+  name: z.string().max(120).optional(),
+  bookingId: z.string().optional(),
+  sessionId: z.string().optional(),
+  message: z.string().trim().min(5, "Write the message first").max(SMS_MAX_CHARS, `Keep it under ${SMS_MAX_CHARS} characters`),
+});
+
+/** A text to someone who nearly booked. */
+async function sendLeadSms(raw: unknown, a: { name?: string }) {
+  const parsed = smsSchema.safeParse(raw);
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 422 });
+  const d = parsed.data;
+
+  if (!smsConfigured()) return NextResponse.json({ error: "Text messages are not switched on yet (the Twilio details are missing)." }, { status: 503 });
+
+  const to = toE164(d.phone);
+  if (!to) return NextResponse.json({ error: "That number has no country code, so it cannot be texted. Add it, for example +34." }, { status: 422 });
+
+  // Once a day per number. A double click, or two people in the office, must not text a customer twice.
+  const recent = await prisma.activityLog.findMany({
+    where: { action: "ABANDONED_SMS", createdAt: { gt: new Date(Date.now() - SMS_COOLDOWN_MS) } },
+    select: { details: true },
+    take: 200,
+  });
+  if (recent.some((r) => { const x = (r.details ?? {}) as { to?: string; outcome?: string }; return x.to === to && x.outcome === "sent"; })) {
+    return NextResponse.json({ error: "This number was already texted in the last 24 hours." }, { status: 429 });
+  }
+
+  const text = toGsmSafe(d.message).trim();
+  const result = await sendSms(to, text, { bookingId: d.bookingId ?? null });
+
+  await prisma.activityLog.create({
+    data: {
+      adminName: a.name ?? "Admin",
+      action: "ABANDONED_SMS",
+      entity: d.bookingId ? "Booking" : "BookingSession",
+      entityId: d.bookingId ?? d.sessionId ?? null,
+      details: { to, name: d.name ?? null, outcome: result.outcome, reason: result.reason ?? null, sid: result.id ?? null, text, segments: smsSegments(text) } as never,
+    },
+  }).catch((e) => console.error("[abandoned sms] audit failed:", (e as Error)?.message));
+
+  if (result.outcome !== "sent") {
+    return NextResponse.json({ error: `Not sent: ${result.reason ?? "unknown reason"}` }, { status: result.outcome === "skipped" ? 422 : 502 });
+  }
+  return NextResponse.json({ ok: true, to, segments: smsSegments(text) });
 }
 
 const messageSchema = z.object({
@@ -83,7 +150,9 @@ const messageSchema = z.object({
 export async function POST(req: NextRequest) {
   const a = await admin();
   if (!a) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const parsed = messageSchema.safeParse(await req.json().catch(() => ({})));
+  const raw = await req.json().catch(() => ({}));
+  if ((raw as { kind?: string })?.kind === "sms") return sendLeadSms(raw, a);
+  const parsed = messageSchema.safeParse(raw);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 422 });
   const d = parsed.data;
 

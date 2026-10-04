@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ClipboardCheck, Loader2, Mail, MessageCircle, PenLine, RefreshCw, Send, X } from "lucide-react";
+import { ClipboardCheck, Loader2, Mail, MessageCircle, PenLine, RefreshCw, Send, Smartphone, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatCurrency } from "@/lib/utils";
 import { vehicleClassLabel } from "@/types";
+import { abandonedSmsText, SMS_MAX_CHARS } from "@/lib/abandoned-sms";
+import { smsSegments, toGsmSafe } from "@/lib/sms";
 
 /**
  * Everyone who nearly booked, and the office's two ways of writing to them.
@@ -29,11 +31,15 @@ type Unpaid = {
 type Report = { id: string; to: string; subject: string; type: string; status: string; createdAt: string; bookingId: string | null };
 
 type Target = { to: string; name: string; bookingId?: string; sessionId?: string; label: string };
+type SmsRow = { id: string; entityId: string | null; to: string; outcome: string; text: string; segments: number; by: string | null; createdAt: string };
+/** Who a text is for, and the wording it starts with. */
+type SmsTarget = { phone: string; name: string; bookingId?: string; sessionId?: string; text: string; consent: boolean };
 
 const when = (iso: string) => new Date(iso).toLocaleString("en-GB", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 
 export default function AbandonedPage() {
-  const [data, setData] = useState<{ leads: Lead[]; unpaid: Unpaid[]; report: Report[] } | null>(null);
+  const [data, setData] = useState<{ leads: Lead[]; unpaid: Unpaid[]; report: Report[]; sms: SmsRow[] } | null>(null);
+  const [smsFor, setSmsFor] = useState<SmsTarget | null>(null);
   const [tab, setTab] = useState<"unpaid" | "leads" | "report">("unpaid");
   const [sweeping, setSweeping] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -68,6 +74,9 @@ export default function AbandonedPage() {
   const leads = data?.leads.filter((l) => !l.abandonedBooking?.convertedAt) ?? [];
   const unpaid = data?.unpaid ?? [];
   const report = data?.report ?? [];
+  const smsList = data?.sms ?? [];
+  /** When this booking or session was last texted, if it was. */
+  const textedAt = (key: string | undefined) => (key ? smsList.find((s) => s.entityId === key && s.outcome === "sent")?.createdAt ?? null : null);
 
   return (
     <div className="p-4 pt-16 lg:pt-6 lg:p-8">
@@ -82,7 +91,7 @@ export default function AbandonedPage() {
       </div>
 
       <div className="flex gap-1 mb-6 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1">
-        {([["unpaid", `Unpaid bookings (${unpaid.length})`], ["leads", `Leads (${leads.length})`], ["report", `Emails sent (${report.length})`]] as const).map(([id, label]) => (
+        {([["unpaid", `Unpaid bookings (${unpaid.length})`], ["leads", `Leads (${leads.length})`], ["report", `Sent (${report.length + smsList.length})`]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)} className={`flex-1 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${tab === id ? "bg-gold-500 text-black" : "text-dark-400 hover:text-white"}`}>{label}</button>
         ))}
       </div>
@@ -112,6 +121,11 @@ export default function AbandonedPage() {
                   ]}
                   waText={`Hello ${(b.guestName ?? "").split(" ")[0] || "there"}, this is Elite BCN Transfers. I saw you were booking ${b.pickupAddress.split(",")[0]} to ${b.dropoffAddress.split(",")[0]} on ${when(b.pickupDatetime)} for ${formatCurrency(b.totalAmount)} and did not finish. Can I help you complete it? We will give you our best rate.`}
                   sent={b.recoveryEmailedAt}
+                  textedAt={textedAt(b.id)}
+                  onSms={b.guestPhone ? () => setSmsFor({
+                    phone: b.guestPhone!, name: b.guestName ?? "", bookingId: b.id, consent: true,
+                    text: abandonedSmsText({ name: b.guestName, pickup: b.pickupAddress, dropoff: b.dropoffAddress, date: when(b.pickupDatetime) }),
+                  }) : undefined}
                   consent
                   busy={busy === t.to + b.id}
                   onResend={b.guestEmail ? () => resend(t) : undefined}
@@ -154,6 +168,11 @@ export default function AbandonedPage() {
                   ]}
                   waText={`Hello ${(l.name ?? "").split(" ")[0] || "there"}, this is Elite BCN Transfers. I saw you were booking${str("pickupAddress") ? ` ${str("pickupAddress")!.split(",")[0]}` : " a transfer"}${str("dropoffAddress") ? ` to ${str("dropoffAddress")!.split(",")[0]}` : ""}${str("date") ? ` on ${str("date")}` : ""}${q ? ` for ${formatCurrency(Number(q))}` : ""} and did not finish. Can I help you complete it? We will give you our best rate.`}
                   sent={l.abandonedBooking?.emailSentAt ?? null}
+                  textedAt={textedAt(l.sessionId)}
+                  onSms={l.phone ? () => setSmsFor({
+                    phone: l.phone!, name: l.name ?? "", sessionId: l.sessionId, consent,
+                    text: abandonedSmsText({ name: l.name, pickup: str("pickupAddress"), dropoff: str("dropoffAddress"), date: str("date"), time: str("time") }),
+                  }) : undefined}
                   consent={consent}
                   busy={busy === t.to + l.sessionId}
                   onResend={l.email ? () => resend(t) : undefined}
@@ -165,13 +184,22 @@ export default function AbandonedPage() {
           </div>
         )
       ) : (
-        report.length === 0 ? <Empty text="No recovery email sent yet." /> : (
+        report.length + smsList.length === 0 ? <Empty text="Nothing sent yet." /> : (
           <div className="glass-card rounded-2xl overflow-hidden">
             <table className="w-full text-sm">
               <thead><tr className="text-[10px] uppercase tracking-wider text-dark-500 text-left border-b border-white/[0.06]">
                 <th className="py-2.5 px-4">When</th><th className="py-2.5 px-4">To</th><th className="py-2.5 px-4">What</th><th className="py-2.5 px-4">By</th><th className="py-2.5 px-4">Status</th>
               </tr></thead>
               <tbody>
+                {smsList.map((s) => (
+                  <tr key={s.id} className="border-b border-white/[0.04]">
+                    <td className="py-2.5 px-4 text-dark-300 whitespace-nowrap">{when(s.createdAt)}</td>
+                    <td className="py-2.5 px-4 text-white">{s.to}</td>
+                    <td className="py-2.5 px-4 text-dark-300">Text: {s.text.slice(0, 70)}{s.text.length > 70 ? "…" : ""}</td>
+                    <td className="py-2.5 px-4 text-dark-400">{s.by ?? "Office"}</td>
+                    <td className={`py-2.5 px-4 ${s.outcome === "sent" ? "text-green-400" : "text-red-400"}`}>{s.outcome === "sent" ? "SENT" : "NOT SENT"}</td>
+                  </tr>
+                ))}
                 {report.map((r) => (
                   <tr key={r.id} className="border-b border-white/[0.04]">
                     <td className="py-2.5 px-4 text-dark-300 whitespace-nowrap">{when(r.createdAt)}</td>
@@ -188,6 +216,7 @@ export default function AbandonedPage() {
       )}
 
       {note && <NoteModal target={note} onClose={() => setNote(null)} onSent={() => { setNote(null); load(); }} />}
+      {smsFor && <SmsModal target={smsFor} onClose={() => setSmsFor(null)} onSent={() => { setSmsFor(null); load(); }} />}
     </div>
   );
 }
@@ -196,7 +225,7 @@ function Empty({ text }: { text: string }) {
   return <div className="glass-card rounded-2xl p-10 text-center text-dark-400 text-sm">{text}</div>;
 }
 
-function Row({ name, email, phone, fields, waText, sent, consent, busy, onResend, onNote, createHref, createLabel }: {
+function Row({ name, email, phone, fields, waText, sent, textedAt, consent, busy, onResend, onNote, onSms, createHref, createLabel }: {
   name: string; email: string | null; phone?: string | null;
   fields: [string, string | null | undefined][];
   /** Opens the office booking form with this record already filled in. */
@@ -204,7 +233,9 @@ function Row({ name, email, phone, fields, waText, sent, consent, busy, onResend
   /** Prefilled WhatsApp text: the route and the price they saw. */
   waText?: string;
   sent: string | null; consent: boolean; busy: boolean;
-  onResend?: () => void; onNote?: () => void;
+  /** When this person was last texted from here. */
+  textedAt?: string | null;
+  onResend?: () => void; onNote?: () => void; onSms?: () => void;
 }) {
   return (
     <div className="glass-card rounded-2xl p-5">
@@ -246,11 +277,73 @@ function Row({ name, email, phone, fields, waText, sent, consent, busy, onResend
             {busy ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />} {sent ? "Send card again" : "Send card now"}
           </button>
         )}
+        {onSms && (
+          <button onClick={onSms} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-sky-500/30 bg-sky-500/10 text-sky-300 text-xs hover:bg-sky-500/20">
+            <Smartphone size={12} /> {textedAt ? "Text again" : "Text them"}
+          </button>
+        )}
         {onNote && (
           <button onClick={onNote} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gold-500/10 border border-gold-500/30 text-gold-300 text-xs hover:bg-gold-500/20">
             <PenLine size={12} /> Write to them
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A text for someone who did not finish booking and may not use WhatsApp.
+ *
+ * Opens with the journey they were booking and where to reach a person, in
+ * words the office can change. Shows how many text segments it will be billed
+ * as, because an accent or a long message quietly doubles the cost.
+ */
+function SmsModal({ target, onClose, onSent }: { target: SmsTarget; onClose: () => void; onSent: () => void }) {
+  const [message, setMessage] = useState(target.text);
+  const [busy, setBusy] = useState(false);
+  const safe = toGsmSafe(message);
+  const segments = smsSegments(safe);
+
+  async function send() {
+    setBusy(true);
+    try {
+      const r = await fetch("/api/admin/abandoned", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "sms", phone: target.phone, name: target.name, bookingId: target.bookingId, sessionId: target.sessionId, message }) });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(body.error ?? "Could not send");
+      toast.success(`Text sent to ${target.phone}`);
+      onSent();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Could not send"); } finally { setBusy(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-lg bg-[#0a0a0a] border border-white/[0.08] rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="font-display text-xl text-white">Text {target.name || "them"}</h2>
+            <p className="text-dark-400 text-xs">{target.phone} · sent as a text message from Elite BCN, for someone who may not use WhatsApp</p>
+          </div>
+          <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-dark-400 hover:text-white"><X size={14} /></button>
+        </div>
+
+        {!target.consent && (
+          <p className="mb-3 rounded-lg border border-amber-500/25 bg-amber-500/[0.07] px-3 py-2 text-xs leading-relaxed text-amber-200/90">
+            They did not tick the box to be contacted. This text is a reply about their own enquiry, so keep it to that: their journey and how to reach you.
+          </p>
+        )}
+
+        <label htmlFor="sms-text" className="block text-[10px] text-gold-500/80 uppercase tracking-[0.15em] font-semibold mb-1.5">Your text</label>
+        <textarea id="sms-text" value={message} onChange={(e) => setMessage(e.target.value)} rows={7} maxLength={SMS_MAX_CHARS} className="input-luxury w-full px-3 py-2.5 rounded-lg text-sm leading-relaxed" />
+        <p className="mt-1.5 flex flex-wrap justify-between gap-2 text-[11px] text-dark-500">
+          <span>{safe.length} of {SMS_MAX_CHARS} characters · {segments} text message{segments === 1 ? "" : "s"} to pay for</span>
+          <span>The text points them to WhatsApp and email.</span>
+        </p>
+
+        <button onClick={send} disabled={busy || message.trim().length < 5} className="btn-gold w-full mt-4 py-3 rounded-xl font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-40">
+          {busy ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} Send text
+        </button>
       </div>
     </div>
   );
