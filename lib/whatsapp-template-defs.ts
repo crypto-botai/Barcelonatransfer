@@ -274,6 +274,11 @@ export const TEMPLATE_DEFS: readonly TemplateDef[] = [
   },
 ];
 
+/** The template's wording with its slots filled, in the order the fields are listed. */
+export function renderTemplate(def: Pick<TemplateDef, "body" | "fields">, values: Record<string, string>): string {
+  return def.body.replace(/\{\{(\d+)\}\}/g, (_, n: string) => values[def.fields[Number(n) - 1]] ?? "-");
+}
+
 /** Problems that would make Meta refuse a template, found before submitting. */
 export function templateProblems(t: TemplateDef): string[] {
   const out: string[] = [];

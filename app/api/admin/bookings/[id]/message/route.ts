@@ -7,6 +7,11 @@ import { notify } from "@/lib/notifications/service";
 import { formatPickupDateTime } from "@/lib/datetime";
 import { BASE_URL } from "@/lib/seo";
 import { confirmationVars } from "@/lib/whatsapp-events";
+import { confirmationFields } from "@/lib/whatsapp-messages";
+import { TEMPLATE_DEFS, renderTemplate } from "@/lib/whatsapp-template-defs";
+import { loadThread, recordOutbound } from "@/lib/whatsapp-inbox-store";
+import { sendWhatsAppTextResult } from "@/lib/whatsapp";
+import { toE164 } from "@/lib/phone";
 
 /**
  * Sends a booking's details to the customer's phone, on request.
@@ -165,5 +170,34 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     },
   }).catch(() => {});
 
-  return NextResponse.json({ results: result.results });
+  /**
+   * When WhatsApp would not take the template.
+   *
+   * Meta refuses a business-started message until its template is approved and the
+   * account has a payment method. The booking still has to reach the customer, so:
+   *   1. a customer who has written to the business in the last 24 hours can be sent
+   *      the confirmation as ordinary text, which needs no template, and
+   *   2. for everyone else the same wording is handed back as a wa.me link, which opens
+   *      WhatsApp on the office's own phone with the message ready to send.
+   */
+  let whatsappLink: string | null = null;
+  const wa = result.results.whatsapp;
+  if (channels.includes("whatsapp") && wa && wa.outcome !== "sent" && !/switched off/.test(wa.reason ?? "")) {
+    const def = TEMPLATE_DEFS.find((t) => t.event === "BOOKING_CONFIRMED")!;
+    const text = renderTemplate(def, confirmationFields(booking));
+    const phone = toE164(booking.guestPhone);
+    if (phone) {
+      const thread = await loadThread(phone).catch(() => null);
+      if (thread?.canReplyFreely) {
+        const free = await sendWhatsAppTextResult(phone, text);
+        if (free.outcome === "sent" && free.id) {
+          await recordOutbound({ phone, wamid: free.id, text, by: admin.name ?? "Admin" }).catch(() => {});
+          result.results.whatsapp = { outcome: "sent", reason: "sent as a normal message: the customer wrote to you in the last 24 hours" };
+        }
+      }
+      if (result.results.whatsapp.outcome !== "sent") whatsappLink = `https://wa.me/${phone.replace(/\D/g, "")}?text=${encodeURIComponent(text)}`;
+    }
+  }
+
+  return NextResponse.json({ results: result.results, whatsappLink });
 }

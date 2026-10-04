@@ -303,6 +303,7 @@ function PhoneSection({ booking }: { booking: Booking }) {
   const [status, setStatus] = useState<MessagingStatus | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [last, setLast] = useState<Record<string, SendOutcome> | null>(null);
+  const [waLink, setWaLink] = useState<string | null>(null);
   const [history, setHistory] = useState<TextHistory | null>(null);
 
   const loadHistory = useCallback(() => {
@@ -326,6 +327,7 @@ function PhoneSection({ booking }: { booking: Booking }) {
     if (!confirm(`Send this booking to ${booking.guestPhone} by ${label}?`)) return;
     setBusy(label);
     setLast(null);
+    setWaLink(null);
     try {
       const res = await fetch(`/api/admin/bookings/${booking.id}/message`, {
         method: "POST",
@@ -336,6 +338,7 @@ function PhoneSection({ booking }: { booking: Booking }) {
       if (!res.ok) throw new Error(body.error ?? "Failed");
       const results = body.results as Record<string, SendOutcome>;
       setLast(results);
+      setWaLink(typeof body.whatsappLink === "string" ? body.whatsappLink : null);
       // The receipt arrives a few seconds after the send; look again then.
       window.setTimeout(loadHistory, 6000);
       const sent = Object.values(results).filter((r) => r.outcome === "sent").length;
@@ -421,6 +424,18 @@ function PhoneSection({ booking }: { booking: Booking }) {
             </li>
           ))}
         </ul>
+      )}
+
+      {waLink && (
+        <div className="space-y-1.5 border-t border-white/[0.06] pt-3 text-xs leading-relaxed">
+          <p className="text-dark-400">
+            WhatsApp would not send it from the business number yet: its message template is still waiting for Meta, and the WhatsApp account needs a payment method.
+            You can send the same message now from your own WhatsApp:
+          </p>
+          <a href={waLink} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-gold-500 px-3 font-semibold text-black hover:bg-gold-400">
+            <Phone size={13} /> Open WhatsApp with the message ready
+          </a>
+        </div>
       )}
     </section>
   );
