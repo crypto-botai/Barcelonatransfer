@@ -28,14 +28,14 @@ export const metadata: Metadata = {
   openGraph: {
     ...SHARED_OG,
     title: `Barcelona to Girona Transfer — from €${LADDER.economy} | Fixed Price`,
-    description: `Private transfer Barcelona to Girona or Girona Airport (GRO) from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing.`,
+    description: `Private transfer Barcelona to Girona or Girona Airport (GRO) from €${LADDER.economy}. Fixed price, meet & greet.`,
     url: "https://www.elitebcn.info/transfers/girona",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Girona Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
     title: `Barcelona to Girona Transfer — from €${LADDER.economy} | Fixed Price`,
-    description: `Private transfer Barcelona to Girona from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing.`,
+    description: `Private transfer Barcelona to Girona from €${LADDER.economy}. Fixed price, meet & greet.`,
     images: ["/opengraph-image"],
   },
 };
@@ -84,7 +84,7 @@ export default function GironaTransferPage() {
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Private luxury transfer from BCN El Prat to Girona city or Girona-Costa Brava Airport (GRO).
-              Fixed price, no surge pricing. Direct door-to-door service.
+              Fixed price. Direct door-to-door service.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 1 hr 10 min</div>

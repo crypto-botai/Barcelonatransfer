@@ -69,13 +69,13 @@ function buildFallbackPricing(): string {
   if (!l) {
     return `## PRICING\nPrices are fixed per vehicle and quoted at booking. Do not state a figure — ask the customer to check the booking form.`;
   }
-  return `## PRICING (fixed per vehicle, EXCLUDING VAT and tolls — no surcharges on transfers)
+  return `## PRICING (fixed per vehicle for a midweek pickup, EXCLUDING VAT and tolls)
 - **Economy** (1–3 pax): from €${l.economy}
 - **Business** (1–3 pax): from €${l.business}
 - **Minivan** (4–8 pax): from €${l.minivan}
 - **V-Class** (7 pax): from €${l.vclass}
 - **Minibus** (9–16 pax): from €${l.minibus}
-All transfer prices are fixed. No night surcharge, no surge pricing, no airport fees.${returnLegNote()}`;
+All transfer prices are fixed and shown before booking. No night surcharge and no airport fees. A pickup between Friday 12:00 and Monday 12:00 (Barcelona time) costs a little more than the figures above; the booking form shows the exact final price for the date and time chosen. Never state a weekend figure or a percentage, and never say prices are the same on every day.${returnLegNote()}`;
 }
 
 export async function buildSupportSystemPrompt(kbText: string, language: string): Promise<string> {
@@ -87,7 +87,7 @@ export async function buildSupportSystemPrompt(kbText: string, language: string)
 ${langInstruction}
 
 ## WHO WE ARE
-Elite BCN Transfers is a licensed VTC (Vehículo de Turismo con Conductor) operator in Barcelona, Spain. We provide premium private transfers with fixed prices — no surge pricing, ever.
+Elite BCN Transfers is a licensed VTC (Vehículo de Turismo con Conductor) operator in Barcelona, Spain. We provide premium private transfers with fixed prices shown before booking. The price quoted for the customer's chosen date and time is the final price. A pickup between Friday 12:00 and Monday 12:00 (Barcelona time) costs a little more than the same journey midweek, and the quote already includes it. Never state, guess or compare a percentage, and never say prices are the same every day of the week.
 
 ## OUR FLEET
 - **Mercedes EQE 300 Electric** — 100% electric executive sedan, up to 4 passengers

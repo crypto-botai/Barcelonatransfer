@@ -120,6 +120,11 @@ export interface QuoteResponse {
   needsManualQuote?:   boolean;
   fromLabel?:          string;   // e.g. "El Prat Airport"
   toLabel?:            string;   // e.g. "Barcelona City"
+  /** How busy each end is. Only "high" and "low" are sent; an ordinary area has no entry. */
+  demand?: {
+    pickup:  { label: string; level: "high" | "low" } | null;
+    dropoff: { label: string; level: "high" | "low" } | null;
+  };
   hourlyRate?:         number;
   hours?:              number;
 

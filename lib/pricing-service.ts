@@ -31,6 +31,8 @@ import {
 } from "@/lib/pricing";
 import { FIXED_ROUTES, returnLegSurcharge } from "@/lib/fixed-prices";
 import { haversineDistance } from "@/lib/utils";
+import { withWeekend } from "@/lib/weekend-pricing";
+import { quoteDemand, type QuoteDemand } from "@/lib/demand";
 import type { VehicleClass, FleetVehicle } from "@/types";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -87,6 +89,8 @@ export interface Quote {
   needsManualQuote?:     boolean;
   fromLabel?:            string;   // e.g. "El Prat Airport"
   toLabel?:              string;   // e.g. "Barcelona City"
+  /** How busy each end is for this pickup moment. Only high and low are ever present. */
+  demand?:               QuoteDemand;
 }
 
 // ── Zone resolution ───────────────────────────────────────────────────────────
@@ -294,11 +298,15 @@ export async function getQuote(input: QuoteInput): Promise<Quote> {
   const fromZone = resolveEndpointZone(pickupLat, pickupLng, pickupAddress);
   const toZone   = resolveEndpointZone(dropoffLat, dropoffLng, dropoffAddress);
 
+  // How busy each end is, said beside the price. Costs nothing when the data is
+  // cached and falls back to a fixed list when it cannot be read.
+  const demand = await quoteDemand(fromZone, toZone, pickupDatetime);
+
   if (!fromZone || !toZone) {
     console.info(
       `[pricing-custom] zone=null pickup="${pickupAddress ?? `${pickupLat},${pickupLng}`}" dropoff="${dropoffAddress ?? `${dropoffLat},${dropoffLng}`}" vehicle=${vehicleClass}`
     );
-    return customRouteQuote(vehicleClass, distanceKm, durationMin);
+    return { ...customRouteQuote(vehicleClass, distanceKm, durationMin, pickupDatetime), demand };
   }
 
   const fixedPrice = await lookupFixedPrice(fromZone, toZone, vehicleClass, fleetVehicle);
@@ -307,7 +315,7 @@ export async function getQuote(input: QuoteInput): Promise<Quote> {
     console.info(
       `[pricing-custom] no-table-row from=${fromZone} to=${toZone} vehicle=${vehicleClass} pickup="${pickupAddress ?? ""}" dropoff="${dropoffAddress ?? ""}"`
     );
-    return customRouteQuote(vehicleClass, distanceKm, durationMin);
+    return { ...customRouteQuote(vehicleClass, distanceKm, durationMin, pickupDatetime), demand };
   }
 
   // The only direction-aware adjustment in the system. Everything above it
@@ -319,10 +327,16 @@ export async function getQuote(input: QuoteInput): Promise<Quote> {
   // needs a migration this project has no path for — the schema is pushed, not
   // migrated. The invoice prints baseFare as a single "Base fare" line that has
   // always equalled the total on a fixed-price ride, and it still does.
-  const total = fixedPrice + returnLegSurcharge(
+  const tableFare = fixedPrice + returnLegSurcharge(
     KEY_TO_ZONE_CODE[fromZone],
     KEY_TO_ZONE_CODE[toZone],
   );
+
+  // A pickup between Friday noon and Monday noon costs the weekend's uplift
+  // (lib/weekend-pricing.ts). Folded into the fare for the same reason as the
+  // direction surcharge above: there is nowhere on the booking to put a separate
+  // line, and the customer is meant to see one price, not a percentage.
+  const total = withWeekend(tableFare, pickupDatetime).price;
 
   return {
     vehicleClass,
@@ -340,6 +354,7 @@ export async function getQuote(input: QuoteInput): Promise<Quote> {
     isCustomRoute:       false,
     fromLabel:           ZONE_LABELS[fromZone],
     toLabel:             ZONE_LABELS[toZone],
+    demand,
   };
 }
 
@@ -362,11 +377,13 @@ function hoursUntilPickup(dt: Date): number {
  * from, so it falls back to €0 and the UI's request-a-quote path — a guessed
  * fare would be worse than asking.
  */
-function customRouteQuote(vc: VehicleClass, distanceKm: number, durationMin: number): Quote {
+function customRouteQuote(vc: VehicleClass, distanceKm: number, durationMin: number, pickupDatetime: Date): Quote {
   // Price the car they actually asked for. Without this a V-Class to an unlisted
   // destination cost exactly what a sedan did, while the fixed table charged
   // half as much again for the same upgrade.
-  const fare = distanceFare(distanceKm, vehicleCodeForClass(vc) ?? undefined);
+  // The same weekend rule as a table fare. A fare of 0 means "could not price",
+  // and stays 0 so it still asks the customer to get in touch.
+  const fare = withWeekend(distanceFare(distanceKm, vehicleCodeForClass(vc) ?? undefined), pickupDatetime).price;
 
   return {
     vehicleClass:        vc,

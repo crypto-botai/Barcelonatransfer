@@ -98,8 +98,8 @@ export const DEFAULT_SERVICES: ServiceItem[] = [
 export const DEFAULT_QUICK_REPLIES: QuickReply[] = [
   { id: "hello", shortcut: "hello", text: "Hello, thank you for contacting Elite BCN Transfer. How can we help with your transfer?" },
   { id: "details", shortcut: "details", text: "To give you an exact price, could you tell us: pickup place, drop-off place, date and time, and the number of passengers?" },
-  { id: "price", shortcut: "price", text: "Our prices are fixed, with no surge pricing. You can see the exact price for your trip, and book, at https://www.elitebcn.info/book" },
-  { id: "book", shortcut: "book", text: "You can book online in one minute at https://www.elitebcn.info/book. Fixed price, no surge, pay securely by card." },
+  { id: "price", shortcut: "price", text: "Our prices are fixed per vehicle. You can see the exact price for your trip, and book, at https://www.elitebcn.info/book" },
+  { id: "book", shortcut: "book", text: "You can book online in one minute at https://www.elitebcn.info/book. Fixed price shown before you book, pay securely by card." },
   { id: "payment", shortcut: "payment", text: "At checkout you can pay in full, or pay 30% now and the rest to your chauffeur at the end of the journey, in cash or by card." },
   { id: "cash", shortcut: "cash", text: "Yes, you can pay the balance to your chauffeur at the end of the journey, in cash or by card. Your booking is held once the first payment is made." },
   { id: "link", shortcut: "link", text: "Here is your secure payment link. Your booking is confirmed as soon as the payment goes through." },

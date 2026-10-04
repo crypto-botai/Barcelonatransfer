@@ -74,9 +74,9 @@ export function assistantReply(text: string, services: ResolvedService[]): strin
       const s = mentionedService(text, services);
       const p = s && money(s);
       if (s && p) {
-        return `${s.title}: ${p}, fixed price with no surge pricing. For the exact price for your trip, and to book: ${s.url}. ${FOLLOW_UP}`;
+        return `${s.title}: ${p}, fixed price per vehicle. For the exact price for your date and time, and to book: ${s.url}. ${FOLLOW_UP}`;
       }
-      return `Our prices are fixed, with no surge pricing. Tell us where you are going from and to, or see the exact price and book here: ${book}. ${FOLLOW_UP}`;
+      return `Our prices are fixed per vehicle and shown before you book. Tell us where you are going from and to, or see the exact price and book here: ${book}. ${FOLLOW_UP}`;
     }
     case "book":
       return `You can book online in about a minute, with a fixed price: ${book}. ${FOLLOW_UP}`;

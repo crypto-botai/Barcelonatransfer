@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     ...SHARED_OG,
     title: `Elite BCN | Barcelona Airport Transfers — From €${CHEAPEST_FARE}`,
-    description: `Barcelona's #1 luxury private transfer. Fixed prices from €${CHEAPEST_FARE}, no surge pricing. BCN El Prat T1/T2. Mercedes V-Class & EQE 300 Electric. Book 24/7.`,
+    description: `Barcelona's #1 luxury private transfer. Fixed prices from €${CHEAPEST_FARE}. BCN El Prat T1/T2. Mercedes V-Class & EQE 300 Electric. Book 24/7.`,
     url: "https://www.elitebcn.info",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Luxury Private Transfer Barcelona Airport" }],
   },

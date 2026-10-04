@@ -68,7 +68,7 @@ const SPECS: OfferSpec[] = [
     blurb: "Fixed-price transfer from BCN Airport to Roses and Empuriabrava, northern Costa Brava.",
     zone: "roses", origin: "airport" },
   { name: "Barcelona to Sitges Transfer", service: "Barcelona City to Sitges Private Transfer",
-    blurb: "Fixed-price luxury transfer from Barcelona city centre to Sitges. No surge pricing.",
+    blurb: "Fixed-price luxury transfer from Barcelona city centre to Sitges.",
     zone: "sitges", origin: "barcelona_city" },
   { name: "Barcelona to Tarragona Transfer", service: "Barcelona City to Tarragona Private Transfer",
     blurb: "Fixed-price luxury transfer from Barcelona to Tarragona and PortAventura.",

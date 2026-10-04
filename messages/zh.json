@@ -84,7 +84,7 @@
       "realTime": "实时追踪",
       "sixtyMin": "机场等候60分钟",
       "nameBoard": "到达厅举牌迎接",
-      "noSurge": "不收取动态加价"
+      "noSurge": "固定价格，预订前明示"
     },
     "list": {
       "airport": {
@@ -212,10 +212,10 @@
     "eqe": "奔驰 EQE 300 电动",
     "faqTitle": "常见问题",
     "fixedPrice": "固定价格",
-    "fixedPriceDesc": "您看到的价格就是您支付的价格。绝不溨价。",
+    "fixedPriceDesc": "您看到的价格就是您支付的价格。",
     "flightTracking": "实时航班跟踪",
     "flightTrackingDesc": "我们实时跟踪您的航班。如有延误，司机会相应调整，不额外收费。",
-    "heroSubtitle": "从巴塞罗那埃尔普拉特机场出发的私人豪华接送。固定价格，举牌接机，绝无溨价。",
+    "heroSubtitle": "从巴塞罗那埃尔普拉特机场出发的私人豪华接送。固定价格，举牌接机。",
     "heroTitle": "巴塞罗那机场至{name}接送",
     "meetGreet": "抵达厅举牌接机",
     "meetGreetDesc": "司机会在抵达厅举牌等候您。",
@@ -227,6 +227,8 @@
     "vehiclesAvail": "可选车型"
   },
   "booking": {
+    "demandHigh": "高需求区域",
+    "demandLow": "低需求区域",
     "badgeAvailability": "24/7 全天候",
     "badgeFleet": "奔驰车队",
     "badgeLanguages": "中文和英文",
@@ -268,9 +270,9 @@
     "bookHourly": "按小时预订",
     "colBook": "预订",
     "colRoute": "路线",
-    "footnote": "所有价格均为每车固定价格，不含增值税和路桥费。绝不溨价。",
+    "footnote": "所有价格均为每车固定价格，不含增值税和路桥费。所显示的价格即为您所选日期和时间的应付价格。",
     "getInstantPrice": "获取即时价格",
-    "guarantee1": "绝无溨价",
+    "guarantee1": "预订前明示价格",
     "guarantee2": "固定价格保证",
     "guarantee3": "24 小时前免费取消",
     "guarantee4": "即时确认",
@@ -289,6 +291,8 @@
     "vatNoteBody": "仅在您索取发票时加收 10% 增值税；高速公路路桥费另行收取。专业司机、车辆及燃油费用已包含在内。接机举牌、儿童座椅及其他附加服务为可选项目，需另行付费。"
   },
   "bookflow": {
+    "demandHigh": "高需求区域",
+    "demandLow": "低需求区域",
     "addExtras": "添加附加服务",
     "apply": "应用",
     "back": "返回",

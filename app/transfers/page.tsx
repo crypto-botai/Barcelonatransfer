@@ -28,7 +28,7 @@ const TYPE_GROUPS: { type: string; heading: string }[] = [
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Private Transfer Destinations | Elite BCN" },
   description:
-    "Luxury transfers from Barcelona to Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat, cruise port & more. Fixed prices, no surge pricing.",
+    "Luxury transfers from Barcelona to Sitges, Girona, Tarragona, Andorra, Costa Brava, Montserrat, cruise port & more. Fixed prices.",
   alternates: { canonical: "https://www.elitebcn.info/transfers" },
   keywords: ["barcelona transfer destinations", "barcelona to sitges transfer", "barcelona to girona transfer", "barcelona andorra transfer", "barcelona costa brava transfer"],
   openGraph: {
@@ -282,8 +282,7 @@ export default async function TransfersHubPage() {
               Barcelona <span className="text-gold-gradient">Transfer Routes</span>
             </h1>
             <p className="text-dark-400 max-w-2xl mx-auto text-lg">
-              Fixed-price luxury private transfers from Barcelona Airport to every major destination in Catalonia and beyond.
-              No surge pricing. No surprises.
+              Fixed-price luxury private transfers from Barcelona Airport to every major destination in Catalonia and beyond. No surprises.
             </p>
           </div>
         </section>
@@ -427,7 +426,7 @@ export default async function TransfersHubPage() {
               {[
                 { icon: Star, label: `${SOCIAL_PROOF.google.rating}★ Rating`, sub: `${SOCIAL_PROOF.google.count} Google reviews` },
                 { icon: Clock, label: "24/7 Available", sub: "All flights & arrivals" },
-                { icon: MapPin, label: "Fixed Prices", sub: "No surge pricing" },
+                { icon: MapPin, label: "Fixed Prices", sub: "Shown before you book" },
               ].map(({ icon: Icon, label, sub }) => (
                 <div key={label} className="flex flex-col items-center gap-1">
                   <Icon size={24} className="text-gold-500" />

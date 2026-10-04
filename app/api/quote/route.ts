@@ -7,6 +7,7 @@ import { getQuote } from "@/lib/pricing-service";
 import { FLEET_TO_DB_CLASS, type VehicleClass, type FleetVehicle } from "@/types";
 import { roadDistance, resolveEndpoint } from "@/lib/geo";
 import { capacityError } from "@/lib/capacity";
+import { parsePickupInput } from "@/lib/datetime";
 
 const schema = z.object({
   bookingType:     z.enum(["TRANSFER", "HOURLY", "DAY_HIRE", "CORPORATE"]).default("TRANSFER"),
@@ -80,6 +81,13 @@ export async function POST(req: NextRequest) {
     }
 
     // TRANSFER / CORPORATE — fixed-price lookup via getQuote()
+
+    // The form sends the pickup as a wall clock with no zone ("2026-10-09T12:00").
+    // On this system that means Barcelona, never the server's zone. It matters
+    // here because the weekend starts at Friday noon and ends at Monday noon in
+    // Barcelona: read as UTC, a 12:00 pickup would land two hours late and a
+    // booking at 13:00 on a Friday would be priced as a weekday.
+    const pickupAt = parsePickupInput(pickupDatetime) ?? pickupDate;
     const dropoffLat = body.dropoffLat ?? 0;
     const dropoffLng = body.dropoffLng ?? 0;
 
@@ -146,18 +154,18 @@ export async function POST(req: NextRequest) {
     const outPoint = { lat: from?.lat ?? pickupLat,  lng: from?.lng ?? pickupLng,  address: body.pickupAddress };
     const backPoint = { lat: to?.lat  ?? dropoffLat, lng: to?.lng   ?? dropoffLng, address: body.dropoffAddress };
 
-    const quote = await legQuote(outPoint, backPoint, pickupDate);
+    const quote = await legQuote(outPoint, backPoint, pickupAt);
 
     // ── Round trip ───────────────────────────────────────────────────────────
     if (body.returnDatetime) {
-      const returnDate = new Date(body.returnDatetime);
+      const returnDate = parsePickupInput(body.returnDatetime) ?? new Date(body.returnDatetime);
 
       if (isNaN(returnDate.getTime())) {
         return NextResponse.json({ error: "Invalid return date" }, { status: 422 });
       }
       // A return before the outbound is not a round trip, and pricing it would
       // quietly sell a journey that cannot happen.
-      if (returnDate <= pickupDate) {
+      if (returnDate <= pickupAt) {
         return NextResponse.json(
           { error: "The return must be after the outbound pickup" },
           { status: 422 },
@@ -193,7 +201,7 @@ export async function POST(req: NextRequest) {
         ...quote,
         isReturn:    true,
         totalAmount: Math.round((quote.totalAmount + back.totalAmount) * 100) / 100,
-        outboundLeg: leg(quote, pickupDate),
+        outboundLeg: leg(quote, pickupAt),
         returnLeg:   leg(back, returnDate),
       });
     }

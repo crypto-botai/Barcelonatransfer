@@ -15,20 +15,20 @@ const mpvPrice     = ROUTES.find((r) => r.from === "airport" && r.to === "montse
 
 export const metadata: Metadata = {
   title: { absolute: `Barcelona Airport to Montserrat — from €${airportPrice}` },
-  description: `Private transfer from Barcelona Airport to Montserrat monastery. Fixed price from €${airportPrice}. 50-minute journey. Meet & greet, no surge pricing. Book instantly.`,
+  description: `Private transfer from Barcelona Airport to Montserrat monastery. Fixed price from €${airportPrice}. 50-minute journey. Meet & greet. Book instantly.`,
   alternates: { canonical: "https://www.elitebcn.info/transfers/montserrat" },
   keywords: ["barcelona airport montserrat transfer", "montserrat private transfer", "montserrat day trip barcelona", "barcelona montserrat tour transfer"],
   openGraph: {
     ...SHARED_OG,
     title: `Barcelona Airport to Montserrat Transfer — from €${airportPrice} | Fixed Price`,
-    description: `Private transfer Barcelona Airport to Montserrat from €${airportPrice}. Fixed price, no surge pricing. 50-minute journey.`,
+    description: `Private transfer Barcelona Airport to Montserrat from €${airportPrice}. Fixed price. 50-minute journey.`,
     url: "https://www.elitebcn.info/transfers/montserrat",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Montserrat Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
     title: `Barcelona Airport to Montserrat — from €${airportPrice} | Elite BCN`,
-    description: `Private transfer Barcelona Airport to Montserrat monastery from €${airportPrice}. Fixed price, no surge pricing.`,
+    description: `Private transfer Barcelona Airport to Montserrat monastery from €${airportPrice}. Fixed price.`,
     images: ["/opengraph-image"],
   },
 };
@@ -77,7 +77,7 @@ export default function MontserratTransferPage() {
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Private luxury transfer from BCN El Prat Airport direct to Montserrat monastery.
-              Fixed price from €{airportPrice}, no surge pricing, no stress.
+              Fixed price from €{airportPrice}, no stress.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 50 minutes</div>

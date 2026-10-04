@@ -19,6 +19,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { DEFAULT_PRICING } from "@/lib/pricing";
+import { pickupToUtc } from "@/lib/datetime";
 import { getQuote } from "@/lib/pricing-service";
 import { geocode, roadDistance } from "@/lib/geo";
 import { createSumUpCheckout, getSumUpCheckoutUrl } from "@/lib/sumup";
@@ -197,8 +198,11 @@ export async function createBookingFromChat(
   );
 
   // ── 4. Parse datetime ────────────────────────────────────────────────────────
-  const pickupDatetime = new Date(`${draft.date}T${draft.time}:00`);
-  if (isNaN(pickupDatetime.getTime())) {
+  // The customer said a time in Barcelona. Read as the server's zone it would be saved
+  // two hours off and, now that Friday noon to Monday noon is priced as a weekend,
+  // could be priced for the wrong side of that line.
+  const pickupDatetime = pickupToUtc(draft.date, draft.time);
+  if (!pickupDatetime) {
     return { success: false, error: "Invalid pickup date or time." };
   }
 

@@ -84,7 +84,7 @@
       "realTime": "Acompanhamento em tempo real",
       "sixtyMin": "60 min nos aeroportos",
       "nameBoard": "O seu nome no tablet do motorista",
-      "noSurge": "Sem preços dinâmicos, nunca"
+      "noSurge": "Preço fixo, indicado antes"
     },
     "list": {
       "airport": {
@@ -212,10 +212,10 @@
     "eqe": "Mercedes EQE 300 Electric",
     "faqTitle": "Perguntas frequentes",
     "fixedPrice": "Preço fixo",
-    "fixedPriceDesc": "O preço que vê é o preço que paga. Sem preços dinâmicos, nunca.",
+    "fixedPriceDesc": "O preço que vê para a sua data e hora é o preço que paga.",
     "flightTracking": "Acompanhamento de voo em tempo real",
     "flightTrackingDesc": "Acompanhamos o seu voo em direto. Se atrasar, o motorista ajusta-se sem custo adicional.",
-    "heroSubtitle": "Transfer privado de luxo a partir do aeroporto BCN El Prat. Preço fixo, receção personalizada, sem preços dinâmicos.",
+    "heroSubtitle": "Transfer privado de luxo a partir do aeroporto BCN El Prat. Preço fixo, receção personalizada.",
     "heroTitle": "Transfer do Aeroporto de Barcelona para {name}",
     "meetGreet": "Receção na zona de chegadas",
     "meetGreetDesc": "O seu motorista espera na zona de chegadas com o seu nome no tablet.",
@@ -227,6 +227,8 @@
     "vehiclesAvail": "Veículos disponíveis"
   },
   "booking": {
+    "demandHigh": "Zona de alta procura",
+    "demandLow": "Zona de baixa procura",
     "badgeAvailability": "Disponível 24/7",
     "badgeFleet": "Frota Mercedes-Benz",
     "badgeLanguages": "Português, Inglês e Espanhol",
@@ -268,9 +270,9 @@
     "bookHourly": "Reservar à Hora",
     "colBook": "Reservar",
     "colRoute": "Percurso",
-    "footnote": "Todos os preços são fixos por veículo e excluem IVA e portagens. Sem preços dinâmicos. Nunca.",
+    "footnote": "Todos os preços são fixos por veículo e excluem IVA e portagens. O preço mostrado para a sua data e hora é o que paga.",
     "getInstantPrice": "Obter Preço Imediato",
-    "guarantee1": "Sem preços dinâmicos",
+    "guarantee1": "Preço indicado antes de reservar",
     "guarantee2": "Tarifa fixa garantida",
     "guarantee3": "Cancelamento gratuito 24h",
     "guarantee4": "Confirmação imediata",
@@ -289,6 +291,8 @@
     "vatNoteBody": "O IVA de 10% só é acrescentado se pedir fatura; as portagens são cobradas à parte. Motorista profissional, veículo e combustível estão incluídos. Receção personalizada, cadeiras de criança e outros extras são opcionais e cobrados à parte."
   },
   "bookflow": {
+    "demandHigh": "Zona de alta procura",
+    "demandLow": "Zona de baixa procura",
     "addExtras": "Adicionar Extras",
     "apply": "Aplicar",
     "back": "Voltar",

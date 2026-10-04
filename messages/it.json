@@ -84,7 +84,7 @@
       "realTime": "Tracciamento in tempo reale",
       "sixtyMin": "60 min agli aeroporti",
       "nameBoard": "Cartello nominativo all'arrivo",
-      "noSurge": "Mai tariffe dinamiche"
+      "noSurge": "Prezzo fisso, chiaro in anticipo"
     },
     "list": {
       "airport": {
@@ -204,7 +204,7 @@
   },
   "routes": {
     "heroTitle": "Transfer Aeroporto Barcellona a {name}",
-    "heroSubtitle": "Transfer privato di lusso dall'aeroporto BCN El Prat a {name}. Prezzo fisso da €{price}. Circa {duration} minuti. Nessun sovrapprezzo.",
+    "heroSubtitle": "Transfer privato di lusso dall'aeroporto BCN El Prat a {name}. Prezzo fisso da €{price}. Circa {duration} minuti.",
     "bookNow": "Prenota ora — da €{price}",
     "fixedPrice": "Prezzo fisso",
     "duration": "{min} minuti",
@@ -227,6 +227,8 @@
     "allInclusive": "Tutti i prezzi includono pedaggi, accoglienza e 60 min di attesa gratuita. Nessuna tariffa nascosta."
   },
   "booking": {
+    "demandHigh": "Zona ad alta richiesta",
+    "demandLow": "Zona a bassa richiesta",
     "badgeAvailability": "Disponibile 24/7",
     "badgeFleet": "Flotta Mercedes-Benz",
     "badgeLanguages": "Italiano e inglese",
@@ -268,9 +270,9 @@
     "bookHourly": "Prenota a ore",
     "colBook": "Prenota",
     "colRoute": "Tratta",
-    "footnote": "Tutti i prezzi sono fissi per veicolo ed escludono IVA e pedaggi. Mai prezzi dinamici.",
+    "footnote": "Tutti i prezzi sono fissi per veicolo ed escludono IVA e pedaggi. Il prezzo mostrato per la tua data e ora è il prezzo da pagare.",
     "getInstantPrice": "Ottieni prezzo immediato",
-    "guarantee1": "Nessun prezzo dinamico",
+    "guarantee1": "Prezzo mostrato prima di prenotare",
     "guarantee2": "Tariffa fissa garantita",
     "guarantee3": "Cancellazione gratuita 24 h",
     "guarantee4": "Conferma immediata",
@@ -289,6 +291,8 @@
     "vatNoteBody": "L'IVA al 10% viene aggiunta solo se richiedi la fattura; i pedaggi autostradali sono addebitati separatamente. Autista professionista, veicolo e carburante sono inclusi. Accoglienza personalizzata, seggiolini per bambini e altri extra sono facoltativi e a pagamento."
   },
   "bookflow": {
+    "demandHigh": "Zona ad alta richiesta",
+    "demandLow": "Zona a bassa richiesta",
     "addExtras": "Aggiungi extra",
     "apply": "Applica",
     "back": "Indietro",

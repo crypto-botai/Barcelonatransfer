@@ -55,7 +55,7 @@ export async function resolveServices(items: ServiceItem[], lookup: PriceLookup 
       const built = fromPrice
         ? hourly
           ? `From ${euro(fromPrice)}/hour · ${MIN_HOURLY_HOURS.ECONOMY}h minimum`
-          : `From ${euro(fromPrice)} · fixed price, no surge`
+          : `From ${euro(fromPrice)} · fixed price`
         : "Fixed price quoted when you book";
       return {
         ...s,
@@ -86,7 +86,7 @@ export function buildServicesMenu(services: ResolvedService[]): Record<string, u
     type: "list",
     header: { type: "text", text: "Elite BCN Transfer" },
     body: { text: "Private transfers in Barcelona and the Costa Brava. Choose a service to see the price and book." },
-    footer: { text: "Fixed prices · No surge pricing" },
+    footer: { text: "Fixed prices · Shown before you book" },
     action: {
       button: "View services",
       sections: [
@@ -109,7 +109,7 @@ export function buildCatalogMessage(services: ResolvedService[]): Record<string,
   return {
     type: "catalog_message",
     body: { text: "Our services with prices. Tap View catalog, pick a service and book in a minute." },
-    footer: { text: "Fixed prices · No surge pricing" },
+    footer: { text: "Fixed prices · Shown before you book" },
     // No thumbnail product is named: Meta uses the first item. Naming one that its copy of the catalogue does not hold yet is refused outright.
     action: { name: "catalog_message" },
   };
@@ -125,7 +125,7 @@ export function buildServiceLink(s: ResolvedService): Record<string, unknown> {
   return {
     type: "cta_url",
     header: { type: "image", image: { link: s.imageUrl } },
-    body: { text: `${s.title}: ${price}.\nFixed price, no surge pricing. Tap to see the exact price for your trip and book in a minute.` },
+    body: { text: `${s.title}: ${price}.\nFixed price. Tap to see the exact price for your trip and date and book in a minute.` },
     footer: { text: "Elite BCN Transfer" },
     action: { name: "cta_url", parameters: { display_text: "Book now", url: s.url } },
   };

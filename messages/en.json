@@ -84,7 +84,7 @@
       "realTime": "Real-time tracking",
       "sixtyMin": "60 min at airports",
       "nameBoard": "Name board in arrivals",
-      "noSurge": "No surge, ever"
+      "noSurge": "Fixed price, shown up front"
     },
     "list": {
       "airport": {
@@ -212,10 +212,10 @@
     "eqe": "Mercedes EQE 300 Electric",
     "faqTitle": "Frequently asked questions",
     "fixedPrice": "Fixed price",
-    "fixedPriceDesc": "The price you see is the price you pay. No surge pricing, ever.",
+    "fixedPriceDesc": "The price you see for your date and time is the price you pay.",
     "flightTracking": "Real-time flight tracking",
     "flightTrackingDesc": "We track your flight live. If it is delayed, your driver adjusts at no extra cost.",
-    "heroSubtitle": "Private luxury transfer from BCN El Prat Airport. Fixed price, meet & greet, no surge pricing.",
+    "heroSubtitle": "Private luxury transfer from BCN El Prat Airport. Fixed price, meet & greet.",
     "heroTitle": "Barcelona Airport Transfer to {name}",
     "meetGreet": "Meet & greet in arrivals",
     "meetGreetDesc": "Your driver waits in the arrivals hall with a name board.",
@@ -227,6 +227,8 @@
     "vehiclesAvail": "Available vehicles"
   },
   "booking": {
+    "demandHigh": "High demand area",
+    "demandLow": "Low demand area",
     "badgeAvailability": "24/7 Availability",
     "badgeFleet": "Mercedes-Benz Fleet",
     "badgeLanguages": "English & Español",
@@ -268,9 +270,9 @@
     "bookHourly": "Book Hourly",
     "colBook": "Book",
     "colRoute": "Route",
-    "footnote": "All prices are fixed per vehicle and exclude VAT and tolls. No surge pricing. Ever.",
+    "footnote": "All prices are fixed per vehicle and exclude VAT and tolls. The price shown for your date and time is the price you pay.",
     "getInstantPrice": "Get Instant Price",
-    "guarantee1": "No surge pricing",
+    "guarantee1": "Price shown before you book",
     "guarantee2": "Fixed fare guaranteed",
     "guarantee3": "Free cancellation 24h",
     "guarantee4": "Instant confirmation",
@@ -289,6 +291,8 @@
     "vatNoteBody": "10% VAT is added only if you request an invoice; motorway tolls are charged separately. Professional chauffeur, vehicle and fuel are included. Meet & greet, child seats and other extras are optional and charged separately."
   },
   "bookflow": {
+    "demandHigh": "High demand area",
+    "demandLow": "Low demand area",
     "addExtras": "Add Extras",
     "apply": "Apply",
     "back": "Back",

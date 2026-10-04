@@ -44,7 +44,7 @@ export default function CheckoutTrust({ protectionTaken = false, extras = [] }: 
     ? { Icon: UserCheck, t: "Meet & greet with a name board", d: "Added to your booking. Your chauffeur meets you in the arrivals hall and helps with your bags." }
     : seats.length > 0
       ? { Icon: Baby, t: "Child seat fitted before dispatch", d: "Added to your booking, and fitted before the car leaves, as Spanish law requires." }
-      : { Icon: Coins, t: "Fixed price, per vehicle", d: `No meter and no surge: the fare you see is the fare you pay. Meet & greet at arrivals is available for €${priceOf("meet_greet")} if you want it.` };
+      : { Icon: Coins, t: "Fixed price, per vehicle", d: `No meter: the fare you see for your date and time is the fare you pay. Meet & greet at arrivals is available for €${priceOf("meet_greet")} if you want it.` };
 
   const points = [
     {

@@ -165,7 +165,7 @@ export default function AirportTransfersPage() {
                 { icon: Plane,    title: "Live Flight Tracking",     desc: "We monitor your flight and adjust pickup time automatically. No stress if your flight is early or delayed." },
                 { icon: Clock,    title: "60-Min Free Waiting",       desc: "Complimentary 60 minutes waiting time from flight landing. For other pickups, 15 minutes is included." },
                 { icon: Shield,   title: "Meet & Greet (€5)",        desc: "Optional add-on: your chauffeur meets you inside the arrivals hall with a name board and helps with your bags. Without it, the driver waits at the designated meeting point outside." },
-                { icon: Star,     title: "All Prices Fixed",          desc: "Airport transfer prices are fixed regardless of traffic or time of day. No surge pricing on holiday periods." },
+                { icon: Star,     title: "All Prices Fixed",          desc: "Airport transfer prices are fixed per vehicle and shown before you book, whatever the traffic. The price for your date and time is the price you pay." },
                 { icon: Anchor,   title: "Cruise Port Service",       desc: "Full service to Barcelona Cruise Terminal — including luggage assistance and flexible ship departure timing." },
                 { icon: CheckCircle2, title: "Free Cancellation",     desc: "Cancel for free up to 24 hours before pickup. Your money is refunded in full within 5 business days." },
               ].map((f) => (

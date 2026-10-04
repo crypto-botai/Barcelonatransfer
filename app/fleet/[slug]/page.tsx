@@ -51,7 +51,7 @@ export async function generateMetadata(
 
   const description = fitDescription([
     `${vehicle.label} with a professional chauffeur in Barcelona, from €${minFare} fixed per vehicle.`,
-    `Up to ${vehicle.maxPassengers} passengers. Flight tracking, no surge pricing.`,
+    `Up to ${vehicle.maxPassengers} passengers. Flight tracking.`,
   ]);
 
   return {
@@ -283,7 +283,7 @@ export default async function FleetVehiclePage(
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {[
-                { icon: Star,   title: "Fixed price guaranteed", body: "The price you see is the price you pay. No meter, no surge pricing, no airport fees at drop-off." },
+                { icon: Star,   title: "Fixed price guaranteed", body: "The price shown for your date and time is the price you pay. No meter and no airport fees at drop-off." },
                 { icon: Shield, title: "60 min free waiting",    body: "For airport pickups, your driver waits up to 60 minutes from your actual landing time at no extra charge." },
                 { icon: Clock,  title: "24/7 availability",      body: "Available day and night, every day of the year. Book online in 2 minutes with instant confirmation." },
               ].map(({ icon: Icon, title, body }) => (

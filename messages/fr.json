@@ -84,7 +84,7 @@
       "realTime": "Suivi en temps réel",
       "sixtyMin": "60 min aux aéroports",
       "nameBoard": "Pancarte nominative à l'arrivée",
-      "noSurge": "Jamais de surcharges"
+      "noSurge": "Prix fixe, annoncé d'avance"
     },
     "list": {
       "airport": {
@@ -204,7 +204,7 @@
   },
   "routes": {
     "heroTitle": "Transfert Aéroport de Barcelone vers {name}",
-    "heroSubtitle": "Transfert privé de luxe depuis l'aéroport BCN El Prat vers {name}. Prix fixe à partir de €{price}. Environ {duration} minutes. Sans majoration, jamais.",
+    "heroSubtitle": "Transfert privé de luxe depuis l'aéroport BCN El Prat vers {name}. Prix fixe à partir de €{price}. Environ {duration} minutes.",
     "bookNow": "Réserver — à partir de €{price}",
     "fixedPrice": "Prix fixe",
     "duration": "{min} minutes",
@@ -227,6 +227,8 @@
     "allInclusive": "Tous les prix incluent péages, accueil et 60 min d'attente gratuite. Sans frais cachés."
   },
   "booking": {
+    "demandHigh": "Zone à forte demande",
+    "demandLow": "Zone à faible demande",
     "badgeAvailability": "Disponible 24h/24",
     "badgeFleet": "Flotte Mercedes-Benz",
     "badgeLanguages": "Français & anglais",
@@ -268,9 +270,9 @@
     "bookHourly": "Réserver à l’heure",
     "colBook": "Réserver",
     "colRoute": "Trajet",
-    "footnote": "Tous les prix sont fixes par véhicule et hors TVA et péages. Jamais de tarification dynamique.",
+    "footnote": "Tous les prix sont fixes par véhicule et hors TVA et péages. Le prix affiché pour votre date et votre heure est le prix payé.",
     "getInstantPrice": "Obtenir un prix immédiat",
-    "guarantee1": "Pas de tarification dynamique",
+    "guarantee1": "Prix affiché avant de réserver",
     "guarantee2": "Tarif fixe garanti",
     "guarantee3": "Annulation gratuite 24 h",
     "guarantee4": "Confirmation immédiate",
@@ -289,6 +291,8 @@
     "vatNoteBody": "La TVA de 10 % n'est ajoutée que si vous demandez une facture ; les péages d'autoroute sont facturés séparément. Le chauffeur professionnel, le véhicule et le carburant sont inclus. L'accueil personnalisé, les sièges enfant et les autres options sont facultatifs et facturés séparément."
   },
   "bookflow": {
+    "demandHigh": "Zone à forte demande",
+    "demandLow": "Zone à faible demande",
     "addExtras": "Ajouter des extras",
     "apply": "Appliquer",
     "back": "Retour",

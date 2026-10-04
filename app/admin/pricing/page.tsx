@@ -2,6 +2,7 @@ import { getAdminRoutes, getPricingSettings } from "@/lib/pricing-service";
 import AdminPricingGrid from "./AdminPricingGrid";
 import SyncRoutesButton from "@/components/admin/SyncRoutesButton";
 import ApplyTablePricesButton from "@/components/admin/ApplyTablePricesButton";
+import WeekendRates from "./WeekendRates";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,7 @@ export default async function AdminPricingPage() {
           Edit route prices here — changes go live across the site instantly (cache flushes on save).
         </p>
       </div>
+      <WeekendRates />
       {/* Renders only when the code has routes the database has not got yet. */}
       <SyncRoutesButton />
       {/* And these when a route the database already has is priced differently

@@ -233,7 +233,6 @@ export default async function TransferSlugPage({ params }: { params: Promise<{ s
               Fixed-price private transfer from BCN El Prat Airport to {dest.name} ({dest.area}).{" "}
               {dest.distance_km} km — approximately {dest.duration_min} minutes. From{" "}
               <span className="text-gold-400 font-semibold">{sedan !== null ? `€${sedan}${isFixed ? " fixed" : ""}` : "price on request"}</span>.
-              No surge pricing, ever.
             </p>
 
             {/* Stats row */}

@@ -84,7 +84,7 @@
       "realTime": "Seguimiento en tiempo real",
       "sixtyMin": "60 min en aeropuertos",
       "nameBoard": "Cartel con nombre en llegadas",
-      "noSurge": "Sin tarifas dinámicas"
+      "noSurge": "Precio fijo, claro desde el principio"
     },
     "list": {
       "airport": {
@@ -212,10 +212,10 @@
     "eqe": "Mercedes EQE 300 Eléctrico",
     "faqTitle": "Preguntas frecuentes",
     "fixedPrice": "Precio fijo",
-    "fixedPriceDesc": "El precio que ve es el precio que paga. Sin tarifas dinámicas, nunca.",
+    "fixedPriceDesc": "El precio que ve para su fecha y hora es el precio que paga.",
     "flightTracking": "Seguimiento de vuelos en tiempo real",
     "flightTrackingDesc": "Seguimos su vuelo en directo. Si se retrasa, su conductor se adapta sin coste adicional.",
-    "heroSubtitle": "Traslado privado de lujo desde el aeropuerto BCN El Prat. Precio fijo, recepción personalizada, sin tarifas dinámicas.",
+    "heroSubtitle": "Traslado privado de lujo desde el aeropuerto BCN El Prat. Precio fijo, recepción personalizada.",
     "heroTitle": "Traslado del aeropuerto de Barcelona a {name}",
     "meetGreet": "Recepción en llegadas",
     "meetGreetDesc": "Su conductor le espera en la sala de llegadas con un cartel con su nombre.",
@@ -227,6 +227,8 @@
     "vehiclesAvail": "Vehículos disponibles"
   },
   "booking": {
+    "demandHigh": "Zona de alta demanda",
+    "demandLow": "Zona de baja demanda",
     "badgeAvailability": "Disponible 24/7",
     "badgeFleet": "Flota Mercedes-Benz",
     "badgeLanguages": "Español e inglés",
@@ -268,9 +270,9 @@
     "bookHourly": "Reservar por horas",
     "colBook": "Reservar",
     "colRoute": "Trayecto",
-    "footnote": "Todos los precios son fijos por vehículo y excluyen IVA y peajes. Sin tarifas dinámicas. Nunca.",
+    "footnote": "Todos los precios son fijos por vehículo y excluyen IVA y peajes. El precio mostrado para su fecha y hora es el que paga.",
     "getInstantPrice": "Obtener precio inmediato",
-    "guarantee1": "Sin tarifas dinámicas",
+    "guarantee1": "Precio mostrado antes de reservar",
     "guarantee2": "Tarifa fija garantizada",
     "guarantee3": "Cancelación gratuita 24 h",
     "guarantee4": "Confirmación inmediata",
@@ -289,6 +291,8 @@
     "vatNoteBody": "El 10 % de IVA se añade solo si solicita factura; los peajes de autopista se cobran aparte. El chófer profesional, el vehículo y el combustible están incluidos. El servicio de bienvenida, las sillas infantiles y otros extras son opcionales y se cobran aparte."
   },
   "bookflow": {
+    "demandHigh": "Zona de alta demanda",
+    "demandLow": "Zona de baja demanda",
     "addExtras": "Añadir extras",
     "apply": "Aplicar",
     "back": "Atrás",

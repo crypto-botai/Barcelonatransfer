@@ -29,6 +29,7 @@ import { WALLET_LABEL } from "@/lib/wallets";
 import PremiumPayButton from "@/components/ui/PremiumPayButton";
 import toast from "react-hot-toast";
 import { useTranslations } from "@/components/language/I18nProvider";
+import DemandNote from "@/components/booking/DemandNote";
 import { pickupToUtc, pickupToParts } from "@/lib/datetime";
 import PhoneField from "@/components/booking/PhoneField";
 import { isUsablePhone, splitE164 } from "@/lib/dial-codes";
@@ -1042,6 +1043,7 @@ export default function BookFormClient() {
                         ? "Distance-based fixed price for this journey · excl. VAT & tolls"
                         : "excl. VAT & tolls · 10% VAT added only if you need an invoice"}
                     </p>
+                    <DemandNote className="mt-3" demand={quote.demand} high={t("demandHigh")} low={t("demandLow")} />
                   </div>
                 )}
 
@@ -1316,6 +1318,7 @@ export default function BookFormClient() {
                           : `${quote.distanceKm} km · distance-based fixed fare`}
                       </p>
                     )}
+                    <DemandNote className="mb-3 justify-start" demand={quote.demand} high={t("demandHigh")} low={t("demandLow")} />
                     <div className="bg-black/30 rounded-xl p-4 space-y-2 text-sm">
                       <div className="flex justify-between text-dark-400">
                         <span>{t("transferPrice")}</span><span>{formatCurrency(quote.totalAmount)}</span>

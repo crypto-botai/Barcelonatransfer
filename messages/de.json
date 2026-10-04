@@ -84,7 +84,7 @@
       "realTime": "Echtzeit-Tracking",
       "sixtyMin": "60 Min. am Flughafen",
       "nameBoard": "Namensschild im Ankunftsbereich",
-      "noSurge": "Niemals Preisaufschläge"
+      "noSurge": "Festpreis, vorab genannt"
     },
     "list": {
       "airport": {
@@ -204,7 +204,7 @@
   },
   "routes": {
     "heroTitle": "Transfer Flughafen Barcelona nach {name}",
-    "heroSubtitle": "Privater Luxustransfer vom Flughafen BCN El Prat nach {name}. Festpreis ab €{price}. Ca. {duration} Minuten. Keine Preisaufschläge.",
+    "heroSubtitle": "Privater Luxustransfer vom Flughafen BCN El Prat nach {name}. Festpreis ab €{price}. Ca. {duration} Minuten.",
     "bookNow": "Jetzt buchen — ab €{price}",
     "fixedPrice": "Festpreis",
     "duration": "{min} Minuten",
@@ -227,6 +227,8 @@
     "allInclusive": "Alle Preise inkl. Maut, Abholung und 60 Min. kostenloser Wartezeit. Keine versteckten Gebühren."
   },
   "booking": {
+    "demandHigh": "Gebiet mit hoher Nachfrage",
+    "demandLow": "Gebiet mit geringer Nachfrage",
     "badgeAvailability": "24/7 verfügbar",
     "badgeFleet": "Mercedes-Benz Flotte",
     "badgeLanguages": "Deutsch & Englisch",
@@ -268,9 +270,9 @@
     "bookHourly": "Stundenweise buchen",
     "colBook": "Buchen",
     "colRoute": "Strecke",
-    "footnote": "Alle Preise sind Festpreise pro Fahrzeug, zzgl. MwSt. und Maut. Niemals dynamische Preise.",
+    "footnote": "Alle Preise sind Festpreise pro Fahrzeug, zzgl. MwSt. und Maut. Der für Ihr Datum und Ihre Uhrzeit angezeigte Preis ist der zu zahlende Preis.",
     "getInstantPrice": "Sofortpreis erhalten",
-    "guarantee1": "Keine dynamischen Preise",
+    "guarantee1": "Preis vor der Buchung genannt",
     "guarantee2": "Festpreis garantiert",
     "guarantee3": "Kostenlose Stornierung 24 Std.",
     "guarantee4": "Sofortige Bestätigung",
@@ -289,6 +291,8 @@
     "vatNoteBody": "10 % MwSt. werden nur berechnet, wenn Sie eine Rechnung wünschen; Autobahnmaut wird separat abgerechnet. Professioneller Chauffeur, Fahrzeug und Kraftstoff sind inbegriffen. Empfangsservice, Kindersitze und weitere Extras sind optional und kostenpflichtig."
   },
   "bookflow": {
+    "demandHigh": "Gebiet mit hoher Nachfrage",
+    "demandLow": "Gebiet mit geringer Nachfrage",
     "addExtras": "Extras hinzufügen",
     "apply": "Anwenden",
     "back": "Zurück",

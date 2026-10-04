@@ -183,7 +183,7 @@ export default function LourdesTransferPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Shield, title: `Fixed price €${lourdesPrice}`, body: `One price covers the whole 415 km crossing into France. No meter, no surge, no per-passenger charge. VAT and motorway tolls are charged separately.` },
+                { icon: Shield, title: `Fixed price €${lourdesPrice}`, body: `One price covers the whole 415 km crossing into France. No meter and no per-passenger charge. VAT and motorway tolls are charged separately.` },
                 { icon: Accessibility, title: "Reduced mobility welcome", body: "Tell us what you are travelling with — folding wheelchair, rollator, oxygen — and we confirm the right vehicle before you pay rather than on the day." },
                 { icon: Users, title: "Parish and group pilgrimages", body: "Priced per vehicle, so a minibus of 16 costs far less per person than a sedan. Several cars can travel in convoy and arrive together." },
                 { icon: Clock, title: "Direct — no changes", body: "There is no direct train or flight. Rail means two changes and a longer day; we go door to door in one leg, with comfort stops when you want them." },

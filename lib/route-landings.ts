@@ -836,7 +836,7 @@ const SITGES: RouteLanding = {
       paras: [
         "Sitges fills completely three times a year, and each one changes how a transfer works. Carnival in February and Pride in June both close roads in the centre; the International Film Festival in October fills the hotels rather than the streets.",
         "During Carnival and Pride the police close the seafront and several approaches to the old town for the parades. Your driver will get as close as the closures allow and tell you in advance if your address is inside a restricted zone — better to know before you land than to discover it with your luggage on a pavement.",
-        "Book earlier than usual for those dates. Availability tightens across the whole Garraf coast, and a fixed fare booked in advance is also protection against the surge pricing that everything else on the road does that week.",
+        "Book earlier than usual for those dates. Availability tightens across the whole Garraf coast, and a fixed fare booked in advance is agreed before the busy days arrive.",
       ],
     },
     {
@@ -1085,7 +1085,7 @@ const ANDORRA_RETURN: RouteLanding = {
       paras: [
         `Coming from Barcelona the car is already where the work is. Going the other way it is not: a departure from Andorra means positioning a car up the valley for a time your flight chose, and driving it back to Barcelona afterwards. The €${andorraReturnExtra} is that, and nothing else — same car, same driver, same road.`,
         `It is the only asymmetric fare on the site. Everywhere else a journey costs what it costs in either direction, which is why the price table lists routes with a ⇄ rather than an arrow. Andorra outbound is €${andorraOutboundFrom} from either the airport or the city; Andorra back to either is €${andorraReturnFrom}.`,
-        "The figure is fixed at booking like any other. It is not a surge, it does not move with the season, and it does not change if the drive takes four hours instead of three.",
+        "The figure is fixed at booking like any other. It does not change after you book, and it does not change if the drive takes four hours instead of three.",
       ],
     },
     {

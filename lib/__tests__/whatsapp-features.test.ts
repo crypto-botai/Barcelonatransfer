@@ -207,7 +207,8 @@ describe("assistantReply", () => {
     const r = assistantReply("How much to Tossa de Mar?", await services())!;
     expect(r).toContain("from €155");
     expect(r).toContain("https://www.elitebcn.info/transfers/tossa-de-mar");
-    expect(r).toContain("no surge");
+    expect(r).toContain("exact price for your date and time");
+    expect(r).not.toMatch(/surge/i);
   });
 
   it("follows the price table: a changed price changes the answer", async () => {

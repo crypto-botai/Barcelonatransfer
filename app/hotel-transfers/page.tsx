@@ -131,7 +131,7 @@ export default function HotelTransfersPage() {
             </h1>
             <p className="text-dark-400 text-lg max-w-xl mx-auto mb-10">
               Private luxury transfers between Barcelona Airport and every major hotel in the city.
-              From €{airportCityPrice} — fixed price, no meter, no surge.
+              From €{airportCityPrice} — fixed price, no meter.
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm text-dark-300 mb-10">
               <span className="flex items-center gap-2"><Star size={14} className="text-gold-500" /> Fixed price from €{airportCityPrice}</span>

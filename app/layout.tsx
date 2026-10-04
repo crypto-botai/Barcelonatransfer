@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     template: "%s | Elite BCN Transfers",
   },
   description:
-    `Barcelona's #1 luxury private transfer. Fixed prices from €${CHEAPEST_FARE} — no surge pricing, ever. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class, EQE 300 & Vito. Book 24/7.`,
+    `Barcelona's #1 luxury private transfer. Fixed prices from €${CHEAPEST_FARE}. BCN El Prat T1/T2, cruise port, hotels. Mercedes V-Class, EQE 300 & Vito. Book 24/7.`,
   authors: [{ name: "Elite BCN Transfers" }],
   creator: "Elite BCN Transfers",
   publisher: "Elite BCN Transfers",
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     siteName: "Elite BCN Transfers",
     title: `Elite BCN | Luxury Airport Transfers Barcelona — Fixed Prices from €${CHEAPEST_FARE}`,
     description:
-      "Barcelona's premier luxury chauffeur service. Fixed-price airport transfers, VIP travel, executive transport. Mercedes V-Class & EQE 300 Electric. No surge pricing, ever.",
+      "Barcelona's premier luxury chauffeur service. Fixed-price airport transfers, VIP travel, executive transport. Mercedes V-Class & EQE 300 Electric.",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Luxury Private Transfer Barcelona Airport" }],
   },
   twitter: {
@@ -273,7 +273,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     "Elite Barcelona Transfers",
                     "VTC Barcelona",
                   ],
-                  description: `Luxury private airport transfers in Barcelona. Fixed prices from €${CHEAPEST_FARE}. Mercedes V-Class & EQE 300 Electric. No surge pricing. Available 24/7. BCN El Prat T1/T2, cruise port, hotels, all Costa Daurada destinations.`,
+                  description: `Luxury private airport transfers in Barcelona. Fixed prices from €${CHEAPEST_FARE}. Mercedes V-Class & EQE 300 Electric. Available 24/7. BCN El Prat T1/T2, cruise port, hotels, all Costa Daurada destinations.`,
                   url: "https://www.elitebcn.info",
                   telephone: "+34635383712",
                   email: COMPANY.email,
@@ -381,7 +381,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   "@id": "https://www.elitebcn.info/#website",
                   url: "https://www.elitebcn.info",
                   name: "Elite BCN Transfers",
-                  description: "Luxury private airport transfers in Barcelona — fixed prices, no surge pricing.",
+                  description: "Luxury private airport transfers in Barcelona — fixed prices.",
                   publisher: { "@id": "https://www.elitebcn.info/#organization" },
                   inLanguage: ["en-GB", "es-ES"],
                   potentialAction: {

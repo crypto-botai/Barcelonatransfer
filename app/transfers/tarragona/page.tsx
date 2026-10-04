@@ -39,14 +39,14 @@ export const metadata: Metadata = {
   openGraph: {
     ...SHARED_OG,
     title: `Barcelona to Tarragona Transfer — from €${LADDER.economy} | Fixed Price`,
-    description: `Private transfer Barcelona to Tarragona or PortAventura from €${LADDER.economy}. Fixed price, no surge pricing.`,
+    description: `Private transfer Barcelona to Tarragona or PortAventura from €${LADDER.economy}. Fixed price.`,
     url: "https://www.elitebcn.info/transfers/tarragona",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Tarragona Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
     title: `Barcelona to Tarragona Transfer — from €${LADDER.economy} | Fixed Price`,
-    description: `Private transfer Barcelona to Tarragona or PortAventura from €${LADDER.economy}. Fixed price, no surge pricing.`,
+    description: `Private transfer Barcelona to Tarragona or PortAventura from €${LADDER.economy}. Fixed price.`,
     images: ["/opengraph-image"],
   },
 };

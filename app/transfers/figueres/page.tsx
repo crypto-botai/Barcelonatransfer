@@ -11,7 +11,7 @@ const D: DestinationSpec = {
   durationText: "1 hr 40 min",
   guideHref: "/blog/figueres-dali-theatre-museum",
   intro:
-    "Private transfer from Barcelona or El Prat Airport to Figueres, home of the Dalí Theatre-Museum. Fixed price, door to door, no surge pricing.",
+    "Private transfer from Barcelona or El Prat Airport to Figueres, home of the Dalí Theatre-Museum. Fixed price, door to door.",
   about: [
     "Figueres is the capital of the Alt Empordà, about 140 kilometres north of Barcelona and close to the French border. For most visitors it means one thing: the Dalí Theatre-Museum, built by Salvador Dalí inside the shell of the town theatre where he held his first exhibition, and where he is now buried beneath the floor.",
     "The museum is the most visited in Catalonia after the Picasso Museum, and it is unlike any conventional gallery — Dalí described the whole building as a single surrealist object, with giant eggs on the roof, a geodesic dome over the old auditorium, and a courtyard containing a Cadillac that rains on the inside.",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   openGraph: {
     ...SHARED_OG,
     title: "Barcelona to Figueres Transfer — Dalí Museum | Fixed Price",
-    description: "Private transfer from Barcelona to Figueres and the Dalí Theatre-Museum. Fixed price, meet & greet, no surge pricing.",
+    description: "Private transfer from Barcelona to Figueres and the Dalí Theatre-Museum. Fixed price, meet & greet.",
     url: `${BASE_URL}/transfers/figueres`,
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Figueres Private Transfer" }],
   },

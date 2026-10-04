@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Barcelona to Tossa de Mar Transfer | Elite BCN",
-    description: "Private transfer from Barcelona to Tossa de Mar. Fixed price, meet & greet, no surge pricing.",
+    description: "Private transfer from Barcelona to Tossa de Mar. Fixed price, meet & greet.",
     images: ["/opengraph-image"],
   },
 };

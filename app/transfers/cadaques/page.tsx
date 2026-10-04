@@ -23,14 +23,14 @@ export const metadata: Metadata = {
   openGraph: {
     ...SHARED_OG,
     title: `Barcelona to Cadaqués Transfer — from €${LADDER.economy} | Fixed Price`,
-    description: `Private transfer from Barcelona to Cadaqués from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing. 2h 15min.`,
+    description: `Private transfer from Barcelona to Cadaqués from €${LADDER.economy}. Fixed price, meet & greet. 2h 15min.`,
     url: `${BASE}/transfers/cadaques`,
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Cadaqués Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
     title: `Barcelona to Cadaqués Transfer — from €${LADDER.economy} | Elite BCN`,
-    description: `Private transfer from Barcelona to Cadaqués from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing.`,
+    description: `Private transfer from Barcelona to Cadaqués from €${LADDER.economy}. Fixed price, meet & greet.`,
     images: ["/opengraph-image"],
   },
 };
@@ -116,7 +116,7 @@ export default function CadaquesTransferPage() {
               Barcelona to <br /><span className="text-gold-gradient">Cadaqués Transfer</span>
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
-              Private luxury transfer between Barcelona (city or BCN Airport) and Cadaqués. Fixed price, no surge pricing, ever.
+              Private luxury transfer between Barcelona (city or BCN Airport) and Cadaqués. Fixed price.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 2h 15min</div>

@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { VEHICLE_CATALOG, FLEET_TO_DB_CLASS, type FleetVehicle, type QuoteResponse } from "@/types";
 import AddressAutocomplete, { type QuickZone } from "./AddressAutocomplete";
 import { useTranslations } from "@/components/language/I18nProvider";
+import DemandNote from "@/components/booking/DemandNote";
 import { seatsFor, smallestFor } from "@/lib/capacity";
 
 /* ── Quick-select zones (pickup + drop-off) ────────────────────────────────── */
@@ -460,6 +461,7 @@ export default function BookingForm({ compact = false }: Props) {
                   ) : null}
                 </div>
               </div>
+              <DemandNote className="mt-2" demand={quote.demand} high={t("demandHigh")} low={t("demandLow")} />
             </div>
           )}
 

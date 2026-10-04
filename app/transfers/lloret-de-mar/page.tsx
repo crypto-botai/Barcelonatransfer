@@ -17,20 +17,20 @@ const BASE = "https://www.elitebcn.info";
 export const metadata: Metadata = {
   title: { absolute: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy}` },
   description:
-    `Private transfer from Barcelona to Lloret de Mar. Fixed price from €${LADDER.economy}. 65-minute journey via AP-7. Meet & greet, no surge pricing. Book instantly.`,
+    `Private transfer from Barcelona to Lloret de Mar. Fixed price from €${LADDER.economy}. 65-minute journey via AP-7. Meet & greet. Book instantly.`,
   alternates: { canonical: `${BASE}/transfers/lloret-de-mar` },
   keywords: ["barcelona lloret de mar transfer", "lloret de mar private car barcelona", "lloret de mar airport transfer", "costa brava transfer lloret"],
   openGraph: {
     ...SHARED_OG,
     title: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy} | Fixed Price`,
-    description: `Private transfer from Barcelona to Lloret de Mar from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing. 65 minutes.`,
+    description: `Private transfer from Barcelona to Lloret de Mar from €${LADDER.economy}. Fixed price, meet & greet. 65 minutes.`,
     url: `${BASE}/transfers/lloret-de-mar`,
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Lloret de Mar Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
     title: `Barcelona to Lloret de Mar Transfer — from €${LADDER.economy} | Elite BCN`,
-    description: `Private transfer from Barcelona to Lloret de Mar from €${LADDER.economy}. Fixed price, meet & greet, no surge pricing.`,
+    description: `Private transfer from Barcelona to Lloret de Mar from €${LADDER.economy}. Fixed price, meet & greet.`,
     images: ["/opengraph-image"],
   },
 };
@@ -116,7 +116,7 @@ export default function LloretDeMarTransferPage() {
               Barcelona to <br /><span className="text-gold-gradient">Lloret de Mar Transfer</span>
             </h1>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
-              Private luxury transfer between Barcelona (city or BCN Airport) and Lloret de Mar. Fixed price, no surge pricing, ever.
+              Private luxury transfer between Barcelona (city or BCN Airport) and Lloret de Mar. Fixed price.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
               <div className="flex items-center gap-2 text-white"><Clock size={16} className="text-gold-500" /> 65 minutes</div>

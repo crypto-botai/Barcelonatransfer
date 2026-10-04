@@ -74,7 +74,7 @@ const fleetSchema = {
   "@context": "https://schema.org",
   "@type": "ItemList",
   name: "Elite BCN Transfers Fleet",
-  description: "Luxury private transfer fleet available in Barcelona — fixed prices, no surge pricing.",
+  description: "Luxury private transfer fleet available in Barcelona — fixed prices.",
   numberOfItems: VEHICLE_CATALOG.length,
   itemListElement: VEHICLE_CATALOG.map((v, i) => ({
     "@type": "ListItem",

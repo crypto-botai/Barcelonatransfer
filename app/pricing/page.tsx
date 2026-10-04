@@ -35,7 +35,7 @@ const PRICING_SCHEMA = {
   "@type": "WebPage",
   name: "Barcelona Private Transfer Prices — Fixed Rates",
   url: "https://www.elitebcn.info/pricing",
-  description: "Fixed prices per vehicle for private transfers from Barcelona Airport to all Catalonia destinations. Excludes VAT and tolls. No surge pricing.",
+  description: "Fixed prices per vehicle for private transfers from Barcelona Airport to all Catalonia destinations. Excludes VAT and tolls.",
   breadcrumb: {
     "@type": "BreadcrumbList",
     itemListElement: [
@@ -80,7 +80,7 @@ export default async function PricingPage() {
               Barcelona Fixed <span className="text-gold-gradient">Transfer Prices</span>
             </h1>
             <p className="text-dark-400 max-w-2xl mx-auto">
-              All prices are fixed per vehicle and exclude VAT and tolls. 10% VAT applies only if you need an invoice; tolls are charged separately. No surge pricing, ever.
+              All prices are fixed per vehicle and exclude VAT and tolls. 10% VAT applies only if you need an invoice; tolls are charged separately.
             </p>
           </div>
         </section>

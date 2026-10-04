@@ -37,14 +37,14 @@ export const metadata: Metadata = {
   openGraph: {
     ...SHARED_OG,
     title: `Barcelona to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
-    description: `Private transfer from Barcelona to Andorra la Vella from €${andorraPrice}. Fixed price, no surge pricing. Ski season specialist.`,
+    description: `Private transfer from Barcelona to Andorra la Vella from €${andorraPrice}. Fixed price. Ski season specialist.`,
     url: "https://www.elitebcn.info/transfers/andorra",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Elite BCN — Barcelona to Andorra Private Transfer" }],
   },
   twitter: {
     card: "summary_large_image",
     title: `Barcelona to Andorra Transfer — from €${andorraPrice} | Fixed Price`,
-    description: `Private transfer Barcelona to Andorra la Vella from €${andorraPrice}. Fixed price, no surge pricing. Ski season specialist.`,
+    description: `Private transfer Barcelona to Andorra la Vella from €${andorraPrice}. Fixed price. Ski season specialist.`,
     images: ["/opengraph-image"],
   },
 };
@@ -94,7 +94,7 @@ export default function AndorraTransferPage() {
             <p className="text-dark-400 text-lg max-w-2xl mx-auto mb-10">
               Private transfer to Andorra la Vella from BCN El Prat Airport or anywhere in Barcelona city —
               the same fixed fare either way.
-              Fixed price €{andorraPrice} — no meter, no tolls surprise, no surge pricing.
+              Fixed price €{andorraPrice} — no meter, no tolls surprise.
               We also serve the ski stations at Grandvalira and Vallnord, which are further up
               the valley and quoted by distance.
             </p>

@@ -30,9 +30,11 @@ import type { VehicleClass } from "@/types";
  *   Time only  — the agreed fare carries over and only the time-dependent
  *                surcharge moves. The journey is the same journey, so
  *                re-quoting it would silently reprice a booking taken weeks
- *                ago at whatever the table says today. A fixed-price transfer
- *                never surcharges at all; "No surge pricing, ever" is on the
- *                public pricing page.
+ *                ago at whatever the table says today. A transfer takes no
+ *                night or last-minute surcharge; the one thing that moves its
+ *                fare with the clock is the weekend (Friday noon to Monday
+ *                noon), which is worked out from the fare it already carries
+ *                (lib/reschedule-price.ts).
  *
  *   Address    — a different journey, so it is quoted afresh through the same
  *                getQuote the booking engine uses, against the same published
@@ -116,7 +118,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       pickupAddress: true, pickupLat: true, pickupLng: true,
       dropoffAddress: true, dropoffLat: true, dropoffLng: true,
       vehicleClass: true, distanceKm: true, durationMin: true,
-      baseFare: true, totalAmount: true, specialRequests: true,
+      baseFare: true, totalAmount: true, specialRequests: true, createdAt: true,
       depositAmount: true, balanceAmount: true, balancePaidAt: true,
       guestName: true, guestEmail: true,
       user: { select: { name: true, email: true } },
@@ -159,6 +161,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   let airportSurcharge: number | null = null;
   let nightSurcharge = 0;
   let lastMinuteSurcharge = 0;
+  let weekendMoved = false;
 
   if (routeChanged) {
     basis = "requoted";
@@ -214,6 +217,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         totalAmount: booking.totalAmount,
         pickupDatetime: booking.pickupDatetime,
         bookingType: meta.bookingType,
+        createdAt: booking.createdAt,
       },
       newPickupAt,
     );
@@ -222,6 +226,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     difference          = priced.difference;
     nightSurcharge      = priced.newSurcharges.night;
     lastMinuteSurcharge = priced.newSurcharges.lastMinute;
+    // Moving into or out of a weekend moves the fare, so the base fare moves with it.
+    if (priced.weekend.changed) baseFare = priced.baseFare;
+    weekendMoved = priced.weekend.changed;
   }
 
   const willApplyPrice = body.applyPriceChange && difference !== 0;
@@ -283,6 +290,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
               : {}),
           }
         : {}),
+      // The fare the invoice prints as the base fare follows a weekend move.
+      ...(willApplyPrice && weekendMoved && !routeChanged ? { baseFare } : {}),
       ...(willApplyPrice ? { totalAmount: newTotal } : {}),
       // Only a booking that still has an uncollected balance moves it. One
       // already settled is left alone: the money is in, and rewriting the

@@ -1,5 +1,6 @@
 import { NIGHT_SURCHARGE_RATE, LAST_MINUTE_SURCHARGE_RATE, LAST_MINUTE_HOURS } from "@/lib/pricing";
 import { isNightTime } from "@/lib/utils";
+import { weekendOf, weekendPercent } from "@/lib/weekend-pricing";
 
 /**
  * What moving a booking does to its price.
@@ -8,14 +9,18 @@ import { isNightTime } from "@/lib/utils";
  * wanted rather than where it goes: a night pickup adds 20%, and a pickup
  * inside the last-minute window adds 15%.
  *
- * A TRANSFER carries neither, ever. The price table is fixed and the pricing
- * page says so in as many words — "No surge pricing, ever" — and the quote
- * API returns nightSurcharge: 0 on every transfer whatever the hour. An
- * earlier version of this file applied the uplift to all bookings alike,
- * which meant moving a fixed-price airport run to 23:00 added 20% the
- * booking engine would never have charged, against a promise on the public
- * pricing page. Only the types the engine actually surcharges are
+ * A TRANSFER carries neither. The price table is fixed and the quote API
+ * returns nightSurcharge: 0 on every transfer whatever the hour. An earlier
+ * version of this file applied the uplift to all bookings alike, which meant
+ * moving a fixed-price airport run to 23:00 added 20% the booking engine would
+ * never have charged. Only the types the engine actually surcharges are
  * surcharged here.
+ *
+ * What a transfer does depend on is the weekend. A pickup between Friday noon
+ * and Monday noon costs that weekend's percentage (lib/weekend-pricing.ts), so
+ * moving a booking into a weekend, out of one, or to a weekend with a different
+ * percentage moves its fare. That is worked out below from the fare the booking
+ * already carries, so a price the office adjusted by hand is moved, not undone.
  *
  * Only these two are recomputed. Distance, the route table price and the
  * vehicle are untouched by a change of time, so the base fare carries over
@@ -66,9 +71,46 @@ export function timeSurcharges(
   return { night, lastMinute, total: round(night + lastMinute) };
 }
 
+/**
+ * The first moment a booking was priced with the weekend rule. A booking taken
+ * before it was priced without, and keeps that price until it is moved.
+ */
+export const WEEKEND_PRICING_STARTS = new Date("2026-10-04T17:15:00Z");
+
+export interface WeekendShift {
+  /** The percentage the booking's current fare carries: 0 on a weekday, or if it predates the rule. */
+  oldPercent: number;
+  /** The percentage the new time carries. */
+  newPercent: number;
+  /** Whether the weekend part of the fare changes at all. */
+  changed: boolean;
+  /** The fare with the new weekend percentage, when it changed. */
+  newBase: number | null;
+}
+
+/** What moving this booking does to the weekend part of its fare. */
+export function weekendShift(
+  booking: { baseFare: number; pickupDatetime: Date; createdAt?: Date | null },
+  newPickup: Date,
+): WeekendShift {
+  const carriesRule = !booking.createdAt || booking.createdAt >= WEEKEND_PRICING_STARTS;
+  const oldFriday = weekendOf(booking.pickupDatetime);
+  const newFriday = weekendOf(newPickup);
+  const oldPercent = carriesRule && oldFriday ? weekendPercent(oldFriday) : 0;
+  const newPercent = newFriday ? weekendPercent(newFriday) : 0;
+  if (oldPercent === newPercent) return { oldPercent, newPercent, changed: false, newBase: null };
+
+  // Take the old percentage back off, then put the new one on. Table fares are whole euros,
+  // so the round trip returns the same fare.
+  const weekday = oldPercent ? Math.round(booking.baseFare / (1 + oldPercent / 100)) : booking.baseFare;
+  return { oldPercent, newPercent, changed: true, newBase: Math.round(weekday * (1 + newPercent / 100)) };
+}
+
 export interface Repriced {
   /** The fare before any time-dependent surcharge. */
   baseFare: number;
+  /** What the weekend does to this move. */
+  weekend: WeekendShift;
   oldSurcharges: TimeSurcharges;
   newSurcharges: TimeSurcharges;
   oldTotal: number;
@@ -86,8 +128,10 @@ export interface Repriced {
 export function repriceForNewTime(
   booking: {
     baseFare: number; totalAmount: number; pickupDatetime: Date;
-    /** From the booking's metadata. A transfer, or null, never surcharges. */
+    /** From the booking's metadata. A transfer, or null, never takes the time-of-day surcharges. */
     bookingType?: string | null;
+    /** When it was booked: a booking taken before the weekend rule keeps its old price until moved. */
+    createdAt?: Date | null;
   },
   newPickup: Date,
   now: number = Date.now(),
@@ -107,10 +151,17 @@ export function repriceForNewTime(
   // it: a fare the office adjusted by hand must not be quietly undone by a
   // change of time. Only the movement in surcharge is applied to it.
   const oldTotal = round(booking.totalAmount);
-  const newTotal = round(oldTotal + (newSurcharges.total - oldSurcharges.total));
+  // Hourly hire is priced by the hour and has no weekend rule; a transfer does.
+  const weekend: WeekendShift = surcharged
+    ? { oldPercent: 0, newPercent: 0, changed: false, newBase: null }
+    : weekendShift({ baseFare: base, pickupDatetime: booking.pickupDatetime, createdAt: booking.createdAt }, newPickup);
+  const weekendDifference = weekend.changed && weekend.newBase != null ? weekend.newBase - base : 0;
+
+  const newTotal = round(oldTotal + (newSurcharges.total - oldSurcharges.total) + weekendDifference);
 
   return {
-    baseFare: base,
+    baseFare: weekend.changed && weekend.newBase != null ? weekend.newBase : base,
+    weekend,
     oldSurcharges,
     newSurcharges,
     oldTotal,
