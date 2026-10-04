@@ -10,6 +10,7 @@ import { notify } from "@/lib/notifications/service";
 import { formatPickupDateTime } from "@/lib/datetime";
 import { driverMailTo } from "@/lib/driver-email";
 import { wantsSmsAlerts } from "@/lib/booking-meta";
+import { driverAssignedVars, tellBookingCancelled, tellCustomerJourneyCompleted, tellDriverNewJob } from "@/lib/whatsapp-events";
 
 export async function GET(
   req: NextRequest,
@@ -91,6 +92,7 @@ export async function PATCH(
       if (!booking || booking.userId !== sessionUser?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
       if (!["PENDING", "CONFIRMED"].includes(booking.status)) return NextResponse.json({ error: "Cannot cancel at this stage" }, { status: 400 });
       const updated = await prisma.booking.update({ where: { id }, data: { status: "CANCELLED" }, select: { id: true, status: true } });
+      await tellBookingCancelled(id);
       if (booking.guestEmail) {
         sendBookingCancelledEmail({
           to:               booking.guestEmail,
@@ -223,12 +225,23 @@ export async function PATCH(
         bookingId: booking.id,
         phone:     booking.guestPhone,
         vars: {
-          driver: driverName,
           code:   booking.confirmationCode,
-          when:   formatPickupDateTime(booking.pickupDatetime),
           link:   `${process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info"}/track/${booking.confirmationCode}`,
+          ...driverAssignedVars(booking, { name: driverName, phone: driverPhone, vehicle }),
+          when:   formatPickupDateTime(booking.pickupDatetime),
         },
       });
+
+      // The chauffeur own WhatsApp: the job, their fare, no customer money.
+      await tellDriverNewJob(booking.id);
+    }
+
+    // Told once, whoever changed the status: the customer who paid, and the chauffeur who was to drive it.
+    if (["CANCELLED", "REFUNDED"].includes(String(data.status)) && !["CANCELLED", "REFUNDED"].includes(String(current?.status))) {
+      await tellBookingCancelled(booking.id);
+    }
+    if (data.status === "COMPLETED" && current?.status !== "COMPLETED") {
+      await tellCustomerJourneyCompleted(booking.id);
     }
 
     return NextResponse.json(booking);

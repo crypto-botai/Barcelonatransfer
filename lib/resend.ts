@@ -472,13 +472,10 @@ export async function sendAdminNewBookingAlert({
     throw err;
   }
 
-  // WhatsApp only. The office has already been emailed a few lines above, so
-  // the email fallback is off — with it on, one booking sent two identical
-  // messages the moment WhatsApp was unconfigured, which it always has been.
-  void notifyAdmin(
-    `🚗 New Booking ${confirmationCode}\n${guestName} · €${totalAmount.toFixed(2)}\n${pickupAddress} → ${dropoffAddress}\n${pickupDatetime}`,
-    { emailFallback: false },
-  );
+  // The office WhatsApp copy of a paid booking is the approved confirmation
+  // template, sent from payment completion (tellOfficeBookingConfirmed). It used
+  // to be a line of free text here, which WhatsApp only accepts from a number the
+  // office has messaged in the last 24 hours, so it usually reached no one.
 }
 
 // ─── New Lead Alert (booking started, not yet paid) ──────────
@@ -515,11 +512,11 @@ export async function sendNewLeadAlert({
     throw err;
   }
 
-  // WhatsApp only — the email above already told the office about this lead.
-  void notifyAdmin(
-    `\u{1F464} New lead — not paid yet\n${name}\n${phone}\n${pickup ?? ""} \u2192 ${dropoff ?? ""}\n${when ?? ""}`,
-    { emailFallback: false },
-  );
+  // WhatsApp too, as the approved "premium transfer request" template. The email
+  // above already told the office, so this never falls back to another email.
+  // Imported when needed: lib/whatsapp-events reaches back into this file.
+  const { tellOfficeNewLead } = await import("@/lib/whatsapp-events");
+  await tellOfficeNewLead({ name, email, phone, pickup, dropoff, when, passengers });
 }
 
 // ─── Welcome Email ───────────────────────────────────────────

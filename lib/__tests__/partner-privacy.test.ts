@@ -101,7 +101,7 @@ describe("what the customer is sent when a company's driver is assigned", () => 
 
   it("tells the customer's phone and inbox the chauffeur's name only", () => {
     const customerNotify = dispatch.slice(dispatch.indexOf('event: "DRIVER_ASSIGNED"'), dispatch.indexOf('event: "DRIVER_NEW_JOB"'));
-    expect(customerNotify).toContain("driver: driverName");
+    expect(customerNotify).toContain("...driverAssignedVars(updated, { name: driverName, phone: driverPhone, vehicle })");
     expect(customerNotify).not.toMatch(/partner|company/i);
   });
 

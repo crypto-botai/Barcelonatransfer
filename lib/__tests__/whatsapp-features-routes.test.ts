@@ -225,19 +225,19 @@ describe("message templates", () => {
   });
 
   it("shows each template the site needs with where Meta has it", async () => {
-    m.listTemplates.mockResolvedValue(meta([{ name: "booking_confirmation", status: "APPROVED" }, { name: "driver_assigned", status: "PENDING" }, { name: "flight_delayed", status: "REJECTED", rejectedReason: "INVALID_FORMAT" }, { name: "unrelated", status: "APPROVED" }]));
+    m.listTemplates.mockResolvedValue(meta([{ name: "elitebcn_booking_confirmed", status: "APPROVED" }, { name: "elitebcn_driver_assigned", status: "PENDING" }, { name: "flight_delayed", status: "REJECTED", rejectedReason: "INVALID_FORMAT" }, { name: "unrelated", status: "APPROVED" }]));
     const rows = (await (await templatesGet()).json()).templates as { name: string; status: string; problem: string | null }[];
     expect(rows.map((r) => r.name)).toEqual(TEMPLATE_DEFS.map((t) => t.name));
-    expect(rows.find((r) => r.name === "booking_confirmation")!.status).toBe("APPROVED");
-    expect(rows.find((r) => r.name === "driver_assigned")!.status).toBe("PENDING");
+    expect(rows.find((r) => r.name === "elitebcn_booking_confirmed")!.status).toBe("APPROVED");
+    expect(rows.find((r) => r.name === "elitebcn_driver_assigned")!.status).toBe("PENDING");
     expect(rows.find((r) => r.name === "flight_delayed")).toMatchObject({ status: "REJECTED", problem: "INVALID_FORMAT" });
     expect(rows.find((r) => r.name === "pickup_soon")!.status).toBe("MISSING");
   });
 
   it("uses the English version when the same name exists in other languages", async () => {
-    m.listTemplates.mockResolvedValue(meta([{ name: "driver_assigned", status: "REJECTED", language: "es" }, { name: "driver_assigned", status: "APPROVED", language: "en_US" }]));
+    m.listTemplates.mockResolvedValue(meta([{ name: "elitebcn_driver_assigned", status: "REJECTED", language: "es" }, { name: "elitebcn_driver_assigned", status: "APPROVED", language: "en_US" }]));
     const rows = (await (await templatesGet()).json()).templates as { name: string; status: string }[];
-    expect(rows.find((r) => r.name === "driver_assigned")!.status).toBe("APPROVED");
+    expect(rows.find((r) => r.name === "elitebcn_driver_assigned")!.status).toBe("APPROVED");
   });
 
   it("explains when Meta cannot be reached", async () => {
@@ -248,9 +248,10 @@ describe("message templates", () => {
   });
 
   it("submits only the templates that do not exist, leaving approved, waiting and refused ones alone", async () => {
-    m.listTemplates
-      .mockResolvedValueOnce(meta([{ name: "booking_confirmation", status: "APPROVED" }, { name: "driver_assigned", status: "PENDING" }, { name: "flight_delayed", status: "REJECTED" }]))
-      .mockResolvedValue(meta([{ name: "booking_confirmation", status: "APPROVED" }, { name: "driver_assigned", status: "PENDING" }, { name: "flight_delayed", status: "REJECTED" }, { name: "pickup_soon", status: "PENDING" }, { name: "driver_flight_delay", status: "PENDING" }]));
+    // Everything exists except the last two in the list; one of the rest is waiting, one approved, one refused.
+    const missing = ["pickup_soon", "driver_flight_delay"];
+    const have = TEMPLATE_DEFS.filter((t) => !missing.includes(t.name)).map((t, i) => ({ name: t.name, status: ["APPROVED", "PENDING", "REJECTED"][i % 3] }));
+    m.listTemplates.mockResolvedValueOnce(meta(have)).mockResolvedValue(meta([...have, ...missing.map((name) => ({ name, status: "PENDING" }))]));
     m.createTemplate.mockResolvedValue({ ok: true, status: "PENDING" });
     const body = await (await templatesPost()).json();
     expect(m.createTemplate.mock.calls.map((c) => c[0].name).sort()).toEqual(["driver_flight_delay", "pickup_soon"]);

@@ -129,20 +129,36 @@ describe("what goes in a WhatsApp template", () => {
     expect(templateField(65)).toBe("65");
   });
 
-  it("keeps the confirmation template under the name it has always had", () => {
-    vi.stubEnv("WA_TEMPLATE_BOOKING_CONFIRMED", "");
-    expect(whatsappTemplateFor("BOOKING_CONFIRMED")).toEqual({ name: "booking_confirmation", fields: ["code", "when", "route"] });
+  it("sends the confirmation as the full booking template, to the customer and to the office", () => {
+    vi.stubEnv("WA_TEMPLATE_ELITEBCN_BOOKING_CONFIRMED", "");
+    const forCustomer = whatsappTemplateFor("BOOKING_CONFIRMED");
+    expect(forCustomer?.name).toBe("elitebcn_booking_confirmed");
+    expect(forCustomer?.fields).toHaveLength(21);
+    expect(forCustomer?.fields.slice(0, 3)).toEqual(["when", "name", "phone"]);
+    expect(whatsappTemplateFor("BOOKING_CONFIRMED_ADMIN")).toEqual(forCustomer);
+    vi.unstubAllEnvs();
+  });
+
+  it("is not caught by an override that was set for the template it replaced", () => {
+    // The old confirmation override is named after the event, and is still set in production.
+    vi.stubEnv("WA_TEMPLATE_BOOKING_CONFIRMED", "booking_confirmation");
+    expect(whatsappTemplateFor("BOOKING_CONFIRMED")?.name).toBe("elitebcn_booking_confirmed");
     vi.unstubAllEnvs();
   });
 
   /** Every automatic WhatsApp message has its own template, under a fixed name, with an override for the day one is resubmitted. */
   it("has a template for each automatic message, and lets its name be overridden", () => {
-    vi.stubEnv("WA_TEMPLATE_DRIVER_ASSIGNED", "");
-    expect(whatsappTemplateFor("DRIVER_ASSIGNED")).toEqual({ name: "driver_assigned", fields: ["code", "driver", "when"] });
+    vi.stubEnv("WA_TEMPLATE_ELITEBCN_DRIVER_ASSIGNED", "");
+    expect(whatsappTemplateFor("DRIVER_ASSIGNED")).toEqual({ name: "elitebcn_driver_assigned", fields: ["ref", "driver", "driverContact", "vehicle", "plate", "pickupTime", "pickup"] });
+    expect(whatsappTemplateFor("NEW_LEAD")?.name).toBe("elitebcn_new_request");
+    expect(whatsappTemplateFor("DRIVER_NEW_JOB")?.name).toBe("elitebcn_driver_new_job");
+    expect(whatsappTemplateFor("RATE_RIDE")?.name).toBe("elitebcn_job_completed");
+    expect(whatsappTemplateFor("BOOKING_CANCELLED")?.name).toBe("elitebcn_booking_cancelled");
+    expect(whatsappTemplateFor("DRIVER_JOB_CANCELLED")?.name).toBe("elitebcn_driver_job_cancelled");
     expect(whatsappTemplateFor("FLIGHT_DELAYED")).toEqual({ name: "flight_delayed", fields: ["code", "flight", "when"] });
     expect(whatsappTemplateFor("PICKUP_SOON")).toEqual({ name: "pickup_soon", fields: ["code", "when", "route"] });
     expect(whatsappTemplateFor("FLIGHT_DELAYED_DRIVER")).toEqual({ name: "driver_flight_delay", fields: ["code", "passenger", "flight", "when", "pickup"] });
-    vi.stubEnv("WA_TEMPLATE_DRIVER_ASSIGNED", "driver_assigned_v2");
+    vi.stubEnv("WA_TEMPLATE_ELITEBCN_DRIVER_ASSIGNED", "driver_assigned_v2");
     expect(whatsappTemplateFor("DRIVER_ASSIGNED")?.name).toBe("driver_assigned_v2");
     vi.unstubAllEnvs();
   });
@@ -170,22 +186,30 @@ describe("what goes in a WhatsApp template", () => {
    * dash, and the customer reads "Your driver is -". Every call site has to
    * pass every field its event's template uses.
    */
-  const CALLERS: Array<[NotificationEvent, string, string]> = [
-    ["BOOKING_CONFIRMED", "lib/payment-completion.ts", 'event:     "BOOKING_CONFIRMED"'],
-    ["BOOKING_CONFIRMED", "app/api/admin/bookings/route.ts", 'event:     "BOOKING_CONFIRMED"'],
-    ["BOOKING_CONFIRMED", "app/api/admin/bookings/[id]/message/route.ts", 'event: "BOOKING_CONFIRMED"'],
-    ["PICKUP_SOON",       "app/api/cron/pickup-reminder/route.ts", 'event:     "PICKUP_SOON"'],
-    ["DRIVER_ASSIGNED",   "app/api/bookings/[id]/route.ts", 'event:     "DRIVER_ASSIGNED"'],
-    ["DRIVER_ASSIGNED",   "lib/partner.ts", 'event: "DRIVER_ASSIGNED"'],
-    ["FLIGHT_DELAYED",    "lib/flights/sweep.ts", 'event:     "FLIGHT_DELAYED"'],
+  // [event, file, where the call starts, how its fields are supplied]. The booking and
+  // chauffeur templates have many fields, filled by one builder (lib/whatsapp-messages.ts)
+  // whose output is checked field for field in whatsapp-messages.test.ts; the short
+  // ones are listed in the call itself.
+  const CALLERS: Array<[NotificationEvent, string, string, string | null]> = [
+    ["BOOKING_CONFIRMED", "lib/payment-completion.ts", 'event:     "BOOKING_CONFIRMED"', "...confirmationVars("],
+    ["BOOKING_CONFIRMED", "app/api/admin/bookings/route.ts", 'event:     "BOOKING_CONFIRMED"', "...confirmationVars("],
+    ["BOOKING_CONFIRMED", "app/api/admin/bookings/[id]/message/route.ts", 'event: "BOOKING_CONFIRMED"', "...confirmationVars("],
+    ["PICKUP_SOON",       "app/api/cron/pickup-reminder/route.ts", 'event:     "PICKUP_SOON"', null],
+    ["DRIVER_ASSIGNED",   "app/api/bookings/[id]/route.ts", 'event:     "DRIVER_ASSIGNED"', "...driverAssignedVars("],
+    ["DRIVER_ASSIGNED",   "lib/partner.ts", 'event: "DRIVER_ASSIGNED"', "...driverAssignedVars("],
+    ["FLIGHT_DELAYED",    "lib/flights/sweep.ts", 'event:     "FLIGHT_DELAYED"', null],
   ];
 
-  it.each(CALLERS)("%s passes every template field (%s)", (event, file, marker) => {
+  it.each(CALLERS)("%s passes every template field (%s)", (event, file, marker, builder) => {
     const src = rd(file);
     const at = src.indexOf(marker);
     expect(at, `${file} has no ${event} notification`).toBeGreaterThan(-1);
     // The call, up to the end of its vars.
     const call = src.slice(at, at + 900);
+    if (builder) {
+      expect(call, `${file} does not fill the ${event} template with ${builder})`).toContain(builder);
+      return;
+    }
     for (const field of WHATSAPP_TEMPLATES[event]!.fields) {
       expect(call, `${file} does not pass "${field}" for ${event}`).toMatch(new RegExp(`\\b${field}\\s*[:,}]`));
     }
@@ -312,7 +336,7 @@ describe("the dispatcher, end to end", () => {
     expect(res.results.sms.outcome).toBe("sent");
 
     const wa = fetchMock.mock.calls.find((c) => String(c[0]).includes("graph.facebook"))!;
-    expect(JSON.parse(wa[1].body).template.name).toBe("booking_confirmation");
+    expect(JSON.parse(wa[1].body).template.name).toBe("elitebcn_booking_confirmed");
     const sms = fetchMock.mock.calls.find((c) => String(c[0]).includes("twilio"))!;
     expect(new URLSearchParams(sms[1].body).get("Body")).toContain("PRB6PY9KU7");
   });

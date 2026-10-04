@@ -6,6 +6,7 @@ import { refundSumUpTransaction } from "@/lib/sumup";
 import { sendCancellationEmail, sendAdminCancellationAlert } from "@/lib/resend";
 import { formatPickupDateTime } from "@/lib/datetime";
 import { refundPolicy, paidOnline, freeCancelHours, PROTECTION_CUTOFF_HOURS } from "@/lib/deposits";
+import { tellBookingCancelled } from "@/lib/whatsapp-events";
 
 export async function POST(
   _req: NextRequest,
@@ -110,6 +111,9 @@ export async function POST(
       }),
     ]);
   }
+
+  // On WhatsApp too, to a customer who had paid and to the chauffeur on the job.
+  await tellBookingCancelled(booking.id);
 
   return NextResponse.json({
     success:        true,

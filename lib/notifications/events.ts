@@ -29,6 +29,9 @@ export const NOTIFICATION_EVENTS = [
   "RIDE_TODAY",
   "RATE_RIDE",
   "DRIVER_NEW_JOB",
+  "DRIVER_JOB_CANCELLED",
+  "BOOKING_CONFIRMED_ADMIN",
+  "NEW_LEAD",
   "OFFICE_MESSAGE",
 ] as const;
 
@@ -264,6 +267,39 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
       es: { title: "Nuevo servicio: {{when}}",    body: "{{pickup}} a {{dropoff}}. Abre tu portal para ver los detalles." },
       fr: { title: "Nouvelle course : {{when}}",  body: "{{pickup}} vers {{dropoff}}." },
       de: { title: "Neuer Auftrag: {{when}}",     body: "{{pickup}} nach {{dropoff}}." },
+    },
+  },
+
+  /** The office's copy of a confirmation: WhatsApp only, to the office number. */
+  BOOKING_CONFIRMED_ADMIN: {
+    channels: ["whatsapp"],
+    copy: {
+      en: { title: "Booking confirmed",  body: "Booking {{code}} on {{when}} is confirmed and paid." },
+      es: { title: "Reserva confirmada", body: "La reserva {{code}} del {{when}} está confirmada y pagada." },
+      fr: { title: "Réservation confirmée", body: "La réservation {{code}} du {{when}} est confirmée et payée." },
+      de: { title: "Buchung bestätigt",  body: "Buchung {{code}} am {{when}} ist bestätigt und bezahlt." },
+    },
+  },
+
+  /** A new unpaid enquiry, to the office, while the customer is still deciding. */
+  NEW_LEAD: {
+    channels: ["whatsapp"],
+    copy: {
+      en: { title: "New request",    body: "{{name}} has started a booking and not paid yet." },
+      es: { title: "Nueva solicitud", body: "{{name}} ha iniciado una reserva y aún no ha pagado." },
+      fr: { title: "Nouvelle demande", body: "{{name}} a commencé une réservation sans payer." },
+      de: { title: "Neue Anfrage",   body: "{{name}} hat eine Buchung begonnen und noch nicht bezahlt." },
+    },
+  },
+
+  /** A job the chauffeur was given has been cancelled. */
+  DRIVER_JOB_CANCELLED: {
+    channels: ["inapp", "push", "whatsapp"],
+    copy: {
+      en: { title: "Job cancelled",       body: "Booking {{code}} on {{when}} has been cancelled. Do not attend the pick-up." },
+      es: { title: "Trabajo cancelado",   body: "La reserva {{code}} del {{when}} se ha cancelado. No acudas a la recogida." },
+      fr: { title: "Course annulée",      body: "La réservation {{code}} du {{when}} est annulée. Ne vous rendez pas à la prise en charge." },
+      de: { title: "Auftrag storniert",   body: "Buchung {{code}} am {{when}} wurde storniert. Bitte nicht zur Abholung fahren." },
     },
   },
 

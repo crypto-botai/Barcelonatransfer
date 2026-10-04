@@ -12,9 +12,14 @@
  * lib/whatsapp-template-defs.ts, which is also what the settings screen
  * submits to Meta. This file only turns an event into the template to send.
  *
- * Each template's name can be overridden by an environment variable, for the
- * day one is resubmitted under a new name after Meta rejects the first. Without
- * the variable the template is sent under its own name.
+ * Each template's name can be overridden by an environment variable named after
+ * the template (WA_TEMPLATE_ELITEBCN_BOOKING_CONFIRMED), for the day one is
+ * resubmitted under a new name after Meta rejects the first. Without the
+ * variable the template is sent under its own name.
+ *
+ * The variable is named after the template, not the event, so a template
+ * replaced by a new one under a new name is not caught by an override that was
+ * set for the old one.
  */
 
 import type { NotificationEvent } from "./events";
@@ -32,14 +37,12 @@ export interface WhatsAppTemplateSpec {
 }
 
 export const WHATSAPP_TEMPLATES: Partial<Record<NotificationEvent, WhatsAppTemplateSpec>> = Object.fromEntries(
-  TEMPLATE_DEFS.map((t) => [
-    t.event,
-    { env: `WA_TEMPLATE_${t.event}`, fallbackName: t.name, fields: t.fields, suggestedText: t.body } satisfies WhatsAppTemplateSpec,
-  ]),
+  TEMPLATE_DEFS.flatMap((t) => {
+    const spec = { env: `WA_TEMPLATE_${t.name.toUpperCase()}`, fallbackName: t.name, fields: t.fields, suggestedText: t.body } satisfies WhatsAppTemplateSpec;
+    // The same wording can go to more than one person: the confirmation to the customer and to the office.
+    return [t.event, ...(t.alsoFor ?? [])].map((e) => [e, spec] as const);
+  }),
 );
-
-// The confirmation's override has always had this name, and is already set in production.
-WHATSAPP_TEMPLATES.BOOKING_CONFIRMED!.env = "WA_TEMPLATE_BOOKING_CONFIRMED";
 
 /** The approved template to use for an event, or null to send free text. */
 export function whatsappTemplateFor(

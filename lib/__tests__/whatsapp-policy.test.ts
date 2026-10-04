@@ -25,16 +25,71 @@ const decide = (over: Partial<Parameters<typeof decideWhatsApp>[0]> = {}) =>
   });
 
 describe("which messages exist at all", () => {
-  it("allows the four customer messages and the driver's delay", () => {
-    for (const e of ["BOOKING_CONFIRMED", "DRIVER_ASSIGNED", "FLIGHT_DELAYED", "PICKUP_SOON", "FLIGHT_DELAYED_DRIVER"]) {
+  it("allows the customer messages, the driver's messages and the office's copies", () => {
+    for (const e of [
+      "BOOKING_CONFIRMED", "DRIVER_ASSIGNED", "RATE_RIDE", "BOOKING_CANCELLED", "FLIGHT_DELAYED", "PICKUP_SOON",
+      "DRIVER_NEW_JOB", "DRIVER_JOB_CANCELLED", "FLIGHT_DELAYED_DRIVER",
+      "BOOKING_CONFIRMED_ADMIN", "NEW_LEAD",
+    ]) {
       expect(decide({ event: e }), e).toEqual({ send: true });
     }
   });
 
   it("refuses everything else, however it is asked for", () => {
-    for (const e of ["PICKUP_REMINDER", "DRIVER_EN_ROUTE", "DRIVER_ARRIVED", "RIDE_ON_BOARD", "RIDE_COMPLETED", "REVIEW_REQUEST", "PAYMENT_RECEIVED", "RIDE_TODAY", "RATE_RIDE", "OFFICE_MESSAGE", "TRIP_MESSAGE", "WHATEVER"]) {
+    for (const e of ["PICKUP_REMINDER", "DRIVER_EN_ROUTE", "DRIVER_ARRIVED", "RIDE_ON_BOARD", "RIDE_COMPLETED", "REVIEW_REQUEST", "PAYMENT_RECEIVED", "RIDE_TODAY", "OFFICE_MESSAGE", "TRIP_MESSAGE", "WHATEVER"]) {
       expect(decide({ event: e }), e).toMatchObject({ send: false, reason: expect.stringMatching(/not one of the automatic/) });
     }
+  });
+});
+
+describe("completion, cancellation and the office's own messages", () => {
+  it("thanks a customer for a completed journey however it was paid for", () => {
+    expect(decide({ event: "RATE_RIDE", booking: booking({ status: "COMPLETED", paymentStatus: "PENDING", paymentMethod: "CASH" }) })).toEqual({ send: true });
+    expect(decide({ event: "RATE_RIDE", booking: booking({ status: "CANCELLED" }) })).toMatchObject({ send: false });
+  });
+
+  it("tells a customer who had paid that the booking is cancelled, including after a refund", () => {
+    for (const paymentStatus of ["PAID", "REFUNDED", "PARTIALLY_REFUNDED"]) {
+      expect(decide({ event: "BOOKING_CANCELLED", booking: booking({ status: "CANCELLED", paymentStatus }) }), paymentStatus).toEqual({ send: true });
+    }
+  });
+
+  it("does not message someone who never paid and then dropped the booking", () => {
+    expect(decide({ event: "BOOKING_CANCELLED", booking: booking({ status: "CANCELLED", paymentStatus: "PENDING" }) })).toMatchObject({ send: false, reason: "the booking was never paid" });
+  });
+
+  it("sends each of them once, and the driver's job again only to a different driver", () => {
+    expect(decide({ event: "RATE_RIDE", sentBefore: 1 })).toMatchObject({ send: false });
+    expect(decide({ event: "BOOKING_CANCELLED", booking: booking({ status: "CANCELLED" }), sentBefore: 1 })).toMatchObject({ send: false });
+    expect(decide({ event: "BOOKING_CONFIRMED_ADMIN", sentBefore: 1 })).toMatchObject({ send: false });
+    expect(decide({ event: "DRIVER_NEW_JOB", sentBefore: 1 })).toEqual({ send: true });
+    expect(decide({ event: "DRIVER_NEW_JOB", sentBefore: 1, repeated: true })).toMatchObject({ send: false });
+    expect(MAX_PER_BOOKING.DRIVER_NEW_JOB).toBe(3);
+  });
+
+  it("treats a driver's new job and cancellation as the same recipient, not the same text", () => {
+    for (const e of ["DRIVER_NEW_JOB", "DRIVER_JOB_CANCELLED"]) {
+      expect(sameness(e, { recipient: "u1" }, { recipient: "u1" }), e).toBe(true);
+      expect(sameness(e, { recipient: "u2" }, { recipient: "u1" }), e).toBe(false);
+    }
+  });
+
+  it("has a switch for each, and each switch only turns off its own message", () => {
+    const off = (k: keyof typeof DEFAULT_AUTO_MESSAGES) => ({ ...DEFAULT_AUTO_MESSAGES, [k]: false });
+    expect(decide({ event: "RATE_RIDE", settings: off("completionNote") })).toMatchObject({ send: false });
+    expect(decide({ event: "BOOKING_CANCELLED", booking: booking({ status: "CANCELLED" }), settings: off("cancellationNotice") })).toMatchObject({ send: false });
+    expect(decide({ event: "DRIVER_NEW_JOB", settings: off("driverJobAlerts") })).toMatchObject({ send: false });
+    expect(decide({ event: "DRIVER_JOB_CANCELLED", settings: off("driverJobAlerts") })).toMatchObject({ send: false });
+    expect(decide({ event: "NEW_LEAD", settings: off("officeAlerts") })).toMatchObject({ send: false });
+    expect(decide({ event: "BOOKING_CONFIRMED_ADMIN", settings: off("officeAlerts") })).toMatchObject({ send: false });
+    // Turning the driver's job alerts off leaves the driver's flight delays alone, and the reverse.
+    expect(decide({ event: "FLIGHT_DELAYED_DRIVER", settings: off("driverJobAlerts") })).toEqual({ send: true });
+    expect(decide({ event: "DRIVER_NEW_JOB", settings: off("driverFlightAlerts") })).toEqual({ send: true });
+  });
+
+  it("does not depend on the customer paying for the office or the driver to hear", () => {
+    expect(decide({ event: "NEW_LEAD", booking: null })).toEqual({ send: true });
+    expect(decide({ event: "DRIVER_NEW_JOB", booking: booking({ paymentStatus: "PENDING" }) })).toEqual({ send: true });
   });
 });
 
@@ -169,13 +224,16 @@ describe("the template wording", () => {
   it("has unique names Meta will accept, and one per automatic message", () => {
     const names = TEMPLATE_DEFS.map((t) => t.name);
     expect(new Set(names).size).toBe(names.length);
-    expect(TEMPLATE_DEFS.map((t) => t.event).sort()).toEqual(["BOOKING_CONFIRMED", "DRIVER_ASSIGNED", "FLIGHT_DELAYED", "FLIGHT_DELAYED_DRIVER", "PICKUP_SOON"]);
+    expect(TEMPLATE_DEFS.map((t) => t.event).sort()).toEqual([
+      "BOOKING_CANCELLED", "BOOKING_CONFIRMED", "DRIVER_ASSIGNED", "DRIVER_JOB_CANCELLED", "DRIVER_NEW_JOB",
+      "FLIGHT_DELAYED", "FLIGHT_DELAYED_DRIVER", "NEW_LEAD", "PICKUP_SOON", "RATE_RIDE",
+    ]);
   });
 
   it("is utility wording, never a promotion", () => {
     for (const t of TEMPLATE_DEFS) {
       expect(t.category).toBe("UTILITY");
-      expect(t.body, t.name).not.toMatch(/discount|offer|% off|book now|special|limited|sale/i);
+      expect(t.body, t.name).not.toMatch(/discount|offer|% off|book now|special(?! requests)|limited|sale/i);
     }
   });
 

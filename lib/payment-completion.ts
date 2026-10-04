@@ -8,6 +8,7 @@ import { paidOnline } from "@/lib/deposits";
 import { sendOpenAiConversion } from "@/lib/tracking/openai-conversions";
 import { parseBookingMeta, wantsSmsAlerts } from "@/lib/booking-meta";
 import { loadJourneyGroup } from "@/lib/journeys";
+import { confirmationVars, tellOfficeBookingConfirmed } from "@/lib/whatsapp-events";
 
 // Shared by app/api/payments/webhook, app/api/payments/verify, and app/api/cron/payment-reconcile
 // so all three entry points apply the exact same DB + email side-effects for a paid or failed
@@ -197,12 +198,16 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
         phone:     updated.guestPhone,
         vars: {
           code:  updated.confirmationCode,
-          when:  formatPickupDateTime(updated.pickupDatetime),
           route,
           link:  `${BASE_URL}/track/${updated.confirmationCode}`,
+          // The whole booking, for the WhatsApp confirmation (and the text's own wording).
+          ...confirmationVars(updated),
         },
       });
     }
+
+    // The office gets the same confirmation, on its own WhatsApp number.
+    await tellOfficeBookingConfirmed(updated.id);
 
     // In-app copy for the customer portal, plus the audit entry. Email and
     // WhatsApp already went out above through their existing templates, so

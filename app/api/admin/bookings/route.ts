@@ -15,6 +15,7 @@ import { PAYMENT_METHODS, paymentLine } from "@/lib/payment-method";
 import { calendarLinks, returnTripUrl } from "@/lib/calendar";
 import { seatShare, vehicleNote } from "@/lib/vehicle-group";
 import { MAX_STOPS } from "@/lib/booking-meta";
+import { confirmationVars } from "@/lib/whatsapp-events";
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
 
@@ -630,9 +631,9 @@ export async function POST(req: NextRequest) {
         phone:     body.guestPhone,
         vars: {
           code:  booking.confirmationCode,
-          when:  formatPickupDateTime(pickup),
           route: body.dropoffAddress ? `${body.pickupAddress} → ${body.dropoffAddress}` : body.pickupAddress,
           link:  `${BASE_URL}/track/${booking.confirmationCode}`,
+          ...confirmationVars(booking),
         },
       }).catch((e) => console.error("[admin create booking] phone confirmation:", e)));
     }

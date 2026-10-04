@@ -5,7 +5,7 @@ import { TEMPLATE_DEFS, templateProblems } from "@/lib/whatsapp-template-defs";
 
 export const dynamic = "force-dynamic";
 
-type Row = { name: string; to: "customer" | "driver"; purpose: string; body: string; status: string; problem: string | null };
+type Row = { name: string; to: "customer" | "driver" | "admin"; purpose: string; body: string; status: string; problem: string | null };
 
 /** Where each template the site needs stands in Meta: approved, waiting, refused or not yet submitted. */
 async function rows(): Promise<{ ok: true; rows: Row[] } | { ok: false; reason: string }> {

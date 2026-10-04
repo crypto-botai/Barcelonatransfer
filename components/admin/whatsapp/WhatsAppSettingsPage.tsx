@@ -116,7 +116,7 @@ export default function WhatsAppSettingsPage() {
   const [linking, setLinking] = useState(false);
   const [shop, setShop] = useState<{ state: "checking" | "on" | "off" | "error"; error?: string }>({ state: "checking" });
   const [shopBusy, setShopBusy] = useState(false);
-  type TemplateRow = { name: string; to: "customer" | "driver"; purpose: string; body: string; status: string; problem: string | null };
+  type TemplateRow = { name: string; to: "customer" | "driver" | "admin"; purpose: string; body: string; status: string; problem: string | null };
   const [templates, setTemplates] = useState<TemplateRow[] | null>(null);
   const [templateError, setTemplateError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -287,15 +287,40 @@ export default function WhatsAppSettingsPage() {
       {/* ── Automatic messages ─────────────────────────────────────────── */}
       <Card
         title="Automatic messages"
-        hint="What the site sends by WhatsApp on its own. A customer gets only these, never more than the limits below, and only for a paid booking. Everything else (driver on the way, reminders, reviews) goes by email or in their account."
+        hint="What the site sends by WhatsApp on its own, and to whom. Each goes out once per booking (a changed driver or a moved flight is the only reason for a second), and a customer is only messaged for a paid booking. Everything else (driver on the way, reminders) goes by email or in their account."
       >
-        <ol className="mb-5 list-decimal space-y-1 pl-5 text-[13px] leading-relaxed text-dark-300">
-          <li><span className="text-white">Booking confirmation</span>, once, as soon as the booking is paid. Email always goes too, and a text only if the customer paid the €0.50 text-alerts option.</li>
-          <li><span className="text-white">Your driver</span>, when a driver is assigned. Once per driver, at most twice.</li>
-          <li><span className="text-white">Flight delay</span>, only when the landing time really moved, at most twice.</li>
-          <li><span className="text-white">One heads-up about an hour before pickup</span>, skipped if another message went to that customer in the previous two hours, so a last-minute booking is told once.</li>
-        </ol>
+        <div className="mb-5 grid gap-5 text-[13px] leading-relaxed text-dark-300 md:grid-cols-3">
+          <div>
+            <h3 className="mb-1.5 text-[11px] font-medium text-dark-500">Customer</h3>
+            <ul className="space-y-1.5">
+              <li><span className="text-white">Booking confirmation</span>: the whole booking, price paid and payment status, once it is paid.</li>
+              <li><span className="text-white">Your chauffeur</span>: name, number, car and plate when a driver is assigned.</li>
+              <li><span className="text-white">Journey completed</span>: a thank-you with the link to rate it.</li>
+              <li><span className="text-white">Booking cancelled</span>: only if they had paid.</li>
+              <li><span className="text-white">Flight delay</span> and <span className="text-white">one heads-up an hour before pickup</span>.</li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="mb-1.5 text-[11px] font-medium text-dark-500">Chauffeur</h3>
+            <ul className="space-y-1.5">
+              <li><span className="text-white">New job</span>: the passenger, route, flight, extras by name, their own fare and any cash to take. Never the customer&apos;s price.</li>
+              <li><span className="text-white">Job cancelled</span>.</li>
+              <li><span className="text-white">Flight delay</span> on their job.</li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="mb-1.5 text-[11px] font-medium text-dark-500">Office</h3>
+            <ul className="space-y-1.5">
+              <li><span className="text-white">Booking confirmed</span>: the same message the customer gets, with the driver once assigned.</li>
+              <li><span className="text-white">New request</span>: when someone starts a booking and has not paid.</li>
+            </ul>
+          </div>
+        </div>
         <div className="space-y-4">
+          <Toggle on={settings.autoMessages.officeAlerts} onChange={(v) => patch((x) => ({ ...x, autoMessages: { ...x.autoMessages, officeAlerts: v } }))} label="Alerts to the office" description="Confirmed bookings and new requests, to the office WhatsApp number." />
+          <Toggle on={settings.autoMessages.driverJobAlerts} onChange={(v) => patch((x) => ({ ...x, autoMessages: { ...x.autoMessages, driverJobAlerts: v } }))} label="New and cancelled jobs to drivers" description="Sent to the driver's WhatsApp number on their profile, so keep it up to date." />
+          <Toggle on={settings.autoMessages.completionNote} onChange={(v) => patch((x) => ({ ...x, autoMessages: { ...x.autoMessages, completionNote: v } }))} label="Thank-you when the journey is completed" />
+          <Toggle on={settings.autoMessages.cancellationNotice} onChange={(v) => patch((x) => ({ ...x, autoMessages: { ...x.autoMessages, cancellationNotice: v } }))} label="Notice to customers when a paid booking is cancelled" />
           <Toggle on={settings.autoMessages.headsUp} onChange={(v) => patch((x) => ({ ...x, autoMessages: { ...x.autoMessages, headsUp: v } }))} label="Heads-up an hour before pickup" />
           <Toggle on={settings.autoMessages.flightAlerts} onChange={(v) => patch((x) => ({ ...x, autoMessages: { ...x.autoMessages, flightAlerts: v } }))} label="Flight delay alerts to customers" />
           <Toggle on={settings.autoMessages.driverFlightAlerts} onChange={(v) => patch((x) => ({ ...x, autoMessages: { ...x.autoMessages, driverFlightAlerts: v } }))} label="Flight delay alerts to drivers" description="Sent to the driver's WhatsApp number on their profile, so keep it up to date." />
@@ -306,7 +331,7 @@ export default function WhatsAppSettingsPage() {
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
               <h3 className="text-sm font-medium text-white">Message templates</h3>
-              <p className="mt-0.5 max-w-xl text-[12.5px] leading-snug text-dark-400">WhatsApp only lets a business start a conversation with wording Meta has approved. These five are what the messages above use.</p>
+              <p className="mt-0.5 max-w-xl text-[12.5px] leading-snug text-dark-400">WhatsApp only lets a business start a conversation with wording Meta has approved. These are what the messages above use. A message is not sent by WhatsApp until its template shows Approved.</p>
             </div>
             <div className="flex shrink-0 gap-2">
               <button type="button" onClick={() => void refreshTemplates()} aria-label="Refresh template status" title="Refresh" className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-dark-300 hover:bg-white/[0.05]"><RefreshCw size={15} /></button>

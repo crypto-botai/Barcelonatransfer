@@ -11,16 +11,20 @@
  *
  * What a customer can receive automatically:
  *   1. the booking confirmation, once, and only for a paid booking
- *   2. the driver's name, once per driver
+ *   2. the driver's name and number, once per driver
  *   3. a flight delay, only when the landing time really moved
  *   4. one heads-up about an hour before pickup, never close behind another message
- * What a driver can receive: a flight delay on their own job.
+ *   5. one note when the journey is completed
+ *   6. one notice if a paid booking is cancelled
+ * What a driver can receive: a new job, a cancelled job, and a flight delay on their own job.
+ * What the office can receive: its own copy of each confirmation, and each new request.
  * Everything else a customer is told, by email or in their account, not here.
  * Replies to a customer who wrote to us are the office's own and are not covered.
  */
 
-export const CUSTOMER_EVENTS = ["BOOKING_CONFIRMED", "DRIVER_ASSIGNED", "FLIGHT_DELAYED", "PICKUP_SOON"] as const;
-export const DRIVER_EVENTS = ["FLIGHT_DELAYED_DRIVER"] as const;
+export const CUSTOMER_EVENTS = ["BOOKING_CONFIRMED", "DRIVER_ASSIGNED", "RATE_RIDE", "BOOKING_CANCELLED", "FLIGHT_DELAYED", "PICKUP_SOON"] as const;
+export const DRIVER_EVENTS = ["DRIVER_NEW_JOB", "DRIVER_JOB_CANCELLED", "FLIGHT_DELAYED_DRIVER"] as const;
+export const ADMIN_EVENTS = ["BOOKING_CONFIRMED_ADMIN", "NEW_LEAD"] as const;
 
 /** Most WhatsApp messages of one kind a booking can ever trigger. */
 export const MAX_PER_BOOKING: Record<string, number> = {
@@ -28,7 +32,12 @@ export const MAX_PER_BOOKING: Record<string, number> = {
   DRIVER_ASSIGNED: 2, // the driver can change once
   FLIGHT_DELAYED: 2, // a delay can grow once; more than that is the office's call
   PICKUP_SOON: 1,
+  RATE_RIDE: 1,
+  BOOKING_CANCELLED: 1,
   FLIGHT_DELAYED_DRIVER: 3,
+  DRIVER_NEW_JOB: 3, // a job can change hands
+  DRIVER_JOB_CANCELLED: 3,
+  BOOKING_CONFIRMED_ADMIN: 1,
 };
 
 /** A heads-up is held back when another message went to the same customer this recently. */
@@ -43,6 +52,14 @@ export interface AutoMessageSettings {
   flightAlerts: boolean;
   /** Tell the driver when their passenger's flight is delayed. */
   driverFlightAlerts: boolean;
+  /** Tell a driver when a job is given to them, and when it is cancelled. */
+  driverJobAlerts: boolean;
+  /** One note to the customer when the journey is completed. */
+  completionNote: boolean;
+  /** One notice to the customer if a paid booking is cancelled. */
+  cancellationNotice: boolean;
+  /** The office's own copy of each confirmation, and each new request. */
+  officeAlerts: boolean;
 }
 
 export const DEFAULT_AUTO_MESSAGES: AutoMessageSettings = {
@@ -50,6 +67,10 @@ export const DEFAULT_AUTO_MESSAGES: AutoMessageSettings = {
   headsUp: true,
   flightAlerts: true,
   driverFlightAlerts: true,
+  driverJobAlerts: true,
+  completionNote: true,
+  cancellationNotice: true,
+  officeAlerts: true,
 };
 
 export interface BookingFacts {
@@ -63,6 +84,7 @@ export type Verdict = { send: true } | { send: false; reason: string };
 
 export const isCustomerEvent = (e: string) => (CUSTOMER_EVENTS as readonly string[]).includes(e);
 export const isDriverEvent = (e: string) => (DRIVER_EVENTS as readonly string[]).includes(e);
+export const isAdminEvent = (e: string) => (ADMIN_EVENTS as readonly string[]).includes(e);
 
 /**
  * What makes two messages "the same one": telling a customer the same driver
@@ -70,7 +92,11 @@ export const isDriverEvent = (e: string) => (DRIVER_EVENTS as readonly string[])
  */
 export function sameness(event: string, vars: Record<string, unknown> | undefined, row: Record<string, unknown> | null | undefined): boolean {
   if (!vars || !row) return false;
-  const key = event === "DRIVER_ASSIGNED" ? "driver" : event === "FLIGHT_DELAYED" ? "when" : event === "FLIGHT_DELAYED_DRIVER" ? "recipient" : null;
+  const key =
+    event === "DRIVER_ASSIGNED" ? "driver" :
+    event === "FLIGHT_DELAYED" ? "when" :
+    event === "FLIGHT_DELAYED_DRIVER" || event === "DRIVER_NEW_JOB" || event === "DRIVER_JOB_CANCELLED" ? "recipient" :
+    null;
   if (!key) return false;
   const mine = vars[key];
   return mine !== undefined && mine !== null && String(mine) === String(row[key] ?? "");
@@ -91,20 +117,38 @@ export function decideWhatsApp(a: {
   const { event, booking, sentBefore, repeated, lastCustomerSendAt, now, settings } = a;
   const no = (reason: string): Verdict => ({ send: false, reason });
 
-  if (!isCustomerEvent(event) && !isDriverEvent(event)) return no("not one of the automatic WhatsApp messages");
+  if (!isCustomerEvent(event) && !isDriverEvent(event) && !isAdminEvent(event)) return no("not one of the automatic WhatsApp messages");
 
   const cap = MAX_PER_BOOKING[event] ?? 1;
   if (repeated) return no("this exact message was already sent");
   if (sentBefore >= cap) return no(`already sent ${sentBefore} of ${cap} for this booking`);
 
+  if (isAdminEvent(event)) {
+    return settings.officeAlerts ? { send: true } : no("office alerts are switched off");
+  }
+
   if (isDriverEvent(event)) {
-    return settings.driverFlightAlerts ? { send: true } : no("driver flight alerts are switched off");
+    if (event === "FLIGHT_DELAYED_DRIVER") return settings.driverFlightAlerts ? { send: true } : no("driver flight alerts are switched off");
+    return settings.driverJobAlerts ? { send: true } : no("driver job alerts are switched off");
   }
 
   // From here on it is a customer message, which needs the booking to judge.
   if (!booking) return { send: true };
 
-  if (booking.status === "CANCELLED" || booking.status === "REFUNDED") return no("the booking is cancelled");
+  const cancelled = booking.status === "CANCELLED" || booking.status === "REFUNDED";
+
+  // A cancellation is told to a customer who had paid, whose money is now in play.
+  // A booking nobody paid for and then dropped is not worth a message.
+  if (event === "BOOKING_CANCELLED") {
+    if (!settings.cancellationNotice) return no("cancellation notices are switched off");
+    const hadPaid = ["PAID", "REFUNDED", "PARTIALLY_REFUNDED"].includes(booking.paymentStatus);
+    return hadPaid || (settings.cashBookings && booking.paymentMethod === "CASH") ? { send: true } : no("the booking was never paid");
+  }
+
+  if (cancelled) return no("the booking is cancelled");
+
+  // The journey happened, however it was paid for: say thank you.
+  if (event === "RATE_RIDE") return settings.completionNote ? { send: true } : no("completion notes are switched off");
 
   const paid = booking.paymentStatus === "PAID";
   const cashOk = settings.cashBookings && booking.paymentMethod === "CASH";

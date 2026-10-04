@@ -367,10 +367,14 @@ describe("followUpCandidates", () => {
 
 describe("settings for the new features", () => {
   it("automatic messages: only the cash switch is off by default", () => {
-    expect(DEFAULT_SETTINGS.autoMessages).toEqual({ cashBookings: false, headsUp: true, flightAlerts: true, driverFlightAlerts: true });
+    expect(DEFAULT_SETTINGS.autoMessages).toEqual({
+      cashBookings: false, headsUp: true, flightAlerts: true, driverFlightAlerts: true,
+      driverJobAlerts: true, completionNote: true, cancellationNotice: true, officeAlerts: true,
+    });
     expect(sanitizeSettings({}).autoMessages).toEqual(DEFAULT_SETTINGS.autoMessages);
     expect(sanitizeSettings({ autoMessages: { cashBookings: "yes" } }).autoMessages.cashBookings).toBe(false);
     expect(sanitizeSettings({ autoMessages: { headsUp: false } }).autoMessages.headsUp).toBe(false);
+    expect(sanitizeSettings({ autoMessages: { officeAlerts: false, cancellationNotice: false } }).autoMessages).toMatchObject({ officeAlerts: false, cancellationNotice: false, completionNote: true });
   });
 
   it("the nobody-replies answer is off until switched on, and its wait is kept sensible", () => {

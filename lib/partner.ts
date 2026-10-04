@@ -13,6 +13,7 @@ import {
 import { notify } from "@/lib/notifications/service";
 import { driverMailTo, generateDriverLogin, DRIVER_LOGIN_DOMAIN } from "@/lib/driver-email";
 import { wantsSmsAlerts } from "@/lib/booking-meta";
+import { driverAssignedVars, tellCustomerJourneyCompleted, tellDriverNewJob } from "@/lib/whatsapp-events";
 
 /**
  * Fleet partner companies.
@@ -436,18 +437,20 @@ export async function dispatchPartnerJob(partnerId: string, bookingId: string, d
     bookingId: booking.id,
     phone: booking.guestPhone,
     vars: {
-      driver: driverName,
       code: booking.confirmationCode,
-      when,
       link: `${SITE_URL}/track/${booking.confirmationCode}`,
+      ...driverAssignedVars(updated, { name: driverName, phone: driverPhone, vehicle }),
+      when,
     },
   }).catch(() => {});
 
-  // The driver's phone, too.
+  // The driver phone, too. By WhatsApp it carries the job with the fare they were
+  // told (the one set for them) and none of the customer money.
   await notify({
     event: "DRIVER_NEW_JOB", userId: driver.userId, url: "/driver",
     vars: { when, pickup: booking.pickupAddress, dropoff: booking.dropoffAddress || "as arranged" },
   }).catch(() => {});
+  await tellDriverNewJob(bookingId);
 
   return updated;
 }
@@ -543,6 +546,7 @@ export async function completePartnerJob(partnerId: string, bookingId: string) {
     }
   }
   await notify({ event: "RATE_RIDE", userId: booking.userId, bookingId, url: `/review?booking=${bookingId}`, vars: { code: booking.confirmationCode } }).catch(() => {});
+  await tellCustomerJourneyCompleted(bookingId);
   return updated;
 }
 

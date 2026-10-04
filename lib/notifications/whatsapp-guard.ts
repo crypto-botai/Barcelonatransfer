@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { loadSettings } from "@/lib/whatsapp-settings-store";
 import {
-  CUSTOMER_EVENTS, DEFAULT_AUTO_MESSAGES, decideWhatsApp, isCustomerEvent, sameness,
+  ADMIN_EVENTS, CUSTOMER_EVENTS, DRIVER_EVENTS, DEFAULT_AUTO_MESSAGES, decideWhatsApp, isCustomerEvent, sameness,
   type Verdict,
 } from "@/lib/whatsapp-policy";
 
@@ -38,7 +38,7 @@ export async function whatsappVerdict(input: {
         where: {
           entity: "Notification",
           entityId: input.bookingId,
-          action: { in: [...CUSTOMER_EVENTS, "FLIGHT_DELAYED_DRIVER"].map((e) => `NOTIFY_${e}`) },
+          action: { in: [...CUSTOMER_EVENTS, ...DRIVER_EVENTS, ...ADMIN_EVENTS].map((e) => `NOTIFY_${e}`) },
         },
         orderBy: { createdAt: "desc" },
         take: 60,

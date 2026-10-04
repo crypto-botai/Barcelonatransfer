@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { BookingStatus, DriverStatus, type RideStage } from "@prisma/client";
 import { notify } from "@/lib/notifications/service";
 import { sendReviewRequestEmail } from "@/lib/resend";
+import { tellCustomerJourneyCompleted } from "@/lib/whatsapp-events";
 import { canTransition, STAGE_META, RIDE_STAGES } from "@/lib/ride-stages";
 
 export const dynamic = "force-dynamic";
@@ -150,6 +151,7 @@ export async function PATCH(req: NextRequest) {
       url: `/review?booking=${booking.id}`,
       vars: { code: booking.confirmationCode },
     });
+    await tellCustomerJourneyCompleted(booking.id);
   }
 
   return NextResponse.json({

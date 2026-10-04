@@ -231,6 +231,10 @@ export function sanitizeSettings(input: unknown): WhatsAppSettings {
       headsUp: raw.autoMessages?.headsUp !== false,
       flightAlerts: raw.autoMessages?.flightAlerts !== false,
       driverFlightAlerts: raw.autoMessages?.driverFlightAlerts !== false,
+      driverJobAlerts: raw.autoMessages?.driverJobAlerts !== false,
+      completionNote: raw.autoMessages?.completionNote !== false,
+      cancellationNotice: raw.autoMessages?.cancellationNotice !== false,
+      officeAlerts: raw.autoMessages?.officeAlerts !== false,
     },
     unanswered: {
       enabled: raw.unanswered?.enabled === true,
