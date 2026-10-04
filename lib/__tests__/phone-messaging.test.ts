@@ -130,11 +130,13 @@ describe("what goes in a WhatsApp template", () => {
   });
 
   it("sends the confirmation as the full booking template, to the customer and to the office", () => {
-    vi.stubEnv("WA_TEMPLATE_ELITEBCN_BOOKING_CONFIRMED", "");
+    vi.stubEnv("WA_TEMPLATE_ELITEBCN_BOOKING_CONFIRMATION", "");
     const forCustomer = whatsappTemplateFor("BOOKING_CONFIRMED");
-    expect(forCustomer?.name).toBe("elitebcn_booking_confirmed");
-    expect(forCustomer?.fields).toHaveLength(21);
+    expect(forCustomer?.name).toBe("elitebcn_booking_confirmation");
+    expect(forCustomer?.fields).toHaveLength(18);
     expect(forCustomer?.fields.slice(0, 3)).toEqual(["when", "name", "phone"]);
+    // Nobody is assigned when a booking comes in, so the confirmation has no driver in it.
+    expect(forCustomer?.fields.join(" ")).not.toMatch(/driver|confirmedVehicle|plate/i);
     expect(whatsappTemplateFor("BOOKING_CONFIRMED_ADMIN")).toEqual(forCustomer);
     vi.unstubAllEnvs();
   });
@@ -142,7 +144,7 @@ describe("what goes in a WhatsApp template", () => {
   it("is not caught by an override that was set for the template it replaced", () => {
     // The old confirmation override is named after the event, and is still set in production.
     vi.stubEnv("WA_TEMPLATE_BOOKING_CONFIRMED", "booking_confirmation");
-    expect(whatsappTemplateFor("BOOKING_CONFIRMED")?.name).toBe("elitebcn_booking_confirmed");
+    expect(whatsappTemplateFor("BOOKING_CONFIRMED")?.name).toBe("elitebcn_booking_confirmation");
     vi.unstubAllEnvs();
   });
 
@@ -336,7 +338,7 @@ describe("the dispatcher, end to end", () => {
     expect(res.results.sms.outcome).toBe("sent");
 
     const wa = fetchMock.mock.calls.find((c) => String(c[0]).includes("graph.facebook"))!;
-    expect(JSON.parse(wa[1].body).template.name).toBe("elitebcn_booking_confirmed");
+    expect(JSON.parse(wa[1].body).template.name).toBe("elitebcn_booking_confirmation");
     const sms = fetchMock.mock.calls.find((c) => String(c[0]).includes("twilio"))!;
     expect(new URLSearchParams(sms[1].body).get("Body")).toContain("PRB6PY9KU7");
   });

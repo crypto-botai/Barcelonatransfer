@@ -49,7 +49,7 @@ const safe = async (label: string, fn: () => Promise<unknown>) => {
 };
 
 /** The fields a customer's confirmation needs, for the callers that send it themselves. */
-export const confirmationVars = (b: MessageBooking, driver?: MessageDriver | null) => flat(confirmationFields(b, driver));
+export const confirmationVars = (b: MessageBooking) => flat(confirmationFields(b));
 
 /** The fields for the customer's "your chauffeur" message, for the callers that send it themselves. */
 export const driverAssignedVars = (b: MessageBooking, driver: MessageDriver) => flat(driverAssignedFields(b, driver));
@@ -62,7 +62,7 @@ export async function tellOfficeBookingConfirmed(bookingId: string): Promise<voi
     if (!to || !b) return;
     await notify({
       event: "BOOKING_CONFIRMED_ADMIN", channels: ["whatsapp"], bookingId, phone: to,
-      vars: { code: b.confirmationCode, ...flat(confirmationFields(b, driverFacts(b.driver))) },
+      vars: { code: b.confirmationCode, ...flat(confirmationFields(b)) },
     });
   });
 }

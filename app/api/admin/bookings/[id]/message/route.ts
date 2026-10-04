@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { notify } from "@/lib/notifications/service";
 import { formatPickupDateTime } from "@/lib/datetime";
 import { BASE_URL } from "@/lib/seo";
-import { confirmationVars, driverFacts } from "@/lib/whatsapp-events";
+import { confirmationVars } from "@/lib/whatsapp-events";
 
 /**
  * Sends a booking's details to the customer's phone, on request.
@@ -97,7 +97,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       guestName: true, guestEmail: true, passengers: true, luggage: true, vehicleClass: true, flightNumber: true,
       specialRequests: true, totalAmount: true, paymentStatus: true, paymentMethod: true, depositAmount: true,
       balanceAmount: true, balancePaidAt: true, driverAmount: true,
-      driver: { select: { userId: true, whatsappNumber: true, user: { select: { name: true, phone: true } }, vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } } } },
     },
   });
   if (!booking) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
@@ -148,7 +147,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       code:  booking.confirmationCode,
       route,
       link:  `${BASE_URL}/track/${booking.confirmationCode}`,
-      ...confirmationVars(booking, driverFacts(booking.driver)),
+      ...confirmationVars(booking),
     },
   });
 

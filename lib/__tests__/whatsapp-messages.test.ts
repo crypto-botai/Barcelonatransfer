@@ -39,7 +39,7 @@ const def = (name: string) => TEMPLATE_DEFS.find((t) => t.name === name)!;
 
 describe("every slot of every template is filled", () => {
   const cases: [string, Record<string, string>][] = [
-    ["elitebcn_booking_confirmed", confirmationFields(booking(), driver)],
+    ["elitebcn_booking_confirmation", confirmationFields(booking())],
     ["elitebcn_new_request", requestFields({ name: "Ana", phone: "+34600123456" })],
     ["elitebcn_driver_assigned", driverAssignedFields(booking(), driver)],
     ["elitebcn_driver_new_job", driverJobFields(booking())],
@@ -60,12 +60,11 @@ describe("every slot of every template is filled", () => {
 
 describe("the confirmation, for the customer and the office", () => {
   it("shows the whole booking, the real price and where the payment stands", () => {
-    const f = confirmationFields(booking(), driver);
+    const f = confirmationFields(booking());
     expect(f).toMatchObject({
       when: expect.stringContaining("2026"), name: "Ana Smith", phone: "+34600123456", email: "ana@example.com",
       pickup: "Barcelona Airport T1", dropoff: "Hotel Arts, Carrer de la Marina 19", flight: "VY1875", passengers: "3", luggage: "2",
       vehicleType: "Business", ref: "EBC-4821", price: "€287.50", payment: "Paid in full",
-      driver: "Pedro Ruiz", driverContact: "+34611222333", confirmedVehicle: "Mercedes E-Class, 1234 ABC",
     });
     expect(f.requests).toBe("Quiet driver please");
   });
@@ -81,11 +80,19 @@ describe("the confirmation, for the customer and the office", () => {
     expect(confirmationFields(booking({ specialRequests: null })).children).toBe("None");
   });
 
-  it("says the driver is still to be assigned until somebody is", () => {
-    const f = confirmationFields(booking());
-    expect(f.driver).toBe("To be assigned");
-    expect(f.driverContact).toMatch(/assigned/);
-    expect(f.confirmedVehicle).toBe("Business");
+  it("has no driver in it: a booking comes in from the customer, and nobody is assigned yet", () => {
+    const f = confirmationFields(booking({ driverAmount: 50 }));
+    expect(Object.keys(f).join(" ")).not.toMatch(/driver|confirmedVehicle|plate/i);
+    expect(Object.values(f).join(" ")).not.toMatch(/to be assigned|pedro/i);
+    // The template cannot show one either.
+    const d = def("elitebcn_booking_confirmation");
+    expect(d.body).not.toMatch(/driver|chauffeur|confirmed vehicle/i);
+    expect(d.fields.join(" ")).not.toMatch(/driver|confirmedVehicle|plate/i);
+  });
+
+  it("the chauffeur is told in his own message, once somebody is assigned", () => {
+    expect(def("elitebcn_driver_assigned").body).toMatch(/CHAUFFEUR ASSIGNED/);
+    expect(driverAssignedFields(booking(), driver).driver).toBe("Pedro Ruiz");
   });
 
   it("states a deposit, cash and unpaid booking each in its own words", () => {
@@ -177,10 +184,11 @@ describe("completion and cancellation", () => {
 
 describe("the templates themselves", () => {
   it("follow the layout asked for: the header, the booking lines, the divider, the confirmation block, the sign-off", () => {
-    const t = def("elitebcn_booking_confirmed").body;
+    const t = def("elitebcn_booking_confirmation").body;
     expect(t.startsWith("✨ *ELITEBCN | PREMIUM TRANSFER BOOKING* ✨")).toBe(true);
     expect(t).toContain("✅ *BOOKING CONFIRMATION DETAILS*");
     expect(t).toContain("💶 *Total Price:*");
+    expect(t).toContain("💳 *Payment Status:*");
     expect(t.endsWith("✨ *Premium Transfers • Professional Service*")).toBe(true);
     expect(def("elitebcn_new_request").body.startsWith("✨ *ELITEBCN | PREMIUM TRANSFER REQUEST* ✨")).toBe(true);
   });

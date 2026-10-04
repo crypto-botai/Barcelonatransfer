@@ -99,21 +99,21 @@ function details(b: MessageBooking, extras: string): Fields {
 }
 
 /**
- * The confirmation, for the customer and for the office: the whole booking, then
- * who is driving it. The driver lines say so plainly until somebody is assigned.
+ * The confirmation, for the customer and for the office: the whole booking, the
+ * price and where the payment stands.
+ *
+ * There is no driver in it. A booking comes in from the customer and nobody is
+ * assigned until the office does it, so a driver line would only ever say "to be
+ * assigned". The chauffeur is told in his own message (driverAssignedFields).
  */
-export function confirmationFields(b: MessageBooking, driver?: MessageDriver | null): Fields {
-  const car = driver?.vehicle ? `${driver.vehicle.make} ${driver.vehicle.model}, ${driver.vehicle.licensePlate}`.trim() : null;
+export function confirmationFields(b: MessageBooking): Fields {
   return {
     ...details(b, formatExtras(parseBookingMeta(b.specialRequests).extras)),
     ref: b.confirmationCode,
-    confirmedVehicle: car ?? title(b.vehicleClass),
-    driver: driver?.name?.trim() || "To be assigned",
     pickupPoint: airportMeeting(b),
     pickupTime: when(b.pickupDatetime),
     price: euro(b.totalAmount),
     payment: paymentLine(b),
-    driverContact: driver?.phone?.trim() || "Sent when your driver is assigned",
   };
 }
 

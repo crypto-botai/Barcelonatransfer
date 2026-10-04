@@ -225,10 +225,10 @@ describe("message templates", () => {
   });
 
   it("shows each template the site needs with where Meta has it", async () => {
-    m.listTemplates.mockResolvedValue(meta([{ name: "elitebcn_booking_confirmed", status: "APPROVED" }, { name: "elitebcn_driver_assigned", status: "PENDING" }, { name: "flight_delayed", status: "REJECTED", rejectedReason: "INVALID_FORMAT" }, { name: "unrelated", status: "APPROVED" }]));
+    m.listTemplates.mockResolvedValue(meta([{ name: "elitebcn_booking_confirmation", status: "APPROVED" }, { name: "elitebcn_driver_assigned", status: "PENDING" }, { name: "flight_delayed", status: "REJECTED", rejectedReason: "INVALID_FORMAT" }, { name: "unrelated", status: "APPROVED" }]));
     const rows = (await (await templatesGet()).json()).templates as { name: string; status: string; problem: string | null }[];
     expect(rows.map((r) => r.name)).toEqual(TEMPLATE_DEFS.map((t) => t.name));
-    expect(rows.find((r) => r.name === "elitebcn_booking_confirmed")!.status).toBe("APPROVED");
+    expect(rows.find((r) => r.name === "elitebcn_booking_confirmation")!.status).toBe("APPROVED");
     expect(rows.find((r) => r.name === "elitebcn_driver_assigned")!.status).toBe("PENDING");
     expect(rows.find((r) => r.name === "flight_delayed")).toMatchObject({ status: "REJECTED", problem: "INVALID_FORMAT" });
     expect(rows.find((r) => r.name === "pickup_soon")!.status).toBe("MISSING");

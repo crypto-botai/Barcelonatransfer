@@ -83,32 +83,30 @@ const BOOKING_EXAMPLES = [
 
 export const TEMPLATE_DEFS: readonly TemplateDef[] = [
   {
-    name: "elitebcn_booking_confirmed",
+    name: "elitebcn_booking_confirmation",
     event: "BOOKING_CONFIRMED",
     alsoFor: ["BOOKING_CONFIRMED_ADMIN"],
     to: "customer",
-    purpose: "The confirmation, sent once when a booking is paid. The same message goes to the office.",
-    fields: [...BOOKING_FIELDS, "ref", "confirmedVehicle", "driver", "pickupPoint", "pickupTime", "price", "payment", "driverContact"],
+    // No driver in it: a booking comes in from the customer, and nobody is assigned until the
+    // office does it. The chauffeur follows as his own message (elitebcn_driver_assigned).
+    purpose: "The confirmation, sent once when a booking is paid. The same message goes to the office. The chauffeur follows in a separate message once one is assigned.",
+    fields: [...BOOKING_FIELDS, "ref", "pickupPoint", "pickupTime", "price", "payment"],
     body: [
       "✨ *ELITEBCN | PREMIUM TRANSFER BOOKING* ✨",
       ...BOOKING_LINES,
       RULE,
       "✅ *BOOKING CONFIRMATION DETAILS*",
       "🔖 *Booking Reference:* {{14}}",
-      "🚘 *Confirmed Vehicle:* {{15}}",
-      "👨‍✈️ *Driver:* {{16}}",
-      "📍 *Pick-up Point:* {{17}}",
-      "⏰ *Pick-up Time:* {{18}}",
-      "💶 *Total Price:* {{19}}",
-      "💳 *Payment Status:* {{20}}",
-      "📞 *Driver Contact:* {{21}}",
+      "📍 *Pick-up Point:* {{15}}",
+      "⏰ *Pick-up Time:* {{16}}",
+      "💶 *Total Price:* {{17}}",
+      "💳 *Payment Status:* {{18}}",
       RULE,
       SIGN_OFF,
     ].join("\n"),
     examples: [
       ...BOOKING_EXAMPLES,
-      "EBC-4821", "Mercedes E-Class, 1234 ABC", "To be assigned", "Barcelona Airport T1 (arrivals, flight VY1875)", "14 Oct 2026, 12:00",
-      "€95", "Paid in full", "Sent when your driver is assigned",
+      "EBC-4821", "Barcelona Airport T1 (arrivals, flight VY1875)", "14 Oct 2026, 12:00", "€95", "Paid in full",
     ],
     category: "UTILITY",
     language: "en",
