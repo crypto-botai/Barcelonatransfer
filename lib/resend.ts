@@ -1,3 +1,4 @@
+import { adminInboxes } from "@/lib/admin-recipients";
 import { Resend } from "resend";
 import { logEmail } from "@/lib/marketing";
 import { COMPANY } from "@/lib/company-facts";
@@ -70,6 +71,9 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? COMPANY.email;
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://www.elitebcn.info";
 
 async function sendEmail(payload: Parameters<Resend["emails"]["send"]>[0]): Promise<string | undefined> {
+  // An alert for the office goes to the office mailbox and to every administrator's own
+  // inbox (lib/admin-recipients.ts). The mailbox alone was never being read.
+  if (payload.to === ADMIN_EMAIL) payload.to = await adminInboxes(ADMIN_EMAIL);
   // Default reply-to so customer replies reach the working inbox.
   // Callers that need a different reply-to (e.g. admin alerts that should reply to the guest) set it explicitly.
   if (!payload.replyTo) {

@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { notify } from "@/lib/notifications/service";
-import { ownerNumber } from "@/lib/whatsapp";
+import { notifyAdmin, ownerNumber } from "@/lib/whatsapp";
 import {
   cancelledFields, completedFields, confirmationFields, driverAssignedFields, driverCancelledFields, driverJobFields, requestFields,
-  type Fields, type MessageBooking, type MessageDriver,
+  euro, paymentLine, type Fields, type MessageBooking, type MessageDriver,
 } from "@/lib/whatsapp-messages";
 
 /**
@@ -54,16 +54,33 @@ export const confirmationVars = (b: MessageBooking) => flat(confirmationFields(b
 /** The fields for the customer's "your chauffeur" message, for the callers that send it themselves. */
 export const driverAssignedVars = (b: MessageBooking, driver: MessageDriver) => flat(driverAssignedFields(b, driver));
 
+/**
+ * Plain wording for the office, for when the approved template cannot be sent.
+ *
+ * Plain text reaches the office number only while it has messaged the business in
+ * the last 24 hours, so it is a fallback and not a replacement: an alert that
+ * sometimes arrives is better than one that never does. Nothing is sent twice.
+ */
+export const officeBookingText = (b: MessageBooking) =>
+  `🚗 New Booking ${b.confirmationCode}\n${b.guestName ?? "Guest"} · ${euro(b.totalAmount)} · ${paymentLine(b)}\n${b.pickupAddress} → ${b.dropoffAddress ?? "as arranged"}\n${confirmationFields(b).when}`;
+
+export const officeLeadText = (l: { name?: string | null; phone?: string | null; pickup?: string | null; dropoff?: string | null; when?: string | null }) =>
+  `👤 New lead, not paid yet\n${l.name ?? "Someone"}\n${l.phone ?? ""}\n${l.pickup ?? ""} → ${l.dropoff ?? ""}\n${l.when ?? ""}`;
+
 /** The office's own copy of a paid booking. */
 export async function tellOfficeBookingConfirmed(bookingId: string): Promise<void> {
   await safe("office confirmation", async () => {
     const to = officeNumber();
     const b = await load(bookingId);
     if (!to || !b) return;
-    await notify({
+    const sent = await notify({
       event: "BOOKING_CONFIRMED_ADMIN", channels: ["whatsapp"], bookingId, phone: to,
       vars: { code: b.confirmationCode, ...flat(confirmationFields(b)) },
     });
+    // The template is not approved yet, or the number cannot take business-started messages: say it in plain words.
+    if (sent.results.whatsapp?.outcome !== "sent" && !/switched off/.test(sent.results.whatsapp?.reason ?? "")) {
+      await notifyAdmin(officeBookingText(b), { emailFallback: false });
+    }
   });
 }
 
@@ -75,7 +92,10 @@ export async function tellOfficeNewLead(lead: {
   await safe("office new request", async () => {
     const to = officeNumber();
     if (!to) return;
-    await notify({ event: "NEW_LEAD", channels: ["whatsapp"], phone: to, vars: { ...flat(requestFields(lead)), name: lead.name?.trim() || "A customer" } });
+    const sent = await notify({ event: "NEW_LEAD", channels: ["whatsapp"], phone: to, vars: { ...flat(requestFields(lead)), name: lead.name?.trim() || "A customer" } });
+    if (sent.results.whatsapp?.outcome !== "sent" && !/switched off/.test(sent.results.whatsapp?.reason ?? "")) {
+      await notifyAdmin(officeLeadText(lead), { emailFallback: false });
+    }
   });
 }
 
