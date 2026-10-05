@@ -289,9 +289,18 @@ describe("OpenAI credentials never reach the browser", () => {
 describe("the existing Google installation is left alone", () => {
   const layout = rd("app/layout.tsx");
 
-  it("keeps both IDs exactly as they were", () => {
-    expect(layout).toContain("G-E9QZFG5WZY");
+  it("sends to the www.elitebcn.info Analytics property and the Google Ads account, and to no other property", () => {
+    expect(layout).toContain("G-PTFFJ19396");
     expect(layout).toContain("AW-18391666445");
+    // The property it used to send to. The Analytics property for this site showed no data while it did.
+    expect(layout).not.toContain("G-E9QZFG5WZY");
+    // Every Google ID on the page is one of the two above: a third would load another container.
+    const ids = new Set([...layout.matchAll(/\b(?:G|AW)-[A-Z0-9]{8,12}\b/g)].map((m) => m[0]));
+    expect([...ids].sort()).toEqual(["AW-18391666445", "G-PTFFJ19396"]);
+  });
+
+  it("does not load Google's own snippet a second time", () => {
+    expect(layout).not.toContain("googletagmanager.com/gtag/js");
   });
 
   it("still loads the heavy script through the deferred component", () => {
@@ -308,7 +317,7 @@ describe("the existing Google installation is left alone", () => {
   it("installs the gtag shim and both configs inline in the head", () => {
     expect(layout).toContain("function gtag(){window.dataLayer.push(arguments);}");
     expect(layout).toContain("window.gtag=gtag;");
-    expect(layout).toContain("gtag('config','G-E9QZFG5WZY');");
+    expect(layout).toContain("gtag('config','G-PTFFJ19396');");
     expect(layout).toContain("gtag('config','AW-18391666445');");
   });
 

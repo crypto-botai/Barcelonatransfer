@@ -122,7 +122,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             gtag.js only ever processes `arguments` objects. A plain array or
             object pushed onto dataLayer is ignored without error — that is
             Tag Manager's syntax, and this site does not run Tag Manager. See
-            lib/tracking/events.ts, which must go through window.gtag. */}
+            lib/tracking/events.ts, which must go through window.gtag.
+
+            G-PTFFJ19396 is the measurement ID of the "www.elitebcn.info" property
+            (stream 15442447250) in the Google Analytics account that also holds
+            the Google Ads account, so one login manages both. The site used to
+            send to a different property, and this one showed "no data received". Do not paste Google's own gtag.js snippet for a second
+            ID on top of this: it loads the same 160 KB script again. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
@@ -130,7 +136,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "function gtag(){window.dataLayer.push(arguments);}" +
               "window.gtag=gtag;" +
               "gtag('js',new Date());" +
-              "gtag('config','G-E9QZFG5WZY');" +
+              "gtag('config','G-PTFFJ19396');" +
               "gtag('config','AW-18391666445');",
           }}
         />
@@ -424,7 +430,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MobileBookBar />
           {/* Only the heavy gtag.js script is deferred; the shim and both
               config commands are already in the head above. */}
-          <DeferredAnalytics gaId="G-E9QZFG5WZY" />
+          <DeferredAnalytics gaId="G-PTFFJ19396" />
           {/* Catches ?oppref= on the first page of the visit, whichever page
               that is: an ad lands on a destination page and the visitor
               reaches /book by navigating, by which time the parameter is
