@@ -17,10 +17,11 @@
     "db:seed": "npx tsx prisma/seed.ts",
     "audit:claims": "node scripts/audit-extra-claims.mjs",
     "typecheck": "tsc --noEmit",
-    "lint:safety": "eslint instrumentation.ts lib/env-guard.ts lib/api/v1 app/api/v1 scripts/check-secrets.mjs",
+    "lint:safety": "eslint instrumentation.ts lib/env-guard.ts lib/api/v1 app/api/v1 scripts/check-secrets.mjs scripts/check-history.mjs scripts/staging",
     "check:secrets": "node scripts/check-secrets.mjs",
     "db:push:staging": "npx tsx scripts/staging/assert-staging.ts && prisma db push",
-    "db:seed:staging": "npx tsx scripts/staging/assert-staging.ts && npx tsx scripts/staging/seed-synthetic.ts"
+    "db:seed:staging": "npx tsx scripts/staging/assert-staging.ts && npx tsx scripts/staging/seed-synthetic.ts",
+    "check:history": "node scripts/check-history.mjs"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

@@ -1,6 +1,6 @@
-# Mobile architecture
+# Mobile
 
-The customer and driver apps live in the separate repository **`elitebcn-apps`** (a copy of this document is kept there). They are React Native apps built with Expo, TypeScript throughout, for iOS and Android.
+The customer and driver apps live in the separate **private** repository **`elitebcn-apps`** (a copy of this document is kept there). Until it is hosted on GitHub it exists only on the owner's machine; the hosting steps are in `docs/RELEASE.md`, section 3. They are React Native apps built with Expo, TypeScript throughout, for iOS and Android.
 
 ## 1. Principles
 
@@ -121,10 +121,19 @@ The apps open the **existing hosted SumUp checkout** in a secure in-app browser 
 
 `Analytics` is a contract with a no-op default: a closed list of event names, identifiers and counts only, never names, emails, phone numbers, addresses, flight numbers or positions. A vendor SDK plugs in behind it later, and only after the person has seen the privacy notice. Crashes in a screen are caught by `AppErrorBoundary`, which shows a calm recovery state and reports the class of error, not its message.
 
-## 12. Quality gates
+## 12. Environment variables and secrets in the apps
+
+- Only two build-time settings exist: `EXPO_PUBLIC_APP_ENV` (`development`, `staging`, `production`) and `EXPO_PUBLIC_API_URL`. Both are public by nature: they end up inside the shipped app.
+- **No secret ever goes in the apps repository or the app.** No API keys, no database URLs, no signing secrets, no payment keys. The server holds them. A test (`packages/config/test/env-safety.test.ts`) fails if a secret-looking `EXPO_PUBLIC_` name appears in the repository.
+- `.env` files are git-ignored. `.env.example` holds the two names with placeholders.
+- A build that disagrees with itself (production build with a staging address, or the reverse) fails at startup.
+- Tokens live only in the Keychain or Keystore. Lint blocks AsyncStorage.
+- Staging builds are separate apps on the phone (own bundle id), so test data and real data never share storage.
+
+## 13. Quality gates
 
 `npm run typecheck`, `npm run lint`, `npm test` (83 tests today), and a secret scan, in CI on every pull request. A web build of the design check is used to review visuals before a device build.
 
-## 13. What is not built yet
+## 14. What is not built yet
 
 Sign-up, forgot password, booking, payment, ride tracking, notifications, driver onboarding, documents, ride lifecycle, earnings, the app icon and store assets. Phase 2 starts with the auth endpoints and the refresh-token table.

@@ -23,7 +23,7 @@ How the EliteBCN platform is put together, and the rules that keep the live busi
                                                 '── sandbox or unset third-party accounts, no crons
 
                         MOBILE APPS
- GitHub: elitebcn-apps (new repository, monorepo)
+ GitHub: elitebcn-apps (new PRIVATE repository, monorepo)
         apps/customer   apps/driver   packages/*
         |  HTTPS, bearer tokens
         v
@@ -116,9 +116,12 @@ GitHub main ──> Vercel production build        GitHub staging ──> stagin
 
 | You want | Look in |
 |---|---|
-| The mobile API foundation | `lib/api/v1/`, `app/api/v1/` |
+| Environments, branches, deployment rules, rollback | `docs/RELEASE.md` |
+| Creating staging (Neon, Vercel, GitHub) | `docs/STAGING.md` |
+| Secrets, rotation, safeguards, database safety | `docs/SECURITY.md` |
+| The mobile API contract | `docs/API-V1.md`, `lib/api/v1/`, `app/api/v1/` |
+| The mobile apps, their structure and rules | `docs/MOBILE.md`, `docs/DESIGN-SYSTEM.md`, repository `elitebcn-apps` |
+| The planned role model | `docs/ROLES.md` |
 | The staging safety guard | `lib/env-guard.ts`, `instrumentation.ts`, `scripts/staging/` |
-| CI | `.github/workflows/ci.yml`, `scripts/check-secrets.mjs` |
-| Staging setup | `docs/STAGING.md`, `.env.staging.example` |
-| Security findings and plan | `docs/SECURITY.md` |
-| The apps | repository `elitebcn-apps` |
+| CI and secret scanners | `.github/workflows/ci.yml`, `scripts/check-secrets.mjs`, `scripts/check-history.mjs` |
+| GitHub branch rulesets (importable) | `docs/github/` |

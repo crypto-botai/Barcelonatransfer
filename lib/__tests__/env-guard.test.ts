@@ -7,6 +7,7 @@ import {
   resolveAppEnvironment,
   EnvGuardError,
   PRODUCTION_DB_HOST_FINGERPRINTS,
+  databaseNames,
 } from "@/lib/env-guard";
 
 /**
@@ -19,7 +20,7 @@ const sha = (host: string) => createHash("sha256").update(host).digest("hex");
 const FAKE_PROD_HOST = "ep-fake-production-123456.eu-central-1.aws.neon.tech";
 const FAKE_STAGING_HOST = "ep-fake-staging-654321.eu-central-1.aws.neon.tech";
 const withProd = { PRODUCTION_DB_HOST_SHA256: sha(FAKE_PROD_HOST) };
-const url = (host: string, pooled = false) => `postgresql://user:pw@${pooled ? host.replace(".", "-pooler.") : host}/db?sslmode=require`;
+const url = (host: string, pooled = false, db = "db") => `postgresql://user:pw@${pooled ? host.replace(".", "-pooler.") : host}/${db}?sslmode=require`;
 
 describe("which environment this is", () => {
   it("lets APP_ENV decide", () => {
@@ -72,6 +73,45 @@ describe("finding database hosts", () => {
   });
 });
 
+describe("the staging database must be marked as staging", () => {
+  const staging = { APP_ENV: "staging", ...withProd };
+
+  it("reads database names from URLs and from PGDATABASE-style variables", () => {
+    expect(new Set(databaseNames({ A: url("h.example.com", false, "Elitebcn_Staging"), PGDATABASE: "other", B: "hello" }))).toEqual(new Set(["elitebcn_staging", "other"]));
+  });
+
+  it("refuses a staging environment whose database name does not say staging, even on an unknown host", () => {
+    const v = assessDatabaseSafety({ ...staging, POSTGRES_PRISMA_URL: url(FAKE_STAGING_HOST, false, "neondb") });
+    expect(v.ok).toBe(false);
+    expect(v.ok === false && v.reason).toMatch(/name contains "staging"/);
+  });
+
+  it("refuses when only one of several variables names an unmarked database", () => {
+    const v = assessDatabaseSafety({ ...staging, POSTGRES_PRISMA_URL: url(FAKE_STAGING_HOST, true, "elitebcn_staging"), POSTGRES_URL_NON_POOLING: url(FAKE_STAGING_HOST, false, "postgres") });
+    expect(v.ok).toBe(false);
+  });
+
+  it("accepts any variable form that carries a staging name", () => {
+    expect(assessDatabaseSafety({ ...staging, POSTGRES_PRISMA_URL: url(FAKE_STAGING_HOST, true, "elitebcn_staging"), PGDATABASE: "elitebcn_staging" }).ok).toBe(true);
+  });
+
+  it("does not put the database name or host in the message", () => {
+    const v = assessDatabaseSafety({ ...staging, POSTGRES_PRISMA_URL: url(FAKE_STAGING_HOST, false, "customers_live") });
+    expect(v.ok === false && v.reason).not.toContain("customers_live");
+    expect(v.ok === false && v.reason).not.toContain(FAKE_STAGING_HOST);
+  });
+
+  it("applies only to staging: development, test and unknown environments are not asked for the marker", () => {
+    for (const env of [{ APP_ENV: "development" }, { NODE_ENV: "test" }, {}]) {
+      expect(assessDatabaseSafety({ ...env, POSTGRES_PRISMA_URL: url(FAKE_STAGING_HOST, false, "db"), ...withProd }).ok).toBe(true);
+    }
+  });
+
+  it("never asks production for it", () => {
+    expect(assessDatabaseSafety({ VERCEL_ENV: "production", POSTGRES_PRISMA_URL: url(FAKE_PROD_HOST, false, "neondb"), ...withProd }).ok).toBe(true);
+  });
+});
+
 describe("the guard", () => {
   it("refuses staging on the production database", () => {
     const v = assessDatabaseSafety({ APP_ENV: "staging", POSTGRES_PRISMA_URL: url(FAKE_PROD_HOST), ...withProd });
@@ -101,7 +141,7 @@ describe("the guard", () => {
   });
 
   it("lets staging start on its own database", () => {
-    expect(assessDatabaseSafety({ APP_ENV: "staging", POSTGRES_PRISMA_URL: url(FAKE_STAGING_HOST), ...withProd }).ok).toBe(true);
+    expect(assessDatabaseSafety({ APP_ENV: "staging", POSTGRES_PRISMA_URL: url(FAKE_STAGING_HOST, false, "elitebcn_staging"), ...withProd }).ok).toBe(true);
   });
 
   it("lets production use the production database and checks nothing there", () => {

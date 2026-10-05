@@ -76,6 +76,26 @@ export function databaseHostFingerprints(env: Env = process.env): string[] {
   return [...found];
 }
 
+/** Every database name in the environment (the last path segment of a postgres URL, or PGDATABASE-style variables). */
+export function databaseNames(env: Env = process.env): string[] {
+  const found = new Set<string>();
+  for (const [key, value] of Object.entries(env)) {
+    if (!value) continue;
+    if (/^postgres(ql)?:\/\//i.test(value)) {
+      try {
+        const name = decodeURIComponent(new URL(value).pathname.replace(/^\//, ""));
+        if (name) found.add(name.toLowerCase());
+      } catch { /* not a URL */ }
+    } else if (/^(PGDATABASE|POSTGRES_DATABASE|DATABASE_NAME)$/.test(key)) {
+      found.add(value.trim().toLowerCase());
+    }
+  }
+  return [...found];
+}
+
+/** A staging database must say so in its name. The documented name is elitebcn_staging. */
+export const STAGING_DATABASE_MARKER = "staging";
+
 export type DatabaseSafety =
   | { ok: true; environment: AppEnvironment }
   | { ok: false; environment: AppEnvironment; reason: string };
@@ -88,15 +108,33 @@ export function assessDatabaseSafety(env: Env = process.env): DatabaseSafety {
   const extra = (env.PRODUCTION_DB_HOST_SHA256 ?? "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
   const production = new Set([...PRODUCTION_DB_HOST_FINGERPRINTS, ...extra]);
   const hit = databaseHostFingerprints(env).find((f) => production.has(f));
-  if (!hit) return { ok: true, environment };
+  if (hit) {
+    return {
+      ok: false,
+      environment,
+      reason:
+        `Refusing to start: the "${environment}" environment is configured with the production database ` +
+        `(host fingerprint ${hit.slice(0, 8)}). Point its database variables at the staging database.`,
+    };
+  }
 
-  return {
-    ok: false,
-    environment,
-    reason:
-      `Refusing to start: the "${environment}" environment is configured with the production database ` +
-      `(host fingerprint ${hit.slice(0, 8)}). Point its database variables at the staging database.`,
-  };
+  // Staging is held to a second, positive test: it may only use a database whose name
+  // contains "staging". A production database under a new host (after a migration or a
+  // restore) would slip past the fingerprint list; it would not slip past this.
+  if (environment === "staging") {
+    const unmarked = databaseNames(env).filter((n) => !n.includes(STAGING_DATABASE_MARKER));
+    if (unmarked.length > 0) {
+      return {
+        ok: false,
+        environment,
+        reason:
+          `Refusing to start: the "staging" environment must use a database whose name contains "${STAGING_DATABASE_MARKER}" ` +
+          `(for example elitebcn_staging). ${unmarked.length} database variable(s) name something else.`,
+      };
+    }
+  }
+
+  return { ok: true, environment };
 }
 
 export class EnvGuardError extends Error {

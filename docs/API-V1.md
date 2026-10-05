@@ -1,0 +1,127 @@
+# Mobile API, version 1
+
+The contract between the EliteBCN apps and the server. The source of truth for the types is `lib/api/v1/types.ts`; the apps keep a copy in `packages/types` (repository `elitebcn-apps`). Change the server file first, additively, then mirror it.
+
+## 1. Principles
+
+1. **The server is the source of truth.** Prices, availability, status and permission are decided here. The apps display them.
+2. **Additive evolution.** Add fields and endpoints. Never remove, rename or retype one in v1. A breaking change becomes `/api/v2`, and v1 keeps working until old apps are gone.
+3. **Reuse, do not duplicate.** Endpoints call the existing booking, pricing and payment code (`getQuote`, the booking and SumUp logic). They do not copy it.
+4. **Boring and predictable.** One envelope, one error shape, stable codes.
+
+## 2. What exists today
+
+| Endpoint | Auth | Purpose |
+|---|---|---|
+| `GET /api/v1/health` | none | Is the API up, and which environment is it (`production`, `staging`, ...). No database call |
+| `GET /api/v1/app-config?app=&platform=&version=` | none | Version gate: `ok`, `update_available`, `update_required`, plus store link. Add `&strict=1` to receive `UPGRADE_REQUIRED` (426) instead |
+
+Everything else below is planned and **not built**.
+
+| Area | Planned endpoints |
+|---|---|
+| `/api/v1/auth/*` | `login`, `register`, `refresh`, `logout`, `forgot-password`, `reset-password` |
+| `/api/v1/quote` | quote for one-way, return, hourly (calls `getQuote`) |
+| `/api/v1/bookings/*` | create, list, detail, cancel, rate |
+| `/api/v1/customer/*` | upcoming and past rides, active ride |
+| `/api/v1/driver/*` | profile, documents, online/offline, assigned rides, accept/reject, stage changes |
+| `/api/v1/tracking/*` | secure ingest (driver), channel grant (customer, staff) |
+| `/api/v1/notifications/*` | device registration, preferences |
+| `/api/v1/payments/*` | create hosted SumUp checkout, status |
+| `/api/v1/profile/*` | profile, language, delete account |
+
+## 3. Envelope
+
+```json
+{ "ok": true,  "data": { },  "meta": { "requestId": "…", "apiVersion": "v1" } }
+{ "ok": false, "error": { "code": "VALIDATION_FAILED", "message": "…", "details": [{ "path": "email", "message": "…" }], "retryable": false, "retryAfterSeconds": 30 }, "meta": { … } }
+```
+
+Every response carries `Cache-Control: no-store`, `X-Request-Id` (the same as `meta.requestId`), `X-Api-Version`, `X-Robots-Tag: noindex` and `X-Content-Type-Options: nosniff`. A rate-limited response also carries `Retry-After`. No CORS headers are sent: the apps are not browsers.
+
+## 4. Error codes (append only)
+
+| Code | HTTP | Retry? | Meaning for the app |
+|---|---|---|---|
+| `VALIDATION_FAILED` | 422 | no | Show the field problems in `details` |
+| `UNAUTHENTICATED` | 401 | no | Not signed in |
+| `TOKEN_EXPIRED` | 401 | no | Refresh the access token, repeat the call once |
+| `TOKEN_INVALID` | 401 | no | Sign in again |
+| `REFRESH_REUSED` | 401 | no | The session was ended for safety. Sign in again |
+| `FORBIDDEN` | 403 | no | This role may not do this |
+| `NOT_FOUND` | 404 | no | |
+| `METHOD_NOT_ALLOWED` | 405 | no | |
+| `CONFLICT` | 409 | no | The state changed. Reload |
+| `UPGRADE_REQUIRED` | 426 | no | Show the update screen |
+| `RATE_LIMITED` | 429 | yes | Wait `retryAfterSeconds` |
+| `INTERNAL` | 500 | no | Generic message. Quote `requestId` to support |
+| `NOT_IMPLEMENTED` | 501 | no | |
+| `UPSTREAM_FAILED` | 502 | yes | A service the server depends on failed |
+| `UNAVAILABLE` | 503 | yes | |
+
+`message` is safe to show a person. It never contains a secret, a query or a stack trace. The client adds `NETWORK_ERROR`, `TIMEOUT`, `INVALID_RESPONSE`, `SESSION_LOST` and `ABORTED` for failures that never reached the server.
+
+## 5. Authentication
+
+```
+POST /api/v1/auth/login   { email, password } ──> { accessToken, refreshToken, expiresIn }       [next phase]
+every call:               Authorization: Bearer <accessToken>
+near expiry or TOKEN_EXPIRED:
+POST /api/v1/auth/refresh { refreshToken }    ──> a NEW pair; the old refresh token is spent       [next phase]
+```
+
+- Access token: JWT HS256, 15 minutes, claims `sub`, `role`, `sid` (device session), `iss`, `aud`, `iat`, `exp`, `jti`. Signed with `MOBILE_JWT_SECRET`.
+- Refresh token: 256 random bits, single use, only its SHA-256 hash is stored. A replayed token revokes the whole sign-in family. A session ends 90 days after sign-in.
+- Built and tested now: `lib/api/v1/tokens.ts`. The storage table arrives with the sign-in endpoints.
+- The web's cookie session is **not** accepted on `/api/v1`.
+
+## 6. Authorisation
+
+Each route is declared with `apiHandler(route, handler, { auth: { roles: [...] } })`. A route that is public says `auth: false` explicitly. Sensitive routes add `recheck` to confirm the user and session still exist and still hold the role (an access token cannot be revoked inside its 15 minutes). A customer reaches only their own bookings, a driver only rides assigned to them and the permitted driver data, staff according to `docs/ROLES.md`. Ownership is checked on every object, not only on the route.
+
+## 7. Request validation
+
+Every body and query is parsed with a zod schema (`lib/api/v1/validate.ts`). Bodies larger than 64 KB are refused. Failures list the field `path` and a message and **never echo the value**.
+
+## 8. Idempotency
+
+A write that creates a booking or takes a payment accepts an `Idempotency-Key` header. The server keeps the result for 24 hours and returns it for a repeat, so a retry after a dropped connection cannot book or charge twice. The client never retries a write by itself.
+
+## 9. Rate limiting
+
+**Today:** a per-instance limiter behind an interface (`lib/api/v1/rate-limit.ts`). On serverless this is a floor that stops a runaway loop on one instance, not a control against a determined caller. It is not replaced in this phase.
+
+**Required before any public mobile launch:** a shared store (managed Redis or Vercel KV) implementing the same interface, plus a Vercel Firewall rate-limit rule as an outer layer. Route classes and starting limits:
+
+| Class | Key | Starting limit |
+|---|---|---|
+| Sign-in | IP **and** account, both must pass | 5 per minute, 20 per hour per account |
+| Register | IP | 5 per hour |
+| Forgot / reset password | email and IP | 3 per hour per email, 10 per hour per IP |
+| Token refresh | session id | 30 per minute |
+| Quote and place search | user, or IP when guest | 60 per minute |
+| Create booking / create payment | user | 10 per hour / 5 per minute |
+| Driver GPS ingest | session id | 60 per minute |
+| Other public reads | IP | 120 per minute |
+| Other authenticated | user | 240 per minute |
+
+Also required with the shared store: temporary lockout after repeated sign-in failures, and a bot challenge on register and forgot-password. All of the sign-in, register, password and refresh routes of the future `/api/v1/auth/*` need the shared store from the day they exist. The existing website's own public endpoints are reviewed separately.
+
+## 10. Logging and audit
+
+- **Logs:** one JSON line per call: request id, method, route, status, duration, user id and role when known, error code. Keys that look like secrets (`authorization`, `token`, `password`, `refresh`, `card`, `iban`, `apiKey`, ...) are redacted at any depth. No request or response body is logged.
+- **Audit:** state changes, driver assignment and rejection, refunds and payment changes, document approvals, role changes, sign-in, sign-out and refresh reuse, and every read of another person's location are written to the existing `activity_logs` table through `lib/api/v1/audit.ts`. A failure to write an audit entry is logged loudly but never fails the request.
+
+## 11. Versioning and app support
+
+- The path carries the version. `GET /api/v1/app-config` tells each app at launch whether its version is supported. Minimum and latest versions per app and platform are environment variables (`MOBILE_CUSTOMER_IOS_MIN_VERSION`, ...), changeable without a deploy.
+- The apps send `X-App-Name`, `X-App-Version`, `X-App-Platform` with every request.
+- A removed or incompatible behaviour is announced one release ahead through `update_available`, then enforced with `update_required`.
+
+## 12. Environments
+
+The same API runs in staging (`APP_ENV=staging`, synthetic data) and production. A production app build refuses to start against any address but the production site, and every other build refuses to start against it. `GET /api/v1/health` names the environment so a build and a person can confirm which one they are talking to.
+
+## 13. Prices
+
+No `/api/v1` response lets a client compute a price. The server returns the final amount in cents plus a display breakdown. The apps display it. The mobile packages contain no pricing code, and a test fails if any appears.
