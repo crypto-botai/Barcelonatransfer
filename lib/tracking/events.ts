@@ -39,11 +39,21 @@ declare global {
   }
 }
 
-/** Google Ads conversion labels, e.g. "AW-18391666445/AbCdEf...". */
+/**
+ * Google Ads conversion labels ("AW-<account>/<label>").
+ *
+ * These are public: they sit in every page's network traffic, so they are
+ * written here rather than in Vercel. An env var still wins, which lets a
+ * label be swapped or switched off ("" disables it) without a code change.
+ * Found in Google Ads > Goals > Conversions > the action > Data sources >
+ * Manage > See event snippet. Checkout has no Ads conversion action.
+ */
+const fromEnv = (value: string | undefined, fallback: string | undefined) => (value === undefined ? fallback : value || undefined);
+
 const ADS_LABELS: Record<TrackedEvent, string | undefined> = {
-  booking_started:  process.env.NEXT_PUBLIC_ADS_LABEL_BOOKING_STARTED,
-  checkout_started: process.env.NEXT_PUBLIC_ADS_LABEL_CHECKOUT_STARTED,
-  order_created:    process.env.NEXT_PUBLIC_ADS_LABEL_ORDER_CREATED,
+  booking_started:  fromEnv(process.env.NEXT_PUBLIC_ADS_LABEL_BOOKING_STARTED,  "AW-18391666445/XgujCNj0_IodEI2e6sFE"),
+  checkout_started: fromEnv(process.env.NEXT_PUBLIC_ADS_LABEL_CHECKOUT_STARTED, undefined),
+  order_created:    fromEnv(process.env.NEXT_PUBLIC_ADS_LABEL_ORDER_CREATED,    "AW-18391666445/iwx8CNL0_IodEI2e6sFE"),
 };
 
 export interface EventPayload {
