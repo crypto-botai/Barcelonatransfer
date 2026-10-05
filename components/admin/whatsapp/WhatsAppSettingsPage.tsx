@@ -311,7 +311,7 @@ export default function WhatsAppSettingsPage() {
           <div>
             <h3 className="mb-1.5 text-[11px] font-medium text-dark-500">Office</h3>
             <ul className="space-y-1.5">
-              <li><span className="text-white">Booking confirmed</span>: the same message the customer gets, with the driver once assigned.</li>
+              <li><span className="text-white">Booking confirmed</span>: the same message the customer gets. The chauffeur is told separately once one is assigned.</li>
               <li><span className="text-white">New request</span>: when someone starts a booking and has not paid.</li>
             </ul>
           </div>
