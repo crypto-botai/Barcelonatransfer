@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const m = vi.hoisted(() => ({ admin: true, send: vi.fn() }));
 vi.mock("@/lib/whatsapp-admin", () => ({ requireAdmin: async () => (m.admin ? { name: "Sam" } : null) }));
 vi.mock("@/lib/whatsapp", () => ({ sendWhatsAppTemplate: m.send }));
+vi.mock("@/lib/whatsapp-inbox-store", () => ({ recordOutbound: vi.fn().mockResolvedValue(undefined) }));
 
 import { POST } from "@/app/api/admin/whatsapp/test/route";
 import { TEMPLATE_DEFS } from "@/lib/whatsapp-template-defs";

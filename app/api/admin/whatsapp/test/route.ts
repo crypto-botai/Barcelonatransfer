@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/whatsapp-admin";
 import { sendWhatsAppTemplate } from "@/lib/whatsapp";
-import { TEMPLATE_DEFS } from "@/lib/whatsapp-template-defs";
+import { TEMPLATE_DEFS, renderTemplate } from "@/lib/whatsapp-template-defs";
+import { recordOutbound } from "@/lib/whatsapp-inbox-store";
 import { confirmationFields, driverAssignedFields, type MessageBooking } from "@/lib/whatsapp-messages";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +23,8 @@ const SAMPLE: MessageBooking = {
 };
 
 export async function POST(req: Request) {
-  if (!(await requireAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const admin = await requireAdmin();
+  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { phone } = (await req.json().catch(() => ({}))) as { phone?: string };
   if (!phone || !/^\+\d{8,15}$/.test(phone.replace(/[\s-]/g, ""))) {
     return NextResponse.json({ error: "Give the number with its country code, e.g. +34635383712." }, { status: 422 });
@@ -40,7 +42,12 @@ export async function POST(req: Request) {
     const def = TEMPLATE_DEFS.find((t) => t.event === event);
     if (!def) { results[event] = { outcome: "failed", reason: "template not defined" }; continue; }
     const name = process.env[`WA_TEMPLATE_${def.name.toUpperCase()}`] || def.name;
-    results[def.name] = await sendWhatsAppTemplate(to, name, def.fields.map((f) => values[event][f] ?? "-"), def.language);
+    const sent = await sendWhatsAppTemplate(to, name, def.fields.map((f) => values[event][f] ?? "-"), def.language);
+    results[def.name] = sent;
+    // Logged in the chat, so Meta's delivery report (delivered, read, or the reason it failed) shows up beside it.
+    if (sent.outcome === "sent" && sent.id) {
+      await recordOutbound({ phone: to, wamid: sent.id, text: `[TEST] ${renderTemplate(def, values[event])}`, by: admin.name }).catch(() => {});
+    }
   }
   return NextResponse.json({ to, results });
 }
