@@ -154,14 +154,14 @@ function routeFiles(dir: string): string[] {
 }
 
 const rel = (p: string) => p.slice(ROOT.length + 1).split("\\").join("/");
-const ADMIN_CHECK = /getServerSession|requireAdmin|requireRole|authorize|isAdmin/;
+// Must name the ADMIN role (or use a helper that does): a bare "is signed in" check is not enough, anyone can register.
+const ADMIN_CHECK = /requireAdmin|requireRole|["']ADMIN["']/;
 
 /**
- * How many admin API handlers may lack a session and role check. Every new admin route
- * must have one. The allowance below is for one older route that is tracked in the
- * private security plan and scheduled for removal; this number may only fall, never rise.
+ * How many admin API handlers may lack a session and role check: none. Every admin route
+ * must verify the caller itself, whatever the middleware does.
  */
-const MAX_UNCHECKED_ADMIN_ROUTES = 1;
+const MAX_UNCHECKED_ADMIN_ROUTES = 0;
 
 describe("API handlers verify the caller, whatever the middleware does", () => {
   const admin = routeFiles(join(ROOT, "app", "api", "admin")).map(rel);
@@ -170,7 +170,7 @@ describe("API handlers verify the caller, whatever the middleware does", () => {
     expect(admin.length).toBeGreaterThan(40);
   });
 
-  it("every admin API route checks the session and role, apart from the one tracked allowance", () => {
+  it("every admin API route checks the session and role", () => {
     const unchecked = admin.filter((f) => !ADMIN_CHECK.test(readFileSync(join(ROOT, f), "utf8")));
     expect(unchecked.length).toBeLessThanOrEqual(MAX_UNCHECKED_ADMIN_ROUTES);
   });
