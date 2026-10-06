@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireAdmin } from "@/lib/whatsapp-admin";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/** ADMIN role only. "Signed in" is not enough: anyone can register a customer account. */
 async function isAdmin(): Promise<boolean> {
-  const session = await getServerSession(authOptions);
-  return !!session?.user;
+  return !!(await requireAdmin());
 }
 
 export async function PATCH(

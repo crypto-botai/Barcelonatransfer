@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireAdmin } from "@/lib/whatsapp-admin";
 import { prisma } from "@/lib/prisma";
 import { decryptKey, testRawKey, markDbKeyFailed, markDbKeySuccess } from "@/lib/ai/dbKeyManager";
 
@@ -11,8 +10,8 @@ export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // ADMIN only. A signed-in customer is not enough: anyone can register one.
+  if (!(await requireAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
   const key = await prisma.adminApiKey.findUnique({ where: { id } });
