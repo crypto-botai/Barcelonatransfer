@@ -28,6 +28,7 @@ import { smsTextFor } from "./sms-copy";
 import { whatsappTemplateFor } from "./whatsapp-templates";
 import { whatsappVerdict } from "./whatsapp-guard";
 import { sendPushToUser, sendPushToBooking } from "./push";
+import { MOBILE_EVENTS, sendMobilePushToUser } from "./mobile-push";
 import { prisma as db } from "@/lib/prisma";
 import {
   copyFor,
@@ -204,6 +205,23 @@ ${body}`);
       } catch (e) {
         mark("push", "failed", errText(e));
       }
+    }
+  }
+
+  // ---- mobile apps --------------------------------------------------------
+  // The same moments that reach a phone as web push also reach the EliteBCN apps.
+  // A call that names its own channels (WhatsApp only, say) does not, so one event
+  // is not announced twice. Best-effort and silent: it never changes the result.
+  if (input.userId && MOBILE_EVENTS.has(input.event) && (!input.channels || input.channels.includes("push"))) {
+    try {
+      const driverJob = input.event === "DRIVER_NEW_JOB" && vars.pickup && vars.dropoff;
+      await sendMobilePushToUser(input.userId, {
+        title,
+        body: driverJob ? `${vars.pickup} to ${vars.dropoff}` : body,
+        data: { event: input.event, ...(input.bookingId ? { bookingId: input.bookingId } : {}) },
+      });
+    } catch (e) {
+      console.warn("[notify] mobile push failed:", errText(e));
     }
   }
 

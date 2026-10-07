@@ -41,7 +41,10 @@ vi.mock("@/lib/prisma", () => {
         findUnique: async ({ where }: { where: { id: string } }) => db.users.find((u) => u.id === where.id) ?? null,
         findMany: async () => db.admins,
       },
-      activityLog: { create: async ({ data }: { data: Row }) => { db.logs.push(data); return data; } },
+      activityLog: {
+        create: async ({ data }: { data: Row }) => { db.logs.push(data); return data; },
+        findFirst: async ({ where }: { where: Row }) => db.logs.find((l) => l.action === where.action && l.entityId === where.entityId) ?? null,
+      },
       notification: { createMany: async ({ data }: { data: Row[] }) => { db.notes.push(...data); return { count: data.length }; } },
       rideTracking: { findFirst: async () => ({ lat: 41.39, lng: 2.17, speed: 5, heading: 90, createdAt: new Date() }) },
     },
@@ -234,6 +237,21 @@ describe("customer actions go through the website's own handlers, as the caller"
     expect((db.legacyCalls[0].body as Row).dryRun).toBe(true);
     expect((db.legacyCalls[0].body as Row).guestEmail).toBe("ana@example.com");
     expect((await call(checkoutQuote, null, { method: "POST", body: {} })).status).toBe(401);
+  });
+
+  it("the same booking request sent twice makes one booking, and one account cannot replay another account's key", async () => {
+    const key = { "idempotency-key": "key-for-this-booking-1" };
+    const send = async (who: [string, string]) => {
+      const res = await createBooking(new Request("http://localhost/x", { method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": `10.9.0.${++n}`, authorization: `Bearer ${await token(who[0], who[1])}`, ...key }, body: JSON.stringify({ pickupAddress: "x" }) }));
+      return (await res.json()) as { data: { bookingId: string } };
+    };
+    const first = await send(ANA);
+    const second = await send(ANA);
+    expect(second.data.bookingId).toBe(first.data.bookingId);
+    expect(db.legacyCalls.filter((c) => c.name === "booking")).toHaveLength(1);
+    // Another customer with the same key is a different request.
+    await send(BEN);
+    expect(db.legacyCalls.filter((c) => c.name === "booking")).toHaveLength(2);
   });
 
   it("a real booking can never be turned into a dry run, nor a dry run into a booking", async () => {
