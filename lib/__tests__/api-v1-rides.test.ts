@@ -57,6 +57,7 @@ vi.mock("@/app/api/bookings/route", async () => {
       const body = await req.json();
       const s = await getRequestSession();
       db.legacyCalls.push({ name: "booking", body, actorId: (s?.user as { id?: string } | undefined)?.id ?? null });
+      if (body.dryRun) return Response.json({ dryRun: true, fare: 65, extras: 10.5, couponDiscount: 0, returnDiscount: 0, vat: 0, tip: 0, protectionFee: 0, total: 75.5, payNow: 75.5, balance: 0, option: "FULL" });
       return Response.json({ bookingId: "b-new", checkoutUrl: "https://checkout.sumup.com/pay/x", accountCreated: true, email: "x@y.z", tempPassword: "TEMP-SECRET" });
     },
   };
@@ -97,6 +98,7 @@ import { POST as rateRide } from "@/app/api/v1/rides/[id]/rating/route";
 import { GET as trackRide } from "@/app/api/v1/rides/[id]/track/route";
 import { POST as createBooking } from "@/app/api/v1/bookings/route";
 import { POST as quote } from "@/app/api/v1/quotes/route";
+import { POST as checkoutQuote } from "@/app/api/v1/quotes/checkout/route";
 import { GET as driverRides } from "@/app/api/v1/driver/rides/route";
 import { GET as driverRide } from "@/app/api/v1/driver/rides/[id]/route";
 import { POST as respond } from "@/app/api/v1/driver/rides/[id]/respond/route";
@@ -223,6 +225,20 @@ describe("customer actions go through the website's own handlers, as the caller"
     expect(text).not.toContain("TEMP-SECRET");
     expect(text).not.toContain("tempPassword");
     expect(res.json.data).toMatchObject({ bookingId: "b-new", payment: "ONLINE", checkoutUrl: "https://checkout.sumup.com/pay/x" });
+  });
+
+  it("the checkout quote is the website's dry run, as the caller, with nothing added up here", async () => {
+    const res = await call(checkoutQuote, ANA, { method: "POST", body: { pickupAddress: "x", extras: [] } });
+    expect(res.json.data).toEqual({ fare: 65, extras: 10.5, couponDiscount: 0, returnDiscount: 0, vat: 0, tip: 0, protectionFee: 0, total: 75.5, payNow: 75.5, balance: 0, option: "FULL", currency: "EUR" });
+    expect(db.legacyCalls[0]).toMatchObject({ name: "booking", actorId: "c1" });
+    expect((db.legacyCalls[0].body as Row).dryRun).toBe(true);
+    expect((db.legacyCalls[0].body as Row).guestEmail).toBe("ana@example.com");
+    expect((await call(checkoutQuote, null, { method: "POST", body: {} })).status).toBe(401);
+  });
+
+  it("a real booking can never be turned into a dry run, nor a dry run into a booking", async () => {
+    await call(createBooking, ANA, { method: "POST", body: { dryRun: true, pickupAddress: "x" } });
+    expect((db.legacyCalls[0].body as Row).dryRun).toBe(false);
   });
 
   it("the quote is public and is the website's quote", async () => {

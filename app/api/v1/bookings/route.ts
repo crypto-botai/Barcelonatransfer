@@ -40,6 +40,8 @@ export const POST = apiHandler(
 
     const payload = {
       ...input,
+      // A booking is a booking: the priced preview has its own route (quotes/checkout).
+      dryRun: false,
       guestEmail: actor.email,
       guestName: typeof input.guestName === "string" && input.guestName.trim().length >= 2 ? input.guestName : actor.name ?? "Guest",
     };

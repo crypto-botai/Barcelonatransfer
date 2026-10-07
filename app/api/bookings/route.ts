@@ -60,6 +60,9 @@ const extraSchema = z.object({
 });
 
 const schema = z.object({
+  // The mobile apps ask what a booking would cost, to the cent, before it is made.
+  // True answers with the price breakdown and writes nothing.
+  dryRun:          z.boolean().default(false),
   couponCode:      z.string().optional(),
   // Pay everything now, or 30% now and the rest to the chauffeur.
   payOption:       z.enum(["FULL", "DEPOSIT"]).default("FULL"),
@@ -437,6 +440,25 @@ export async function POST(req: NextRequest) {
       ? Math.round(plan.balance * (outboundFare / totalWithExtras) * 100) / 100
       : plan.balance;
     const returnBalance = Math.round((plan.balance - outboundBalance) * 100) / 100;
+
+    // A priced preview. Every figure above is the one the booking would be created with;
+    // nothing has been written yet, and nothing is.
+    if (body.dryRun) {
+      return NextResponse.json({
+        dryRun: true,
+        fare: serverTotal,
+        extras: extrasCost,
+        couponDiscount,
+        returnDiscount,
+        vat: vatAmount,
+        tip: tipAmount,
+        protectionFee: plan.protectionFee,
+        total: plan.total,
+        payNow: plan.payNow,
+        balance: plan.balance,
+        option: plan.option,
+      });
+    }
 
     // Encode booking metadata into specialRequests.
     //
