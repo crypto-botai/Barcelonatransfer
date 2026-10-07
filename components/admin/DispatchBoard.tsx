@@ -311,8 +311,6 @@ function JobRow({
               <p className="text-emerald-400 text-xs font-medium">{job.driverName}</p>
               {job.driverAnswer === "ACCEPTED" ? (
                 <p className="text-emerald-400/80 text-[10px]">Accepted in the app</p>
-              ) : job.driverAnswer === "WAITING" ? (
-                <p className="text-amber-400/90 text-[10px]">Waiting for their answer</p>
               ) : null}
               {job.partnerName && <p className="text-dark-500 text-[10px]">via {job.partnerName}</p>}
               <Link href={`/dashboard/tracking/${job.id}`} className="text-dark-500 text-[10px] hover:text-white flex items-center gap-1 justify-end mt-0.5">
