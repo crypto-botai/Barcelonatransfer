@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getRequestSession } from "@/lib/request-session";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +18,7 @@ export const dynamic = "force-dynamic";
  * attached. Admin accounts cannot delete themselves here.
  */
 export async function DELETE() {
-  const session = await getServerSession(authOptions);
+  const session = await getRequestSession();
   const u = session?.user as { id?: string; role?: string } | undefined;
   if (!session || !u?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (u.role === "ADMIN") return NextResponse.json({ error: "An admin account cannot be deleted from here" }, { status: 403 });
