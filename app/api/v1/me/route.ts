@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { apiHandler } from "@/lib/api/v1/response";
 import { parseBody } from "@/lib/api/v1/validate";
@@ -62,4 +63,24 @@ export const DELETE = apiHandler(
     return { deleted: true };
   },
   { auth: { roles: ["CUSTOMER", "DRIVER"] }, rateLimit: "credentials" },
+);
+
+const profileBody = z.object({
+  name: z.string().trim().min(2).max(120).optional(),
+  phone: z.string().trim().regex(/^[+]?[0-9 ()-]{6,20}$/, "Enter a phone number with its country code.").nullable().optional(),
+});
+
+/** PATCH /api/v1/me — change your own name and phone. Nothing else about an account can be changed here. */
+export const PATCH = apiHandler(
+  "me.update",
+  async ({ req, auth }) => {
+    const input = await parseBody(req, profileBody);
+    const user = await prisma.user.update({
+      where: { id: auth!.userId },
+      data: { ...(input.name ? { name: input.name } : {}), ...(input.phone !== undefined ? { phone: input.phone } : {}) },
+      select: { id: true, name: true, email: true, phone: true },
+    });
+    return user;
+  },
+  { auth: { roles: ["CUSTOMER", "DRIVER"] } },
 );

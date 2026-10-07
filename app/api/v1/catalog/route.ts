@@ -1,5 +1,6 @@
 import { apiHandler } from "@/lib/api/v1/response";
 import { EXTRAS_CATALOG, FLEET_TO_DB_CLASS, VEHICLE_CATALOG } from "@/types";
+import { getFleetFromPrice } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,8 @@ export const GET = apiHandler(
       features: v.features,
       description: v.description,
       imageUrl: v.image ? `${origin()}${v.image}` : null,
+      // The headline "from" price the website shows on its fleet page: airport to the city.
+      fromPrice: getFleetFromPrice(v.class),
     })),
     extras: EXTRAS_CATALOG.map((e) => ({
       id: e.id,
