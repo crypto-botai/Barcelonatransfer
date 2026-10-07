@@ -164,3 +164,28 @@ All answer in the standard envelope. Bearer token unless marked public.
 - `bookings.driverResponse`, `driverRespondedAt`, `driverResponseBy`: three nullable columns. An answer counts only while `driverResponseBy` is the booking's current driver, so reassigning a ride needs no reset.
 
 Neither is applied to production. `prisma db push` on production needs its own approval.
+
+### More endpoints (later in phases 3 to 11)
+
+| Method and path | Who | What |
+|---|---|---|
+| POST /auth/forgot-password | public | The website's reset email. Same answer for any address |
+| POST /auth/change-password | CUSTOMER, DRIVER | Signs every other phone out and returns a fresh session |
+| DELETE /me | CUSTOMER, DRIVER | Delete the account (password asked again) |
+| GET /catalog | public | Fleet and extras, from the same lists as the website |
+| GET /places?q= | public | The website's address search |
+| POST /quotes/checkout | CUSTOMER | The exact total of this booking: the website's booking handler in dry-run mode |
+
+Push: `notify()` also reaches the apps (Expo push service) for the customer and driver moments that push on the web. Payloads carry only the event and the booking id.
+
+`POST /bookings` honours an `Idempotency-Key` header: the same key from the same account returns the booking already made.
+
+## Release order for the mobile work (important)
+
+The additive schema (two new tables and three nullable columns on bookings) must be applied to the production database BEFORE the code that reads it is deployed. Prisma selects every column of a model unless told otherwise, so a deployment that knows the new `bookings` columns, running against a database that does not have them yet, fails on pages that read bookings. The order is therefore:
+
+1. Back up. Apply the additive change (`prisma db push`, additive only, no data touched) in a quiet hour.
+2. Deploy the code.
+3. Verify (sign in from a test account, read a ride, the admin dispatch board).
+
+None of this is applied. Each step needs its own approval.
