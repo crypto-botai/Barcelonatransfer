@@ -31,6 +31,8 @@ export const RATE_LIMITS = {
   credentials: { limit: 5, windowSeconds: 60 },
   /** Token refresh. */
   refresh: { limit: 30, windowSeconds: 60 },
+  /** Price quotes: each one can call a routing service, so they are limited harder than other reads. */
+  quote: { limit: 30, windowSeconds: 60 },
   /** Driver GPS ingest: one fix every few seconds, with headroom for batches. */
   tracking: { limit: 60, windowSeconds: 60 },
 } as const;

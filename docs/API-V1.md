@@ -125,3 +125,42 @@ The same API runs in staging (`APP_ENV=staging`, synthetic data) and production.
 ## 13. Prices
 
 No `/api/v1` response lets a client compute a price. The server returns the final amount in cents plus a display breakdown. The apps display it. The mobile packages contain no pricing code, and a test fails if any appears.
+
+## Endpoints built (phases 3 to 5)
+
+All answer in the standard envelope. Bearer token unless marked public.
+
+| Method and path | Who | What |
+|---|---|---|
+| POST /auth/login | public | email, password, app (customer or driver). Returns access token (15 min), refresh token (single use), user, mustChangePassword |
+| POST /auth/register | public | Creates a CUSTOMER and signs them in. Drivers apply through the office |
+| POST /auth/refresh | public | Spends a refresh token for a new pair. Re-reads the account: a suspended driver loses the session here |
+| POST /auth/logout | public | Revokes the session family. Same answer for unknown tokens |
+| GET /me | any | Fresh account state, re-applies the sign-in rules |
+| POST /devices, DELETE /devices | any | Register or remove an Expo push token |
+| POST /quotes | public | The website's own quote function, unchanged |
+| POST /bookings | CUSTOMER | The website's own booking handler, as the caller. Returns bookingId, checkoutUrl (hosted SumUp page) or ARRANGED |
+| GET /rides?scope= | CUSTOMER | Own rides (upcoming, past, all) |
+| GET /rides/:id | CUSTOMER | One own ride, with the assigned driver once there is one. Anyone else's: NOT_FOUND |
+| POST /rides/:id/cancel | CUSTOMER | The website's cancellation and refund policy, unchanged |
+| POST /rides/:id/pay | CUSTOMER | A SumUp checkout for an unpaid ride |
+| POST /rides/:id/rating | CUSTOMER | Once, when completed |
+| GET /rides/:id/track | CUSTOMER | Latest driver position, only while the driver is on the way or the trip is under way |
+| GET /driver/rides?scope= | DRIVER | pending, today, upcoming, past; only the caller's own |
+| GET /driver/rides/:id | DRIVER | One own ride. No customer price, no office notes |
+| POST /driver/rides/:id/respond | DRIVER | ACCEPT or REJECT (a rejection returns the ride to the dispatcher and tells the office) |
+| POST /driver/rides/:id/stage | DRIVER | The one-tap stages, through the website's ride handler. Needs an accepted ride |
+| POST /driver/location | DRIVER | One position fix, accepted only for an accepted, live ride |
+| GET and POST /driver/status | DRIVER | Availability |
+| GET /driver/earnings | DRIVER | Own payout today, this week, this month |
+
+### How the website's rules are reused
+
+`lib/request-session.ts` gives the website's handlers one line, `getRequestSession()`, in place of `getServerSession`. On the website it returns the cookie session exactly as before. A /api/v1 route verifies the bearer token, then runs the handler inside `runAsActor`, and the handler sees that person. Only `app/api/v1` and `lib/api/v1` may import `runAsActor`; a test enforces it. Five handlers were changed by that one line: booking creation, cancellation, the driver ride stage, driver status and the driver position ping.
+
+### Database additions (additive, applied to staging only)
+
+- `mobile_refresh_tokens`, `mobile_devices`: new tables.
+- `bookings.driverResponse`, `driverRespondedAt`, `driverResponseBy`: three nullable columns. An answer counts only while `driverResponseBy` is the booking's current driver, so reassigning a ride needs no reset.
+
+Neither is applied to production. `prisma db push` on production needs its own approval.

@@ -316,6 +316,11 @@ model Booking {
   customerLat         Float?
   customerLng         Float?
   customerLocatedAt   DateTime?
+  // The assigned driver's answer from the mobile app. Only counts while
+  // driverResponseBy is the booking's current driver, so reassigning needs no reset.
+  driverResponse      String?
+  driverRespondedAt   DateTime?
+  driverResponseBy    String?
   returnOfId        String?    @unique
   returnOf          Booking?   @relation("RoundTrip", fields: [returnOfId], references: [id])
   returnLeg         Booking?   @relation("RoundTrip")

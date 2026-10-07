@@ -25,6 +25,7 @@ import { paymentPlan, returnDiscountFor, RETURN_DISCOUNT_PERCENT, type PayOption
 import { sanitiseOppref } from "@/lib/tracking/oppref";
 import { toE164 } from "@/lib/phone";
 import { SMS_ALERTS_ID } from "@/lib/booking-meta";
+import { getRequestSession } from "@/lib/request-session";
 
 /**
  * Membership tier of whoever is booking.
@@ -148,7 +149,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getRequestSession();
     const user    = session?.user as { id?: string } | undefined;
     // A non-JSON body throws here, before zod runs, so it would otherwise
     // escape the ZodError branch below and be reported as a server error.
