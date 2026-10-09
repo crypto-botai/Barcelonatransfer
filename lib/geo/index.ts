@@ -405,6 +405,39 @@ export const searchPlaces = unstable_cache(searchUncached, ["place-search-v3-lim
   tags: ["geo"],
 });
 
+/**
+ * The address at a point on the map, for the mobile apps' "pick on the map". Photon first, Nominatim if it is down.
+ * The point is the one the person chose, never the geocoder's own idea of it, so the pin and the booking agree.
+ * Null when neither can name the place. Not cached: every pin is a different point.
+ */
+export async function reversePlace(lat: number, lng: number): Promise<Place | null> {
+  const keep = (p: Place): Place => ({ ...p, lat, lng });
+  try {
+    const res = await fetch(`${PHOTON}/reverse?lat=${lat}&lon=${lng}&lang=en`, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(5000) });
+    if (res.ok) {
+      const data = (await res.json()) as { features?: PhotonFeature[] };
+      const first = (data.features ?? []).map(photonPlace).find((p): p is Place => p !== null);
+      if (first) return keep(first);
+    }
+  } catch {
+    /* fall through to Nominatim */
+  }
+  try {
+    const res = await serialise(() =>
+      fetch(`${NOMINATIM}/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18&addressdetails=0`, { headers: { "User-Agent": UA, "Accept-Language": "en" }, signal: AbortSignal.timeout(6000) }),
+    );
+    if (!res.ok) return null;
+    const r = (await res.json()) as { display_name?: string; place_id?: number };
+    if (!r.display_name) return null;
+    const parts = r.display_name.split(",").map((x) => x.trim()).filter(Boolean);
+    const name = parts[0] ?? r.display_name;
+    const context = parts.slice(1).filter((x) => !/^\d{5}$/.test(x) && x !== "España" && x !== "Spain").join(", ");
+    return { lat, lng, name, context, label: r.display_name, kind: "address", id: r.place_id ? String(r.place_id) : undefined };
+  } catch {
+    return null;
+  }
+}
+
 /** First match for an address, or null. Never guesses a location. */
 export async function geocode(address: string): Promise<Place | null> {
   const results = await searchPlaces(address);
