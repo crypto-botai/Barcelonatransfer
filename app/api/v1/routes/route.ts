@@ -36,7 +36,8 @@ export const GET = apiHandler(
           toKey: r.toKey,
           note: r.note,
           prices: { ECONOMY: r.economy, BUSINESS: r.business, MINIVAN: r.minivan, VCLASS: r.vclass, MINIBUS: r.minibus },
-          updatedAt: r.updatedAt.toISOString(),
+          // The price table is read through Next's data cache, which hands dates back as ISO text, so accept both.
+          updatedAt: new Date(r.updatedAt).toISOString(),
         })),
     };
   },

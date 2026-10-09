@@ -49,6 +49,13 @@ describe("GET /api/v1/routes", () => {
     expect(json.data.classes.map((c: any) => c.code)).toEqual(["ECONOMY", "BUSINESS", "MINIVAN", "VCLASS", "MINIBUS"]);
   });
 
+  it("still answers when the cached table hands its dates back as text (the data cache does this)", async () => {
+    table.rows = [row({ updatedAt: "2026-10-01T10:00:00.000Z" })];
+    const { status, json } = await get();
+    expect(status).toBe(200);
+    expect(json.data.routes[0].updatedAt).toBe("2026-10-01T10:00:00.000Z");
+  });
+
   it("a price changed in the table (the admin) is what the next request returns", async () => {
     expect((await get()).json.data.routes[1].prices.VCLASS).toBe(75);
     table.rows[0] = row({ vclass: 80 });
