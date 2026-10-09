@@ -36,6 +36,7 @@ export default async function DispatchPage() {
         pickupAddress: true, dropoffAddress: true, pickupDatetime: true,
         passengers: true, luggage: true, vehicleClass: true, flightNumber: true,
         totalAmount: true, guestName: true, guestPhone: true, driverId: true,
+        driverResponse: true, driverResponseBy: true,
         driver: { select: { user: { select: { name: true } } } },
         partnerId: true, partnerPayout: true, partnerDispatchedAt: true,
         partner: { select: { name: true } },
@@ -82,6 +83,8 @@ export default async function DispatchPage() {
     guestPhone:     b.guestPhone,
     driverId:       b.driverId,
     driverName:     b.driver?.user.name ?? null,
+    // The driver's answer in the app counts only for the driver it was given by.
+    driverAnswer:   b.driverId && b.driverResponseBy === b.driverId && b.driverResponse === "ACCEPTED" ? "ACCEPTED" : null,
     partnerId:      b.partnerId,
     partnerName:    b.partner?.name ?? null,
     partnerPayout:  b.partnerPayout,

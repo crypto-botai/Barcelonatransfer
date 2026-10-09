@@ -95,6 +95,8 @@ model User {
   driver          Driver?
   customerProfile CustomerProfile?
   fleetPartner    FleetPartner?
+  mobileTokens    MobileRefreshToken[]
+  mobileDevices   MobileDevice[]
 
   @@map("users")
 }
@@ -314,6 +316,11 @@ model Booking {
   customerLat         Float?
   customerLng         Float?
   customerLocatedAt   DateTime?
+  // The assigned driver's answer from the mobile app. Only counts while
+  // driverResponseBy is the booking's current driver, so reassigning needs no reset.
+  driverResponse      String?
+  driverRespondedAt   DateTime?
+  driverResponseBy    String?
   returnOfId        String?    @unique
   returnOf          Booking?   @relation("RoundTrip", fields: [returnOfId], references: [id])
   returnLeg         Booking?   @relation("RoundTrip")
@@ -1178,4 +1185,49 @@ model TripMessage {
 
   @@index([bookingId, createdAt])
   @@map("trip_messages")
+}
+
+/// One refresh token of a signed-in phone, for the mobile apps (/api/v1).
+///
+/// Only the SHA-256 of the token is stored, never the token. Each sign-in starts
+/// a family; refreshing spends a token and issues the next in the same family.
+/// A spent token shown again revokes the whole family (it was stolen or copied).
+/// Additive table: nothing existing reads or writes it.
+model MobileRefreshToken {
+  id              String    @id
+  userId          String
+  role            String
+  sessionId       String
+  familyId        String
+  tokenHash       String    @unique
+  expiresAt       DateTime
+  familyStartedAt DateTime
+  usedAt          DateTime?
+  revokedAt       DateTime?
+  deviceName      String?
+  createdAt       DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+  @@map("mobile_refresh_tokens")
+}
+
+/// A phone that may be sent push notifications (Expo push token), for one app.
+/// Removed at sign-out and when the push service says the token is dead.
+model MobileDevice {
+  id         String   @id @default(cuid())
+  userId     String
+  token      String   @unique
+  platform   String
+  app        String
+  appVersion String?
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("mobile_devices")
 }

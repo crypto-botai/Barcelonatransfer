@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getRequestSession } from "@/lib/request-session";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,7 @@ const pingSchema = z.object({
  * driver's own record, and coordinates are range-checked.
  */
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
+  const session = await getRequestSession();
   const user = session?.user as { id?: string; role?: string } | undefined;
   if (!session || !user?.id || user.role !== "DRIVER") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -16,6 +16,8 @@ export interface DispatchJob {
   flightNumber: string | null; totalAmount: number;
   guestName: string | null; guestPhone: string | null;
   driverId: string | null; driverName: string | null;
+  /** Set when the assigned driver said yes in the app; absent otherwise (many drivers still use the web portal). */
+  driverAnswer?: "ACCEPTED" | null;
   /** Set when the office has sent the job to a fleet partner company. */
   partnerId?: string | null; partnerName?: string | null; partnerPayout?: number | null;
   /** The company has put one of its drivers on it. */
@@ -307,6 +309,9 @@ function JobRow({
           ) : job.driverId ? (
             <div className="text-right">
               <p className="text-emerald-400 text-xs font-medium">{job.driverName}</p>
+              {job.driverAnswer === "ACCEPTED" ? (
+                <p className="text-emerald-400/80 text-[10px]">Accepted in the app</p>
+              ) : null}
               {job.partnerName && <p className="text-dark-500 text-[10px]">via {job.partnerName}</p>}
               <Link href={`/dashboard/tracking/${job.id}`} className="text-dark-500 text-[10px] hover:text-white flex items-center gap-1 justify-end mt-0.5">
                 <MapPin size={9} /> Track

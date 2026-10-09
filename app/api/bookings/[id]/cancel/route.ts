@@ -1,18 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { refundSumUpTransaction } from "@/lib/sumup";
 import { sendCancellationEmail, sendAdminCancellationAlert } from "@/lib/resend";
 import { formatPickupDateTime } from "@/lib/datetime";
 import { refundPolicy, paidOnline, freeCancelHours, PROTECTION_CUTOFF_HOURS } from "@/lib/deposits";
 import { tellBookingCancelled } from "@/lib/whatsapp-events";
+import { getRequestSession } from "@/lib/request-session";
 
 export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
+  const session = await getRequestSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const user = session.user as { id: string; email?: string };

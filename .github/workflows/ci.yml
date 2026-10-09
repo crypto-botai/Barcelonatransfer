@@ -1,0 +1,81 @@
+name: CI
+
+# Runs on every pull request into staging or main, and on pushes to staging.
+# Nothing here deploys anything and nothing here can reach a real database or a real
+# third-party account: it uses throwaway values for every variable the build reads.
+
+on:
+  pull_request:
+    branches: [staging, main]
+  push:
+    branches: [staging]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Throwaway values. The build only needs the variables to exist.
+  APP_ENV: development
+  POSTGRES_PRISMA_URL: postgresql://ci:ci@localhost:5432/ci
+  POSTGRES_URL_NON_POOLING: postgresql://ci:ci@localhost:5432/ci
+  NEXTAUTH_SECRET: ci-only-nextauth-secret-not-used-anywhere-real
+  NEXTAUTH_URL: http://localhost:3000
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  checks:
+    name: Typecheck, lint, tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Secrets are not tracked
+        run: npm run check:secrets
+
+      - name: Prisma schema is valid
+        run: npx prisma validate
+
+      - name: Prisma client generates
+        run: npx prisma generate
+
+      - name: TypeScript
+        run: npm run typecheck
+
+      - name: Lint (safety and mobile-API code)
+        run: npm run lint:safety
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  dependency-audit:
+    name: Dependency audit (advisory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Reports, does not block. It is not a required check. Upgrading production
+    # dependencies is its own approved task, because it changes the live site.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      # Lists advisories in production dependencies. Read it, do not ignore it.
+      - run: npm audit --omit=dev --audit-level=critical

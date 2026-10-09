@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BookingStatus, DriverStatus, type RideStage } from "@prisma/client";
 import { notify } from "@/lib/notifications/service";
 import { sendReviewRequestEmail } from "@/lib/resend";
 import { tellCustomerJourneyCompleted } from "@/lib/whatsapp-events";
 import { canTransition, STAGE_META, RIDE_STAGES } from "@/lib/ride-stages";
+import { getRequestSession } from "@/lib/request-session";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +24,7 @@ const schema = z.object({
 const LEGACY: Record<string, RideStage> = { START: "ON_THE_WAY", COMPLETE: "COMPLETED" };
 
 export async function PATCH(req: NextRequest) {
-  const session = await getServerSession(authOptions);
+  const session = await getRequestSession();
   const user = session?.user as { id?: string; role?: string } | undefined;
   if (!session || !user?.id || user.role !== "DRIVER") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
