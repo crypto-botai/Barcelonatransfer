@@ -38,6 +38,19 @@ export async function requireDriver(userId: string) {
   return driver;
 }
 
+/**
+ * The car a driver is assigned to, for the home screen: its name, plate and seats. The oldest active vehicle, or null when
+ * the office has not given them one. Nothing else about the vehicle (documents, photos, notes) is sent.
+ */
+export async function driverVehicle(driverId: string) {
+  const v = await prisma.vehicle.findFirst({
+    where: { driverId, isActive: true },
+    orderBy: { createdAt: "asc" },
+    select: { make: true, model: true, licensePlate: true, maxPassengers: true, class: true },
+  });
+  return v ? { name: `${v.make} ${v.model}`.trim(), plate: v.licensePlate, passengers: v.maxPassengers, vehicleClass: String(v.class) } : null;
+}
+
 export async function loadDriverRide(id: string, driverId: string) {
   return prisma.booking.findFirst({ where: { id, driverId, isDeleted: false }, select: DRIVER_RIDE_SELECT });
 }

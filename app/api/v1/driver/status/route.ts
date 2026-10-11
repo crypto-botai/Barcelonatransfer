@@ -6,19 +6,19 @@ import { ApiError } from "@/lib/api/v1/errors";
 import { actorFor } from "@/lib/api/v1/actor";
 import { callLegacy } from "@/lib/api/v1/legacy";
 import { clientAddress } from "@/lib/api/v1/rate-limit";
-import { requireDriver } from "@/lib/api/v1/driver-rides";
+import { driverVehicle, requireDriver } from "@/lib/api/v1/driver-rides";
 import { PATCH as websiteStatus } from "@/app/api/driver/status/route";
 
 export const dynamic = "force-dynamic";
 
 const body = z.object({ status: z.enum(["ONLINE", "OFFLINE"]) });
 
-/** GET /api/v1/driver/status — the driver's availability and headline numbers for the home screen. */
+/** GET /api/v1/driver/status — the driver's availability, headline numbers and assigned car for the home screen. */
 export const GET = apiHandler(
   "driver.status.get",
   async ({ auth }) => {
     const driver = await requireDriver(auth!.userId);
-    return { status: driver.status, rating: driver.rating > 0 ? driver.rating : null, totalRides: driver.totalRides };
+    return { status: driver.status, rating: driver.rating > 0 ? driver.rating : null, totalRides: driver.totalRides, vehicle: await driverVehicle(driver.id) };
   },
   { auth: { roles: ["DRIVER"] } },
 );
