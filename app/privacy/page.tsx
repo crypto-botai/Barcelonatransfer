@@ -41,7 +41,7 @@ export default function PrivacyPage() {
             <h1 className="font-display text-5xl sm:text-6xl text-white mb-4">
               Privacy <span className="text-gold-gradient">Policy</span>
             </h1>
-            <p className="text-dark-400 max-w-xl mx-auto">Last updated: May 2025</p>
+            <p className="text-dark-400 max-w-xl mx-auto">Last updated: October 2026</p>
           </div>
         </section>
 
@@ -115,12 +115,27 @@ export default function PrivacyPage() {
                 </div>
 
                 <div>
-                  <h2 className="text-white font-display text-xl mb-3">9. Changes to This Policy</h2>
+                  <h2 className="text-white font-display text-xl mb-3">9. Our Mobile Apps</h2>
+                  <p>The EliteBCN app (for customers) and the EliteBCN Driver app (for our chauffeurs) use the same account and booking data described above. In addition:</p>
+                  <ul className="list-disc pl-5 space-y-1 mt-2">
+                    <li><strong className="text-white">Location (customer app):</strong> only when you tap &quot;My location&quot; or the map picker, to fill in your pickup address. We use it once and do not track you in the background. You can turn it off in your phone&apos;s settings and type the address instead.</li>
+                    <li><strong className="text-white">Location (driver app):</strong> while a chauffeur has an accepted ride, the app shares their position, including when the screen is off, so the passenger can see the arrival and dispatch can follow the journey. Sharing stops when the ride ends. These positions are kept with the booking record (see Data Retention).</li>
+                    <li><strong className="text-white">Notifications:</strong> if you allow them, we store a push token for your phone to send booking and ride updates. It is removed when you sign out or delete your account.</li>
+                    <li><strong className="text-white">Sign-in:</strong> a secure sign-in token is stored in your phone&apos;s protected storage so you stay signed in.</li>
+                    <li><strong className="text-white">Maps:</strong> the address picker shows OpenStreetMap map tiles, so your phone connects to OpenStreetMap to download them. The address for the pin is looked up by our server, not by your phone.</li>
+                    <li><strong className="text-white">Payments:</strong> you pay on SumUp&apos;s secure page. The apps never see or store your card details.</li>
+                    <li><strong className="text-white">No advertising:</strong> the apps contain no ads and no advertising or tracking SDKs, and we do not sell your data.</li>
+                  </ul>
+                  <p className="mt-3"><strong className="text-white">Deleting your account:</strong> in the customer app, open Settings and choose Delete account, or email {COMPANY.email}. We remove your account and personal profile; booking records we must keep by law are retained as described in Data Retention.</p>
+                </div>
+
+                <div>
+                  <h2 className="text-white font-display text-xl mb-3">10. Changes to This Policy</h2>
                   <p>We may update this policy from time to time. The &quot;last updated&quot; date at the top will reflect any changes. Continued use of our service constitutes acceptance of the revised policy.</p>
                 </div>
 
                 <div>
-                  <h2 className="text-white font-display text-xl mb-3">10. Contact</h2>
+                  <h2 className="text-white font-display text-xl mb-3">11. Contact</h2>
                   <p>For any privacy-related queries: <a href={`mailto:${COMPANY.email}`} className="text-gold-400 hover:text-gold-300 underline underline-offset-2 decoration-gold-400/40">{COMPANY.email}</a></p>
                 </div>
 
