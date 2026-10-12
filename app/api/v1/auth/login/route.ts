@@ -7,6 +7,8 @@ import { issueSession, mobileAuthConfig } from "@/lib/api/v1/tokens";
 import { PrismaRefreshTokenStore } from "@/lib/api/v1/refresh-store";
 import { checkCredentials } from "@/lib/api/v1/sign-in";
 import { prismaSignInDeps } from "@/lib/api/v1/sign-in-db";
+import { offerToClaimBookings } from "@/lib/claim-bookings";
+import { sendClaimBookingsEmail } from "@/lib/resend";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +32,8 @@ export const POST = apiHandler(
     const ip = clientAddress(req);
 
     const { user, role } = await checkCredentials(prismaSignInDeps, { email: input.email, password: input.password, app: input.app, ip });
+    // A customer who has bookings made without an account is offered them again by email (at most twice a day).
+    if (input.app === "customer") await offerToClaimBookings({ id: user.id, email: user.email, name: user.name, role: user.role }, sendClaimBookingsEmail);
     const tokens = await issueSession(new PrismaRefreshTokenStore(), { userId: user.id, role }, mobileAuthConfig());
 
     await audit({ action: "API_V1_SIGN_IN", entity: "user", entityId: user.id, actorId: user.id, actorRole: role, requestId, ip, details: { app: input.app } });

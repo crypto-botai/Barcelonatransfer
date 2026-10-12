@@ -9,6 +9,8 @@ import { clientAddress } from "@/lib/api/v1/rate-limit";
 import { issueSession, mobileAuthConfig } from "@/lib/api/v1/tokens";
 import { PrismaRefreshTokenStore } from "@/lib/api/v1/refresh-store";
 import { normaliseEmail } from "@/lib/api/v1/sign-in";
+import { offerToClaimBookings } from "@/lib/claim-bookings";
+import { sendClaimBookingsEmail } from "@/lib/resend";
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +59,8 @@ export const POST = apiHandler(
         select: { id: true, name: true, email: true, phone: true },
       });
       userId = user.id;
+      // Bookings made as a guest with this email: offered by an email link (a password sign-up does not prove the address is theirs).
+      await offerToClaimBookings({ id: userId, email: user.email, name: user.name, role: "CUSTOMER" }, sendClaimBookingsEmail);
       const tokens = await issueSession(new PrismaRefreshTokenStore(), { userId, role: "CUSTOMER" }, mobileAuthConfig());
       await audit({ action: "API_V1_REGISTER", entity: "user", entityId: userId, actorId: userId, actorRole: "CUSTOMER", requestId, ip: clientAddress(req) });
       return { ...tokens, user: { ...user, role: "CUSTOMER" as const }, mustChangePassword: false };
