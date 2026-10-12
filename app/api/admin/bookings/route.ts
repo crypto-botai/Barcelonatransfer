@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
 
   const status    = req.nextUrl.searchParams.get("status");
   const search    = req.nextUrl.searchParams.get("q");
-  const limit     = Math.min(parseInt(req.nextUrl.searchParams.get("limit") ?? "100"), 500);
+  const limit     = Math.min(parseInt(req.nextUrl.searchParams.get("limit") ?? "500"), 500);
   const deleted   = req.nextUrl.searchParams.get("deleted") === "true";
   // Website bookings that were never paid are not bookings yet; they live in
   // Abandoned, where the office chases them. Ones the office made by hand
