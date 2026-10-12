@@ -4,6 +4,7 @@ import { parseBody } from "@/lib/api/v1/validate";
 import { actorFor } from "@/lib/api/v1/actor";
 import { callLegacy } from "@/lib/api/v1/legacy";
 import { audit } from "@/lib/api/v1/audit";
+import { paymentPageUrl } from "@/lib/api/v1/checkout-url";
 import { clientAddress } from "@/lib/api/v1/rate-limit";
 import { findPriorBooking, readKey, rememberBooking } from "@/lib/api/v1/idempotency";
 import { POST as websiteCheckout } from "@/app/api/payments/create-checkout/route";
@@ -44,14 +45,13 @@ export const POST = apiHandler(
     const idem = readKey(req);
     const prior = idem ? await findPriorBooking(actor.id, idem) : null;
     if (prior) {
-      let url = "";
+      let url: string | null = null;
       try {
-        url = String((await callLegacy(websiteCheckout, { method: "POST", path: "/api/payments/create-checkout", body: { bookingId: prior }, ip: clientAddress(req) })).json.checkoutUrl ?? "");
+        url = paymentPageUrl((await callLegacy(websiteCheckout, { method: "POST", path: "/api/payments/create-checkout", body: { bookingId: prior }, ip: clientAddress(req) })).json.checkoutUrl, base());
       } catch {
         // Already paid, or not payable online: there is no checkout to open.
       }
-      const online = /^https:///.test(url);
-      return { bookingId: prior, checkoutUrl: online ? url : null, payment: online ? ("ONLINE" as const) : ("ARRANGED" as const), successUrl: `${base()}/booking/success?booking_id=${encodeURIComponent(prior)}` };
+      return { bookingId: prior, checkoutUrl: url, payment: url ? ("ONLINE" as const) : ("ARRANGED" as const), successUrl: `${base()}/booking/success?booking_id=${encodeURIComponent(prior)}` };
     }
 
     const payload = {
@@ -65,15 +65,15 @@ export const POST = apiHandler(
 
     const bookingId = String(json.bookingId ?? "");
     if (idem && bookingId) await rememberBooking(actor.id, idem, bookingId);
-    const url = typeof json.checkoutUrl === "string" ? json.checkoutUrl : "";
-    const online = /^https:\/\//.test(url);
+    // The website answers with a path (/booking/pay/...); the app needs the full address of the payment page.
+    const url = paymentPageUrl(json.checkoutUrl, base());
     await audit({ action: "API_V1_BOOKING_CREATED", entity: "booking", entityId: bookingId, actorId: actor.id, actorRole: actor.role, requestId, ip: clientAddress(req) });
 
     return {
       bookingId,
-      checkoutUrl: online ? url : null,
+      checkoutUrl: url,
       // "ARRANGED": payment is settled by hand with the office, the website's own fallback.
-      payment: online ? ("ONLINE" as const) : ("ARRANGED" as const),
+      payment: url ? ("ONLINE" as const) : ("ARRANGED" as const),
       successUrl: `${base()}/booking/success?booking_id=${encodeURIComponent(bookingId)}`,
     };
   },
