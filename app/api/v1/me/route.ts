@@ -27,11 +27,13 @@ export const GET = apiHandler("me", async ({ auth }) => {
   const app = user ? appForRole(user.role) : null;
   if (!user || !app) throw new ApiError("TOKEN_INVALID", "Sign in again.");
   assertMayUseApp(user, app);
+  const photo = await prisma.user.findUnique({ where: { id: user.id }, select: { image: true } });
   return {
     id: user.id,
     name: user.name,
     email: user.email,
     phone: user.phone,
+    image: photo?.image ?? null,
     role: user.role,
     mustChangePassword: user.mustChangePassword,
     ...(user.driverStatus ? { driverStatus: user.driverStatus } : {}),
