@@ -457,7 +457,7 @@ function SuccessInner() {
 export default function SuccessPage() {
   return (
     <>
-      <Navbar />
+      <div data-site-chrome><Navbar /></div>
       <Suspense>
         <SuccessInner />
       </Suspense>

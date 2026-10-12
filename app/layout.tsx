@@ -13,6 +13,7 @@ import MotionProvider from "@/components/layout/MotionProvider";
 // answer themselves.
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import MobileBookBar from "@/components/layout/MobileBookBar";
+import EmbedMode from "@/components/layout/EmbedMode";
 import DeferredAnalytics from "@/components/layout/DeferredAnalytics";
 import OpprefCapture from "@/components/tracking/OpprefCapture";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -426,8 +427,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div id="main" tabIndex={-1} className="outline-none">
             {children}
           </div>
-          <WhatsAppButton />
-          <MobileBookBar />
+          <EmbedMode />
+          <div data-site-chrome>
+            <WhatsAppButton />
+            <MobileBookBar />
+          </div>
           {/* Only the heavy gtag.js script is deferred; the shim and both
               config commands are already in the head above. */}
           <DeferredAnalytics gaId="G-PTFFJ19396" />

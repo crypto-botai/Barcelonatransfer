@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function FailedPage() {
   return (
     <>
-      <Navbar />
+      <div data-site-chrome><Navbar /></div>
       <main className="min-h-screen bg-[#050505] flex items-center justify-center p-4">
         <div className="glass-card rounded-2xl p-8 max-w-md w-full text-center">
           <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6">
