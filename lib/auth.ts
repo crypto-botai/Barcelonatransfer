@@ -52,6 +52,8 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, account, trigger }) {
+      // The profile photo can be kept with the account as a picture; it must never travel inside the sign-in cookie.
+      delete token.picture;
       if (user) {
         token.id                = user.id;
         token.role              = (user as { role?: string }).role;
