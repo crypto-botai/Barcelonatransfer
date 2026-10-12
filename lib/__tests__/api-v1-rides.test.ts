@@ -26,6 +26,7 @@ vi.mock("@/lib/prisma", () => {
     prisma: {
       booking: {
         findFirst: async ({ where }: { where: Row }) => db.bookings.find((b) => match(b, where)) ?? null,
+        findUnique: async ({ where }: { where: Row }) => { const b = db.bookings.find((x) => x.id === where.id); return b ? { driverId: b.driverId ?? null, driver: { user: { image: null } } } : null; },
         findMany: async ({ where }: { where: Row }) => { db.lastFindManyWhere = where; return db.bookings.filter((b) => b.userId === where.userId || b.driverId === where.driverId); },
         updateMany: async ({ where, data }: { where: Row; data: Row }) => {
           const hit = db.bookings.filter((b) => b.id === where.id && b.driverId === where.driverId && b.status === where.status);
@@ -43,6 +44,7 @@ vi.mock("@/lib/prisma", () => {
       },
       activityLog: {
         create: async ({ data }: { data: Row }) => { db.logs.push(data); return data; },
+        findMany: async () => [],
         findFirst: async ({ where }: { where: Row }) => db.logs.find((l) => l.action === where.action && l.entityId === where.entityId) ?? null,
       },
       notification: { createMany: async ({ data }: { data: Row[] }) => { db.notes.push(...data); return { count: data.length }; } },

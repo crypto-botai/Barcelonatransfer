@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { parseBookingMeta } from "@/lib/booking-meta";
 import { notFound } from "./errors";
+import { publicVehicle, VEHICLE_SELECT } from "./vehicle";
+import { eventTime, isAirportPickup, waitingState } from "./waiting";
 
 /**
  * What a customer app may know about one of their own rides.
@@ -24,7 +26,7 @@ export const CUSTOMER_RIDE_SELECT = {
     select: {
       rating: true,
       user: { select: { name: true, phone: true } },
-      vehicles: { take: 1, orderBy: { createdAt: "desc" as const }, select: { make: true, model: true, color: true, licensePlate: true } },
+      vehicles: { where: { isActive: true }, take: 1, orderBy: { updatedAt: "desc" as const }, select: VEHICLE_SELECT },
     },
   },
   rideEvents: { orderBy: { createdAt: "asc" as const }, select: { stage: true, createdAt: true } },
@@ -50,7 +52,15 @@ export async function requireOwnedRide(id: string, userId: string): Promise<Row>
 const DRIVER_VISIBLE = new Set(["DRIVER_ASSIGNED", "IN_PROGRESS", "COMPLETED"]);
 const CANCELLABLE = new Set(["PENDING", "CONFIRMED", "DRIVER_ASSIGNED"]);
 
-export function customerRideDto(b: Row, now = new Date()) {
+export interface RideExtras {
+  /** When the passenger said they had landed (airport pickups). */
+  landedAt?: Date | null;
+  /** The chauffeur's profile picture and car photos: sent for one ride only, never in lists (they can be large). */
+  driverImage?: string | null;
+  carPhotos?: { front: string | null; back: string | null };
+}
+
+export function customerRideDto(b: Row, now = new Date(), extra: RideExtras = {}) {
   const meta = parseBookingMeta(b.specialRequests);
   const hired = meta.bookingType === "HOURLY" || meta.bookingType === "DAY_HIRE";
   const hours = hired && b.durationMin > 0 ? Math.round((b.durationMin / 60) * 100) / 100 : null;
@@ -86,11 +96,21 @@ export function customerRideDto(b: Row, now = new Date()) {
             name: b.driver.user.name,
             phone: b.driver.user.phone,
             rating: b.driver.rating > 0 ? b.driver.rating : null,
-            vehicle: b.driver.vehicles[0]
-              ? { make: b.driver.vehicles[0].make, model: b.driver.vehicles[0].model, color: b.driver.vehicles[0].color, plate: b.driver.vehicles[0].licensePlate }
-              : null,
+            image: extra.driverImage ?? null,
+            vehicle: (() => {
+              const v = publicVehicle(b.driver.vehicles[0]);
+              return v ? { ...v, photos: extra.carPhotos ?? null } : null;
+            })(),
           }
         : null,
+    waiting: waitingState({
+      airport: isAirportPickup(b),
+      arrivedAt: eventTime(b.rideEvents, "ARRIVED"),
+      onBoardAt: eventTime(b.rideEvents, "ON_BOARD"),
+      landedAt: extra.landedAt ?? null,
+      pickupAt: b.pickupDatetime,
+      now,
+    }),
     timeline: b.rideEvents.map((e) => ({ stage: e.stage, at: e.createdAt.toISOString() })),
     canCancel: CANCELLABLE.has(b.status) && b.pickupDatetime.getTime() > now.getTime(),
     canPay: b.paymentStatus !== "PAID" && CANCELLABLE.has(b.status),

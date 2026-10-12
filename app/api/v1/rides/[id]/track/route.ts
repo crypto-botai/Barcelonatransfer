@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { apiHandler } from "@/lib/api/v1/response";
 import { requireOwnedRide } from "@/lib/api/v1/rides";
 import { distanceKm } from "@/lib/api/v1/distance";
+import { estimateRoad, hasCoords, roadDistance } from "@/lib/geo";
 
 export const dynamic = "force-dynamic";
 
@@ -36,8 +37,19 @@ export const GET = apiHandler(
       ? { lat: ride.dropoffLat, lng: ride.dropoffLng }
       : { lat: ride.pickupLat, lng: ride.pickupLng };
 
+    // Road distance and time by the same routing the quote uses; a straight-line estimate when the router is unavailable.
+    const here = { lat: latest.lat, lng: latest.lng };
+    let road: { distanceKm: number; durationMin: number; precise: boolean } | null = null;
+    if (hasCoords(target.lat, target.lng)) {
+      const to = { lat: target.lat as number, lng: target.lng as number };
+      road = await roadDistance(here, to).catch(() => estimateRoad(here, to));
+    }
+
     return {
       live: true,
+      etaMinutes: road ? Math.max(1, Math.round(road.durationMin)) : null,
+      roadKm: road ? road.distanceKm : null,
+      etaPrecise: road ? road.precise : false,
       status: ride.status,
       stage: ride.rideStage,
       point: { lat: latest.lat, lng: latest.lng, speed: latest.speed, heading: latest.heading, at: latest.createdAt.toISOString() },
