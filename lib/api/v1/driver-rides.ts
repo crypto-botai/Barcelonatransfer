@@ -4,6 +4,8 @@ import { collectDue } from "@/lib/checkout-money";
 import { BOOKING_TIMEZONE, pickupToUtc } from "@/lib/datetime";
 import { nextStage, STAGE_META } from "@/lib/ride-stages";
 import { forbidden, notFound, unauthenticated } from "./errors";
+import { carName, clean, currentVehicle } from "./vehicle";
+import { eventTime, isAirportPickup, waitingState } from "./waiting";
 
 /**
  * What a driver app may know about a ride, and who the driver is.
@@ -26,6 +28,7 @@ export const DRIVER_RIDE_SELECT = {
   totalAmount: true, paymentStatus: true, paymentMethod: true, balanceAmount: true, balancePaidAt: true,
   durationMin: true,
   customerLat: true, customerLng: true, customerLocatedAt: true,
+  rideEvents: { orderBy: { createdAt: "asc" as const }, select: { stage: true, createdAt: true } },
 } as const;
 
 type Row = NonNullable<Awaited<ReturnType<typeof loadDriverRide>>>;
@@ -39,16 +42,24 @@ export async function requireDriver(userId: string) {
 }
 
 /**
- * The car a driver is assigned to, for the home screen: its name, plate and seats. The oldest active vehicle, or null when
- * the office has not given them one. Nothing else about the vehicle (documents, photos, notes) is sent.
+ * The car a driver is assigned to, for the home screen and the vehicle screen. The same rule the passenger's app uses (see
+ * vehicle.ts), or null when the driver has no car on file yet. Documents and notes are never sent.
  */
 export async function driverVehicle(driverId: string) {
-  const v = await prisma.vehicle.findFirst({
-    where: { driverId, isActive: true },
-    orderBy: { createdAt: "asc" },
-    select: { make: true, model: true, licensePlate: true, maxPassengers: true, class: true },
-  });
-  return v ? { name: `${v.make} ${v.model}`.trim(), plate: v.licensePlate, passengers: v.maxPassengers, vehicleClass: String(v.class) } : null;
+  const v = await currentVehicle(driverId);
+  if (!v) return null;
+  return {
+    id: v.id,
+    name: carName(v),
+    make: clean(v.make),
+    model: clean(v.model),
+    year: v.year > 1980 ? v.year : null,
+    color: clean(v.color) || null,
+    plate: clean(v.licensePlate),
+    passengers: v.maxPassengers,
+    luggage: v.maxLuggage,
+    vehicleClass: String(v.class),
+  };
 }
 
 export async function loadDriverRide(id: string, driverId: string) {
@@ -70,7 +81,13 @@ export function effectiveResponse(b: { driverId: string | null; driverResponse: 
   return b.driverResponse === "ACCEPTED" ? "ACCEPTED" : b.driverResponse === "REJECTED" ? "REJECTED" : "PENDING";
 }
 
-export function driverRideDto(b: Row, now = new Date()) {
+export interface DriverRideExtras {
+  landedAt?: Date | null;
+  /** Whether the driver has already rated the passenger (single ride only). */
+  ratedCustomer?: boolean;
+}
+
+export function driverRideDto(b: Row, now = new Date(), extra: DriverRideExtras = {}) {
   const meta = parseBookingMeta(b.specialRequests);
   const hired = meta.bookingType === "HOURLY" || meta.bookingType === "DAY_HIRE";
   const hours = hired && b.durationMin > 0 ? Math.round((b.durationMin / 60) * 100) / 100 : null;
@@ -105,6 +122,15 @@ export function driverRideDto(b: Row, now = new Date()) {
     customer: { name: b.guestName, phone: b.guestPhone },
     customerLocation: customerFresh && b.customerLat !== null && b.customerLng !== null ? { lat: b.customerLat, lng: b.customerLng, at: b.customerLocatedAt!.toISOString() } : null,
     payout: b.driverAmount,
+    waiting: waitingState({
+      airport: isAirportPickup(b),
+      arrivedAt: eventTime(b.rideEvents, "ARRIVED"),
+      onBoardAt: eventTime(b.rideEvents, "ON_BOARD"),
+      landedAt: extra.landedAt ?? null,
+      pickupAt: b.pickupDatetime,
+      now,
+    }),
+    canRateCustomer: b.status === "COMPLETED" && extra.ratedCustomer === false,
     collect: collectDue({ totalAmount: b.totalAmount, paymentStatus: b.paymentStatus, paymentMethod: b.paymentMethod, balanceAmount: b.balanceAmount, balancePaidAt: b.balancePaidAt }),
   };
 }
