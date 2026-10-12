@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse, after } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -39,34 +40,38 @@ export async function GET(req: NextRequest) {
   // (cash, transfer, WhatsApp) are confirmed and stay here.
   const includeUnpaid = req.nextUrl.searchParams.get("unpaid") === "true";
 
-  const bookings = await prisma.booking.findMany({
-    where: {
-      isDeleted: deleted,
-      ...(includeUnpaid || deleted ? {} : {
-        NOT: { status: "PENDING", paymentStatus: "PENDING", paymentMethod: null },
-      }),
-      ...(status ? { status: status as never } : {}),
-      ...(search ? {
-        OR: [
-          { confirmationCode: { contains: search, mode: "insensitive" } },
-          { guestName:        { contains: search, mode: "insensitive" } },
-          { guestEmail:       { contains: search, mode: "insensitive" } },
-          { guestPhone:       { contains: search, mode: "insensitive" } },
-          { pickupAddress:    { contains: search, mode: "insensitive" } },
-        ],
-      } : {}),
-    },
-    // Soonest pickup first. The list is re-ordered in the browser too
-    // (lib/booking-order), but a caller that does not sort should still get
-    // something useful rather than the order the office typed them in.
-    orderBy: { pickupDatetime: "asc" },
-    take: limit,
-    include: {
-      driver:  { include: { user: { select: { name: true, phone: true } }, vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } } } },
-      user:    { select: { name: true, email: true } },
-      partner: { select: { name: true } },
-    },
-  });
+  const where: Prisma.BookingWhereInput = {
+    isDeleted: deleted,
+    ...(includeUnpaid || deleted ? {} : {
+      NOT: { status: "PENDING", paymentStatus: "PENDING", paymentMethod: null },
+    }),
+    ...(status ? { status: status as never } : {}),
+    ...(search ? {
+      OR: [
+        { confirmationCode: { contains: search, mode: "insensitive" } },
+        { guestName:        { contains: search, mode: "insensitive" } },
+        { guestEmail:       { contains: search, mode: "insensitive" } },
+        { guestPhone:       { contains: search, mode: "insensitive" } },
+        { pickupAddress:    { contains: search, mode: "insensitive" } },
+      ],
+    } : {}),
+  };
+  const include = {
+    driver:  { include: { user: { select: { name: true, phone: true } }, vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } } } },
+    user:    { select: { name: true, email: true } },
+    partner: { select: { name: true } },
+  };
+
+  // The list is capped, so what the cap keeps matters. It used to take the first `limit` rows by soonest pickup across ALL
+  // bookings, which once there were more than that meant the oldest ones: every newer booking, however recent, was missing from
+  // the page (it was only found by searching). So both ends are taken: everything still to come, soonest first, and the most
+  // recent history, newest first. The page then orders them for dispatch (lib/booking-order).
+  const now = new Date();
+  const [upcoming, past] = await Promise.all([
+    prisma.booking.findMany({ where: { ...where, pickupDatetime: { gte: now } }, orderBy: { pickupDatetime: "asc" }, take: limit, include }),
+    prisma.booking.findMany({ where: { ...where, pickupDatetime: { lt: now } }, orderBy: { pickupDatetime: "desc" }, take: limit, include }),
+  ]);
+  const bookings = [...upcoming, ...past];
 
   return NextResponse.json(bookings);
 }
