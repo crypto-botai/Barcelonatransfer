@@ -1578,6 +1578,35 @@ export function passwordResetCard(o: {
   `);
 }
 
+/** "We found bookings made with your email: add them to your account." */
+export function claimBookingsCard(o: { name?: string | null; email: string; count: number; claimUrl: string }): string {
+  const n = o.count === 1 ? "1 booking" : `${o.count} bookings`;
+  return card(`
+    <tr><td style="padding:40px 40px 0 40px;">
+      ${eyebrow("Account")}
+      ${headline("Add your bookings to your account")}
+      ${paragraph(`Hello${o.name ? ` ${esc(o.name)}` : ""}, you have just made an Elite BCN account with <span style="color:${GOLD};">${esc(o.email)}</span>. We found ${n} made with this email before the account existed.`)}
+      ${paragraph("Confirm below and they will appear in your account, with your driver's details and live tracking when your ride is on its way.", 12)}
+    </td></tr>
+
+    <tr><td style="padding:28px 40px 0 40px;">
+      ${button(o.claimUrl, "Add my bookings")}
+    </td></tr>
+
+    <tr><td style="padding:26px 40px 0 40px;">
+      <div style="font-family:${SANS};font-size:12px;line-height:20px;color:${LABEL};padding-bottom:10px;">Or paste this into your browser:</div>
+      ${monoBox(o.claimUrl)}
+    </td></tr>
+
+    <tr><td style="padding:26px 40px 0 40px;">
+      <div style="border-top:1px solid ${RULE};padding-top:18px;font-family:${SANS};font-size:12px;line-height:20px;color:${LABEL};">
+        If you did not create this account, ignore this message: nothing has been shared and your bookings stay private. The link expires in seven days.
+      </div>
+    </td></tr>
+    ${sectionSpacer(42)}
+  `);
+}
+
 /** Someone has joined the newsletter. */
 export function newsletterWelcomeCard(o: {
   name?: string | null;

@@ -12,6 +12,7 @@ import { PrismaRefreshTokenStore } from "@/lib/api/v1/refresh-store";
 import { assertMayUseApp } from "@/lib/api/v1/sign-in";
 import { loadSignInUser } from "@/lib/api/v1/sign-in-db";
 import { verifyGoogleIdToken } from "@/lib/api/v1/google-token";
+import { linkGuestBookings } from "@/lib/claim-bookings";
 
 export const dynamic = "force-dynamic";
 
@@ -61,8 +62,10 @@ export const POST = apiHandler(
     if (!user) throw new ApiError("INTERNAL", "Sign-in could not be completed.");
 
     const role = assertMayUseApp(user, input.app);
+    // Google has verified this email, so bookings made as a guest with it belong to this person: link them now.
+    const claimed = role === "CUSTOMER" ? await linkGuestBookings(user.id, user.email).catch(() => 0) : 0;
     const tokens = await issueSession(new PrismaRefreshTokenStore(), { userId: user.id, role }, mobileAuthConfig());
-    await audit({ action: created ? "API_V1_GOOGLE_REGISTER" : "API_V1_GOOGLE_SIGN_IN", entity: "user", entityId: user.id, actorId: user.id, actorRole: role, requestId, ip, details: { app: input.app } });
+    await audit({ action: created ? "API_V1_GOOGLE_REGISTER" : "API_V1_GOOGLE_SIGN_IN", entity: "user", entityId: user.id, actorId: user.id, actorRole: role, requestId, ip, details: { app: input.app, claimedBookings: claimed } });
 
     return {
       ...tokens,

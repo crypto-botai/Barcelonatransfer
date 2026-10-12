@@ -4,6 +4,10 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { linkGuestBookings, offerToClaimBookings } from "@/lib/claim-bookings";
+
+// Loaded when needed: the email module is large and nothing at sign-in time should pay for it unless a booking is waiting to be claimed.
+const mailClaim = async (o: { to: string; name: string | null; count: number; claimUrl: string }) => (await import("@/lib/resend")).sendClaimBookingsEmail(o);
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -39,6 +43,9 @@ export const authOptions: NextAuthOptions = {
         const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!isValid) return null;
 
+        // A customer with bookings made without an account is offered them by email (at most twice a day).
+        if (user.role === "CUSTOMER") await offerToClaimBookings({ id: user.id, email: user.email, name: user.name, role: user.role }, mailClaim);
+
         return {
           id:                user.id,
           email:             user.email,
@@ -70,6 +77,8 @@ export const authOptions: NextAuthOptions = {
           token.role               = dbUser.role;
           token.mustChangePassword = dbUser.mustChangePassword;
         }
+        // Google has verified the email: bookings made as a guest with it are this person's.
+        if (user?.email && dbUser?.role === "CUSTOMER") await linkGuestBookings(token.id as string, user.email).catch(() => 0);
       }
       // The role can change under a live session: the office converts a
       // customer account into a fleet company, or a customer deletes their

@@ -52,7 +52,7 @@ import {
   driverEmailChangedCard,
   pickupChangedCard, adminPickupChangedCard, bookingRescheduledCard,
   partnerJobCard, adminPartnerDispatchCard, credentialsCard, partnerConvertedCard,
-  abandonedRecoveryCard, personalNoteCard,
+  abandonedRecoveryCard, personalNoteCard, claimBookingsCard,
   journeysConfirmationCard, type JourneyLine,
 } from "@/lib/email/premium";
 
@@ -543,6 +543,13 @@ export async function sendWelcomeEmail({
   );
   const id = await sendEmail({ from: FROM, to, subject: `Welcome to Elite BCN — Your Account is Ready`, html });
   await logEmail({ to, subject: `Welcome to Elite BCN`, type: "WELCOME", resendId: id });
+}
+
+// ─── Bookings made as a guest, offered to the account that now exists ──────────
+export async function sendClaimBookingsEmail({ to, name, count, claimUrl }: { to: string; name: string | null; count: number; claimUrl: string }) {
+  const html = emailDocument(claimBookingsCard({ name, email: to, count, claimUrl }), "Confirm to add your earlier bookings to your Elite BCN account.");
+  const id = await sendEmail({ from: FROM, to, subject: "Add your Elite BCN bookings to your account", html });
+  await logEmail({ to, subject: "Add your Elite BCN bookings to your account", type: "CLAIM_BOOKINGS", resendId: id });
 }
 
 // ─── Abandoned Booking Recovery ──────────────────────────────
