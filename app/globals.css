@@ -517,3 +517,7 @@
    is nearly invisible on the dark panels, which made an empty phone box look
    broken. Only for the compact phone field. */
 .input-luxury.phone-input::placeholder { color: #9a968a; }
+
+/* Payment pages shown inside the mobile apps (?app=1, see EmbedMode): no website menu, booking bar or chat button. */
+html[data-embed="app"] [data-site-chrome] { display: none !important; }
+html[data-embed="app"] main { padding-top: 1.25rem !important; }

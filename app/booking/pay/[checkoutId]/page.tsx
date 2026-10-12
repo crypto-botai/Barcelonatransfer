@@ -356,7 +356,7 @@ function PayInner() {
 export default function PayPage() {
   return (
     <>
-      <Navbar />
+      <div data-site-chrome><Navbar /></div>
       <Suspense>
         <PayInner />
       </Suspense>
