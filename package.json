@@ -52,6 +52,7 @@
     "jose": "^5.9.6",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.462.0",
+    "maplibre-gl": "^5.24.0",
     "next": "16.2.6",
     "next-auth": "^4.24.10",
     "next-intl": "^4.13.0",

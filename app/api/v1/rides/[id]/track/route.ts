@@ -2,7 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { apiHandler } from "@/lib/api/v1/response";
 import { requireOwnedRide } from "@/lib/api/v1/rides";
 import { distanceKm } from "@/lib/api/v1/distance";
-import { estimateRoad, hasCoords, roadDistance } from "@/lib/geo";
+import { hasCoords } from "@/lib/geo";
+import { arrivalAt, freshness, liveRoute } from "@/lib/geo/live-route";
 
 export const dynamic = "force-dynamic";
 
@@ -37,25 +38,43 @@ export const GET = apiHandler(
       ? { lat: ride.dropoffLat, lng: ride.dropoffLng }
       : { lat: ride.pickupLat, lng: ride.pickupLng };
 
-    // Road distance and time by the same routing the quote uses; a straight-line estimate when the router is unavailable.
+    // Routes from the routing service (see lib/geo/live-route.ts): the driver to the next stop, and the journey itself. Road-network
+    // times, not live traffic, and labelled so. The cache keeps a fix every few seconds from becoming a routing call every few seconds.
     const here = { lat: latest.lat, lng: latest.lng };
-    let road: { distanceKm: number; durationMin: number; precise: boolean } | null = null;
-    if (hasCoords(target.lat, target.lng)) {
-      const to = { lat: target.lat as number, lng: target.lng as number };
-      road = await roadDistance(here, to).catch(() => estimateRoad(here, to));
-    }
+    const toward = ride.rideStage === "ON_BOARD" ? "DROPOFF" : "PICKUP";
+    const nextStop = toward === "PICKUP" ? { lat: ride.pickupLat, lng: ride.pickupLng } : target;
+    const leg = hasCoords(nextStop.lat, nextStop.lng) ? await liveRoute(`${id}:leg`, here, { lat: nextStop.lat as number, lng: nextStop.lng as number }) : null;
+    const tripOk = hasCoords(ride.pickupLat, ride.pickupLng) && hasCoords(ride.dropoffLat, ride.dropoffLng) && ride.dropoffAddress.trim() !== "";
+    const trip = tripOk ? await liveRoute(`${id}:trip`, { lat: ride.pickupLat, lng: ride.pickupLng }, { lat: ride.dropoffLat as number, lng: ride.dropoffLng as number }) : null;
+    const now = Date.now();
+    const ageSeconds = Math.max(0, Math.round((now - latest.createdAt.getTime()) / 1000));
 
     return {
       live: true,
-      etaMinutes: road ? Math.max(1, Math.round(road.durationMin)) : null,
-      roadKm: road ? road.distanceKm : null,
-      etaPrecise: road ? road.precise : false,
+      etaMinutes: leg ? leg.durationMin : null,
+      roadKm: leg ? leg.distanceKm : null,
+      etaPrecise: leg ? leg.basis === "road-network" : false,
+      // basis tells the screen how to word the time: "road-network" is normal road speeds with no live traffic.
+      basis: leg ? leg.basis : null,
+      trafficAware: false,
+      freshness: freshness(ageSeconds),
+      eta: {
+        pickupAt: toward === "PICKUP" && leg ? arrivalAt(leg.durationMin, now) : null,
+        dropoffAt: leg && toward === "DROPOFF" ? arrivalAt(leg.durationMin, now) : trip && leg ? arrivalAt(leg.durationMin + trip.durationMin, now) : null,
+      },
+      route: {
+        // The line from the car to the next stop, and the planned journey (pickup to destination).
+        toNextStop: leg ? leg.coordinates : null,
+        trip: trip ? trip.coordinates : null,
+        tripKm: trip ? trip.distanceKm : null,
+        tripMinutes: trip ? trip.durationMin : null,
+      },
       status: ride.status,
       stage: ride.rideStage,
       point: { lat: latest.lat, lng: latest.lng, speed: latest.speed, heading: latest.heading, at: latest.createdAt.toISOString() },
-      ageSeconds: Math.max(0, Math.round((Date.now() - latest.createdAt.getTime()) / 1000)),
-      straightLineKm: distanceKm({ lat: latest.lat, lng: latest.lng }, target),
-      toward: ride.rideStage === "ON_BOARD" ? "DROPOFF" : "PICKUP",
+      ageSeconds,
+      straightLineKm: distanceKm(here, { lat: target.lat, lng: target.lng }),
+      toward,
     };
   },
   { auth: { roles: ["CUSTOMER"] }, rateLimit: "tracking" },

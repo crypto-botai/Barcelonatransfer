@@ -19,6 +19,7 @@ interface NavItem {
 const NAV: NavItem[] = [
   { icon: LayoutDashboard, label: "Overview",    href: "/admin" },
   { icon: Radar,           label: "Dispatch",    href: "/admin/dispatch" },
+  { icon: Radar,           label: "Live fleet",  href: "/admin/live" },
   { icon: CalendarCheck,   label: "Bookings",    href: "/admin/bookings" },
   { icon: MessageCircle,   label: "WhatsApp",    href: "/admin/whatsapp" },
   { icon: PieChart,        label: "Analytics",   href: "/admin/analytics" },
