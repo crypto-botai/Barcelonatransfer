@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { prisma } from "@/lib/prisma";
 import { apiHandler } from "@/lib/api/v1/response";
 import { parseBody } from "@/lib/api/v1/validate";
 import { ApiError } from "@/lib/api/v1/errors";
@@ -38,6 +39,10 @@ export const POST = apiHandler(
     const actor = await actorFor(auth!);
     const { json } = await callLegacy(websiteRide, { method: "PATCH", path: "/api/driver/ride", body: { bookingId: id, ...input }, actor, ip: clientAddress(req) });
     await audit({ action: "API_V1_RIDE_STAGE", entity: "booking", entityId: id, actorId: actor.id, actorRole: "DRIVER", requestId, ip: clientAddress(req), details: { stage: input.stage } });
+    // The ride is over: the passenger's shared position is deleted now, not at the next daily clean-up.
+    if (input.stage === "COMPLETED") {
+      await prisma.booking.update({ where: { id }, data: { customerLat: null, customerLng: null, customerLocatedAt: null } }).catch(() => undefined);
+    }
     return { stage: input.stage, ...(typeof json.status === "string" ? { status: json.status } : {}) };
   },
   { auth: { roles: ["DRIVER"] } },

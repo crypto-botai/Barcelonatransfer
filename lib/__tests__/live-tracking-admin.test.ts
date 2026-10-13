@@ -15,6 +15,8 @@ const state = vi.hoisted(() => ({
   deleteWhere: null as Row | null,
   clearWhere: null as Row | null,
   clearData: null as Row | null,
+  driverWhere: null as Row | null,
+  driverData: null as Row | null,
 }));
 
 vi.mock("next-auth", () => ({ getServerSession: async () => state.session }));
@@ -44,6 +46,13 @@ vi.mock("@/lib/prisma", () => ({
         return { count: 5 };
       },
     },
+    driver: {
+      updateMany: async ({ where, data }: { where: Row; data: Row }) => {
+        state.driverWhere = where;
+        state.driverData = data;
+        return { count: 3 };
+      },
+    },
     activityLog: { create: async ({ data }: { data: Row }) => { state.logs.push(data); return data; } },
   },
 }));
@@ -66,7 +75,7 @@ beforeEach(() => {
   state.bookings = [base()];
   state.fixes = { r1: { lat: 41.3, lng: 2.1, speed: 8, heading: 90, createdAt: new Date(Date.now() - 4000) } };
   state.logs = [];
-  state.deleteWhere = state.clearWhere = state.clearData = null;
+  state.deleteWhere = state.clearWhere = state.clearData = state.driverWhere = state.driverData = null;
   process.env.CRON_SECRET = "cron-test-secret";
 });
 
@@ -156,12 +165,17 @@ describe("/api/cron/purge-tracking", () => {
     const before = Date.now();
     const res = await call("cron-test-secret");
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ deletedTrackingRows: 5, clearedCustomerLocations: 2 });
+    expect(await res.json()).toEqual({ deletedTrackingRows: 5, clearedCustomerLocations: 2, clearedDriverPositions: 3 });
     const cutoff = (state.deleteWhere!.createdAt.lt as Date).getTime();
     expect(before - cutoff).toBeGreaterThanOrEqual(30 * 86_400_000 - 5000);
     expect(before - cutoff).toBeLessThan(31 * 86_400_000);
     expect(state.clearWhere!.OR[0].status.in).toEqual(["COMPLETED", "CANCELLED", "REFUNDED"]);
     expect(state.clearWhere!.OR[1].customerLocatedAt.lt).toBeInstanceOf(Date);
     expect(state.clearData).toEqual({ customerLat: null, customerLng: null, customerLocatedAt: null });
+    // a driver's last-known position is cleared when it is more than a day old (or was never timestamped)
+    expect(state.driverWhere!.currentLat).toEqual({ not: null });
+    expect(state.driverWhere!.OR[0]).toEqual({ lastLocationAt: null });
+    expect(before - (state.driverWhere!.OR[1].lastLocationAt.lt as Date).getTime()).toBeGreaterThanOrEqual(24 * 3600_000 - 5000);
+    expect(state.driverData).toEqual({ currentLat: null, currentLng: null });
   });
 });

@@ -95,7 +95,8 @@ export function driverRideDto(b: Row, now = new Date(), extra: DriverRideExtras 
   const response = effectiveResponse(b);
   const open = b.status === "DRIVER_ASSIGNED" || b.status === "IN_PROGRESS";
   const next = open && response !== "REJECTED" ? nextStage(b.rideStage) : null;
-  const customerFresh = b.customerLocatedAt ? now.getTime() - b.customerLocatedAt.getTime() < 3 * 60_000 : false;
+  // The passenger's position is shown only while the ride is open (assigned or under way) and the last fix is under three minutes old.
+  const customerFresh = open && b.customerLocatedAt ? now.getTime() - b.customerLocatedAt.getTime() < 3 * 60_000 : false;
 
   return {
     id: b.id,

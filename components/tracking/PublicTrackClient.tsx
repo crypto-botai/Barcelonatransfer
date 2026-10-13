@@ -31,6 +31,8 @@ export interface TrackBooking {
   driverName: string | null;
   driverPhone: string | null;
   driverEmail?: string | null;
+  /** Signed, expiring token the page uses to ask for positions (the confirmation code only opens the page). */
+  trackToken?: string;
   vehicle: string | null;
   plate: string | null;
 }
@@ -56,7 +58,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
   const poll = useCallback(async () => {
     try {
       const res = await fetch(
-        `/api/tracking?bookingId=${encodeURIComponent(booking.id)}&code=${encodeURIComponent(booking.code)}`,
+        `/api/tracking?bookingId=${encodeURIComponent(booking.id)}${booking.trackToken ? `&t=${encodeURIComponent(booking.trackToken)}` : `&code=${encodeURIComponent(booking.code)}`}`,
         { cache: "no-store" },
       );
       if (!res.ok) return;
@@ -70,7 +72,7 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
     } finally {
       setLoaded(true);
     }
-  }, [booking.id, booking.code]);
+  }, [booking.id, booking.trackToken]);
 
   useEffect(() => {
     void poll();

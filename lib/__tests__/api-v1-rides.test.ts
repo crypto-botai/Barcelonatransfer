@@ -651,3 +651,34 @@ describe("live tracking: the driver publishing and reading routes", () => {
     expect((await call(driverRoute, OMAR, { id: "r1", path: "/x?lat=999&lng=2.1" })).status).toBeGreaterThanOrEqual(400);
   });
 });
+
+describe("live tracking: the passenger's position after the ride", () => {
+  it("is not shown to the driver once the ride is completed or cancelled, even if the last fix is seconds old", async () => {
+    accepted2();
+    Object.assign(db.bookings[0], { customerLat: 41.39, customerLng: 2.17, customerLocatedAt: new Date() });
+    expect((await call(driverRide, OMAR, { id: "r1" })).json.data.customerLocation).not.toBeNull();
+    for (const status of ["COMPLETED", "CANCELLED"]) {
+      db.bookings[0].status = status;
+      expect((await call(driverRide, OMAR, { id: "r1" })).json.data.customerLocation).toBeNull();
+    }
+  });
+
+  it("is deleted when the driver completes the ride", async () => {
+    accepted2();
+    Object.assign(db.bookings[0], { customerLat: 41.39, customerLng: 2.17, customerLocatedAt: new Date() });
+    db.bookings[0].driverResponse = "ACCEPTED";
+    expect((await call(stage, OMAR, { method: "POST", body: { stage: "COMPLETED" }, id: "r1" })).status).toBe(200);
+    expect(db.bookings[0]).toMatchObject({ customerLat: null, customerLng: null, customerLocatedAt: null });
+  });
+
+  it("the driver route endpoint gives nothing for a completed or cancelled ride", async () => {
+    accepted2();
+    for (const status of ["COMPLETED", "CANCELLED"]) {
+      db.bookings[0].status = status;
+      const d = (await call(driverRoute, OMAR, { id: "r1", path: "/x?lat=41.3&lng=2.1" })).json.data;
+      expect(d).toMatchObject({ toPickup: null, trip: null, toDropoff: null, dropoffAt: null });
+    }
+    expect(db.routeCalls).toBe(0);
+  });
+});
+

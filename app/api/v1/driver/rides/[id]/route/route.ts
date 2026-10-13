@@ -30,6 +30,11 @@ export const GET = apiHandler(
       if (last) from = { lat: last.lat, lng: last.lng };
     }
 
+    // Routes only for an open ride: a completed or cancelled one has nothing left to drive.
+    if (ride.status !== "DRIVER_ASSIGNED" && ride.status !== "IN_PROGRESS") {
+      return { from: null, trafficAware: false as const, basis: null, toPickup: null, trip: null, dropoffAt: null, toDropoff: null };
+    }
+
     const now = Date.now();
     const pickup = hasCoords(ride.pickupLat, ride.pickupLng) ? { lat: ride.pickupLat, lng: ride.pickupLng } : null;
     const drop = ride.dropoffAddress.trim() && hasCoords(ride.dropoffLat, ride.dropoffLng) ? { lat: ride.dropoffLat as number, lng: ride.dropoffLng as number } : null;

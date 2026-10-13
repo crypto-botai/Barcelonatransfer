@@ -36,8 +36,11 @@ export function formatShortDate(date: Date | string): string {
 export function generateConfirmationCode(): string {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let code = "EBC-";
+  // Web Crypto, not Math.random: the code opens the public tracking page, so it must not be predictable. (Not node:crypto: this file is also used in the browser.)
+  const bytes = new Uint32Array(8);
+  globalThis.crypto.getRandomValues(bytes);
   for (let i = 0; i < 8; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+    code += chars.charAt(bytes[i]! % chars.length);
   }
   return code;
 }

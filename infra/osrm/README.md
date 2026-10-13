@@ -37,7 +37,7 @@ Point a DNS A record for `routing.elitebcn.info` at the server. Restrict the pro
 | --- | --- |
 | `ROUTING_BASE_URL` | `https://routing.elitebcn.info` |
 
-Do **not** set `ROUTING_ALLOW_PUBLIC_DEMO`. In production the website refuses the public OSRM demo and, if `ROUTING_BASE_URL` is missing or invalid, switches routing off: the apps then show a labelled straight-line estimate and no route line. Quotes use the same variable (unset keeps the existing quote behaviour).
+There is no setting that allows the public OSRM demo in production: the website refuses it, and if `ROUTING_BASE_URL` is missing, invalid or plain http, routing is switched off: the apps then show a labelled straight-line estimate and no route line. Quotes use the same variable (unset keeps the existing quote behaviour).
 
 ## 5. Check it
 

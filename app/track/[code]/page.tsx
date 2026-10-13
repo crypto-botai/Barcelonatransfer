@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { signTrackingToken } from "@/lib/tracking-access";
 import PublicTrackClient, { type TrackBooking } from "@/components/tracking/PublicTrackClient";
 
 export const dynamic = "force-dynamic";
@@ -16,10 +17,11 @@ export const metadata: Metadata = {
 /**
  * Public journey tracking.
  *
- * Authorised by possession of the booking's confirmation code, which is a cuid
- * — long and unguessable — and which the customer already has in their
- * confirmation email. That avoids issuing a second secret to manage, and works
- * for guest bookings that have no account to log into.
+ * The page opens with the booking's confirmation code (the link in the customer's
+ * confirmation email, which works for guest bookings that have no account). The code
+ * only opens THIS page: the page then holds a signed, expiring tracking token and
+ * uses that, not the code, to ask for positions (see lib/tracking-access.ts). The
+ * driver's contact details are shown only while the ride is assigned or under way.
  */
 export default async function TrackPage({
   params,
@@ -47,6 +49,7 @@ export default async function TrackPage({
   if (!booking || booking.isDeleted) notFound();
 
   const v = booking.driver?.vehicles[0];
+  const live = booking.status === "DRIVER_ASSIGNED" || booking.status === "IN_PROGRESS" || booking.status === "CONFIRMED";
 
   const data: TrackBooking = {
     id:             booking.id,
@@ -59,11 +62,12 @@ export default async function TrackPage({
     pickupLng:      booking.pickupLng,
     dropoffLat:     booking.dropoffLat,
     dropoffLng:     booking.dropoffLng,
-    driverName:     booking.driver?.user.name ?? null,
-    driverPhone:    booking.driver?.user.phone ?? booking.driver?.whatsappNumber ?? null,
-    driverEmail:    booking.driver?.user.email ?? null,
-    vehicle:        v ? `${v.make} ${v.model}`.trim() : null,
-    plate:          v?.licensePlate ?? null,
+    driverName:     live ? booking.driver?.user.name ?? null : null,
+    driverPhone:    live ? booking.driver?.user.phone ?? booking.driver?.whatsappNumber ?? null : null,
+    driverEmail:    live ? booking.driver?.user.email ?? null : null,
+    vehicle:        live && v ? `${v.make} ${v.model}`.trim() : null,
+    plate:          live ? v?.licensePlate ?? null : null,
+    trackToken:     signTrackingToken(booking.id, booking.pickupDatetime),
   };
 
   return (

@@ -19,11 +19,18 @@ export const fixExtras = {
   at: z.number().int().positive().optional(),
 };
 
-export function assertUsableFix(fix: { lat: number; lng: number; accuracy?: number; at?: number }, now = Date.now()): void {
-  if (fix.lat === 0 && fix.lng === 0) throw new ApiError("VALIDATION_FAILED", "That is not a real position.");
-  if (fix.accuracy !== undefined && fix.accuracy > MAX_ACCURACY_M) throw new ApiError("VALIDATION_FAILED", "The position is too imprecise to use.");
+/** Why a fix cannot be used, or null when it can. Shared by the /api/v1 routes (which throw it) and the website's own route. */
+export function fixProblem(fix: { lat: number; lng: number; accuracy?: number; at?: number }, now = Date.now()): string | null {
+  if (fix.lat === 0 && fix.lng === 0) return "That is not a real position.";
+  if (fix.accuracy !== undefined && fix.accuracy > MAX_ACCURACY_M) return "The position is too imprecise to use.";
   if (fix.at !== undefined) {
-    if (now - fix.at > MAX_FIX_AGE_MS) throw new ApiError("VALIDATION_FAILED", "That position is too old.");
-    if (fix.at - now > MAX_FUTURE_MS) throw new ApiError("VALIDATION_FAILED", "The phone's clock is wrong.");
+    if (now - fix.at > MAX_FIX_AGE_MS) return "That position is too old.";
+    if (fix.at - now > MAX_FUTURE_MS) return "The phone's clock is wrong.";
   }
+  return null;
+}
+
+export function assertUsableFix(fix: { lat: number; lng: number; accuracy?: number; at?: number }, now = Date.now()): void {
+  const problem = fixProblem(fix, now);
+  if (problem) throw new ApiError("VALIDATION_FAILED", problem);
 }

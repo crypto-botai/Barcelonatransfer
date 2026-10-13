@@ -40,17 +40,16 @@ export interface RoutingConfig {
 /**
  * Which routing server to use, decided from the environment.
  *
- * In production the public OSRM demo server is NEVER used unless ROUTING_ALLOW_PUBLIC_DEMO=1 is set on purpose: with no
- * ROUTING_BASE_URL (or one that points at the demo host) routing is switched off and the apps show a labelled straight-line
- * estimate, so a missing setting cannot silently put paying rides on a server with no uptime promise. Outside production the demo
- * is the default so local work needs no setup. Plain http is refused in production.
+ * The public OSRM demo server is only ever used when NODE_ENV is not "production" (local development and tests). In production it
+ * is refused outright and NO setting can turn it back on: with ROUTING_BASE_URL unset, invalid, plain http or pointing at the demo
+ * host, routing is switched off and the apps show a labelled straight-line estimate. (Staging and preview deployments also run with
+ * NODE_ENV=production, so they need their own routing server too.) Plain http is refused in production.
  */
 export function routingConfig(env: Record<string, string | undefined> = process.env): RoutingConfig {
   const production = env.NODE_ENV === "production";
   const raw = (env.ROUTING_BASE_URL ?? "").trim().replace(/\/+$/, "");
-  const allowDemo = env.ROUTING_ALLOW_PUBLIC_DEMO === "1";
   if (!raw) {
-    if (!production || allowDemo) return { baseUrl: PUBLIC_OSRM_DEMO, isDemo: true };
+    if (!production) return { baseUrl: PUBLIC_OSRM_DEMO, isDemo: true };
     return { baseUrl: null, isDemo: false, reason: "ROUTING_BASE_URL is not set in production" };
   }
   let url: URL;
@@ -61,7 +60,7 @@ export function routingConfig(env: Record<string, string | undefined> = process.
   }
   if (production && url.protocol !== "https:") return { baseUrl: null, isDemo: false, reason: "ROUTING_BASE_URL must be https in production" };
   const isDemo = url.hostname === new URL(PUBLIC_OSRM_DEMO).hostname;
-  if (isDemo && production && !allowDemo) return { baseUrl: null, isDemo: true, reason: "the public OSRM demo server is not allowed in production" };
+  if (isDemo && production) return { baseUrl: null, isDemo: true, reason: "the public OSRM demo server is not allowed in production" };
   return { baseUrl: raw, isDemo };
 }
 

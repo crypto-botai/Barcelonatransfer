@@ -12,7 +12,6 @@ const status = (code: number) => ({ ok: code < 400, status: code, json: async ()
 beforeEach(() => {
   resetRoutingState();
   delete process.env.ROUTING_BASE_URL;
-  delete process.env.ROUTING_ALLOW_PUBLIC_DEMO;
 });
 afterEach(() => vi.restoreAllMocks());
 
@@ -29,10 +28,20 @@ describe("routingConfig: production can never silently use the public demo", () 
     expect(c.reason).toMatch(/not set/);
   });
 
-  it("in production the demo address is refused unless allowed on purpose", () => {
-    expect(routingConfig({ ...prod, ROUTING_BASE_URL: PUBLIC_OSRM_DEMO }).baseUrl).toBeNull();
-    expect(routingConfig({ ...prod, ROUTING_BASE_URL: PUBLIC_OSRM_DEMO + "/" }).baseUrl).toBeNull();
-    expect(routingConfig({ ...prod, ROUTING_ALLOW_PUBLIC_DEMO: "1" }).baseUrl).toBe(PUBLIC_OSRM_DEMO);
+  it("in production the demo address is refused, and no setting can turn it back on", () => {
+    for (const extra of [{}, { ROUTING_ALLOW_PUBLIC_DEMO: "1" }, { ROUTING_ALLOW_PUBLIC_DEMO: "true" }]) {
+      expect(routingConfig({ ...prod, ...extra, ROUTING_BASE_URL: PUBLIC_OSRM_DEMO }).baseUrl).toBeNull();
+      expect(routingConfig({ ...prod, ...extra, ROUTING_BASE_URL: PUBLIC_OSRM_DEMO + "/" }).baseUrl).toBeNull();
+      expect(routingConfig({ ...prod, ...extra, ROUTING_BASE_URL: "https://ROUTER.project-osrm.org/route" }).baseUrl).toBeNull();
+      expect(routingConfig({ ...prod, ...extra }).baseUrl).toBeNull();
+    }
+  });
+
+  it("the demo is available only when NODE_ENV is not production (local development and tests)", () => {
+    expect(routingConfig({ NODE_ENV: "development" }).baseUrl).toBe(PUBLIC_OSRM_DEMO);
+    expect(routingConfig({ NODE_ENV: "test" }).baseUrl).toBe(PUBLIC_OSRM_DEMO);
+    expect(routingConfig({}).baseUrl).toBe(PUBLIC_OSRM_DEMO);
+    expect(routingConfig({ NODE_ENV: "production" }).baseUrl).toBeNull();
   });
 
   it("in production plain http and garbage are refused; a self-hosted https server is accepted", () => {
