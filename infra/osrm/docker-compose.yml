@@ -1,0 +1,19 @@
+# Self-hosted OSRM routing server for EliteBCN live tracking and quotes.
+#
+# One small Linux VPS is enough for Catalonia/Spain (2 vCPU, 4 GB RAM, 20 GB disk). See infra/osrm/README.md.
+# Put an HTTPS reverse proxy (Caddy or nginx) in front of port 5000, then set ROUTING_BASE_URL=https://routing.elitebcn.info
+# on the website. Never expose port 5000 to the internet without TLS: the website refuses plain http in production.
+services:
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:v5.27.1
+    restart: unless-stopped
+    command: osrm-routed --algorithm mld --max-table-size 50 /data/spain-latest.osrm
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - ./data:/data:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- 'http://localhost:5000/route/v1/driving/2.0785,41.2971;2.1686,41.3874?overview=false' | grep -q '\"code\":\"Ok\"'"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

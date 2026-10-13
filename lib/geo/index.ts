@@ -22,7 +22,9 @@
 import { unstable_cache } from "next/cache";
 
 const NOMINATIM = "https://nominatim.openstreetmap.org";
-const OSRM      = "https://router.project-osrm.org";
+// Quotes use the same routing server as live tracking when ROUTING_BASE_URL is set (a self-hosted OSRM); unset keeps the existing
+// behaviour (the public demo) so prices do not change by accident.
+const OSRM      = (process.env.ROUTING_BASE_URL ?? "https://router.project-osrm.org").replace(/\/+$/, "");
 
 /** Identifies this application to Nominatim as their policy requires. */
 const UA = "EliteBCNTransfers/1.0 (+https://www.elitebcn.info; booking@elitebcn.info)";

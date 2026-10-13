@@ -96,11 +96,19 @@ export async function GET(req: NextRequest) {
     partnerOk = Boolean(p && p.id === booking.partnerId);
   }
 
+  // A driver may read the position of a ride they are assigned to, and no other. (This used to accept any signed-in driver for any
+  // booking id, which let one driver watch another driver's rides.)
+  let assignedDriver = false;
+  if (user?.role === "DRIVER" && user.id && booking.driverId) {
+    const d = await prisma.driver.findUnique({ where: { userId: user.id }, select: { id: true } });
+    assignedDriver = Boolean(d && d.id === booking.driverId);
+  }
+
   const authorised =
     (code && code === booking.confirmationCode) ||
     (user?.id && user.id === booking.userId) ||
     user?.role === "ADMIN" ||
-    user?.role === "DRIVER" ||
+    assignedDriver ||
     partnerOk;
 
   if (!authorised) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

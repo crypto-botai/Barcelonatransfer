@@ -5,6 +5,7 @@ import { ApiError } from "@/lib/api/v1/errors";
 import { actorFor } from "@/lib/api/v1/actor";
 import { callLegacy } from "@/lib/api/v1/legacy";
 import { clientAddress } from "@/lib/api/v1/rate-limit";
+import { assertUsableFix, fixExtras } from "@/lib/api/v1/gps-fix";
 import { effectiveResponse, requireDriver, requireDriverRide } from "@/lib/api/v1/driver-rides";
 import { POST as websiteTracking } from "@/app/api/tracking/route";
 
@@ -19,6 +20,7 @@ const body = z.object({
   lng: z.number().min(-180).max(180),
   speed: z.number().min(0).max(120).optional(),
   heading: z.number().min(0).max(360).optional(),
+  ...fixExtras,
 });
 
 /**
@@ -34,6 +36,7 @@ export const POST = apiHandler(
   "driver.location",
   async ({ req, auth }) => {
     const input = await parseBody(req, body);
+    assertUsableFix(input);
     const driver = await requireDriver(auth!.userId);
     const ride = await requireDriverRide(input.bookingId, driver.id);
 
@@ -45,7 +48,7 @@ export const POST = apiHandler(
     }
 
     const actor = await actorFor(auth!);
-    await callLegacy(websiteTracking, { method: "POST", path: "/api/tracking", body: input, actor, ip: clientAddress(req) });
+    await callLegacy(websiteTracking, { method: "POST", path: "/api/tracking", body: { bookingId: input.bookingId, lat: input.lat, lng: input.lng, speed: input.speed, heading: input.heading }, actor, ip: clientAddress(req) });
     return { ok: true };
   },
   { auth: { roles: ["DRIVER"] }, rateLimit: "tracking" },

@@ -28,6 +28,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!parsed.success) return NextResponse.json({ error: "Invalid position" }, { status: 400 });
   const me = await identifyParticipant(id, parsed.data.code);
   if (!me || me.sender !== "CUSTOMER") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Only while the chauffeur is assigned or on the way: a finished or cancelled booking keeps no position.
+  const now = await prisma.booking.findUnique({ where: { id }, select: { status: true } });
+  if (!now || (now.status !== "DRIVER_ASSIGNED" && now.status !== "IN_PROGRESS")) return NextResponse.json({ error: "Location can be shared while your chauffeur is on the way." }, { status: 409 });
   await prisma.booking.update({
     where: { id },
     data: { customerLat: parsed.data.lat, customerLng: parsed.data.lng, customerLocatedAt: new Date() },
@@ -48,9 +51,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const me = await identifyParticipant(id, req.nextUrl.searchParams.get("code"));
   if (!me) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const b = await prisma.booking.findUnique({ where: { id }, select: { customerLat: true, customerLng: true, customerLocatedAt: true } });
+  const b = await prisma.booking.findUnique({ where: { id }, select: { customerLat: true, customerLng: true, customerLocatedAt: true, status: true } });
   if (!b) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  const fresh = b.customerLocatedAt ? Date.now() - b.customerLocatedAt.getTime() < 3 * 60_000 : false;
+  const active = b.status === "DRIVER_ASSIGNED" || b.status === "IN_PROGRESS";
+  const fresh = active && b.customerLocatedAt ? Date.now() - b.customerLocatedAt.getTime() < 3 * 60_000 : false;
   return NextResponse.json({
     sharing: fresh,
     lat: fresh ? b.customerLat : null,

@@ -17,6 +17,10 @@ const db = vi.hoisted(() => ({
   logs: [] as Row[],
   notes: [] as Row[],
   lastFindManyWhere: null as Row | null,
+  fix: null as null | { lat: number; lng: number; speed: number | null; heading: number | null; ageMs: number },
+  routeMode: "ok" as "ok" | "fail",
+  routeCalls: 0,
+  trackingWrites: [] as Row[],
   legacyCalls: [] as { name: string; body: unknown; actorId: string | null }[],
 }));
 
@@ -28,6 +32,11 @@ vi.mock("@/lib/prisma", () => {
         findFirst: async ({ where }: { where: Row }) => db.bookings.find((b) => match(b, where)) ?? null,
         findUnique: async ({ where }: { where: Row }) => { const b = db.bookings.find((x) => x.id === where.id); return b ? { driverId: b.driverId ?? null, driver: { user: { image: null } } } : null; },
         findMany: async ({ where }: { where: Row }) => { db.lastFindManyWhere = where; return db.bookings.filter((b) => b.userId === where.userId || b.driverId === where.driverId); },
+        update: async ({ where, data }: { where: Row; data: Row }) => {
+          const b = db.bookings.find((x) => x.id === where.id);
+          if (b) Object.assign(b, data);
+          return b;
+        },
         updateMany: async ({ where, data }: { where: Row; data: Row }) => {
           const hit = db.bookings.filter((b) => b.id === where.id && b.driverId === where.driverId && b.status === where.status);
           hit.forEach((b) => Object.assign(b, data));
@@ -48,12 +57,25 @@ vi.mock("@/lib/prisma", () => {
         findFirst: async ({ where }: { where: Row }) => db.logs.find((l) => l.action === where.action && l.entityId === where.entityId) ?? null,
       },
       notification: { createMany: async ({ data }: { data: Row[] }) => { db.notes.push(...data); return { count: data.length }; } },
-      rideTracking: { findFirst: async () => ({ lat: 41.39, lng: 2.17, speed: 5, heading: 90, createdAt: new Date() }) },
+      rideTracking: { findFirst: async () => (db.fix ? { lat: db.fix.lat, lng: db.fix.lng, speed: db.fix.speed, heading: db.fix.heading, createdAt: new Date(Date.now() - db.fix.ageMs) } : null) },
     },
   };
 });
 
 // The website's own handlers: replaced by probes that report who they were run as.
+// Routing is replaced by a probe: no network in tests, and the failure path can be forced.
+vi.mock("@/lib/geo/live-route", async (orig) => {
+  const real = await orig<typeof import("@/lib/geo/live-route")>();
+  return {
+    ...real,
+    liveRoute: async () => {
+      db.routeCalls++;
+      return db.routeMode === "fail"
+        ? { distanceKm: 3, durationMin: 6, coordinates: [], basis: "estimate" as const }
+        : { distanceKm: 3.2, durationMin: 7, coordinates: [[2.17, 41.39], [2.18, 41.4]] as [number, number][], basis: "road-network" as const };
+    },
+  };
+});
 vi.mock("@/app/api/quote/route", () => ({ POST: async () => Response.json({ totalAmount: 65 }) }));
 vi.mock("@/app/api/bookings/route", async () => {
   const { getRequestSession } = await import("@/lib/request-session");
@@ -109,6 +131,8 @@ import { GET as driverRide } from "@/app/api/v1/driver/rides/[id]/route";
 import { POST as respond } from "@/app/api/v1/driver/rides/[id]/respond/route";
 import { POST as stage } from "@/app/api/v1/driver/rides/[id]/stage/route";
 import { POST as location } from "@/app/api/v1/driver/location/route";
+import { POST as shareLocation, DELETE as stopSharing } from "@/app/api/v1/rides/[id]/location/route";
+import { GET as driverRoute } from "@/app/api/v1/driver/rides/[id]/route/route";
 import { POST as setStatus } from "@/app/api/v1/driver/status/route";
 import { getRequestSession } from "@/lib/request-session";
 
@@ -163,6 +187,9 @@ beforeEach(() => {
   );
   db.admins.push({ id: "a1" });
   db.bookings.push(ride());
+  db.fix = { lat: 41.39, lng: 2.17, speed: 5, heading: 90, ageMs: 3000 };
+  db.routeMode = "ok";
+  db.routeCalls = 0;
 });
 
 describe("customer rides: who sees what", () => {
@@ -427,5 +454,200 @@ describe("the actor can only be set by /api/v1", () => {
     };
     for (const d of ["app", "lib", "components"]) walk(join(root, d));
     expect(hits).toEqual([]);
+  });
+});
+
+
+/* ───────────────────────── live tracking: who may read and write what ───────────────────────── */
+
+const accepted2 = () => Object.assign(db.bookings[0], { driverResponse: "ACCEPTED", driverResponseBy: "d1", status: "IN_PROGRESS", rideStage: "ON_THE_WAY" });
+
+describe("live tracking: the passenger's view of the car", () => {
+  it("another customer, a driver or nobody gets nothing", async () => {
+    accepted2();
+    expect((await call(trackRide, BEN, { id: "r1" })).status).toBe(404);
+    expect((await call(trackRide, OMAR, { id: "r1" })).status).toBe(403);
+    expect((await call(trackRide, null, { id: "r1" })).status).toBe(401);
+  });
+
+  it("returns the road line, driving time, arrival time and says it is not live traffic", async () => {
+    accepted2();
+    const d = (await call(trackRide, ANA, { id: "r1" })).json.data;
+    expect(d).toMatchObject({ live: true, basis: "road-network", trafficAware: false, etaMinutes: 7, roadKm: 3.2, freshness: "live" });
+    expect(d.route.toNextStop).toHaveLength(2);
+    expect(typeof d.eta.pickupAt).toBe("string");
+  });
+
+  it("when routing is down the times are labelled as an estimate and no line is invented", async () => {
+    accepted2();
+    db.routeMode = "fail";
+    const d = (await call(trackRide, ANA, { id: "r1" })).json.data;
+    expect(d.basis).toBe("estimate");
+    expect(d.etaPrecise).toBe(false);
+    expect(d.route.toNextStop).toEqual([]);
+  });
+
+  it("an old fix is shown as stale, never as current", async () => {
+    accepted2();
+    db.fix!.ageMs = 10 * 60_000;
+    const d = (await call(trackRide, ANA, { id: "r1" })).json.data;
+    expect(d.freshness).toBe("stale");
+    expect(d.ageSeconds).toBeGreaterThanOrEqual(600);
+  });
+
+  it("a driver who is on the way but has sent no position gives 'not live', with no point, route or time", async () => {
+    accepted2();
+    db.fix = null;
+    const d = (await call(trackRide, ANA, { id: "r1" })).json.data;
+    expect(d.live).toBe(false);
+    expect(d.point).toBeUndefined();
+    expect(d.etaMinutes).toBeUndefined();
+  });
+
+  it("a cancelled ride, a completed ride and a ride that has not set off all show nothing", async () => {
+    for (const patch of [{ status: "CANCELLED" }, { status: "COMPLETED", rideStage: "COMPLETED" }, { status: "DRIVER_ASSIGNED", rideStage: null }]) {
+      db.bookings[0] = ride({ rideStage: "ON_THE_WAY", ...patch });
+      const d = (await call(trackRide, ANA, { id: "r1" })).json.data;
+      expect(d.live).toBe(false);
+      expect(JSON.stringify(d)).not.toContain("41.39");
+    }
+  });
+
+  it("an expired or missing token is refused before anything is read", async () => {
+    accepted2();
+    const bad = await trackRide(new Request("http://localhost/x", { headers: { authorization: "Bearer not.a.token", "x-forwarded-for": "10.9.9.9" } }), { params: Promise.resolve({ id: "r1" }) });
+    expect(bad.status).toBe(401);
+  });
+
+  it("no routing call is made for a ride that is not live", async () => {
+    db.bookings[0] = ride({ status: "CONFIRMED", rideStage: null });
+    await call(trackRide, ANA, { id: "r1" });
+    expect(db.routeCalls).toBe(0);
+  });
+});
+
+describe("live tracking: the passenger sharing their own position", () => {
+  const ping = { lat: 41.39, lng: 2.17 };
+
+  it("only the owner can share, and only while the chauffeur is assigned or on the way", async () => {
+    accepted2();
+    expect((await call(shareLocation, ANA, { method: "POST", body: ping, id: "r1" })).status).toBe(200);
+    expect(db.bookings[0].customerLat).toBe(41.39);
+    expect((await call(shareLocation, BEN, { method: "POST", body: ping, id: "r1" })).status).toBe(404);
+    expect((await call(shareLocation, OMAR, { method: "POST", body: ping, id: "r1" })).status).toBe(403);
+    expect((await call(shareLocation, null, { method: "POST", body: ping, id: "r1" })).status).toBe(401);
+    db.bookings[0].status = "COMPLETED";
+    expect((await call(shareLocation, ANA, { method: "POST", body: ping, id: "r1" })).status).toBe(409);
+    db.bookings[0].status = "CANCELLED";
+    expect((await call(shareLocation, ANA, { method: "POST", body: ping, id: "r1" })).status).toBe(409);
+  });
+
+  it("refuses a position that is old, imprecise, from a wrong clock, or the 0,0 'nothing'", async () => {
+    accepted2();
+    const t = Date.now();
+    for (const bad of [{ ...ping, at: t - 10 * 60_000 }, { ...ping, accuracy: 900 }, { ...ping, at: t + 10 * 60_000 }, { lat: 0, lng: 0 }]) {
+      expect((await call(shareLocation, ANA, { method: "POST", body: bad, id: "r1" })).status).toBe(422);
+    }
+    expect(db.bookings[0].customerLat).toBeNull();
+    expect((await call(shareLocation, ANA, { method: "POST", body: { ...ping, at: t - 2000, accuracy: 12 }, id: "r1" })).status).toBe(200);
+  });
+
+  it("the driver sees the passenger only while the passenger is sharing, and never after they switch it off", async () => {
+    accepted2();
+    db.bookings[0].driverResponse = "ACCEPTED";
+    expect((await call(driverRide, OMAR, { id: "r1" })).json.data.customerLocation).toBeNull();
+    await call(shareLocation, ANA, { method: "POST", body: ping, id: "r1" });
+    expect((await call(driverRide, OMAR, { id: "r1" })).json.data.customerLocation).toMatchObject({ lat: 41.39 });
+    await call(stopSharing, ANA, { method: "DELETE", id: "r1" });
+    expect(db.bookings[0]).toMatchObject({ customerLat: null, customerLng: null, customerLocatedAt: null });
+    expect((await call(driverRide, OMAR, { id: "r1" })).json.data.customerLocation).toBeNull();
+  });
+
+  it("a position that has not been refreshed for three minutes is treated as not sharing", async () => {
+    accepted2();
+    Object.assign(db.bookings[0], { customerLat: 41.39, customerLng: 2.17, customerLocatedAt: new Date(Date.now() - 4 * 60_000) });
+    expect((await call(driverRide, OMAR, { id: "r1" })).json.data.customerLocation).toBeNull();
+  });
+
+  it("another driver, and a driver the ride was taken from, cannot read the passenger's position", async () => {
+    accepted2();
+    await call(shareLocation, ANA, { method: "POST", body: ping, id: "r1" });
+    expect((await call(driverRide, LEO, { id: "r1" })).status).toBe(404);
+    db.bookings[0].driverId = "d2";
+    expect((await call(driverRide, OMAR, { id: "r1" })).status).toBe(404);
+  });
+
+  it("another customer cannot stop someone else's sharing", async () => {
+    accepted2();
+    await call(shareLocation, ANA, { method: "POST", body: ping, id: "r1" });
+    expect((await call(stopSharing, BEN, { method: "DELETE", id: "r1" })).status).toBe(404);
+    expect(db.bookings[0].customerLat).toBe(41.39);
+  });
+});
+
+describe("live tracking: the driver publishing and reading routes", () => {
+  const fix = { bookingId: "r1", lat: 41.3, lng: 2.1 };
+  const live = () => {
+    accepted2();
+    db.bookings[0].pickupDatetime = new Date(Date.now() + 10 * 60_000);
+  };
+
+  it("refuses a position for a ride the driver does not own, or that was reassigned away from them", async () => {
+    live();
+    expect((await call(location, LEO, { method: "POST", body: fix })).status).toBe(404);
+    db.bookings[0].driverId = "d2";
+    expect((await call(location, OMAR, { method: "POST", body: fix })).status).toBe(404);
+  });
+
+  it("refuses stale, imprecise, future-dated and null-island fixes on the server", async () => {
+    live();
+    const t = Date.now();
+    for (const bad of [{ ...fix, at: t - 5 * 60_000 }, { ...fix, accuracy: 500 }, { ...fix, at: t + 5 * 60_000 }, { ...fix, lat: 0, lng: 0 }]) {
+      expect((await call(location, OMAR, { method: "POST", body: bad })).status).toBe(422);
+    }
+    expect(db.legacyCalls.filter((c) => c.name === "track")).toHaveLength(0);
+    expect((await call(location, OMAR, { method: "POST", body: { ...fix, at: t - 1000, accuracy: 8 } })).status).toBe(200);
+  });
+
+  it("passes only the position fields on to the website's tracking handler", async () => {
+    live();
+    await call(location, OMAR, { method: "POST", body: { ...fix, accuracy: 8, at: Date.now(), speed: 3 } });
+    expect(db.legacyCalls.find((c) => c.name === "track")?.body).toEqual({ bookingId: "r1", lat: 41.3, lng: 2.1, speed: 3, heading: undefined });
+  });
+
+  it("stops accepting positions once the ride is cancelled, completed or the driver has not accepted", async () => {
+    live();
+    for (const patch of [{ status: "CANCELLED" }, { rideStage: "COMPLETED" }, { driverResponse: null }]) {
+      db.bookings[0] = ride({ driverResponse: "ACCEPTED", driverResponseBy: "d1", status: "IN_PROGRESS", rideStage: "ON_THE_WAY", ...patch });
+      expect((await call(location, OMAR, { method: "POST", body: fix })).status).toBe(409);
+    }
+  });
+
+  it("the route endpoint is for the ride's own driver only, and gives road lines with honest labels", async () => {
+    live();
+    expect((await call(driverRoute, LEO, { id: "r1", path: "/x?lat=41.3&lng=2.1" })).status).toBe(404);
+    expect((await call(driverRoute, ANA, { id: "r1" })).status).toBe(403);
+    expect((await call(driverRoute, null, { id: "r1" })).status).toBe(401);
+    const d = (await call(driverRoute, OMAR, { id: "r1", path: "/x?lat=41.3&lng=2.1" })).json.data;
+    expect(d).toMatchObject({ trafficAware: false, basis: "road-network" });
+    expect(d.toPickup.line).toHaveLength(2);
+    expect(typeof d.toPickup.arrivesAt).toBe("string");
+  });
+
+  it("with routing down the route endpoint says 'estimate' and invents no line; with no position at all it gives no leg", async () => {
+    live();
+    db.routeMode = "fail";
+    const d = (await call(driverRoute, OMAR, { id: "r1", path: "/x?lat=41.3&lng=2.1" })).json.data;
+    expect(d.basis).toBe("estimate");
+    expect(d.toPickup.line).toEqual([]);
+    db.fix = null;
+    const none = (await call(driverRoute, OMAR, { id: "r1" })).json.data;
+    expect(none.toPickup).toBeNull();
+    expect(none.from).toBeNull();
+  });
+
+  it("rejects coordinates that are not numbers in range", async () => {
+    live();
+    expect((await call(driverRoute, OMAR, { id: "r1", path: "/x?lat=999&lng=2.1" })).status).toBeGreaterThanOrEqual(400);
   });
 });

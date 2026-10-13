@@ -3,9 +3,8 @@ import { estimateRoad, haversineKm, type LatLng } from "@/lib/geo";
 /**
  * Driving routes for live ride tracking: the line to draw, the road distance and the driving time.
  *
- * Provider: any OSRM-compatible /route/v1/driving endpoint, set with ROUTING_BASE_URL. The default is the public OSRM demo server,
- * which has no uptime promise and a fair-use policy; it is fine for testing and light use but must be replaced for production
- * (self-hosted OSRM, or Valhalla behind an OSRM-compatible adapter). Nothing outside this file depends on the provider.
+ * Provider: any OSRM-compatible /route/v1/driving endpoint, set with ROUTING_BASE_URL (see routingConfig for the production rules:
+ * the public demo server is refused in production). Nothing outside this file depends on the provider.
  *
  * Honesty: these are road-network durations at the provider's normal speeds. They are NOT live-traffic estimates and are labelled
  * `basis: "road-network"` so no screen presents them as traffic-aware. When the provider is down the straight-line estimate is used
@@ -25,9 +24,46 @@ export interface LiveRoute {
   basis: RouteBasis;
 }
 
-const base = () => (process.env.ROUTING_BASE_URL ?? "https://router.project-osrm.org").replace(/\/$/, "");
+export const PUBLIC_OSRM_DEMO = "https://router.project-osrm.org";
 const UA = "EliteBCN-LiveTracking/1.0 (info@elitebcn.info)";
 const MAX_POINTS = 400;
+
+export interface RoutingConfig {
+  /** Where routes are requested, or null when routing is switched off (the apps then show a labelled straight-line estimate). */
+  baseUrl: string | null;
+  /** True when the address is the public OSRM demo server. */
+  isDemo: boolean;
+  /** Why routing is off, for logs and the health check. Never shown to passengers. */
+  reason?: string;
+}
+
+/**
+ * Which routing server to use, decided from the environment.
+ *
+ * In production the public OSRM demo server is NEVER used unless ROUTING_ALLOW_PUBLIC_DEMO=1 is set on purpose: with no
+ * ROUTING_BASE_URL (or one that points at the demo host) routing is switched off and the apps show a labelled straight-line
+ * estimate, so a missing setting cannot silently put paying rides on a server with no uptime promise. Outside production the demo
+ * is the default so local work needs no setup. Plain http is refused in production.
+ */
+export function routingConfig(env: Record<string, string | undefined> = process.env): RoutingConfig {
+  const production = env.NODE_ENV === "production";
+  const raw = (env.ROUTING_BASE_URL ?? "").trim().replace(/\/+$/, "");
+  const allowDemo = env.ROUTING_ALLOW_PUBLIC_DEMO === "1";
+  if (!raw) {
+    if (!production || allowDemo) return { baseUrl: PUBLIC_OSRM_DEMO, isDemo: true };
+    return { baseUrl: null, isDemo: false, reason: "ROUTING_BASE_URL is not set in production" };
+  }
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return { baseUrl: null, isDemo: false, reason: "ROUTING_BASE_URL is not a valid URL" };
+  }
+  if (production && url.protocol !== "https:") return { baseUrl: null, isDemo: false, reason: "ROUTING_BASE_URL must be https in production" };
+  const isDemo = url.hostname === new URL(PUBLIC_OSRM_DEMO).hostname;
+  if (isDemo && production && !allowDemo) return { baseUrl: null, isDemo: true, reason: "the public OSRM demo server is not allowed in production" };
+  return { baseUrl: raw, isDemo };
+}
 
 /** Keeps a long route light for a phone: every n-th point, always including the last. */
 export function thin(coords: [number, number][], max = MAX_POINTS): [number, number][] {
@@ -39,17 +75,81 @@ export function thin(coords: [number, number][], max = MAX_POINTS): [number, num
   return out;
 }
 
-async function fetchRoute(from: LatLng, to: LatLng): Promise<LiveRoute | null> {
+const TIMEOUT_MS = 3500;
+const RETRIES = 1;
+const BREAKER_AFTER = 3;
+const BREAKER_OPEN_MS = 30_000;
+const MAX_CALLS_PER_MINUTE = 40;
+
+const breaker = { failures: 0, openUntil: 0 };
+let callWindow = { start: 0, calls: 0 };
+
+/** Test hook: forget breaker and rate-limit state. */
+export function resetRoutingState(): void {
+  breaker.failures = 0;
+  breaker.openUntil = 0;
+  callWindow = { start: 0, calls: 0 };
+  cache.clear();
+}
+
+/** One attempt, with a timeout. Returns null when the server answered but had no route; throws on network errors and 5xx. */
+async function attempt(baseUrl: string, from: LatLng, to: LatLng): Promise<LiveRoute | null> {
+  const url = `${baseUrl}/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
+  const res = await fetch(url, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(TIMEOUT_MS) });
+  if (res.status >= 500) throw new Error(`routing ${res.status}`);
+  if (!res.ok) return null;
+  const data = (await res.json()) as { routes?: Array<{ distance: number; duration: number; geometry?: { coordinates?: [number, number][] } }> };
+  const r = data.routes?.[0];
+  if (!r || !Number.isFinite(r.distance) || !Number.isFinite(r.duration)) return null;
+  return { distanceKm: Math.round(r.distance / 100) / 10, durationMin: Math.max(1, Math.round(r.duration / 60)), coordinates: thin(r.geometry?.coordinates ?? []), basis: "road-network" };
+}
+
+/**
+ * Asks the routing server, with: a short timeout, at most one retry (only for network errors and 5xx), a circuit breaker (after
+ * three failures in a row routing is skipped for 30 seconds so a dead server is not hammered and requests are not slowed), and a
+ * ceiling of 40 calls a minute per server instance. Any of these returns null and the caller uses the labelled estimate.
+ */
+async function fetchRoute(from: LatLng, to: LatLng, now = Date.now()): Promise<LiveRoute | null> {
+  const cfg = routingConfig();
+  if (!cfg.baseUrl) return null;
+  if (now < breaker.openUntil) return null;
+  if (now - callWindow.start > 60_000) callWindow = { start: now, calls: 0 };
+  if (callWindow.calls >= MAX_CALLS_PER_MINUTE) return null;
+  callWindow.calls++;
+  for (let i = 0; i <= RETRIES; i++) {
+    try {
+      const route = await attempt(cfg.baseUrl, from, to);
+      breaker.failures = 0;
+      return route;
+    } catch {
+      if (i < RETRIES) await new Promise((r) => setTimeout(r, 200));
+    }
+  }
+  breaker.failures++;
+  if (breaker.failures >= BREAKER_AFTER) breaker.openUntil = now + BREAKER_OPEN_MS;
+  return null;
+}
+
+export interface RoutingHealth {
+  configured: boolean;
+  isDemo: boolean;
+  ok: boolean;
+  latencyMs: number | null;
+  breakerOpen: boolean;
+  reason?: string;
+}
+
+/** A real test route (Barcelona airport to the city centre) against the configured server; used by the admin health check. */
+export async function routingHealth(now = Date.now()): Promise<RoutingHealth> {
+  const cfg = routingConfig();
+  const base = { configured: cfg.baseUrl !== null, isDemo: cfg.isDemo, breakerOpen: now < breaker.openUntil };
+  if (!cfg.baseUrl) return { ...base, ok: false, latencyMs: null, reason: cfg.reason };
+  const t0 = Date.now();
   try {
-    const url = `${base()}/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
-    const res = await fetch(url, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(5000) });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { routes?: Array<{ distance: number; duration: number; geometry?: { coordinates?: [number, number][] } }> };
-    const r = data.routes?.[0];
-    if (!r || !Number.isFinite(r.distance) || !Number.isFinite(r.duration)) return null;
-    return { distanceKm: Math.round(r.distance / 100) / 10, durationMin: Math.max(1, Math.round(r.duration / 60)), coordinates: thin(r.geometry?.coordinates ?? []), basis: "road-network" };
-  } catch {
-    return null;
+    const r = await attempt(cfg.baseUrl, { lat: 41.2971, lng: 2.0785 }, { lat: 41.3874, lng: 2.1686 });
+    return { ...base, ok: r !== null && r.distanceKm > 5 && r.distanceKm < 40, latencyMs: Date.now() - t0 };
+  } catch (e) {
+    return { ...base, ok: false, latencyMs: Date.now() - t0, reason: e instanceof Error ? e.message : "failed" };
   }
 }
 
@@ -57,6 +157,8 @@ interface Cached { at: number; from: LatLng; to: LatLng; route: LiveRoute }
 const cache = new Map<string, Cached>();
 const MOVE_KM = 0.15;
 const MAX_AGE_MS = 60_000;
+/** The labelled estimate is only reused briefly, so routing is tried again soon after it recovers. */
+const FALLBACK_AGE_MS = 10_000;
 
 /**
  * The route from `from` to `to`, reused while the start has not moved meaningfully and the answer is fresh. `key` identifies the
@@ -64,8 +166,8 @@ const MAX_AGE_MS = 60_000;
  */
 export async function liveRoute(key: string, from: LatLng, to: LatLng, now = Date.now()): Promise<LiveRoute> {
   const hit = cache.get(key);
-  if (hit && now - hit.at < MAX_AGE_MS && haversineKm(hit.from, from) < MOVE_KM && haversineKm(hit.to, to) < 0.01) return hit.route;
-  const fresh = await fetchRoute(from, to);
+  if (hit && now - hit.at < (hit.route.basis === "estimate" ? FALLBACK_AGE_MS : MAX_AGE_MS) && haversineKm(hit.from, from) < MOVE_KM && haversineKm(hit.to, to) < 0.01) return hit.route;
+  const fresh = await fetchRoute(from, to, now);
   const est = estimateRoad(from, to);
   const route: LiveRoute = fresh ?? { distanceKm: est.distanceKm, durationMin: Math.max(1, est.durationMin), coordinates: [], basis: "estimate" };
   if (cache.size > 500) cache.clear();

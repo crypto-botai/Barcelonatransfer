@@ -4,10 +4,11 @@ import { apiHandler } from "@/lib/api/v1/response";
 import { parseBody } from "@/lib/api/v1/validate";
 import { ApiError } from "@/lib/api/v1/errors";
 import { requireOwnedRide } from "@/lib/api/v1/rides";
+import { assertUsableFix, fixExtras } from "@/lib/api/v1/gps-fix";
 
 export const dynamic = "force-dynamic";
 
-const body = z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) });
+const body = z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180), ...fixExtras });
 
 const SHARE_WHILE = new Set(["DRIVER_ASSIGNED", "IN_PROGRESS"]);
 
@@ -22,6 +23,7 @@ export const POST = apiHandler(
   async ({ req, auth, params }) => {
     const { id } = await params!;
     const input = await parseBody(req, body);
+    assertUsableFix(input);
     const ride = await requireOwnedRide(id, auth!.userId);
     if (!SHARE_WHILE.has(ride.status)) throw new ApiError("CONFLICT", "Location can be shared while your chauffeur is on the way.");
     await prisma.booking.update({ where: { id }, data: { customerLat: input.lat, customerLng: input.lng, customerLocatedAt: new Date() } });
