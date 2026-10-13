@@ -54,7 +54,7 @@ export async function GET() {
       // The road from the car to its next stop (the pickup, or the destination once the passenger is on board), road-network time.
       const onBoard = r.rideStage === "ON_BOARD";
       const next = onBoard ? { lat: r.dropoffLat, lng: r.dropoffLng } : { lat: r.pickupLat, lng: r.pickupLng };
-      const leg = fix && hasCoords(next.lat, next.lng) && r.rideStage !== "ARRIVED" && r.rideStage !== "WAITING_PASSENGER" ? await liveRoute(`${r.id}:admin`, { lat: fix.lat, lng: fix.lng }, { lat: next.lat as number, lng: next.lng as number }, now) : null;
+      const leg = fix && hasCoords(next.lat, next.lng) && r.rideStage !== "ARRIVED" && r.rideStage !== "WAITING_PASSENGER" ? await liveRoute(`${r.id}:${onBoard ? "to-drop" : "to-pickup"}`, { lat: fix.lat, lng: fix.lng }, { lat: next.lat as number, lng: next.lng as number }, now) : null;
       return {
         id: r.id,
         code: r.confirmationCode,

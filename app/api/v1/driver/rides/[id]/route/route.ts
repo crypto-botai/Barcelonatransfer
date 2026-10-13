@@ -39,9 +39,9 @@ export const GET = apiHandler(
     const pickup = hasCoords(ride.pickupLat, ride.pickupLng) ? { lat: ride.pickupLat, lng: ride.pickupLng } : null;
     const drop = ride.dropoffAddress.trim() && hasCoords(ride.dropoffLat, ride.dropoffLng) ? { lat: ride.dropoffLat as number, lng: ride.dropoffLng as number } : null;
     const onBoard = ride.rideStage === "ON_BOARD";
-    const toPickup = from && pickup && !onBoard ? await liveRoute(`${id}:d-pickup`, from, pickup) : null;
+    const toPickup = from && pickup && !onBoard ? await liveRoute(`${id}:to-pickup`, from, pickup) : null;
     const trip = pickup && drop ? await liveRoute(`${id}:trip`, pickup, drop) : null;
-    const toDrop = onBoard && from && drop ? await liveRoute(`${id}:d-drop`, from, drop) : null;
+    const toDrop = onBoard && from && drop ? await liveRoute(`${id}:to-drop`, from, drop) : null;
 
     return {
       from,

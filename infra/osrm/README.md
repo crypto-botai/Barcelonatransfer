@@ -1,3 +1,5 @@
+> **NOT USED.** On 2026-10-13 the owner chose OpenRouteService (ORS) as the routing provider. Do not deploy or configure this folder. It is kept only as a reference and as a fallback plan if ORS is ever dropped. See `docs/ROUTING_ORS.md` in the apps repo.
+
 # Self-hosted OSRM for EliteBCN
 
 Nothing here is deployed by the repository. It is the recipe; creating the server, DNS name and TLS certificate needs your approval.

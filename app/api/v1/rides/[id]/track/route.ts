@@ -43,7 +43,7 @@ export const GET = apiHandler(
     const here = { lat: latest.lat, lng: latest.lng };
     const toward = ride.rideStage === "ON_BOARD" ? "DROPOFF" : "PICKUP";
     const nextStop = toward === "PICKUP" ? { lat: ride.pickupLat, lng: ride.pickupLng } : target;
-    const leg = hasCoords(nextStop.lat, nextStop.lng) ? await liveRoute(`${id}:leg`, here, { lat: nextStop.lat as number, lng: nextStop.lng as number }) : null;
+    const leg = hasCoords(nextStop.lat, nextStop.lng) ? await liveRoute(`${id}:${toward === "PICKUP" ? "to-pickup" : "to-drop"}`, here, { lat: nextStop.lat as number, lng: nextStop.lng as number }) : null;
     const tripOk = hasCoords(ride.pickupLat, ride.pickupLng) && hasCoords(ride.dropoffLat, ride.dropoffLng) && ride.dropoffAddress.trim() !== "";
     const trip = tripOk ? await liveRoute(`${id}:trip`, { lat: ride.pickupLat, lng: ride.pickupLng }, { lat: ride.dropoffLat as number, lng: ride.dropoffLng as number }) : null;
     const now = Date.now();

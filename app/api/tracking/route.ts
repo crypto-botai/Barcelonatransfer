@@ -137,6 +137,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Which credential opened it, counted in the logs (no code, token, booking id or address is logged), so the day the bare code is no
+  // longer used can be seen before TRACKING_ALLOW_CODE is set to 0.
+  const method = byToken ? "token" : byCode ? "code" : user?.role === "ADMIN" ? "admin" : assignedDriver ? "driver" : partnerOk ? "partner" : "owner";
+  console.info(JSON.stringify({ evt: "tracking_access", method }));
+
   // Location is only shared while it is operationally relevant. Once the ride
   // is over, the trail stops being something the customer needs and becomes a
   // record of where a driver has been.
