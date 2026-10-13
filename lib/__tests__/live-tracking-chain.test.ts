@@ -70,7 +70,7 @@ vi.mock("@/app/api/driver/ride/route", async () => {
   return {
     PATCH: async (req: Request) => {
       const { bookingId, stage: st } = (await req.json()) as { bookingId: string; stage: string };
-      await prisma.booking.update({ where: { id: bookingId }, data: { rideStage: st, status: st === "COMPLETED" ? "COMPLETED" : "IN_PROGRESS" } });
+      await prisma.booking.update({ where: { id: bookingId }, data: { rideStage: st as never, status: st === "COMPLETED" ? "COMPLETED" : "IN_PROGRESS" } });
       return Response.json({ ok: true, status: st === "COMPLETED" ? "COMPLETED" : "IN_PROGRESS" });
     },
   };
@@ -78,7 +78,7 @@ vi.mock("@/app/api/driver/ride/route", async () => {
 
 let n = 0;
 const token = (userId: string, role: string) => signAccessToken({ userId, role: role as never, sessionId: "s1" }, mobileAuthConfig());
-async function call(handler: (r: Request, c?: unknown) => Promise<Response>, who: [string, string] | null, opts: { method?: string; body?: unknown; id?: string; path?: string } = {}) {
+async function call(handler: (r: Request, c?: { params?: Promise<Record<string, string>> }) => Promise<Response>, who: [string, string] | null, opts: { method?: string; body?: unknown; id?: string; path?: string } = {}) {
   const headers: Record<string, string> = { "content-type": "application/json", "x-forwarded-for": `10.2.0.${++n}` };
   if (who) headers.authorization = `Bearer ${await token(who[0], who[1])}`;
   const res = await handler(new Request(`http://localhost${opts.path ?? "/x"}`, { method: opts.method ?? "GET", headers, body: opts.body === undefined ? undefined : JSON.stringify(opts.body) }), opts.id ? { params: Promise.resolve({ id: opts.id }) } : undefined);
