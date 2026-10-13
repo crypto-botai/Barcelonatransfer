@@ -231,7 +231,7 @@ describe("liveRoute with OpenRouteService", () => {
     expect(url).not.toContain(KEY);
     expect((init.headers as Record<string, string>).Authorization).toBe(KEY);
     expect(String(init.body)).not.toContain(KEY);
-    expect(JSON.parse(String(init.body))).toEqual({ coordinates: [[A.lng, A.lat], [B.lng, B.lat]], instructions: false });
+    expect(JSON.parse(String(init.body))).toEqual({ coordinates: [[A.lng, A.lat], [B.lng, B.lat]], radiuses: [1500, 1500], instructions: false });
     expect(init.method).toBe("POST");
   });
 

@@ -35,6 +35,9 @@ export type RoutingProvider = "ors" | "osrm";
 
 export const PUBLIC_OSRM_DEMO = "https://router.project-osrm.org";
 export const ORS_DEFAULT_BASE = "https://api.openrouteservice.org";
+
+/** How far (metres) ORS may move a start or end point to reach a drivable road. */
+export const ORS_SNAP_RADIUS_M = 1500;
 const UA = "EliteBCN-LiveTracking/1.0 (info@elitebcn.info)";
 const MAX_POINTS = 400;
 
@@ -162,7 +165,9 @@ async function attemptOrs(cfg: RoutingConfig, from: LatLng, to: LatLng): Promise
   const res = await fetch(`${cfg.baseUrl}/v2/directions/driving-car/geojson`, {
     method: "POST",
     headers: { Authorization: cfg.apiKey!, "Content-Type": "application/json", Accept: "application/geo+json", "User-Agent": UA },
-    body: JSON.stringify({ coordinates: [[from.lng, from.lat], [to.lng, to.lat]], instructions: false }),
+    // ORS looks only 350 m from a point for a road by default. A pickup inside an airport terminal or a big building can be further, and
+    // would then get no route at all (a labelled estimate instead). 1500 m is a bounded, generous search.
+    body: JSON.stringify({ coordinates: [[from.lng, from.lat], [to.lng, to.lat]], radiuses: [ORS_SNAP_RADIUS_M, ORS_SNAP_RADIUS_M], instructions: false }),
     signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   if (res.status === 429) {
