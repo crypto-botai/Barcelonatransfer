@@ -18,9 +18,15 @@ export interface GoogleIdentity {
   subject: string;
 }
 
+/**
+ * The web client of the Firebase project (elitebcn-3e45c). The iPhone apps sign in through it, because the iPhone clients for both bundle
+ * identifiers live in that project, while the Android apps keep the client above. A client ID is public.
+ */
+export const GOOGLE_IPHONE_WEB_CLIENT_ID = "163147095821-u9q7h2tsinrvb8ui5n2us5dl5t09lmep.apps.googleusercontent.com";
+
 function allowedAudiences(): string[] {
   const extra = (process.env.GOOGLE_MOBILE_CLIENT_IDS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-  return [GOOGLE_MOBILE_CLIENT_ID, ...extra];
+  return [GOOGLE_MOBILE_CLIENT_ID, GOOGLE_IPHONE_WEB_CLIENT_ID, ...extra];
 }
 
 type Fetcher = (url: string) => Promise<{ ok: boolean; json: () => Promise<unknown> }>;

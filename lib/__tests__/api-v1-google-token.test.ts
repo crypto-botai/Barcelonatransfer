@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { verifyGoogleIdToken, GOOGLE_MOBILE_CLIENT_ID } from "@/lib/api/v1/google-token";
+import { verifyGoogleIdToken, GOOGLE_MOBILE_CLIENT_ID, GOOGLE_IPHONE_WEB_CLIENT_ID } from "@/lib/api/v1/google-token";
 
 const NOW = 1_800_000_000_000;
 const good = { aud: GOOGLE_MOBILE_CLIENT_ID, iss: "https://accounts.google.com", exp: String(NOW / 1000 + 600), email: "Driver@Example.com", email_verified: "true", name: "Nouman", picture: "https://lh3.googleusercontent.com/a/x", sub: "123" };
@@ -9,6 +9,11 @@ const run = (info: Record<string, unknown>, ok = true) => verifyGoogleIdToken("t
 describe("verifyGoogleIdToken", () => {
   it("accepts a token issued to our app and returns the lower-cased verified email", async () => {
     await expect(run(good)).resolves.toMatchObject({ email: "driver@example.com", name: "Nouman", subject: "123" });
+  });
+
+  it("accepts a token made for the iPhone apps' web client, and still refuses a look-alike client", async () => {
+    await expect(run({ ...good, aud: GOOGLE_IPHONE_WEB_CLIENT_ID })).resolves.toMatchObject({ email: "driver@example.com" });
+    await expect(run({ ...good, aud: "163147095821-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.apps.googleusercontent.com" })).rejects.toThrow();
   });
 
   it("rejects a token made for another app", async () => {
