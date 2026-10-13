@@ -1,3 +1,4 @@
+import { safeEqual, verifyTrackingToken } from "@/lib/tracking-access";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -65,7 +66,8 @@ export async function identifyParticipant(bookingId: string, code?: string | nul
 
   const customerName = booking.guestName ?? u?.name ?? "Customer";
   if (u?.id && booking.userId && u.id === booking.userId) return { sender: "CUSTOMER", name: customerName, bookingId };
-  if (code && code === booking.confirmationCode) return { sender: "CUSTOMER", name: customerName, bookingId };
+  // The public tracking page passes either the confirmation code (old links) or its signed tracking token (see lib/tracking-access.ts).
+  if (code && (safeEqual(code, booking.confirmationCode) || verifyTrackingToken(code, booking.id))) return { sender: "CUSTOMER", name: customerName, bookingId };
 
   return null;
 }

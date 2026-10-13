@@ -44,6 +44,7 @@ import { GET as trackingGet, POST as trackingPost } from "@/app/api/tracking/rou
 import TrackPage from "@/app/track/[code]/page";
 import { codeAccessAllowed, recordFailure, resetTrackingLimiter, safeEqual, signTrackingToken, tooManyFailures, verifyTrackingToken } from "@/lib/tracking-access";
 import { generateConfirmationCode } from "@/lib/utils";
+import { identifyParticipant } from "@/lib/trip-chat";
 
 const CODE = "EBC-ABCD1234";
 const pickup = () => new Date(Date.now() + 30 * 60_000);
@@ -253,5 +254,16 @@ describe("generateConfirmationCode", () => {
       seen.add(c);
     }
     expect(seen.size).toBe(2000);
+  });
+});
+
+describe("the chat, alerts and location-share widgets on the public page", () => {
+  it("accept the signed token as well as the old code, and nothing else", async () => {
+    s.booking!.guestName = "Ana";
+    expect(await identifyParticipant("b1", CODE)).toMatchObject({ sender: "CUSTOMER" });
+    expect(await identifyParticipant("b1", signTrackingToken("b1", pickup()))).toMatchObject({ sender: "CUSTOMER" });
+    expect(await identifyParticipant("b1", signTrackingToken("b2", pickup()))).toBeNull();
+    expect(await identifyParticipant("b1", "EBC-WRONG000")).toBeNull();
+    expect(await identifyParticipant("b1", null)).toBeNull();
   });
 });

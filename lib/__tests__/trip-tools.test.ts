@@ -57,7 +57,8 @@ describe("trip chat", () => {
   it("identifies each side by its own relation to the booking", () => {
     expect(chat).toContain("d.id === booking.driverId");
     expect(chat).toContain("p.id === booking.partnerId");
-    expect(chat).toContain("code === booking.confirmationCode");
+    expect(chat).toContain("safeEqual(code, booking.confirmationCode)");
+    expect(chat).toContain("verifyTrackingToken(code, booking.id)");
     expect(chat).toContain('u?.role === "ADMIN"');
   });
   it("notifies the customer of a message from anyone else", () => {
@@ -74,8 +75,8 @@ describe("trip chat", () => {
       "app/admin/bookings/page.tsx",
     ]) expect(rd(p), p).toContain("<TripChat");
   });
-  it("the public link proves itself with the confirmation code", () => {
-    expect(rd("components/tracking/PublicTrackClient.tsx")).toMatch(/<TripChat bookingId=\{booking\.id\} code=\{booking\.code\}/);
+  it("the public link proves itself with its signed token (the confirmation code only as a fallback)", () => {
+    expect(rd("components/tracking/PublicTrackClient.tsx")).toMatch(/<TripChat bookingId=\{booking\.id\} code=\{booking\.trackToken \?\? booking\.code\}/);
   });
 });
 

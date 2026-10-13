@@ -6,7 +6,7 @@ Nothing here is deployed by the repository. It is the recipe; creating the serve
 
 Any Linux VPS (2 vCPU / 4 GB RAM / 20 GB disk, in the EU) is enough for Spain. Expected cost: about 5-20 EUR per month.
 
-## 2. Map data (once, then monthly)
+## 2. Map data (once, then monthly): `./prepare-data.sh` runs the commands below
 
 ```sh
 mkdir -p data && cd data
@@ -46,3 +46,21 @@ Sign in as an administrator and open `/api/admin/routing-health`. Expected: `{"c
 ## Behaviour when the server is slow or down
 
 Timeout 3.5 s, one retry on network errors and 5xx, circuit breaker (3 failed rounds, then 30 s without calls), at most 40 routing calls per minute per website instance, routes cached for 60 s and until the car has moved about 150 m. Failures show a labelled estimate; nothing is invented.
+
+## Files in this folder
+
+* `docker-compose.yml`: the OSRM container (bound to 127.0.0.1:5000, with a health check).
+* `prepare-data.sh`: downloads Spain, builds the road graph, starts OSRM, runs a smoke test.
+* `Caddyfile`: HTTPS reverse proxy that exposes only `/route/v1/driving/*` (rate limiting needs the caddy-ratelimit plugin; see the note in the file).
+
+## Cut-over and rollback
+
+1. Deploy and test the server first (section 5 check, plus `scripts/compare-quotes.mts` below).
+2. Run `ROUTING_URL_PROPOSED=https://<your host> npx tsx scripts/compare-quotes.mts` from the website repo and review the price differences with the owner before changing anything.
+3. Set `ROUTING_BASE_URL` in the Vercel **Preview** environment, deploy a preview, run the admin health check there.
+4. Only then set it in Production and redeploy. Quotes and live tracking switch together.
+5. Rollback: remove `ROUTING_BASE_URL` from Production and redeploy. Live tracking then shows labelled estimates (the public demo is refused in production); quotes return to their previous behaviour (the public demo), so prices are unchanged.
+
+## Monitoring
+
+Uptime monitor on `https://<host>/route/v1/driving/2.0785,41.2971;2.1686,41.3874?overview=false` expecting `"code":"Ok"`; alert by email. Disk and RAM alerts on the VPS. The website's own check is `/api/admin/routing-health` (administrator only).

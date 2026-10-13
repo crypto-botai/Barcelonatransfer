@@ -1,0 +1,25 @@
+# TLS reverse proxy in front of OSRM. Replace the host name with the one you point DNS at.
+# Caddy obtains and renews the certificate by itself. OSRM listens only on 127.0.0.1:5000 (see docker-compose.yml).
+routing.example.com {
+	# Only the one endpoint the website uses; everything else is closed.
+	@route path /route/v1/driving/*
+	handle @route {
+		# Cheap protection against a runaway client: at most 30 requests per second per address.
+		rate_limit {
+			zone per_ip {
+				key {remote_host}
+				events 30
+				window 1s
+			}
+		}
+		reverse_proxy 127.0.0.1:5000
+	}
+	handle {
+		respond "Not found" 404
+	}
+	log {
+		output file /var/log/caddy/osrm.log
+	}
+}
+# Note: rate_limit needs the caddy-ratelimit plugin (build with xcaddy). If you use stock Caddy, delete the rate_limit block and use
+# the server firewall (ufw limit 443/tcp) instead.

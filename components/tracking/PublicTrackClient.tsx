@@ -193,14 +193,14 @@ export default function PublicTrackClient({ booking }: { booking: TrackBooking }
       )}
 
       {status !== "COMPLETED" && status !== "CANCELLED" && (
-        <RideAlerts bookingId={booking.id} code={booking.code} />
+        <RideAlerts bookingId={booking.id} code={booking.trackToken ?? booking.code} />
       )}
 
       {booking.driverName && (status === "DRIVER_ASSIGNED" || status === "IN_PROGRESS") && (
         <div className="space-y-3">
-          <ShareMyLocation bookingId={booking.id} code={booking.code} />
+          <ShareMyLocation bookingId={booking.id} code={booking.trackToken ?? booking.code} />
           <p className="text-dark-400 text-[10px] uppercase tracking-widest mb-2">Message your chauffeur</p>
-          <TripChat bookingId={booking.id} code={booking.code} compact placeholder="Write to your chauffeur…" />
+          <TripChat bookingId={booking.id} code={booking.trackToken ?? booking.code} compact placeholder="Write to your chauffeur…" />
         </div>
       )}
 
