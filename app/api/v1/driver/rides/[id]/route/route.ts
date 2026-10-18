@@ -47,11 +47,11 @@ export const GET = apiHandler(
       from,
       trafficAware: false,
       basis: (toPickup ?? toDrop ?? trip)?.basis ?? null,
-      toPickup: toPickup ? { km: toPickup.distanceKm, minutes: toPickup.durationMin, arrivesAt: arrivalAt(toPickup.durationMin, now), line: toPickup.coordinates } : null,
-      trip: trip ? { km: trip.distanceKm, minutes: trip.durationMin, line: trip.coordinates } : null,
+      toPickup: toPickup ? { km: toPickup.distanceKm, minutes: toPickup.durationMin, arrivesAt: arrivalAt(toPickup.durationMin, now), line: toPickup.coordinates, steps: toPickup.steps ?? [] } : null,
+      trip: trip ? { km: trip.distanceKm, minutes: trip.durationMin, line: trip.coordinates, steps: trip.steps ?? [] } : null,
       // Arrival at the destination: from now when already on board, otherwise after the pickup and the journey.
       dropoffAt: toDrop ? arrivalAt(toDrop.durationMin, now) : toPickup && trip ? arrivalAt(toPickup.durationMin + trip.durationMin, now) : null,
-      toDropoff: toDrop ? { km: toDrop.distanceKm, minutes: toDrop.durationMin, line: toDrop.coordinates } : null,
+      toDropoff: toDrop ? { km: toDrop.distanceKm, minutes: toDrop.durationMin, line: toDrop.coordinates, steps: toDrop.steps ?? [] } : null,
     };
   },
   { auth: { roles: ["DRIVER"] }, rateLimit: "tracking" },

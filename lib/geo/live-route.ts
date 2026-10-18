@@ -23,12 +23,37 @@ import { estimateRoad, haversineKm, type LatLng } from "@/lib/geo";
 
 export type RouteBasis = "road-network" | "estimate";
 
+/** One turn of the road route, for the driver's guide. */
+export interface RouteStep {
+  text: string;
+  km: number;
+  minutes: number;
+}
+
 export interface LiveRoute {
   distanceKm: number;
   durationMin: number;
   /** [lng, lat] pairs, ready for a map line. Empty for the estimate. */
   coordinates: [number, number][];
   basis: RouteBasis;
+  /** Turn-by-turn instructions, when the routing service gave them. Absent for the estimate. */
+  steps?: RouteStep[];
+}
+
+const MAX_STEPS = 80;
+
+/** Keeps the instructions a phone can show: text, length and time of each, capped. Anything malformed is dropped. */
+export function cleanSteps(raw: unknown): RouteStep[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const out: RouteStep[] = [];
+  for (const s of raw as Array<{ instruction?: unknown; distance?: unknown; duration?: unknown }>) {
+    if (typeof s?.instruction !== "string" || !s.instruction.trim()) continue;
+    const d = typeof s.distance === "number" && Number.isFinite(s.distance) ? s.distance : 0;
+    const t = typeof s.duration === "number" && Number.isFinite(s.duration) ? s.duration : 0;
+    out.push({ text: s.instruction.trim().slice(0, 140), km: Math.round(d / 10) / 100, minutes: Math.round(t / 6) / 10 });
+    if (out.length >= MAX_STEPS) break;
+  }
+  return out.length ? out : undefined;
 }
 
 export type RoutingProvider = "ors" | "osrm";
@@ -151,14 +176,21 @@ class RoutingPause extends Error {
 type Parsed = LiveRoute | null;
 
 async function attemptOsrm(baseUrl: string, from: LatLng, to: LatLng): Promise<Parsed> {
-  const url = `${baseUrl}/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
+  const url = `${baseUrl}/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson&steps=true`;
   const res = await fetch(url, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(TIMEOUT_MS) });
   if (res.status >= 500) throw new Error(`routing ${res.status}`);
   if (!res.ok) return null;
-  const data = (await res.json()) as { routes?: Array<{ distance: number; duration: number; geometry?: { coordinates?: [number, number][] } }> };
+  const data = (await res.json()) as { routes?: Array<{ distance: number; duration: number; geometry?: { coordinates?: [number, number][] }; legs?: Array<{ steps?: Array<{ name?: string; distance?: number; duration?: number; maneuver?: { type?: string; modifier?: string } }> }> }> };
   const r = data.routes?.[0];
   if (!r || !Number.isFinite(r.distance) || !Number.isFinite(r.duration)) return null;
-  return { distanceKm: Math.round(r.distance / 100) / 10, durationMin: Math.max(1, Math.round(r.duration / 60)), coordinates: thin(r.geometry?.coordinates ?? []), basis: "road-network" };
+  const steps = cleanSteps(
+    (r.legs?.[0]?.steps ?? []).map((st) => ({
+      instruction: [st.maneuver?.type === "arrive" ? "Arrive" : st.maneuver?.type === "depart" ? "Head out" : (st.maneuver?.modifier ? `Turn ${st.maneuver.modifier}` : "Continue"), st.name ? `on ${st.name}` : ""].filter(Boolean).join(" "),
+      distance: st.distance,
+      duration: st.duration,
+    })),
+  );
+  return { distanceKm: Math.round(r.distance / 100) / 10, durationMin: Math.max(1, Math.round(r.duration / 60)), coordinates: thin(r.geometry?.coordinates ?? []), basis: "road-network", steps };
 }
 
 async function attemptOrs(cfg: RoutingConfig, from: LatLng, to: LatLng): Promise<Parsed> {
@@ -167,7 +199,7 @@ async function attemptOrs(cfg: RoutingConfig, from: LatLng, to: LatLng): Promise
     headers: { Authorization: cfg.apiKey!, "Content-Type": "application/json", Accept: "application/geo+json", "User-Agent": UA },
     // ORS looks only 350 m from a point for a road by default. A pickup inside an airport terminal or a big building can be further, and
     // would then get no route at all (a labelled estimate instead). 1500 m is a bounded, generous search.
-    body: JSON.stringify({ coordinates: [[from.lng, from.lat], [to.lng, to.lat]], radiuses: [ORS_SNAP_RADIUS_M, ORS_SNAP_RADIUS_M], instructions: false }),
+    body: JSON.stringify({ coordinates: [[from.lng, from.lat], [to.lng, to.lat]], radiuses: [ORS_SNAP_RADIUS_M, ORS_SNAP_RADIUS_M], instructions: true }),
     signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   if (res.status === 429) {
@@ -180,11 +212,11 @@ async function attemptOrs(cfg: RoutingConfig, from: LatLng, to: LatLng): Promise
   if (res.status >= 500) throw new Error(`routing ${res.status}`);
   // 404 = no route / point not near a road, 400 = bad request: a real answer, not a failure of the service.
   if (!res.ok) return null;
-  const data = (await res.json()) as { features?: Array<{ properties?: { summary?: { distance?: number; duration?: number } }; geometry?: { coordinates?: [number, number][] } }> };
+  const data = (await res.json()) as { features?: Array<{ properties?: { summary?: { distance?: number; duration?: number }; segments?: Array<{ steps?: unknown[] }> }; geometry?: { coordinates?: [number, number][] } }> };
   const f = data.features?.[0];
   const sum = f?.properties?.summary;
   if (!f || typeof sum?.distance !== "number" || typeof sum.duration !== "number" || !Number.isFinite(sum.distance) || !Number.isFinite(sum.duration)) return null;
-  return { distanceKm: Math.round(sum.distance / 100) / 10, durationMin: Math.max(1, Math.round(sum.duration / 60)), coordinates: thin(f.geometry?.coordinates ?? []), basis: "road-network" };
+  return { distanceKm: Math.round(sum.distance / 100) / 10, durationMin: Math.max(1, Math.round(sum.duration / 60)), coordinates: thin(f.geometry?.coordinates ?? []), basis: "road-network", steps: cleanSteps(f.properties?.segments?.[0]?.steps) };
 }
 
 const attempt = (cfg: RoutingConfig, from: LatLng, to: LatLng): Promise<Parsed> => (cfg.provider === "ors" ? attemptOrs(cfg, from, to) : attemptOsrm(cfg.baseUrl!, from, to));

@@ -231,7 +231,7 @@ describe("liveRoute with OpenRouteService", () => {
     expect(url).not.toContain(KEY);
     expect((init.headers as Record<string, string>).Authorization).toBe(KEY);
     expect(String(init.body)).not.toContain(KEY);
-    expect(JSON.parse(String(init.body))).toEqual({ coordinates: [[A.lng, A.lat], [B.lng, B.lat]], radiuses: [1500, 1500], instructions: false });
+    expect(JSON.parse(String(init.body))).toEqual({ coordinates: [[A.lng, A.lat], [B.lng, B.lat]], radiuses: [1500, 1500], instructions: true });
     expect(init.method).toBe("POST");
   });
 
@@ -318,5 +318,31 @@ describe("liveRoute with OpenRouteService", () => {
       throw new Error("synchronous failure");
     });
     await expect(liveRoute("n1:to-pickup", A, B)).resolves.toMatchObject({ basis: "estimate" });
+  });
+});
+
+import { cleanSteps } from "@/lib/geo/live-route";
+
+describe("turn-by-turn steps", () => {
+  it("keeps readable steps with their length and time, drops malformed ones", () => {
+    const steps = cleanSteps([
+      { instruction: "Head north on Carrer de Provença", distance: 420, duration: 60 },
+      { instruction: "   " },
+      { distance: 5 },
+      { instruction: "Turn left onto Gran Via", distance: 1530, duration: 150 },
+    ]);
+    expect(steps).toEqual([
+      { text: "Head north on Carrer de Provença", km: 0.42, minutes: 1 },
+      { text: "Turn left onto Gran Via", km: 1.53, minutes: 2.5 },
+    ]);
+  });
+  it("returns nothing when there are no usable steps", () => {
+    expect(cleanSteps(undefined)).toBeUndefined();
+    expect(cleanSteps([])).toBeUndefined();
+    expect(cleanSteps([{ foo: 1 }])).toBeUndefined();
+  });
+  it("caps a very long route", () => {
+    const many = Array.from({ length: 300 }, (_, i) => ({ instruction: `Step ${i}`, distance: 10, duration: 1 }));
+    expect(cleanSteps(many)).toHaveLength(80);
   });
 });
