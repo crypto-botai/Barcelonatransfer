@@ -38,6 +38,23 @@ export interface LiveRoute {
   basis: RouteBasis;
   /** Turn-by-turn instructions, when the routing service gave them. Absent for the estimate. */
   steps?: RouteStep[];
+  /** When this answer was worked out (ms since the epoch). The apps use it to tell a stale route from a current one. */
+  computedAt?: number;
+}
+
+/**
+ * A line the map may draw: at least two points, every one a finite [lng, lat] inside the world, none at 0,0 ("not set").
+ * Anything else is dropped as a whole, never repaired, so a broken answer shows no line instead of a wrong one.
+ */
+export function validLine(coords: unknown): [number, number][] {
+  if (!Array.isArray(coords) || coords.length < 2) return [];
+  for (const c of coords) {
+    if (!Array.isArray(c) || c.length < 2) return [];
+    const [lng, lat] = c as [unknown, unknown];
+    if (typeof lng !== "number" || typeof lat !== "number" || !Number.isFinite(lng) || !Number.isFinite(lat)) return [];
+    if (lng < -180 || lng > 180 || lat < -90 || lat > 90 || (lng === 0 && lat === 0)) return [];
+  }
+  return coords as [number, number][];
 }
 
 const MAX_STEPS = 80;
@@ -190,7 +207,7 @@ async function attemptOsrm(baseUrl: string, from: LatLng, to: LatLng): Promise<P
       duration: st.duration,
     })),
   );
-  return { distanceKm: Math.round(r.distance / 100) / 10, durationMin: Math.max(1, Math.round(r.duration / 60)), coordinates: thin(r.geometry?.coordinates ?? []), basis: "road-network", steps };
+  return { distanceKm: Math.round(r.distance / 100) / 10, durationMin: Math.max(1, Math.round(r.duration / 60)), coordinates: thin(validLine(r.geometry?.coordinates)), basis: "road-network", steps };
 }
 
 async function attemptOrs(cfg: RoutingConfig, from: LatLng, to: LatLng): Promise<Parsed> {
@@ -216,7 +233,7 @@ async function attemptOrs(cfg: RoutingConfig, from: LatLng, to: LatLng): Promise
   const f = data.features?.[0];
   const sum = f?.properties?.summary;
   if (!f || typeof sum?.distance !== "number" || typeof sum.duration !== "number" || !Number.isFinite(sum.distance) || !Number.isFinite(sum.duration)) return null;
-  return { distanceKm: Math.round(sum.distance / 100) / 10, durationMin: Math.max(1, Math.round(sum.duration / 60)), coordinates: thin(f.geometry?.coordinates ?? []), basis: "road-network", steps: cleanSteps(f.properties?.segments?.[0]?.steps) };
+  return { distanceKm: Math.round(sum.distance / 100) / 10, durationMin: Math.max(1, Math.round(sum.duration / 60)), coordinates: thin(validLine(f.geometry?.coordinates)), basis: "road-network", steps: cleanSteps(f.properties?.segments?.[0]?.steps) };
 }
 
 const attempt = (cfg: RoutingConfig, from: LatLng, to: LatLng): Promise<Parsed> => (cfg.provider === "ors" ? attemptOrs(cfg, from, to) : attemptOsrm(cfg.baseUrl!, from, to));
@@ -322,7 +339,7 @@ export async function liveRoute(key: string, from: LatLng, to: LatLng, now = Dat
     fresh = null;
   }
   const est = estimateRoad(from, to);
-  const route: LiveRoute = fresh ?? { distanceKm: est.distanceKm, durationMin: Math.max(1, est.durationMin), coordinates: [], basis: "estimate" };
+  const route: LiveRoute = { ...(fresh ?? { distanceKm: est.distanceKm, durationMin: Math.max(1, est.durationMin), coordinates: [], basis: "estimate" as const }), computedAt: now };
   if (cache.size > 500) cache.clear();
   cache.set(key, { at: now, from, to, route });
   return route;

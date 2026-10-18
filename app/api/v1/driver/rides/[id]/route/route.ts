@@ -32,7 +32,7 @@ export const GET = apiHandler(
 
     // Routes only for an open ride: a completed or cancelled one has nothing left to drive.
     if (ride.status !== "DRIVER_ASSIGNED" && ride.status !== "IN_PROGRESS") {
-      return { from: null, trafficAware: false as const, basis: null, toPickup: null, trip: null, dropoffAt: null, toDropoff: null };
+      return { from: null, stage: ride.rideStage, routeAt: null, trafficAware: false as const, basis: null, toPickup: null, trip: null, dropoffAt: null, toDropoff: null };
     }
 
     const now = Date.now();
@@ -43,8 +43,14 @@ export const GET = apiHandler(
     const trip = pickup && drop ? await liveRoute(`${id}:trip`, pickup, drop) : null;
     const toDrop = onBoard && from && drop ? await liveRoute(`${id}:to-drop`, from, drop) : null;
 
+    // The planned journey never changes, so only the leg from the car says how current the answer is.
+    const live = toPickup ?? toDrop;
+    const computed = Math.min(live?.computedAt ?? now, now);
     return {
       from,
+      // Which stage this answer was worked out for, and when, so a screen that has since moved on can tell it is out of date.
+      stage: ride.rideStage,
+      routeAt: live ? new Date(computed).toISOString() : null,
       trafficAware: false,
       basis: (toPickup ?? toDrop ?? trip)?.basis ?? null,
       toPickup: toPickup ? { km: toPickup.distanceKm, minutes: toPickup.durationMin, arrivesAt: arrivalAt(toPickup.durationMin, now), line: toPickup.coordinates, steps: toPickup.steps ?? [] } : null,

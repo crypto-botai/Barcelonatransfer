@@ -346,3 +346,24 @@ describe("turn-by-turn steps", () => {
     expect(cleanSteps(many)).toHaveLength(80);
   });
 });
+
+import { validLine } from "@/lib/geo/live-route";
+
+describe("validLine", () => {
+  it("keeps a real line", () => {
+    const line: [number, number][] = [[2.07, 41.29], [2.17, 41.38]];
+    expect(validLine(line)).toBe(line);
+  });
+  it("drops anything that is not a drawable road", () => {
+    expect(validLine(undefined)).toEqual([]);
+    expect(validLine([])).toEqual([]);
+    expect(validLine([[2, 41]])).toEqual([]);
+    expect(validLine([[2, 41], [Number.NaN, 41]])).toEqual([]);
+    expect(validLine([[2, 41], [Infinity, 41]])).toEqual([]);
+    expect(validLine([[2, 41], [181, 41]])).toEqual([]);
+    expect(validLine([[2, 41], [2, -91]])).toEqual([]);
+    expect(validLine([[2, 41], [0, 0]])).toEqual([]);
+    expect(validLine([[2, 41], ["2", "41"]])).toEqual([]);
+    expect(validLine([[2, 41], [3]])).toEqual([]);
+  });
+});

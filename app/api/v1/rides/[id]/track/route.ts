@@ -63,6 +63,8 @@ export const GET = apiHandler(
         dropoffAt: leg && toward === "DROPOFF" ? arrivalAt(leg.durationMin, now) : trip && leg ? arrivalAt(leg.durationMin + trip.durationMin, now) : null,
       },
       route: {
+        // When the line to the next stop was worked out (the planned journey never changes), so the app can tell a stale route from a current one.
+        at: leg ? new Date(Math.min(leg.computedAt ?? now, now)).toISOString() : null,
         // The line from the car to the next stop, and the planned journey (pickup to destination).
         toNextStop: leg ? leg.coordinates : null,
         trip: trip ? trip.coordinates : null,

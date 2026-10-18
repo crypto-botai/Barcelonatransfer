@@ -62,6 +62,7 @@ import { POST as driverLocation } from "@/app/api/v1/driver/location/route";
 import { GET as customerTrack } from "@/app/api/v1/rides/[id]/track/route";
 import { POST as shareLocation } from "@/app/api/v1/rides/[id]/location/route";
 import { GET as driverRide } from "@/app/api/v1/driver/rides/[id]/route";
+import { GET as driverRoute } from "@/app/api/v1/driver/rides/[id]/route/route";
 import { POST as stage } from "@/app/api/v1/driver/rides/[id]/stage/route";
 import { GET as liveFleet } from "@/app/api/admin/live-fleet/route";
 
@@ -249,5 +250,106 @@ describe("driver GPS -> backend -> customer map -> admin map, through the real h
     db.bookings[0].driverResponseBy = "d2";
     expect((await call(driverLocation, OMAR, { method: "POST", body: fix() })).status).toBe(404);
     expect((await call(driverRide, OMAR, { id: "r1" })).status).toBe(404);
+  });
+});
+
+describe("the road route the maps draw", () => {
+  const ors = (geometry: unknown) =>
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true, status: 200, headers: new Headers(),
+      json: async () => ({ features: [{ properties: { summary: { distance: 6000, duration: 600 }, segments: [{ steps: [{ instruction: "Head north", distance: 300, duration: 40 }] }] }, geometry: { coordinates: geometry } }] }),
+    } as Response);
+  const withOrs = () => {
+    process.env.ROUTING_PROVIDER = "ors";
+    process.env.ORS_API_KEY = "chain-test-key-not-real-0123456789";
+  };
+  const cleanUp = () => {
+    vi.restoreAllMocks();
+    delete process.env.ROUTING_PROVIDER;
+    delete process.env.ORS_API_KEY;
+  };
+
+  it("a broken line is dropped as a whole, but the distance and time the service gave are kept", async () => {
+    db.bookings[0].rideStage = "ON_THE_WAY";
+    db.bookings[0].status = "IN_PROGRESS";
+    withOrs();
+    for (const bad of [[[2.09, 41.31]], [[2.09, 41.31], [Number.NaN, 41.2]], [[2.09, 41.31], [200, 41.2]], [[2.09, 41.31], [0, 0]], [[2.09, 41.31], "x"], null]) {
+      resetRoutingState();
+      cleanUp();
+      withOrs();
+      ors(bad);
+      await call(driverLocation, OMAR, { method: "POST", body: fix() });
+      const seen = (await call(customerTrack, ANA, { id: "r1" })).json.data!;
+      expect(seen.route.toNextStop).toEqual([]);
+      expect(seen).toMatchObject({ basis: "road-network", etaMinutes: 10, roadKm: 6 });
+      const d = (await call(driverRoute, OMAR, { id: "r1", path: "/x?lat=41.31&lng=2.09" })).json.data!;
+      expect(d.toPickup.line).toEqual([]);
+      expect(d.toPickup).toMatchObject({ km: 6, minutes: 10 });
+    }
+    cleanUp();
+  });
+
+  it("a good line comes through untouched, with turn-by-turn steps for the driver", async () => {
+    db.bookings[0].rideStage = "ON_THE_WAY";
+    db.bookings[0].status = "IN_PROGRESS";
+    withOrs();
+    ors([[2.09, 41.31], [2.085, 41.3], [2.0785, 41.2971]]);
+    const res = (await call(driverRoute, OMAR, { id: "r1", path: "/x?lat=41.31&lng=2.09" })).json.data!;
+    expect(res.toPickup.line).toHaveLength(3);
+    expect(res.toPickup.steps).toEqual([{ text: "Head north", km: 0.3, minutes: 0.7 }]);
+    expect(res.basis).toBe("road-network");
+    cleanUp();
+  });
+
+  it("the driver's route follows the ride stage: to the pickup first, to the destination once the passenger is on board", async () => {
+    db.bookings[0].status = "IN_PROGRESS";
+    withOrs();
+    ors([[2.09, 41.31], [2.0785, 41.2971]]);
+    db.bookings[0].rideStage = "ON_THE_WAY";
+    const before = (await call(driverRoute, OMAR, { id: "r1", path: "/x?lat=41.31&lng=2.09" })).json.data!;
+    expect(before).toMatchObject({ stage: "ON_THE_WAY" });
+    expect(before.toPickup).toBeTruthy();
+    expect(before.toDropoff).toBeNull();
+    resetRoutingState();
+    db.bookings[0].rideStage = "ON_BOARD";
+    const after = (await call(driverRoute, OMAR, { id: "r1", path: "/x?lat=41.33&lng=2.1" })).json.data!;
+    expect(after).toMatchObject({ stage: "ON_BOARD" });
+    expect(after.toPickup).toBeNull();
+    expect(after.toDropoff).toBeTruthy();
+    cleanUp();
+  });
+
+  it("each answer says when it was worked out, and a cached leg keeps its original time", async () => {
+    db.bookings[0].rideStage = "ON_THE_WAY";
+    db.bookings[0].status = "IN_PROGRESS";
+    withOrs();
+    ors([[2.09, 41.31], [2.0785, 41.2971]]);
+    const first = (await call(driverRoute, OMAR, { id: "r1", path: "/x?lat=41.31&lng=2.09" })).json.data!;
+    expect(typeof first.routeAt).toBe("string");
+    await new Promise((r) => setTimeout(r, 30));
+    const second = (await call(driverRoute, OMAR, { id: "r1", path: "/x?lat=41.31&lng=2.09" })).json.data!;
+    expect(second.routeAt).toBe(first.routeAt);
+    cleanUp();
+  });
+
+  it("the driver's route is refused to customers and to a driver who does not own the ride, and shows nothing after completion", async () => {
+    db.bookings[0].rideStage = "ON_THE_WAY";
+    db.bookings[0].status = "IN_PROGRESS";
+    expect((await call(driverRoute, ANA, { id: "r1" })).status).toBe(403);
+    expect((await call(driverRoute, null, { id: "r1" })).status).toBe(401);
+    expect((await call(driverRoute, LEO, { id: "r1" })).status).toBe(404);
+    db.bookings[0].status = "COMPLETED";
+    expect((await call(driverRoute, OMAR, { id: "r1" })).json.data).toMatchObject({ toPickup: null, trip: null, toDropoff: null, routeAt: null });
+  });
+
+  it("a customer sees the route only for their own ride, and not before it is under way", async () => {
+    db.bookings[0].rideStage = "ON_THE_WAY";
+    db.bookings[0].status = "IN_PROGRESS";
+    await call(driverLocation, OMAR, { method: "POST", body: fix() });
+    expect((await call(customerTrack, BEN, { id: "r1" })).status).toBe(404);
+    expect((await call(customerTrack, OMAR, { id: "r1" })).status).toBe(403);
+    expect((await call(customerTrack, null, { id: "r1" })).status).toBe(401);
+    db.bookings[0].rideStage = null;
+    expect((await call(customerTrack, ANA, { id: "r1" })).json.data).toEqual({ live: false, status: "IN_PROGRESS", stage: null });
   });
 });
