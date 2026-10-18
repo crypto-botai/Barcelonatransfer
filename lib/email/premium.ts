@@ -1,4 +1,5 @@
 import { COMPANY } from "@/lib/company-facts";
+import { CUSTOMER_APP_LINKS, customerAppPromoEnabled } from "@/lib/mobile-apps";
 import { telHref, waHref, displayPhone, isDialable } from "@/lib/phone";
 
 /**
@@ -90,6 +91,32 @@ function button(href: string, text: string): string {
 
 function secondaryLink(href: string, text: string): string {
   return `<a href="${href}" style="font-family:${SANS};font-size:13px;color:${GOLD};text-decoration:none;border-bottom:1px solid ${GOLD_EDGE};padding-bottom:2px;">${esc(text)}</a>`;
+}
+
+/**
+ * "Get the app" panel for the booking confirmation.
+ *
+ * Empty unless CUSTOMER_APP_PROMO=1 (see lib/mobile-apps.ts), so it can sit in
+ * the template before the store listings are public.
+ */
+function appDownloadSection(): string {
+  if (!customerAppPromoEnabled()) return "";
+  return `
+    ${sectionSpacer(28)}
+    <tr><td style="padding:0 44px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${PANEL};border:1px solid ${GOLD_EDGE};">
+        <tr><td style="padding:22px 26px;">
+          <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${LABEL};">Our app</div>
+          <div style="font-family:${SERIF};font-size:20px;color:${TITLE};padding-top:8px;">Follow your chauffeur on the day.</div>
+          <div style="font-family:${SANS};font-size:13px;line-height:21px;color:${TEXT};padding-top:8px;">Download the EliteBCN app for the best experience: see your bookings in one place, follow your chauffeur on a live map and get a message when they are on the way.</div>
+          <div style="padding-top:16px;">
+            ${secondaryLink(CUSTOMER_APP_LINKS.android, "Get it on Google Play")}
+            <span style="color:${LABEL};">&nbsp;&middot;&nbsp;</span>
+            ${secondaryLink(CUSTOMER_APP_LINKS.ios, "Download on the App Store")}
+          </div>
+        </td></tr>
+      </table>
+    </td></tr>`;
 }
 
 /** Gold-bordered reference block. */
@@ -396,6 +423,7 @@ export function bookingReceivedCard(o: {
         </table>
       </td></tr>
     ` : ""}
+    ${appDownloadSection()}
     ${sectionSpacer(32)}
 
     <tr><td style="padding:0 44px;text-align:center;">
