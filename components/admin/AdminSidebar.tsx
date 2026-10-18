@@ -31,6 +31,7 @@ const NAV: NavItem[] = [
   { icon: Wallet,          label: "Withdrawals", href: "/admin/withdrawals" },
   { icon: Car,             label: "Fleet",       href: "/admin/fleet" },
   { icon: DollarSign,      label: "Pricing",     href: "/admin/pricing" },
+  { icon: DollarSign,      label: "Price calculator", href: "/admin/price-calculator" },
   { icon: Star,            label: "Reviews",     href: "/admin/reviews" },
   { icon: Clock,           label: "Abandoned",   href: "/admin/abandoned" },
   { icon: Tag,             label: "Coupons",     href: "/admin/coupons" },
