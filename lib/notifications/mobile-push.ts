@@ -49,6 +49,7 @@ export const MOBILE_EVENTS: ReadonlySet<string> = new Set([
   "RATE_RIDE",
   "BOOKING_CANCELLED",
   "TRIP_MESSAGE",
+  "CHAT_MESSAGE",
   "DRIVER_NEW_JOB",
   "DRIVER_JOB_CANCELLED",
   "FLIGHT_DELAYED_DRIVER",

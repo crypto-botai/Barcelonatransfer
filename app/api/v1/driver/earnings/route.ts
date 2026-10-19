@@ -26,21 +26,25 @@ export const GET = apiHandler(
     // The chart needs the last 30 days even at the start of a month, so read from whichever is earlier.
     const since = new Date(Math.min(p.month.getTime(), Date.now() - 31 * 86_400_000));
     const rows = await prisma.booking.findMany({
-      where: { driverId: driver.id, status: "COMPLETED", isDeleted: false, rideEndedAt: { gte: since } },
-      orderBy: { rideEndedAt: "desc" },
-      select: { id: true, confirmationCode: true, pickupAddress: true, dropoffAddress: true, driverAmount: true, rideEndedAt: true },
+      // A completed ride normally has an end time, but one completed by the office, or before the end time was recorded, has none.
+      // It still counts, at its pickup time, so it is not silently missing from the driver's earnings.
+      where: { driverId: driver.id, status: "COMPLETED", isDeleted: false, OR: [{ rideEndedAt: { gte: since } }, { rideEndedAt: null, pickupDatetime: { gte: since } }] },
+      select: { id: true, confirmationCode: true, pickupAddress: true, dropoffAddress: true, driverAmount: true, rideEndedAt: true, pickupDatetime: true },
     });
+    // The moment each ride counts for: when it ended, else when it was due.
+    const counted = rows
+      .map((r) => ({ ...r, at: r.rideEndedAt ?? r.pickupDatetime }))
+      .sort((a, b) => b.at.getTime() - a.at.getTime());
 
     const sum = (from: Date) => {
-      const inRange = rows.filter((r) => r.rideEndedAt && r.rideEndedAt >= from);
+      const inRange = counted.filter((r) => r.at >= from);
       return { rides: inRange.length, amount: r2(inRange.reduce((s, r) => s + (r.driverAmount ?? 0), 0)), currency: "EUR" };
     };
 
     // One point per Madrid day for the last 30 days, oldest first, empty days included so the chart has no gaps.
     const byDay = new Map<string, { amount: number; rides: number }>();
-    for (const r of rows) {
-      if (!r.rideEndedAt) continue;
-      const k = dayKey(r.rideEndedAt);
+    for (const r of counted) {
+      const k = dayKey(r.at);
       const cur = byDay.get(k) ?? { amount: 0, rides: 0 };
       cur.amount += r.driverAmount ?? 0;
       cur.rides += 1;
@@ -57,15 +61,15 @@ export const GET = apiHandler(
       today: sum(p.today),
       week: sum(p.week),
       month: sum(p.month),
-      recent: rows.slice(0, 10).map((r) => ({
+      recent: counted.slice(0, 10).map((r) => ({
         id: r.id,
         code: r.confirmationCode,
         route: `${r.pickupAddress}${r.dropoffAddress.trim() ? ` → ${r.dropoffAddress}` : ""}`,
         amount: r.driverAmount,
-        endedAt: r.rideEndedAt ? r.rideEndedAt.toISOString() : null,
+        endedAt: r.at.toISOString(),
       })),
       // Rides completed this month with no payout set: the office has not priced them for the driver yet.
-      unpriced: rows.filter((r) => r.driverAmount === null && r.rideEndedAt && r.rideEndedAt >= p.month).length,
+      unpriced: counted.filter((r) => r.driverAmount === null && r.at >= p.month).length,
     };
   },
   { auth: { roles: ["DRIVER"] } },

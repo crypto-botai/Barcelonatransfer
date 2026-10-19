@@ -336,6 +336,8 @@ model Booking {
   noShow   NoShowReport?
   payment  Payment?
   messages TripMessage[]
+  chatAttachments TripChatAttachment[]
+  chatReads TripChatRead[]
 
   @@map("bookings")
 }
@@ -1173,6 +1175,13 @@ enum TripSender {
   ADMIN
 }
 
+/// Who may read a trip message. SHARED: the customer, the assigned chauffeur and the office (and the dispatching company on the website).
+/// PRIVATE: only the office and ONE other person (`toParty`), or a reply from that person to the office. The other party never sees it.
+enum ChatScope {
+  SHARED
+  PRIVATE
+}
+
 model TripMessage {
   id         String     @id @default(cuid())
   bookingId  String
@@ -1181,10 +1190,52 @@ model TripMessage {
   body       String     @db.Text
   createdAt  DateTime   @default(now())
 
+  /// Added for the mobile chat. All additive with defaults, so existing rows are SHARED text messages and nothing existing changes.
+  scope        ChatScope   @default(SHARED)
+  /// PRIVATE only: the person it is for (CUSTOMER or DRIVER), or ADMIN for a reply to the office.
+  toParty      TripSender?
+  /// Chosen by the sending app, so a message sent twice (a retry after a dropped signal) is stored once.
+  clientId     String?
+  /// An image from trip_chat_attachments.
+  attachmentId String?
+  /// The signed-in office user who wrote an ADMIN message.
+  adminUserId  String?
+
   booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
+  @@unique([bookingId, sender, clientId])
   @@index([bookingId, createdAt])
+  @@index([bookingId, scope, createdAt])
   @@map("trip_messages")
+}
+
+/// A photo sent in a trip chat (for example the pickup point). Kept in the database, not on a public URL: it is only served to the people
+/// who can read that booking's chat, by an authorised request.
+model TripChatAttachment {
+  id         String     @id @default(cuid())
+  bookingId  String
+  uploadedBy TripSender
+  mime       String
+  size       Int
+  data       Bytes
+  createdAt  DateTime   @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@map("trip_chat_attachments")
+}
+
+/// How far each person has read a booking's chat (for unread counts). party is CUSTOMER, DRIVER or ADMIN (the office, shared).
+model TripChatRead {
+  bookingId String
+  party     TripSender
+  readAt    DateTime
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@id([bookingId, party])
+  @@map("trip_chat_reads")
 }
 
 /// One refresh token of a signed-in phone, for the mobile apps (/api/v1).

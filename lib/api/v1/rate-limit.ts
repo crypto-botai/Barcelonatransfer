@@ -35,6 +35,10 @@ export const RATE_LIMITS = {
   quote: { limit: 30, windowSeconds: 60 },
   /** Driver GPS ingest: one fix every few seconds, with headroom for batches. */
   tracking: { limit: 60, windowSeconds: 60 },
+  /** Chat sends and photo uploads: a person types, so this is generous for talking and tight for flooding. */
+  chatSend: { limit: 20, windowSeconds: 60 },
+  /** Chat polling while a conversation is open (every few seconds). */
+  chatRead: { limit: 60, windowSeconds: 60 },
 } as const;
 
 export class MemoryRateLimiter implements RateLimiter {

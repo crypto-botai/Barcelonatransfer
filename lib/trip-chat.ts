@@ -74,7 +74,8 @@ export async function identifyParticipant(bookingId: string, code?: string | nul
 
 export async function listMessages(bookingId: string, after?: string | null) {
   const rows = await prisma.tripMessage.findMany({
-    where: { bookingId, ...(after ? { createdAt: { gt: new Date(after) } } : {}) },
+    // Shared messages only: this is the website's customer/driver/company view, and a private office message must never reach it.
+    where: { bookingId, scope: "SHARED", ...(after ? { createdAt: { gt: new Date(after) } } : {}) },
     orderBy: { createdAt: "asc" },
     take: 200,
     select: { id: true, sender: true, senderName: true, body: true, createdAt: true },

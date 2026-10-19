@@ -33,6 +33,7 @@ export const NOTIFICATION_EVENTS = [
   "BOOKING_CONFIRMED_ADMIN",
   "NEW_LEAD",
   "OFFICE_MESSAGE",
+  "CHAT_MESSAGE",
 ] as const;
 
 export type NotificationEvent = (typeof NOTIFICATION_EVENTS)[number];
@@ -320,6 +321,17 @@ export const EVENT_DEFS: Record<NotificationEvent, EventDef> = {
       es: { title: "Mensaje de {{from}}",         body: "{{text}}" },
       fr: { title: "Message de {{from}}",         body: "{{text}}" },
       de: { title: "Nachricht von {{from}}",      body: "{{text}}" },
+    },
+  },
+
+  // Live chat. The text never carries the message: a lock screen must not show a chat message, shared or private.
+  CHAT_MESSAGE: {
+    channels: ["push"],
+    copy: {
+      en: { title: "New message", body: "{{from}} sent you a message. Open Elite BCN to read it." },
+      es: { title: "Mensaje nuevo", body: "{{from}} te ha enviado un mensaje. Abre Elite BCN para leerlo." },
+      fr: { title: "Nouveau message", body: "{{from}} vous a envoyé un message. Ouvrez Elite BCN pour le lire." },
+      de: { title: "Neue Nachricht", body: "{{from}} hat Ihnen eine Nachricht gesendet. Öffnen Sie Elite BCN zum Lesen." },
     },
   },
 
