@@ -292,6 +292,66 @@ type TextHistory = {
 };
 
 /**
+ * The customer's email on this booking: fix a wrong address, or send the confirmation to a different one. Only the booking's
+ * address changes, never the customer's sign-in account. Every change and every resend is recorded with who did it.
+ */
+function EmailSection({ booking, onChanged }: { booking: Booking; onChanged: () => void }) {
+  const [email, setEmail] = useState(booking.guestEmail ?? "");
+  const [busy, setBusy] = useState<string | null>(null);
+  useEffect(() => { setEmail(booking.guestEmail ?? ""); }, [booking.id, booking.guestEmail]);
+
+  const dead = booking.status === "CANCELLED" || booking.status === "REFUNDED";
+  const typed = email.trim().toLowerCase();
+  const changed = typed !== (booking.guestEmail ?? "").toLowerCase();
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(typed);
+  const btn = "inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/[0.12] px-3 text-xs text-dark-100 transition-colors hover:border-gold-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-40";
+
+  async function run(label: string, send: boolean) {
+    if (send && !confirm(`Send the booking confirmation to ${typed || booking.guestEmail}?`)) return;
+    setBusy(label);
+    try {
+      const res = await fetch(`/api/admin/bookings/${booking.id}/email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...(changed ? { email: typed } : {}), send }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (body.changed) { toast.success("Email updated"); onChanged(); }
+      if (body.sent) toast.success(`Confirmation sent to ${body.email}`);
+      else if (!res.ok) toast.error(body.sendError ?? body.error ?? "Failed");
+      else if (!body.changed && !send) toast("Nothing to change");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <section className="glass-card rounded-xl p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs uppercase tracking-wider text-dark-400">Customer email</h3>
+        <span className="text-xs text-dark-500">Booking only, not their account</span>
+      </div>
+      <input
+        type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" aria-label="Customer email"
+        className="input-luxury w-full px-3 py-2 rounded-lg text-sm border-gold-500/20"
+      />
+      {typed && !valid && <p className="text-xs text-red-300">That does not look like an email address.</p>}
+      <div className="flex flex-wrap gap-2">
+        <button type="button" disabled={!changed || !valid || busy !== null} onClick={() => run("save", false)} className={btn}>
+          {busy === "save" ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />} Save email
+        </button>
+        <button type="button" disabled={!(typed && valid) || dead || busy !== null} onClick={() => run("send", true)} className={btn}>
+          {busy === "send" ? <Loader2 size={13} className="animate-spin" /> : <Mail size={13} />} {changed ? "Save and send confirmation" : "Resend confirmation"}
+        </button>
+      </div>
+      {dead && <p className="text-xs text-amber-300/80">This booking is cancelled, so a confirmation cannot be sent.</p>}
+    </section>
+  );
+}
+
+/**
  * Send this booking to the customer's phone.
  *
  * For the customers the automatic messages do not reach: booked by phone or
@@ -881,6 +941,7 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted, onRefres
 
           <PaymentSection booking={booking} onChanged={onSaved} />
           <JourneySection booking={booking} onChanged={onRefresh} />
+          <EmailSection booking={booking} onChanged={onSaved} />
           <PhoneSection booking={booking} />
 
           <PartnerSection booking={booking} onChanged={onSaved} />
