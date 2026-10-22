@@ -1,4 +1,5 @@
 import { isAirportLocation } from "@/lib/utils";
+import { S_CLASS_WAIT_PER_HOUR } from "@/lib/s-class-pricing";
 
 /**
  * Waiting time at the pickup, for the passenger's app and the driver's app alike.
@@ -11,6 +12,11 @@ import { isAirportLocation } from "@/lib/utils";
 
 export const WAIT_BLOCK_MINUTES = 30;
 export const WAIT_BLOCK_PRICE = 25;
+
+/** The price of one waiting block. 25 euros for every car except the Mercedes-Maybach S 580, which is 160 an hour (80 a block). */
+export function waitBlockPriceFor(vehicleClass?: string | null): number {
+  return vehicleClass === "FIRST_CLASS" ? (S_CLASS_WAIT_PER_HOUR * WAIT_BLOCK_MINUTES) / 60 : WAIT_BLOCK_PRICE;
+}
 
 export function freeWaitFor(airport: boolean): number {
   return airport ? 60 : 15;
@@ -33,6 +39,8 @@ export interface WaitingInput {
   landedAt: Date | null;
   pickupAt: Date;
   now: Date;
+  /** The booked car's class, for the block price. Omitted means the standard 25 euros. */
+  vehicleClass?: string | null;
 }
 
 export interface Waiting {
@@ -60,6 +68,7 @@ export function waitingState(i: WaitingInput): Waiting | null {
   const waited = Math.max(0, Math.floor((endMs - startMs) / 60_000));
   const paid = Math.max(0, waited - free);
   const blocks = Math.ceil(paid / WAIT_BLOCK_MINUTES);
+  const blockPrice = waitBlockPriceFor(i.vehicleClass);
   return {
     airport: i.airport,
     freeMinutes: free,
@@ -69,10 +78,10 @@ export function waitingState(i: WaitingInput): Waiting | null {
     minutesWaited: waited,
     freeMinutesLeft: Math.max(0, free - waited),
     paidMinutes: paid,
-    charge: blocks * WAIT_BLOCK_PRICE,
+    charge: blocks * blockPrice,
     currency: "EUR",
     blockMinutes: WAIT_BLOCK_MINUTES,
-    blockPrice: WAIT_BLOCK_PRICE,
+    blockPrice,
   };
 }
 

@@ -52,15 +52,6 @@ export interface FixedRoute {
   vehicleOverrides?: Partial<Record<import("@/types").FleetVehicle, number>>;
 
   /**
-   * The per-car price for the opposite direction, where it differs.
-   *
-   * Routes are matched both ways round and carry one figure. A car priced the same each way needs nothing more than
-   * `vehicleOverrides`. This is for the one that does not: the value here applies when the pickup is `to` and the drop-off
-   * is `from`, and a car with no entry here uses its `vehicleOverrides` price both ways.
-   */
-  reverseVehicleOverrides?: Partial<Record<import("@/types").FleetVehicle, number>>;
-
-  /**
    * The price a car USED to cost, for the cars currently on offer.
    *
    * Only ever a display figure: nothing quotes from it and nothing charges it.
@@ -119,9 +110,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // The EQE needs a per-car price for the first time: it used to be the
     // Business car and read the €65 column directly, and that column stays €65
     // because the Minivan and every other Business-class caller prices from it.
-    // The Maybach S 580 (added 22 Oct 2026, owner's prices): €250 from the airport, €235 to it.
-    vehicleOverrides: { CAMRY: 55, TESLA_M3: 55, EQE_300: 60, S_CLASS: 250 },
-    reverseVehicleOverrides: { S_CLASS: 235 },
+    vehicleOverrides: { CAMRY: 55, TESLA_M3: 55, EQE_300: 60 },
     // Display only — the fare each car charged before the 8 Sep offer.
     vehicleOffers: { CAMRY: 60, TESLA_M3: 60, EQE_300: 65 },
   },
@@ -149,8 +138,7 @@ export const FIXED_ROUTES: FixedRoute[] = [
     // Per-car, 13 Aug 2026. Camry and Tesla are Standard and Electric at €60;
     // the Business column below is €65, which is the EQE — the Business car —
     // so the EQE needs no per-car price of its own.
-    // The Maybach S 580 (added 22 Oct 2026, owner's price): €250 between the airport and the port, both ways.
-    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60, S_CLASS: 250 },
+    vehicleOverrides: { CAMRY: 60, TESLA_M3: 60 },
   },
   {
     slug: "cruise-terminal-barcelona-city",
@@ -733,7 +721,7 @@ export const VEHICLE_TO_PRICE_CLASS: Record<FleetVehicle, VehicleCode> = {
   VITO:     "MINIVAN",
   V_CLASS:  "VCLASS",
   SPRINTER: "MINIBUS",
-  // Never read for a fare: the S-Class is priced only by the per-car prices on the routes that list it (see lookupFixedPrice).
+  // Never read for a fare: the S-Class has its own rules (lib/s-class-pricing.ts).
   S_CLASS:  "VCLASS",
 };
 

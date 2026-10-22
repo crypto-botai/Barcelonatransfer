@@ -110,6 +110,7 @@ export function customerRideDto(b: Row, now = new Date(), extra: RideExtras = {}
       landedAt: extra.landedAt ?? null,
       pickupAt: b.pickupDatetime,
       now,
+      vehicleClass: b.vehicleClass,
     }),
     timeline: b.rideEvents.map((e) => ({ stage: e.stage, at: e.createdAt.toISOString() })),
     canCancel: CANCELLABLE.has(b.status) && b.pickupDatetime.getTime() > now.getTime(),

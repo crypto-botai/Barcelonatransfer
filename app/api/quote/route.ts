@@ -1,7 +1,8 @@
+import { isPortPlace, S_CLASS_PORT_MESSAGE } from "@/lib/s-class-pricing";
 import { NextRequest, NextResponse, after } from "next/server";
 import { sweepAbandonedIfDue } from "@/lib/abandoned";
 import { z } from "zod";
-import { HOURLY_RATES, MIN_HOURLY_HOURS, hourlyAvailable, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, calculateLastMinuteSurcharge, LAST_MINUTE_HOURS } from "@/lib/pricing";
+import { HOURLY_RATES, MIN_HOURLY_HOURS, hourlyRateFor, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, calculateLastMinuteSurcharge, LAST_MINUTE_HOURS } from "@/lib/pricing";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
 import { getQuote } from "@/lib/pricing-service";
 import { FLEET_TO_DB_CLASS, type VehicleClass, type FleetVehicle } from "@/types";
@@ -60,10 +61,10 @@ export async function POST(req: NextRequest) {
     const vc = vehicleClass as VehicleClass;
 
     if (bookingType === "HOURLY" || bookingType === "DAY_HIRE") {
-      if (!hourlyAvailable(vc)) return NextResponse.json({ error: "The Mercedes-Maybach S 580 is booked for airport, city and port transfers. For chauffeur hire by the hour, please choose another car or contact us." }, { status: 422 });
+      if (vc === "FIRST_CLASS" && isPortPlace({ lat: pickupLat, lng: pickupLng, address: body.pickupAddress })) return NextResponse.json({ error: S_CLASS_PORT_MESSAGE }, { status: 422 });
       const minH      = MIN_HOURLY_HOURS[vc] ?? 4;
       const hours     = bookingType === "DAY_HIRE" ? 8 : Math.max(body.durationHours ?? 4, minH);
-      const hourlyRate = HOURLY_RATES[vc] ?? 50;
+      const hourlyRate = hourlyRateFor(vc, { lat: pickupLat, lng: pickupLng, address: body.pickupAddress });
       const subtotal   = hourlyRate * hours;
       const isNight    = isNightTime(pickupDate);
       const nightSurcharge   = isNight ? Math.round(subtotal * NIGHT_SURCHARGE_RATE * 100) / 100 : 0;

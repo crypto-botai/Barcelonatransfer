@@ -80,9 +80,9 @@ binding one: check both before choosing a vehicle.
 - Per vehicle, not per person
 
 Individual cars priced below their class column:
-- El Prat Airport ⇄ Barcelona City: Toyota Camry = €55, Tesla Model 3 = €55, Mercedes EQE 300 = €60, Mercedes-Maybach S 580 = €250 (Mercedes-Maybach S 580 = €235 in the direction Barcelona City → El Prat Airport)
+- El Prat Airport ⇄ Barcelona City: Toyota Camry = €55, Tesla Model 3 = €55, Mercedes EQE 300 = €60
 - Within Barcelona city: Toyota Camry = €60, Tesla Model 3 = €60
-- El Prat Airport ⇄ Cruise Terminal: Toyota Camry = €60, Tesla Model 3 = €60, Mercedes-Maybach S 580 = €250
+- El Prat Airport ⇄ Cruise Terminal: Toyota Camry = €60, Tesla Model 3 = €60
 - Cruise Terminal ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €60
 - El Prat Airport ⇄ Castelldefels: Toyota Camry = €60, Tesla Model 3 = €60
 - Barcelona City ⇄ Castelldefels: Toyota Camry = €60, Tesla Model 3 = €60
@@ -177,6 +177,7 @@ Individual cars priced below their class column:
 | MINIVAN          | €65/h     | 4 hours |
 | LUXURY MINIVAN   | €75/h     | 4 hours |
 | MINIBUS          | €160/h    | 4 hours |
+| FIRST CLASS      | €160/h    | 4 hours |
 
 ## Waiting time
 - Airports: 60 minutes free, counted from the actual landing time

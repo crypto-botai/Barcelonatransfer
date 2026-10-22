@@ -130,6 +130,7 @@ export function driverRideDto(b: Row, now = new Date(), extra: DriverRideExtras 
       landedAt: extra.landedAt ?? null,
       pickupAt: b.pickupDatetime,
       now,
+      vehicleClass: b.vehicleClass,
     }),
     canRateCustomer: b.status === "COMPLETED" && extra.ratedCustomer === false,
     collect: collectDue({ totalAmount: b.totalAmount, paymentStatus: b.paymentStatus, paymentMethod: b.paymentMethod, balanceAmount: b.balanceAmount, balancePaidAt: b.balancePaidAt }),

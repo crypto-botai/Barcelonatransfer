@@ -16,6 +16,7 @@
  * Fallback: if the DB is unreachable, falls back to ROUTES from lib/pricing.ts.
  */
 
+import { sClassFixedFare, isPortPlace, isSantsAirportPair, sClassKmFare } from "@/lib/s-class-pricing";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import {
@@ -181,6 +182,10 @@ async function lookupFixedPrice(
   vc: VehicleClass,
   fleetVehicle?: FleetVehicle,
 ): Promise<number | null> {
+  // The S-Class has its own fixed fares and its own rules; it never reads the route table or the price columns, which would sell a
+  // Maybach at a V-Class fare.
+  if (vc === "FIRST_CLASS") return sClassFixedFare(fromZone, toZone);
+
   // Same-zone lookups are allowed: the route table is the authority, so a
   // defined same-zone route (e.g. within Barcelona city) resolves normally,
   // and an undefined one still falls through to null → custom quote.
@@ -192,16 +197,10 @@ async function lookupFixedPrice(
   // read Business while costing €60, €60, €65 and €70. Were the database
   // consulted first here, the fleet page would advertise €60 and the checkout
   // would take €70, which is the exact fault this file exists to prevent.
-  // The S-Class is the one FIRST_CLASS car, so a request that names only the class still finds its per-car price.
-  const car = fleetVehicle ?? (vc === "FIRST_CLASS" ? ("S_CLASS" as FleetVehicle) : undefined);
-  if (car) {
-    const perCar = perCarPrice(fromZone, toZone, car);
+  if (fleetVehicle) {
+    const perCar = perCarPrice(fromZone, toZone, fleetVehicle);
     if (perCar !== null) return perCar;
   }
-
-  // The S-Class has no price column and no per-kilometre rate: it costs what the routes above say and nothing else. Anywhere
-  // else it must be quoted by hand, not read off the V-Class column, which would sell a Maybach at a V-Class fare.
-  if (vc === "FIRST_CLASS") return null;
 
   // Try DB first — if it has rows and the route is found there, use it
   const rows = await getDBRoutes();
@@ -238,13 +237,6 @@ function perCarPrice(fromZone: string, toZone: string, fv: FleetVehicle): number
   const route = FIXED_ROUTES.find(
     (r) => (r.from === from && r.to === to) || (r.from === to && r.to === from),
   );
-  // Going the opposite way round to how the route is written, a car may have its own price (the S-Class: €250 from the airport,
-  // €235 to it). A route whose two ends are the same zone has no opposite way.
-  const reversed = !!route && route.from !== route.to && route.from === to;
-  if (reversed) {
-    const back = route?.reverseVehicleOverrides?.[fv];
-    if (back !== undefined) return back;
-  }
   return route?.vehicleOverrides?.[fv] ?? null;
 }
 
@@ -315,11 +307,17 @@ export async function getQuote(input: QuoteInput): Promise<Quote> {
   // cached and falls back to a fixed list when it cannot be read.
   const demand = await quoteDemand(fromZone, toZone, pickupDatetime);
 
+  // The S-Class does not go to or from the port: nobody can book it there, so it is never priced. Checked before any fare is looked
+  // up, because the "Barcelona city" zone is wide and a terminal typed as a street address would otherwise be priced as the city.
+  if (vehicleClass === "FIRST_CLASS" && (isPortPlace({ zone: fromZone, lat: pickupLat, lng: pickupLng, address: pickupAddress }) || isPortPlace({ zone: toZone, lat: dropoffLat, lng: dropoffLng, address: dropoffAddress }))) {
+    return { ...customRouteQuote(vehicleClass, distanceKm, durationMin, pickupDatetime, { fromZone, toZone, port: true }), demand };
+  }
+
   if (!fromZone || !toZone) {
     console.info(
       `[pricing-custom] zone=null pickup="${pickupAddress ?? `${pickupLat},${pickupLng}`}" dropoff="${dropoffAddress ?? `${dropoffLat},${dropoffLng}`}" vehicle=${vehicleClass}`
     );
-    return { ...customRouteQuote(vehicleClass, distanceKm, durationMin, pickupDatetime), demand };
+    return { ...customRouteQuote(vehicleClass, distanceKm, durationMin, pickupDatetime, { fromZone, toZone }), demand };
   }
 
   const fixedPrice = await lookupFixedPrice(fromZone, toZone, vehicleClass, fleetVehicle);
@@ -328,7 +326,7 @@ export async function getQuote(input: QuoteInput): Promise<Quote> {
     console.info(
       `[pricing-custom] no-table-row from=${fromZone} to=${toZone} vehicle=${vehicleClass} pickup="${pickupAddress ?? ""}" dropoff="${dropoffAddress ?? ""}"`
     );
-    return { ...customRouteQuote(vehicleClass, distanceKm, durationMin, pickupDatetime), demand };
+    return { ...customRouteQuote(vehicleClass, distanceKm, durationMin, pickupDatetime, { fromZone, toZone }), demand };
   }
 
   // The only direction-aware adjustment in the system. Everything above it
@@ -390,14 +388,23 @@ function hoursUntilPickup(dt: Date): number {
  * from, so it falls back to €0 and the UI's request-a-quote path — a guessed
  * fare would be worse than asking.
  */
-function customRouteQuote(vc: VehicleClass, distanceKm: number, durationMin: number, pickupDatetime: Date): Quote {
+function customRouteQuote(vc: VehicleClass, distanceKm: number, durationMin: number, pickupDatetime: Date, where: { fromZone: string | null; toZone: string | null; port?: boolean } = { fromZone: null, toZone: null }): Quote {
   // Price the car they actually asked for. Without this a V-Class to an unlisted
   // destination cost exactly what a sedan did, while the fixed table charged
   // half as much again for the same upgrade.
   // The same weekend rule as a table fare. A fare of 0 means "could not price",
   // and stays 0 so it still asks the customer to get in touch.
-  // Not for the S-Class: it is priced only on the routes that list it, so anywhere else it is quoted by hand.
-  const fare = vc === "FIRST_CLASS" ? 0 : withWeekend(distanceFare(distanceKm, vehicleCodeForClass(vc) ?? undefined), pickupDatetime).price;
+  // The S-Class is 4.75 euros a kilometre anywhere off its fixed fares, except the port (never priced) and Sants to the airport (no price
+  // given yet): those two are quoted by hand. Its weekend uplift is the same as every other car's.
+  const fare =
+    vc === "FIRST_CLASS"
+      ? where.port || isSantsAirportPair(where.fromZone, where.toZone)
+        ? 0
+        : (() => {
+            const base = sClassKmFare(distanceKm);
+            return base > 0 ? withWeekend(base, pickupDatetime).price : 0;
+          })()
+      : withWeekend(distanceFare(distanceKm, vehicleCodeForClass(vc) ?? undefined), pickupDatetime).price;
 
   return {
     vehicleClass:        vc,

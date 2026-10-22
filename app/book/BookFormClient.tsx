@@ -17,7 +17,7 @@ import {
   type FleetVehicle, type VehicleClass, type BookingFormData, type QuoteResponse,
   type BookingType,
 } from "@/types";
-import { getFleetFromPrice, getFleetOffer, hourlyAvailable, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+import { getFleetFromPrice, getFleetOffer, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import { RETURN_TRIPS_ENABLED } from "@/lib/feature-flags";
 import { VAT_RATE, vatOn, wantsInvoice } from "@/lib/vat";
 import { TIP_PRESETS, tipForPercent, clampTip, MAX_TIP_ABSOLUTE } from "@/lib/tips";
@@ -282,6 +282,8 @@ export default function BookFormClient() {
   // bookable. This flag means only one thing: we could not produce a price at
   // all (no drop-off coordinates, so no distance), and a human must quote it.
   const needsManualQuote = quote != null && (quote.needsManualQuote === true || quote.totalAmount <= 0);
+  // The Mercedes-Maybach S 580 is not booked to or from the port (and Sants to the airport has no fare yet): those are sent as a query.
+  const sClassQuery = needsManualQuote && data.vehicleClass === "FIRST_CLASS";
   const [loadingQ,      setLoadingQ]      = useState(false);
   const [submitting,    setSubmitting]    = useState(false);
   const [,              setBookingId]     = useState<string | null>(null);
@@ -917,7 +919,6 @@ export default function BookFormClient() {
 
                 {VEHICLE_CATALOG
                   .filter((v) => v.maxPassengers >= (data.passengers ?? 1))
-                  .filter((v) => !(bookingType === "HOURLY" || bookingType === "DAY_HIRE") || hourlyAvailable(FLEET_TO_DB_CLASS[v.class]))
                   .map((v) => {
                     const dbClass = FLEET_TO_DB_CLASS[v.class];
                     const sel = data.vehicleClass === dbClass;
@@ -1019,15 +1020,15 @@ export default function BookFormClient() {
 
                 {needsManualQuote && (
                   <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4">
-                    <p className="text-amber-400 font-medium text-sm mb-1">We couldn&apos;t calculate a price for this journey.</p>
-                    <p className="text-dark-400 text-xs mb-3">Please check the pickup and drop-off addresses, or message us and we&apos;ll quote you a fixed price by hand.</p>
+                    <p className="text-amber-400 font-medium text-sm mb-1">{sClassQuery ? "The Mercedes-Maybach S 580 is quoted on request for this journey." : "We couldn't calculate a price for this journey."}</p>
+                    <p className="text-dark-400 text-xs mb-3">{sClassQuery ? "We do not take instant bookings for the S 580 to or from the port. Send us a query and we will come back to you with a price." : "Please check the pickup and drop-off addresses, or message us and we'll quote you a fixed price by hand."}</p>
                     <a
-                      href={`https://wa.me/34635383712?text=${encodeURIComponent(`Hi, I need a quote for a transfer from ${data.pickupAddress ?? ""} to ${data.dropoffAddress ?? ""}.`)}`}
+                      href={`https://wa.me/34635383712?text=${encodeURIComponent(`Hi, I need a quote for ${sClassQuery ? "the Mercedes-Maybach S 580 " : "a transfer "}from ${data.pickupAddress ?? ""} to ${data.dropoffAddress ?? ""}.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-gold inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold"
                     >
-                      <MessageCircle size={14} /> WhatsApp for quote
+                      <MessageCircle size={14} /> {sClassQuery ? "Send us a query" : "WhatsApp for quote"}
                     </a>
                   </div>
                 )}
@@ -1190,7 +1191,7 @@ export default function BookFormClient() {
                   <h2 className="font-display text-xl text-white mb-2">{t("addExtras")}</h2>
                   <p className="text-dark-400 text-sm mb-5">Enhance your journey with optional add-ons</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {EXTRAS_CATALOG.map((extra) => {
+                    {EXTRAS_CATALOG.filter((extra) => !(extra.id === "extra_waiting" && data.vehicleClass === "FIRST_CLASS")).map((extra) => {
                       const selected = (data.extras ?? []).find((e) => e.id === extra.id);
                       return (
                         <div key={extra.id}
@@ -1447,12 +1448,12 @@ export default function BookFormClient() {
                   </button>
                   {needsManualQuote ? (
                     <a
-                      href={`https://wa.me/34635383712?text=${encodeURIComponent(`Hi, I need a quote for a transfer from ${data.pickupAddress ?? ""} to ${data.dropoffAddress ?? ""}.`)}`}
+                      href={`https://wa.me/34635383712?text=${encodeURIComponent(`Hi, I need a quote for ${sClassQuery ? "the Mercedes-Maybach S 580 " : "a transfer "}from ${data.pickupAddress ?? ""} to ${data.dropoffAddress ?? ""}.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-gold flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2"
                     >
-                      <MessageCircle size={16} /> WhatsApp for quote
+                      <MessageCircle size={16} /> {sClassQuery ? "Send us a query" : "WhatsApp for quote"}
                     </a>
                   ) : (
                     <PremiumPayButton

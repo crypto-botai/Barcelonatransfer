@@ -1,3 +1,4 @@
+import { sClassHourlyRate } from "@/lib/s-class-pricing";
 import type { VehicleClass, FleetVehicle } from "@/types";
 import { FLEET_TO_DB_CLASS } from "@/types";
 import {
@@ -159,12 +160,18 @@ export const HOURLY_RATES: Record<VehicleClass, number> = {
   MINIVAN:        65,   // Mercedes Vito
   LUXURY_MINIVAN: 75,   // Mercedes V-Class
   MINIBUS:       160,   // Mercedes Sprinter
-  FIRST_CLASS:     0,   // Maybach S 580: not offered by the hour (0 = not available; see hourlyAvailable)
+  FIRST_CLASS:   160,   // Mercedes-Maybach S 580, in the city (195 outside it: see hourlyRateFor)
 };
 
-/** Whether a class can be booked by the hour or by the day. The Maybach S 580 cannot: it is sold on its fixed transfers only. */
-export function hourlyAvailable(vc: VehicleClass): boolean {
-  return (HOURLY_RATES[vc] ?? 0) > 0;
+/**
+ * The hourly rate for a booking. Every car has one rate, except the Maybach S 580: 160 in the city and 195 outside it, by where the
+ * chauffeur picks up. The city here is Barcelona, Sants station and the airport.
+ */
+export function hourlyRateFor(vc: VehicleClass, pickup: { lat?: number | null; lng?: number | null; address?: string | null }): number {
+  if (vc !== "FIRST_CLASS") return HOURLY_RATES[vc] ?? 50;
+  const byWords = pickup.address ? resolveZoneStrict(pickup.address) : null;
+  const byPlace = byWords ?? (typeof pickup.lat === "number" && typeof pickup.lng === "number" && (pickup.lat !== 0 || pickup.lng !== 0) ? detectZoneFromCoords(pickup.lat, pickup.lng) : null);
+  return sClassHourlyRate(byPlace);
 }
 
 export const MIN_HOURLY_HOURS: Record<VehicleClass, number> = {

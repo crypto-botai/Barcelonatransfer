@@ -1,3 +1,4 @@
+import { isPortPlace, S_CLASS_PORT_MESSAGE } from "@/lib/s-class-pricing";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -8,7 +9,7 @@ import { customerExtras } from "@/lib/journeys";
 import { calendarLinks as journeyCalendar } from "@/lib/calendar";
 import { redeemCoupon, validateCoupon } from "@/lib/marketing";
 import { capacityError } from "@/lib/capacity";
-import { calculateLastMinuteSurcharge, HOURLY_RATES, MIN_HOURLY_HOURS, hourlyAvailable, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, MIN_BOOKING_HOURS } from "@/lib/pricing";
+import { calculateLastMinuteSurcharge, HOURLY_RATES, MIN_HOURLY_HOURS, hourlyRateFor, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, MIN_BOOKING_HOURS } from "@/lib/pricing";
 import { getQuote } from "@/lib/pricing-service";
 import { pickupToUtc, formatPickupDateTime } from "@/lib/datetime";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
@@ -243,10 +244,10 @@ export async function POST(req: NextRequest) {
     let returnBreakdown: typeof breakdown | null = null;
 
     if (body.bookingType === "HOURLY" || body.bookingType === "DAY_HIRE") {
-      if (!hourlyAvailable(vc)) return NextResponse.json({ error: "The Mercedes-Maybach S 580 is booked for airport, city and port transfers. For chauffeur hire by the hour, please choose another car or contact us." }, { status: 422 });
+      if (vc === "FIRST_CLASS" && isPortPlace({ lat: body.pickupLat, lng: body.pickupLng, address: body.pickupAddress })) return NextResponse.json({ error: S_CLASS_PORT_MESSAGE }, { status: 422 });
       const minH  = MIN_HOURLY_HOURS[vc] ?? 4;
       const hours = body.bookingType === "DAY_HIRE" ? 8 : Math.max(body.durationHours ?? 4, minH);
-      const hourlyRate = HOURLY_RATES[vc] ?? 50;
+      const hourlyRate = hourlyRateFor(vc, { lat: body.pickupLat, lng: body.pickupLng, address: body.pickupAddress });
       const subtotal = hourlyRate * hours;
       const nightSurcharge = isNightTime(pickupDatetime) ? subtotal * NIGHT_SURCHARGE_RATE : 0;
       const airportSurcharge = isAirportLocation(body.pickupLat, body.pickupLng) ? AIRPORT_SURCHARGE : 0;
@@ -295,7 +296,7 @@ export async function POST(req: NextRequest) {
       // no distance to work from — still needs a human.
       if (sq.needsManualQuote || sq.totalAmount <= 0) {
         return NextResponse.json(
-          { error: "We could not calculate a price for this route. Please contact us via WhatsApp." },
+          { error: vc === "FIRST_CLASS" ? "The Mercedes-Maybach S 580 is quoted on request for this journey. Please send us a query and we will come back to you." : "We could not calculate a price for this route. Please contact us via WhatsApp." },
           { status: 422 }
         );
       }
@@ -375,6 +376,10 @@ export async function POST(req: NextRequest) {
     // sent. Nothing checked either against the catalogue, so a crafted request
     // could attach an extra at a negative price and pay less than the fare.
     const tier = await tierForUser(user?.id);
+    // The S 580's waiting is charged on the day at 160 an hour, so the 25-euro prepaid waiting extra is not offered with it.
+    if (vc === "FIRST_CLASS" && (body.extras ?? []).some((e) => e.id === "extra_waiting")) {
+      return NextResponse.json({ error: "Waiting time for the Mercedes-Maybach S 580 is charged on the day at €160 per hour, so it cannot be prepaid as an extra." }, { status: 422 });
+    }
     const extrasCost = extrasCostFor(body.extras, tier);
 
     // The discount comes off the fare *and* the extras, which is what the

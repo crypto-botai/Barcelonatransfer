@@ -376,7 +376,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     smallBags: 4,
     features: ["Rear Executive Seating", "Chauffeur in Suit", "Climate Control", "WiFi", "Bottled Water"],
     image: "/fleet/maybach-s580.png",
-    description: "The flagship first-class saloon for those who want the finest arrival in Barcelona. Fixed fares between the airport, the city and the port.",
+    description: "The flagship first-class saloon for those who want the finest arrival in Barcelona. Instant booking between the airport, the city and Sants station, and by the hour or for longer journeys.",
     badge: "First Class",
   },
 ];
