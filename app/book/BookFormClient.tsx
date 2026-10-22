@@ -17,7 +17,7 @@ import {
   type FleetVehicle, type VehicleClass, type BookingFormData, type QuoteResponse,
   type BookingType,
 } from "@/types";
-import { getFleetFromPrice, getFleetOffer, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
+import { getFleetFromPrice, getFleetOffer, hourlyAvailable, HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
 import { RETURN_TRIPS_ENABLED } from "@/lib/feature-flags";
 import { VAT_RATE, vatOn, wantsInvoice } from "@/lib/vat";
 import { TIP_PRESETS, tipForPercent, clampTip, MAX_TIP_ABSOLUTE } from "@/lib/tips";
@@ -917,6 +917,7 @@ export default function BookFormClient() {
 
                 {VEHICLE_CATALOG
                   .filter((v) => v.maxPassengers >= (data.passengers ?? 1))
+                  .filter((v) => !(bookingType === "HOURLY" || bookingType === "DAY_HIRE") || hourlyAvailable(FLEET_TO_DB_CLASS[v.class]))
                   .map((v) => {
                     const dbClass = FLEET_TO_DB_CLASS[v.class];
                     const sel = data.vehicleClass === dbClass;

@@ -34,7 +34,8 @@ export type FleetVehicle =
   | "EQE_300"
   | "VITO"
   | "V_CLASS"
-  | "SPRINTER";
+  | "SPRINTER"
+  | "S_CLASS";
 
 // Converts a FleetVehicle to its Prisma-compatible VehicleClass for API / DB writes
 export const FLEET_TO_DB_CLASS: Record<FleetVehicle, VehicleClass> = {
@@ -45,6 +46,7 @@ export const FLEET_TO_DB_CLASS: Record<FleetVehicle, VehicleClass> = {
   VITO:     "MINIVAN",
   V_CLASS:  "LUXURY_MINIVAN",
   SPRINTER: "MINIBUS",
+  S_CLASS:  "FIRST_CLASS",
 };
 
 // DB-compatible vehicle class (matches the Prisma VehicleClass enum values we actually use)
@@ -55,7 +57,8 @@ export type VehicleClass =
   | "ELECTRIC_VIP"
   | "MINIVAN"
   | "LUXURY_MINIVAN"
-  | "MINIBUS";
+  | "MINIBUS"
+  | "FIRST_CLASS";
 
 export interface BookingExtra {
   id:       string;
@@ -363,6 +366,19 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     description: "Premium group transfers for corporate events, airport runs, and tours for up to 16 passengers.",
     badge: "Minibus",
   },
+  {
+    class: "S_CLASS",
+    label: "Mercedes-Maybach S 580",
+    models: ["Mercedes-Maybach S 580"],
+    maxPassengers: 3,
+    largeBags: 2,
+    mediumBags: 3,
+    smallBags: 4,
+    features: ["Rear Executive Seating", "Chauffeur in Suit", "Climate Control", "WiFi", "Bottled Water"],
+    image: "/fleet/maybach-s580.png",
+    description: "The flagship first-class saloon for those who want the finest arrival in Barcelona. Fixed fares between the airport, the city and the port.",
+    badge: "First Class",
+  },
 ];
 
 // Single source of truth for the vehicle-class badge color scheme — every fleet
@@ -385,6 +401,7 @@ export const VEHICLE_BADGE_STYLES: Record<string, string> = {
   "Luxury":         "bg-[#c9a84c] text-black",
   "Minivan":        "bg-orange-700 text-white",
   "Luxury Minivan": "bg-purple-600 text-white",
+  "First Class":    "bg-zinc-900 text-[#e7c36a] ring-1 ring-[#c9a84c]",
   "Minibus":        "bg-rose-700 text-white",
 };
 

@@ -8,7 +8,7 @@ import { customerExtras } from "@/lib/journeys";
 import { calendarLinks as journeyCalendar } from "@/lib/calendar";
 import { redeemCoupon, validateCoupon } from "@/lib/marketing";
 import { capacityError } from "@/lib/capacity";
-import { calculateLastMinuteSurcharge, HOURLY_RATES, MIN_HOURLY_HOURS, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, MIN_BOOKING_HOURS } from "@/lib/pricing";
+import { calculateLastMinuteSurcharge, HOURLY_RATES, MIN_HOURLY_HOURS, hourlyAvailable, AIRPORT_SURCHARGE, NIGHT_SURCHARGE_RATE, MIN_BOOKING_HOURS } from "@/lib/pricing";
 import { getQuote } from "@/lib/pricing-service";
 import { pickupToUtc, formatPickupDateTime } from "@/lib/datetime";
 import { isAirportLocation, isNightTime } from "@/lib/utils";
@@ -243,6 +243,7 @@ export async function POST(req: NextRequest) {
     let returnBreakdown: typeof breakdown | null = null;
 
     if (body.bookingType === "HOURLY" || body.bookingType === "DAY_HIRE") {
+      if (!hourlyAvailable(vc)) return NextResponse.json({ error: "The Mercedes-Maybach S 580 is booked for airport, city and port transfers. For chauffeur hire by the hour, please choose another car or contact us." }, { status: 422 });
       const minH  = MIN_HOURLY_HOURS[vc] ?? 4;
       const hours = body.bookingType === "DAY_HIRE" ? 8 : Math.max(body.durationHours ?? 4, minH);
       const hourlyRate = HOURLY_RATES[vc] ?? 50;

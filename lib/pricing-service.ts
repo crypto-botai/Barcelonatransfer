@@ -192,10 +192,16 @@ async function lookupFixedPrice(
   // read Business while costing €60, €60, €65 and €70. Were the database
   // consulted first here, the fleet page would advertise €60 and the checkout
   // would take €70, which is the exact fault this file exists to prevent.
-  if (fleetVehicle) {
-    const perCar = perCarPrice(fromZone, toZone, fleetVehicle);
+  // The S-Class is the one FIRST_CLASS car, so a request that names only the class still finds its per-car price.
+  const car = fleetVehicle ?? (vc === "FIRST_CLASS" ? ("S_CLASS" as FleetVehicle) : undefined);
+  if (car) {
+    const perCar = perCarPrice(fromZone, toZone, car);
     if (perCar !== null) return perCar;
   }
+
+  // The S-Class has no price column and no per-kilometre rate: it costs what the routes above say and nothing else. Anywhere
+  // else it must be quoted by hand, not read off the V-Class column, which would sell a Maybach at a V-Class fare.
+  if (vc === "FIRST_CLASS") return null;
 
   // Try DB first — if it has rows and the route is found there, use it
   const rows = await getDBRoutes();
@@ -232,6 +238,13 @@ function perCarPrice(fromZone: string, toZone: string, fv: FleetVehicle): number
   const route = FIXED_ROUTES.find(
     (r) => (r.from === from && r.to === to) || (r.from === to && r.to === from),
   );
+  // Going the opposite way round to how the route is written, a car may have its own price (the S-Class: €250 from the airport,
+  // €235 to it). A route whose two ends are the same zone has no opposite way.
+  const reversed = !!route && route.from !== route.to && route.from === to;
+  if (reversed) {
+    const back = route?.reverseVehicleOverrides?.[fv];
+    if (back !== undefined) return back;
+  }
   return route?.vehicleOverrides?.[fv] ?? null;
 }
 
@@ -383,7 +396,8 @@ function customRouteQuote(vc: VehicleClass, distanceKm: number, durationMin: num
   // half as much again for the same upgrade.
   // The same weekend rule as a table fare. A fare of 0 means "could not price",
   // and stays 0 so it still asks the customer to get in touch.
-  const fare = withWeekend(distanceFare(distanceKm, vehicleCodeForClass(vc) ?? undefined), pickupDatetime).price;
+  // Not for the S-Class: it is priced only on the routes that list it, so anywhere else it is quoted by hand.
+  const fare = vc === "FIRST_CLASS" ? 0 : withWeekend(distanceFare(distanceKm, vehicleCodeForClass(vc) ?? undefined), pickupDatetime).price;
 
   return {
     vehicleClass:        vc,

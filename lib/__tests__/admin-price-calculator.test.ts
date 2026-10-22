@@ -35,8 +35,8 @@ describe("admin price calculator", () => {
     const r = await call(good);
     expect(r.status).toBe(200);
     const j = await r.json();
-    expect(j.quotes).toHaveLength(7);
-    expect(getQuote).toHaveBeenCalledTimes(7);
+    expect(j.quotes).toHaveLength(8);
+    expect(getQuote).toHaveBeenCalledTimes(8);
     expect(j.quotes[0]).toMatchObject({ total: 55, basis: "table", fromLabel: "El Prat Airport" });
     expect(j.distanceKm).toBe(18.4);
     expect(j.routeCoordinates).toHaveLength(2);

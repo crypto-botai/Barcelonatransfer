@@ -1,5 +1,5 @@
 # Elite BCN Transfers — Complete AI Reference (llms-full.txt)
-# Generated from live site data on 2026-09-27. Companion to /llms.txt.
+# Generated from live site data on 2026-10-22. Companion to /llms.txt.
 
 ## Service Identity
 - Legal name: Elite BCN Transfers
@@ -16,7 +16,7 @@
 - Booking: https://www.elitebcn.info/book
 - Price calculator: https://www.elitebcn.info/tools/transfer-cost-calculator
 
-## Fleet (7 vehicles)
+## Fleet (8 vehicles)
 Passenger and luggage limits are separate constraints. The boot is often the
 binding one: check both before choosing a vehicle.
 
@@ -62,6 +62,12 @@ binding one: check both before choosing a vehicle.
    Features: Large Group, Air Conditioning, PA System, Luggage Hold, Reclining Seats
    Premium group transfers for corporate events, airport runs, and tours for up to 16 passengers.
 
+8. Mercedes-Maybach S 580 — First Class
+   Passengers: up to 3
+   Luggage: 2 large (75 × 50 × 30 cm), 3 medium (65 × 45 × 25 cm), 4 small (55 × 40 × 20 cm)
+   Features: Rear Executive Seating, Chauffeur in Suit, Climate Control, WiFi, Bottled Water
+   The flagship first-class saloon for those who want the finest arrival in Barcelona. Fixed fares between the airport, the city and the port.
+
 ## Price policy
 - All prices are FIXED and FINAL — the quoted figure is what is charged
 - No surge pricing at night, on holidays, in bad weather or during events
@@ -74,9 +80,9 @@ binding one: check both before choosing a vehicle.
 - Per vehicle, not per person
 
 Individual cars priced below their class column:
-- El Prat Airport ⇄ Barcelona City: Toyota Camry = €55, Tesla Model 3 = €55, Mercedes EQE 300 = €60
+- El Prat Airport ⇄ Barcelona City: Toyota Camry = €55, Tesla Model 3 = €55, Mercedes EQE 300 = €60, Mercedes-Maybach S 580 = €250 (Mercedes-Maybach S 580 = €235 in the direction Barcelona City → El Prat Airport)
 - Within Barcelona city: Toyota Camry = €60, Tesla Model 3 = €60
-- El Prat Airport ⇄ Cruise Terminal: Toyota Camry = €60, Tesla Model 3 = €60
+- El Prat Airport ⇄ Cruise Terminal: Toyota Camry = €60, Tesla Model 3 = €60, Mercedes-Maybach S 580 = €250
 - Cruise Terminal ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €60
 - El Prat Airport ⇄ Castelldefels: Toyota Camry = €60, Tesla Model 3 = €60
 - Barcelona City ⇄ Castelldefels: Toyota Camry = €60, Tesla Model 3 = €60
@@ -187,6 +193,7 @@ Individual cars priced below their class column:
 - Extra Waiting (30 min) — €25 / 30 min. Additional waiting time.
 - Pet Transport — €20 each. Travel with your pet.
 - Multiple Stops — €25 each. Additional stops en route.
+- Text Message Alerts — €0.50. Two texts only: your booking confirmation and your driver details. Nothing else.
 - Wheelchair Accessible — on request, no charge. Accessible vehicle requested.
 
 ## Cancellation and changes

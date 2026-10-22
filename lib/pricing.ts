@@ -34,6 +34,8 @@ export const DEFAULT_PRICING: Record<VehicleClass, {
   MINIVAN:        { baseFare: 30,  pricePerKm: 1.65, pricePerMinute: 0.28, minimumFare: 65  },
   LUXURY_MINIVAN: { baseFare: 50,  pricePerKm: 2.20, pricePerMinute: 0.40, minimumFare: 75  },
   MINIBUS:        { baseFare: 70,  pricePerKm: 2.40, pricePerMinute: 0.50, minimumFare: 200 },
+  // The Maybach S 580 is priced only on its fixed routes (see lib/fixed-prices.ts); these figures are never used for a customer fare.
+  FIRST_CLASS:    { baseFare: 60,  pricePerKm: 3.00, pricePerMinute: 0.60, minimumFare: 235 },
 };
 
 export const AIRPORT_SURCHARGE = 8;
@@ -157,7 +159,13 @@ export const HOURLY_RATES: Record<VehicleClass, number> = {
   MINIVAN:        65,   // Mercedes Vito
   LUXURY_MINIVAN: 75,   // Mercedes V-Class
   MINIBUS:       160,   // Mercedes Sprinter
+  FIRST_CLASS:     0,   // Maybach S 580: not offered by the hour (0 = not available; see hourlyAvailable)
 };
+
+/** Whether a class can be booked by the hour or by the day. The Maybach S 580 cannot: it is sold on its fixed transfers only. */
+export function hourlyAvailable(vc: VehicleClass): boolean {
+  return (HOURLY_RATES[vc] ?? 0) > 0;
+}
 
 export const MIN_HOURLY_HOURS: Record<VehicleClass, number> = {
   ECONOMY:        4,
@@ -167,6 +175,7 @@ export const MIN_HOURLY_HOURS: Record<VehicleClass, number> = {
   MINIVAN:        4,
   LUXURY_MINIVAN: 4,
   MINIBUS:        4,
+  FIRST_CLASS:    4,
 };
 
 /**

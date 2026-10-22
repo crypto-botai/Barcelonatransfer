@@ -149,7 +149,9 @@ describe("every published price matches the route table", () => {
 describe("every hourly rate matches the pricing table", () => {
   it.each(FILES)("%s quotes the real rate and minimum for each class", (name, text) => {
     let checked = 0;
-    for (const [cls, rate] of Object.entries(HOURLY_RATES)) {
+    // A rate of 0 means the class is not offered by the hour (the Maybach S 580), so it has no row to compare.
+    const hourly = Object.entries(HOURLY_RATES).filter(([, rate]) => rate > 0);
+    for (const [cls, rate] of hourly) {
       const label = cls.replace(/_/g, " ");
       const row = text.split("\n").find((l) => l.startsWith(`| ${label} `));
       expect(row, `${name}: no hourly row for ${label}`).toBeTruthy();
@@ -159,7 +161,7 @@ describe("every hourly rate matches the pricing table", () => {
       expect(row, `${name}: ${label} minimum`).toContain(`| ${min} hours |`);
       checked++;
     }
-    expect(checked, `${name} compared too few classes`).toBe(Object.keys(HOURLY_RATES).length);
+    expect(checked, `${name} compared too few classes`).toBe(hourly.length);
   });
 });
 

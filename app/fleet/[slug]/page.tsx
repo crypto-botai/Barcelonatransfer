@@ -18,6 +18,7 @@ const SLUG_TO_CLASS: Record<string, FleetVehicle> = {
   "executive-minivan": "VITO",
   "luxury-minivan":    "V_CLASS",
   "group-minibus":     "SPRINTER",
+  "mercedes-maybach-s580": "S_CLASS",
 };
 
 const BASE = "https://www.elitebcn.info";

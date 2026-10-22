@@ -20,6 +20,7 @@ export const FLEET_PAGE: Record<FleetVehicle, string> = {
   VITO:     "executive-minivan",
   V_CLASS:  "luxury-minivan",
   SPRINTER: "group-minibus",
+  S_CLASS:  "mercedes-maybach-s580",
 };
 
 /** The detail page path for a vehicle, e.g. "/fleet/luxury-minivan". */

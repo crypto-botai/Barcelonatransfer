@@ -120,7 +120,12 @@ function perCarNotes(): string {
       return `${v?.label ?? car} = €${price}`;
     });
     const where = r.from === r.to ? destLabel(r) : `${r.fromLabel} ⇄ ${r.toLabel}`;
-    lines.push(`- ${where}: ${parts.join(", ")}`);
+    // A car priced differently on the way back says so: "Mercedes-Maybach S 580 = €250 (€235 from Barcelona City)".
+    const backNote = Object.entries(r.reverseVehicleOverrides ?? {}).map(([car, price]) => {
+      const v = VEHICLE_CATALOG.find((x) => x.class === car);
+      return `${v?.label ?? car} = €${price} in the direction ${r.toLabel} → ${r.fromLabel}`;
+    });
+    lines.push(`- ${where}: ${parts.join(", ")}${backNote.length ? ` (${backNote.join("; ")})` : ""}`);
   }
   return lines.join("\n");
 }
@@ -144,6 +149,8 @@ function hourlyTable(): string {
   const seen = new Set<string>();
   const rows: string[] = [];
   for (const [cls, rate] of Object.entries(HOURLY_RATES)) {
+    // A class with a rate of 0 (the Maybach S 580) is not offered by the hour, so it has no row.
+    if (!rate) continue;
     const key = `${cls}`;
     if (seen.has(key)) continue;
     seen.add(key);

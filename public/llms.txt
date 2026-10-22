@@ -1,7 +1,7 @@
 # Elite BCN Transfers — AI & LLM Reference
 
 > Licensed VTC chauffeur service in Barcelona, Spain. Fixed-price private
-> transfers, no surge pricing. Generated from the live pricing data on 2026-09-27.
+> transfers, no surge pricing. Generated from the live pricing data on 2026-10-22.
 > Format: [llms.txt v1](https://llmstxt.org).
 
 ## Service Summary
@@ -20,7 +20,7 @@ individually. Prices are per vehicle and EXCLUDE VAT and tolls.
 - Phone: +34 635 383 712
 - Email: booking@elitebcn.info
 
-## Fleet (7 vehicles operated)
+## Fleet (8 vehicles operated)
 - Toyota Corolla — Economy, up to 3 passengers, 2 large cases (75 × 50 × 30 cm). Air Conditioning, USB Charging, WiFi, Professional Driver.
 - Toyota Camry — Standard, up to 3 passengers, 3 large cases (75 × 50 × 30 cm). Air Conditioning, USB Charging, WiFi, Professional Driver, Comfortable Seating.
 - Tesla Model 3 — Electric, up to 4 passengers, 2 large cases (75 × 50 × 30 cm). 100% Electric, Autopilot, Panoramic Roof, WiFi, USB Charging.
@@ -28,6 +28,7 @@ individually. Prices are per vehicle and EXCLUDE VAT and tolls.
 - Mercedes Vito — Minivan, up to 8 passengers, 4 large cases (75 × 50 × 30 cm). Spacious Cabin, Climate Control, WiFi, USB Charging, Sliding Doors.
 - Mercedes V-Class — Luxury Minivan, up to 7 passengers, 4 large cases (75 × 50 × 30 cm). Captain Seats, Conference Layout, Champagne Bar, 4K Screen, Privacy Glass.
 - Mercedes Sprinter — Minibus, up to 16 passengers, 12 large cases (75 × 50 × 30 cm). Large Group, Air Conditioning, PA System, Luggage Hold, Reclining Seats.
+- Mercedes-Maybach S 580 — First Class, up to 3 passengers, 2 large cases (75 × 50 × 30 cm). Rear Executive Seating, Chauffeur in Suit, Climate Control, WiFi, Bottled Water.
 
 ## Pricing
 Fixed per vehicle, EXCLUDING VAT and tolls. Routes are bidirectional —
@@ -41,9 +42,9 @@ the journey INTO the destination; leaving costs more:
 - Andorra to El Prat Airport: EUR 370 (Economy, per vehicle). El Prat Airport to Andorra is EUR 350. The journey out of Andorra costs EUR 20 more than the journey into it. Details: https://www.elitebcn.info/transfers/andorra-to-barcelona
 
 Where an individual car is priced below its class column:
-- El Prat Airport ⇄ Barcelona City: Toyota Camry = €55, Tesla Model 3 = €55, Mercedes EQE 300 = €60
+- El Prat Airport ⇄ Barcelona City: Toyota Camry = €55, Tesla Model 3 = €55, Mercedes EQE 300 = €60, Mercedes-Maybach S 580 = €250 (Mercedes-Maybach S 580 = €235 in the direction Barcelona City → El Prat Airport)
 - Within Barcelona city: Toyota Camry = €60, Tesla Model 3 = €60
-- El Prat Airport ⇄ Cruise Terminal: Toyota Camry = €60, Tesla Model 3 = €60
+- El Prat Airport ⇄ Cruise Terminal: Toyota Camry = €60, Tesla Model 3 = €60, Mercedes-Maybach S 580 = €250
 - Cruise Terminal ⇄ Barcelona City: Toyota Camry = €60, Tesla Model 3 = €60
 - El Prat Airport ⇄ Castelldefels: Toyota Camry = €60, Tesla Model 3 = €60
 - Barcelona City ⇄ Castelldefels: Toyota Camry = €60, Tesla Model 3 = €60
@@ -160,6 +161,7 @@ vehicle, fuel and parking are included.
 - Extra Waiting (30 min) — €25 / 30 min. Additional waiting time.
 - Pet Transport — €20 each. Travel with your pet.
 - Multiple Stops — €25 each. Additional stops en route.
+- Text Message Alerts — €0.50. Two texts only: your booking confirmation and your driver details. Nothing else.
 - Wheelchair Accessible — on request, no charge. Accessible vehicle requested.
 
 ## Booking

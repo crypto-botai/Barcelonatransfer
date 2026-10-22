@@ -42,8 +42,10 @@ describe("hourly rates", () => {
   });
 
   it("shows every car, not a hand-picked few", () => {
-    expect(HOURLY_FLEET).toHaveLength(VEHICLE_CATALOG.length);
-    expect(HOURLY_FROM).toBe(Math.min(...Object.values(HOURLY_RATES)));
+    // Every car offered by the hour. The Maybach S 580 is sold on its fixed transfers only (rate 0), so it is the one car not listed.
+    expect(HOURLY_FLEET).toHaveLength(VEHICLE_CATALOG.length - 1);
+    expect(HOURLY_FLEET.map((v) => v.vehicle)).not.toContain("S_CLASS");
+    expect(HOURLY_FROM).toBe(Math.min(...Object.values(HOURLY_RATES).filter((r) => r > 0)));
   });
 
   it("names the Lexus on the tier it shares a rate with", () => {

@@ -129,8 +129,8 @@ describe("Pricing parity: FIXED_ROUTES × vehicle", () => {
 describe("VEHICLE_TO_PRICE_CLASS", () => {
   const VALID_CODES: VehicleCode[] = ["ECONOMY", "BUSINESS", "MINIVAN", "VCLASS", "MINIBUS"];
 
-  it("has exactly 7 fleet vehicle entries", () => {
-    expect(Object.keys(VEHICLE_TO_PRICE_CLASS).length).toBe(7);
+  it("has exactly 8 fleet vehicle entries", () => {
+    expect(Object.keys(VEHICLE_TO_PRICE_CLASS).length).toBe(8);
   });
 
   it("all values are one of the 5 valid VehicleCodes (no arithmetic, no LUXURY_SUV_MID)", () => {

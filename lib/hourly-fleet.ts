@@ -54,9 +54,10 @@ const SUITED_TO: Record<FleetVehicle, string> = {
   VITO:     "Groups with luggage, or a family touring day.",
   V_CLASS:  "Weddings, VIP days, and touring in comfort.",
   SPRINTER: "Conference shuttles and group itineraries.",
+  S_CLASS:  "Not offered by the hour: sold on its fixed airport, city and port transfers.",
 };
 
-export const HOURLY_FLEET: HourlyVehicle[] = VEHICLE_CATALOG.map((v) => {
+export const HOURLY_FLEET: HourlyVehicle[] = VEHICLE_CATALOG.filter((v) => (HOURLY_RATES[FLEET_TO_DB_CLASS[v.class]] ?? 0) > 0).map((v) => {
   const dbClass = FLEET_TO_DB_CLASS[v.class];
   return {
     vehicle: v.class,

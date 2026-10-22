@@ -32,7 +32,8 @@ import { formatCurrency } from "@/lib/utils";
  */
 
 /** The owner's transparent cutouts, by vehicle. */
-const STAGE_IMAGE: Record<FleetVehicle, string> = {
+/** A car with no cutout yet (the Maybach S 580) is left off the stage rather than shown with a wrong picture. */
+const STAGE_IMAGE: Partial<Record<FleetVehicle, string>> = {
   COROLLA:  "/fleet/stage/sedan-corolla.webp",
   CAMRY:    "/fleet/stage/sedan-camry.webp",
   TESLA_M3: "/fleet/stage/tesla-model-3.webp",
@@ -44,7 +45,7 @@ const STAGE_IMAGE: Record<FleetVehicle, string> = {
 
 /** The name a button can carry: "Reserve the V-Class", not "Reserve the Mercedes V-Class". */
 const SHORT: Record<FleetVehicle, string> = {
-  COROLLA: "Corolla", CAMRY: "Camry", TESLA_M3: "Model 3", EQE_300: "EQE", VITO: "Vito", V_CLASS: "V-Class", SPRINTER: "Sprinter",
+  COROLLA: "Corolla", CAMRY: "Camry", TESLA_M3: "Model 3", EQE_300: "EQE", VITO: "Vito", V_CLASS: "V-Class", SPRINTER: "Sprinter", S_CLASS: "Maybach",
 };
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -84,7 +85,7 @@ function CountingFare({ value }: { value: number }) {
 export default function FleetStage() {
   const t = useTranslations("fleet");
   const reduce = useReducedMotion();
-  const cars = VEHICLE_CATALOG;
+  const cars = VEHICLE_CATALOG.filter((v) => STAGE_IMAGE[v.class]);
   const [[index, dir], setState] = useState<[number, number]>([0, 0]);
   const car = cars[index];
   const price = getFleetFromPrice(car.class);
@@ -199,7 +200,7 @@ export default function FleetStage() {
               >
                 <div className="relative w-full h-full">
                   <Image
-                    src={STAGE_IMAGE[car.class]}
+                    src={STAGE_IMAGE[car.class] ?? ""}
                     alt={car.label}
                     fill
                     priority={index === 0}
@@ -209,7 +210,7 @@ export default function FleetStage() {
                   />
                   {/* Reflection: the same photo, mirrored and fading. */}
                   <div className="absolute left-0 right-0 top-[100%] h-[34%] overflow-hidden opacity-[0.28] pointer-events-none" style={{ WebkitMaskImage: "linear-gradient(to bottom, #000, transparent 70%)", maskImage: "linear-gradient(to bottom, #000, transparent 70%)" }} aria-hidden="true">
-                    <Image src={STAGE_IMAGE[car.class]} alt="" fill sizes="720px" className="object-contain object-top" style={{ transform: "scaleY(-1)" }} draggable={false} />
+                    <Image src={STAGE_IMAGE[car.class] ?? ""} alt="" fill sizes="720px" className="object-contain object-top" style={{ transform: "scaleY(-1)" }} draggable={false} />
                   </div>
                 </div>
               </motion.figure>
@@ -284,7 +285,7 @@ export default function FleetStage() {
               className={`group relative flex-none w-[132px] md:w-auto snap-center flex flex-col gap-2 p-2.5 pb-3 border-t text-left transition-colors ${i === index ? "border-gold-500" : "border-white/[0.08]"}`}
             >
               <div className={`relative h-[54px] transition-all duration-500 ${i === index ? "opacity-100 -translate-y-1" : "opacity-60 group-hover:opacity-90"}`}>
-                <Image src={STAGE_IMAGE[v.class]} alt="" fill sizes="160px" className="object-contain" />
+                <Image src={STAGE_IMAGE[v.class] ?? ""} alt="" fill sizes="160px" className="object-contain" />
               </div>
               <span className={`flex justify-between gap-1.5 text-[11px] tracking-wide ${i === index ? "text-white" : "text-dark-500"}`}>
                 <span>{v.label}</span>

@@ -184,6 +184,8 @@ describe("a per-car price cannot diverge from the column silently", () => {
     const wrong: string[] = [];
     for (const route of FIXED_ROUTES) {
       for (const [car, price] of Object.entries(route.vehicleOverrides ?? {})) {
+        // The Maybach S 580 is a tier of its own with no column to stay under: it is priced above the V-Class on purpose.
+        if (car === "S_CLASS") continue;
         const cls = lookupPriceByClass(route.from, route.to, FLEET_TO_DB_CLASS[car as FleetVehicle]);
         if (cls !== null && price > cls) {
           wrong.push(`${route.slug} ${car} €${price} > class €${cls}`);
