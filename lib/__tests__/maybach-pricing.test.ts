@@ -12,7 +12,8 @@ import { waitBlockPriceFor, waitingState } from "@/lib/api/v1/waiting";
 
 /**
  * The Mercedes-Maybach S 580, on the owner's rules of 22 Oct 2026:
- *  - instant, fixed: airport to city 250, city to airport 235, Sants to city 175, city to Sants 165
+ *  - instant, fixed: airport to city 250, city to airport 235, Sants to city 175, city to Sants 165,
+ *    airport to Sants 250, Sants to airport 235
  *  - anywhere else but the port: 4.75 euros a kilometre
  *  - the port (cruise terminals, Moll Adossat) is never booked: a query instead
  *  - 160 an hour in the city, 195 outside it; waiting 160 an hour
@@ -45,6 +46,11 @@ describe("S 580: instant fixed fares", () => {
     expect((await quote(SANTS, CITY)).totalAmount).toBe(175);
     expect((await quote(HOTEL, SANTS)).totalAmount).toBe(165);
     expect((await quote(CITY, SANTS)).totalAmount).toBe(165);
+  });
+
+  it("airport to Sants is 250 and Sants to the airport is 235, the same as the city", async () => {
+    expect((await quote(AIRPORT, SANTS)).totalAmount).toBe(250);
+    expect((await quote(SANTS, AIRPORT)).totalAmount).toBe(235);
   });
 
   it("a request that names only the class gets the same fares", async () => {
@@ -95,14 +101,6 @@ describe("S 580: 4.75 euros a kilometre anywhere else", () => {
   it("never prices a short hop under the cheapest fixed S-Class fare", async () => {
     expect(sClassKmFare(5)).toBe(S_CLASS_MIN_FARE);
     expect((await quote(HOTEL, CITY, { distanceKm: 4 })).totalAmount).toBe(S_CLASS_MIN_FARE);
-  });
-
-  it("Sants to the airport has no price yet, so it is quoted by hand", async () => {
-    for (const [a, b] of [[SANTS, AIRPORT], [AIRPORT, SANTS]] as [P, P][]) {
-      const q = await quote(a, b, { distanceKm: 14 });
-      expect(q.needsManualQuote).toBe(true);
-      expect(q.totalAmount).toBe(0);
-    }
   });
 
   it("a journey with no distance cannot be priced", async () => {

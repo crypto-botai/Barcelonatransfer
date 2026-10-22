@@ -282,7 +282,7 @@ export default function BookFormClient() {
   // bookable. This flag means only one thing: we could not produce a price at
   // all (no drop-off coordinates, so no distance), and a human must quote it.
   const needsManualQuote = quote != null && (quote.needsManualQuote === true || quote.totalAmount <= 0);
-  // The Mercedes-Maybach S 580 is not booked to or from the port (and Sants to the airport has no fare yet): those are sent as a query.
+  // The Mercedes-Maybach S 580 is not booked to or from the port: those journeys are sent as a query.
   const sClassQuery = needsManualQuote && data.vehicleClass === "FIRST_CLASS";
   const [loadingQ,      setLoadingQ]      = useState(false);
   const [submitting,    setSubmitting]    = useState(false);

@@ -189,9 +189,9 @@ export default function AboutPage() {
               </p>
               <h3 className="font-display text-xl text-white pt-4">The fleet</h3>
               <p>
-                Seven vehicles, from a Toyota Corolla for a solo traveller to a 16-seat Mercedes
+                Eight vehicles, from a Toyota Corolla for a solo traveller to a 16-seat Mercedes
                 Sprinter for a group, with Tesla Model 3 and Mercedes EQE electric options in
-                between. We publish the passenger and luggage capacity of each one, because the
+                between and the Mercedes-Maybach S 580 at the top. We publish the passenger and luggage capacity of each one, because the
                 boot is more often the limit than the seats, and the wrong choice is discovered at
                 the kerb with nowhere to put a suitcase.
               </p>

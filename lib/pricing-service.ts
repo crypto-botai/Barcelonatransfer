@@ -16,7 +16,7 @@
  * Fallback: if the DB is unreachable, falls back to ROUTES from lib/pricing.ts.
  */
 
-import { sClassFixedFare, isPortPlace, isSantsAirportPair, sClassKmFare } from "@/lib/s-class-pricing";
+import { sClassFixedFare, isPortPlace, sClassKmFare } from "@/lib/s-class-pricing";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import {
@@ -394,11 +394,11 @@ function customRouteQuote(vc: VehicleClass, distanceKm: number, durationMin: num
   // half as much again for the same upgrade.
   // The same weekend rule as a table fare. A fare of 0 means "could not price",
   // and stays 0 so it still asks the customer to get in touch.
-  // The S-Class is 4.75 euros a kilometre anywhere off its fixed fares, except the port (never priced) and Sants to the airport (no price
-  // given yet): those two are quoted by hand. Its weekend uplift is the same as every other car's.
+  // The S-Class is 4.75 euros a kilometre anywhere off its fixed fares, except the port, which is never priced (quoted by hand). Its
+  // weekend uplift is the same as every other car's.
   const fare =
     vc === "FIRST_CLASS"
-      ? where.port || isSantsAirportPair(where.fromZone, where.toZone)
+      ? where.port
         ? 0
         : (() => {
             const base = sClassKmFare(distanceKm);

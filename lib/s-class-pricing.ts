@@ -2,7 +2,8 @@
  * The Mercedes-Maybach S 580's prices, which are the owner's own and follow different rules from every other car.
  *
  * Set by the owner on 22 Oct 2026:
- *  - Instant booking, fixed fares: airport to city 250, city to airport 235, Sants station to city 175, city to Sants 165.
+ *  - Instant booking, fixed fares: airport to city 250, city to airport 235, Sants station to city 175, city to Sants 165, and the
+ *    airport and Sants priced like the airport and the city: airport to Sants 250, Sants to airport 235.
  *  - Anywhere else (not the port): 4.75 euros per kilometre of road.
  *  - By the hour: 160 in the city, 195 outside it. Waiting is charged at 160 an hour as well.
  *  - The port (cruise terminals, Moll Adossat) is NOT taken: nobody can book the S-Class to or from it. They are told to send a query.
@@ -34,17 +35,15 @@ const FIXED: Record<string, number> = {
   "barcelona_city>airport": 235,
   "sants>barcelona_city": 175,
   "barcelona_city>sants": 165,
+  // Sants station and the airport cost the same as the city and the airport, each way (owner, 22 Oct 2026).
+  "airport>sants": 250,
+  "sants>airport": 235,
 };
 
 /** The fixed one-way fare, or null when the pair has none. Direction matters: the key is "from>to". */
 export function sClassFixedFare(fromZone: string | null, toZone: string | null): number | null {
   if (!fromZone || !toZone) return null;
   return FIXED[`${fromZone}>${toZone}`] ?? null;
-}
-
-/** Sants station and the airport, either way. The owner wants these instant but has not given a price, so they are quoted by hand. */
-export function isSantsAirportPair(fromZone: string | null, toZone: string | null): boolean {
-  return (fromZone === "airport" && toZone === "sants") || (fromZone === "sants" && toZone === "airport");
 }
 
 const rad = (d: number) => (d * Math.PI) / 180;

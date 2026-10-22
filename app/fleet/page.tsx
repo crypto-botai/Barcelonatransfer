@@ -12,7 +12,7 @@ import { amenitySentence, FLEET_FACTS, vehicleBrand } from "@/lib/fleet-facts";
 export const metadata: Metadata = {
   title: { absolute: "Barcelona Fleet — Mercedes V-Class & Tesla | Elite BCN" },
   description:
-    "Barcelona private transfer fleet: Mercedes V-Class, EQE 300 Electric, Tesla Model 3 & Vito. Seven cars, fixed prices, per vehicle not per seat.",
+    "Barcelona private transfer fleet: Mercedes-Maybach S 580, V-Class, EQE 300 Electric, Tesla Model 3 & Vito. Eight cars, fixed prices, per vehicle not per seat.",
   alternates: { canonical: "https://www.elitebcn.info/fleet" },
   keywords: ["barcelona transfer fleet", "mercedes v-class barcelona", "tesla model 3 barcelona transfer", "luxury chauffeur barcelona fleet"],
   openGraph: {
@@ -114,7 +114,7 @@ export default function FleetPage() {
               Luxury Vehicle <span className="text-gold-gradient">Fleet Barcelona</span>
             </h1>
             <p className="text-dark-400 max-w-2xl mx-auto">
-              From economy saloons to a sixteen-seat minibus — seven vehicles, each with a published
+              From economy saloons to a sixteen-seat minibus — eight vehicles, each with a published
               capacity and a published fare. Every car lists what it actually carries, because seats and
               boot space run out at different points.
             </p>
