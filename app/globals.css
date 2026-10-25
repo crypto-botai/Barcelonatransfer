@@ -521,3 +521,37 @@
 /* Payment pages shown inside the mobile apps (?app=1, see EmbedMode): no website menu, booking bar or chat button. */
 html[data-embed="app"] [data-site-chrome] { display: none !important; }
 html[data-embed="app"] main { padding-top: 1.25rem !important; }
+
+
+/*
+ * Below-the-fold home-page sections skip style, layout and paint until they are near the screen (content-visibility: auto). The home
+ * page is a very large document, and styling all of it before the first frame cost about 1.5 s of main-thread work on a mid-range
+ * phone, which is what held back the first paint. The text stays in the page for search engines, find-in-page and screen readers.
+ *
+ * Each section carries its measured height (phone, tablet, desktop; measured 25 Oct 2026) as the placeholder, so the scrollbar and
+ * the content below do not jump as sections come into view. Once a section has been seen, the browser remembers its real height
+ * (the `auto` keyword) and these numbers stop mattering.
+ */
+.cv-auto { content-visibility: auto; }
+.cv-services { contain-intrinsic-size: auto 1620px; }
+.cv-fleet    { contain-intrinsic-size: auto 1130px; }
+.cv-pricing  { contain-intrinsic-size: auto 1580px; }
+.cv-reviews  { contain-intrinsic-size: auto 1230px; }
+.cv-how      { contain-intrinsic-size: auto 1420px; }
+.cv-faq      { contain-intrinsic-size: auto 1640px; }
+@media (max-width: 1099px) {
+  .cv-services { contain-intrinsic-size: auto 3000px; }
+  .cv-fleet    { contain-intrinsic-size: auto 1520px; }
+  .cv-pricing  { contain-intrinsic-size: auto 1670px; }
+  .cv-reviews  { contain-intrinsic-size: auto 1210px; }
+  .cv-how      { contain-intrinsic-size: auto 1420px; }
+  .cv-faq      { contain-intrinsic-size: auto 1810px; }
+}
+@media (max-width: 639px) {
+  .cv-services { contain-intrinsic-size: auto 5400px; }
+  .cv-fleet    { contain-intrinsic-size: auto 1370px; }
+  .cv-pricing  { contain-intrinsic-size: auto 2110px; }
+  .cv-reviews  { contain-intrinsic-size: auto 1170px; }
+  .cv-how      { contain-intrinsic-size: auto 2270px; }
+  .cv-faq      { contain-intrinsic-size: auto 2640px; }
+}

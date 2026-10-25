@@ -44,16 +44,16 @@ export default async function HomePage() {
       <Navbar />
       <main>
         <HeroSection />
-        <ServicesSection />
-        <FleetStage />
-        <PricingSection routes={routes} />
+        <div className="cv-auto cv-services"><ServicesSection /></div>
+        <div className="cv-auto cv-fleet"><FleetStage /></div>
+        <div className="cv-auto cv-pricing"><PricingSection routes={routes} /></div>
         {/* Reviews come straight after the price: the reader who has just seen
             what it costs is the one who wants to know whether it is any good.
             The explanation of how a transfer works sits below them — it answers
             questions somebody already interested will have. */}
-        <TestimonialsSection reviews={reviewData.reviews} profile={reviewData.profile} />
-        <HowItWorksSection />
-        <FAQSection />
+        <div className="cv-auto cv-reviews"><TestimonialsSection reviews={reviewData.reviews} profile={reviewData.profile} /></div>
+        <div className="cv-auto cv-how"><HowItWorksSection /></div>
+        <div className="cv-auto cv-faq"><FAQSection /></div>
       </main>
       <InstallPrompt />
       <Footer />

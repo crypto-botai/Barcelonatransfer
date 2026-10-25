@@ -119,10 +119,14 @@ export default function Footer() {
                 <MessageCircle size={14} className="text-gold-500/60" />
                 {t("contact.whatsapp")}
               </a>
-              <p className="flex items-center gap-3 text-sm text-dark-400">
-                <MapPin size={14} className="text-gold-500/60 flex-shrink-0" />
-                {t("contact.location")}
-              </p>
+              <address className="flex items-start gap-3 text-sm text-dark-400 not-italic">
+                <MapPin size={14} className="text-gold-500/60 flex-shrink-0 mt-0.5" />
+                <span>
+                  {COMPANY.address.street}, {COMPANY.address.postalCode} {COMPANY.address.city}
+                  <br />
+                  {t("contact.location")}
+                </span>
+              </address>
             </div>
             {/* The handle is elitebcn.info on all three. These previously
                 pointed at "elitebcntransfers", which is not an account. */}

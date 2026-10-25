@@ -15,6 +15,8 @@ export const COMPANY = {
    * To switch: set NEXT_PUBLIC_CONTACT_EMAIL in Vercel. Zero code change needed.
    */
   email:        process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "booking@elitebcn.info",
+  /** The registered premises (confirmed by the owner 25 Aug 2026); the same address as the structured data and the Google profile. */
+  address:      { street: "Carrer de Llull 465", postalCode: "08019", city: "Barcelona" },
   city:         "Barcelona",
   region:       "Catalonia",
   country:      "ES",

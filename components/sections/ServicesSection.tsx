@@ -66,6 +66,7 @@ function ServiceCard({ index }: { index: number }) {
             alt={title}
             fill
             sizes={SIZES}
+            quality={60}
             className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
           />
           {/* A hairline of the card background at the foot of the photo so it

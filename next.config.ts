@@ -30,6 +30,11 @@ const nextConfig: NextConfig = {
     // which was the source of every fleet card requesting a 3840px image for a
     // ~400px card. Trimmed to the range this site actually uses.
     deviceSizes: [384, 640, 750, 828, 1080, 1200, 1920],
+    // Next's default imageSizes include 384, which deviceSizes already has, so every srcset listed 384w twice (invalid HTML: the
+    // W3C validator flagged 22 of them). Left out here so each width appears once.
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    // 60 is used for card photos and thumbnails (Lighthouse flagged ~56 KiB of over-quality on the home page); 75 stays the default.
+    qualities: [60, 75],
     formats: ["image/avif", "image/webp"],
   },
   serverExternalPackages: ["@prisma/client", "prisma"],

@@ -219,6 +219,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   name: "Elite BCN Transfers",
                   url: "https://www.elitebcn.info",
                   logo: { "@type": "ImageObject", url: "https://www.elitebcn.info/icon-512.png", width: 512, height: 512 },
+                  // Google lists a missing `image` as a non-critical issue; the same picture the local business entry below uses.
+                  image: "https://www.elitebcn.info/opengraph-image",
                   telephone: "+34635383712",
                   email: COMPANY.email,
                   foundingDate: "2018",

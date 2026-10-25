@@ -275,19 +275,18 @@ export default function FleetStage() {
         </div>
 
         {/* Filmstrip */}
-        <div ref={stripRef} role="tablist" aria-label={t("allVehicles")} className="mt-7 flex md:grid md:grid-cols-7 gap-2.5 overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-1.5 scrollbar-hide relative">
+        <div ref={stripRef} role="group" aria-label={t("allVehicles")} className="mt-7 flex md:grid md:grid-cols-7 gap-2.5 overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-1.5 scrollbar-hide relative">
           {cars.map((v, i) => (
             <button
               key={v.class}
               type="button"
-              role="tab"
-              aria-selected={i === index}
+              aria-pressed={i === index}
               onClick={() => go(i)}
               className={`group relative flex-none w-[132px] md:w-auto snap-center flex flex-col gap-2 p-2.5 pb-3 border-t text-left transition-colors ${i === index ? "border-gold-500" : "border-white/[0.08]"}`}
             >
-              <div className={`relative h-[54px] transition-all duration-500 ${i === index ? "opacity-100 -translate-y-1" : "opacity-60 group-hover:opacity-90"}`}>
-                <Image src={STAGE_IMAGE[v.class] ?? ""} alt={`${v.label} (${v.badge ?? "chauffeur car"})`} fill sizes="160px" className="object-contain" />
-              </div>
+              <span className={`relative block h-[54px] transition-all duration-500 ${i === index ? "opacity-100 -translate-y-1" : "opacity-60 group-hover:opacity-90"}`}>
+                <Image src={STAGE_IMAGE[v.class] ?? ""} alt={`${v.label} (${v.badge ?? "chauffeur car"})`} fill sizes="160px" quality={60} className="object-contain" />
+              </span>
               <span className={`flex justify-between gap-1.5 text-[11px] tracking-wide ${i === index ? "text-white" : "text-dark-500"}`}>
                 <span>{v.label}</span>
                 <span className="font-display font-normal text-gold-300">{formatCurrency(getFleetFromPrice(v.class))}</span>
