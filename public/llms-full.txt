@@ -1,5 +1,5 @@
 # Elite BCN Transfers — Complete AI Reference (llms-full.txt)
-# Generated from live site data on 2026-10-22. Companion to /llms.txt.
+# Generated from live site data on 2026-10-25. Companion to /llms.txt.
 
 ## Service Identity
 - Legal name: Elite BCN Transfers
@@ -68,9 +68,15 @@ binding one: check both before choosing a vehicle.
    Features: Rear Executive Seating, Chauffeur in Suit, Climate Control, WiFi, Bottled Water
    The flagship first-class saloon for those who want the finest arrival in Barcelona. Instant booking between the airport, the city and Sants station, and by the hour or for longer journeys.
 
+Mercedes-Maybach S 580 (first class, up to 3 passengers) is priced on its own terms, not from the route table below:
+- Instant booking, fixed: BCN El Prat Airport → Barcelona city €250; Barcelona city → airport €235; Sants station → city €175; city → Sants €165; airport → Sants €250; Sants → airport €235.
+- Any other journey: €4.75 per kilometre of road.
+- By the hour: €160/h in Barcelona, €195/h outside it. Waiting time: €160/h.
+- Not offered to or from the port or cruise terminals: those requests are answered by a manual query.
+
 ## Price policy
 - All prices are FIXED and FINAL — the quoted figure is what is charged
-- No surge pricing at night, on holidays, in bad weather or during events
+- The fare is confirmed before you pay and does not change with traffic, delays or a meter
 - Included: chauffeur, vehicle, fuel, airport fees, parking
 - Excluded: VAT (10%, added only when an invoice is requested) and motorway tolls
 - Routes are bidirectional — A→B and B→A cost the same — with these exceptions,

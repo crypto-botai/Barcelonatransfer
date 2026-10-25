@@ -210,7 +210,7 @@ export default function FleetStage() {
                   />
                   {/* Reflection: the same photo, mirrored and fading. */}
                   <div className="absolute left-0 right-0 top-[100%] h-[34%] overflow-hidden opacity-[0.28] pointer-events-none" style={{ WebkitMaskImage: "linear-gradient(to bottom, #000, transparent 70%)", maskImage: "linear-gradient(to bottom, #000, transparent 70%)" }} aria-hidden="true">
-                    <Image src={STAGE_IMAGE[car.class] ?? ""} alt="" fill sizes="720px" className="object-contain object-top" style={{ transform: "scaleY(-1)" }} draggable={false} />
+                    <Image src={STAGE_IMAGE[car.class] ?? ""} alt={`${car.label}, a private chauffeur transfer car in Barcelona`} fill sizes="720px" className="object-contain object-top" style={{ transform: "scaleY(-1)" }} draggable={false} />
                   </div>
                 </div>
               </motion.figure>
@@ -263,6 +263,7 @@ export default function FleetStage() {
 
             <Link
               href={`/book?vehicle=${car.class}`}
+              rel="nofollow"
               className="h-[58px] flex items-center justify-center bg-gold-500 hover:bg-gold-300 text-[#0a0a0a] font-medium tracking-[0.18em] uppercase text-[11px] transition-colors active:translate-y-px"
             >
               {t("reserveVehicle")}: {SHORT[car.class]}
@@ -285,7 +286,7 @@ export default function FleetStage() {
               className={`group relative flex-none w-[132px] md:w-auto snap-center flex flex-col gap-2 p-2.5 pb-3 border-t text-left transition-colors ${i === index ? "border-gold-500" : "border-white/[0.08]"}`}
             >
               <div className={`relative h-[54px] transition-all duration-500 ${i === index ? "opacity-100 -translate-y-1" : "opacity-60 group-hover:opacity-90"}`}>
-                <Image src={STAGE_IMAGE[v.class] ?? ""} alt="" fill sizes="160px" className="object-contain" />
+                <Image src={STAGE_IMAGE[v.class] ?? ""} alt={`${v.label} (${v.badge ?? "chauffeur car"})`} fill sizes="160px" className="object-contain" />
               </div>
               <span className={`flex justify-between gap-1.5 text-[11px] tracking-wide ${i === index ? "text-white" : "text-dark-500"}`}>
                 <span>{v.label}</span>

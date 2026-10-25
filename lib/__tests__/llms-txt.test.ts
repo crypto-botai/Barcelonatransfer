@@ -83,6 +83,17 @@ describe("stated facts match the site's own data", () => {
     expect(text).toContain(`${FIXED_ROUTES.length} fixed`);
   });
 
+  it.each(FILES)("%s does not claim there is no surge pricing", (_name, text) => {
+    // Weekend transfers carry an uplift (lib/weekend-pricing.ts), so "no surge pricing" is not true and AI assistants would repeat it.
+    expect(text).not.toMatch(/no surge/i);
+  });
+
+  it.each(FILES)("%s states the Maybach S 580's own fares from the pricing rules", (_name, text) => {
+    expect(text).toContain("Mercedes-Maybach S 580");
+    expect(text).toMatch(/Barcelona city → airport €235/);
+    expect(text).toMatch(/€4\.75 per kilometre/);
+  });
+
   it.each(FILES)("%s lists every published language", (_name, text) => {
     // The old files claimed Catalan, which the site does not publish.
     expect(text).not.toMatch(/Catalan/);

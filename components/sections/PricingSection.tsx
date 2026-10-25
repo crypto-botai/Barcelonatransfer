@@ -96,7 +96,7 @@ function PriceTable({ data, search, rowCta }: {
                     href="/book"
                     className="text-xs text-gold-500/70 hover:text-gold-400 transition-colors whitespace-nowrap"
                   >
-                    {t("book")} →
+                    {t("book")}<span className="sr-only"> {r.label}</span> →
                   </Link>
                 </td>
               )}

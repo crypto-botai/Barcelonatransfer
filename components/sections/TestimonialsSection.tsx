@@ -65,6 +65,10 @@ export default function TestimonialsSection({
   const quoted = reviews.filter((r) => r.text && r.text.trim().length > 0);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  // The drifting strip repeats its reviews to loop without a seam. That copy is made in the browser only, so the page's HTML
+  // (what search engines and AI assistants read) carries each review once instead of twice.
+  const [looping, setLooping] = useState(false);
+  useEffect(() => setLooping(true), []);
   const current = quoted[index];
 
   const go = useCallback((next: number) => {
@@ -204,7 +208,7 @@ export default function TestimonialsSection({
             aria-hidden="true"
           >
             <div className="flex gap-3.5 w-max animate-[guestbook-drift_90s_linear_infinite] hover:[animation-play-state:paused] motion-reduce:animate-none">
-              {[...quoted, ...quoted].map((r, i) => (
+              {(looping ? [...quoted, ...quoted] : quoted).map((r, i) => (
                 <div key={i} className="w-[300px] flex-shrink-0 border border-white/[0.08] bg-[#0c0b09] px-5 py-[18px] flex flex-col gap-3">
                   <p className="m-0 text-[13px] leading-relaxed text-dark-300 line-clamp-3">{r.text}</p>
                   <div className="flex items-center gap-3">

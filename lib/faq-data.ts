@@ -1,4 +1,5 @@
 import { ladderFor } from "@/lib/destination-pricing";
+import { sClassFixedFare, S_CLASS_PER_KM, S_CLASS_HOURLY_IN_CITY, S_CLASS_HOURLY_OUT_OF_CITY, S_CLASS_WAIT_PER_HOUR } from "@/lib/s-class-pricing";
 
 /**
  * Fares quoted in the FAQ are read from the route table, never typed.
@@ -52,7 +53,8 @@ export const FAQ_GROUPS = [
   {
     group: "Vehicles & Fleet",
     items: [
-      { q: "What vehicles do you offer?", a: "Our fleet includes: Toyota Corolla/Camry (economy/business sedan, up to 4 pax), Tesla Model 3 (electric VIP), Mercedes EQE 300 Electric (executive sedan), Mercedes Vito (executive minivan, up to 7 pax), Mercedes V-Class (luxury 7-seat MPV), and Mercedes Sprinter (group minibus, up to 16 pax)." },
+      { q: "What vehicles do you offer?", a: "Our fleet has eight cars: Toyota Corolla (economy saloon, up to 3 passengers), Toyota Camry (standard saloon, up to 3), Tesla Model 3 (electric, up to 4), Mercedes EQE 300 Electric (business saloon, up to 4), Mercedes Vito (executive minivan, up to 8), Mercedes V-Class (luxury 7-seat MPV), Mercedes Sprinter (group minibus, up to 16) and the Mercedes-Maybach S 580 (first-class saloon, up to 3). Each car has its own page with its passenger and luggage capacity." },
+      { q: "Do you offer a Mercedes-Maybach S 580?", a: `Yes. The Mercedes-Maybach S 580 is our first-class saloon for up to 3 passengers. Fixed fares, booked instantly online: airport to Barcelona city €${sClassFixedFare("airport", "barcelona_city")} and city to airport €${sClassFixedFare("barcelona_city", "airport")}; Sants station to the city €${sClassFixedFare("sants", "barcelona_city")} and the city to Sants €${sClassFixedFare("barcelona_city", "sants")}; the airport to Sants €${sClassFixedFare("airport", "sants")} and Sants to the airport €${sClassFixedFare("sants", "airport")}. Other journeys are €${S_CLASS_PER_KM.toFixed(2)} per kilometre. By the hour it is €${S_CLASS_HOURLY_IN_CITY} in Barcelona and €${S_CLASS_HOURLY_OUT_OF_CITY} outside it, and waiting time is €${S_CLASS_WAIT_PER_HOUR} per hour. The S 580 does not take bookings to or from the port: send us a query for those.` },
       { q: "Are the vehicles clean and well-maintained?", a: "All vehicles are professionally cleaned before every trip and serviced on schedule. If anything about the car is not right when it arrives, tell the driver or call us and we will deal with it." },
       { q: "Can I request a specific vehicle model?", a: "We'll do our best to accommodate specific model requests. Please add a note in the Special Requests field when booking, or contact us directly to confirm availability." },
       { q: "Do your vehicles have WiFi?", a: "Most of them. WiFi is listed on six of the eight cars in the fleet — the exceptions are the V-Class and the Sprinter. Each vehicle page lists exactly what that car carries, so check there before booking if it matters to you." },

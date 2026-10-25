@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Do not announce the framework in every response (X-Powered-By): it helps nobody but scanners.
+  poweredByHeader: false,
   experimental: {
     // CSS was inlined into <style> to avoid a render-blocking stylesheet
     // request. That was the right call when the bundle was ~15 KiB, which is

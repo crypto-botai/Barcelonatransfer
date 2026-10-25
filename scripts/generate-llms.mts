@@ -27,6 +27,7 @@ import {
   type VehicleCode,
 } from "../lib/fixed-prices";
 import { VEHICLE_CATALOG, EXTRAS_CATALOG, BAG_SIZES } from "../types";
+import { sClassFixedFare, S_CLASS_PER_KM, S_CLASS_HOURLY_IN_CITY, S_CLASS_HOURLY_OUT_OF_CITY, S_CLASS_WAIT_PER_HOUR } from "../lib/s-class-pricing";
 import { HOURLY_RATES, MIN_HOURLY_HOURS, ZONE_LABELS, ZONE_CODE_TO_KEY } from "../lib/pricing";
 import { COMPANY } from "../lib/company-facts";
 import { SUPPORTED_LOCALES } from "../lib/i18n";
@@ -138,6 +139,21 @@ function fleetLines(): string {
   }).join("\n");
 }
 
+/**
+ * The Mercedes-Maybach S 580 is priced by its own rules, not by the route table, so it gets its own block here, read from the
+ * same constants the quote uses.
+ */
+function sClassBlock(): string {
+  const f = (a: string, b: string) => `€${sClassFixedFare(a, b)}`;
+  return [
+    "Mercedes-Maybach S 580 (first class, up to 3 passengers) is priced on its own terms, not from the route table below:",
+    `- Instant booking, fixed: BCN El Prat Airport → Barcelona city ${f("airport", "barcelona_city")}; Barcelona city → airport ${f("barcelona_city", "airport")}; Sants station → city ${f("sants", "barcelona_city")}; city → Sants ${f("barcelona_city", "sants")}; airport → Sants ${f("airport", "sants")}; Sants → airport ${f("sants", "airport")}.`,
+    `- Any other journey: €${S_CLASS_PER_KM.toFixed(2)} per kilometre of road.`,
+    `- By the hour: €${S_CLASS_HOURLY_IN_CITY}/h in Barcelona, €${S_CLASS_HOURLY_OUT_OF_CITY}/h outside it. Waiting time: €${S_CLASS_WAIT_PER_HOUR}/h.`,
+    "- Not offered to or from the port or cruise terminals: those requests are answered by a manual query.",
+  ].join("\n");
+}
+
 function extrasLines(): string {
   return EXTRAS_CATALOG.map((e) => {
     const price = e.price === 0 ? "on request, no charge" : e.priceLabel;
@@ -172,7 +188,7 @@ const city = routesFrom("BARCELONA_CITY");
 const brief = `# ${COMPANY.legalName} — AI & LLM Reference
 
 > Licensed VTC chauffeur service in Barcelona, Spain. Fixed-price private
-> transfers, no surge pricing. Generated from the live pricing data on ${today}.
+> transfers, the price confirmed before you pay. Generated from the live pricing data on ${today}.
 > Format: [llms.txt v1](https://llmstxt.org).
 
 ## Service Summary
@@ -193,6 +209,8 @@ individually. Prices are per vehicle and EXCLUDE VAT and tolls.
 
 ## Fleet (${VEHICLE_CATALOG.length} vehicles operated)
 ${fleetLines()}
+
+${sClassBlock()}
 
 ## Pricing
 Fixed per vehicle, EXCLUDING VAT and tolls. Routes are bidirectional —
@@ -285,9 +303,11 @@ ${VEHICLE_CATALOG.map((v, i) => `${i + 1}. ${v.label} — ${v.badge ?? "vehicle"
    Features: ${v.features.join(", ")}
    ${v.description}`).join("\n\n")}
 
+${sClassBlock()}
+
 ## Price policy
 - All prices are FIXED and FINAL — the quoted figure is what is charged
-- No surge pricing at night, on holidays, in bad weather or during events
+- The fare is confirmed before you pay and does not change with traffic, delays or a meter
 - Included: chauffeur, vehicle, fuel, airport fees, parking
 - Excluded: VAT (10%, added only when an invoice is requested) and motorway tolls
 - Routes are bidirectional — A→B and B→A cost the same — with these exceptions,

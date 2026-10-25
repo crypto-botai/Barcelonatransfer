@@ -1,7 +1,7 @@
 # Elite BCN Transfers — AI & LLM Reference
 
 > Licensed VTC chauffeur service in Barcelona, Spain. Fixed-price private
-> transfers, no surge pricing. Generated from the live pricing data on 2026-10-22.
+> transfers, the price confirmed before you pay. Generated from the live pricing data on 2026-10-25.
 > Format: [llms.txt v1](https://llmstxt.org).
 
 ## Service Summary
@@ -29,6 +29,12 @@ individually. Prices are per vehicle and EXCLUDE VAT and tolls.
 - Mercedes V-Class — Luxury Minivan, up to 7 passengers, 4 large cases (75 × 50 × 30 cm). Captain Seats, Conference Layout, Champagne Bar, 4K Screen, Privacy Glass.
 - Mercedes Sprinter — Minibus, up to 16 passengers, 12 large cases (75 × 50 × 30 cm). Large Group, Air Conditioning, PA System, Luggage Hold, Reclining Seats.
 - Mercedes-Maybach S 580 — First Class, up to 3 passengers, 2 large cases (75 × 50 × 30 cm). Rear Executive Seating, Chauffeur in Suit, Climate Control, WiFi, Bottled Water.
+
+Mercedes-Maybach S 580 (first class, up to 3 passengers) is priced on its own terms, not from the route table below:
+- Instant booking, fixed: BCN El Prat Airport → Barcelona city €250; Barcelona city → airport €235; Sants station → city €175; city → Sants €165; airport → Sants €250; Sants → airport €235.
+- Any other journey: €4.75 per kilometre of road.
+- By the hour: €160/h in Barcelona, €195/h outside it. Waiting time: €160/h.
+- Not offered to or from the port or cruise terminals: those requests are answered by a manual query.
 
 ## Pricing
 Fixed per vehicle, EXCLUDING VAT and tolls. Routes are bidirectional —
