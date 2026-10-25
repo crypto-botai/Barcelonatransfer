@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { shouldForcePasswordChange } from "@/lib/auth-gates";
 
-export async function middleware(req: NextRequest) {
+async function handle(req: NextRequest) {
   // Block crawling on any non-production host (Vercel preview URLs, *.vercel.app)
   // so Google never sees canonical-pointing pages on non-canonical domains
   const host = req.headers.get("host") ?? "";
@@ -121,6 +121,20 @@ export async function middleware(req: NextRequest) {
   }
 
   return noindex(NextResponse.next());
+}
+
+/**
+ * The real entry point: the logic above, then a fresh Date on whatever it returns.
+ *
+ * Pages are prerendered and served from Vercel's cache, and a cached response keeps the Date it was generated with. The home page
+ * showed a Date 17 minutes behind the real time (with an Age header saying so), and SEO checkers read that as "the server clock is
+ * wrong". Stamping the time of this request keeps the header truthful for the client. The Age header still tells a cache-aware client
+ * how old the page is, so nothing is hidden.
+ */
+export async function middleware(req: NextRequest) {
+  const res = await handle(req);
+  res.headers.set("Date", new Date().toUTCString());
+  return res;
 }
 
 export const config = {

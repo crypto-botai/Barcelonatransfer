@@ -32,6 +32,9 @@ export default function Footer() {
     { key: "groupMinibus",     href: "/fleet/group-minibus",     label: null },
   ];
 
+  // These three are also named in the prose of the home page, with the same link text. The suffix (hidden) tells the two links apart.
+  const SUFFIXED = new Set<string>(["sitges", "andorra", "tarragona"]);
+
   const DESTINATIONS = [
     { key: "barcelonaAirport", href: "/airport-transfers" },
     { key: "sitges",           href: "/transfers/sitges" },
@@ -94,7 +97,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-5 group w-fit">
+            <div className="flex items-center gap-2 mb-5 group w-fit">
               <div className="w-8 h-8 border border-gold-500 rotate-45 flex items-center justify-center">
                 <div className="w-3 h-3 bg-gold-500" />
               </div>
@@ -102,7 +105,7 @@ export default function Footer() {
                 <span className="text-white">ELITE</span>
                 <span className="text-gold-500">BCN</span>
               </span>
-            </Link>
+            </div>
             <p className="text-dark-400 text-sm leading-relaxed mb-6 max-w-xs">
               {t("tagline")}
             </p>
@@ -201,14 +204,14 @@ export default function Footer() {
               {DESTINATIONS.map(({ key, href }) => (
                 <li key={key}>
                   <Link href={href} className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
-                    {t(`links.${key}`)}
+                    {t(`links.${key}`)}{SUFFIXED.has(key) ? <span className="sr-only"> {t("transferSuffix")}</span> : null}
                   </Link>
                 </li>
               ))}
               {/* The only priority destination with no sitewide link. */}
               <li>
                 <Link href="/transfers/costa-brava" className="text-sm text-dark-400 hover:text-gold-400 transition-colors">
-                  Costa Brava
+                  Costa Brava<span className="sr-only"> {t("transferSuffix")}</span>
                 </Link>
               </li>
               <li>

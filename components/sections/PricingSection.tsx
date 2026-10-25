@@ -78,6 +78,7 @@ function PriceTable({ data, search, rowCta }: {
                     {returnExtra.page ? (
                       <Link href={returnExtra.page} className="inline-flex min-h-6 items-center hover:text-gold-400 transition-colors underline underline-offset-2 decoration-gold-500/30">
                         +{formatCurrency(returnExtra.amount)} leaving {returnExtra.leavingLabel}
+                        <span className="sr-only"> on the {r.fromKey === "airport" ? "airport" : "Barcelona city"} route</span>
                       </Link>
                     ) : (
                       <>+{formatCurrency(returnExtra.amount)} leaving {returnExtra.leavingLabel}</>

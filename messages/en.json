@@ -193,7 +193,8 @@
       "location": "Barcelona, Spain · Licensed VTC"
     },
     "copyright": "All rights reserved. Licensed VTC Operator — Barcelona, Spain.",
-    "languageHeading": "Language"
+    "languageHeading": "Language",
+    "transferSuffix": "transfers"
   },
   "common": {
     "loading": "Loading…",

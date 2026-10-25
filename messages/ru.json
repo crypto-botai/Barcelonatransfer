@@ -193,7 +193,8 @@
       "location": "Барселона, Испания · Лицензированный VTC"
     },
     "copyright": "Все права защищены. Лицензированный оператор VTC — Барселона, Испания.",
-    "languageHeading": "Язык"
+    "languageHeading": "Язык",
+    "transferSuffix": "трансферы"
   },
   "common": {
     "loading": "Загрузка…",
