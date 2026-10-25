@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { sendPaymentConfirmationEmail } from "@/lib/resend";
 import { formatPickupDateTime } from "@/lib/datetime";
 import { PAYMENT_METHODS } from "@/lib/payment-method";
+import { settleCompanions } from "@/lib/journeys";
 
 /**
  * The office marking a payment received — or not.
@@ -70,6 +71,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     },
   });
 
+  // The journey home of a round trip (and rides booked together) is paid with this one, so it follows.
+  const alsoSettled = await settleCompanions(booking, paid ? { paid: true, paymentMethod: body.paymentMethod ?? booking.paymentMethod ?? null, markedBy: admin.name ?? admin.id ?? "admin" } : { paid: false });
+
   await prisma.activityLog.create({
     data: {
       adminId:   admin.id ?? "admin",
@@ -77,7 +81,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       action:    paid ? "MARK_PAID" : "MARK_UNPAID",
       entity:    "BOOKING",
       entityId:  id,
-      details:   { confirmationCode: booking.confirmationCode, method: updated.paymentMethod, amount: booking.totalAmount } as never,
+      details:   { confirmationCode: booking.confirmationCode, method: updated.paymentMethod, amount: booking.totalAmount, alsoSettledJourneys: alsoSettled } as never,
     },
   }).catch(() => {});
 

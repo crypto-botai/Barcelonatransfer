@@ -60,6 +60,10 @@ export async function GET(req: NextRequest) {
     driver:  { include: { user: { select: { name: true, phone: true } }, vehicles: { take: 1, select: { make: true, model: true, licensePlate: true } } } },
     user:    { select: { name: true, email: true } },
     partner: { select: { name: true } },
+    // Which trip this is part of: the journey home of a round trip, or the outbound that has one. The list used to show each as a
+    // plain one-way booking, so a return that was never marked paid looked like a booking nobody had paid for.
+    returnOf:  { select: { confirmationCode: true, paymentStatus: true, status: true } },
+    returnLeg: { select: { confirmationCode: true, paymentStatus: true, status: true } },
   };
 
   // The list is capped, so what the cap keeps matters. It used to take the first `limit` rows by soonest pickup across ALL

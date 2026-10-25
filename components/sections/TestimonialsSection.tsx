@@ -121,7 +121,7 @@ export default function TestimonialsSection({
             target="_blank"
             rel="noreferrer"
             className="group flex items-center gap-4"
-            aria-label={`${profile.rating.toFixed(1)} on Google, opens the profile`}
+            aria-label={`${profile.rating.toFixed(1)} On Google · every review verified. Opens the Google profile`}
           >
             <span className="font-display text-5xl sm:text-[56px] leading-none text-gold-300">{profile.rating.toFixed(1)}</span>
             <span className="flex flex-col gap-1.5">

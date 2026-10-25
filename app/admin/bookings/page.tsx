@@ -34,6 +34,10 @@ type Booking = {
   protectionFee?: number | null;
   partnerId: string | null; partnerPayout: number | null; partnerDispatchedAt: string | null;
   partner?: { name: string } | null;
+  /** The outbound this booking is the return of. */
+  returnOf?: { confirmationCode: string; paymentStatus: string; status: string } | null;
+  /** The return leg of this booking, when it is the outbound of a round trip. */
+  returnLeg?: { confirmationCode: string; paymentStatus: string; status: string } | null;
   driverId: string | null; adminNotes: string | null;
   driver?: { user: { name: string | null; phone: string | null }; vehicles?: { make: string; model: string; licensePlate: string }[] } | null;
   isDeleted: boolean; deletedAt: string | null;
@@ -359,6 +363,21 @@ function EmailSection({ booking, onChanged }: { booking: Booking; onChanged: () 
  * or anyone who says it never arrived. Says plainly what is and is not switched
  * on, because a button that does nothing is worse than no button.
  */
+/** Says a booking is half of a round trip, and whether the other half is paid. Nothing for a one-way booking. */
+function TripTag({ booking }: { booking: Pick<Booking, "returnOf" | "returnLeg"> }) {
+  const other = booking.returnLeg ?? booking.returnOf;
+  if (!other) return null;
+  const paid = other.paymentStatus === "PAID" || other.paymentStatus === "PARTIALLY_REFUNDED" || other.paymentStatus === "REFUNDED";
+  return (
+    <span
+      className={`mt-0.5 inline-flex items-center gap-1 rounded-full border px-1.5 py-px text-[10px] font-sans tracking-normal ${paid ? "border-emerald-500/30 text-emerald-300" : "border-amber-500/40 text-amber-300"}`}
+      title={booking.returnLeg ? `Round trip: the journey home is ${other.confirmationCode}` : `Round trip: this is the journey home of ${other.confirmationCode}`}
+    >
+      {booking.returnLeg ? "Round trip · outbound" : "Round trip · return"} {other.confirmationCode}{paid ? "" : " · unpaid"}
+    </span>
+  );
+}
+
 function PhoneSection({ booking }: { booking: Booking }) {
   const [status, setStatus] = useState<MessagingStatus | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -762,6 +781,7 @@ function BookingDrawer({ booking, drivers, onClose, onSaved, onDeleted, onRefres
         <div className="flex items-center justify-between p-5 border-b border-white/[0.06] sticky top-0 bg-[#0a0a0a] z-10">
           <div>
             <p className="text-gold-400 font-mono text-lg tracking-widest">{booking.confirmationCode}</p>
+            <TripTag booking={booking} />
             <p className="text-dark-500 text-xs mt-0.5">{new Date(booking.createdAt).toLocaleString("en-GB")}</p>
           </div>
           <div className="flex items-center gap-2">
@@ -1317,7 +1337,7 @@ export default function AdminBookingsPage() {
                     {filtered.map((b) => (
                       <tr key={b.id} onClick={() => setSelected(b)}
                         className="price-row border-b border-white/[0.04] cursor-pointer hover:bg-white/[0.02]">
-                        <td className="py-3 px-3 text-xs font-mono text-gold-400 tracking-widest">{b.confirmationCode}</td>
+                        <td className="py-3 px-3 text-xs font-mono text-gold-400 tracking-widest"><span className="block">{b.confirmationCode}</span><TripTag booking={b} /></td>
                         <td className="py-3 px-3">
                           <p className="text-sm text-white whitespace-nowrap">{b.guestName ?? "—"}</p>
                           <p className="text-xs text-dark-500 truncate max-w-[120px]">{b.guestEmail}</p>

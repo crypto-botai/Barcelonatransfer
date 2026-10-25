@@ -7,7 +7,7 @@ import { formatPickupDateTime } from "@/lib/datetime";
 import { paidOnline } from "@/lib/deposits";
 import { sendOpenAiConversion } from "@/lib/tracking/openai-conversions";
 import { parseBookingMeta, wantsSmsAlerts } from "@/lib/booking-meta";
-import { loadJourneyGroup } from "@/lib/journeys";
+import { loadJourneyGroup, settleCompanions } from "@/lib/journeys";
 import { confirmationVars, tellOfficeBookingConfirmed } from "@/lib/whatsapp-events";
 
 // Shared by app/api/payments/webhook, app/api/payments/verify, and app/api/cron/payment-reconcile
@@ -49,6 +49,12 @@ export async function finalizeSumUpPayment(bookingId: string, checkout: SumUpChe
     },
   });
   if (claimed.count === 0) return "already-paid";
+
+  // One checkout pays for the whole trip. The journey home of a round trip (and any ride booked together with this one) is a booking
+  // row of its own, and it is paid and confirmed with this one. Only the caller that won the claim above gets here, so this runs once.
+  // The card transaction id is deliberately NOT copied onto the other journeys: it belongs to the one charge on this booking, and a
+  // refund started from a journey that carries it would be worked out from that journey's own fare, not from its share of the charge.
+  await settleCompanions(booking, { paid: true });
 
   // What the row now holds. Built from what was just written rather than read
   // back, because the three fields above are the only ones that changed.

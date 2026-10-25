@@ -99,7 +99,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link
               href="/"
-              aria-label="Elite BCN — home"
+              aria-label="ELITEBCN home"
               aria-current={pathname === "/" ? "page" : undefined}
               className="flex items-center gap-2 group rounded-lg"
             >
