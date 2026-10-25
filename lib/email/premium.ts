@@ -1,4 +1,4 @@
-import { COMPANY } from "@/lib/company-facts";
+import { COMPANY, SOCIAL_PROFILES } from "@/lib/company-facts";
 import { CUSTOMER_APP_LINKS, customerAppPromoEnabled } from "@/lib/mobile-apps";
 import { telHref, waHref, displayPhone, isDialable } from "@/lib/phone";
 
@@ -267,6 +267,13 @@ function card(content: string): string {
           <a href="tel:${PHONE_DIGITS}" style="color:${BAND_MUTED};text-decoration:none;">${PHONE}</a>
           &nbsp;&middot;&nbsp;
           <a href="mailto:${COMPANY.email}" style="color:${BAND_MUTED};text-decoration:none;">${COMPANY.email}</a>
+        </div>
+        <div style="font-family:${SANS};font-size:12px;line-height:21px;color:${BAND_MUTED};padding-top:12px;">
+          <a href="${SOCIAL_PROFILES.instagram}" style="color:${BAND_MUTED};text-decoration:none;">Instagram</a>
+          &nbsp;&middot;&nbsp;
+          <a href="${SOCIAL_PROFILES.facebook}" style="color:${BAND_MUTED};text-decoration:none;">Facebook</a>
+          &nbsp;&middot;&nbsp;
+          <a href="${SOCIAL_PROFILES.tiktok}" style="color:${BAND_MUTED};text-decoration:none;">TikTok</a>
         </div>
         <div style="font-family:${SANS};font-size:11px;line-height:19px;color:#8C8C92;padding-top:10px;">
           Barcelona, Spain &middot; Licensed VTC Operator<br>

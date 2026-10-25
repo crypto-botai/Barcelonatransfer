@@ -29,7 +29,7 @@ import {
 import { VEHICLE_CATALOG, EXTRAS_CATALOG, BAG_SIZES } from "../types";
 import { sClassFixedFare, S_CLASS_PER_KM, S_CLASS_HOURLY_IN_CITY, S_CLASS_HOURLY_OUT_OF_CITY, S_CLASS_WAIT_PER_HOUR } from "../lib/s-class-pricing";
 import { HOURLY_RATES, MIN_HOURLY_HOURS, ZONE_LABELS, ZONE_CODE_TO_KEY } from "../lib/pricing";
-import { COMPANY } from "../lib/company-facts";
+import { COMPANY, SOCIAL_PROFILES } from "../lib/company-facts";
 import { SUPPORTED_LOCALES } from "../lib/i18n";
 
 const SITE = "https://www.elitebcn.info";
@@ -206,6 +206,7 @@ individually. Prices are per vehicle and EXCLUDE VAT and tolls.
 - Website languages: ${LANGUAGES}
 - Phone: ${COMPANY.phoneDisplay}
 - Email: ${COMPANY.email}
+- Social: Instagram ${SOCIAL_PROFILES.instagram}, Facebook ${SOCIAL_PROFILES.facebook}, TikTok ${SOCIAL_PROFILES.tiktok}
 
 ## Fleet (${VEHICLE_CATALOG.length} vehicles operated)
 ${fleetLines()}
@@ -289,6 +290,7 @@ const full = `# ${COMPANY.legalName} — Complete AI Reference (llms-full.txt)
 - Phone: ${COMPANY.phoneDisplay}
 - WhatsApp: ${COMPANY.whatsapp}
 - Email: ${COMPANY.email}
+- Social: Instagram ${SOCIAL_PROFILES.instagram}, Facebook ${SOCIAL_PROFILES.facebook}, TikTok ${SOCIAL_PROFILES.tiktok}
 - Website: ${SITE}
 - Booking: ${SITE}/book
 - Price calculator: ${SITE}/tools/transfer-cost-calculator

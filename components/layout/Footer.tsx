@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Mail, Phone, MessageCircle, MapPin, Instagram, Facebook } from "lucide-react";
 import { useTranslations } from "@/components/language/I18nProvider";
 import NewsletterForm from "@/components/marketing/NewsletterForm";
-import { COMPANY } from "@/lib/company-facts";
+import { COMPANY, SOCIAL_PROFILES } from "@/lib/company-facts";
 import { SUPPORTED_LOCALES, LANGUAGE_META, localizedPath } from "@/lib/i18n";
 
 export default function Footer() {
@@ -128,7 +128,7 @@ export default function Footer() {
                 pointed at "elitebcntransfers", which is not an account. */}
             <div className="flex gap-3 mt-5">
               <a
-                href="https://www.instagram.com/elitebcn.info"
+                href={SOCIAL_PROFILES.instagram}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Elite BCN on Instagram"
@@ -137,7 +137,7 @@ export default function Footer() {
                 <Instagram size={16} />
               </a>
               <a
-                href="https://www.facebook.com/elitebcn.info"
+                href={SOCIAL_PROFILES.facebook}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Elite BCN on Facebook"
@@ -146,7 +146,7 @@ export default function Footer() {
                 <Facebook size={16} />
               </a>
               <a
-                href="https://www.tiktok.com/@elitebcn.info"
+                href={SOCIAL_PROFILES.tiktok}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Elite BCN on TikTok"

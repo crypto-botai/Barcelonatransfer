@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { COMPANY } from "@/lib/company-facts";
+import { COMPANY, SOCIAL_PROFILES } from "@/lib/company-facts";
 // The Google Business Profile's own name, so the LocalBusiness below can
 // declare it as an alternate and Google can resolve the two to one business.
 import { GOOGLE_PROFILE } from "@/data/reviews";
@@ -253,9 +253,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   // real listing, and it is the one that connects this domain
                   // to the reviews shown on the site.
                   sameAs: [
-                    "https://www.instagram.com/elitebcn.info",
-                    "https://www.facebook.com/elitebcn.info",
-                    "https://www.tiktok.com/@elitebcn.info",
+                    SOCIAL_PROFILES.instagram,
+                    SOCIAL_PROFILES.facebook,
+                    SOCIAL_PROFILES.tiktok,
                     "https://www.google.com/maps?cid=8610295895899713122",
                   ],
                 },
@@ -326,9 +326,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   // Also on this node, not only on the Organization above, so the
                   // profiles and the business resolve as one entity.
                   sameAs: [
-                    "https://www.instagram.com/elitebcn.info",
-                    "https://www.facebook.com/elitebcn.info",
-                    "https://www.tiktok.com/@elitebcn.info",
+                    SOCIAL_PROFILES.instagram,
+                    SOCIAL_PROFILES.facebook,
+                    SOCIAL_PROFILES.tiktok,
                     "https://www.google.com/maps?cid=8610295895899713122",
                   ],
                   // The same Maps listing again, as hasMap. sameAs says "this

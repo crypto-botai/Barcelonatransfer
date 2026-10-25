@@ -21,6 +21,13 @@ export const COMPANY = {
   vtcLicensed:  true,
 };
 
+/** The company's profiles. The handle is the same on all three: elitebcn.info (checked live on 25 Oct 2026). */
+export const SOCIAL_PROFILES = {
+  instagram: "https://www.instagram.com/elitebcn.info",
+  facebook:  "https://www.facebook.com/elitebcn.info",
+  tiktok:    "https://www.tiktok.com/@elitebcn.info",
+} as const;
+
 export const SOCIAL_PROOF = {
   // Read from the reviews file rather than repeated here, so the rating shown
   // beside the reviews and the rating published in structured data cannot drift

@@ -5,7 +5,7 @@ import { FIXED_ROUTES, type VehicleCode } from "@/lib/fixed-prices";
 import { VEHICLE_CATALOG, EXTRAS_CATALOG } from "@/types";
 import { SUPPORTED_LOCALES } from "@/lib/i18n";
 import { HOURLY_RATES, MIN_HOURLY_HOURS } from "@/lib/pricing";
-import { COMPANY } from "@/lib/company-facts";
+import { COMPANY, SOCIAL_PROFILES } from "@/lib/company-facts";
 
 /**
  * public/llms.txt and llms-full.txt are served to GPTBot, ClaudeBot,
@@ -92,6 +92,10 @@ describe("stated facts match the site's own data", () => {
     expect(text).toContain("Mercedes-Maybach S 580");
     expect(text).toMatch(/Barcelona city → airport €235/);
     expect(text).toMatch(/€4\.75 per kilometre/);
+  });
+
+  it.each(FILES)("%s names the company's social profiles", (_name, text) => {
+    for (const url of Object.values(SOCIAL_PROFILES)) expect(text).toContain(url);
   });
 
   it.each(FILES)("%s lists every published language", (_name, text) => {
