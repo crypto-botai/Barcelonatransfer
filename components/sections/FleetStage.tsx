@@ -290,7 +290,7 @@ export default function FleetStage() {
               </div>
               <span className={`flex justify-between gap-1.5 text-[11px] tracking-wide ${i === index ? "text-white" : "text-dark-500"}`}>
                 <span>{v.label}</span>
-                <b className="font-display font-normal text-gold-300">{formatCurrency(getFleetFromPrice(v.class))}</b>
+                <span className="font-display font-normal text-gold-300">{formatCurrency(getFleetFromPrice(v.class))}</span>
               </span>
             </button>
           ))}
