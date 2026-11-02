@@ -33,10 +33,11 @@ export async function getSupportReply(
   sessionId: string,
   messages: ChatMessage[],
   language = "en",
+  voice?: { callerNumber: string },
 ): Promise<{ reply: string; escalate: boolean }> {
   const agentRecord  = await prisma.aiAgent.findUnique({ where: { name: AGENT_NAME } });
   const kbText       = await buildKbText(language);
-  const systemPrompt = await buildSupportSystemPrompt(kbText, language);
+  const systemPrompt = await buildSupportSystemPrompt(kbText, language, voice);
 
   const sanitisedMessages: { role: "user" | "assistant"; content: string }[] = messages.map((m) =>
     m.role === "user" ? { role: "user" as const, content: wrapAsData("customer_message", m.content) } : { role: "assistant" as const, content: m.content },

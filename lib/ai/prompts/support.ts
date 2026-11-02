@@ -78,7 +78,27 @@ function buildFallbackPricing(): string {
 All transfer prices are fixed and shown before booking. No night surcharge and no airport fees. A pickup between Friday 12:00 and Monday 12:00 (Barcelona time) costs a little more than the figures above; the booking form shows the exact final price for the date and time chosen. Never state a weekend figure or a percentage, and never say prices are the same on every day.${returnLegNote()}`;
 }
 
-export async function buildSupportSystemPrompt(kbText: string, language: string): Promise<string> {
+/**
+ * Appended when the "customer" is a caller on the phone rather than a visitor typing. The same booking steps apply, but the
+ * words are spoken aloud by a synthetic voice, so nothing may rely on a link, a list or a screen.
+ */
+function voiceModeSection(callerNumber: string): string {
+  const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Madrid" });
+  return `
+
+## PHONE CALL MODE (overrides the style rules above)
+The customer is speaking to you on a telephone call. Everything you write is read aloud by a voice.
+- Reply in one or two short sentences, under 35 words. Plain spoken words only: no markdown, no bullets, no links, no emoji.
+- Ask one question at a time. Today is ${today} (Barcelona time); turn "tomorrow" or "next Friday" into a real date yourself.
+- The caller's number is ${callerNumber || "unknown"}. For the phone number, confirm this number instead of asking for it.
+- For the email, ask the caller to say it slowly, then read it back as "name at domain dot com" and ask if it is right before using it.
+- Never read out a URL. The payment link is sent by text message to the caller's phone after the booking is created; say so.
+- Do not quote a price: it is read to the caller automatically once the booking exists.
+- When you have everything, read the booking back in one short sentence and ask "Shall I book it?". Only after the caller agrees, give a one-line thanks and then the <BOOKING_JSON> block.
+- If the caller wants a person, or you cannot help, say a colleague will call them back on this number.`;
+}
+
+export async function buildSupportSystemPrompt(kbText: string, language: string, voice?: { callerNumber: string }): Promise<string> {
   const langInstruction = LANG_MAP[language] ?? "Always reply in English.";
   const pricingSection  = await buildLivePricingSection();
 
@@ -185,5 +205,5 @@ If a question cannot be answered from the knowledge base or you are uncertain, o
 - Use **bold** for key details (prices, vehicle names)
 - Use short bullet lists for comparisons or multiple options
 - Keep replies mobile-friendly (short paragraphs)
-- No markdown tables — use bullets instead`;
+- No markdown tables — use bullets instead${voice ? voiceModeSection(voice.callerNumber) : ""}`;
 }
