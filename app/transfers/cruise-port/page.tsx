@@ -229,6 +229,10 @@ export default function CruisePortTransferPage() {
                 Every journey is private. The car carries your party only, so the luggage that comes off a
                 two-week cruise is not competing for space with anyone else&apos;s.
               </p>
+              <p>
+                Ship calling at Tarragona instead? See the <Link href="/transfers/tarragona-cruise-port" className="text-gold-400 hover:underline">Tarragona cruise port transfer</Link>,
+                priced as one fixed fare from the airport or central Barcelona.
+              </p>
             </div>
           </div>
         </section>

@@ -1,6 +1,6 @@
 import {
   ShoppingBag, Train, Waves, Umbrella, Clock, MapPin, ShieldCheck,
-  Car, Luggage, Plane, CalendarClock, Route as RouteIcon, Mountain, Snowflake,
+  Car, Luggage, Plane, CalendarClock, Route as RouteIcon, Mountain, Snowflake, Anchor,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -1580,9 +1580,124 @@ const ROSES: RouteLanding = {
   ),
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Tarragona cruise port
+//
+// Tarragona takes cruise calls and the Tarragona fare covers the whole city, port
+// included (the pricing zone is a 5 km circle round the centre, and the port is
+// about a kilometre from it), so there is no separate port fare to invent: the page
+// reads the Tarragona ladder. Distance and time are the figures /transfers/tarragona
+// already publishes. Nothing is said about particular ships, berths or timetables,
+// because none of that is on file and it changes by season.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const tarragonaPortAirport = ladder("BCN_AIRPORT", "TARRAGONA");
+const tarragonaPortCity = ladder("BARCELONA_CITY", "TARRAGONA");
+const tarragonaPortFrom = cheapestOf(tarragonaPortAirport, tarragonaPortCity);
+
+const TARRAGONA_CRUISE: RouteLanding = {
+  slug: "tarragona-cruise-port",
+  name: "Tarragona Cruise Port",
+  h1: "Tarragona Cruise Port Transfer",
+  eyebrow: "Costa Daurada · Port of Tarragona",
+  EyebrowIcon: Anchor,
+  title: `Tarragona Cruise Port Transfer — from €${tarragonaPortFrom}`,
+  description: `Private transfer between Barcelona and the Port of Tarragona cruise terminal. Fixed €${tarragonaPortFrom} per vehicle, about 90 km and 1 hour, timed to your ship.`,
+  keywords: [
+    "tarragona cruise port transfer",
+    "barcelona airport to tarragona cruise port",
+    "tarragona port taxi",
+    "tarragona cruise terminal transfer",
+    "cruise ship tarragona private transfer",
+  ],
+  heroLead: `A private car between Barcelona and your ship at Tarragona, in one run with no change. Fixed at €${tarragonaPortFrom} per vehicle, the same from the airport or from central Barcelona, and timed to the ship rather than to a guess.`,
+  facts: [
+    { icon: MapPin, k: "Distance", v: "about 90 km" },
+    { icon: Clock, k: "Journey", v: "about 1 hour" },
+    { icon: Plane, k: "Free waiting", v: "60 minutes at the airport" },
+    { icon: ShieldCheck, k: "Fixed", v: `€${tarragonaPortFrom}` },
+  ],
+  priceTables: [
+    { heading: "From BCN El Prat Airport", caption: "Fixed fares from Barcelona El Prat Airport to Tarragona and its cruise port by vehicle", vehicles: tarragonaPortAirport },
+    { heading: "From central Barcelona", caption: "Fixed fares from central Barcelona to Tarragona and its cruise port by vehicle", vehicles: tarragonaPortCity },
+  ],
+  priceNote: "The Tarragona fare covers the whole city including the port, so there is no separate cruise supplement. The route runs both ways at the same price: use it to reach the ship or to leave it.",
+  included: [
+    "Licensed chauffeur, vehicle and fuel",
+    "Ship and flight tracking, pickup timed to the real arrival",
+    "60 minutes free waiting from landing at the airport, 15 minutes at the port",
+    "Door to door: the cruise terminal, the old town, a hotel or the station",
+    "Free cancellation up to 24 hours before",
+  ],
+  excluded: [
+    "10% VAT — only if you request an invoice",
+    "Motorway tolls on the AP-7",
+    "Meet and greet with your name on a tablet",
+    "Child, baby and booster seats",
+  ],
+  optionsIntro: "Barcelona to Tarragona is a short run, but a ship's departure time makes the choice of transport matter more than it does on a normal day.",
+  options: [
+    { name: "Private transfer", cost: `€${tarragonaPortFrom} per vehicle`, time: "About 1 hour, door to door", best: "Embarkation day, families and groups with luggage, and any sailing with a fixed all-aboard time" },
+    { name: "Train", cost: "Per person, plus getting to the station", time: "Around an hour on the train, plus both ends", best: "A solo traveller with one bag arriving in the city centre" },
+    { name: "Taxi", cost: "Metered, plus any airport supplement", time: "Similar to a private transfer", best: "Rarely, on this distance" },
+  ],
+  optionsNote: "The train is cheap and fine for one person with a rucksack. It stops being a good plan with cases, because the airport is not on the line and the station is not at the ship, so luggage changes hands at every step. On a day when the ship leaves at a fixed hour, the fixed price and fixed pickup are the point.",
+  sections: [
+    {
+      h2: "Getting to the ship",
+      h2Accent: "on time",
+      paras: [
+        "For embarkation, give us the ship name, the all-aboard time and your flight number if you are arriving by air. We track the flight, move the pickup if it lands late, and plan the drive so you reach the port with room to spare rather than at the last call.",
+        "The drive is about an hour on the AP-7. Allow extra in summer, when weekends carry the whole coast's traffic. We build that margin into the pickup time, which is why we ask for the sailing time and not only the flight.",
+        "Your luggage goes in the boot and stays with the car until the terminal. Check-in at the port is quick for most sailings, but the cut-off is not negotiable, so plan the journey backwards from it.",
+      ],
+      cards: [
+        { icon: Clock, t: "Planned backwards", d: "Pickup is set from the all-aboard time, not from the flight alone." },
+        { icon: Luggage, t: "Luggage to the terminal", d: "Cases stay in the boot until the car stops at the terminal." },
+        { icon: ShieldCheck, t: "Fixed whatever the traffic", d: "The price agreed at booking is the price charged." },
+      ],
+    },
+    {
+      h2: "A day in Tarragona",
+      h2Accent: "from the ship",
+      paras: [
+        "If Tarragona is a port of call, the old town and the Roman amphitheatre are close to the quay. The [Tarragona page](/transfers/tarragona) covers what there is to see and the fares for the wider area, and the same fixed price applies if you want a driver for the day rather than a transfer.",
+        "Many passengers also want PortAventura or the beaches of the [Costa Daurada](/transfers/costa-dorada). Tell us the plan and the all-aboard time and we will give you a price for the whole day, with the return to the ship timed so you are never rushing.",
+      ],
+    },
+    {
+      h2: "Barcelona cruise passengers",
+      h2Accent: "heading here",
+      paras: [
+        "Sailing from Barcelona and calling at Tarragona, or ending a cruise at one port and starting another at the other? The [Barcelona cruise port page](/transfers/cruise-port) covers the Barcelona terminals. We can link the two journeys into one booking so the driver is the same person and the timing is agreed once.",
+        "Landing at BCN and joining the ship at Tarragona is the common case. The fare is the airport fare, with 60 minutes of free waiting from landing, and the driver watches the flight rather than your booked time.",
+      ],
+    },
+  ],
+  faqs: [
+    { q: "How much is a transfer from Barcelona to the Tarragona cruise port?", a: `From €${tarragonaPortFrom} for the ${tarragonaPortCity[0].label}, fixed per vehicle rather than per person. It is the same fare from the airport or central Barcelona for most cars, and the Tarragona fare covers the port. Prices exclude VAT and tolls; 10% VAT is added only if you request an invoice.` },
+    { q: "How long is the drive between Barcelona and Tarragona port?", a: "About an hour for roughly 90 km, mostly on the AP-7. Add margin on summer weekends. We plan the pickup backwards from your ship's all-aboard time so the traffic is our problem, not yours." },
+    { q: "Do you track my flight and my ship?", a: "We track the flight by number, so a late landing moves the pickup without a call from you. For the ship, give us the name and the all-aboard time when you book and we time the drive to that. Airport pickups include 60 minutes of free waiting from landing." },
+    { q: "Can you take us from the port to a Tarragona hotel or to PortAventura?", a: "Yes. The Tarragona fare covers the city, and PortAventura and Salou have their own fixed fares on the Costa Daurada page. Tell us where you are going and when the ship leaves, and we will price the day." },
+    { q: "Is the train easier than a private transfer?", a: "For one person with one bag, it is cheaper. With luggage it means getting to Sants first, the train, then a taxi from the station to the port. On embarkation day the fixed price and the fixed pickup time are worth more than the saving." },
+    { q: "Do you carry child seats and large luggage?", a: "Yes. Child, baby and booster seats are fitted before the car is dispatched, so ask when you book. For a large party or heavy cruise luggage the V-Class and the minivan are the right sizes, and the price table above shows each." },
+  ],
+  bookingLead: "Give us your ship's name, the all-aboard time, your flight number if you are flying in, the pickup address and how many passengers. The price is confirmed before you pay and does not move afterwards.",
+  ctaLead: `Fixed at €${tarragonaPortFrom} per vehicle between Barcelona and the Tarragona cruise port.`,
+  cheapest: tarragonaPortFrom,
+  ...schemaFor(
+    "tarragona-cruise-port",
+    "Tarragona Cruise Port",
+    "Barcelona to Tarragona Cruise Port Private Transfer",
+    `Fixed-price private transfer between Barcelona (El Prat Airport or the city) and the Port of Tarragona cruise terminal. From €${tarragonaPortFrom} per vehicle, about 90 km and 1 hour.`,
+    tarragonaPortFrom,
+    { type: "City", name: "Tarragona", sameAs: "https://www.wikidata.org/wiki/Q15614" },
+  ),
+};
+
 export const ROUTE_LANDINGS: RouteLanding[] = [
   LA_ROCA, SANTS, VILANOVA, BEGUR, ENCAMP, SITGES, SALOU, ANDORRA_RETURN,
-  CAMBRILS, CALELLA, BLANES, ROSES,
+  CAMBRILS, CALELLA, BLANES, ROSES, TARRAGONA_CRUISE,
 ];
 
 export function routeLanding(slug: string): RouteLanding | undefined {

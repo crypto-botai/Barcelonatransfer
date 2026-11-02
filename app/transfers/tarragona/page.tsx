@@ -152,6 +152,10 @@ export default function TarragonaTransferPage() {
                 A private transfer takes approximately 60 minutes versus 1–1.5 hours by train with connections,
                 and is the only practical option for families travelling with luggage to a resort hotel.
               </p>
+              <p>
+                Joining or leaving a ship? The <Link href="/transfers/tarragona-cruise-port" className="text-gold-400 hover:underline">Tarragona cruise port transfer</Link> page
+                covers embarkation day, with pickups timed to your ship's all-aboard time.
+              </p>
             </div>
           </div>
         </section>
