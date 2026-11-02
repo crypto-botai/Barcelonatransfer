@@ -17,6 +17,11 @@ export function voiceAgentEnabled(): boolean {
   return process.env.VOICE_AGENT_ENABLED === "true";
 }
 
+/** "menu" (default): keypad menu, no AI. "ai": the free-speech booking assistant. */
+export function voiceAgentMode(): "menu" | "ai" {
+  return process.env.VOICE_AGENT_MODE === "ai" ? "ai" : "menu";
+}
+
 /** The most turns a call may take before it is handed to a person. Bounds cost on a call that goes round in circles. */
 export const MAX_TURNS = 24;
 
@@ -130,3 +135,27 @@ export async function saveTurn(callSid: string, role: Turn["role"], content: str
     .create({ data: { action: "VOICE_TURN", entity: "Call", entityId: null, details: { callSid, role, content: content.slice(0, 1500) } } })
     .catch((e) => console.error("[voice] could not save turn:", (e as Error)?.message));
 }
+
+// ─── The keypad menu ─────────────────────────────────────────────────────────────────────────────────────────────────────
+
+const MENU: Record<VoiceLang, string> = {
+  en:
+    "Hello, you have reached Elite BCN Transfers. To receive a booking link by text message, press 1. " +
+    "To speak to our team, press 2. To leave a message, press 3. Para español, pulse 9.",
+  es:
+    "Hola, ha llamado a Elite BCN Transfers. Para recibir un enlace de reserva por mensaje de texto, pulse 1. " +
+    "Para hablar con nuestro equipo, pulse 2. Para dejar un mensaje, pulse 3. For English, press 9.",
+};
+
+/** Says the menu and waits for one key. No key twice running puts the caller through to the office. */
+export function menuResponse(lang: VoiceLang, attempt: number): Response {
+  if (attempt >= 2) return dialOffice(OFFICE_PHONE, lang);
+  const v = VOICES[lang];
+  const action = `/api/twilio/voice/menu?lang=${lang}&amp;n=${attempt}`;
+  return twiml(
+    `<Gather input="dtmf" numDigits="1" timeout="6" action="${action}" method="POST">${say(MENU[lang], lang)}</Gather>` +
+      `<Redirect method="POST">${action}&amp;none=1</Redirect>`,
+  );
+}
+
+const OFFICE_PHONE = "+34635383712";

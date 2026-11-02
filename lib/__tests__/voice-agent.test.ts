@@ -18,6 +18,8 @@ vi.mock("@/lib/whatsapp", () => ({ notifyAdmin: mocks.notify }));
 
 import { POST as inbound } from "@/app/api/twilio/voice/route";
 import { POST as turn } from "@/app/api/twilio/voice/turn/route";
+import { POST as menu } from "@/app/api/twilio/voice/menu/route";
+import { POST as recorded } from "@/app/api/twilio/voice/recorded/route";
 
 const TOKEN = "test-token";
 const FROM = "+34600111222";
@@ -74,10 +76,60 @@ describe("the incoming call", () => {
     expect(xml).toContain("<Dial>+34635383712</Dial>");
     expect(xml).not.toContain("<Gather");
   });
-  it("greets, says it is automated and listens when the agent is on", async () => {
+  it("plays the keypad menu by default, with no AI", async () => {
     const xml = await text(await inbound(call("/api/twilio/voice", { CallSid: "CA1", From: FROM })));
-    expect(xml).toContain("<Gather");
+    expect(xml).toContain('input="dtmf"');
+    expect(xml).toContain("press 1");
+    expect(xml).not.toContain("automated booking assistant");
+  });
+  it("uses the free-speech assistant only when asked to", async () => {
+    vi.stubEnv("VOICE_AGENT_MODE", "ai");
+    const xml = await text(await inbound(call("/api/twilio/voice", { CallSid: "CA1", From: FROM })));
+    expect(xml).toContain('input="speech"');
     expect(xml).toContain("automated booking assistant");
+  });
+});
+
+describe("the keypad menu", () => {
+  const key = (digit: string, q = "lang=en&n=0") => menu(call(`/api/twilio/voice/menu?${q}`, { CallSid: "CA1", From: FROM, Digits: digit }));
+
+  it("refuses an unsigned request", async () => {
+    expect((await menu(call("/api/twilio/voice/menu?lang=en&n=0", { Digits: "1" }, false))).status).toBe(403);
+  });
+  it("1 texts the booking link to the caller and hangs up", async () => {
+    const xml = await text(await key("1"));
+    expect(mocks.sms).toHaveBeenCalledWith(FROM, expect.stringContaining("https://www.elitebcn.info/book"));
+    expect(xml).toContain("booking link");
+    expect(xml).toContain("<Hangup/>");
+  });
+  it("1 says so when the number cannot be texted", async () => {
+    mocks.sms.mockResolvedValue({ outcome: "skipped" });
+    expect(await text(await key("1"))).toContain("could not text");
+  });
+  it("2 puts the caller through to the office", async () => {
+    expect(await text(await key("2"))).toContain("<Dial>+34635383712</Dial>");
+  });
+  it("3 records a message", async () => {
+    const xml = await text(await key("3"));
+    expect(xml).toContain("<Record");
+    expect(xml).toContain("recorded");
+  });
+  it("9 switches language, and a wrong or missing key plays the menu again, then goes to the office", async () => {
+    expect(await text(await key("9"))).toContain("pulse 1");
+    expect(await text(await key("7"))).toContain("<Gather");
+    expect(await text(await key("", "lang=en&n=1"))).toContain("<Dial>");
+  });
+});
+
+describe("a recorded message", () => {
+  it("is filed and the office is told", async () => {
+    const xml = await text(await recorded(call("/api/twilio/voice/recorded?lang=en", { CallSid: "CA1", From: FROM, RecordingUrl: "https://api.twilio.com/rec/RE1", RecordingDuration: "40" })));
+    expect(mocks.create).toHaveBeenCalled();
+    expect(mocks.notify).toHaveBeenCalledWith(expect.stringContaining("https://api.twilio.com/rec/RE1"));
+    expect(xml).toContain("call you back");
+  });
+  it("refuses an unsigned request", async () => {
+    expect((await recorded(call("/api/twilio/voice/recorded", { RecordingUrl: "x" }, false))).status).toBe(403);
   });
 });
 

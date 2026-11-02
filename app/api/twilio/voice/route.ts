@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { COMPANY } from "@/lib/company-facts";
 import { candidateWebhookUrls, formParams, validTwilioSignature } from "@/lib/twilio-webhook";
-import { dialOffice, gatherAndSay, twiml, voiceAgentEnabled } from "@/lib/voice-agent";
+import { dialOffice, gatherAndSay, menuResponse, twiml, voiceAgentEnabled, voiceAgentMode } from "@/lib/voice-agent";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,12 +26,15 @@ export async function POST(req: NextRequest) {
 
   if (!voiceAgentEnabled()) return dialOffice(COMPANY.phone, "en");
 
-  const greeting =
-    "Hello, you have reached Elite BCN Transfers. This is our automated booking assistant, and your words are written down to arrange your transfer. " +
-    "How can I help? Para español, diga español.";
-  return twiml(
-    gatherAndSay(greeting, "en", "/api/twilio/voice/turn?lang=en&n=0") +
-      // Nothing heard at all: try once more through the turn route, which decides when to give up.
-      `<Redirect method="POST">/api/twilio/voice/turn?lang=en&amp;n=0&amp;silent=1</Redirect>`,
-  );
+  // The free-speech AI agent is opt-in. The default is a short keypad menu: it cannot mishear anyone.
+  if (voiceAgentMode() === "ai") {
+    const greeting =
+      "Hello, you have reached Elite BCN Transfers. This is our automated booking assistant, and your words are written down to arrange your transfer. " +
+      "How can I help? Para español, diga español.";
+    return twiml(
+      gatherAndSay(greeting, "en", "/api/twilio/voice/turn?lang=en&n=0") +
+        `<Redirect method="POST">/api/twilio/voice/turn?lang=en&amp;n=0&amp;silent=1</Redirect>`,
+    );
+  }
+  return menuResponse("en", 0);
 }
