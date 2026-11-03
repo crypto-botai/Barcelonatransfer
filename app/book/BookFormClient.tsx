@@ -834,7 +834,7 @@ export default function BookFormClient() {
                     {data.date && data.time && hoursUntilPickup < 1 && (
                       <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400">
                         <AlertCircle size={13} className="mt-0.5 flex-shrink-0" />
-                        <span>Bookings require at least 1 hour notice. For urgent transfers, call <a href="tel:+34635383712" className="underline font-medium">+34 635 383 712</a>.</span>
+                        <span>Bookings require at least 1 hour notice. For urgent transfers, call <a href="tel:+34635383712" className="underline font-medium">+34 635 383 712</a> or <a href="tel:+447455731577" className="underline font-medium">+44 7455 731577</a>.</span>
                       </div>
                     )}
                     {data.date && data.time && hoursUntilPickup >= 1 && hoursUntilPickup < 4 &&

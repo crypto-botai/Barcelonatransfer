@@ -11,7 +11,7 @@
 import type { VoiceLang } from "@/lib/voice-agent";
 import { pickupToUtc } from "@/lib/datetime";
 
-export type Step = "pickup" | "dropoff" | "flight" | "when" | "pax" | "bags" | "name" | "email" | "email_ok" | "confirm" | "change";
+export type Step = "pickup" | "dropoff" | "flight" | "when" | "pax" | "bags" | "name" | "wa" | "wa_ok" | "confirm" | "change";
 
 export interface Slots {
   pickup?: string;
@@ -22,7 +22,8 @@ export interface Slots {
   passengers?: number;
   luggage?: number;
   name?: string;
-  email?: string;
+  /** The caller's WhatsApp number with country code, digits only. The booking's contact until the office gets an email by WhatsApp. */
+  whatsapp?: string;
 }
 
 export interface FlowState {
@@ -104,16 +105,18 @@ export function parseName(speech: string): string | null {
   return n.length >= 2 && n.length <= 60 && /[a-záéíóúñ]/i.test(n) ? n.replace(/\b\w/g, (c) => c.toUpperCase()) : null;
 }
 
-export function parseEmail(speech: string): string | null {
-  const e = speech
+/** A WhatsApp number typed on the keypad, or said digit by digit, with its country code. Digits only, 10 to 15 of them. */
+export function parsePhone(speech: string, digits = ""): string | null {
+  const spoken = speech
     .toLowerCase()
-    .replace(/[.,;]+$/g, "")
-    .replace(/\s+(at|arroba)\s+/g, "@")
-    .replace(/\s+(dot|punto)\s+/g, ".")
-    .replace(/\s+(underscore|guion bajo)\s+/g, "_")
-    .replace(/\s+(dash|hyphen|guion)\s+/g, "-")
-    .replace(/\s+/g, "");
-  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e) ? e : null;
+    .replace(/(?<![\p{L}])(zero|oh|cero)(?![\p{L}])/gu, "0").replace(/(?<![\p{L}])(one|uno|un)(?![\p{L}])/gu, "1")
+    .replace(/(?<![\p{L}])(two|dos)(?![\p{L}])/gu, "2").replace(/(?<![\p{L}])(three|tres)(?![\p{L}])/gu, "3")
+    .replace(/(?<![\p{L}])(four|cuatro)(?![\p{L}])/gu, "4").replace(/(?<![\p{L}])(five|cinco)(?![\p{L}])/gu, "5")
+    .replace(/(?<![\p{L}])(six|seis)(?![\p{L}])/gu, "6").replace(/(?<![\p{L}])(seven|siete)(?![\p{L}])/gu, "7")
+    .replace(/(?<![\p{L}])(eight|ocho)(?![\p{L}])/gu, "8").replace(/(?<![\p{L}])(nine|nueve)(?![\p{L}])/gu, "9");
+  let d = (digits || spoken).replace(/\D/g, "");
+  if (d.startsWith("00")) d = d.slice(2);
+  return d.length >= 10 && d.length <= 15 ? d : null;
 }
 
 /** Which part the caller wants to change. */
@@ -126,16 +129,15 @@ export function parseChange(speech: string): Step | null {
   if (has("passengers?|people|persons?|pax|pasajeros?|personas?")) return "pax";
   if (has("suitcases?|bags?|luggage|maletas?|equipaje")) return "bags";
   if (has("name|nombre")) return "name";
-  if (has("e-?mail|mail|correo")) return "email";
+  if (has("whats ?app|phone|number|mobile|telefono|teléfono|número|numero|móvil|movil")) return "wa";
   if (has("flight|vuelo")) return "flight";
   return null;
 }
 
 // ─── What is said ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-/** An address or email read aloud: "ana dot ruiz at gmail dot com". */
-export const emailAloud = (e: string, lang: VoiceLang) =>
-  e.replace(/@/g, lang === "es" ? " arroba " : " at ").replace(/\./g, lang === "es" ? " punto " : " dot ");
+/** A number read aloud one digit at a time, so that a voice does not say it as "four hundred and forty". */
+export const digitsAloud = (n: string, lang: VoiceLang) => `${lang === "es" ? "más" : "plus"} ${n.split("").join(" ")}`;
 
 const P = {
   en: {
@@ -146,7 +148,8 @@ const P = {
     pax: "How many passengers? Say a number, or press it on the keypad.",
     bags: "How many suitcases? Say a number, or say none.",
     name: "What is your name?",
-    email: "Please say your email address slowly, like john dot smith at gmail dot com.",
+    wa: "Now please type your WhatsApp number on the keypad, with the country code, then press hash. For example, for a UK number, 4 4, then the number without the first zero.",
+    waShort: "Sorry, that number looks too short. Please type it with the country code, then press hash.",
     change: "What would you like to change? Say pickup, destination, time, passengers or name.",
     again: "Sorry, I did not catch that. ",
     num: "Sorry, please say just a number. ",
@@ -163,7 +166,8 @@ const P = {
     pax: "¿Cuántos pasajeros? Diga un número o púlselo en el teclado.",
     bags: "¿Cuántas maletas? Diga un número, o diga ninguna.",
     name: "¿Cómo se llama?",
-    email: "Diga su correo electrónico despacio, por ejemplo juan punto perez arroba gmail punto com.",
+    wa: "Ahora escriba su número de WhatsApp en el teclado, con el prefijo del país, y pulse almohadilla. Por ejemplo, para España, 3 4 y después el número.",
+    waShort: "Perdone, ese número es demasiado corto. Escríbalo con el prefijo del país y pulse almohadilla.",
     change: "¿Qué quiere cambiar? Diga recogida, destino, hora, pasajeros o nombre.",
     again: "Perdone, no le he entendido. ",
     num: "Perdone, diga solo un número. ",
@@ -175,7 +179,7 @@ const P = {
 } as const;
 
 export function prompt(step: Step, lang: VoiceLang): string {
-  if (step === "email_ok" || step === "confirm") return "";
+  if (step === "wa_ok" || step === "confirm") return "";
   return P[lang][step];
 }
 
@@ -189,13 +193,15 @@ export function confirmText(s: Slots, lang: VoiceLang): string {
     : `Let me check. Pickup at ${s.pickup}, going to ${s.dropoff}, on ${when}, ${s.passengers} passengers, under the name ${s.name}. Press 1 or say yes to book, or press 2 to change something.`;
 }
 
-export const emailOkText = (email: string, lang: VoiceLang) =>
-  lang === "es" ? `He entendido ${emailAloud(email, lang)}. ¿Es correcto? Pulse 1 para sí o 2 para no.` : `I heard ${emailAloud(email, lang)}. Is that correct? Press 1 for yes or 2 for no.`;
+export const waOkText = (n: string, lang: VoiceLang) =>
+  lang === "es" ? `He entendido ${digitsAloud(n, lang)}. ¿Es correcto? Pulse 1 para sí o 2 para no.` : `I heard ${digitsAloud(n, lang)}. Is that correct? Press 1 for yes or 2 for no.`;
 
 /** What the Gather should accept for this step. */
-export function gatherFor(step: Step): { digits: number } {
+/** `digits` is how many keys end the answer on their own; 0 means none, and `hash` means the caller ends a long number with #. */
+export function gatherFor(step: Step): { digits: number; hash?: boolean } {
   if (step === "pax" || step === "bags") return { digits: 2 };
-  if (step === "email_ok" || step === "confirm") return { digits: 1 };
+  if (step === "wa_ok" || step === "confirm") return { digits: 1 };
+  if (step === "wa") return { digits: 15, hash: true };
   return { digits: 0 };
 }
 
@@ -210,9 +216,9 @@ function nextAfter(step: Step, s: Slots): Step {
     case "when": return "pax";
     case "pax": return "bags";
     case "bags": return "name";
-    case "name": return "email";
-    case "email": return "email_ok";
-    case "email_ok": return "confirm";
+    case "name": return "wa";
+    case "wa": return "wa_ok";
+    case "wa_ok": return "confirm";
     default: return "confirm";
   }
 }
@@ -240,13 +246,13 @@ export function step(state: FlowState, speech: string, digits = ""): Reply {
   const fail = (lead: string): Reply => {
     const fails = state.fails + 1;
     if (fails >= MAX_FAILS) return { state: { ...state, fails }, say: P[lang].handoff, handoff: true };
-    return { state: { ...state, fails }, say: lead + (prompt(state.step, lang) || (state.step === "email_ok" ? emailOkText(s.email ?? "", lang) : confirmText(s, lang))) };
+    return { state: { ...state, fails }, say: lead + (prompt(state.step, lang) || (state.step === "wa_ok" ? waOkText(s.whatsapp ?? "", lang) : confirmText(s, lang))) };
   };
   const go = (slots: Slots, from: Step = state.step): Reply => {
-    // After a change, go straight back to the confirmation. A changed email is still read back first.
-    const to: Step = from === "email" ? "email_ok" : state.back ? "confirm" : nextAfter(from, slots);
+    // After a change, go straight back to the confirmation. A changed number is still read back first.
+    const to: Step = from === "wa" ? "wa_ok" : state.back ? "confirm" : nextAfter(from, slots);
     const ns: FlowState = { ...state, slots, step: to, fails: 0, back: to === "confirm" ? false : state.back };
-    return { state: ns, say: to === "confirm" ? confirmText(slots, lang) : to === "email_ok" ? emailOkText(slots.email ?? "", lang) : prompt(to, lang) };
+    return { state: ns, say: to === "confirm" ? confirmText(slots, lang) : to === "wa_ok" ? waOkText(slots.whatsapp ?? "", lang) : prompt(to, lang) };
   };
 
   const text = speech.trim();
@@ -280,14 +286,14 @@ export function step(state: FlowState, speech: string, digits = ""): Reply {
       const n = parseName(text);
       return n ? go({ ...s, name: n }) : fail(P[lang].again);
     }
-    case "email": {
-      const e = parseEmail(text);
-      return e ? go({ ...s, email: e }) : fail(P[lang].again);
+    case "wa": {
+      const n = parsePhone(text, digits);
+      return n ? go({ ...s, whatsapp: n }) : fail(P[lang].waShort);
     }
-    case "email_ok": {
+    case "wa_ok": {
       const yn = parseYesNo(text, digits);
       if (yn === true) return go(s);
-      if (yn === false) return { state: { ...state, step: "email", fails: 0 }, say: P[lang].email };
+      if (yn === false) return { state: { ...state, step: "wa", fails: 0 }, say: P[lang].wa };
       return fail(P[lang].again);
     }
     case "confirm": {

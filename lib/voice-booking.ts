@@ -10,6 +10,12 @@ import { sendSms } from "@/lib/sms";
 import { notifyAdmin } from "@/lib/whatsapp";
 import { say, spokenToEmail, twiml, type VoiceLang } from "@/lib/voice-agent";
 
+/**
+ * A phone booking has no email: the office asks for it on WhatsApp afterwards. The booking record needs an address, so it gets one
+ * on the reserved .invalid domain, which can never receive mail or be mistaken for a real one.
+ */
+const noEmail = (phone: string) => `phone-${phone.replace(/\D/g, "")}@no-email.invalid`;
+
 const FAILED = {
   en: "I could not finish that booking myself. A colleague will call you back on this number shortly. Thank you for calling.",
   es: "No he podido terminar la reserva yo mismo. Un compañero le llamará a este número en breve. Gracias por llamar.",
@@ -25,7 +31,7 @@ function spellOut(ref: string, lang: VoiceLang): string {
 export async function bookByPhone(draft: ChatBookingDraft, ctx: { callSid: string; from: string; lang: VoiceLang }): Promise<Response> {
   const { callSid, from, lang } = ctx;
   const result = await createBookingFromChat(
-    { ...draft, phone: draft.phone || from, email: spokenToEmail(draft.email || "") },
+    { ...draft, phone: draft.phone || from, email: spokenToEmail(draft.email || "") || noEmail(draft.phone || from) },
     callSid,
     "phone",
   ).catch((e) => ({ success: false as const, error: (e as Error)?.message }));
@@ -40,7 +46,8 @@ export async function bookByPhone(draft: ChatBookingDraft, ctx: { callSid: strin
   const amount = Math.round(result.amount ?? 0);
   const link = result.paymentUrl?.startsWith("/") ? `https://www.elitebcn.info${result.paymentUrl}` : result.paymentUrl;
   await sendSms(draft.phone || from, `Elite BCN: booking ${result.reference} for EUR ${amount}. Pay securely to confirm: ${link}`, { bookingId: result.bookingId }).catch(() => {});
-  await notifyAdmin(`Phone booking ${result.reference}: ${draft.name}, ${draft.pickup} → ${draft.dropoff}, ${draft.date} ${draft.time}, EUR ${amount}. Awaiting payment.`).catch(() => {});
+  await notifyAdmin(`Phone booking ${result.reference}: ${draft.name}, ${draft.pickup} → ${draft.dropoff}, ${draft.date} ${draft.time}, EUR ${amount}. Awaiting payment.${draft.email ? "" : `
+No email yet: ask for it on WhatsApp ${draft.phone || from}.`}`).catch(() => {});
 
   const lead = lang === "es" ? "Hecho. Su referencia es " : "Done. Your booking reference is ";
   const tail = lang === "es"

@@ -190,11 +190,12 @@ export async function saveState(callSid: string, state: FlowState): Promise<void
 }
 
 /** Listens for one answer, by voice or by keypad, then posts it to `action`. */
-export function gatherStep(text: string, lang: VoiceLang, action: string, digits: number): string {
+export function gatherStep(text: string, lang: VoiceLang, action: string, digits: number, hash = false): string {
   const v = VOICES[lang];
   const hints = "Barcelona, El Prat, airport, Terminal 1, Terminal 2, Sants, Tarragona, Sitges, Andorra, Girona, Montserrat, PortAventura, hotel, tomorrow, today, yes, no";
   const input = digits ? "speech dtmf" : "speech";
-  const dtmf = digits ? ` numDigits="${digits}"` : "";
+  // A long number is ended by the caller pressing #, not by counting keys.
+  const dtmf = hash ? ' finishOnKey="#"' : digits ? ` numDigits="${digits}"` : "";
   return (
     `<Gather input="${input}"${dtmf} language="${v.gather}" timeout="8" speechTimeout="auto" speechModel="phone_call" enhanced="true" hints="${esc(hints)}" ` +
     `action="${esc(action)}" method="POST">${say(text, lang)}</Gather>`

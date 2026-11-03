@@ -30,8 +30,10 @@ export const metadata: Metadata = {
 
 const CONTACT_ITEMS = [
   { icon: Phone,         label: "Phone",    value: "+34 635 383 712",  href: "tel:+34635383712",               external: false },
+  { icon: Phone,         label: "Phone (UK)", value: "+44 7455 731577", href: "tel:+447455731577",             external: false },
   { icon: Mail,          label: "Email",    value: COMPANY.email,      href: `mailto:${COMPANY.email}`,        external: false },
   { icon: MessageCircle, label: "WhatsApp", value: "Chat with us now", href: "https://wa.me/34635383712",      external: true },
+  { icon: MessageCircle, label: "WhatsApp (UK)", value: "+44 7455 731577", href: "https://wa.me/447455731577",  external: true },
   { icon: MapPin,        label: "Location", value: "Barcelona, Spain", href: "https://maps.google.com/?q=Barcelona,Spain", external: true },
 ];
 

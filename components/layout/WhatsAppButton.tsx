@@ -90,6 +90,24 @@ export default function WhatsAppButton() {
               <Phone size={14} />
               Call +34 635 383 712
             </a>
+            <a
+              href="https://wa.me/447455731577"
+              target="_blank"
+              rel="noreferrer"
+              style={{ touchAction: "manipulation" }}
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-white/10 text-dark-300 text-sm hover:text-white hover:border-white/20 transition-colors"
+            >
+              <MessageCircle size={14} />
+              WhatsApp +44 7455 731577
+            </a>
+            <a
+              href="tel:+447455731577"
+              style={{ touchAction: "manipulation" }}
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-white/10 text-dark-300 text-sm hover:text-white hover:border-white/20 transition-colors"
+            >
+              <Phone size={14} />
+              Call +44 7455 731577 (book by phone)
+            </a>
           </div>
         </div>
       )}

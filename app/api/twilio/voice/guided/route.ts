@@ -19,7 +19,7 @@ const ACTION = "/api/twilio/voice/guided";
 /** Says `text`, listens for the answer to the step the state is now at, and comes back here on silence. */
 function ask(state: FlowState, text: string): Response {
   return twiml(
-    gatherStep(text, state.lang, ACTION, gatherFor(state.step).digits) +
+    gatherStep(text, state.lang, ACTION, gatherFor(state.step).digits, !!gatherFor(state.step).hash) +
       `<Redirect method="POST">${ACTION}</Redirect>`,
   );
 }
@@ -72,7 +72,8 @@ export async function POST(req: NextRequest) {
   if (reply.handoff) {
     const s = reply.state.slots;
     await notifyAdmin(
-      `Phone agent handed a call to the office.\nFrom: ${from}\nSo far: ${s.name ?? "?"} · ${s.pickup ?? "?"} → ${s.dropoff ?? "?"} · ${s.date ?? "?"} ${s.time ?? ""} · ${s.passengers ?? "?"} pax`,
+      `Phone agent handed a call to the office.\nFrom: ${from}\nSo far: ${s.name ?? "?"} · ${s.pickup ?? "?"} → ${s.dropoff ?? "?"} · ${s.date ?? "?"} ${s.time ?? ""} · ${s.passengers ?? "?"} pax
+WhatsApp: ${s.whatsapp ? `+${s.whatsapp}` : "?"}`,
     ).catch(() => {});
     return dialOffice(COMPANY.phone, reply.state.lang, reply.say);
   }
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
     const s = reply.state.slots;
     return bookByPhone(
       {
-        name: s.name ?? "", phone: from, email: s.email ?? "", pickup: s.pickup ?? "", dropoff: s.dropoff ?? "",
+        name: s.name ?? "", phone: s.whatsapp ? `+${s.whatsapp}` : from, email: "", pickup: s.pickup ?? "", dropoff: s.dropoff ?? "",
         date: s.date ?? "", time: s.time ?? "", passengers: s.passengers ?? 1, luggage: s.luggage ?? 0, flightNumber: s.flight ?? null,
       },
       { callSid, from, lang: reply.state.lang },

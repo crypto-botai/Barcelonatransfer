@@ -9,6 +9,10 @@ export const COMPANY = {
   phone:        "+34635383712",
   phoneDisplay: "+34 635 383 712",
   whatsapp:     "https://wa.me/34635383712",
+  /** The UK number: calls are answered by the phone booking agent, and the same number takes WhatsApp. Added beside the Spanish one, not instead of it. */
+  phoneUk:        "+447455731577",
+  phoneUkDisplay: "+44 7455 731577",
+  whatsappUk:     "https://wa.me/447455731577",
   /**
    * The mailbox that RECEIVES mail.
    * Gmail is the working fallback until bookings@elitebcn.info has verified MX records.

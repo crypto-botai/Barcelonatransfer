@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { BASE_URL } from "@/lib/seo";
 import { twilioSignature } from "@/lib/twilio-webhook";
 import {
-  applyWhen, cleanPlace, confirmText, initialState, parseChange, parseCount, parseEmail, parseFlight, parseName, parseYesNo, step,
+  applyWhen, cleanPlace, confirmText, initialState, parseChange, parseCount, parsePhone, parseFlight, parseName, parseYesNo, step,
   type FlowState,
 } from "@/lib/voice-flow";
 
@@ -37,8 +37,11 @@ describe("reading answers", () => {
     expect(parseFlight("BA 478")).toBe("BA478");
     expect(parseFlight("no flight")).toBe("skip");
     expect(parseName("my name is ana ruiz")).toBe("Ana Ruiz");
-    expect(parseEmail("john dot smith at gmail dot com")).toBe("john.smith@gmail.com");
-    expect(parseEmail("not an email")).toBeNull();
+    expect(parsePhone("", "447455731577")).toBe("447455731577");
+    expect(parsePhone("", "+34 635 383 712")).toBe("34635383712");
+    expect(parsePhone("", "0034635383712")).toBe("34635383712");
+    expect(parsePhone("four four seven four five five seven three one five seven seven")).toBe("447455731577");
+    expect(parsePhone("", "635383712")).toBeNull();
   });
   it("finds which part the caller wants changed", () => {
     expect(parseChange("the pickup")).toBe("pickup");
@@ -74,10 +77,11 @@ describe("the question flow", () => {
     r = step(r.state, "", "3");
     expect(r.state.slots.luggage).toBe(3);
     r = step(r.state, "Ana Ruiz");
-    expect(r.state.step).toBe("email");
-    r = step(r.state, "ana at gmail dot com");
-    expect(r.state.step).toBe("email_ok");
-    expect(r.say).toContain("ana at gmail dot com");
+    expect(r.state.step).toBe("wa");
+    expect(r.say).toContain("WhatsApp");
+    r = step(r.state, "", "34600111222");
+    expect(r.state.step).toBe("wa_ok");
+    expect(r.say).toContain("plus 3 4 6 0 0");
     r = step(r.state, "", "1");
     expect(r.state.step).toBe("confirm");
     expect(r.say).toContain("Hotel Arts");
@@ -85,12 +89,13 @@ describe("the question flow", () => {
     expect(r.say).toContain("2 passengers");
     expect(step(r.state, "yes").book).toBe(true);
   });
-  it("a wrong email read-back asks for it again", () => {
-    const st: FlowState = { ...initialState(), step: "email_ok", slots: { email: "ana@gmail.com" } };
-    expect(step(st, "", "2").state.step).toBe("email");
+  it("a wrong number read-back asks for it again, and a short number is refused", () => {
+    const st: FlowState = { ...initialState(), step: "wa_ok", slots: { whatsapp: "34600111222" } };
+    expect(step(st, "", "2").state.step).toBe("wa");
+    expect(step({ ...initialState(), step: "wa" }, "", "635383712").say).toContain("too short");
   });
   it("changing one answer comes straight back to the confirmation", () => {
-    const slots = { pickup: "A", dropoff: "B", date: "2099-11-05", time: "10:00", passengers: 2, luggage: 1, name: "Ana", email: "a@b.co" };
+    const slots = { pickup: "A", dropoff: "B", date: "2099-11-05", time: "10:00", passengers: 2, luggage: 1, name: "Ana", whatsapp: "34600111222" };
     let r = step({ ...initialState(), step: "confirm", slots }, "no");
     expect(r.state.step).toBe("change");
     r = step(r.state, "the passengers");
@@ -180,12 +185,12 @@ describe("the guided call route", () => {
     expect(xml).toContain("How many passengers");
   });
   it("creates the booking only after the caller confirms", async () => {
-    const slots = { pickup: "A", dropoff: "B", date: "2099-11-05", time: "10:30", passengers: 2, luggage: 1, name: "Ana", email: "a@b.co", flight: null };
+    const slots = { pickup: "A", dropoff: "B", date: "2099-11-05", time: "10:30", passengers: 2, luggage: 1, name: "Ana", whatsapp: "34600111222", flight: null };
     mocks.findFirst.mockResolvedValue({ details: { state: { lang: "en", step: "confirm", slots, fails: 0 } } });
     mocks.book.mockResolvedValue(new Response("<Response/>"));
     await guided(call({ CallSid: "CA1", From: FROM, Digits: "1" }));
     expect(mocks.book).toHaveBeenCalledTimes(1);
-    expect(mocks.book.mock.calls[0][0]).toMatchObject({ name: "Ana", phone: FROM, pickup: "A", dropoff: "B", passengers: 2, email: "a@b.co" });
+    expect(mocks.book.mock.calls[0][0]).toMatchObject({ name: "Ana", phone: "+34600111222", pickup: "A", dropoff: "B", passengers: 2 });
     expect(mocks.book.mock.calls[0][1]).toMatchObject({ callSid: "CA1", lang: "en" });
   });
   it("puts the caller through to the office when they ask for an agent, or when the model is unavailable for the date", async () => {
