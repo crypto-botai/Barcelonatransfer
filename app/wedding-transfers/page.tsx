@@ -64,7 +64,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "What happens if the ceremony or the photographs run late?",
-    a: "Tell the driver or message us on WhatsApp. Time past the booked hours is quoted before it is charged, never added afterwards. We do not publish an overtime rate because it depends on the car and on what is booked after you, so we agree it with you on the day.",
+    a: "Tell the driver or message us on WhatsApp. Extra time is charged at the same hourly rate as the car you booked, with no overtime surcharge.",
   },
   {
     q: "Do you drive to venues outside Barcelona?",
@@ -76,7 +76,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Are you licensed, and do you decorate the cars?",
-    a: "We are a licensed VTC operator and every car is valeted before each journey. We have not published a decoration service. If you want ribbons or flowers fitted, tell us what you have in mind when you book and we will say yes or no before you pay.",
+    a: "We are a licensed VTC operator and every car is valeted before each journey. We do not offer car decoration, so ribbons and flowers are not part of the service.",
   },
   {
     q: "How far ahead should we book?",
