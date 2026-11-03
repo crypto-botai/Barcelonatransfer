@@ -17,9 +17,13 @@ export function voiceAgentEnabled(): boolean {
   return process.env.VOICE_AGENT_ENABLED === "true";
 }
 
-/** "menu" (default): keypad menu, no AI. "ai": the free-speech booking assistant. */
-export function voiceAgentMode(): "menu" | "ai" {
-  return process.env.VOICE_AGENT_MODE === "ai" ? "ai" : "menu";
+/**
+ * "guided" (default): fixed questions in order, answers read by code. "menu": keypad menu, no AI. "ai": the free-speech
+ * assistant that lets a model run the whole conversation (it misheard callers, so it is opt-in).
+ */
+export function voiceAgentMode(): "guided" | "menu" | "ai" {
+  const m = process.env.VOICE_AGENT_MODE;
+  return m === "menu" || m === "ai" ? m : "guided";
 }
 
 /** The most turns a call may take before it is handed to a person. Bounds cost on a call that goes round in circles. */
@@ -159,3 +163,36 @@ export function menuResponse(lang: VoiceLang, attempt: number): Response {
 }
 
 const OFFICE_PHONE = "+34635383712";
+
+// ─── The guided flow's place in the call ────────────────────────────────────────────────────────────────────────────────
+
+import type { FlowState } from "@/lib/voice-flow";
+
+/** The latest saved state of this call, or null on its first turn. */
+export async function loadState(callSid: string): Promise<FlowState | null> {
+  const row = await prisma.activityLog.findFirst({
+    where: { action: "VOICE_STATE", details: { path: ["callSid"], equals: callSid } },
+    orderBy: { createdAt: "desc" },
+    select: { details: true },
+  });
+  const d = row?.details as { state?: FlowState } | null;
+  return d?.state ?? null;
+}
+
+export async function saveState(callSid: string, state: FlowState): Promise<void> {
+  await prisma.activityLog
+    .create({ data: { action: "VOICE_STATE", entity: "Call", entityId: null, details: { callSid, state: state as unknown as object } } })
+    .catch((e) => console.error("[voice] could not save state:", (e as Error)?.message));
+}
+
+/** Listens for one answer, by voice or by keypad, then posts it to `action`. */
+export function gatherStep(text: string, lang: VoiceLang, action: string, digits: number): string {
+  const v = VOICES[lang];
+  const hints = "Barcelona, El Prat, airport, Terminal 1, Terminal 2, Sants, Tarragona, Sitges, Andorra, Girona, Montserrat, PortAventura, hotel, tomorrow, today, yes, no";
+  const input = digits ? "speech dtmf" : "speech";
+  const dtmf = digits ? ` numDigits="${digits}"` : "";
+  return (
+    `<Gather input="${input}"${dtmf} language="${v.gather}" speechTimeout="auto" speechModel="phone_call" enhanced="true" hints="${esc(hints)}" ` +
+    `action="${esc(action)}" method="POST">${say(text, lang)}</Gather>`
+  );
+}

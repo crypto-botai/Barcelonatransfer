@@ -76,7 +76,14 @@ describe("the incoming call", () => {
     expect(xml).toContain("<Dial>+34635383712</Dial>");
     expect(xml).not.toContain("<Gather");
   });
-  it("plays the keypad menu by default, with no AI", async () => {
+  it("starts the guided booking by default", async () => {
+    const xml = await text(await inbound(call("/api/twilio/voice", { CallSid: "CA1", From: FROM })));
+    expect(xml).toContain('input="speech"');
+    expect(xml).toContain("where should we pick you up");
+    expect(xml).toContain("/api/twilio/voice/guided");
+  });
+  it("plays the keypad menu when asked to, with no AI", async () => {
+    vi.stubEnv("VOICE_AGENT_MODE", "menu");
     const xml = await text(await inbound(call("/api/twilio/voice", { CallSid: "CA1", From: FROM })));
     expect(xml).toContain('input="dtmf"');
     expect(xml).toContain("press 1");

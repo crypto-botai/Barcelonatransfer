@@ -3,11 +3,10 @@ import { COMPANY } from "@/lib/company-facts";
 import { candidateWebhookUrls, formParams, validTwilioSignature } from "@/lib/twilio-webhook";
 import { getSupportReply } from "@/lib/ai/agents/support";
 import { isBudgetAvailable } from "@/lib/ai/budget";
-import { createBookingFromChat } from "@/lib/ai/bookingFromChat";
-import { sendSms } from "@/lib/sms";
+import { bookByPhone } from "@/lib/voice-booking";
 import { notifyAdmin } from "@/lib/whatsapp";
 import {
-  MAX_TURNS, dialOffice, forSpeech, gatherAndSay, loadTurns, saveTurn, say, spokenToEmail, splitBooking, twiml,
+  MAX_TURNS, dialOffice, forSpeech, gatherAndSay, loadTurns, saveTurn, say, splitBooking, twiml,
   voiceAgentEnabled, wantsHuman, wantsSpanish, type VoiceLang,
 } from "@/lib/voice-agent";
 
@@ -41,13 +40,6 @@ const T = {
     bye: "Gracias por llamar a Elite BCN Transfers. Adiós.",
   },
 } as const;
-
-/** "Your booking reference is E B C 1 2 3": letters and digits one at a time, which is how a reference is heard correctly. */
-function spellOut(ref: string, lang: VoiceLang): string {
-  const v = lang === "es" ? "Polly.Lucia-Neural" : "Polly.Amy-Neural";
-  const l = lang === "es" ? "es-ES" : "en-GB";
-  return `<Say voice="${v}" language="${l}"><say-as interpret-as="characters">${ref.replace(/[^A-Za-z0-9]/g, "")}</say-as></Say>`;
-}
 
 export async function POST(req: NextRequest) {
   const params = await formParams(req).catch(() => ({} as Record<string, string>));
@@ -108,34 +100,5 @@ export async function POST(req: NextRequest) {
     return twiml(gatherAndSay(forSpeech(spoken) || T[lang].noHear, lang, next(lang, n + 1)) + again(lang, n + 1));
   }
 
-  // The caller's own number is the contact number unless they gave another one.
-  const result = await createBookingFromChat(
-    { ...draft, phone: draft.phone || from, email: spokenToEmail(draft.email || "") },
-    callSid,
-    "phone",
-  ).catch((e) => ({ success: false as const, error: (e as Error)?.message }));
-
-  if (!result.success) {
-    await notifyAdmin(
-      `Phone agent could not create a booking.\nCall: ${callSid}\nFrom: ${from}\nCaller: ${draft.name} · ${draft.pickup} → ${draft.dropoff} · ${draft.date} ${draft.time}\nReason: ${result.error ?? "unknown"}\nPlease call them back.`,
-    ).catch(() => {});
-    return twiml(say(T[lang].failed, lang));
-  }
-
-  const amount = Math.round(result.amount ?? 0);
-  const link = result.paymentUrl?.startsWith("/") ? `https://www.elitebcn.info${result.paymentUrl}` : result.paymentUrl;
-  await sendSms(draft.phone || from, `Elite BCN: booking ${result.reference} for EUR ${amount}. Pay securely to confirm: ${link}`, { bookingId: result.bookingId }).catch(() => {});
-  await notifyAdmin(`Phone booking ${result.reference}: ${draft.name}, ${draft.pickup} → ${draft.dropoff}, ${draft.date} ${draft.time}, EUR ${amount}. Awaiting payment.`).catch(() => {});
-
-  const lead = lang === "es"
-    ? `Hecho. Su referencia es `
-    : `Done. Your booking reference is `;
-  const tail = lang === "es"
-    ? `. El precio es ${amount} euros, y le he enviado el enlace de pago por mensaje de texto. La reserva se confirma cuando pague.`
-    : `. The price is ${amount} euros, and I have sent the payment link by text message. The booking is confirmed once you pay.`;
-  return twiml(
-    say(lead, lang) + spellOut(result.reference ?? "", lang) + say(tail, lang) +
-      gatherAndSay(T[lang].anythingElse, lang, next(lang, n + 1)) +
-      say(T[lang].bye, lang) + `<Hangup/>`,
-  );
+  return bookByPhone(draft, { callSid, from, lang });
 }

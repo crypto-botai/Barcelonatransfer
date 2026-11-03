@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { COMPANY } from "@/lib/company-facts";
 import { candidateWebhookUrls, formParams, validTwilioSignature } from "@/lib/twilio-webhook";
-import { dialOffice, gatherAndSay, menuResponse, twiml, voiceAgentEnabled, voiceAgentMode } from "@/lib/voice-agent";
+import { dialOffice, gatherAndSay, gatherStep, menuResponse, twiml, voiceAgentEnabled, voiceAgentMode } from "@/lib/voice-agent";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,8 +26,18 @@ export async function POST(req: NextRequest) {
 
   if (!voiceAgentEnabled()) return dialOffice(COMPANY.phone, "en");
 
-  // The free-speech AI agent is opt-in. The default is a short keypad menu: it cannot mishear anyone.
-  if (voiceAgentMode() === "ai") {
+  const mode = voiceAgentMode();
+
+  // The default: fixed questions in order, answers read by code. See lib/voice-flow.ts.
+  if (mode === "guided") {
+    const greeting =
+      "Hello, you have reached Elite BCN Transfers. This is our automated booking assistant, and your answers are written down to arrange your transfer. " +
+      "Para español, diga español. If you want a person at any time, say agent. First, where should we pick you up? You can say a hotel, an address, or the airport.";
+    return twiml(gatherStep(greeting, "en", "/api/twilio/voice/guided", 0) + `<Redirect method="POST">/api/twilio/voice/guided</Redirect>`);
+  }
+
+  // The free-speech AI agent is opt-in: a model runs the whole conversation, and it misheard callers.
+  if (mode === "ai") {
     const greeting =
       "Hello, you have reached Elite BCN Transfers. This is our automated booking assistant, and your words are written down to arrange your transfer. " +
       "How can I help? Para español, diga español.";
