@@ -124,6 +124,11 @@ const RELEASES: ReadonlyArray<{ date: string; paths: readonly string[] }> = [
     ],
   },
   {
+    // The wedding transport service page.
+    date: "2026-11-03",
+    paths: ["/wedding-transfers"],
+  },
+  {
     // The return leg out of Andorra, which is the one journey on the site that
     // costs more in one direction than the other and had no page saying so.
     date: "2026-11-02",
@@ -204,6 +209,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // ── Service pages ──────────────────────────────────────────────
     { url: `${BASE}/vip-transportation`,  lastModified: lastMod("/vip-transportation"), changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/wedding-transfers`,   lastModified: lastMod("/wedding-transfers"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/day-tours`,           lastModified: lastMod("/day-tours"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE}/hotel-transfers`,     lastModified: lastMod("/hotel-transfers"), changeFrequency: "monthly", priority: 0.85 },
 
