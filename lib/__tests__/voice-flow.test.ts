@@ -105,14 +105,18 @@ describe("the question flow", () => {
     expect(applyWhen(st, "2020-01-01", "10:00").say).toContain("already passed");
     const first = applyWhen(st, null, null);
     expect(first.handoff).toBeUndefined();
-    expect(applyWhen(first.state, null, null).handoff).toBe(true);
+    const second = applyWhen(first.state, null, null);
+    expect(second.handoff).toBeUndefined();
+    expect(applyWhen(second.state, null, null).handoff).toBe(true);
   });
   it("two failed answers in a row put the caller through to a person", () => {
     const st: FlowState = { ...initialState(), step: "pax" };
     const a = step(st, "banana");
     expect(a.handoff).toBeUndefined();
     expect(a.say).toContain("number");
-    expect(step(a.state, "apple").handoff).toBe(true);
+    const b = step(a.state, "apple");
+    expect(b.handoff).toBeUndefined();
+    expect(step(b.state, "pear").handoff).toBe(true);
   });
   it("the confirmation says what will be booked", () => {
     expect(confirmText({ pickup: "A", dropoff: "B", date: "2099-11-05", time: "10:00", passengers: 2, name: "Ana" }, "en")).toContain("Press 1");
@@ -185,10 +189,10 @@ describe("the guided call route", () => {
     expect(mocks.book.mock.calls[0][1]).toMatchObject({ callSid: "CA1", lang: "en" });
   });
   it("puts the caller through to the office when they ask for an agent, or when the model is unavailable for the date", async () => {
-    expect(await (await guided(call({ CallSid: "CA1", From: FROM, SpeechResult: "I want an agent" }))).text()).toContain("<Dial>+34635383712</Dial>");
+    expect(await (await guided(call({ CallSid: "CA1", From: FROM, SpeechResult: "I want an agent" }))).text()).toContain("<Dial timeout=\"25\">+34635383712</Dial>");
     mocks.findFirst.mockResolvedValue({ details: { state: { lang: "en", step: "when", slots: {}, fails: 0 } } });
     mocks.budget.mockResolvedValue(false);
-    expect(await (await guided(call({ CallSid: "CA1", From: FROM, SpeechResult: "tomorrow at ten" }))).text()).toContain("<Dial>");
+    expect(await (await guided(call({ CallSid: "CA1", From: FROM, SpeechResult: "tomorrow at ten" }))).text()).toContain("<Dial");
     expect(mocks.notify).toHaveBeenCalled();
   });
   it("switches to Spanish on the first question", async () => {

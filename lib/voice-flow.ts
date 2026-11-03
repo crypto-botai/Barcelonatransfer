@@ -37,7 +37,7 @@ export interface FlowState {
 
 export const initialState = (): FlowState => ({ lang: "en", step: "pickup", slots: {}, fails: 0 });
 
-export const MAX_FAILS = 2;
+export const MAX_FAILS = 3;
 
 // ─── Reading answers ─────────────────────────────────────────────────────────────────────────────────────────────────────
 

@@ -60,7 +60,11 @@ export function twiml(inner: string): Response {
 
 /** Hands the call to a person. The number is the office's own. */
 export function dialOffice(phone: string, lang: VoiceLang, sentence?: string): Response {
-  return twiml(`${sentence ? say(sentence, lang) : ""}<Dial>${esc(phone)}</Dial>`);
+  const none = lang === "es"
+    ? "Lo siento, nadie puede atender ahora mismo. Por favor, llame de nuevo en unos minutos o reserve en elitebcn punto info. Adiós."
+    : "Sorry, nobody is free right now. Please call again in a few minutes, or book online at elitebcn dot info. Goodbye.";
+  // Dial only carries on to the next verb when nobody answers, so the line after it is for that case alone.
+  return twiml(`${sentence ? say(sentence, lang) : ""}<Dial timeout="25">${esc(phone)}</Dial>${say(none, lang)}<Hangup/>`);
 }
 
 /** The caller asks for a person. */
@@ -192,7 +196,7 @@ export function gatherStep(text: string, lang: VoiceLang, action: string, digits
   const input = digits ? "speech dtmf" : "speech";
   const dtmf = digits ? ` numDigits="${digits}"` : "";
   return (
-    `<Gather input="${input}"${dtmf} language="${v.gather}" speechTimeout="auto" speechModel="phone_call" enhanced="true" hints="${esc(hints)}" ` +
+    `<Gather input="${input}"${dtmf} language="${v.gather}" timeout="8" speechTimeout="auto" speechModel="phone_call" enhanced="true" hints="${esc(hints)}" ` +
     `action="${esc(action)}" method="POST">${say(text, lang)}</Gather>`
   );
 }

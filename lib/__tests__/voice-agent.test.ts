@@ -73,7 +73,7 @@ describe("the incoming call", () => {
   it("puts the caller through to the office while the agent is off", async () => {
     vi.stubEnv("VOICE_AGENT_ENABLED", "");
     const xml = await text(await inbound(call("/api/twilio/voice", { CallSid: "CA1", From: FROM })));
-    expect(xml).toContain("<Dial>+34635383712</Dial>");
+    expect(xml).toContain("<Dial timeout=\"25\">+34635383712</Dial>");
     expect(xml).not.toContain("<Gather");
   });
   it("starts the guided booking by default", async () => {
@@ -114,7 +114,7 @@ describe("the keypad menu", () => {
     expect(await text(await key("1"))).toContain("could not text");
   });
   it("2 puts the caller through to the office", async () => {
-    expect(await text(await key("2"))).toContain("<Dial>+34635383712</Dial>");
+    expect(await text(await key("2"))).toContain("<Dial timeout=\"25\">+34635383712</Dial>");
   });
   it("3 records a message", async () => {
     const xml = await text(await key("3"));
@@ -124,7 +124,7 @@ describe("the keypad menu", () => {
   it("9 switches language, and a wrong or missing key plays the menu again, then goes to the office", async () => {
     expect(await text(await key("9"))).toContain("pulse 1");
     expect(await text(await key("7"))).toContain("<Gather");
-    expect(await text(await key("", "lang=en&n=1"))).toContain("<Dial>");
+    expect(await text(await key("", "lang=en&n=1"))).toContain("<Dial");
   });
 });
 
@@ -149,16 +149,16 @@ describe("a turn", () => {
   });
   it("hands over to the office when the caller asks for a person", async () => {
     const xml = await text(await turn(call(path, { CallSid: "CA1", From: FROM, SpeechResult: "let me talk to a person" })));
-    expect(xml).toContain("<Dial>+34635383712</Dial>");
+    expect(xml).toContain("<Dial timeout=\"25\">+34635383712</Dial>");
     expect(mocks.reply).not.toHaveBeenCalled();
   });
   it("asks again on silence and gives up to a person after two", async () => {
     expect(await text(await turn(call("/api/twilio/voice/turn?lang=en&n=0", { CallSid: "CA1", From: FROM })))).toContain("<Gather");
-    expect(await text(await turn(call("/api/twilio/voice/turn?lang=en&n=2", { CallSid: "CA1", From: FROM })))).toContain("<Dial>");
+    expect(await text(await turn(call("/api/twilio/voice/turn?lang=en&n=2", { CallSid: "CA1", From: FROM })))).toContain("<Dial");
   });
   it("goes to the office when the AI budget is spent", async () => {
     mocks.budget.mockResolvedValue(false);
-    expect(await text(await turn(call(path, { CallSid: "CA1", From: FROM, SpeechResult: "hello" })))).toContain("<Dial>");
+    expect(await text(await turn(call(path, { CallSid: "CA1", From: FROM, SpeechResult: "hello" })))).toContain("<Dial");
   });
   it("speaks the reply and keeps listening", async () => {
     mocks.reply.mockResolvedValue({ reply: "Where would you like to be picked up?", escalate: false });
