@@ -348,7 +348,7 @@ export const VEHICLE_CATALOG: VehicleInfo[] = [
     largeBags: 4,
     mediumBags: 5,
     smallBags: 12,
-    features: ["Captain Seats", "Conference Layout", "Champagne Bar", "4K Screen", "Privacy Glass"],
+    features: ["Captain Seats", "Conference Layout", "Privacy Glass"],
     image: "/fleet/v-class-mercedes.png",
     description: "A mobile luxury lounge — the ultimate group experience. Perfect for VIP transfers and corporate events.",
     badge: "Luxury Minivan",

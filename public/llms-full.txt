@@ -54,7 +54,7 @@ binding one: check both before choosing a vehicle.
 6. Mercedes V-Class — Luxury Minivan
    Passengers: up to 7
    Luggage: 4 large (75 × 50 × 30 cm), 5 medium (65 × 45 × 25 cm), 12 small (55 × 40 × 20 cm)
-   Features: Captain Seats, Conference Layout, Champagne Bar, 4K Screen, Privacy Glass
+   Features: Captain Seats, Conference Layout, Privacy Glass
    A mobile luxury lounge — the ultimate group experience. Perfect for VIP transfers and corporate events.
 
 7. Mercedes Sprinter — Minibus
